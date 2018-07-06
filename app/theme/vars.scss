@@ -1,0 +1,18 @@
+//
+// Pay attention: 
+//    Only put color, opacity, layout related (border, border-radius) here, DO NOT put any "screen size sensitive"
+// vars here !!!
+//
+// ------------------------------------------------------------------------------------------------------
+// Navigation bar
+// ------------------------------------------------------------------------------------------------------
+$NAVI_BAR_BACKGROUND_COLOR: rgb(21, 26, 53);
+
+$NAVI_BAR_TOOLBAR_BUTTON_CLOSE_COLOR: rgb(255, 97, 87);
+$NAVI_BAR_TOOLBAR_BUTTON_MINIMIZE_COLOR: rgb(255, 190, 46);
+$NAVI_BAR_TOOLBAR_BUTTON_FULLSCREEN_COLOR: rgb(40, 201, 63);
+
+$NAVI_BAR_ITEM_FONT_COLOR: rgb(60, 65, 87);
+$NAVI_BAR_ITEM_FONT_ACTIVE_COLOR: white;
+$NAVI_BAR_ITEM_ICON_COLOR: rgb(60, 65, 87);
+$NAVI_BAR_ITEM_ICON_ACTIVE_COLOR: rgb(6, 121, 170);

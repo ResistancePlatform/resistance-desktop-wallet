@@ -1,0 +1,10 @@
+@import "../theme/full-screen.scss";
+@import "../theme/h-box-layout.scss";
+@import "../theme/v-box-layout.scss";
+
+.overviewContainer {
+    @include full-screen();
+}
+
+.overviewContent {
+}

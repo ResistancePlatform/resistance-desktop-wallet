@@ -1,0 +1,60 @@
+@import "../theme/vars.scss";
+
+@mixin navibarToolbarButton {
+  display: inline-block;
+  
+  width: 0.8rem;
+  height: 0.8rem;
+
+  margin-right: 1rem;
+  border-radius: 20rem;
+
+  cursor: pointer;
+}
+
+.navibarContainer {
+  background-color: $NAVI_BAR_BACKGROUND_COLOR;
+  padding: 0.8rem;
+
+  width: 15rem;
+
+  .navibarToolbarContainer {
+    margin-bottom: 2rem;
+  }
+
+  .closeButton {
+    @include navibarToolbarButton();
+    background-color: $NAVI_BAR_TOOLBAR_BUTTON_CLOSE_COLOR;
+  }
+
+  .minimizeButton {
+    @include navibarToolbarButton();
+    background-color: $NAVI_BAR_TOOLBAR_BUTTON_MINIMIZE_COLOR;
+  }
+
+  .fullScreenButton {
+    @include navibarToolbarButton();
+    background-color: $NAVI_BAR_TOOLBAR_BUTTON_FULLSCREEN_COLOR;
+  }
+  
+}
+
+.naviVBarItem {
+  padding: 0.8rem 0;
+
+  span {
+    margin-right: 0.8rem;
+  }
+
+  a {
+    text-decoration: none;
+    color: $NAVI_BAR_ITEM_FONT_COLOR;
+
+    .active {
+      color: $NAVI_BAR_ITEM_FONT_ACTIVE_COLOR;
+    }
+
+  }
+
+}
+
