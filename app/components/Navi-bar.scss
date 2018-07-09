@@ -16,7 +16,8 @@
   background-color: $NAVI_BAR_BACKGROUND_COLOR;
   padding: 0.8rem;
 
-  width: 15rem;
+  min-width: 10rem;
+  width: 10rem;
 
   .navibarToolbarContainer {
     margin-bottom: 2rem;

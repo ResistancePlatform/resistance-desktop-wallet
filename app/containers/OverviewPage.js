@@ -22,7 +22,7 @@ class Overview extends Component<Props> {
 
   componentDidMount() {
     appStore.dispatch(OverviewActions.loadBalances())
-    // appStore.dispatch(OverviewActions.loadTransactionList())
+    appStore.dispatch(OverviewActions.loadTransactionList())
   }
 
   render() {
@@ -32,7 +32,7 @@ class Overview extends Component<Props> {
 
         <div className={[HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
           <Balance balances={this.props.overview.balances} />
-          <TransactionList />
+          <TransactionList transactionList={this.props.overview.transactionList} />
         </div>
       </div>
     )

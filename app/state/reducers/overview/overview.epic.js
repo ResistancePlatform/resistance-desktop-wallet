@@ -21,7 +21,7 @@ const loadBalancesEpic = (action$: ActionsObservable<AppAction>) => action$
     // .do(action => logger.debug(`${epicInstanceName}`, `loadTopListEpic`, `action:`, ConsoleTheme.testing, action))
     .pipe(
         tap((action: AppAction) => console.log(`[ ${epicInstanceName} ] - loadBalancesEpic, ${action.type}`)),
-        switchMap(() => resistanceCliService.geBalance()),
+        switchMap(() => resistanceCliService.getBalance()),
         map(result => result ? OverviewActions.loadBalancesSuccess(result) : OverviewActions.loadBalancesFail('Cannot load balance.')),
         catchError(error => {
             // console.error(`error: `, error)
@@ -37,7 +37,30 @@ const loadBalancesFailEpic = (action$: ActionsObservable<AppAction>) => action$
         map(() => of(OverviewActions.empty()))
     )
 
+const loadTransactionListEpic = (action$: ActionsObservable<AppAction>) => action$
+    .ofType(OverviewActions.LOAD_BALANCES)
+    // .do(action => logger.debug(`${epicInstanceName}`, `loadTopListEpic`, `action:`, ConsoleTheme.testing, action))
+    .pipe(
+        tap((action: AppAction) => console.log(`[ ${epicInstanceName} ] - loadTransactionListEpic, ${action.type}`)),
+        switchMap(() => resistanceCliService.getPublicTransactions()),
+        map(result => result ? OverviewActions.loadTransactionListSuccess(result) : OverviewActions.loadTransactionListFail('Cannot load balance.')),
+        catchError(error => {
+            console.error(`error: `, error)
+            const errorMessage = error.code && error.code === 'ECONNREFUSED' ? 'Cannot connect to "resistanced" service.' : error
+            return of(OverviewActions.loadTransactionListFail(errorMessage))
+        })
+    )
+
+const loadTransactionListFailEpic = (action$: ActionsObservable<AppAction>) => action$
+    .ofType(OverviewActions.LOAD_BALANCES_FAIL)
+    .pipe(
+        tap(action => setTimeout(() => dialogService.showError(action.payload), 100)),
+        map(() => of(OverviewActions.empty()))
+    )
+
 export const OverviewEpics = (action$, store) => merge(
     loadBalancesEpic(action$, store),
-    loadBalancesFailEpic(action$, store)
+    loadBalancesFailEpic(action$, store),
+    loadTransactionListEpic(action$, store),
+    loadTransactionListFailEpic(action$, store)
 )

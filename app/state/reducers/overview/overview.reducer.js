@@ -4,7 +4,7 @@ import { AppAction } from '../appAction'
 export type Transaction = {
   type?: string,
   direction?: string,
-  confirmed?: boolean,
+  confirmed?: string,
   amount?: string,
   date?: string,
   destinationAddress?: string

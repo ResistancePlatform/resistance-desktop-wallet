@@ -1,3 +1,5 @@
+@import "../../theme/vars.scss";
+
 .balanceContainer {
     height: 8rem;
 
@@ -12,7 +14,7 @@
 
 .balanceTitle {
     font-size: 0.6rem;
-    color: #eeeeee;
+    color: $BALANCE_TITLE_FONT_COLOR;
     opacity: 0.6;
 }
 

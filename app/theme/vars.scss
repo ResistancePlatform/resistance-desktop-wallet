@@ -16,3 +16,23 @@ $NAVI_BAR_ITEM_FONT_COLOR: rgb(60, 65, 87);
 $NAVI_BAR_ITEM_FONT_ACTIVE_COLOR: white;
 $NAVI_BAR_ITEM_ICON_COLOR: rgb(60, 65, 87);
 $NAVI_BAR_ITEM_ICON_ACTIVE_COLOR: rgb(6, 121, 170);
+
+// ------------------------------------------------------------------------------------------------------
+// Overview - Balance
+// ------------------------------------------------------------------------------------------------------
+$BALANCE_TITLE_FONT_COLOR: #EEEEEE;
+
+// ------------------------------------------------------------------------------------------------------
+// Overview - Transaction List
+// ------------------------------------------------------------------------------------------------------
+$TRANSACTION_LIST_BACKGROUND_COLOR: rgb(29, 36, 64);
+$TRANSACTION_LIST_HEADER_FONT_COLOR: rgb(52, 59, 91);
+$TRANSACTION_LIST_BODY_FONT_COLOR: rgb(222, 223, 227);
+$TRANSACTION_LIST_BODY_ICON_COLOR: rgb(67, 75, 109);
+$TRANSACTION_LIST_BODY_SEPARATOR_COLOR: rgb(49, 56, 88);
+
+$TRANSACTION_LIST_COLUMN_TYPE_WIDTH: 6rem;
+$TRANSACTION_LIST_COLUMN_DIRECTION_WIDTH: 5rem;
+$TRANSACTION_LIST_COLUMN_CONFIRMED_WIDTH: 5rem;
+$TRANSACTION_LIST_COLUMN_AMOUNT_WIDTH: 6rem;
+$TRANSACTION_LIST_COLUMN_DATE_WIDTH: 9rem;

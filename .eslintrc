@@ -41,7 +41,8 @@
       2,
       "multiline"
     ],
-    "react/jsx-indent":"off"
+    "react/jsx-indent": "off",
+    "react/no-array-index-key": "off"
   },
   "plugins": [
     "flowtype",
