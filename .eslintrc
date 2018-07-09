@@ -26,6 +26,7 @@
     "no-console": "off",
     "no-use-before-define": "off",
     "no-multi-assign": "off",
+    "class-methods-use-this": "off",
     "promise/param-names": "error",
     "promise/always-return": "error",
     "promise/catch-or-return": "error",
@@ -39,7 +40,8 @@
     "react/jsx-first-prop-new-line": [
       2,
       "multiline"
-    ]
+    ],
+    "react/jsx-indent":"off"
   },
   "plugins": [
     "flowtype",

@@ -1,9 +1,12 @@
 // @flow
 import React, { Component } from 'react'
+import { Balances } from '../../reducers/overview'
 import styles from './Balance.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 
-type Props = {}
+type Props = {
+  balances: Balances
+}
 
 export default class Balance extends Component<Props> {
   props: Props
@@ -16,8 +19,8 @@ export default class Balance extends Component<Props> {
           <div className={styles.balanceWraper}>
             <div className={styles.balanceTitle}>TRANSPARENT BALANCE (T)</div>
             <div className={styles.balanceValue}>
-              24.12
-            <span className={styles.balanceValueUnit}>RES</span>
+              {this.props.balances.transparentBalance}
+              <span className={styles.balanceValueUnit}>RES</span>
             </div>
           </div>
         </div>
@@ -25,7 +28,7 @@ export default class Balance extends Component<Props> {
         <div className={[styles.privateBalance, HLayout.hBoxChild].join(' ')}>
           <div className={styles.balanceTitle}>PRIVATE BALANCE (R)</div>
           <div className={styles.balanceValue}>
-            170.39
+            {this.props.balances.privateBalance}
             <span className={styles.balanceValueUnit}>RES</span>
           </div>
         </div>
@@ -33,7 +36,7 @@ export default class Balance extends Component<Props> {
         <div className={[styles.totalBalance, HLayout.hBoxChild].join(' ')}>
           <div className={styles.balanceTitle}>TOTAL BALANCE (R + T)</div>
           <div className={styles.balanceValue}>
-            194.51
+            {this.props.balances.totalBalance}
             <span className={styles.balanceValueUnit}>RES</span>
           </div>
         </div>
