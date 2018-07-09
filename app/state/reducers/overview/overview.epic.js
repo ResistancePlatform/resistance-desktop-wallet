@@ -23,7 +23,8 @@ const loadBalancesEpic = (action$: ActionsObservable<AppAction>) => action$
         map(result => result ? OverviewActions.loadBalancesSuccess(result) : OverviewActions.loadBalancesFail('Cannot load balance.')),
         catchError(error => {
             console.error(`error: `, error)
-            of(OverviewActions.loadBalancesFail(error))
+            const errorMessage = error.code && error.code === 'ECONNREFUSED' ? 'Cannot connect to "resistanced" service.' : error
+            return of(OverviewActions.loadBalancesFail(errorMessage))
         })
     )
 

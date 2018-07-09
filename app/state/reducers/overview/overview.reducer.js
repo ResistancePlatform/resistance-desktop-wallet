@@ -46,7 +46,11 @@ export const OverviewActions = {
 }
 
 const initState: OverviewState = {
-  balances: {},
+  balances: {
+    transparentBalance: 0,
+    privateBalance: 0,
+    totalBalance: 0
+  },
   transactionList: []
 }
 
@@ -57,7 +61,14 @@ export const OverviewReducer = (state: OverviewState = initState, action: AppAct
       return { ...state, balances: action.payload }
 
     case OverviewActions.LOAD_BALANCES_FAIL:
-      return { ...state, balances: null }
+      return {
+        ...state,
+        balances: {
+          transparentBalance: 0,
+          privateBalance: 0,
+          totalBalance: 0
+        }
+      }
 
     case OverviewActions.LOAD_TRANSACTION_LIST_SUCCESS:
       return { ...state, transactionList: action.payload }

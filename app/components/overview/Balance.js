@@ -19,7 +19,7 @@ export default class Balance extends Component<Props> {
           <div className={styles.balanceWraper}>
             <div className={styles.balanceTitle}>TRANSPARENT BALANCE (T)</div>
             <div className={styles.balanceValue}>
-              {this.props.balances.transparentBalance}
+              {this.props.balances.transparentBalance ? this.props.balances.transparentBalance : 0}
               <span className={styles.balanceValueUnit}>RES</span>
             </div>
           </div>
@@ -28,7 +28,7 @@ export default class Balance extends Component<Props> {
         <div className={[styles.privateBalance, HLayout.hBoxChild].join(' ')}>
           <div className={styles.balanceTitle}>PRIVATE BALANCE (R)</div>
           <div className={styles.balanceValue}>
-            {this.props.balances.privateBalance}
+            {this.props.balances.privateBalance ? this.props.balances.privateBalance : 0}
             <span className={styles.balanceValueUnit}>RES</span>
           </div>
         </div>
@@ -36,7 +36,7 @@ export default class Balance extends Component<Props> {
         <div className={[styles.totalBalance, HLayout.hBoxChild].join(' ')}>
           <div className={styles.balanceTitle}>TOTAL BALANCE (R + T)</div>
           <div className={styles.balanceValue}>
-            {this.props.balances.totalBalance}
+            {this.props.balances.totalBalance ? this.props.balances.totalBalance : 0}
             <span className={styles.balanceValueUnit}>RES</span>
           </div>
         </div>
