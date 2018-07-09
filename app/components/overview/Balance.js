@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react'
-import { Balances } from '../../reducers/overview'
+import { Balances } from '../../state/reducers/overview/overview.reducer'
 import styles from './Balance.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 
