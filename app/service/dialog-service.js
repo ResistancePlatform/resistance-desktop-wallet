@@ -13,8 +13,6 @@ let instance = null
  */
 export class DialogService {
 
-    cliClient: any
-
     /**
      *Creates an instance of DialogService.
      * @memberof DialogService
