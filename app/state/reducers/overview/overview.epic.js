@@ -1,14 +1,6 @@
 // @flow
-import {
-    map,
-    tap,
-    switchMap,
-    catchError
-} from 'rxjs/operators'
-import {
-    merge,
-    of
-} from 'rxjs'
+import { map, tap, switchMap, catchError } from 'rxjs/operators'
+import { merge, of } from 'rxjs'
 
 import { ActionsObservable } from 'redux-observable'
 // import { Store } from 'redux'
@@ -29,7 +21,10 @@ const loadBalancesEpic = (action$: ActionsObservable<AppAction>) => action$
         tap((action: AppAction) => console.log(`[ ${epicInstanceName} ] - loadBalancesEpic, ${action.type}`)),
         switchMap(() => resistanceCliService.geBalance()),
         map(result => result ? OverviewActions.loadBalancesSuccess(result) : OverviewActions.loadBalancesFail('Cannot load balance.')),
-        catchError(error => of(OverviewActions.loadBalancesFail(error)))
+        catchError(error => {
+            console.error(`error: `, error)
+            of(OverviewActions.loadBalancesFail(error))
+        })
     )
 
 export const OverviewEpics = (action$, store) => merge(
