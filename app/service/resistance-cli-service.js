@@ -28,9 +28,6 @@ const getResistanceClientInstance = () => new Client({
  */
 export class ResistanceCliService {
 
-    time: Date
-    cliClient: any
-
     /**
      *Creates an instance of ResistanceCliService.
      * @memberof ResistanceCliService
@@ -42,7 +39,6 @@ export class ResistanceCliService {
 
         this.time = new Date()
         console.log(`Client:`, Client)
-        this.cliClient = getResistanceClientInstance()
         // this.logger.debug(this, `constructor`, `ResistanceCliService created.`, ConsoleTheme.testing)
 
         return instance
@@ -54,11 +50,12 @@ export class ResistanceCliService {
      * @memberof ResistanceCliService
      */
     geBalance(): Observable<Balances> {
+        const cli = getResistanceClientInstance()
         const commandList = [
             { method: 'z_gettotalbalance', params: ['', 1, false] }
         ]
 
-        return from(this.cliClient.command(commandList))
+        return from(cli.command(commandList))
             .pipe(
                 map(result => ({
                     transparentBalance: parseFloat(result[0].transparent),
