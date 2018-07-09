@@ -18,12 +18,15 @@
     "consistent-return": "off",
     "comma-dangle": "off",
     "generator-star-spacing": "off",
+    "import/no-mutable-exports": "off",
     "import/no-unresolved": "error",
     "import/no-extraneous-dependencies": "off",
+    "import/prefer-default-export": "off",
     "jsx-a11y/anchor-is-valid": "off",
     "no-console": "off",
     "no-use-before-define": "off",
     "no-multi-assign": "off",
+    "class-methods-use-this": "off",
     "promise/param-names": "error",
     "promise/always-return": "error",
     "promise/catch-or-return": "error",
@@ -33,7 +36,13 @@
     }],
     "react/jsx-no-bind": "off",
     "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx"] }],
-    "react/prefer-stateless-function": "off"
+    "react/prefer-stateless-function": "off",
+    "react/jsx-first-prop-new-line": [
+      2,
+      "multiline"
+    ],
+    "react/jsx-indent": "off",
+    "react/no-array-index-key": "off"
   },
   "plugins": [
     "flowtype",
