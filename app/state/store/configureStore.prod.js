@@ -4,8 +4,8 @@ import { combineEpics, createEpicMiddleware } from 'redux-observable'
 import { createHashHistory } from 'history'
 import { routerMiddleware } from 'react-router-redux'
 
-import { OverviewReducer } from '../reducers/overview'
-import { OverviewEpics } from '../reducers/overview.epic'
+import { OverviewReducer } from '../reducers/overview/overview.reducer'
+import { OverviewEpics } from '../reducers/overview/overview.epic'
 
 export const history = createHashHistory()
 const appReducers = combineReducers({
