@@ -35,6 +35,10 @@ export const OverviewActions = {
   LOAD_TRANSACTION_LIST_SUCCESS: `${overviewActionTypePrefix}: LOAD_TRANSACTION_LIST_SUCCESS`,
   LOAD_TRANSACTION_LIST_FAIL: `${overviewActionTypePrefix}: LOAD_TRANSACTION_LIST_FAIL`,
 
+  MAIN_WINDOW_CLOSE: `${overviewActionTypePrefix}: MAIN_WINDOW_CLOSE`,
+  MAIN_WINDOW_MINIMIZE: `${overviewActionTypePrefix}: MAIN_WINDOW_MINIMIZE`,
+  MAIN_WINDOW_MAXIMIZE: `${overviewActionTypePrefix}: MAIN_WINDOW_MAXIMIZE`,
+
   loadBalances: (): AppAction => ({ type: OverviewActions.LOAD_BALANCES }),
   loadBalancesSuccess: (balances: Balances): AppAction => ({ type: OverviewActions.LOAD_BALANCES_SUCCESS, payload: balances }),
   loadBalancesFail: (error: string): AppAction => ({ type: OverviewActions.LOAD_BALANCES_FAIL, payload: error }),
@@ -42,6 +46,10 @@ export const OverviewActions = {
   loadTransactionList: (): AppAction => ({ type: OverviewActions.LOAD_TRANSACTION_LIST }),
   loadTransactionListSuccess: (transactionList: Array<Transaction>): AppAction => ({ type: OverviewActions.LOAD_TRANSACTION_LIST_SUCCESS, payload: transactionList }),
   loadTransactionListFail: (error: string): AppAction => ({ type: OverviewActions.LOAD_TRANSACTION_LIST_FAIL, payload: error }),
+
+  mainWindowClose: (): AppAction => ({ type: OverviewActions.MAIN_WINDOW_CLOSE }),
+  mainWindowMinimize: (): AppAction => ({ type: OverviewActions.MAIN_WINDOW_MINIMIZE }),
+  mainWindowMaximize: (): AppAction => ({ type: OverviewActions.MAIN_WINDOW_MAXIMIZE }),
 
   empty: (): AppAction => ({ type: OverviewActions.EMPTY })
 }
