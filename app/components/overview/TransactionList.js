@@ -20,14 +20,14 @@ export default class TransactionList extends Component<Props> {
     }
 
     // const tableContent = `<table></table>`
-    const tableBody = this.props.transactionList.map((transaction, index) => (
-      <div className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')}>
+    const tableBody = this.props.transactionList.map((transaction) => (
+      <div className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')} key={transaction.transactionId}>
         <div className={styles.tableBodyRowColumnType} >{transaction.type}</div>
-        <div className={styles.tableBodyRowColumnDirection} key={index}>{transaction.direction}</div>
-        <div className={styles.tableBodyRowColumnConfirmed} key={index}>{transaction.confirmed}</div>
-        <div className={styles.tableBodyRowColumnAmount} key={index}>{transaction.amount}</div>
-        <div className={styles.tableBodyRowColumnDate} key={index}>{transaction.date}</div>
-        <div className={[HLayout.hBoxChild, styles.tableBodyRowColumnAddress].join(' ')} key={index}>{transaction.destinationAddress}</div>
+        <div className={styles.tableBodyRowColumnDirection}>{transaction.direction}</div>
+        <div className={styles.tableBodyRowColumnConfirmed}>{transaction.confirmed}</div>
+        <div className={styles.tableBodyRowColumnAmount}>{transaction.amount}</div>
+        <div className={styles.tableBodyRowColumnDate}>{transaction.date}</div>
+        <div className={[HLayout.hBoxChild, styles.tableBodyRowColumnAddress].join(' ')}>{transaction.destinationAddress}</div>
       </div>
     ))
 

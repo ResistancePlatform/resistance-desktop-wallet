@@ -38,7 +38,7 @@ const loadBalancesFailEpic = (action$: ActionsObservable<AppAction>) => action$
     )
 
 const loadTransactionListEpic = (action$: ActionsObservable<AppAction>) => action$
-    .ofType(OverviewActions.LOAD_BALANCES)
+    .ofType(OverviewActions.LOAD_TRANSACTION_LIST)
     // .do(action => logger.debug(`${epicInstanceName}`, `loadTopListEpic`, `action:`, ConsoleTheme.testing, action))
     .pipe(
         tap((action: AppAction) => console.log(`[ ${epicInstanceName} ] - loadTransactionListEpic, ${action.type}`)),
@@ -52,7 +52,7 @@ const loadTransactionListEpic = (action$: ActionsObservable<AppAction>) => actio
     )
 
 const loadTransactionListFailEpic = (action$: ActionsObservable<AppAction>) => action$
-    .ofType(OverviewActions.LOAD_BALANCES_FAIL)
+    .ofType(OverviewActions.LOAD_TRANSACTION_LIST_FAIL)
     .pipe(
         tap(action => setTimeout(() => dialogService.showError(action.payload), 100)),
         map(() => of(OverviewActions.empty()))

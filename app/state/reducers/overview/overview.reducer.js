@@ -7,7 +7,8 @@ export type Transaction = {
   confirmed?: string,
   amount?: string,
   date?: string,
-  destinationAddress?: string
+  destinationAddress?: string,
+  transactionId?: string
 }
 
 export type Balances = {

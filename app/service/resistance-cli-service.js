@@ -110,7 +110,8 @@ export class ResistanceCliService {
                         confirmed: getConfirmed(originalTransaction.confirmations),
                         amount: getAmount(originalTransaction.amount),
                         date: getDate(originalTransaction.time),
-                        destinationAddress: originalTransaction.address
+                        destinationAddress: originalTransaction.address,
+                        transactionId: originalTransaction.txid
                     }))
                     return transactionList
                 })
