@@ -2,7 +2,6 @@
 import React, { Component } from 'react'
 import { NavLink } from 'react-router-dom'
 import styles from './Navi-bar.scss'
-import layout from '../theme/h-box-layout.scss'
 
 type Props = {}
 

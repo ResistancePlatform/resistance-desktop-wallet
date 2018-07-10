@@ -1,6 +1,7 @@
 @import "../theme/vars.scss";
 
 @mixin navibarToolbarButton {
+  -webkit-app-region: no-drag;
   display: inline-block;
   
   width: 0.8rem;
@@ -13,6 +14,7 @@
 }
 
 .navibarContainer {
+  -webkit-app-region: drag;
   background-color: $NAVI_BAR_BACKGROUND_COLOR;
   padding: 0.8rem;
 
@@ -20,6 +22,7 @@
   width: 10rem;
 
   .navibarToolbarContainer {
+    // -webkit-app-region: drag;
     margin-bottom: 2rem;
   }
 
@@ -41,6 +44,7 @@
 }
 
 .naviVBarItem {
+  -webkit-app-region: no-drag;
   padding: 0.8rem 0;
 
   span {
