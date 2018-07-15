@@ -3,7 +3,7 @@ import { remote } from 'electron'
 import { map, tap, switchMap, catchError } from 'rxjs/operators'
 import { merge, of } from 'rxjs'
 
-import { ActionsObservable } from 'redux-observable'
+import { ActionsObservable, ofType } from 'redux-observable'
 // import { Store } from 'redux'
 import { AppAction } from '../appAction'
 
@@ -17,80 +17,73 @@ const epicInstanceName = 'OverviewEpics'
 const resistanceCliService = new ResistanceCliService()
 const dialogService = new DialogService()
 
-const loadBalancesEpic = (action$: ActionsObservable<AppAction>) => action$
-    .ofType(OverviewActions.LOAD_BALANCES)
-    // .do(action => logger.debug(`${epicInstanceName}`, `loadTopListEpic`, `action:`, ConsoleTheme.testing, action))
-    .pipe(
-        tap((action: AppAction) => console.log(`[ ${epicInstanceName} ] - loadBalancesEpic, ${action.type}`)),
-        switchMap(() => resistanceCliService.getBalance()),
-        map(result => result ? OverviewActions.loadBalancesSuccess(result) : OverviewActions.loadBalancesFail('Cannot load balance.')),
-        catchError(error => {
-            // console.error(`error: `, error)
-            const errorMessage = error.code && error.code === 'ECONNREFUSED' ? 'Cannot connect to "resistanced" service.' : error
-            return of(OverviewActions.loadBalancesFail(errorMessage))
-        })
-    )
+const loadBalancesEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(OverviewActions.LOAD_BALANCES),
+    // tap(action => logger.debug(`${epicInstanceName}`, `loadTopListEpic`, `action:`, ConsoleTheme.testing, action)),
+    tap((action: AppAction) => console.log(`[ ${epicInstanceName} ] - loadBalancesEpic, ${action.type}`)),
+    switchMap(() => resistanceCliService.getBalance()),
+    map(result => result ? OverviewActions.loadBalancesSuccess(result) : OverviewActions.loadBalancesFail('Cannot load balance.')),
+    catchError(error => {
+        // console.error(`error: `, error)
+        const errorMessage = error.code && error.code === 'ECONNREFUSED' ? 'Cannot connect to "resistanced" service.' : error
+        return of(OverviewActions.loadBalancesFail(errorMessage))
+    })
+)
 
-const loadBalancesFailEpic = (action$: ActionsObservable<AppAction>) => action$
-    .ofType(OverviewActions.LOAD_BALANCES_FAIL)
-    .pipe(
-        tap(action => setTimeout(() => dialogService.showError(action.payload), 100)),
-        map(() => of(OverviewActions.empty()))
-    )
+const loadBalancesFailEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(OverviewActions.LOAD_BALANCES_FAIL),
+    tap(action => setTimeout(() => dialogService.showError(action.payload), 100)),
+    map(() => of(OverviewActions.empty()))
+)
 
-const loadTransactionListEpic = (action$: ActionsObservable<AppAction>) => action$
-    .ofType(OverviewActions.LOAD_TRANSACTION_LIST)
-    // .do(action => logger.debug(`${epicInstanceName}`, `loadTopListEpic`, `action:`, ConsoleTheme.testing, action))
-    .pipe(
-        tap((action: AppAction) => console.log(`[ ${epicInstanceName} ] - loadTransactionListEpic, ${action.type}`)),
-        switchMap(() => resistanceCliService.getPublicTransactions()),
-        map(result => result ? OverviewActions.loadTransactionListSuccess(result) : OverviewActions.loadTransactionListFail('Cannot load balance.')),
-        catchError(error => {
-            console.error(`error: `, error)
-            const errorMessage = error.code && error.code === 'ECONNREFUSED' ? 'Cannot connect to "resistanced" service.' : error
-            return of(OverviewActions.loadTransactionListFail(errorMessage))
-        })
-    )
+const loadTransactionListEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(OverviewActions.LOAD_TRANSACTION_LIST),
+    // tap(action => logger.debug(`${epicInstanceName}`, `loadTopListEpic`, `action:`, ConsoleTheme.testing, action)),
+    tap((action: AppAction) => console.log(`[ ${epicInstanceName} ] - loadTransactionListEpic, ${action.type}`)),
+    switchMap(() => resistanceCliService.getPublicTransactions()),
+    map(result => result ? OverviewActions.loadTransactionListSuccess(result) : OverviewActions.loadTransactionListFail('Cannot load balance.')),
+    catchError(error => {
+        console.error(`error: `, error)
+        const errorMessage = error.code && error.code === 'ECONNREFUSED' ? 'Cannot connect to "resistanced" service.' : error
+        return of(OverviewActions.loadTransactionListFail(errorMessage))
+    })
+)
 
-const loadTransactionListFailEpic = (action$: ActionsObservable<AppAction>) => action$
-    .ofType(OverviewActions.LOAD_TRANSACTION_LIST_FAIL)
-    .pipe(
-        tap(action => setTimeout(() => dialogService.showError(action.payload), 100)),
-        map(() => of(OverviewActions.empty()))
-    )
+const loadTransactionListFailEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(OverviewActions.LOAD_TRANSACTION_LIST_FAIL),
+    tap(action => setTimeout(() => dialogService.showError(action.payload), 100)),
+    map(() => of(OverviewActions.empty()))
+)
 
-const mainWindowCloseEpic = (action$: ActionsObservable<AppAction>) => action$
-    .ofType(OverviewActions.MAIN_WINDOW_CLOSE)
-    .pipe(
-        tap(() => setTimeout(() => {
-            remote.getCurrentWindow().close()
-        }, 100)),
-        map(() => OverviewActions.empty())
-    )
+const mainWindowCloseEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(OverviewActions.MAIN_WINDOW_CLOSE),
+    tap(() => setTimeout(() => {
+        remote.getCurrentWindow().close()
+    }, 100)),
+    map(() => OverviewActions.empty())
+)
 
-const mainWindowMinimizeEpic = (action$: ActionsObservable<AppAction>) => action$
-    .ofType(OverviewActions.MAIN_WINDOW_MINIMIZE)
-    .pipe(
-        tap(() => setTimeout(() => {
-            remote.getCurrentWindow().minimize()
-        }, 100)),
-        map(() => OverviewActions.empty())
-    )
+const mainWindowMinimizeEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(OverviewActions.MAIN_WINDOW_MINIMIZE),
+    tap(() => setTimeout(() => {
+        remote.getCurrentWindow().minimize()
+    }, 100)),
+    map(() => OverviewActions.empty())
+)
 
-const mainWindowMaximizeEpic = (action$: ActionsObservable<AppAction>) => action$
-    .ofType(OverviewActions.MAIN_WINDOW_MAXIMIZE)
-    .pipe(
-        tap(() => setTimeout(() => {
-            const win = remote.getCurrentWindow()
+const mainWindowMaximizeEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(OverviewActions.MAIN_WINDOW_MAXIMIZE),
+    tap(() => setTimeout(() => {
+        const win = remote.getCurrentWindow()
 
-            if (process.platform === 'darwin') {
-                win.setFullScreen(!win.isFullScreen())
-            } else {
-                win.isMaximized() ? win.unmaximize() : win.maximize()
-            }
-        }, 100)),
-        map(() => OverviewActions.empty())
-    )
+        if (process.platform === 'darwin') {
+            win.setFullScreen(!win.isFullScreen())
+        } else {
+            win.isMaximized() ? win.unmaximize() : win.maximize()
+        }
+    }, 100)),
+    map(() => OverviewActions.empty())
+)
 
 
 export const OverviewEpics = (action$, store) => merge(

@@ -1,0 +1,21 @@
+@import "./vars.scss";
+
+// ------------------------------------------------------------------------------------------------------
+// Generic rounded button
+// ------------------------------------------------------------------------------------------------------
+@mixin roundedButton($activeStyle: false) {
+    padding: 0.6rem 1.2rem;
+
+    @if $activeStyle {
+        border: 2px solid $BASE_COLOR_PURPLE;
+        background-color: $BASE_COLOR_PURPLE;
+    } @else {
+        border: 2px solid $BASE_COLOR_BODER_GRAY;
+        background-color: transparent;
+    }
+
+    border-radius: 5rem;
+
+    color: $BASE_COLOR_BUTTON_FONT_GRAY;
+    font-size: 0.75rem;
+}

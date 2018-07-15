@@ -4,16 +4,21 @@ import { createHashHistory } from 'history'
 import { routerMiddleware } from 'react-router-redux'
 import { createLogger } from 'redux-logger'
 
+import { SystemInfoReducer } from '../reducers/system-info/system-info.reducer'
+import { SystemInfoEpics } from '../reducers/system-info/system-info.epic'
+
 import { OverviewReducer } from '../reducers/overview/overview.reducer'
 import { OverviewEpics } from '../reducers/overview/overview.epic'
 
 export const history = createHashHistory()
 
 const appReducers = combineReducers({
+  systemInfo: SystemInfoReducer,
   overview: OverviewReducer
 })
 
 export const appEpics = combineEpics(
+  SystemInfoEpics,
   OverviewEpics
 )
 

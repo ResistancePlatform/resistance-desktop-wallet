@@ -13,6 +13,7 @@
     "node": true
   },
   "rules": {
+    "global-require": "off",
     "arrow-parens": ["off"],
     "compat/compat": "error",
     "consistent-return": "off",

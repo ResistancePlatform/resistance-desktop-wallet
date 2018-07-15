@@ -1,10 +1,17 @@
 @import "../theme/full-screen.scss";
 @import "../theme/h-box-layout.scss";
 @import "../theme/v-box-layout.scss";
+@import "../theme/generic-component.scss";
+@import "../theme/vars.scss";
 
-.overviewContainer {
-    @include full-screen();
+
+
+.layoutContainer {
 }
 
 .overviewContent {
 }
+
+.bottomStatusBar {
+}
+
