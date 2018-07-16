@@ -13,6 +13,7 @@
     "node": true
   },
   "rules": {
+    "global-require": "off",
     "arrow-parens": ["off"],
     "compat/compat": "error",
     "consistent-return": "off",
@@ -28,6 +29,7 @@
     "no-use-before-define": "off",
     "no-multi-assign": "off",
     "no-unused-expressions": "off",
+    "no-lonely-if": "off",
     "class-methods-use-this": "off",
     "promise/param-names": "error",
     "promise/always-return": "error",

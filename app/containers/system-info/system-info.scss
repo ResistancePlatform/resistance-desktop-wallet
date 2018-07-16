@@ -1,0 +1,59 @@
+@import "../../theme/generic-component.scss";
+@import "../../theme/vars.scss";
+
+$SYSTEM_INFO_BAR_HEIGHT: 5.5rem;
+
+.systemInfoContainer {
+    padding: 0 2rem 0 1.5rem;
+    align-items: center !important;
+
+    min-height: $SYSTEM_INFO_BAR_HEIGHT;
+    height: $SYSTEM_INFO_BAR_HEIGHT;
+
+    background-color: $SYSTEM_INFO_BAR_BACKGROUND_COLOR;
+}
+
+.statusColumnWrapper {
+    display: inline-block;
+    margin-right: 1rem;
+
+    &:last-child{
+        margin-right: 0 !important;
+    }
+}
+
+.statusColoumnTitle {
+    margin-bottom: 0.4rem;
+
+    font-size: 0.7rem;
+    color: $BASE_COLOR_GRAY;
+}
+
+.statusColoumnValue {
+    i {
+        margin-right: 0.5rem;
+    }
+
+    span {
+        font-size: 0.9rem;
+        color: $BASE_COLOR_WHITE;
+    }
+}
+
+.daemonIsRunning {
+    color: $SYSTEM_INFO_BAR_RUNNING_ICON_COLOR;
+}
+
+.daemonIsNotRunning {
+    color: $SYSTEM_INFO_BAR_NOT_RUNNING_ICON_COLOR;
+}
+
+.walletInFinderButton {
+    @include roundedButton();
+}
+
+.installationPathButton {
+    @include roundedButton();
+
+    margin-left: 1rem;
+}

@@ -3,7 +3,31 @@ import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import Root from './containers/Root';
 import { configureStore, history } from './state/store/configureStore';
+// import { AppState } from './state/reducers/appState'
 import './app.global.scss';
+
+// const initAppState: AppState = {
+//   systemInfo: {
+//     daemonInfo: {
+//       status: DaemonStatus.NOT_RUNNING,
+//       residentSizeMB: 0
+//     },
+//     blockChainInfo: {
+//       connectionCount: 0,
+//       blockchainSynchronizedPercentage: 0,
+//       lastBlockDate: null
+//     }
+//   },
+
+//   overview: {
+//     balances: {
+//       transparentBalance: 0,
+//       privateBalance: 0,
+//       totalBalance: 0
+//     },
+//     transactionList: []
+//   }
+// }
 
 const store = configureStore();
 

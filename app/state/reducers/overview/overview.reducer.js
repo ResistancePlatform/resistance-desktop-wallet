@@ -19,7 +19,7 @@ export type Balances = {
 
 export type OverviewState = {
   balances?: Balances,
-  transactionList?: Array<Transaction>
+  transactions?: Array<Transaction>
 }
 
 const overviewActionTypePrefix = 'OVERVIEW_ACTION'
@@ -27,30 +27,22 @@ const overviewActionTypePrefix = 'OVERVIEW_ACTION'
 export const OverviewActions = {
   EMPTY: `${overviewActionTypePrefix}: EMPTY`,
 
-  LOAD_BALANCES: `${overviewActionTypePrefix}: LOAD_BALANCES`,
-  LOAD_BALANCES_SUCCESS: `${overviewActionTypePrefix}: LOAD_BALANCES_SUCCESS`,
-  LOAD_BALANCES_FAIL: `${overviewActionTypePrefix}: LOAD_BALANCES_FAIL`,
+  START_GETTING_WALLET_INFO: `${overviewActionTypePrefix}: START_GETTING_WALLET_INFO`,
+  GOT_WALLET_INFO: `${overviewActionTypePrefix}: GOT_WALLET_INFO`,
 
-  LOAD_TRANSACTION_LIST: `${overviewActionTypePrefix}: LOAD_TRANSACTION_LIST`,
-  LOAD_TRANSACTION_LIST_SUCCESS: `${overviewActionTypePrefix}: LOAD_TRANSACTION_LIST_SUCCESS`,
-  LOAD_TRANSACTION_LIST_FAIL: `${overviewActionTypePrefix}: LOAD_TRANSACTION_LIST_FAIL`,
+  START_GETTING_TRANSACTION_DATA_FROM_WALLET: `${overviewActionTypePrefix}: START_GETTING_TRANSACTION_DATA_FROM_WALLET`,
+  GOT_TRANSACTION_DATA_FROM_WALLET: `${overviewActionTypePrefix}: GOT_TRANSACTION_DATA_FROM_WALLET`,
 
   MAIN_WINDOW_CLOSE: `${overviewActionTypePrefix}: MAIN_WINDOW_CLOSE`,
   MAIN_WINDOW_MINIMIZE: `${overviewActionTypePrefix}: MAIN_WINDOW_MINIMIZE`,
   MAIN_WINDOW_MAXIMIZE: `${overviewActionTypePrefix}: MAIN_WINDOW_MAXIMIZE`,
 
-  loadBalances: (): AppAction => ({ type: OverviewActions.LOAD_BALANCES }),
-  loadBalancesSuccess: (balances: Balances): AppAction => ({ type: OverviewActions.LOAD_BALANCES_SUCCESS, payload: balances }),
-  loadBalancesFail: (error: string): AppAction => ({ type: OverviewActions.LOAD_BALANCES_FAIL, payload: error }),
+  startGettingWalletInfo: (): AppAction => ({ type: OverviewActions.START_GETTING_WALLET_INFO }),
+  gotWalletInfo: (balances: Balances): AppAction => ({ type: OverviewActions.GOT_WALLET_INFO, payload: balances }),
 
-  loadTransactionList: (): AppAction => ({ type: OverviewActions.LOAD_TRANSACTION_LIST }),
-  loadTransactionListSuccess: (transactionList: Array<Transaction>): AppAction => ({ type: OverviewActions.LOAD_TRANSACTION_LIST_SUCCESS, payload: transactionList }),
-  loadTransactionListFail: (error: string): AppAction => ({ type: OverviewActions.LOAD_TRANSACTION_LIST_FAIL, payload: error }),
-
-  mainWindowClose: (): AppAction => ({ type: OverviewActions.MAIN_WINDOW_CLOSE }),
-  mainWindowMinimize: (): AppAction => ({ type: OverviewActions.MAIN_WINDOW_MINIMIZE }),
-  mainWindowMaximize: (): AppAction => ({ type: OverviewActions.MAIN_WINDOW_MAXIMIZE }),
-
+  startGettingTransactionDataFromWallet: (): AppAction => ({ type: OverviewActions.START_GETTING_TRANSACTION_DATA_FROM_WALLET }),
+  gotTransactionDataFromWallet: (transactions: Array<Transaction>): AppAction => ({ type: OverviewActions.GOT_TRANSACTION_DATA_FROM_WALLET, payload: transactions }),
+  
   empty: (): AppAction => ({ type: OverviewActions.EMPTY })
 }
 
@@ -60,30 +52,30 @@ const initState: OverviewState = {
     privateBalance: 0,
     totalBalance: 0
   },
-  transactionList: []
+  transactions: []
 }
 
 export const OverviewReducer = (state: OverviewState = initState, action: AppAction) => {
 
   switch (action.type) {
-    case OverviewActions.LOAD_BALANCES_SUCCESS:
+    case OverviewActions.GOT_WALLET_INFO:
       return { ...state, balances: action.payload }
 
-    case OverviewActions.LOAD_BALANCES_FAIL:
-      return {
-        ...state,
-        balances: {
-          transparentBalance: 0,
-          privateBalance: 0,
-          totalBalance: 0
-        }
-      }
+    // case OverviewActions.GET_WALLET_INFO_FAIL:
+    //   return {
+    //     ...state,
+    //     balances: {
+    //       transparentBalance: 0,
+    //       privateBalance: 0,
+    //       totalBalance: 0
+    //     }
+    //   }
 
-    case OverviewActions.LOAD_TRANSACTION_LIST_SUCCESS:
-      return { ...state, transactionList: action.payload }
+    case OverviewActions.GOT_TRANSACTION_DATA_FROM_WALLET:
+      return { ...state, transactions: action.payload }
 
-    case OverviewActions.LOAD_TRANSACTION_LIST_FAIL:
-      return { ...state, transactionList: null }
+    // case OverviewActions.GET_TRANSACTION_DATA_FROM_WALLET_FAIL:
+    //   return { ...state, transactions: null }
 
     default:
       return state

@@ -6,21 +6,21 @@ import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
 type Props = {
-  transactionList: Array<Transaction>
+  transactions: Array<Transaction>
 }
 
 export default class TransactionList extends Component<Props> {
   props: Props
 
   getTransactionTable() {
-    if (!this.props.transactionList || this.props.transactionList.length <= 0) {
+    if (!this.props.transactions || this.props.transactions.length <= 0) {
       return (
         <div>No Transaction.</div>
       )
     }
 
     // const tableContent = `<table></table>`
-    const tableBody = this.props.transactionList.map((transaction) => (
+    const tableBody = this.props.transactions.map((transaction) => (
       <div className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')} key={transaction.transactionId}>
         <div className={styles.tableBodyRowColumnType} >{transaction.type}</div>
         <div className={styles.tableBodyRowColumnDirection}>{transaction.direction}</div>
