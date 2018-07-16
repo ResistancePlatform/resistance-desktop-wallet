@@ -15,23 +15,18 @@ const startGettingWalletInfoEpic = (action$: ActionsObservable<AppAction>) => ac
     ofType(OverviewActions.START_GETTING_WALLET_INFO),
     tap((action: AppAction) => logger.debug(epicInstanceName, `startGettingWalletInfoEpic`, action.type, ConsoleTheme.testing)),
     tap(() => resistanceCliService.startPollingWalletInfo()),
-    map(result => OverviewActions.gotWalletInfo(result))
+    map(() => OverviewActions.empty())
 )
 
-const loadTransactionListEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-    ofType(OverviewActions.LOAD_TRANSACTION_LIST),
-    tap((action: AppAction) => logger.debug(epicInstanceName, `loadTransactionListEpic`, action.type, ConsoleTheme.testing)),
-    switchMap(() => resistanceCliService.getPublicTransactions()),
-    map(result => result ? OverviewActions.loadTransactionListSuccess(result) : OverviewActions.loadTransactionListFail('Cannot get transaction data from wallet.')),
-    catchError(error => {
-        console.error(`error: `, error)
-        const errorMessage = error.code && error.code === 'ECONNREFUSED' ? 'Cannot connect to "resistanced" service.' : error
-        return of(OverviewActions.loadTransactionListFail(errorMessage))
-    })
+const startGettingTransactionDataFromWalletEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(OverviewActions.START_GETTING_TRANSACTION_DATA_FROM_WALLET),
+    tap((action: AppAction) => logger.debug(epicInstanceName, `startGettingTransactionDataFromWalletEpic`, action.type, ConsoleTheme.testing)),
+    tap(() => resistanceCliService.startPollingTransactionsDataFromWallet()),
+    map(() => OverviewActions.empty())
 )
 
 
 export const OverviewEpics = (action$, store) => merge(
     startGettingWalletInfoEpic(action$, store),
-    loadTransactionListEpic(action$, store),
+    startGettingTransactionDataFromWalletEpic(action$, store),
 )

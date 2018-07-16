@@ -43,7 +43,7 @@ class Overview extends Component<Props> {
 
 					<div className={[HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
 						<Balance balances={this.props.overview.balances} />
-						<TransactionList transactionList={this.props.overview.transactionList} />
+						<TransactionList transactions={this.props.overview.transactions} />
 					</div>
 				</div>
 

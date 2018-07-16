@@ -1,7 +1,7 @@
 // @flow
 
 import Client from 'bitcoin-core'
-import { Observable, from, timer } from 'rxjs'
+import { Observable, from } from 'rxjs'
 import { map, tap, take } from 'rxjs/operators'
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { getFormattedDateString } from '../utils/data-util'
@@ -31,6 +31,8 @@ let blockchainInfoPollingIntervalId = -1
 const blockchainInfoPollingIntervalSetting = 5 * 1000
 let walletInfoPollingIntervalId = -1
 const walletInfoPollingIntervalSetting = 2 * 1000
+let transactionDataFromWalletPollingIntervalId = -1
+const transactionDataFromWalletPollingIntervalSetting = 5 * 1000
 
 
 /**
@@ -72,58 +74,6 @@ export class ResistanceCliService {
             storeModule.appStore.dispatch(action)
         }
     }
-
-    /**
-     * @returns {Observable<Balances>}
-     * @memberof ResistanceCliService
-     */
-    getPublicTransactions(): Observable<Balances> {
-
-        const getDirection = (value: string) => {
-            if (value === 'receive')
-                return 'In'
-            else if (value === 'send')
-                return 'Out'
-            else if (value === 'generate')
-                return 'Mined'
-            else if (value === 'immature')
-                return 'Immature'
-
-            return value
-        }
-
-        const getConfirmed = (value: number) => value !== 0 ? 'Yes' : 'No'
-
-        const getAmount = (value: number) => value.toFixed(2)
-
-        const getDate = (value: number) => {
-            const tempDate = new Date(value * 1000)
-            return getFormattedDateString(tempDate)
-        }
-
-        const cli = getResistanceClientInstance()
-        const commandList = [
-            { method: 'listtransactions', parameters: ['', 200] }
-        ]
-
-        return from(cli.command(commandList))
-            .pipe(
-                map(result => result[0]),
-                map(result => {
-                    const transactionList: Array<Transaction> = result.map(originalTransaction => ({
-                        type: `T (Public)`,
-                        direction: getDirection(originalTransaction.category),
-                        confirmed: getConfirmed(originalTransaction.confirmations),
-                        amount: getAmount(originalTransaction.amount),
-                        date: getDate(originalTransaction.time),
-                        destinationAddress: originalTransaction.address,
-                        transactionId: originalTransaction.txid
-                    }))
-                    return transactionList
-                })
-            )
-    }
-
 
     /**
      * Polling the daemon status per 1 second, for getting the `resistanced` running status and memory usage
@@ -218,7 +168,7 @@ export class ResistanceCliService {
                     (result: Balances) => {
                         this.dispatchAction(OverviewActions.gotWalletInfo(result))
                     },
-                    (error) => this.logger.debug(this, `startPollingWalletInfo`, `Error happen: `, ConsoleTheme.error, error),
+                    (error) => this.logger.debug(this, `startPollingWalletInfo`, `subscribe error: `, ConsoleTheme.error, error),
                 // () => this.logger.debug(this, `startPollingWalletInfo`, `observable completed.`, ConsoleTheme.testing)
             );
         }
@@ -240,8 +190,89 @@ export class ResistanceCliService {
      * @returns {Observable<DaemonInfo>}
      * @memberof ResistanceCliService
      */
-    startPollingTransactionsDatFromWallet(): Observable<DaemonInfo> {
-        return timer(100, 5000)
+    startPollingTransactionsDataFromWallet(): Observable<DaemonInfo> {
+
+        /**
+         * 
+         */
+        const getAsyncTransactionDataFromWallet = () => {
+
+            const getDirection = (value: string) => {
+                if (value === 'receive')
+                    return 'In'
+                else if (value === 'send')
+                    return 'Out'
+                else if (value === 'generate')
+                    return 'Mined'
+                else if (value === 'immature')
+                    return 'Immature'
+
+                return value
+            }
+
+            const getConfirmed = (value: number) => value !== 0 ? 'Yes' : 'No'
+
+            const getAmount = (value: number | string) => (typeof(value) === 'string') ? parseFloat(value).toFixed(2) : value.toFixed(2)
+
+            const getDate = (value: number) => {
+                const tempDate = new Date(value * 1000)
+                return getFormattedDateString(tempDate)
+            }
+
+            const cli = getResistanceClientInstance()
+            const getPublicTransactionsCmd = () => [{ method: 'listtransactions', parameters: ['', 200] }]
+            // const getWalletZAddressesCmd = () => [{ method: 'z_listaddresses', parameters: [null] }]
+            // const getWalletZReceivedTransactionsCmd = (zAddress) => [{ method: 'z_listreceivedbyaddress', parameters: [zAddress, 0] }]
+
+            const responseTransactions = { transactions: null, optionalError: null }
+
+            const getPublicTransactionsPromise = cli.command(getPublicTransactionsCmd())
+                .then(result => result[0])
+                .then(result => {
+                    const transactionList: Array<Transaction> = result.map(originalTransaction => ({
+                        type: `T (Public)`,
+                        direction: getDirection(originalTransaction.category),
+                        confirmed: getConfirmed(originalTransaction.confirmations),
+                        amount: getAmount(originalTransaction.amount),
+                        date: getDate(originalTransaction.time),
+                        destinationAddress: originalTransaction.address,
+                        transactionId: originalTransaction.txid
+                    }))
+                    responseTransactions.transactions = transactionList
+                    delete responseTransactions.optionalError
+                    return responseTransactions
+                })
+                .catch(error => {
+                    console.error(error)
+                    responseTransactions.optionalError = error
+                    return responseTransactions
+                })
+
+            from(getPublicTransactionsPromise)
+                .pipe(
+                    take(1)
+                )
+                .subscribe(
+                    (result) => {
+                        this.logger.debug(this, `startPollingTransactionsDataFromWallet`, `subscribe result: `, ConsoleTheme.testing, result)
+                        if (result.transactions && (result.optionalError === null || result.optionalError === undefined)) {
+                            this.dispatchAction(OverviewActions.gotTransactionDataFromWallet(result.transactions))
+                        }
+                    },
+                    error => this.logger.debug(this, `startPollingTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error),
+                // () => this.logger.debug(this, `startPollingBlockChainInfo`, `observable completed.`, ConsoleTheme.testing)
+            )
+        }
+
+        // The first run
+        getAsyncTransactionDataFromWallet()
+
+        // The periodic run
+        if (transactionDataFromWalletPollingIntervalId !== -1) {
+            clearInterval(transactionDataFromWalletPollingIntervalId)
+            transactionDataFromWalletPollingIntervalId = -1
+        }
+        transactionDataFromWalletPollingIntervalId = setInterval(() => getAsyncTransactionDataFromWallet(), transactionDataFromWalletPollingIntervalSetting)
     }
 
     /**
@@ -332,7 +363,7 @@ export class ResistanceCliService {
 
                         this.dispatchAction(SystemInfoActions.gotBlockChainInfo(blockchainInfo))
                     },
-                    error => this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe blockchainInfo: `, ConsoleTheme.error, error),
+                    error => this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe error: `, ConsoleTheme.error, error),
                 // () => this.logger.debug(this, `startPollingBlockChainInfo`, `observable completed.`, ConsoleTheme.testing)
             )
         }

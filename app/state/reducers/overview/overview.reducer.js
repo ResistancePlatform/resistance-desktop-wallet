@@ -52,7 +52,7 @@ const initState: OverviewState = {
     privateBalance: 0,
     totalBalance: 0
   },
-  transactionList: []
+  transactions: []
 }
 
 export const OverviewReducer = (state: OverviewState = initState, action: AppAction) => {

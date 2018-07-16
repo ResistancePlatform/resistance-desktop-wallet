@@ -29,6 +29,7 @@ class SystemInfo extends Component<Props> {
 		appStore.dispatch(SystemInfoActions.startGettingDaemonInfo())
 		appStore.dispatch(SystemInfoActions.startGettingBlockChainInfo())
 		appStore.dispatch(OverviewActions.startGettingWalletInfo())
+		appStore.dispatch(OverviewActions.startGettingTransactionDataFromWallet())
 	}
 
 	displayLastBlockTime(tempDate: Date | null) {
