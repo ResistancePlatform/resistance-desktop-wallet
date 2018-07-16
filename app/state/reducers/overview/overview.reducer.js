@@ -43,14 +43,6 @@ export const OverviewActions = {
   loadBalancesSuccess: (balances: Balances): AppAction => ({ type: OverviewActions.LOAD_BALANCES_SUCCESS, payload: balances }),
   loadBalancesFail: (error: string): AppAction => ({ type: OverviewActions.LOAD_BALANCES_FAIL, payload: error }),
 
-  loadTransactionList: (): AppAction => ({ type: OverviewActions.LOAD_TRANSACTION_LIST }),
-  loadTransactionListSuccess: (transactionList: Array<Transaction>): AppAction => ({ type: OverviewActions.LOAD_TRANSACTION_LIST_SUCCESS, payload: transactionList }),
-  loadTransactionListFail: (error: string): AppAction => ({ type: OverviewActions.LOAD_TRANSACTION_LIST_FAIL, payload: error }),
-
-  mainWindowClose: (): AppAction => ({ type: OverviewActions.MAIN_WINDOW_CLOSE }),
-  mainWindowMinimize: (): AppAction => ({ type: OverviewActions.MAIN_WINDOW_MINIMIZE }),
-  mainWindowMaximize: (): AppAction => ({ type: OverviewActions.MAIN_WINDOW_MAXIMIZE }),
-
   empty: (): AppAction => ({ type: OverviewActions.EMPTY })
 }
 

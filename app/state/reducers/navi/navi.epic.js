@@ -4,31 +4,17 @@ import { map, tap } from 'rxjs/operators'
 import { merge } from 'rxjs'
 
 import { ActionsObservable, ofType } from 'redux-observable'
-// import { Store } from 'redux'
 import { AppAction } from '../appAction'
-
 import { NaviActions } from './navi.reducer'
+import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
 
-// const logger = LoggerService.getInstance()
-// const service = DataProxyService.getInstance()
 const epicInstanceName = 'NaviEpics'
+const logger = new LoggerService()
 
-// const naviToPathEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-//     ofType(NaviActions.NAVI_TO_PATH),
-//     // tap(action => logger.debug(`${epicInstanceName}`, `loadTopListEpic`, `action:`, ConsoleTheme.testing, action)),
-//     tap((action: AppAction) => console.log(`[ ${epicInstanceName} ] - loadBalancesEpic, ${action.type}`)),
-//     switchMap(() => resistanceCliService.getBalance()),
-//     map(result => result ? NaviActions.loadBalancesSuccess(result) : NaviActions.loadBalancesFail('Cannot load balance.')),
-//     catchError(error => {
-//         // console.error(`error: `, error)
-//         const errorMessage = error.code && error.code === 'ECONNREFUSED' ? 'Cannot connect to "resistanced" service.' : error
-//         return of(NaviActions.loadBalancesFail(errorMessage))
-//     })
-// )
 
 const naviPathChangedEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
     ofType('@@router/LOCATION_CHANGE'),
-    tap((action) => console.log(`[ ${epicInstanceName} ] - naviPathChangedEpic, pathname: ${action.payload.pathname}`)),
+    tap((action: AppAction) => logger.debug(epicInstanceName, `naviPathChangedEpic`, `pathname: `, ConsoleTheme.testing, action.payload.pathname)),
     map((action) => NaviActions.naviToPathSuccess(action.payload.pathname))
 )
 

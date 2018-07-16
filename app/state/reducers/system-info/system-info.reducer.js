@@ -28,7 +28,7 @@ export const SystemInfoActions = {
   GOT_DAEMON_INFO: `${systemInfoActionTypePrefix}: GOT_DAEMON_INFO`,
 
   START_GETTING_BLOCKCHAIN_INFO: `${systemInfoActionTypePrefix}: START_GETTING_BLOCKCHAIN_INFO`,
-  GOT_BLOCKCHAIN_INFO: `${systemInfoActionTypePrefix}: GOT_DGOT_BLOCKCHAIN_INFOAEMON_INFO`,
+  GOT_BLOCKCHAIN_INFO: `${systemInfoActionTypePrefix}: GOT_BLOCKCHAIN_INFO`,
 
   startGettingDaemonInfo: (): AppAction => ({ type: SystemInfoActions.START_GETTING_DAEMON_INFO }),
   gotDaemonInfo: (daemonInfo: DaemonInfo): AppAction => ({ type: SystemInfoActions.GOT_DAEMON_INFO, payload: daemonInfo }),

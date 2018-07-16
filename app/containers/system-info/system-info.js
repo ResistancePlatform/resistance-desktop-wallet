@@ -25,20 +25,24 @@ class SystemInfo extends Component<Props> {
 	 * @memberof SystemInfo
 	 */
 	componentDidMount() {
+		appStore.dispatch(SystemInfoActions.startGettingDaemonInfo())
 		appStore.dispatch(SystemInfoActions.startGettingBlockChainInfo())
 	}
 
 	displayLastBlockTime(tempDate: Date | null) {
 		if (tempDate === undefined || tempDate === null || tempDate === false) {
 			return 'N/A'
-		} 
-
-		const nowDate = new Date()
-		if (tempDate.toLocaleDateString() === nowDate.toLocaleDateString()) {
-			return `Today, ${tempDate.toLocaleTimeString()}`
 		}
 
-		return tempDate.toLocaleString()
+		const nowDate = new Date()
+		let tempDateTimeStr = ''
+		if (tempDate.toLocaleDateString() === nowDate.toLocaleDateString()) {
+			tempDateTimeStr = `Today, ${tempDate.toLocaleTimeString()}`
+		} else {
+			tempDateTimeStr = tempDate.toLocaleString()
+		}
+
+		return tempDateTimeStr.substring(0, tempDateTimeStr.length - 3)
 	}
 
 	/**

@@ -3,7 +3,9 @@
 import Client from 'bitcoin-core'
 import { Observable, from, timer } from 'rxjs'
 import { map, tap, take } from 'rxjs/operators'
+import { LoggerService, ConsoleTheme } from './logger-service'
 import { getFormattedDateString } from '../utils/data-util'
+import { AppAction } from '../state/reducers/appAction'
 import { Balances, Transaction } from '../state/reducers/overview/overview.reducer'
 import { BlockChainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 
@@ -23,12 +25,19 @@ const getResistanceClientInstance = () => new Client({
     timeout: 500
 })
 
+let daemonInfoPollingIntervalId = -1
+const daemonInfoPollingIntervalSetting = 1 * 1000
+let blockchainInfoPollingIntervalId = -1
+const blockchainInfoPollingIntervalSetting = 5 * 1000
+
 
 /**
  * @export
  * @class ResistanceCliService
  */
 export class ResistanceCliService {
+
+    logger: LoggerService
 
     /**
      *Creates an instance of ResistanceCliService.
@@ -40,9 +49,26 @@ export class ResistanceCliService {
         }
 
         this.time = new Date()
-        // this.logger.debug(this, `constructor`, `ResistanceCliService created.`, ConsoleTheme.testing)
+        this.logger = new LoggerService()
 
         return instance
+    }
+
+    /**
+     * We CANNOT use:
+     *   import { appStore } from '../state/store/configureStore'
+     * 
+     * As that will import BEFORE the `appStore` be created !!!
+     * We have to require the latest `appStore` to make sure it has been created !!!
+     *
+     * @param {AppAction} action
+     * @memberof ResistanceCliService
+     */
+    dispatchAction(action: AppAction) {
+        const storeModule = require('../state/store/configureStore')
+        if (storeModule && storeModule.appStore) {
+            storeModule.appStore.dispatch(action)
+        }
     }
 
 
@@ -63,7 +89,7 @@ export class ResistanceCliService {
                     privateBalance: parseFloat(result[0].private),
                     totalBalance: parseFloat(result[0].total) // .toPrecision(10)
                 })),
-                tap(balances => console.log(`balances: `, balances))
+                tap(balances => this.logger.debug(this, `getBalance`, `balances: `, ConsoleTheme.testing, balances))
             )
     }
 
@@ -120,13 +146,66 @@ export class ResistanceCliService {
 
 
     /**
-     * Polling the daemon status per 1 second
+     * Polling the daemon status per 1 second, for getting the `resistanced` running status and memory usage
      *
      * @returns {Observable<DaemonInfo>}
      * @memberof ResistanceCliService
      */
     startPollingDaemonStatus(): Observable<DaemonInfo> {
-        return timer(100, 1000)
+        /**
+         * 
+         */
+        const getAsyncDaemonInfo = () => {
+            const cli = getResistanceClientInstance()
+            const daemonInfo: DaemonInfo = {
+                status: 'RUNNING',
+                residentSizeMB: 0,
+                optionalError: null
+            }
+
+            const getInfoPromise = cli.getInfo()
+                .then(() => {
+                    delete (daemonInfo.optionalError)
+                    return daemonInfo
+                })
+                .catch(error => {
+                    console.error(error)
+                    daemonInfo.optionalError = error
+                    return daemonInfo
+                })
+
+            from(getInfoPromise)
+                .pipe(
+                    take(1)
+                )
+                .subscribe(
+                    (result: DaemonInfo) => {
+                        const daemonInfoResult = Object.assign(result)
+
+                        if (daemonInfoResult.optionalError) {
+                            if (daemonInfoResult.optionalError.code && daemonInfoResult.optionalError.code === 'ECONNREFUSED') {
+                                daemonInfoResult.status = 'NOT_RUNNING'
+                            } else {
+                                daemonInfoResult.status = 'UNABLE_TO_ASCERTAIN'
+                            }
+                        }
+
+                        this.dispatchAction(SystemInfoActions.gotDaemonInfo(daemonInfoResult))
+                    },
+                    (error) => this.logger.debug(this, `startPollingDaemonStatus`, `Error happen: `, ConsoleTheme.error, error),
+                    // () => this.logger.debug(this, `startPollingDaemonStatus`, `observable completed.`, ConsoleTheme.testing)
+                );
+        }
+
+        // The first run
+        getAsyncDaemonInfo()
+
+        // The periodic run
+        if (daemonInfoPollingIntervalId !== -1) {
+            clearInterval(daemonInfoPollingIntervalId);
+            daemonInfoPollingIntervalId = -1
+        }
+        daemonInfoPollingIntervalId = setInterval(() => getAsyncDaemonInfo(), daemonInfoPollingIntervalSetting)
     }
 
     /**
@@ -157,7 +236,6 @@ export class ResistanceCliService {
     startPollingBlockChainInfo() {
 
         /**
-         * 
          * @param {*} tempDate 
          */
         const getBlockchainSynchronizedPercentage = (tempDate: Date) => {
@@ -178,7 +256,7 @@ export class ResistanceCliService {
                 }
 
                 // Also set a member that may be queried
-                return  parseFloat(dPercentage.toFixed(2))
+                return parseFloat(dPercentage.toFixed(2))
             }
 
             return 100
@@ -215,7 +293,8 @@ export class ResistanceCliService {
                 .then(result => cli.getBlockHash(result))
                 .then(result => cli.getBlock(result))
                 .then(result => {
-                    console.log(`blockInfo: ${JSON.stringify(result, null, 4)}`)
+                    this.logger.debug(this, `startPollingBlockChainInfo`, `blockInfo`, ConsoleTheme.testing, result)
+
                     finalResult.lastBlockDate = new Date(result.time * 1000)
                     finalResult.blockchainSynchronizedPercentage = getBlockchainSynchronizedPercentage(finalResult.lastBlockDate)
                     delete (finalResult.optionalError)
@@ -229,43 +308,16 @@ export class ResistanceCliService {
 
             from(getBlockChainInfoPromise)
                 .pipe(
-                    take(1),
-                    tap(blockchainInfo => console.log(`blockchainInfo from tap: `, blockchainInfo))
+                    take(1)
                 )
                 .subscribe(
                     (blockchainInfo: BlockChainInfo) => {
-                        console.log(`blockchainInfo: `, blockchainInfo)
+                        this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe blockchainInfo: `, ConsoleTheme.testing, blockchainInfo)
 
-                        /**
-                         * We CANNOT use:
-                         *   import { appStore } from '../state/store/configureStore'
-                         * 
-                         * As that will import BEFORE the `appStore` be created !!!
-                         * We have to require the latest `appStore` to make sure it has been created !!!
-                         */
-                        const storeModule = require('../state/store/configureStore')
-                        console.log(`appStore: `, storeModule.appStore)
-                        if (storeModule.appStore) {
-                            storeModule.appStore.dispatch(SystemInfoActions.gotBlockChainInfo(blockchainInfo))
-
-                            const daemonInfo: DaemonInfo = {
-                                status: 'RUNNING',
-                                residentSizeMB: 0
-                            }
-
-                            if (blockchainInfo.optionalError) {
-                                if (blockchainInfo.optionalError.code && blockchainInfo.optionalError.code === 'ECONNREFUSED') {
-                                    daemonInfo.status = 'NOT_RUNNING'
-                                } else {
-                                    daemonInfo.status = 'UNABLE_TO_ASCERTAIN'
-                                }
-                            }
-
-                            storeModule.appStore.dispatch(SystemInfoActions.gotDaemonInfo(daemonInfo))
-                        }
+                        this.dispatchAction(SystemInfoActions.gotBlockChainInfo(blockchainInfo))
                     },
-                    error => console.error(`error: `, error),
-                    () => console.log(`observable completed.`)
+                    error => this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe blockchainInfo: `, ConsoleTheme.error, error),
+                    // () => this.logger.debug(this, `startPollingBlockChainInfo`, `observable completed.`, ConsoleTheme.testing)
                 )
         }
 
@@ -273,6 +325,10 @@ export class ResistanceCliService {
         getAsyncBlockchainInfo()
 
         // The periodic run
-        setInterval(() => getAsyncBlockchainInfo(), 5000)
+        if (blockchainInfoPollingIntervalId !== -1) {
+            clearInterval(blockchainInfoPollingIntervalId)
+            blockchainInfoPollingIntervalId = -1
+        }
+        blockchainInfoPollingIntervalId = setInterval(() => getAsyncBlockchainInfo(), blockchainInfoPollingIntervalSetting)
     }
 }
