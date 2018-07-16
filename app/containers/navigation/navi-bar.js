@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react'
 import { NavLink } from 'react-router-dom'
-import styles from './Navi-bar.scss'
-import { OverviewActions } from '../state/reducers/overview/overview.reducer'
-import { appStore } from '../state/store/configureStore'
+import styles from './navi-bar.scss'
+import { NaviActions } from '../../state/reducers/navi/navi.reducer'
+import { appStore } from '../../state/store/configureStore'
 
 type Props = {}
 
@@ -12,17 +12,17 @@ export default class NaviBar extends Component<Props> {
 
   onCloseClicked(event) {
     event.preventDefault();
-    appStore.dispatch(OverviewActions.mainWindowClose())
+    appStore.dispatch(NaviActions.mainWindowClose())
   }
 
   onMinimizeClicked(event) {
     event.preventDefault();
-    appStore.dispatch(OverviewActions.mainWindowMinimize())
+    appStore.dispatch(NaviActions.mainWindowMinimize())
   }
 
   onMaximizeClicked(event) {
     event.preventDefault();
-    appStore.dispatch(OverviewActions.mainWindowMaximize())
+    appStore.dispatch(NaviActions.mainWindowMaximize())
   }
 
   render() {

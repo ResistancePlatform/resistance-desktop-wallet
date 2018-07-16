@@ -4,6 +4,9 @@ import { createHashHistory } from 'history'
 import { routerMiddleware } from 'react-router-redux'
 import { createLogger } from 'redux-logger'
 
+import { NaviReducer } from '../reducers/navi/navi.reducer'
+import { NaviEpics } from '../reducers/navi/navi.epic'
+
 import { SystemInfoReducer } from '../reducers/system-info/system-info.reducer'
 import { SystemInfoEpics } from '../reducers/system-info/system-info.epic'
 
@@ -13,18 +16,20 @@ import { OverviewEpics } from '../reducers/overview/overview.epic'
 export const history = createHashHistory()
 
 const appReducers = combineReducers({
+  navi: NaviReducer,
   systemInfo: SystemInfoReducer,
   overview: OverviewReducer
 })
 
 export const appEpics = combineEpics(
+  NaviEpics,
   SystemInfoEpics,
   OverviewEpics
 )
 
 const epicMiddleware = createEpicMiddleware()
 
-export let appStore: Store = null;
+export let appStore: Store = null
 
 export const configureStore = (initialState) => {
   // Redux Configuration
@@ -42,11 +47,11 @@ export const configureStore = (initialState) => {
   }
 
   // Router Middleware
-  const router = routerMiddleware(history);
-  middleware.push(router);
+  const router = routerMiddleware(history)
+  middleware.push(router)
 
   // Epic middleware
-  middleware.push(epicMiddleware);
+  middleware.push(epicMiddleware)
 
   // Create Store
   appStore = createStore(

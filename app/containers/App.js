@@ -1,11 +1,12 @@
 // @flow
 import React from 'react'
-import { Switch, Route } from 'react-router'
+import { Switch, Route, Redirect } from 'react-router'
+import NaviBar from './navigation/navi-bar'
 import SytemInfo from './system-info/system-info'
-import Overview from './OverviewPage'
+import Overview from './overview/overview'
 
 import styles from './App.scss'
-// import HLayout from '../theme/h-box-layout.scss'
+import HLayout from '../theme/h-box-layout.scss'
 import VLayout from '../theme/v-box-layout.scss'
 
 
@@ -23,19 +24,29 @@ export default class App extends React.Component<Props> {
 	render() {
 		return (
 			<div id="App" className={[styles.appContainer, VLayout.vBoxContainer].join(' ')}>
-				<Switch>
-					{
-						/*
-						<Route path="/own-addresses" component={OwnAddresses} />
-						<Route path="/send-cash" component={SendCash} />
-						<Route path="/address-book" component={AddressBook} />
-						<Route path="/settings" component={Settings} /> 
-						<Route exact path="/" component={Overview} />
-						*/
-					}
-					<Route exact path="/" component={Overview} />
-					{/* <Route exact path="/" render={() => <Overview />} /> */}
-				</Switch>
+				{ /* Content container */}
+				<div className={[styles.contentContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
+					<NaviBar />
+
+					{ /* Route content container */}
+					<div className={[styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer].join(' ')}>
+						<Switch>
+							{
+								/*
+								<Route path="/own-addresses" component={OwnAddresses} />
+								<Route path="/send-cash" component={SendCash} />
+								<Route path="/address-book" component={AddressBook} />
+								<Route path="/settings" component={Settings} /> 
+								<Route exact path="/" component={Overview} />
+								*/
+							}
+							<Route exact path="/overview" component={Overview} />
+							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
+						</Switch>
+					</div>
+				</div>
+
+				{ /* System info bar */}
 				<SytemInfo />
 			</div>
 		)

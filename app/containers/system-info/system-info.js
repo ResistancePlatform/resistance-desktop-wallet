@@ -25,10 +25,6 @@ class SystemInfo extends Component<Props> {
 	 * @memberof SystemInfo
 	 */
 	componentDidMount() {
-		// appStore.dispatch(SystemInfoActions.startGettingDaemonInfo())
-		// setTimeout(() => {
-		// 	appStore.dispatch(SystemInfoActions.startGettingBlockChainInfo())
-		// }, 1000);
 		appStore.dispatch(SystemInfoActions.startGettingBlockChainInfo())
 	}
 

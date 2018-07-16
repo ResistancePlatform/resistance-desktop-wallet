@@ -24,12 +24,3 @@ body {
 #root {
   @include full-screen();
 }
-
-#App {
-  @include full-screen();
-}
-/* a:hover {
-  opacity: 1;
-  text-decoration: none;
-  cursor: pointer;
-} */

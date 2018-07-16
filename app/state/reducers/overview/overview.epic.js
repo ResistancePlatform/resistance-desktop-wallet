@@ -55,43 +55,10 @@ const loadTransactionListFailEpic = (action$: ActionsObservable<AppAction>) => a
     map(() => of(OverviewActions.empty()))
 )
 
-const mainWindowCloseEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-    ofType(OverviewActions.MAIN_WINDOW_CLOSE),
-    tap(() => setTimeout(() => {
-        remote.getCurrentWindow().close()
-    }, 100)),
-    map(() => OverviewActions.empty())
-)
-
-const mainWindowMinimizeEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-    ofType(OverviewActions.MAIN_WINDOW_MINIMIZE),
-    tap(() => setTimeout(() => {
-        remote.getCurrentWindow().minimize()
-    }, 100)),
-    map(() => OverviewActions.empty())
-)
-
-const mainWindowMaximizeEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-    ofType(OverviewActions.MAIN_WINDOW_MAXIMIZE),
-    tap(() => setTimeout(() => {
-        const win = remote.getCurrentWindow()
-
-        if (process.platform === 'darwin') {
-            win.setFullScreen(!win.isFullScreen())
-        } else {
-            win.isMaximized() ? win.unmaximize() : win.maximize()
-        }
-    }, 100)),
-    map(() => OverviewActions.empty())
-)
-
 
 export const OverviewEpics = (action$, store) => merge(
     loadBalancesEpic(action$, store),
     loadBalancesFailEpic(action$, store),
     loadTransactionListEpic(action$, store),
-    loadTransactionListFailEpic(action$, store),
-    mainWindowCloseEpic(action$, store),
-    mainWindowMinimizeEpic(action$, store),
-    mainWindowMaximizeEpic(action$, store)
+    loadTransactionListFailEpic(action$, store)
 )

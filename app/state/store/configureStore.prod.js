@@ -4,6 +4,9 @@ import { combineEpics, createEpicMiddleware } from 'redux-observable'
 import { createHashHistory } from 'history'
 import { routerMiddleware } from 'react-router-redux'
 
+import { NaviReducer } from '../reducers/navi/navi.reducer'
+import { NaviEpics } from '../reducers/navi/navi.epic'
+
 import { SystemInfoReducer } from '../reducers/system-info/system-info.reducer'
 import { SystemInfoEpics } from '../reducers/system-info/system-info.epic'
 
@@ -12,11 +15,13 @@ import { OverviewEpics } from '../reducers/overview/overview.epic'
 
 export const history = createHashHistory()
 const appReducers = combineReducers({
+  navi: NaviReducer,
   systemInfo: SystemInfoReducer,
   overview: OverviewReducer
 })
 
 export const appEpics = combineEpics(
+  NaviEpics,
   SystemInfoEpics,
   OverviewEpics
 )

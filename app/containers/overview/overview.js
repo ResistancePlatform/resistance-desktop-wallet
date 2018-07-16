@@ -1,15 +1,12 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-// import { OverviewActions, OverviewState } from '../state/reducers/overview/overview.reducer'
-// import { appStore } from '../state/store/configureStore'
 
-import NaviBar from '../components/Navi-bar'
-import Balance from '../components/overview/Balance'
-import TransactionList from '../components/overview/TransactionList'
-import styles from './OverviewPage.scss'
-import HLayout from '../theme/h-box-layout.scss'
-import VLayout from '../theme/v-box-layout.scss'
+import Balance from '../../components/overview/Balance'
+import TransactionList from '../../components/overview/TransactionList'
+import styles from './overview.scss'
+import HLayout from '../../theme/h-box-layout.scss'
+import VLayout from '../../theme/v-box-layout.scss'
 
 
 type Props = {
@@ -27,8 +24,8 @@ class Overview extends Component<Props> {
 	 * @memberof Overview
 	 */
 	componentDidMount() {
-		// appStore.dispatch(OverviewActions.loadBalances())
-		// appStore.dispatch(OverviewActions.loadTransactionList())
+		// appStore.dispatch(OverviewActions.startPollingWalletBalances())
+		// appStore.dispatch(OverviewActions.startPollingWalletTransactions())
 	}
 
 
@@ -39,11 +36,10 @@ class Overview extends Component<Props> {
 	render() {
 		return (
 			// Layout container
-			<div className={[styles.layoutContainer, VLayout.vBoxChild, VLayout.vBoxContainer].join(' ')}>
+			<div className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
 
 				{ /* Route content */}
 				<div className={[styles.overviewContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
-					<NaviBar />
 
 					<div className={[HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
 						<Balance balances={this.props.overview.balances} />
