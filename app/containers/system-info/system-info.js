@@ -2,6 +2,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import { SystemInfoActions, SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
+import { OverviewActions } from '../../state/reducers/overview/overview.reducer'
 import { appStore } from '../../state/store/configureStore'
 import { AppState } from '../../state/reducers/appState'
 
@@ -27,6 +28,7 @@ class SystemInfo extends Component<Props> {
 	componentDidMount() {
 		appStore.dispatch(SystemInfoActions.startGettingDaemonInfo())
 		appStore.dispatch(SystemInfoActions.startGettingBlockChainInfo())
+		appStore.dispatch(OverviewActions.startGettingWalletInfo())
 	}
 
 	displayLastBlockTime(tempDate: Date | null) {

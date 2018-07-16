@@ -11,23 +11,18 @@ const epicInstanceName = 'OverviewEpics'
 const resistanceCliService = new ResistanceCliService()
 const logger = new LoggerService()
 
-const loadBalancesEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-    ofType(OverviewActions.LOAD_BALANCES),
-    tap((action: AppAction) => logger.debug(epicInstanceName, `loadBalancesEpic`, action.type, ConsoleTheme.testing)),
-    switchMap(() => resistanceCliService.getBalance()),
-    map(result => result ? OverviewActions.loadBalancesSuccess(result) : OverviewActions.loadBalancesFail('Cannot load balance.')),
-    catchError(error => {
-        // console.error(`error: `, error)
-        const errorMessage = error.code && error.code === 'ECONNREFUSED' ? 'Cannot connect to "resistanced" service.' : error
-        return of(OverviewActions.loadBalancesFail(errorMessage))
-    })
+const startGettingWalletInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(OverviewActions.START_GETTING_WALLET_INFO),
+    tap((action: AppAction) => logger.debug(epicInstanceName, `startGettingWalletInfoEpic`, action.type, ConsoleTheme.testing)),
+    tap(() => resistanceCliService.startPollingWalletInfo()),
+    map(result => OverviewActions.gotWalletInfo(result))
 )
 
 const loadTransactionListEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
     ofType(OverviewActions.LOAD_TRANSACTION_LIST),
     tap((action: AppAction) => logger.debug(epicInstanceName, `loadTransactionListEpic`, action.type, ConsoleTheme.testing)),
     switchMap(() => resistanceCliService.getPublicTransactions()),
-    map(result => result ? OverviewActions.loadTransactionListSuccess(result) : OverviewActions.loadTransactionListFail('Cannot load balance.')),
+    map(result => result ? OverviewActions.loadTransactionListSuccess(result) : OverviewActions.loadTransactionListFail('Cannot get transaction data from wallet.')),
     catchError(error => {
         console.error(`error: `, error)
         const errorMessage = error.code && error.code === 'ECONNREFUSED' ? 'Cannot connect to "resistanced" service.' : error
@@ -37,6 +32,6 @@ const loadTransactionListEpic = (action$: ActionsObservable<AppAction>) => actio
 
 
 export const OverviewEpics = (action$, store) => merge(
-    loadBalancesEpic(action$, store),
+    startGettingWalletInfoEpic(action$, store),
     loadTransactionListEpic(action$, store),
 )

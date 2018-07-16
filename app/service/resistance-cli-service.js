@@ -6,7 +6,7 @@ import { map, tap, take } from 'rxjs/operators'
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { getFormattedDateString } from '../utils/data-util'
 import { AppAction } from '../state/reducers/appAction'
-import { Balances, Transaction } from '../state/reducers/overview/overview.reducer'
+import { Balances, Transaction, OverviewActions } from '../state/reducers/overview/overview.reducer'
 import { BlockChainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 
 /**
@@ -29,6 +29,8 @@ let daemonInfoPollingIntervalId = -1
 const daemonInfoPollingIntervalSetting = 1 * 1000
 let blockchainInfoPollingIntervalId = -1
 const blockchainInfoPollingIntervalSetting = 5 * 1000
+let walletInfoPollingIntervalId = -1
+const walletInfoPollingIntervalSetting = 2 * 1000
 
 
 /**
@@ -69,28 +71,6 @@ export class ResistanceCliService {
         if (storeModule && storeModule.appStore) {
             storeModule.appStore.dispatch(action)
         }
-    }
-
-
-    /**
-     * @returns {Observable<Balances>}
-     * @memberof ResistanceCliService
-     */
-    getBalance(): Observable<Balances> {
-        const cli = getResistanceClientInstance()
-        const commandList = [
-            { method: 'z_gettotalbalance', parameters: ['', 1, false] }
-        ]
-
-        return from(cli.command(commandList))
-            .pipe(
-                map(result => ({
-                    transparentBalance: parseFloat(result[0].transparent),
-                    privateBalance: parseFloat(result[0].private),
-                    totalBalance: parseFloat(result[0].total) // .toPrecision(10)
-                })),
-                tap(balances => this.logger.debug(this, `getBalance`, `balances: `, ConsoleTheme.testing, balances))
-            )
     }
 
     /**
@@ -193,8 +173,8 @@ export class ResistanceCliService {
                         this.dispatchAction(SystemInfoActions.gotDaemonInfo(daemonInfoResult))
                     },
                     (error) => this.logger.debug(this, `startPollingDaemonStatus`, `Error happen: `, ConsoleTheme.error, error),
-                    // () => this.logger.debug(this, `startPollingDaemonStatus`, `observable completed.`, ConsoleTheme.testing)
-                );
+                // () => this.logger.debug(this, `startPollingDaemonStatus`, `observable completed.`, ConsoleTheme.testing)
+            );
         }
 
         // The first run
@@ -209,13 +189,49 @@ export class ResistanceCliService {
     }
 
     /**
-     * Polling the wallet balance per 2 second
+     * Polling the wallet info per 2 second
      *
      * @returns {Observable<DaemonInfo>}
      * @memberof ResistanceCliService
      */
-    startPollingWalletBalance(): Observable<DaemonInfo> {
-        return timer(100, 2000)
+    startPollingWalletInfo(): Observable<DaemonInfo> {
+        /**
+         * 
+         */
+        const getAsyncWalletInfo = () => {
+            const cli = getResistanceClientInstance()
+            const commandList = [
+                { method: 'z_gettotalbalance' },
+                // { method: 'z_gettotalbalance', parameters: [0] },
+            ]
+
+            from(cli.command(commandList))
+                .pipe(
+                    tap(result => this.logger.debug(this, `startPollingWalletInfo`, `result: `, ConsoleTheme.testing, result)),
+                    map(result => ({
+                        transparentBalance: parseFloat(result[0].transparent),
+                        privateBalance: parseFloat(result[0].private),
+                        totalBalance: parseFloat(result[0].total) // .toPrecision(10)
+                    }))
+                )
+                .subscribe(
+                    (result: Balances) => {
+                        this.dispatchAction(OverviewActions.gotWalletInfo(result))
+                    },
+                    (error) => this.logger.debug(this, `startPollingWalletInfo`, `Error happen: `, ConsoleTheme.error, error),
+                // () => this.logger.debug(this, `startPollingWalletInfo`, `observable completed.`, ConsoleTheme.testing)
+            );
+        }
+
+        // The first run
+        getAsyncWalletInfo()
+
+        // The periodic run
+        if (walletInfoPollingIntervalId !== -1) {
+            clearInterval(walletInfoPollingIntervalId);
+            walletInfoPollingIntervalId = -1
+        }
+        walletInfoPollingIntervalId = setInterval(() => getAsyncWalletInfo(), walletInfoPollingIntervalSetting)
     }
 
     /**
@@ -224,7 +240,7 @@ export class ResistanceCliService {
      * @returns {Observable<DaemonInfo>}
      * @memberof ResistanceCliService
      */
-    startPollingWalletTransactions(): Observable<DaemonInfo> {
+    startPollingTransactionsDatFromWallet(): Observable<DaemonInfo> {
         return timer(100, 5000)
     }
 
@@ -317,8 +333,8 @@ export class ResistanceCliService {
                         this.dispatchAction(SystemInfoActions.gotBlockChainInfo(blockchainInfo))
                     },
                     error => this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe blockchainInfo: `, ConsoleTheme.error, error),
-                    // () => this.logger.debug(this, `startPollingBlockChainInfo`, `observable completed.`, ConsoleTheme.testing)
-                )
+                // () => this.logger.debug(this, `startPollingBlockChainInfo`, `observable completed.`, ConsoleTheme.testing)
+            )
         }
 
         // The first run
