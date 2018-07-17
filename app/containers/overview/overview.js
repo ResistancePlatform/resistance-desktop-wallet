@@ -1,7 +1,8 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-
+import { OverviewActions } from '../../state/reducers/overview/overview.reducer'
+import { appStore } from '../../state/store/configureStore'
 import Balance from '../../components/overview/Balance'
 import TransactionList from '../../components/overview/TransactionList'
 import styles from './overview.scss'
@@ -24,10 +25,17 @@ class Overview extends Component<Props> {
 	 * @memberof Overview
 	 */
 	componentDidMount() {
-		// appStore.dispatch(OverviewActions.startPollingWalletBalances())
-		// appStore.dispatch(OverviewActions.startPollingWalletTransactions())
+		appStore.dispatch(OverviewActions.startGettingWalletInfo())
+		appStore.dispatch(OverviewActions.startGettingTransactionDataFromWallet())
 	}
 
+	/**
+	 * @memberof Overview
+	 */
+	componentWillUnmount() {
+		appStore.dispatch(OverviewActions.stopGettingWalletInfo())
+		appStore.dispatch(OverviewActions.stopGettingTransactionDataFromWallet())
+	}
 
 	/**
 	 * @returns

@@ -1,7 +1,7 @@
 // @flow
 
 import Client from 'bitcoin-core'
-import { Observable, from } from 'rxjs'
+import { from } from 'rxjs'
 import { map, tap, take } from 'rxjs/operators'
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { getFormattedDateString } from '../utils/data-util'
@@ -26,9 +26,9 @@ const getResistanceClientInstance = () => new Client({
 })
 
 let daemonInfoPollingIntervalId = -1
-const daemonInfoPollingIntervalSetting = 1 * 1000
+const daemonInfoPollingIntervalSetting = 2 * 1000
 let blockchainInfoPollingIntervalId = -1
-const blockchainInfoPollingIntervalSetting = 5 * 1000
+const blockchainInfoPollingIntervalSetting = 4 * 1000
 let walletInfoPollingIntervalId = -1
 const walletInfoPollingIntervalSetting = 2 * 1000
 let transactionDataFromWalletPollingIntervalId = -1
@@ -76,12 +76,11 @@ export class ResistanceCliService {
     }
 
     /**
-     * Polling the daemon status per 1 second, for getting the `resistanced` running status and memory usage
+     * Polling the daemon status per 2 second (after the first run), for getting the `resistanced` running status and memory usage
      *
-     * @returns {Observable<DaemonInfo>}
      * @memberof ResistanceCliService
      */
-    startPollingDaemonStatus(): Observable<DaemonInfo> {
+    startPollingDaemonStatus() {
         /**
          * 
          */
@@ -138,13 +137,23 @@ export class ResistanceCliService {
         daemonInfoPollingIntervalId = setInterval(() => getAsyncDaemonInfo(), daemonInfoPollingIntervalSetting)
     }
 
+
     /**
-     * Polling the wallet info per 2 second
-     *
-     * @returns {Observable<DaemonInfo>}
      * @memberof ResistanceCliService
      */
-    startPollingWalletInfo(): Observable<DaemonInfo> {
+    stopPollingWalletInfo() {
+        if (walletInfoPollingIntervalId !== -1) {
+            clearInterval(walletInfoPollingIntervalId);
+            walletInfoPollingIntervalId = -1
+        }
+    }
+
+    /**
+     * Polling the wallet info per 2 second (after the first run)
+     *
+     * @memberof ResistanceCliService
+     */
+    startPollingWalletInfo() {
         /**
          * 
          */
@@ -177,20 +186,26 @@ export class ResistanceCliService {
         getAsyncWalletInfo()
 
         // The periodic run
-        if (walletInfoPollingIntervalId !== -1) {
-            clearInterval(walletInfoPollingIntervalId);
-            walletInfoPollingIntervalId = -1
-        }
+        this.stopPollingWalletInfo()
         walletInfoPollingIntervalId = setInterval(() => getAsyncWalletInfo(), walletInfoPollingIntervalSetting)
     }
 
     /**
-     * Polling the wallet transactions per 5 second
-     *
-     * @returns {Observable<DaemonInfo>}
      * @memberof ResistanceCliService
      */
-    startPollingTransactionsDataFromWallet(): Observable<DaemonInfo> {
+    stopPollingTransactionsDataFromWallet() {
+        if (transactionDataFromWalletPollingIntervalId !== -1) {
+            clearInterval(transactionDataFromWalletPollingIntervalId)
+            transactionDataFromWalletPollingIntervalId = -1
+        }
+    }
+
+    /**
+     * Polling the wallet transactions per 5 second (after the first run)
+     *
+     * @memberof ResistanceCliService
+     */
+    startPollingTransactionsDataFromWallet() {
 
         /**
          * 
@@ -212,7 +227,7 @@ export class ResistanceCliService {
 
             const getConfirmed = (value: number) => value !== 0 ? 'Yes' : 'No'
 
-            const getAmount = (value: number | string) => (typeof(value) === 'string') ? parseFloat(value).toFixed(2) : value.toFixed(2)
+            const getAmount = (value: number | string) => (typeof (value) === 'string') ? parseFloat(value).toFixed(2) : value.toFixed(2)
 
             const getDate = (value: number) => {
                 const tempDate = new Date(value * 1000)
@@ -229,17 +244,22 @@ export class ResistanceCliService {
             const getPublicTransactionsPromise = cli.command(getPublicTransactionsCmd())
                 .then(result => result[0])
                 .then(result => {
-                    const transactionList: Array<Transaction> = result.map(originalTransaction => ({
-                        type: `T (Public)`,
-                        direction: getDirection(originalTransaction.category),
-                        confirmed: getConfirmed(originalTransaction.confirmations),
-                        amount: getAmount(originalTransaction.amount),
-                        date: getDate(originalTransaction.time),
-                        destinationAddress: originalTransaction.address,
-                        transactionId: originalTransaction.txid
-                    }))
-                    responseTransactions.transactions = transactionList
-                    delete responseTransactions.optionalError
+                    if (Array.isArray(result)) {
+                        const transactionList: Array<Transaction> = result.map(originalTransaction => ({
+                            type: `T (Public)`,
+                            direction: getDirection(originalTransaction.category),
+                            confirmed: getConfirmed(originalTransaction.confirmations),
+                            amount: getAmount(originalTransaction.amount),
+                            date: getDate(originalTransaction.time),
+                            destinationAddress: originalTransaction.address,
+                            transactionId: originalTransaction.txid
+                        }))
+                        responseTransactions.transactions = transactionList
+                        delete responseTransactions.optionalError                        
+                    } else {
+                        // 'result' should be an error
+                        responseTransactions.optionalError = result
+                    }
                     return responseTransactions
                 })
                 .catch(error => {
@@ -268,15 +288,22 @@ export class ResistanceCliService {
         getAsyncTransactionDataFromWallet()
 
         // The periodic run
-        if (transactionDataFromWalletPollingIntervalId !== -1) {
-            clearInterval(transactionDataFromWalletPollingIntervalId)
-            transactionDataFromWalletPollingIntervalId = -1
-        }
+        this.stopPollingTransactionsDataFromWallet()
         transactionDataFromWalletPollingIntervalId = setInterval(() => getAsyncTransactionDataFromWallet(), transactionDataFromWalletPollingIntervalSetting)
     }
 
     /**
-     * Polling the block chain info per 5 second
+     * @memberof ResistanceCliService
+     */
+    stopPollingBlockChainInfo() {
+        if (blockchainInfoPollingIntervalId !== -1) {
+            clearInterval(blockchainInfoPollingIntervalId)
+            blockchainInfoPollingIntervalId = -1
+        }
+    }
+
+    /**
+     * Polling the block chain info per 5 second (after the first run)
      *
      * @memberof ResistanceCliService
      */
@@ -372,10 +399,7 @@ export class ResistanceCliService {
         getAsyncBlockchainInfo()
 
         // The periodic run
-        if (blockchainInfoPollingIntervalId !== -1) {
-            clearInterval(blockchainInfoPollingIntervalId)
-            blockchainInfoPollingIntervalId = -1
-        }
+        this.stopPollingBlockChainInfo()
         blockchainInfoPollingIntervalId = setInterval(() => getAsyncBlockchainInfo(), blockchainInfoPollingIntervalSetting)
     }
 }

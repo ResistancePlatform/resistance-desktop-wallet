@@ -1,6 +1,6 @@
 // @flow
-import { map, tap, switchMap, catchError } from 'rxjs/operators'
-import { merge, of } from 'rxjs'
+import { map, tap } from 'rxjs/operators'
+import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { AppAction } from '../appAction'
 import { OverviewActions } from './overview.reducer'
@@ -18,6 +18,13 @@ const startGettingWalletInfoEpic = (action$: ActionsObservable<AppAction>) => ac
     map(() => OverviewActions.empty())
 )
 
+const stopGettingWalletInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(OverviewActions.STOP_GETTING_WALLET_INFO),
+    tap((action: AppAction) => logger.debug(epicInstanceName, `stopGettingWalletInfoEpic`, action.type, ConsoleTheme.testing)),
+    tap(() => resistanceCliService.stopPollingWalletInfo()),
+    map(() => OverviewActions.empty())
+)
+
 const startGettingTransactionDataFromWalletEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
     ofType(OverviewActions.START_GETTING_TRANSACTION_DATA_FROM_WALLET),
     tap((action: AppAction) => logger.debug(epicInstanceName, `startGettingTransactionDataFromWalletEpic`, action.type, ConsoleTheme.testing)),
@@ -25,8 +32,17 @@ const startGettingTransactionDataFromWalletEpic = (action$: ActionsObservable<Ap
     map(() => OverviewActions.empty())
 )
 
+const stopGettingTransactionDataFromWalletEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(OverviewActions.STOP_GETTING_TRANSACTION_DATA_FROM_WALLET),
+    tap((action: AppAction) => logger.debug(epicInstanceName, `stopGettingTransactionDataFromWalletEpic`, action.type, ConsoleTheme.testing)),
+    tap(() => resistanceCliService.stopPollingTransactionsDataFromWallet()),
+    map(() => OverviewActions.empty())
+)
 
-export const OverviewEpics = (action$, store) => merge(
-    startGettingWalletInfoEpic(action$, store),
-    startGettingTransactionDataFromWalletEpic(action$, store),
+
+export const OverviewEpics = (action$, state$) => merge(
+    startGettingWalletInfoEpic(action$, state$),
+    stopGettingWalletInfoEpic(action$, state$),
+    startGettingTransactionDataFromWalletEpic(action$, state$),
+    stopGettingTransactionDataFromWalletEpic(action$, state$)
 )
