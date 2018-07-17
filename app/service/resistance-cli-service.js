@@ -230,7 +230,10 @@ export class ResistanceCliService {
 
             const getConfirmed = (value: number) => value !== 0 ? 'Yes' : 'No'
 
-            const getAmount = (value: number | string) => (typeof (value) === 'string') ? parseFloat(value).toFixed(2) : value.toFixed(2)
+            const getAmount = (value: number | string) => {
+                const tempFloat = (typeof (value) === 'string') ? parseFloat(value).toFixed(2) : value.toFixed(2)
+                return tempFloat > 0 ? tempFloat : -tempFloat
+            } 
 
             const getDate = (value: number) => {
                 const tempDate = new Date(value * 1000)
