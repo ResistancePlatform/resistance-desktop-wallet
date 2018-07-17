@@ -12,9 +12,12 @@ export type Transaction = {
 }
 
 export type Balances = {
-  transparentBalance?: number,
-  privateBalance?: number,
-  totalBalance?: number
+  transparentBalance: number,
+  transparentUnconfirmedBalance?: number,
+  privateBalance: number,
+  privateUnconfirmedBalance: number,
+  totalBalance: number,
+  totalUnconfirmedBalance: number
 }
 
 export type OverviewState = {
@@ -46,15 +49,18 @@ export const OverviewActions = {
   startGettingTransactionDataFromWallet: (): AppAction => ({ type: OverviewActions.START_GETTING_TRANSACTION_DATA_FROM_WALLET }),
   stopGettingTransactionDataFromWallet: (): AppAction => ({ type: OverviewActions.STOP_GETTING_TRANSACTION_DATA_FROM_WALLET }),
   gotTransactionDataFromWallet: (transactions: Array<Transaction>): AppAction => ({ type: OverviewActions.GOT_TRANSACTION_DATA_FROM_WALLET, payload: transactions }),
-  
+
   empty: (): AppAction => ({ type: OverviewActions.EMPTY })
 }
 
 const initState: OverviewState = {
   balances: {
     transparentBalance: 0,
+    transparentUnconfirmedBalance: 0,
     privateBalance: 0,
-    totalBalance: 0
+    privateUnconfirmedBalance: 0,
+    totalBalance: 0,
+    totalUnconfirmedBalance: 0
   },
   transactions: []
 }

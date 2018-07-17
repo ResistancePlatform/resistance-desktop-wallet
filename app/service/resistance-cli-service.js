@@ -161,7 +161,7 @@ export class ResistanceCliService {
             const cli = getResistanceClientInstance()
             const commandList = [
                 { method: 'z_gettotalbalance' },
-                // { method: 'z_gettotalbalance', parameters: [0] },
+                { method: 'z_gettotalbalance', parameters: [0] },
             ]
 
             from(cli.command(commandList))
@@ -170,7 +170,10 @@ export class ResistanceCliService {
                     map(result => ({
                         transparentBalance: parseFloat(result[0].transparent),
                         privateBalance: parseFloat(result[0].private),
-                        totalBalance: parseFloat(result[0].total) // .toPrecision(10)
+                        totalBalance: parseFloat(result[0].total),
+                        transparentUnconfirmedBalance: parseFloat(result[1].transparent),
+                        privateUnconfirmedBalance: parseFloat(result[1].private),
+                        totalUnconfirmedBalance: parseFloat(result[1].total)
                     }))
                 )
                 .subscribe(
