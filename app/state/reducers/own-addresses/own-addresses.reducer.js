@@ -23,11 +23,15 @@ export const OwnAddressesActions = {
 
   UPDATE_DROPDOWN_MENU_VISIBILITY: `${ownAddressesActionTypePrefix}: UPDATE_DROPDOWN_MENU_VISIBILITY`,
 
+  CREATE_NEW_ADDRESS: `${ownAddressesActionTypePrefix}: CREATE_NEW_ADDRESS`,
+
   getOwnAddresses: (): AppAction => ({ type: OwnAddressesActions.GET_OWN_ADDRESSES }),
   getOwnAddressesSuccess: (addresses: AddressRow[]): AppAction => ({ type: OwnAddressesActions.GET_OWN_ADDRESSES_SUCCESS, payload: addresses }),
   getOwnAddressesFail: (): AppAction => ({ type: OwnAddressesActions.GET_OWN_ADDRESSES_FAIL }),
 
   updateDropdownMenuVisibility: (show: boolean): AppAction => ({ type: OwnAddressesActions.UPDATE_DROPDOWN_MENU_VISIBILITY, payload: show }),
+
+  createNewAddress: (isPrivate: boolean): AppAction => ({ type: OwnAddressesActions.CREATE_NEW_ADDRESS, payload: isPrivate }),
 
   empty: (): AppAction => ({ type: OwnAddressesActions.EMPTY })
 }

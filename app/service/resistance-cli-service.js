@@ -481,9 +481,8 @@ export class ResistanceCliService {
                 const addressResultSet = new Set()
 
                 if (Array.isArray(privateAddressesResult)) {
-                    const privateAddresses = privateAddressesResult.map(tempValue => tempValue.address)
-                    for (let index = 0; index < privateAddresses.length; index++) {
-                        addressResultSet.add(privateAddresses[index])
+                    for (let index = 0; index < privateAddressesResult.length; index++) {
+                        addressResultSet.add(privateAddressesResult[index])
                     }
                 }
 
@@ -531,6 +530,24 @@ export class ResistanceCliService {
         )
     }
 
+    /**
+     * @param {boolean} [isPrivate]
+     * @returns {Observable<any>}
+     * @memberof ResistanceCliService
+     */
+    createNewAddress(isPrivate?: boolean): Observable<any> {
+        const cli = getResistanceClientInstance()
+        const createNewAddressPromise = cli.command([{ method: isPrivate ? `z_getnewaddress` : `getnewaddress` }])
+            .then(newAddress => {
+                this.logger.debug(this, `createNewAddress`, `create ${isPrivate ? 'private ' : 'transparent '} address: `, ConsoleTheme.error, newAddress)
+                return newAddress
+            })
+            .catch(error => {
+                this.logger.debug(this, `createNewAddress`, `Error happen: `, ConsoleTheme.error, error)
+                return ''
+            })
 
+        return from(createNewAddressPromise).pipe(take(1))
+    }
 
 }

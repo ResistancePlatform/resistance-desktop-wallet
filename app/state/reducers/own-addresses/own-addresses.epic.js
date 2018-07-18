@@ -20,6 +20,14 @@ const getOwnAddressesEpic = (action$: ActionsObservable<AppAction>) => action$.p
     map(result => OwnAddressesActions.getOwnAddressesSuccess(result))
 )
 
+const createNewAddressesEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(OwnAddressesActions.CREATE_NEW_ADDRESS),
+    tap((action: AppAction) => logger.debug(epicInstanceName, `createNewAddressesEpic`, action.type, ConsoleTheme.testing)),
+    switchMap((action: AppAction) => resistanceCliService.createNewAddress(action.payload)),
+    map(result => result && result !== '' ? OwnAddressesActions.getOwnAddresses() : OwnAddressesActions.empty())
+)
+
 export const OwnAddressesEpics = (action$, state$) => merge(
     getOwnAddressesEpic(action$, state$),
+    createNewAddressesEpic(action$, state$)
 )

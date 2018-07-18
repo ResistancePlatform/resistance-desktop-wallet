@@ -28,32 +28,54 @@ class OwnAddresses extends Component<Props> {
 		appStore.dispatch(OwnAddressesActions.getOwnAddresses())
 	}
 
-
-	onShowPrivteKeyClicked(event) {
+	eventConfirm(event) {
 		event.preventDefault()
 		event.stopPropagation()
 	}
 
+	commonMenuItemEventHandler(event) {
+		this.eventConfirm(event)
+		appStore.dispatch(OwnAddressesActions.updateDropdownMenuVisibility(false))
+	}
+
+	onShowPrivteKeyClicked(event) {
+		this.eventConfirm(event)
+	}
+
 	onRefreshClicked(event) {
-		event.preventDefault()
-		event.stopPropagation()
+		this.eventConfirm(event)
 		appStore.dispatch(OwnAddressesActions.getOwnAddresses())
 	}
 
 	onAddNewAddressClicked(event) {
-		event.preventDefault()
-		event.stopPropagation()
+		this.eventConfirm(event)
 		appStore.dispatch(OwnAddressesActions.updateDropdownMenuVisibility(true))
 	}
 
 	hideDropdownMenu(event) {
-		event.preventDefault()
-		event.stopPropagation()
-		appStore.dispatch(OwnAddressesActions.updateDropdownMenuVisibility(false))
+		this.commonMenuItemEventHandler(event)
 	}
 
 	getDropdownMenuStyles() {
 		return this.props.ownAddresses && this.props.ownAddresses.showDropdownMenu ? 'block' : 'none'
+	}
+
+	onAddNewTransparentAddressHandler(event) {
+		this.commonMenuItemEventHandler(event)
+		appStore.dispatch(OwnAddressesActions.createNewAddress(false))
+	}
+
+	onAddNewPrivateAddressHandler(event) {
+		this.commonMenuItemEventHandler(event)
+		appStore.dispatch(OwnAddressesActions.createNewAddress(true))
+	}
+
+	onImportPrivateKeyHandler(event) {
+		this.commonMenuItemEventHandler(event)
+	}
+
+	onExportPrivateKeysHandler(event) {
+		this.commonMenuItemEventHandler(event)
 	}
 
 	/**
@@ -63,10 +85,10 @@ class OwnAddresses extends Component<Props> {
 	render() {
 		return (
 			// Layout container
-			<div 
+			<div
 				className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}
-				onClick={(event) => this.hideDropdownMenu(event)} 
-				onKeyDown={(event) => this.hideDropdownMenu(event)} 
+				onClick={(event) => this.hideDropdownMenu(event)}
+				onKeyDown={(event) => this.hideDropdownMenu(event)}
 			>
 
 				{ /* Route content */}
@@ -86,7 +108,12 @@ class OwnAddresses extends Component<Props> {
 
 									{ /* Dropdown menu container */}
 									<div className={styles.dropdownMenu} style={{ display: this.getDropdownMenuStyles() }}>
-										<AddAddressPopupMenu />
+										<AddAddressPopupMenu
+											onAddNewTransparentAddressHandler={(event) => this.onAddNewTransparentAddressHandler(event)}
+											onAddNewPrivateAddressHandler={(event) => this.onAddNewPrivateAddressHandler(event)}
+											onImportPrivateKeyHandler={(event) => this.onImportPrivateKeyHandler(event)}
+											onExportPrivateKeysHandler={(event) => this.onExportPrivateKeysHandler(event)}
+										/>
 									</div>
 								</div>
 							</div>
