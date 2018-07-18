@@ -525,9 +525,7 @@ export class ResistanceCliService {
                 return []
             })
 
-        return from(queryPromise).pipe(
-            take(1)
-        )
+        return from(queryPromise).pipe(take(1))
     }
 
     /**
