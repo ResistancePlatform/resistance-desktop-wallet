@@ -1,13 +1,14 @@
 // @flow
 
 import Client from 'bitcoin-core'
-import { from } from 'rxjs'
+import { from, Observable } from 'rxjs'
 import { map, tap, take } from 'rxjs/operators'
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { getFormattedDateString } from '../utils/data-util'
 import { AppAction } from '../state/reducers/appAction'
-import { Balances, Transaction, OverviewActions } from '../state/reducers/overview/overview.reducer'
 import { BlockChainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
+import { Balances, Transaction, OverviewActions } from '../state/reducers/overview/overview.reducer'
+import { AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
 
 /**
  * ES6 singleton
@@ -233,7 +234,7 @@ export class ResistanceCliService {
             const getAmount = (value: number | string) => {
                 const tempFloat = (typeof (value) === 'string') ? parseFloat(value).toFixed(2) : value.toFixed(2)
                 return tempFloat > 0 ? tempFloat : -tempFloat
-            } 
+            }
 
             const getDate = (value: number) => {
                 const tempDate = new Date(value * 1000)
@@ -242,7 +243,7 @@ export class ResistanceCliService {
 
             const cli = getResistanceClientInstance()
             const getPublicTransactionsCmd = () => [{ method: 'listtransactions', parameters: ['', 200] }]
-            // const getWalletZAddressesCmd = () => [{ method: 'z_listaddresses', parameters: [null] }]
+            // const getWalletZAddressesCmd = () => [{ method: 'z_listaddresses' }]
             // const getWalletZReceivedTransactionsCmd = (zAddress) => [{ method: 'z_listreceivedbyaddress', parameters: [zAddress, 0] }]
 
             const responseTransactions = { transactions: null, optionalError: null }
@@ -261,7 +262,7 @@ export class ResistanceCliService {
                             transactionId: originalTransaction.txid
                         }))
                         responseTransactions.transactions = transactionList
-                        delete responseTransactions.optionalError                        
+                        delete responseTransactions.optionalError
                     } else {
                         // 'result' should be an error
                         responseTransactions.optionalError = result
@@ -408,4 +409,121 @@ export class ResistanceCliService {
         this.stopPollingBlockChainInfo()
         blockchainInfoPollingIntervalId = setInterval(() => getAsyncBlockchainInfo(), blockchainInfoPollingIntervalSetting)
     }
+
+
+    /**
+     * @param {Client} cli
+     * @returns {Promise<any>}
+     * @memberof ResistanceCliService
+     */
+    getWalletPrivateAddresses(cli: Client): Promise<any> {
+        return cli.command([{ method: 'z_listaddresses' }])
+    }
+
+    /**
+     * @param {Client} cli
+     * @returns {Promise<any>}
+     * @memberof ResistanceCliService
+     */
+    getWalletAllPublicAddresses(cli: Client): Promise<any> {
+        return cli.command([{ method: 'listreceivedbyaddress', parameters: [0, true] }])
+    }
+
+
+    /**
+     * @param {Client} cli
+     * @returns {Promise<any>}
+     * @memberof ResistanceCliService
+     */
+    getWalletPublicAddressesWithUnspentOutputs(cli: Client): Promise<any> {
+        return cli.command([{ method: 'listunspent', parameters: [0] }])
+    }
+
+    /**
+     * @param {Client} cli
+     * @param {string} address
+     * @returns {Promise<any>}
+     * @memberof ResistanceCliService
+     */
+    getAddressBalance(cli: Client, addressRow: AddressRow): Promise<any> {
+        return cli.command([
+            { method: 'z_getbalance', parameters: [addressRow.address] },
+            { method: 'z_getbalance', parameters: [addressRow.address, 0] },
+        ]).then(result => {
+            const confirmedBalance = result[0]
+            const unconfirmedBalance = result[1]
+            const isConfirmed = confirmedBalance === unconfirmedBalance
+
+            return Object.assign(addressRow, {
+                balance: isConfirmed ? confirmedBalance : unconfirmedBalance,
+                confirmed: isConfirmed
+            })
+        })
+    }
+
+    getWalletOwnAddresses(): Observable<any> {
+        const cli = getResistanceClientInstance()
+        const promiseArr = [
+            this.getWalletPrivateAddresses(cli),
+            this.getWalletAllPublicAddresses(cli),
+            this.getWalletPublicAddressesWithUnspentOutputs(cli)
+        ]
+
+        Promise.all(promiseArr)
+            .then(result => {
+                console.log(`result: `, result)
+                const privateAddressesResult = result[0][0]
+                const PublicAddressesResult = result[1][0]
+                const PublicAddressesUnspendResult = result[2][0]
+
+                const addressResultSet = new Set()
+
+                if (Array.isArray(privateAddressesResult)) {
+                    const privateAddresses = privateAddressesResult.map(tempValue => tempValue.address)
+                    for (let index = 0; index < privateAddresses.length; index++) {
+                        addressResultSet.add(privateAddresses[index])
+                    }
+                }
+
+                if (Array.isArray(PublicAddressesResult)) {
+                    const publicAddresses = PublicAddressesResult.map(tempValue => tempValue.address)
+                    for (let index = 0; index < publicAddresses.length; index++) {
+                        addressResultSet.add(publicAddresses[index])
+                    }
+                }
+
+                if (Array.isArray(PublicAddressesUnspendResult)) {
+                    const publicAddresses = PublicAddressesUnspendResult.map(tempValue => tempValue.address)
+                    for (let index = 0; index < publicAddresses.length; index++) {
+                        addressResultSet.add(publicAddresses[index])
+                    }
+                }
+
+                const combinedAddresses = Array.from(addressResultSet).map(addr => ({
+                    balance: 0,
+                    confirmed: false,
+                    address: addr
+                }))
+                this.logger.debug(this, `getWalletOwnAddresses`, `combinedAddresses: `, ConsoleTheme.testing, combinedAddresses)
+                return combinedAddresses
+            })
+            .then(combinedAddresses => {
+                if (Array.isArray(combinedAddresses)) {
+                    const tempPromiseArr = combinedAddresses.map(tempAddressRow => this.getAddressBalance(cli, tempAddressRow))
+                    return Promise.all(tempPromiseArr)
+                }
+
+                return []
+            })
+            .then(addresses => {
+                this.logger.debug(this, `getWalletOwnAddresses`, `addresses: `, ConsoleTheme.testing, addresses)
+                return addresses
+            })
+            .catch(error => {
+                this.logger.debug(this, `getWalletOwnAddresses`, `Error happen: `, ConsoleTheme.error, error)
+            })
+    }
+
+
+
 }

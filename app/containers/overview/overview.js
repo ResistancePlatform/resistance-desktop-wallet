@@ -55,8 +55,6 @@ class Overview extends Component<Props> {
 					</div>
 				</div>
 
-				{/* Fixed bottom status bar */}
-
 			</div>
 		)
 	}

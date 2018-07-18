@@ -30,6 +30,7 @@
     "no-multi-assign": "off",
     "no-unused-expressions": "off",
     "no-lonely-if": "off",
+    "no-plusplus": "off",
     "class-methods-use-this": "off",
     "promise/param-names": "error",
     "promise/always-return": "error",
