@@ -1,0 +1,94 @@
+@import "../../theme/vars.scss";
+
+$TRANSACTION_LIST_COLUMN_TYPE_WIDTH: 6rem;
+$TRANSACTION_LIST_COLUMN_DIRECTION_WIDTH: 5rem;
+$TRANSACTION_LIST_COLUMN_CONFIRMED_WIDTH: 5rem;
+$TRANSACTION_LIST_COLUMN_AMOUNT_WIDTH: 6rem;
+$TRANSACTION_LIST_COLUMN_DATE_WIDTH: 9rem;
+
+.ownAddressListContainer {
+    background-color: $TRANSACTION_LIST_BACKGROUND_COLOR;
+
+    color: $TRANSACTION_LIST_BODY_FONT_COLOR;
+
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.title {
+    margin-bottom: 1.6rem;
+
+    text-align: left;
+    
+    font-size: 1.5rem;
+    font-weight: 100;
+    font-style: normal;
+}
+
+.tableContainer {
+
+}
+
+.tableHeader {
+    div {
+        display: inline-block;
+        color: $TRANSACTION_LIST_HEADER_FONT_COLOR;
+        font-size: 0.8rem;
+    }
+}
+
+.tableHeaderColumnType {
+    width: $TRANSACTION_LIST_COLUMN_TYPE_WIDTH;
+}
+
+.tableHeaderColumnDirection {
+    width: $TRANSACTION_LIST_COLUMN_DIRECTION_WIDTH;
+}
+
+.tableHeaderColumnConfirmed {
+    width: $TRANSACTION_LIST_COLUMN_CONFIRMED_WIDTH;
+}
+
+.tableHeaderColumnAmount {
+    width: $TRANSACTION_LIST_COLUMN_AMOUNT_WIDTH;
+}
+
+.tableHeaderColumnDate {
+    width: $TRANSACTION_LIST_COLUMN_DATE_WIDTH;
+}
+
+
+.tableBodyRow {
+    div {
+        padding: 0.8rem 0;
+
+        display: inline-block;
+
+        font-size: 0.8rem;
+
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        border-bottom: 1px solid $TRANSACTION_LIST_BODY_SEPARATOR_COLOR;
+    }
+}
+
+.tableBodyRowColumnType {
+    width: $TRANSACTION_LIST_COLUMN_TYPE_WIDTH;
+}
+
+.tableBodyRowColumnDirection {
+    width: $TRANSACTION_LIST_COLUMN_DIRECTION_WIDTH;
+}
+
+.tableBodyRowColumnConfirmed {
+    width: $TRANSACTION_LIST_COLUMN_CONFIRMED_WIDTH;
+}
+
+.tableBodyRowColumnAmount {
+    width: $TRANSACTION_LIST_COLUMN_AMOUNT_WIDTH;
+}
+
+.tableBodyRowColumnDate {
+    width: $TRANSACTION_LIST_COLUMN_DATE_WIDTH;
+}

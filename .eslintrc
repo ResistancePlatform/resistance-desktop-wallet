@@ -30,6 +30,7 @@
     "no-multi-assign": "off",
     "no-unused-expressions": "off",
     "no-lonely-if": "off",
+    "no-plusplus": "off",
     "class-methods-use-this": "off",
     "promise/param-names": "error",
     "promise/always-return": "error",
@@ -46,7 +47,8 @@
       "multiline"
     ],
     "react/jsx-indent": "off",
-    "react/no-array-index-key": "off"
+    "react/no-array-index-key": "off",
+    "react/jsx-indent-props": "off"    
   },
   "plugins": [
     "flowtype",

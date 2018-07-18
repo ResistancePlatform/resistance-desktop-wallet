@@ -1,0 +1,32 @@
+@import "../../theme/vars.scss";
+
+.AddAddressPopupMenuContainer {
+    padding: 0.5rem 1.5rem;
+    min-width: 16rem;
+    width: 16rem;
+
+    position: absolute;
+    right: 0;
+    top: 0.5rem;
+
+    background-color: $OWN_ADDRESSES_DROPDOWN_MENU_BACKGROUND_COLOR;
+
+    text-align: left;
+    border-radius: 0.35rem;
+}
+
+.menuItem {
+    padding: 1.3rem 1rem;
+    border-bottom: 1px solid $BASE_COLOR_BODER_GRAY;
+
+    color: $BASE_COLOR_BUTTON_FONT_GRAY;
+    font-size: 0.75rem;
+
+    &:hover {
+        color: $BASE_COLOR_PURPLE;
+    }
+}
+
+.lastMenuItem {
+    border-bottom: none;
+}

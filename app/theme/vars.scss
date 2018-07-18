@@ -9,7 +9,7 @@ $BASE_COLOR_GRAY: rgb(68,76, 110);
 $BASE_COLOR_BODER_GRAY: rgb(67, 75, 109);
 $BASE_COLOR_BUTTON_FONT_GRAY: rgb(163, 172, 199);
 $BASE_COLOR_WHITE: rgb(238, 238, 241);
-
+$BASE_COLOR_DARK_BLUE: rgb(29, 36, 64);
 
 // ------------------------------------------------------------------------------------------------------
 // Navigation bar
@@ -54,3 +54,8 @@ $TRANSACTION_LIST_BODY_FONT_COLOR: $BASE_COLOR_WHITE;
 $TRANSACTION_LIST_BODY_ICON_COLOR: rgb(67, 75, 109);
 $TRANSACTION_LIST_BODY_SEPARATOR_COLOR: rgb(49, 56, 88);
 
+
+// ------------------------------------------------------------------------------------------------------
+// Own addresses
+// ------------------------------------------------------------------------------------------------------
+ $OWN_ADDRESSES_DROPDOWN_MENU_BACKGROUND_COLOR: rgb(37, 44, 73);

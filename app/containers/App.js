@@ -4,6 +4,7 @@ import { Switch, Route, Redirect } from 'react-router'
 import NaviBar from './navigation/navi-bar'
 import SytemInfo from './system-info/system-info'
 import Overview from './overview/overview'
+import OwnAddress from './own-addresses/own-addresses'
 
 import styles from './App.scss'
 import HLayout from '../theme/h-box-layout.scss'
@@ -33,7 +34,6 @@ export default class App extends React.Component<Props> {
 						<Switch>
 							{
 								/*
-								<Route path="/own-addresses" component={OwnAddresses} />
 								<Route path="/send-cash" component={SendCash} />
 								<Route path="/address-book" component={AddressBook} />
 								<Route path="/settings" component={Settings} /> 
@@ -41,6 +41,7 @@ export default class App extends React.Component<Props> {
 								*/
 							}
 							<Route exact path="/overview" component={Overview} />
+							<Route exact path="/own-addresses" component={OwnAddress} />
 							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
 						</Switch>
 					</div>
