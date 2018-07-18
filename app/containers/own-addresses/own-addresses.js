@@ -1,9 +1,10 @@
 // @flow
 import React, { Component } from 'react'
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'
 import { OwnAddressesActions, OwnAddressesState } from '../../state/reducers/own-addresses/own-addresses.reducer'
 import { appStore } from '../../state/store/configureStore'
 import OwnAddressList from '../../components/own-addresses/own-address-list'
+import AddAddressPopupMenu from '../../components/own-addresses/add-address-popup-menu'
 import styles from './own-addresses.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
@@ -29,16 +30,30 @@ class OwnAddresses extends Component<Props> {
 
 
 	onShowPrivteKeyClicked(event) {
-		event.preventDefault();
+		event.preventDefault()
+		event.stopPropagation()
 	}
 
 	onRefreshClicked(event) {
-		event.preventDefault();
+		event.preventDefault()
+		event.stopPropagation()
 		appStore.dispatch(OwnAddressesActions.getOwnAddresses())
 	}
 
 	onAddNewAddressClicked(event) {
-		event.preventDefault();
+		event.preventDefault()
+		event.stopPropagation()
+		appStore.dispatch(OwnAddressesActions.updateDropdownMenuVisibility(true))
+	}
+
+	hideDropdownMenu(event) {
+		event.preventDefault()
+		event.stopPropagation()
+		appStore.dispatch(OwnAddressesActions.updateDropdownMenuVisibility(false))
+	}
+
+	getDropdownMenuStyles() {
+		return this.props.ownAddresses && this.props.ownAddresses.showDropdownMenu ? 'block' : 'none'
 	}
 
 	/**
@@ -48,7 +63,11 @@ class OwnAddresses extends Component<Props> {
 	render() {
 		return (
 			// Layout container
-			<div className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
+			<div 
+				className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}
+				onClick={(event) => this.hideDropdownMenu(event)} 
+				onKeyDown={(event) => this.hideDropdownMenu(event)} 
+			>
 
 				{ /* Route content */}
 				<div className={[styles.ownAddressesContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
@@ -61,9 +80,14 @@ class OwnAddresses extends Component<Props> {
 							<div className={[styles.topBarButtonContainer, HLayout.hBoxChild].join(' ')}>
 								<button onClick={(event) => this.onShowPrivteKeyClicked(event)} onKeyDown={(event) => this.onShowPrivteKeyClicked(event)} > SHOW PRIVATE KEY</button>
 								<button onClick={(event) => this.onRefreshClicked(event)} onKeyDown={(event) => this.onRefreshClicked(event)} > REFRESH</button>
-								<div onClick={(event) => this.onAddNewAddressClicked(event)} onKeyDown={(event) => this.onAddNewAddressClicked(event)} >
+								<div className={styles.addAddressButtonContainer} onClick={(event) => this.onAddNewAddressClicked(event)} onKeyDown={(event) => this.onAddNewAddressClicked(event)} >
 									<button className={styles.addNewAddressButton} >+ ADD NEW ADDRESS</button>
 									<div className={styles.addNewAddressButtonAddon} ><i className="fa fa-chevron-down" /></div>
+
+									{ /* Dropdown menu container */}
+									<div className={styles.dropdownMenu} style={{ display: this.getDropdownMenuStyles() }}>
+										<AddAddressPopupMenu />
+									</div>
 								</div>
 							</div>
 						</div>
@@ -83,4 +107,4 @@ const mapStateToProps = (state) => ({
 	ownAddresses: state.ownAddresses
 })
 
-export default connect(mapStateToProps, null)(OwnAddresses);
+export default connect(mapStateToProps, null)(OwnAddresses)

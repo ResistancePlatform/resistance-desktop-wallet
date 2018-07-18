@@ -8,11 +8,11 @@
 
     @if $activeStyle {
         background-color: $BASE_COLOR_PURPLE;
-        border: 2px solid $BASE_COLOR_PURPLE;
+        border: 1.5px solid $BASE_COLOR_PURPLE;
         color: $BASE_COLOR_WHITE;
     } @else {
         background-color: transparent;
-        border: 2px solid $BASE_COLOR_BODER_GRAY;
+        border: 1.5px solid $BASE_COLOR_BODER_GRAY;
         color: $BASE_COLOR_BUTTON_FONT_GRAY;
     }
 
