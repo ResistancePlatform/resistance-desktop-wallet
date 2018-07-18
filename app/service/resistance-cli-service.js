@@ -453,9 +453,11 @@ export class ResistanceCliService {
             const confirmedBalance = result[0]
             const unconfirmedBalance = result[1]
             const isConfirmed = confirmedBalance === unconfirmedBalance
+            const tempBalance = isConfirmed ? confirmedBalance : unconfirmedBalance
+            const fixedBalanceStr = typeof tempBalance === 'string' ? parseFloat(tempBalance).toFixed(2) : tempBalance.toFixed(2)
 
             return Object.assign(addressRow, {
-                balance: isConfirmed ? confirmedBalance : unconfirmedBalance,
+                balance: parseFloat(fixedBalanceStr),
                 confirmed: isConfirmed
             })
         })
