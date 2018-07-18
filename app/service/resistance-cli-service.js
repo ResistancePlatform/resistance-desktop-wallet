@@ -469,7 +469,7 @@ export class ResistanceCliService {
             this.getWalletPublicAddressesWithUnspentOutputs(cli)
         ]
 
-        Promise.all(promiseArr)
+        const queryPromise = Promise.all(promiseArr)
             .then(result => {
                 console.log(`result: `, result)
                 const privateAddressesResult = result[0][0]
@@ -521,7 +521,12 @@ export class ResistanceCliService {
             })
             .catch(error => {
                 this.logger.debug(this, `getWalletOwnAddresses`, `Error happen: `, ConsoleTheme.error, error)
+                return []
             })
+
+        return from(queryPromise).pipe(
+            take(1)
+        )
     }
 
 

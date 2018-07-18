@@ -10,7 +10,7 @@ import VLayout from '../../theme/v-box-layout.scss'
 
 
 type Props = {
-	OwnAddresses: OwnAddressesState
+	ownAddresses: OwnAddressesState
 }
 
 /**
@@ -54,7 +54,7 @@ class OwnAddresses extends Component<Props> {
 							</div>
 						</div>
 
-						<OwnAddressList />
+						<OwnAddressList addresses={this.props.ownAddresses.addresses} />
 
 					</div>
 				</div>
@@ -66,7 +66,7 @@ class OwnAddresses extends Component<Props> {
 
 
 const mapStateToProps = (state) => ({
-	OwnAddresses: state.OwnAddresses
+	ownAddresses: state.ownAddresses
 })
 
 export default connect(mapStateToProps, null)(OwnAddresses);

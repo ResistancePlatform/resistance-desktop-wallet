@@ -21,7 +21,7 @@ export const OwnAddressesActions = {
   GET_OWN_ADDRESSES_FAIL: `${ownAddressesActionTypePrefix}: GET_OWN_ADDRESSES_FAIL`,
 
   getOwnAddresses: (): AppAction => ({ type: OwnAddressesActions.GET_OWN_ADDRESSES }),
-  getOwnAddressesSuccess: (address: string[]): AppAction => ({ type: OwnAddressesActions.GET_OWN_ADDRESSES_SUCCESS, payload: address }),
+  getOwnAddressesSuccess: (addresses: AddressRow[]): AppAction => ({ type: OwnAddressesActions.GET_OWN_ADDRESSES_SUCCESS, payload: addresses }),
   getOwnAddressesFail: (): AppAction => ({ type: OwnAddressesActions.GET_OWN_ADDRESSES_FAIL }),
 
   empty: (): AppAction => ({ type: OwnAddressesActions.EMPTY })
