@@ -27,6 +27,20 @@ class OwnAddresses extends Component<Props> {
 		appStore.dispatch(OwnAddressesActions.getOwnAddresses())
 	}
 
+
+	onShowPrivteKeyClicked(event) {
+		event.preventDefault();
+	}
+
+	onRefreshClicked(event) {
+		event.preventDefault();
+		appStore.dispatch(OwnAddressesActions.getOwnAddresses())
+	}
+
+	onAddNewAddressClicked(event) {
+		event.preventDefault();
+	}
+
 	/**
 	 * @returns
 	 * @memberof OwnAddresses
@@ -45,9 +59,9 @@ class OwnAddresses extends Component<Props> {
 						<div className={[styles.topBar, HLayout.hBoxContainer].join(' ')}>
 							<div className={styles.topBarTitle}>Own Addresses</div>
 							<div className={[styles.topBarButtonContainer, HLayout.hBoxChild].join(' ')}>
-								<button >SHOW PRIVATE KEY</button>
-								<button >REFRESH</button>
-								<div>
+								<button onClick={(event) => this.onShowPrivteKeyClicked(event)} onKeyDown={(event) => this.onShowPrivteKeyClicked(event)} > SHOW PRIVATE KEY</button>
+								<button onClick={(event) => this.onRefreshClicked(event)} onKeyDown={(event) => this.onRefreshClicked(event)} > REFRESH</button>
+								<div onClick={(event) => this.onAddNewAddressClicked(event)} onKeyDown={(event) => this.onAddNewAddressClicked(event)} >
 									<button className={styles.addNewAddressButton} >+ ADD NEW ADDRESS</button>
 									<div className={styles.addNewAddressButtonAddon} ><i className="fa fa-chevron-down" /></div>
 								</div>
