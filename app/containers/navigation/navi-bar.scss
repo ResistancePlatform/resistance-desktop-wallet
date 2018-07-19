@@ -55,17 +55,22 @@ $NAVI_BAR_CONTAINER_WIDTH: 13rem;
 
   span {
     margin-right: 0.8rem;
+    color: $NAVI_BAR_ITEM_ICON_COLOR;
   }
 
   a {
     text-decoration: none;
     color: $NAVI_BAR_ITEM_FONT_COLOR;
+  }
+}
 
-    .active {
-      color: $NAVI_BAR_ITEM_FONT_ACTIVE_COLOR;
-    }
-
+.activeNaviVBarItem {
+  span {
+    color: $NAVI_BAR_ITEM_ICON_ACTIVE_COLOR;
   }
 
+  a {
+    color: $NAVI_BAR_ITEM_FONT_ACTIVE_COLOR;
+  }
 }
 

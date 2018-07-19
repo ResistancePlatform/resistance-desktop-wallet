@@ -5,6 +5,7 @@ import NaviBar from './navigation/navi-bar'
 import SytemInfo from './system-info/system-info'
 import Overview from './overview/overview'
 import OwnAddress from './own-addresses/own-addresses'
+import SendCash from './send-cash/send-cash'
 
 import styles from './App.scss'
 import HLayout from '../theme/h-box-layout.scss'
@@ -34,7 +35,6 @@ export default class App extends React.Component<Props> {
 						<Switch>
 							{
 								/*
-								<Route path="/send-cash" component={SendCash} />
 								<Route path="/address-book" component={AddressBook} />
 								<Route path="/settings" component={Settings} /> 
 								<Route exact path="/" component={Overview} />
@@ -42,6 +42,7 @@ export default class App extends React.Component<Props> {
 							}
 							<Route exact path="/overview" component={Overview} />
 							<Route exact path="/own-addresses" component={OwnAddress} />
+							<Route exact path="/send-cash" component={SendCash} />
 							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
 						</Switch>
 					</div>
