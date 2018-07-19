@@ -1,0 +1,241 @@
+@import "../../theme/vars.scss";
+@import "../../theme/generic-component.scss";
+
+.sendCashContainer {
+    padding: 3rem 2rem;
+
+    min-width: 30rem;
+}
+
+.wrapperContainer {
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.titleBar {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.sendFromContainer {
+    margin-bottom: 2rem;
+
+    font-size: 0.7rem;
+    font-weight: 300;
+}
+
+.sendFromTitle {
+    display: inline-block;
+    margin-right: 1.5rem;
+    color: $BASE_COLOR_BUTTON_FONT_GRAY;
+}
+
+.sendFromCheckboxContainer {
+    display: inline-block;
+
+    span {
+        margin-right: 2.5rem;
+        font-weight: 500;
+    }
+}
+
+.fromAddressContainer {
+    position: relative;
+    margin-bottom: 1rem;
+
+    font-size: 0.7rem;
+    font-weight: 300;
+    
+    div {
+        display: inline-block;
+    }
+}
+
+.sendPrivatelyToggleContainer {
+    margin-left: 1rem;
+
+    .sendPrivateTitle {
+        color: $BASE_COLOR_BUTTON_FONT_GRAY;
+    }
+}
+
+.toggleButton {
+    position: absolute;
+    width: 3.8rem;
+    height: 1.4rem;
+    margin-top: -0.55rem;
+    margin-left: 1rem;
+    padding: 0.2rem;
+
+    cursor: pointer;
+
+    background-color: $SEND_CASH_TOGGLE_BUTTON_BACKGROUND_COLOR;
+    border-radius: 5rem;
+
+    .toggleButtonSwitcher {
+        margin-left: 0.1rem;
+        margin-top: 0.025rem;
+    
+        height: 1.35rem;
+        width: 1.35rem;
+    
+        border-radius: 5rem;
+        background-color: $SEND_CASH_TOGGLE_BUTTON_SWITCHER_COLOR;
+    }
+    
+    .toggleButtonText {
+        position: absolute;
+        right: 0.5rem;
+        top: 0.5rem;
+    
+        color: $SEND_CASH_TOGGLE_BUTTON_TEXT_COLOR
+    }
+}
+
+.toggleButtonOn {
+    .toggleButtonSwitcher {
+        margin-left: 2.3rem;
+    }
+
+    .toggleButtonText {
+        left: 0.5rem;
+        right: unset;
+        color: $SEND_CASH_TOGGLE_BUTTON_SWITCHER_COLOR;
+    }
+}
+
+
+.amountContainer {
+    .transactionFeeContainer {
+        display: inline-block;
+
+        font-weight: 300;
+        font-size: 0.6rem;
+
+        color: $BASE_COLOR_BUTTON_FONT_GRAY;
+
+        span {
+            margin-right: 0.5rem;
+        }
+
+        .part2 {
+            font-weight: 500;
+        }
+    }
+}
+
+// Overwrite the CSS to change the width
+div[name="destination-address"] {
+    margin-bottom: 1rem;
+
+    width: 35.5rem;
+
+    input {
+        min-width: 20rem !important;
+        max-width: 25rem !important;
+        width: 21rem !important;
+    }
+}
+
+div[name="amount"] {
+    display: inline-block;
+    margin-bottom: 1rem;
+    margin-right: 1.5rem;
+
+    input {
+        text-align: right;
+        width: 21rem;
+        max-width: 25rem;
+    }
+}
+
+
+.sendButtonContainer {
+    margin-bottom: 1.5rem;
+    button {
+        @include roundedButton(true);
+
+        margin-left: 0;
+        margin-right: 2rem;
+        padding: 0.5rem 2rem;
+    }
+
+    div {
+        display: inline-block;
+    }
+
+    .desc {
+        width: 30rem;
+
+        display: flex;
+        align-items: center;
+
+        .descIcon {
+            font-size: 1.8rem;
+            color: $BASE_COLOR_BUTTON_FONT_GRAY;
+        }
+
+        .descContent {
+            margin-left: 1rem;
+
+            font-weight: 400;
+            font-size: 0.7rem;
+        }
+    }
+}
+
+.processRow {
+    width: 38.5rem;
+    margin-bottom: 2.5rem;
+
+    font-size: 0.7rem;
+    font-weight: 300;
+
+    .row1 {
+        margin-bottom: 0.5rem;
+
+        .processRow1Title {
+            margin-right: 0.5rem;
+            color: $BASE_COLOR_BUTTON_FONT_GRAY;
+        }
+    
+        .processRow1Status {
+            font-weight: 400;
+        }
+    
+        .processRow1Percent {
+            text-align: right;
+    
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+    }
+
+    .row2 {
+        height: 0.3rem;
+        border-radius: 2rem;
+
+        .progressBarPercent {
+            background-image: $SEND_CASH_PROGRESS_BAR_BACKGROUND_IMAGE;
+        }
+    }
+}
+
+.memoConatiner {
+    padding: 2rem 0;
+
+    font-size: 0.7rem;
+    font-weight: 300;
+
+    color: $BASE_COLOR_BUTTON_FONT_GRAY;    
+
+    border-top: 1px solid $BASE_COLOR_BODER_GRAY;
+
+    .memoTitle {
+        margin-right: 0.5rem;
+
+        font-weight: 400;
+        color: $BASE_COLOR_WHITE;
+    }
+
+}

@@ -11,7 +11,8 @@ import { OverviewReducer } from '../reducers/overview/overview.reducer'
 import { OverviewEpics } from '../reducers/overview/overview.epic'
 import { OwnAddressesReducer } from '../reducers/own-addresses/own-addresses.reducer'
 import { OwnAddressesEpics } from '../reducers/own-addresses/own-addresses.epic'
-
+import { SendCashReducer } from '../reducers/send-cash/send-cash.reducer'
+// import { SendCashEpics } from '../reducers/send-cash/send-cash.epic'
 
 export const history = createHashHistory()
 
@@ -19,7 +20,8 @@ const appReducers = combineReducers({
   navi: NaviReducer,
   systemInfo: SystemInfoReducer,
   overview: OverviewReducer,
-  ownAddresses: OwnAddressesReducer
+  ownAddresses: OwnAddressesReducer,
+  sendCash: SendCashReducer
 })
 
 export const appEpics = combineEpics(
