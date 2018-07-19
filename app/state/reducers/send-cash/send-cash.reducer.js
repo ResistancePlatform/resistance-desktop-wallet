@@ -2,7 +2,8 @@
 import { AppAction } from '../appAction'
 
 export type SendCashState = {
-  isPrivateSendOn: fale
+  isPrivateSendOn: fale,
+  operationProgressPercent: number
 }
 
 const sendCashActionTypePrefix = 'SEND_CASH_ACTION'
@@ -18,7 +19,8 @@ export const SendCashActions = {
 }
 
 const initState: SendCashState = {
-  isPrivateSendOn: false
+  isPrivateSendOn: false,
+  operationProgressPercent: 0.6
 }
 
 export const SendCashReducer = (state: SendCashState = initState, action: AppAction) => {

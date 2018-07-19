@@ -66,7 +66,18 @@ class SendCash extends Component<Props> {
 		console.log(`onDestAddressInputChanged: ${value}`)
 	}
 
+	onAmountAddressInputChanged(value) {
+		console.log(`onAmountAddressInputChanged: ${value}`)
+	}
 
+	onSendButtonClicked(event) {
+		this.eventConfirm(event);
+		console.log(`onSendButtonClicked---->`)
+	}
+
+	getOperationProgressBarStyles() {
+		return { flex: this.props.sendCash.operationProgressPercent }
+	}
 
 	/**
 	 * @returns
@@ -83,6 +94,13 @@ class SendCash extends Component<Props> {
 			enable: true,
 			type: 'PASTE',
 			onAddonClicked: this.onDestAddressPasteClicked
+		}
+
+		const amountAddressAddon: RoundedInputAddon = {
+			enable: true,
+			type: 'TEXT_PLACEHOLDER',
+			value: 'RES',
+			onAddonClicked: null
 		}
 
 		return (
@@ -138,6 +156,52 @@ class SendCash extends Component<Props> {
 							addon={destAddressAddon}
 							onInputChange={(value) => this.onDestAddressInputChanged(value)}
 						/>
+
+						{ /* Amount */}
+						<div className={styles.amountContainer}>
+							<RounedInput
+								name='amount'
+								title='AMOUNT'
+								addon={amountAddressAddon}
+								onInputChange={(value) => this.onAmountAddressInputChanged(value)}
+							/>
+							<div className={styles.transactionFeeContainer}>
+								<span className={styles.part1}>TRANSACTION FEE: </span>
+								<span className={styles.part2}>0.0001</span>
+								<span className={styles.part3}>RES</span>
+							</div>
+						</div>
+
+						{ /* Send button row */}
+						<div className={[styles.sendButtonContainer, HLayout.hBoxContainer].join(' ')}>
+							<button onClick={(event) => this.onSendButtonClicked(event)} onKeyDown={(event) => this.onSendButtonClicked(event)} >SEND</button>
+							<div className={[styles.desc, HLayout.hBoxContainer].join(' ')}>
+								<div className={styles.descIcon}><i className="fa fa-unlock" /></div>
+								<div className={styles.descContent}>You are about to send money from Transparent (K1,JZ) address to Transparent address. This transaction will be visible to everyone.</div>
+							</div>
+						</div>
+
+						{ /* Process row */}
+						<div className={[styles.processRow, VLayout.vBoxContainer].join(' ')}>
+							<div className={[styles.row1, HLayout.hBoxContainer].join(' ')}>
+								<div className={styles.processRow1Title}>LAST OPERATION STATUS: </div>
+								<div className={styles.processRow1Status}>IN PROGRESS</div>
+								<div className={[styles.processRow1Percent, HLayout.hBoxChild].join(' ')}>31%</div>
+							</div>
+
+							<div className={[styles.row2, HLayout.hBoxContainer].join(' ')}>
+								<div className={styles.progressBarPercent} style={this.getOperationProgressBarStyles()} />
+							</div>
+						</div>
+
+						{ /* Memo */ }
+						<div className={styles.memoConatiner} >
+							<span className={styles.memoTitle}>Memo:</span>
+							When sending cash from a Transparent (K1,JZ) address, the remaining balance is sent to another out-generated K1,JZ address.
+							When sending from a Private (Z) address, the remaining unsent balance remains with the Z address. In both case the original
+							sending address cannot be usef for sending again unit the transaction is confirmed. The address is temporarily remove from 
+							the list. Freshly mined coins may only be sent to a Private (Z) address.
+						</div>
 					</div>
 				</div>
 

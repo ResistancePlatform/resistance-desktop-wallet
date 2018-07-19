@@ -67,7 +67,7 @@ export default class RoundedInput extends Component<Props> {
             )
         } else if (this.props.addon.type === 'TEXT_PLACEHOLDER') {
             return (
-                <span className={styles.roundedInputAddonContainer}>{this.props.addon.value}</span>
+                <span className={styles.roundedInputAddonTextPlaceholder}>{this.props.addon.value}</span>
             )
         }
     }

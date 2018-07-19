@@ -14,6 +14,7 @@
     }
 
     .roundedInputTitle {
+        color: $BASE_COLOR_BUTTON_FONT_GRAY;
         width: 9rem;
     }
     
@@ -49,4 +50,8 @@
     .addOnPaste {
         margin-left: 0.5rem;
     }
+}
+
+.roundedInputAddonTextPlaceholder {
+    color: $BASE_COLOR_BUTTON_FONT_GRAY;
 }

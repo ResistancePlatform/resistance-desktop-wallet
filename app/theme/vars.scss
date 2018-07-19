@@ -65,6 +65,7 @@ $TRANSACTION_LIST_BODY_SEPARATOR_COLOR: rgb(49, 56, 88);
  // ------------------------------------------------------------------------------------------------------
 // Send cash
 // ------------------------------------------------------------------------------------------------------
-$OWN_TOGGLE_BUTTON_BACKGROUND_COLOR: $BASE_COLOR_DARK_BLUE_2;
-$OWN_TOGGLE_BUTTON_SWITCHER_COLOR: $BASE_COLOR_PURPLE;
-$OWN_TOGGLE_BUTTON_TEXT_COLOR: $BASE_COLOR_GRAY;
+$SEND_CASH_TOGGLE_BUTTON_BACKGROUND_COLOR: $BASE_COLOR_DARK_BLUE_2;
+$SEND_CASH_TOGGLE_BUTTON_SWITCHER_COLOR: $BASE_COLOR_PURPLE;
+$SEND_CASH_TOGGLE_BUTTON_TEXT_COLOR: $BASE_COLOR_GRAY;
+$SEND_CASH_PROGRESS_BAR_BACKGROUND_IMAGE: linear-gradient(45deg, rgba(0, 158, 216, 1.0) 10%, rgba(164, 104, 241, 1.0));
