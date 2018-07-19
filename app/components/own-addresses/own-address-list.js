@@ -21,8 +21,8 @@ export default class OwnAddressList extends Component<Props> {
 
 		const tableBody = this.props.addresses.map((addrewwRow) => (
 			<div className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')} key={addrewwRow.address}>
-				<div className={styles.tableBodyRowColumnType} >{addrewwRow.balance ? addrewwRow.balance.toFixed(2) : 0}</div>
-				<div className={styles.tableBodyRowColumnDirection}>{addrewwRow.confirmed ? 'YES' : 'NO'}</div>
+				<div className={styles.tableBodyRowColumnBalance} >{addrewwRow.balance ? addrewwRow.balance.toFixed(2) : 0}</div>
+				<div className={styles.tableBodyRowColumnConfirmed}>{addrewwRow.confirmed ? 'YES' : 'NO'}</div>
 				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnAddress].join(' ')}>{addrewwRow.address}</div>
 			</div>
 		))
@@ -30,7 +30,7 @@ export default class OwnAddressList extends Component<Props> {
 		return (
 			<div className={[styles.tableContainer].join(' ')}>
 				<div className={[HLayout.hBoxContainer, styles.tableHeader].join(' ')}>
-					<div className={styles.tableHeaderColumnType}>Balance</div>
+					<div className={styles.tableHeaderColumnBalance}>Balance</div>
 					<div className={styles.tableHeaderColumnConfirmed}>Confirmed</div>
 					<div className={[HLayout.hBoxChild, styles.tableHeaderColumnAddress].join(' ')}>Address</div>
 				</div>

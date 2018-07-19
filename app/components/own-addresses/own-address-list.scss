@@ -1,10 +1,8 @@
 @import "../../theme/vars.scss";
 
-$TRANSACTION_LIST_COLUMN_TYPE_WIDTH: 6rem;
-$TRANSACTION_LIST_COLUMN_DIRECTION_WIDTH: 5rem;
-$TRANSACTION_LIST_COLUMN_CONFIRMED_WIDTH: 5rem;
-$TRANSACTION_LIST_COLUMN_AMOUNT_WIDTH: 6rem;
-$TRANSACTION_LIST_COLUMN_DATE_WIDTH: 9rem;
+$OWN_ADDRESS_LIST_COLUMN_TYPE_WIDTH: 6rem;
+$OWN_ADDRESS_LIST_COLUMN_CONFIRMED_WIDTH: 5rem;
+$OWN_ADDRESS_LIST_COLUMN_ADDRESS_WIDTH: 60%;
 
 .ownAddressListContainer {
     background-color: $TRANSACTION_LIST_BACKGROUND_COLOR;
@@ -37,24 +35,15 @@ $TRANSACTION_LIST_COLUMN_DATE_WIDTH: 9rem;
     }
 }
 
-.tableHeaderColumnType {
-    width: $TRANSACTION_LIST_COLUMN_TYPE_WIDTH;
-}
-
-.tableHeaderColumnDirection {
-    width: $TRANSACTION_LIST_COLUMN_DIRECTION_WIDTH;
+.tableHeaderColumnBalance {
+    width: $OWN_ADDRESS_LIST_COLUMN_TYPE_WIDTH;
 }
 
 .tableHeaderColumnConfirmed {
-    width: $TRANSACTION_LIST_COLUMN_CONFIRMED_WIDTH;
+    width: $OWN_ADDRESS_LIST_COLUMN_CONFIRMED_WIDTH;
 }
 
-.tableHeaderColumnAmount {
-    width: $TRANSACTION_LIST_COLUMN_AMOUNT_WIDTH;
-}
-
-.tableHeaderColumnDate {
-    width: $TRANSACTION_LIST_COLUMN_DATE_WIDTH;
+.tableHeaderColumnAddress {
 }
 
 
@@ -74,22 +63,14 @@ $TRANSACTION_LIST_COLUMN_DATE_WIDTH: 9rem;
     }
 }
 
-.tableBodyRowColumnType {
-    width: $TRANSACTION_LIST_COLUMN_TYPE_WIDTH;
-}
-
-.tableBodyRowColumnDirection {
-    width: $TRANSACTION_LIST_COLUMN_DIRECTION_WIDTH;
+.tableBodyRowColumnBalance {
+    width: $OWN_ADDRESS_LIST_COLUMN_TYPE_WIDTH;
 }
 
 .tableBodyRowColumnConfirmed {
-    width: $TRANSACTION_LIST_COLUMN_CONFIRMED_WIDTH;
+    width: $OWN_ADDRESS_LIST_COLUMN_CONFIRMED_WIDTH;
 }
 
-.tableBodyRowColumnAmount {
-    width: $TRANSACTION_LIST_COLUMN_AMOUNT_WIDTH;
-}
-
-.tableBodyRowColumnDate {
-    width: $TRANSACTION_LIST_COLUMN_DATE_WIDTH;
+.tableBodyRowColumnAddress {
+   max-width: $OWN_ADDRESS_LIST_COLUMN_ADDRESS_WIDTH;
 }
