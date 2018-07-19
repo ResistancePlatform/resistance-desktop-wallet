@@ -43,49 +43,15 @@
 
     font-size: 0.7rem;
     font-weight: 300;
-
+    
     div {
         display: inline-block;
     }
-
-    .leftPart {
-        margin-right: 1rem;
-        padding: 0 1.3rem;
-
-        border: 1.5px solid $BASE_COLOR_BODER_GRAY;
-        border-radius: 5rem;
-    }
 }
 
-.fromAddressTitle {
-    width: 8rem;
+.sendPrivatelyToggleContainer {
+    margin-left: 1rem;
 }
-
-.fromAddressInput {
-
-    input {
-        padding: 0.5rem 1rem;
-
-        min-width: 12rem;
-        max-width: 12rem;
-        width: 12rem;
-
-        background-color: transparent;
-        border: 0;
-        border-left: 1.5px solid $BASE_COLOR_BODER_GRAY;
-
-        color: $BASE_COLOR_WHITE;
-
-        &:focus {
-            outline: none
-        }
-    }
-}
-
-.fromAddressInputAddon {
-    cursor: pointer;
-}
-
 
 .toggleButton {
     position: absolute;
@@ -129,5 +95,15 @@
         left: 0.5rem;
         right: unset;
         color: $OWN_TOGGLE_BUTTON_SWITCHER_COLOR;
+    }
+}
+
+// Overwrite the CSS to change the width
+div[name="destination-address"] {
+    width: 35.5rem;
+
+    input {
+        width: 21rem;
+        max-width: 25rem;
     }
 }

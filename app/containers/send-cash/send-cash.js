@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
+import RounedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import { SendCashActions, SendCashState } from '../../state/reducers/send-cash/send-cash.reducer'
 import { appStore } from '../../state/store/configureStore'
 import styles from './send-cash.scss'
@@ -49,11 +50,41 @@ class SendCash extends Component<Props> {
 		appStore.dispatch(SendCashActions.togglePrivateSend())
 	}
 
+	onFromAddressDropdownClicked(addonType) {
+		console.log(`onFromAddressDropdownClicked: ${addonType}`)
+	}
+
+	onFromAddressInputChanged(value) {
+		console.log(`onFromAddressInputChanged: ${value}`)
+	}
+
+	onDestAddressPasteClicked(addonType) {
+		console.log(`onDestAddressPasteClicked: ${addonType}`)
+	}
+
+	onDestAddressInputChanged(value) {
+		console.log(`onDestAddressInputChanged: ${value}`)
+	}
+
+
+
 	/**
 	 * @returns
 	 * @memberof SendCash
 	 */
 	render() {
+		const fromAddressAddon: RoundedInputAddon = {
+			enable: true,
+			type: 'DROPDOWN',
+			onAddonClicked: this.onFromAddressDropdownClicked
+		}
+
+		const destAddressAddon: RoundedInputAddon = {
+			enable: true,
+			type: 'PASTE',
+			onAddonClicked: this.onDestAddressPasteClicked
+		}
+
 		return (
 			// Layout container
 			<div className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
@@ -78,21 +109,19 @@ class SendCash extends Component<Props> {
 
 						{ /* From address */}
 						<div className={styles.fromAddressContainer}>
-							<div className={styles.leftPart}>
-								<div className={styles.fromAddressTitle}>FROM ADDRESS</div>
-
-								<div className={styles.fromAddressInput}>
-									<input type="text" />
-									<span className={styles.fromAddressInputAddon}><i className="fa fa-chevron-down" /></span>
-								</div>
-							</div>
+							<RounedInput
+								name='from-address'
+								title='FROM ADDRESS'
+								addon={fromAddressAddon}
+								onInputChange={(value) => this.onFromAddressInputChanged(value)}
+							/>
 
 							{ /* Toggle button */}
 							<div className={styles.sendPrivatelyToggleContainer}>
 								<div className={styles.sendPrivateTitle}>SEND PRIVATELY</div>
 
-								<div 
-									className={this.getPrivatelyToggleButtonClasses()} 
+								<div
+									className={this.getPrivatelyToggleButtonClasses()}
 									onClick={(event) => this.onPrivateSendToggleClicked(event)}
 									onKeyDown={(event) => this.onPrivateSendToggleClicked(event)}
 								>
@@ -102,6 +131,13 @@ class SendCash extends Component<Props> {
 							</div>
 						</div>
 
+						{ /* Destination address */}
+						<RounedInput
+							name='destination-address'
+							title='DESTINATION ADDRESS'
+							addon={destAddressAddon}
+							onInputChange={(value) => this.onDestAddressInputChanged(value)}
+						/>
 					</div>
 				</div>
 
