@@ -14,6 +14,11 @@ $TOP_BAR_HEIGHT: 5rem;
     height: $TOP_BAR_HEIGHT;
 
     align-items: center;
+    overflow: visible;
+}
+
+.topBarTitle {
+    font-size: 1.2rem;
 }
 
 .topBarButtonContainer {
@@ -47,7 +52,7 @@ button {
     cursor: pointer;
 
     width: 1rem;
-    padding: 0.6rem 1.2rem 0.6rem 0.4rem;
+    padding: 0.55rem 1.2rem 0.54rem 0.4rem;
 
     background-color: $BASE_COLOR_PURPLE;
 

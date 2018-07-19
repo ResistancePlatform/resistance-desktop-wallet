@@ -53,18 +53,22 @@ export default class Balance extends Component<Props> {
 				</div>
 
 				<div className={[styles.privateBalance, HLayout.hBoxChild].join(' ')}>
-					<div className={styles.balanceTitle}>PRIVATE BALANCE (R)</div>
-					<div className={this.getBalanceValueStyles('private')}>
-						{this.props.balances.privateUnconfirmedBalance ? this.props.balances.privateUnconfirmedBalance : 0}
-						<span className={styles.balanceValueUnit}>RES</span>
+					<div className={styles.balanceWraper}>
+						<div className={styles.balanceTitle}>PRIVATE BALANCE (R)</div>
+						<div className={this.getBalanceValueStyles('private')}>
+							{this.props.balances.privateUnconfirmedBalance ? this.props.balances.privateUnconfirmedBalance : 0}
+							<span className={styles.balanceValueUnit}>RES</span>
+						</div>
 					</div>
 				</div>
 
 				<div className={[styles.totalBalance, HLayout.hBoxChild].join(' ')}>
-					<div className={styles.balanceTitle}>TOTAL BALANCE (R + T)</div>
-					<div className={this.getBalanceValueStyles('total')}>
-						{this.props.balances.totalUnconfirmedBalance ? this.props.balances.totalUnconfirmedBalance : 0}
-						<span className={styles.balanceValueUnit}>RES</span>
+					<div className={styles.balanceWraper}>
+						<div className={styles.balanceTitle}>TOTAL BALANCE (R + T)</div>
+						<div className={this.getBalanceValueStyles('total')}>
+							{this.props.balances.totalUnconfirmedBalance ? this.props.balances.totalUnconfirmedBalance : 0}
+							<span className={styles.balanceValueUnit}>RES</span>
+						</div>
 					</div>
 				</div>
 

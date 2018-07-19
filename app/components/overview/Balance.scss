@@ -12,20 +12,39 @@
     }
 }
 
+.transparentBalance {
+    display: flex;
+}
+
+.privateBalance {
+    display: flex;
+}
+
+.totalBalance {
+    display: flex;
+}
+
+// Make the 'balanceWraper' sitting center of its parent, make sure its parent set to 'display: flex'
+.balanceWraper {
+    margin: auto;
+}
+
 .balanceTitle {
-    font-size: 0.6rem;
+    text-align: left !important;
+    font-size: 0.7rem;
     color: $BALANCE_TITLE_FONT_COLOR;
     opacity: 0.6;
 }
 
 .balanceValue {
+    text-align: left !important;
     font-size: 2rem;
-    font-weight: 100;
+    font-weight: 400;
 }
 
 .balanceValueUnit {
     margin-left: 0.5rem;
-    font-size: 0.8rem;
+    font-size: 1.25rem;
 }
 
 .hasUnconfirmedTransactionBalance {
