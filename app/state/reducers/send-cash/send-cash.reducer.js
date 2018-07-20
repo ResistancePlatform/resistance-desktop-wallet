@@ -1,11 +1,11 @@
 // @flow
 import { AppAction } from '../appAction'
 
-export type ProcessingTransactionStatus = '' | 'queued' | 'executing' | 'cancelled' | 'failed' | 'success'
+export type ProcessingOperationStatus = '' | 'queued' | 'executing' | 'cancelled' | 'failed' | 'success'
 
-export type ProcessingTransaction = {
+export type ProcessingOperation = {
 	operationId: string,
-	status: ProcessingTransactionStatus,
+	status: ProcessingOperationStatus,
 	result: any
 }
 
@@ -15,7 +15,7 @@ export type SendCashState = {
 	fromAddress: string,
 	toAddress: string,
 	amount: number,
-	currentTransaction: ProcessingTransaction | null
+	currentOperation: ProcessingOperation | null
 }
 
 const sendCashActionTypePrefix = 'SEND_CASH_ACTION'
@@ -28,11 +28,19 @@ export const SendCashActions = {
 	UPDATE_TO_ADDRESS: `${sendCashActionTypePrefix}: UPDATE_TO_ADDRESS`,
 	UPDATE_AMOUNT: `${sendCashActionTypePrefix}: UPDATE_AMOUNT`,
 	SHOW_USER_ERROR_MESSAGE: `${sendCashActionTypePrefix}: SHOW_USER_ERROR_MESSAGE`,
+	SEND_CASH: `${sendCashActionTypePrefix}: SEND_CASH`,
+	SEND_CASH_SUCCESS: `${sendCashActionTypePrefix}: SEND_CASH_SUCCESS`,
+	SEND_CASH_FAIL: `${sendCashActionTypePrefix}: SEND_CASH_FAIL`,
+	UPDATE_SEND_OPERATION_STATUS: `${sendCashActionTypePrefix}: UPDATE_SEND_OPERATION_STATUS`,
 
 	togglePrivateSend: (): AppAction => ({ type: SendCashActions.TOGGLE_PRIVATE_SEND }),
 	updateFromAddress: (address: string) => ({ type: SendCashActions.UPDATE_FROM_ADDRESS, payload: address }),
 	updateToAddress: (address: string) => ({ type: SendCashActions.UPDATE_TO_ADDRESS, payload: address }),
 	updateAmount: (amount: number) => ({ type: SendCashActions.UPDATE_AMOUNT, payload: amount }),
+	sendCash: () => ({ type: SendCashActions.SEND_CASH }),
+	sendCashSuccess: () => ({ type: SendCashActions.SEND_CASH_SUCCESS }),
+	sendCashFail: (errorMessage: string, clearCurrentOperation: boolean) => ({ type: SendCashActions.SEND_CASH_FAIL, payload: { errorMessage, clearCurrentOperation } }),
+	updateSendOperationStatus: (progressingTransaction: ProcessingOperation) => ({ type: SendCashActions.UPDATE_SEND_OPERATION_STATUS, payload: progressingTransaction }),
 
 	showUserErrorMessage: (title: string, message: string) => ({ type: SendCashActions.SHOW_USER_ERROR_MESSAGE, payload: { title, message } }),
 
@@ -45,7 +53,7 @@ const initState: SendCashState = {
 	fromAddress: '',
 	toAddress: '',
 	amount: 0,
-	currentTransaction: null
+	currentOperation: null
 }
 
 export const SendCashReducer = (state: SendCashState = initState, action: AppAction) => {
@@ -97,10 +105,19 @@ export const SendCashReducer = (state: SendCashState = initState, action: AppAct
 			return handleAddressUpdate(state, action.payload, true)
 
 		case SendCashActions.UPDATE_TO_ADDRESS:
-		return handleAddressUpdate(state, action.payload, false)
+			return handleAddressUpdate(state, action.payload, false)
 
 		case SendCashActions.UPDATE_AMOUNT:
 			return { ...state, amount: action.payload }
+
+		case SendCashActions.SEND_CASH_SUCCESS:
+			return { ...state, currentOperation: null }
+
+		case SendCashActions.SEND_CASH_FAIL:
+			return action.payload.clearCurrentOperation ? { ...state, currentOperation: null } : state
+
+		case SendCashActions.UPDATE_SEND_OPERATION_STATUS:
+			return { ...state, currentOperation: action.payload }
 
 		default:
 			return state

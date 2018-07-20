@@ -239,3 +239,7 @@ div[name="amount"] {
     }
 
 }
+
+button[name="send-cash"][disabled] {
+    opacity: 0.8;
+}

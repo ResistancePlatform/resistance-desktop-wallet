@@ -5,14 +5,14 @@ import styles from './rounded-input.scss'
 type RoundedInputAddon = {
     enable: boolean,
     type: 'PASTE' | 'DROPDOWN' | 'TEXT_PLACEHOLDER',
-    value: string,
-    onAddonClicked: (addonType) => void
+    value: string | undefined,
+    onAddonClicked: (addonType) => void | null | undefined
 }
 
 type Props = {
     name: string,
     title: string,
-    onlyNumberAllowed: boolean,
+    onlyNumberAllowed: boolean | undefined,
     onInputChange: (value) => void,
     addon: RoundedInputAddon
 }

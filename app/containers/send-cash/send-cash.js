@@ -83,7 +83,7 @@ class SendCash extends Component<Props> {
 
 	onSendButtonClicked(event) {
 		this.eventConfirm(event);
-		console.log(`onSendButtonClicked---->`)
+		appStore.dispatch(SendCashActions.sendCash())
 	}
 
 	getOperationProgressBarStyles() {
@@ -111,7 +111,7 @@ class SendCash extends Component<Props> {
 			enable: true,
 			type: 'TEXT_PLACEHOLDER',
 			value: 'RES',
-			onAddonClicked: null
+			onAddonClicked: () => {}
 		}
 
 		return (
@@ -186,7 +186,14 @@ class SendCash extends Component<Props> {
 
 						{ /* Send button row */}
 						<div className={[styles.sendButtonContainer, HLayout.hBoxContainer].join(' ')}>
-							<button onClick={(event) => this.onSendButtonClicked(event)} onKeyDown={(event) => this.onSendButtonClicked(event)} >SEND</button>
+							<button
+								name="send-cash"
+								disabled={this.props.sendCash.currentOperation && this.props.sendCash.currentOperation.operationId}
+								onClick={(event) => this.onSendButtonClicked(event)}
+								onKeyDown={(event) => this.onSendButtonClicked(event)}
+							>
+								SEND
+							</button>
 							<div className={[styles.desc, HLayout.hBoxContainer].join(' ')}>
 								<div className={styles.descIcon}><i className={this.getSendLockClasses()} /></div>
 								<div className={styles.descContent}>{this.getSendTips()}</div>
