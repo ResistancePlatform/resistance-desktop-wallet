@@ -12,6 +12,7 @@ type RoundedInputAddon = {
 type Props = {
     name: string,
     title: string,
+    onlyNumberAllowed: boolean,
     onInputChange: (value) => void,
     addon: RoundedInputAddon
 }
@@ -21,7 +22,7 @@ export default class RoundedInput extends Component<Props> {
 
     inputOnchangeEventHandler(event) {
         // event.preventDefault()
-		event.stopPropagation()
+        event.stopPropagation()
         const newValue = event.target.value;
         // console.log('inputOnchangeEventHandler: ', newValue)
 
@@ -33,7 +34,7 @@ export default class RoundedInput extends Component<Props> {
     onMyAddonClick(event) {
         event.preventDefault()
         event.stopPropagation()
-        
+
         if (this.props.addon.onAddonClicked) {
             this.props.addon.onAddonClicked(this.props.addon.type)
         }
@@ -78,7 +79,10 @@ export default class RoundedInput extends Component<Props> {
                 <div className={styles.roundedInputTitle}>{this.props.title ? this.props.title : ''}</div>
 
                 <div className={styles.roundedInputTextArea}>
-                    <input type="text" onChange={(event) => this.inputOnchangeEventHandler(event)} />
+                    <input
+                        type={this.props.onlyNumberAllowed ? "number" : "text"}
+                        onChange={(event) => this.inputOnchangeEventHandler(event)}
+                    />
                     {this.renderAddon()}
                 </div>
             </div>
