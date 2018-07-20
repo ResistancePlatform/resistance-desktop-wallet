@@ -41,6 +41,17 @@ class SendCash extends Component<Props> {
 		return this.props.sendCash.isPrivateSendOn ? `${styles.toggleButton} ${styles.toggleButtonOn}` : `${styles.toggleButton}`
 	}
 
+	getSendLockClasses() {
+		return this.props.sendCash.isPrivateSendOn ? `fa fa-lock` : `fa fa-unlock`
+	}
+
+	getSendTips() {
+		const prefixTips = `You are about to send money from`
+		return this.props.sendCash.isPrivateSendOn ?
+			`${prefixTips} Private (Z) address to Private address. This transaction will be invisible to everyone.` :
+			`${prefixTips} Transparent (K1,JZ) address to Transparent address. This transaction will be visible to everyone.`
+	}
+
 	getPrivatelyToggleButtonText() {
 		return this.props.sendCash.isPrivateSendOn ? `ON` : `OFF`
 	}
@@ -55,7 +66,7 @@ class SendCash extends Component<Props> {
 	}
 
 	onFromAddressInputChanged(value) {
-		console.log(`onFromAddressInputChanged: ${value}`)
+		appStore.dispatch(SendCashActions.updateFromAddress(value))
 	}
 
 	onDestAddressPasteClicked(addonType) {
@@ -63,11 +74,11 @@ class SendCash extends Component<Props> {
 	}
 
 	onDestAddressInputChanged(value) {
-		console.log(`onDestAddressInputChanged: ${value}`)
+		appStore.dispatch(SendCashActions.updateToAddress(value))
 	}
 
 	onAmountAddressInputChanged(value) {
-		console.log(`onAmountAddressInputChanged: ${value}`)
+		appStore.dispatch(SendCashActions.updateAmount(parseFloat(value)))
 	}
 
 	onSendButtonClicked(event) {
@@ -162,6 +173,7 @@ class SendCash extends Component<Props> {
 							<RounedInput
 								name='amount'
 								title='AMOUNT'
+								onlyNumberAllowed="true"
 								addon={amountAddressAddon}
 								onInputChange={(value) => this.onAmountAddressInputChanged(value)}
 							/>
@@ -176,8 +188,8 @@ class SendCash extends Component<Props> {
 						<div className={[styles.sendButtonContainer, HLayout.hBoxContainer].join(' ')}>
 							<button onClick={(event) => this.onSendButtonClicked(event)} onKeyDown={(event) => this.onSendButtonClicked(event)} >SEND</button>
 							<div className={[styles.desc, HLayout.hBoxContainer].join(' ')}>
-								<div className={styles.descIcon}><i className="fa fa-unlock" /></div>
-								<div className={styles.descContent}>You are about to send money from Transparent (K1,JZ) address to Transparent address. This transaction will be visible to everyone.</div>
+								<div className={styles.descIcon}><i className={this.getSendLockClasses()} /></div>
+								<div className={styles.descContent}>{this.getSendTips()}</div>
 							</div>
 						</div>
 
@@ -194,12 +206,12 @@ class SendCash extends Component<Props> {
 							</div>
 						</div>
 
-						{ /* Memo */ }
+						{ /* Memo */}
 						<div className={styles.memoConatiner} >
 							<span className={styles.memoTitle}>Memo:</span>
 							When sending cash from a Transparent (K1,JZ) address, the remaining balance is sent to another out-generated K1,JZ address.
 							When sending from a Private (Z) address, the remaining unsent balance remains with the Z address. In both case the original
-							sending address cannot be usef for sending again unit the transaction is confirmed. The address is temporarily remove from 
+							sending address cannot be usef for sending again unit the transaction is confirmed. The address is temporarily remove from
 							the list. Freshly mined coins may only be sent to a Private (Z) address.
 						</div>
 					</div>

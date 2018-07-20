@@ -1,25 +1,26 @@
-// // @flow
-// import { map, tap, switchMap } from 'rxjs/operators'
-// import { merge } from 'rxjs'
-// import { ActionsObservable, ofType } from 'redux-observable'
-// import { AppAction } from '../appAction'
-// import { SendCashActions } from './send-cash.reducer'
+// @flow
+import { map, tap, switchMap } from 'rxjs/operators'
+import { merge } from 'rxjs'
+import { ActionsObservable, ofType } from 'redux-observable'
+import { AppAction } from '../appAction'
+import { SendCashActions } from './send-cash.reducer'
 // import { ResistanceCliService } from '../../../service/resistance-cli-service'
-// import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
+import { DialogService } from '../../../service/dialog-service'
+import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
 
-// const epicInstanceName = 'SendCashEpics'
+const epicInstanceName = 'SendCashEpics'
 // const resistanceCliService = new ResistanceCliService()
-// const logger = new LoggerService()
+const dialogService: DialogService = new DialogService()
+const logger = new LoggerService()
 
-// // const getOwnAddressesEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-// //     ofType(OwnAddressesActions.GET_OWN_ADDRESSES),
-// //     tap((action: AppAction) => logger.debug(epicInstanceName, `getOwnAddressesEpic`, action.type, ConsoleTheme.testing)),
-// //     switchMap(() => resistanceCliService.getWalletOwnAddresses()),
-// //     map(result => OwnAddressesActions.getOwnAddressesSuccess(result))
-// // )
+const showUserErrorMessageEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(SendCashActions.SHOW_USER_ERROR_MESSAGE),
+    tap((action: AppAction) => logger.debug(epicInstanceName, `showUserErrorMessageEpic`, action.type, ConsoleTheme.testing)),
+    tap((action: AppAction) => dialogService.showError(action.payload.title, action.payload.message)),
+    map(() => SendCashActions.empty())
+)
 
 
-// // export const OwnAddressesEpics = (action$, state$) => merge(
-// //     getOwnAddressesEpic(action$, state$),
-// //     createNewAddressesEpic(action$, state$)
-// // )
+export const SendCashEpics = (action$, state$) => merge(
+    showUserErrorMessageEpic(action$, state$)
+)

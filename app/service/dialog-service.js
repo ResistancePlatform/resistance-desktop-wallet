@@ -25,7 +25,13 @@ export class DialogService {
         return instance
     }
 
-    showError(errorMsg: string) {
+
+    /**
+     * @param {string} title
+     * @param {string} errorMsg
+     * @memberof DialogService
+     */
+    showError(title: string, errorMsg: string) {
         dialog.showErrorBox(`Error`, errorMsg)
     }
 
