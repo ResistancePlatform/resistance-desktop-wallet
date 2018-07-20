@@ -9,6 +9,7 @@ import { AppAction } from '../state/reducers/appAction'
 import { BlockChainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 import { Balances, Transaction, OverviewActions } from '../state/reducers/overview/overview.reducer'
 import { AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
+import { SendCashActions, ProcessingOperation } from '../state/reducers/send-cash/send-cash.reducer'
 
 /**
  * ES6 singleton
@@ -34,6 +35,9 @@ let walletInfoPollingIntervalId = -1
 const walletInfoPollingIntervalSetting = 2 * 1000
 let transactionDataFromWalletPollingIntervalId = -1
 const transactionDataFromWalletPollingIntervalSetting = 5 * 1000
+
+let sendCashPollingIntervalId = -1
+const sendCashPollingIntervalSetting = 2 * 1000
 
 
 /**
@@ -546,6 +550,120 @@ export class ResistanceCliService {
             })
 
         return from(createNewAddressPromise).pipe(take(1))
+    }
+
+    /**
+     * @param {string} fromAddress
+     * @param {string} toAddress
+     * @param {number} amountToSend
+     * @returns {Observable<any>}
+     * @memberof ResistanceCliService
+     */
+    sendCash(fromAddress: string, toAddress: string, amountToSend: number) {
+        const cli = getResistanceClientInstance()
+
+        /**
+         * 
+         */
+        const getSendCashPromise = (fAddress: string, tAddress: string, amountNeedToSend: number): Promise<any> => {
+            const sendCashParams = [
+                fAddress,
+                [{ address: tAddress, amount: amountNeedToSend }]
+            ]
+
+            // sendmany "T address here" [{“address”:”t address”, “amount”:0.005}, {“address”:”z address”,”amount”:0.03, “memo”:”f508af…”}]
+            return cli.command([{ method: `z_sendmany`, parameters: sendCashParams }])
+        }
+
+        getSendCashPromise(fromAddress, toAddress, amountToSend)
+            .then(result => {
+                const tempResult = result[0]
+
+                // Check error
+                if (tempResult.name && tempResult.name === 'RpcError') {
+                    throw new Error(tempResult.message)
+                }
+
+                const operationId = result[0]
+                this.logger.debug(this, `sendCash`, `operationId: `, ConsoleTheme.error, operationId)
+                return operationId
+            })
+            .then(operationId => {
+                this.stopPollingOperationStatus()
+                this.starPollingOperationStatus(operationId)
+
+                return 'done'
+            })
+            .catch(error => {
+                this.logger.debug(this, `sendCash`, `Error happen: `, ConsoleTheme.error, error)
+
+                // Make sure pass "true" to "clearCurrentOperation" !!!
+                this.dispatchAction(SendCashActions.sendCashFail(error.message, true))
+            })
+    }
+
+    /**
+     * @memberof ResistanceCliService
+     */
+    stopPollingOperationStatus() {
+        if (sendCashPollingIntervalId !== -1) {
+            clearInterval(sendCashPollingIntervalId);
+            sendCashPollingIntervalId = -1
+        }
+    }
+
+    /**
+     * @param {string} operationId
+     * @returns {Observable<any>}
+     * @memberof ResistanceCliService
+     */
+    starPollingOperationStatus(operationId: string): Observable<any> {
+
+        const getAsyncOperationStatus = (operId: string) => {
+            const cli = getResistanceClientInstance()
+            const params = [operId]
+            const promise = cli.command([{ method: `z_getoperationstatus`, parameters: [params] }])
+
+            promise
+                .then(result => {
+                    const tempStatus = result[0][0]
+
+                    if (tempStatus && tempStatus.status === 'success') {
+                        this.stopPollingOperationStatus()
+
+                        this.dispatchAction(SendCashActions.sendCashSuccess())
+                    } else if (tempStatus && tempStatus.status === 'failed') {
+                        this.stopPollingOperationStatus()
+
+                        const failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Unknow error happen.`
+                        this.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
+                    } else if (tempStatus && tempStatus.status === 'cancelled') {
+                        this.stopPollingOperationStatus()
+
+                        const failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Operation has been cancelled.`
+                        this.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
+                    } else {
+                        const inProgressOperation: ProcessingOperation = {
+                            operationId: tempStatus.id,
+                            status: tempStatus.status,
+                            result: tempStatus.result
+                        }
+
+                        this.dispatchAction(SendCashActions.updateSendOperationStatus(inProgressOperation))
+                    }
+
+                    return 'done'
+                })
+                .catch(error => {
+                    this.logger.debug(this, `getAsyncOperationStatus`, `Error happen: `, ConsoleTheme.error, error)
+
+                    // Make sure pass "true" to "clearCurrentOperation" !!!
+                    this.dispatchAction(SendCashActions.sendCashFail(error.message, true))
+                    this.stopPollingOperationStatus()
+                })
+        }
+
+        sendCashPollingIntervalId = setInterval(() => getAsyncOperationStatus(operationId), sendCashPollingIntervalSetting)
     }
 
 }
