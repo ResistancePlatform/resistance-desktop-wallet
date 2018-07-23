@@ -6,12 +6,12 @@ export type ProcessingOperationStatus = '' | 'queued' | 'executing' | 'cancelled
 export type ProcessingOperation = {
 	operationId: string,
 	status: ProcessingOperationStatus,
+	percent: number,
 	result: any
 }
 
 export type SendCashState = {
 	isPrivateSendOn: boolean,
-	operationProgressPercent: number,
 	fromAddress: string,
 	toAddress: string,
 	amount: number,
@@ -49,7 +49,6 @@ export const SendCashActions = {
 
 const initState: SendCashState = {
 	isPrivateSendOn: false,
-	operationProgressPercent: 0,
 	fromAddress: '',
 	toAddress: '',
 	amount: 0,

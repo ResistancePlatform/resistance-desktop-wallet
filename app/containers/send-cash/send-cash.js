@@ -87,7 +87,27 @@ class SendCash extends Component<Props> {
 	}
 
 	getOperationProgressBarStyles() {
-		return { flex: this.props.sendCash.operationProgressPercent }
+		const flexValue = this.props.sendCash.currentOperation.percent / 100
+		return { flex: flexValue }
+	}
+
+	renderProgressRow() {
+		if (!this.props.sendCash || !this.props.sendCash.currentOperation) {
+			return null
+		}
+		return (
+			<div className={[styles.processRow, VLayout.vBoxContainer].join(' ')}>
+				<div className={[styles.row1, HLayout.hBoxContainer].join(' ')}>
+					<div className={styles.processRow1Title}>LAST OPERATION STATUS: </div>
+					<div className={styles.processRow1Status}>IN PROGRESS</div>
+					<div className={[styles.processRow1Percent, HLayout.hBoxChild].join(' ')}>{this.props.sendCash.currentOperation.percent}%</div>
+				</div>
+
+				<div className={[styles.row2, HLayout.hBoxContainer].join(' ')}>
+					<div className={styles.progressBarPercent} style={this.getOperationProgressBarStyles()} />
+				</div>
+			</div>
+		)
 	}
 
 	/**
@@ -111,7 +131,7 @@ class SendCash extends Component<Props> {
 			enable: true,
 			type: 'TEXT_PLACEHOLDER',
 			value: 'RES',
-			onAddonClicked: () => {}
+			onAddonClicked: () => { }
 		}
 
 		return (
@@ -201,17 +221,7 @@ class SendCash extends Component<Props> {
 						</div>
 
 						{ /* Process row */}
-						<div className={[styles.processRow, VLayout.vBoxContainer].join(' ')}>
-							<div className={[styles.row1, HLayout.hBoxContainer].join(' ')}>
-								<div className={styles.processRow1Title}>LAST OPERATION STATUS: </div>
-								<div className={styles.processRow1Status}>IN PROGRESS</div>
-								<div className={[styles.processRow1Percent, HLayout.hBoxChild].join(' ')}>31%</div>
-							</div>
-
-							<div className={[styles.row2, HLayout.hBoxContainer].join(' ')}>
-								<div className={styles.progressBarPercent} style={this.getOperationProgressBarStyles()} />
-							</div>
-						</div>
+						{this.renderProgressRow()}
 
 						{ /* Memo */}
 						<div className={styles.memoConatiner} >

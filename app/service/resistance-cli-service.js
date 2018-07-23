@@ -618,6 +618,7 @@ export class ResistanceCliService {
      * @memberof ResistanceCliService
      */
     starPollingOperationStatus(operationId: string): Observable<any> {
+        let initProgressPercent = 0
 
         const getAsyncOperationStatus = (operId: string) => {
             const cli = getResistanceClientInstance()
@@ -643,9 +644,12 @@ export class ResistanceCliService {
                         const failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Operation has been cancelled.`
                         this.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
                     } else {
+                        initProgressPercent += 2
+                        const newProgressPercent = initProgressPercent <= 100 ? initProgressPercent : 100
                         const inProgressOperation: ProcessingOperation = {
                             operationId: tempStatus.id,
                             status: tempStatus.status,
+                            percent: newProgressPercent,
                             result: tempStatus.result
                         }
 
