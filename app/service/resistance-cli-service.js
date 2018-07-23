@@ -237,7 +237,7 @@ export class ResistanceCliService {
 
             const getAmount = (value: number | string) => {
                 const tempFloat = (typeof (value) === 'string') ? parseFloat(value).toFixed(2) : value.toFixed(2)
-                return tempFloat > 0 ? tempFloat : -tempFloat
+                return tempFloat.startsWith('-') ? tempFloat.substring(1) : tempFloat
             }
 
             const getDate = (value: number) => {
