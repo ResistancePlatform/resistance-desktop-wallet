@@ -60,15 +60,27 @@ const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.
     }),
 )
 
+const sendCashSuccessEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+    ofType(SendCashActions.SEND_CASH_SUCCESS),
+    tap((action: AppAction) => logger.debug(epicInstanceName, `sendCashSuccessEpic`, action.type, ConsoleTheme.testing)),
+    tap(() => {
+        const sendCashState = state$.value.sendCash
+        const message = `Successfully sent ${sendCashState.amount} RES from address:\n ${sendCashState.fromAddress} \n\n to address:\n ${sendCashState.toAddress}`
+        dialogService.showMessage(`Cash Sent Successfully`, message)
+    }),
+    map(() => SendCashActions.empty())
+)
+
 const sendCashFailEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
     ofType(SendCashActions.SEND_CASH_FAIL),
     tap((action: AppAction) => logger.debug(epicInstanceName, `sendCashFailEpic`, action.type, ConsoleTheme.testing)),
-    tap((action: AppAction) => dialogService.showError(`Send Cash Fail`, action.payload.errorMessage)),
+    tap((action: AppAction) => dialogService.showError(`Cash Send Fail`, action.payload.errorMessage)),
     map(() => SendCashActions.empty())
 )
 
 export const SendCashEpics = (action$, state$) => merge(
     showUserErrorMessageEpic(action$, state$),
     sendCashEpic(action$, state$),
+    sendCashSuccessEpic(action$, state$),
     sendCashFailEpic(action$, state$)
 )

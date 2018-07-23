@@ -35,4 +35,18 @@ export class DialogService {
         dialog.showErrorBox(`Error`, errorMsg)
     }
 
+
+    /**
+     * @param {string} title
+     * @param {string} message
+     * @param {*} [option]
+     * @memberof DialogService
+     */
+    showMessage(title: string, message: string, option?: any) {
+        const showOption = option ? option : {
+            type: 'info'
+        }
+        dialog.showMessageBox(Object.assign(showOption, { title, message }))
+    }
+
 }

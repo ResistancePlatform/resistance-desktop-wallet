@@ -25,8 +25,8 @@ class SystemInfo extends Component<Props> {
 	 * @memberof SystemInfo
 	 */
 	componentDidMount() {
-		appStore.dispatch(SystemInfoActions.startGettingDaemonInfo())
-		appStore.dispatch(SystemInfoActions.startGettingBlockChainInfo())
+		// appStore.dispatch(SystemInfoActions.startGettingDaemonInfo())
+		// appStore.dispatch(SystemInfoActions.startGettingBlockChainInfo())
 	}
 
 	displayLastBlockTime(tempDate: Date | null) {
