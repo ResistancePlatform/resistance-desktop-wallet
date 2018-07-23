@@ -51,9 +51,11 @@ $NAVI_BAR_CONTAINER_WIDTH: 13rem;
 
 .naviVBarItem {
   -webkit-app-region: no-drag;
+  align-items: center !important;
   padding: 0.8rem 0;
 
   span {
+    font-size: 1.5rem;
     margin-right: 0.8rem;
     color: $NAVI_BAR_ITEM_ICON_COLOR;
   }
@@ -74,3 +76,6 @@ $NAVI_BAR_CONTAINER_WIDTH: 13rem;
   }
 }
 
+.icon-own-address:before { 
+  font-size: 1.3rem !important;
+}

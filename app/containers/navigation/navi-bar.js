@@ -5,6 +5,7 @@ import { NavLink } from 'react-router-dom'
 import styles from './navi-bar.scss'
 import { NaviActions, NaviState } from '../../state/reducers/navi/navi.reducer'
 import { appStore } from '../../state/store/configureStore'
+import HLayout from '../../theme/h-box-layout.scss'
 
 type Props = {
 	navi: NaviState
@@ -44,24 +45,24 @@ export class NaviBar extends Component<Props> {
 				</div>
 
 				{/* Route items */}
-				<div className={this.getNaviBarItemClasses('/overview')}>
-					<span className="fa fa-star fa-fw" />
+				<div className={[this.getNaviBarItemClasses('/overview'), HLayout.hBoxContainer].join(' ')}>
+					<span className="icon-overview" />
 					<NavLink to="/">Overview</NavLink>
 				</div>
-				<div className={this.getNaviBarItemClasses('/own-addresses')}>
-					<span className="fa fa-windows fa-fw" />
+				<div className={[this.getNaviBarItemClasses('/own-addresses'), HLayout.hBoxContainer].join(' ')}>
+					<span className="icon-own-address" />
 					<NavLink to="/own-addresses">Own Addresses</NavLink>
 				</div>
-				<div className={this.getNaviBarItemClasses('/send-cash')}>
-					<span className="fa fa-envelope fa-fw" />
+				<div className={[this.getNaviBarItemClasses('/send-cash'), HLayout.hBoxContainer].join(' ')}>
+					<span className="icon-send-cash" />
 					<NavLink to="/send-cash">Send Cash</NavLink>
 				</div>
-				<div className={this.getNaviBarItemClasses('/address-book')}>
-					<span className="fa fa-font fa-fw" />
+				<div className={[this.getNaviBarItemClasses('/address-book'), HLayout.hBoxContainer].join(' ')}>
+					<span className="icon-address-book" />
 					<NavLink to="/address-book">Address Book</NavLink>
 				</div>
-				<div className={this.getNaviBarItemClasses('/settings')}>
-					<span className="fa fa-cog fa-fw" />
+				<div className={[this.getNaviBarItemClasses('/settings'), HLayout.hBoxContainer].join(' ')}>
+					<span className="icon-settings" />
 					<NavLink to="/settings">Settings</NavLink>
 				</div>
 

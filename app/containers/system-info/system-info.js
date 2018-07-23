@@ -60,8 +60,8 @@ class SystemInfo extends Component<Props> {
 						<div className={styles.statusColoumnTitle}>RESISTANCE STATUS</div>
 						<div className={styles.statusColoumnValue}>
 							{this.props.systemInfo.daemonInfo.status === 'RUNNING' ?
-								<span><i className={['fa', 'fa-check-circle', styles.daemonIsRunning].join(' ')} /><span>Running</span></span> :
-								<span><i className={['fa', 'fa-times-circle', styles.daemonIsNotRunning].join(' ')} /><span>NOT RUNNING</span></span>
+								<span><i className={['icon-status-running', styles.daemonIsRunning].join(' ')} /><span>Running</span></span> :
+								<span><i className={['icon-status-stop', styles.daemonIsNotRunning].join(' ')} /><span>NOT RUNNING</span></span>
 							}
 						</div>
 					</div>
