@@ -169,23 +169,38 @@ class Settings extends Component<Props> {
             {/* Manage daemon */}
             <div className={styles.manageDaemonContainer}>
               <div className={styles.manageDaemonTitle}>MANAGE DAEMON</div>
-              <button
-                className={styles.stopLocalNodeButton}
-                onClick={event => this.onStopLocalNodeClicked(event)}
-                onKeyDown={event => this.onStopLocalNodeClicked(event)}
-              >
-                {this.props.systemInfo.daemonInfo.status === 'RUNNING'
-                  ? 'STOP LOCAL NODE'
-                  : 'START LOCAL NODE'}
-              </button>
 
-              <button
-                className={styles.showStatusButton}
-                onClick={event => this.onShowStatusClicked(event)}
-                onKeyDown={event => this.onShowStatusClicked(event)}
-              >
-                SHOW STATUS
-              </button>
+              <div className={styles.manageDaemonBody}>
+                <button
+                  className={styles.stopLocalNodeButton}
+                  onClick={event => this.onStopLocalNodeClicked(event)}
+                  onKeyDown={event => this.onStopLocalNodeClicked(event)}
+                >
+                  {this.props.systemInfo.daemonInfo.status === 'RUNNING'
+                    ? 'STOP LOCAL NODE'
+                    : 'START LOCAL NODE'}
+                </button>
+
+                <button
+                  className={styles.showStatusButton}
+                  onClick={event => this.onShowStatusClicked(event)}
+                  onKeyDown={event => this.onShowStatusClicked(event)}
+                >
+                  SHOW STATUS
+                </button>
+
+                {/* Enable Tor toggle */}
+                <div className={styles.toggleButtonContainer}>
+                  <div className={styles.toggleButtonContainerTitle}>
+                    Enable Tor
+                  </div>
+
+                  <div className={styles.toggleButton}>
+                    <div className={styles.toggleButtonSwitcher} />
+                    <div className={styles.toggleButtonText}>Off</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Manage wallet */}
