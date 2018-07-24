@@ -8,6 +8,8 @@ import styles from './settings.scss';
 import HLayout from '../../theme/h-box-layout.scss';
 import VLayout from '../../theme/v-box-layout.scss';
 
+const config = require('electron').remote.require('electron-settings');
+
 type Props = {
   systemInfo: SystemInfoState
   // sendCash: SendCashState
@@ -32,6 +34,12 @@ class Settings extends Component<Props> {
   eventConfirm(event) {
     event.preventDefault();
     event.stopPropagation();
+  }
+
+  getEnableTorToggleButtonClasses() {
+    return config.get('manageDaemon.enableTor', false)
+      ? `${styles.toggleButton} ${styles.toggleButtonOn}`
+      : `${styles.toggleButton}`;
   }
 
   /**
@@ -72,6 +80,15 @@ class Settings extends Component<Props> {
    * @memberof Settings
    */
   onStopLocalNodeClicked(event) {
+    this.eventConfirm(event);
+    // appStore.dispatch(SettingsActions.stopStartLocalNode())
+  }
+
+  /**
+   * @param {*} event
+   * @memberof Settings
+   */
+  onEnableTorToggleClicked(event) {
     this.eventConfirm(event);
     // appStore.dispatch(SettingsActions.stopStartLocalNode())
   }
@@ -189,13 +206,28 @@ class Settings extends Component<Props> {
                   SHOW STATUS
                 </button>
 
+                {/* Enable Mining toggle */}
+                <div className={styles.toggleButtonContainer}>
+                  <div className={styles.toggleButtonContainerTitle}>
+                    Enable Mining
+                  </div>
+                  <div className={styles.toggleButton}>
+                    <div className={styles.toggleButtonSwitcher} />
+                    <div className={styles.toggleButtonText}>Off</div>
+                  </div>
+                </div>
+
                 {/* Enable Tor toggle */}
                 <div className={styles.toggleButtonContainer}>
                   <div className={styles.toggleButtonContainerTitle}>
                     Enable Tor
                   </div>
-
-                  <div className={styles.toggleButton}>
+                  <div
+                    title="Requires restarting the daemon"
+                    className={this.getEnableTorToggleButtonClasses()}
+                    onClick={event => this.onEnableTorToggleClicked(event)}
+                    onKeyDown={event => this.onEnableTorToggleClicked(event)}
+                  >
                     <div className={styles.toggleButtonSwitcher} />
                     <div className={styles.toggleButtonText}>Off</div>
                   </div>
