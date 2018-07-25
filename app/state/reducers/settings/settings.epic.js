@@ -4,6 +4,7 @@ import { merge } from 'rxjs';
 import { ofType } from 'redux-observable';
 
 import { LoggerService, ConsoleTheme } from '../../../service/logger-service';
+import { ResistanceService } from '../../../service/resistance-service';
 import { MinerService } from '../../../service/miner-service';
 import { TorService } from '../../../service/tor-service';
 import { SettingsActions } from './settings.reducer';
@@ -13,8 +14,46 @@ const epicInstanceName = 'SettingsEpics';
 const logger = new LoggerService();
 const config = require('electron').remote.require('electron-settings');
 
+const resistanceService = new ResistanceService();
 const minerService = new MinerService();
 const torService = new TorService();
+
+const startLocalNodeEpic = (action$: ActionsObservable<AppAction>, state$) =>
+  action$.pipe(
+    ofType(SettingsActions.START_LOCAL_NODE),
+    tap((action: AppAction) =>
+      logger.debug(
+        epicInstanceName,
+        `startLocalNodeEpic`,
+        action.type,
+        ConsoleTheme.testing
+      )
+    ),
+    tap(() => {
+      const settingsState = state$.value.settings;
+      resistanceService.start(settingsState.isTorEnabled);
+    }),
+    map(() => SettingsActions.empty())
+  );
+
+const stopLocalNodeEpic = (action$: ActionsObservable<AppAction>) =>
+  action$.pipe(
+    ofType(SettingsActions.STOP_LOCAL_NODE),
+    tap((action: AppAction) =>
+      logger.debug(
+        epicInstanceName,
+        `stopLocalNodeEpic`,
+        action.type,
+        ConsoleTheme.testing
+      )
+    ),
+    tap(() => {
+      config.set('manageDaemon.enableMiner', false);
+      minerService.stop();
+      resistanceService.stop();
+    }),
+    map(() => SettingsActions.empty())
+  );
 
 const toggleEnableMinerEpic = (action$: ActionsObservable<AppAction>, state$) =>
   action$.pipe(
@@ -68,6 +107,8 @@ const toggleEnableTorEpic = (action$: ActionsObservable<AppAction>, state$) =>
 
 export const SettingsEpics = (action$, state$) =>
   merge(
+    startLocalNodeEpic(action$, state$),
+    stopLocalNodeEpic(action$, state$),
     toggleEnableMinerEpic(action$, state$),
     toggleEnableTorEpic(action$, state$)
   );

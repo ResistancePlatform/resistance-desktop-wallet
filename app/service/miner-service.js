@@ -93,15 +93,14 @@ export class MinerService {
           osService.killPid(pid, err => {
             if (err) {
               reject(err);
+            } else {
+              resolve();
             }
           });
         }
       };
 
-      return osService.getPid('minerd').then(pid => {
-        killMiner(pid);
-        return null;
-      });
+      return osService.getPid('minerd').then(killMiner);
     });
   }
 }

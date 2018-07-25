@@ -16,6 +16,12 @@ export const SettingsActions = {
   START_LOCAL_NODE: `${settingsActionTypePrefix}: START_LOCAL_NODE`,
   STOP_LOCAL_NODE: `${settingsActionTypePrefix}: STOP_LOCAL_NODE`,
 
+  startLocalNode: (): AppAction => ({
+    type: SettingsActions.START_LOCAL_NODE
+  }),
+  stopLocalNode: (): AppAction => ({
+    type: SettingsActions.STOP_LOCAL_NODE
+  }),
   toggleEnableMiner: (): AppAction => ({
     type: SettingsActions.TOGGLE_ENABLE_MINER
   }),
@@ -36,6 +42,9 @@ export const SettingsReducer = (
   action: AppAction
 ) => {
   switch (action.type) {
+    case SettingsActions.STOP_LOCAL_NODE:
+      return { ...state, isMinerEnabled: false };
+
     case SettingsActions.TOGGLE_ENABLE_TOR:
       return { ...state, isTorEnabled: !state.isTorEnabled };
 

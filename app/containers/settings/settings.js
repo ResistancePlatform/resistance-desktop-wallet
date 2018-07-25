@@ -91,9 +91,28 @@ class Settings extends Component<Props> {
    * @param {*} event
    * @memberof Settings
    */
+  onStartStopLocalNodeClicked(event) {
+    this.eventConfirm(event);
+
+    switch (this.props.systemInfo.daemonInfo.status) {
+      case 'RUNNING':
+        return appStore.dispatch(SettingsActions.stopLocalNode());
+      case 'NOT_RUNNING':
+        return appStore.dispatch(SettingsActions.startLocalNode());
+      default:
+    }
+  }
+
+  /**
+   * @param {*} event
+   * @memberof Settings
+   */
   onEnableMiningToggleClicked(event) {
     this.eventConfirm(event);
-    appStore.dispatch(SettingsActions.toggleEnableMiner());
+
+    if (this.props.systemInfo.daemonInfo.status === 'RUNNING') {
+      appStore.dispatch(SettingsActions.toggleEnableMiner());
+    }
   }
 
   /**
@@ -202,8 +221,8 @@ class Settings extends Component<Props> {
               <div className={styles.manageDaemonBody}>
                 <button
                   className={styles.stopLocalNodeButton}
-                  onClick={event => this.onStopLocalNodeClicked(event)}
-                  onKeyDown={event => this.onStopLocalNodeClicked(event)}
+                  onClick={event => this.onStartStopLocalNodeClicked(event)}
+                  onKeyDown={event => this.onStartStopLocalNodeClicked(event)}
                 >
                   {this.props.systemInfo.daemonInfo.status === 'RUNNING'
                     ? 'STOP LOCAL NODE'
@@ -231,7 +250,7 @@ class Settings extends Component<Props> {
                   >
                     <div className={styles.toggleButtonSwitcher} />
                     <div className={styles.toggleButtonText}>
-                      {this.props.settings.isMiningEnabled ? 'On' : 'Off'}
+                      {this.props.settings.isMinerEnabled ? 'On' : 'Off'}
                     </div>
                   </div>
                 </div>
