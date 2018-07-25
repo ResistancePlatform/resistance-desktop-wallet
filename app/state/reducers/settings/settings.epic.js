@@ -31,7 +31,7 @@ const toggleEnableTorEpic = (action$: ActionsObservable<AppAction>, state$) =>
 
       if (settingsState.isTorEnabled) {
         console.log('Starting Tor');
-        // torService.start()
+        torService.start();
       } else {
         torService.stop();
       }

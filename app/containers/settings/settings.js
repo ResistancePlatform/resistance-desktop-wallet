@@ -224,7 +224,9 @@ class Settings extends Component<Props> {
                     onKeyDown={event => this.onEnableTorToggleClicked(event)}
                   >
                     <div className={styles.toggleButtonSwitcher} />
-                    <div className={styles.toggleButtonText}>Off</div>
+                    <div className={styles.toggleButtonText}>
+                      {this.props.settings.isTorEnabled ? 'On' : 'Off'}
+                    </div>
                   </div>
                 </div>
               </div>

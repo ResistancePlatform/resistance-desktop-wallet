@@ -19,6 +19,15 @@ function getOS() {
   return 'windows';
 }
 
+function killPid(pid) {
+  ps.kill(pid, err => {
+    if (err) {
+      throw new Error(err);
+    }
+    console.log('Process %s has been killed!', pid);
+  });
+}
+
 function getPid(proc, cb) {
   // A simple pid lookup
   let process;
@@ -90,28 +99,27 @@ export class TorService {
   start() {
     return this.isTorProcessPresent().then(present => {
       if (!present) {
-        console.log(`./bin/'${getOS()}/${startTorString}`);
+        const command = `${__dirname}/bin/${getOS()}/${startTorString}${torLog}`;
+        console.log(command);
 
-        exec(
-          `./bin/'${getOS()}/${startTorString}${torLog}`,
-          (err, stdout, stderr) => {
-            if (err) {
-              // Node couldn't execute the command
-              console.log(err);
-              console.log(`stdout: ${stdout}`);
-              console.log(`stderr: ${stderr}`);
-              return;
-            }
-
-            // The *entire* stdout and stderr (buffered)
-            console.log(`Tor Started Successfully`);
+        exec(command, (err, stdout, stderr) => {
+          if (err) {
+            // Node couldn't execute the command
+            console.log(err);
             console.log(`stdout: ${stdout}`);
             console.log(`stderr: ${stderr}`);
+            return;
           }
-        );
+
+          // The *entire* stdout and stderr (buffered)
+          console.log(`Tor Started Successfully`);
+          console.log(`stdout: ${stdout}`);
+          console.log(`stderr: ${stderr}`);
+        });
+      } else {
+        console.log('Tor is already running');
       }
 
-      console.log('Tor is already running');
       return null;
     });
   }
@@ -119,5 +127,21 @@ export class TorService {
   /**
    * @memberof TorService
    */
-  stop() {}
+  stop() {
+    let pid;
+    return this.isTorProcessPresent().then(present => {
+      if (!present) {
+        console.log("Tor isn't running");
+      } else {
+        killPid(pid, err => {
+          if (err) {
+            throw new Error(err);
+          }
+          console.log('Process %s has been killed!', pid);
+        });
+      }
+
+      return null;
+    });
+  }
 }
