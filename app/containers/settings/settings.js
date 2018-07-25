@@ -256,7 +256,10 @@ class Settings extends Component<Props> {
                 </div>
 
                 {/* Enable Tor toggle */}
-                <div className={styles.toggleButtonContainer}>
+                <div
+                  className={styles.toggleButtonContainer}
+                  style={{ paddingLeft: '5rem' }}
+                >
                   <div className={styles.toggleButtonContainerTitle}>
                     Enable Tor
                   </div>
