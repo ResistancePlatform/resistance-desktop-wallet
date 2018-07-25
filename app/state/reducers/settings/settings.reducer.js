@@ -16,9 +16,13 @@ export const SettingsActions = {
   START_LOCAL_NODE: `${settingsActionTypePrefix}: START_LOCAL_NODE`,
   STOP_LOCAL_NODE: `${settingsActionTypePrefix}: STOP_LOCAL_NODE`,
 
+  toggleEnableMiner: (): AppAction => ({
+    type: SettingsActions.TOGGLE_ENABLE_MINER
+  }),
   toggleEnableTor: (): AppAction => ({
     type: SettingsActions.TOGGLE_ENABLE_TOR
   }),
+
   empty: (): AppAction => ({ type: SettingsActions.EMPTY })
 };
 

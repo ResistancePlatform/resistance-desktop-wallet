@@ -40,10 +40,18 @@ class Settings extends Component<Props> {
     event.stopPropagation();
   }
 
-  getEnableTorToggleButtonClasses() {
-    return this.props.settings.isTorEnabled
+  getToggleButtonClasses(on) {
+    return on
       ? `${styles.toggleButton} ${styles.toggleButtonOn}`
       : `${styles.toggleButton}`;
+  }
+
+  getEnableMiningToggleButtonClasses() {
+    return this.getToggleButtonClasses(this.props.settings.isMinerEnabled);
+  }
+
+  getEnableTorToggleButtonClasses() {
+    return this.getToggleButtonClasses(this.props.settings.isTorEnabled);
   }
 
   /**
@@ -77,6 +85,15 @@ class Settings extends Component<Props> {
   onSavePasswordClicked(event) {
     this.eventConfirm(event);
     console.log(`onSavePasswordClicked---->`);
+  }
+
+  /**
+   * @param {*} event
+   * @memberof Settings
+   */
+  onEnableMiningToggleClicked(event) {
+    this.eventConfirm(event);
+    appStore.dispatch(SettingsActions.toggleEnableMiner());
   }
 
   /**
@@ -197,6 +214,7 @@ class Settings extends Component<Props> {
                   className={styles.showStatusButton}
                   onClick={event => this.onShowStatusClicked(event)}
                   onKeyDown={event => this.onShowStatusClicked(event)}
+                  disabled
                 >
                   SHOW STATUS
                 </button>
@@ -206,9 +224,15 @@ class Settings extends Component<Props> {
                   <div className={styles.toggleButtonContainerTitle}>
                     Enable Mining
                   </div>
-                  <div className={styles.toggleButton}>
+                  <div
+                    className={this.getEnableMiningToggleButtonClasses()}
+                    onClick={event => this.onEnableMiningToggleClicked(event)}
+                    onKeyDown={event => this.onEnableMiningToggleClicked(event)}
+                  >
                     <div className={styles.toggleButtonSwitcher} />
-                    <div className={styles.toggleButtonText}>Off</div>
+                    <div className={styles.toggleButtonText}>
+                      {this.props.settings.isMiningEnabled ? 'On' : 'Off'}
+                    </div>
                   </div>
                 </div>
 
@@ -218,7 +242,7 @@ class Settings extends Component<Props> {
                     Enable Tor
                   </div>
                   <div
-                    title="Requires restarting the daemon"
+                    title="Local node restart is required"
                     className={this.getEnableTorToggleButtonClasses()}
                     onClick={event => this.onEnableTorToggleClicked(event)}
                     onKeyDown={event => this.onEnableTorToggleClicked(event)}
