@@ -43,7 +43,10 @@ const initAppState: AppState = {
     fromAddress: '',
     toAddress: '',
     amount: 0,
-    currentOperation: null
+    currentOperation: null,
+    showDropdownMenu: false,
+    sendFromRadioButtonType: 'transparent',
+    addressList: []
   },
   settings: {
     isTorEnabled: false,

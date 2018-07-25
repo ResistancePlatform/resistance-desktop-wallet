@@ -197,4 +197,53 @@ div[name="amount"] {
 
 button[name="send-cash"][disabled] {
     opacity: 0.8;
+    cursor: not-allowed;
+}
+
+
+/**---------------------------------------------------------------------------------------------------
+ * Override the default radio button style
+ *---------------------------------------------------------------------------------------------------*/
+.radioButtonContainer {
+    display: inline-block;
+    margin-right: 1.5rem;
+}
+
+input[type=radio   ]:not(old){
+    width     : 2em;
+    margin    : 0;
+    padding   : 0;
+    font-size : 1em;
+    opacity   : 0;
+    cursor    : pointer;
+}
+
+input[type=radio   ]:not(old) + label{
+    display      : inline-block;
+    margin-left  : -2em;
+    line-height  : 1.5em;
+
+    font-size    : 0.75rem;
+    font-weight  : 500;
+    cursor       : pointer;
+}
+
+input[type=radio   ]:not(old) + label > span{
+    display          : inline-block;
+    width            : 1.25rem;
+    height           : 1.25rem;
+    // margin           : 0.25em 0.5em 0.25em 0.25em;
+    margin-right     : 1rem;
+    border-radius    : 5rem;
+    background       : rgb(22, 26, 52);
+    vertical-align   : middle;
+}
+
+input[type=radio]:not(old):checked +  label > span > span{
+    display          : block;
+    width            : 0.55rem;
+    height           : 0.55rem;
+    margin           : 0.32rem;
+    border-radius    : 5rem;
+    background       : $BASE_COLOR_PURPLE;
 }

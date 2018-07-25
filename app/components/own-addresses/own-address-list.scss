@@ -60,6 +60,8 @@ $OWN_ADDRESS_LIST_COLUMN_ADDRESS_WIDTH: 60%;
         border-left: none;
         border-right: none;
         border-bottom: 1px solid $TRANSACTION_LIST_BODY_SEPARATOR_COLOR;
+
+        overflow: scroll;
     }
 }
 
