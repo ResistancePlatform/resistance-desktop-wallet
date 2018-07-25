@@ -2,7 +2,8 @@
 import { AppAction } from '../appAction';
 
 export type SettingsState = {
-  isTorEnabled: boolean
+  isTorEnabled: boolean,
+  isMinerEnabled: boolean
 };
 
 const settingsActionTypePrefix = 'SETTINGS_ACTION';
@@ -12,7 +13,8 @@ export const SettingsActions = {
 
   TOGGLE_ENABLE_TOR: `${settingsActionTypePrefix}: TOGGLE_ENABLE_TOR`,
   TOGGLE_ENABLE_MINER: `${settingsActionTypePrefix}: TOGGLE_ENABLE_MINER`,
-  TOGGLE_LOCAL_NODE: `${settingsActionTypePrefix}: TOGGLE_LOCAL_NODE`,
+  START_LOCAL_NODE: `${settingsActionTypePrefix}: START_LOCAL_NODE`,
+  STOP_LOCAL_NODE: `${settingsActionTypePrefix}: STOP_LOCAL_NODE`,
 
   toggleEnableTor: (): AppAction => ({
     type: SettingsActions.TOGGLE_ENABLE_TOR
@@ -21,7 +23,8 @@ export const SettingsActions = {
 };
 
 const initState = {
-  isTorEnabled: false
+  isTorEnabled: false,
+  isMinerEnabled: true
 };
 
 export const SettingsReducer = (
@@ -31,6 +34,9 @@ export const SettingsReducer = (
   switch (action.type) {
     case SettingsActions.TOGGLE_ENABLE_TOR:
       return { ...state, isTorEnabled: !state.isTorEnabled };
+
+    case SettingsActions.TOGGLE_ENABLE_MINER:
+      return { ...state, isMinerEnabled: !state.isMinerEnabled };
 
     default:
       return state;

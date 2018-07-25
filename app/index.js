@@ -46,7 +46,8 @@ const initAppState: AppState = {
     currentOperation: null
   },
   settings: {
-    isTorEnabled: false
+    isTorEnabled: false,
+    isMinerEnabled: true
   }
 };
 
