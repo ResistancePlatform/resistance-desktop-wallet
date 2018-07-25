@@ -151,8 +151,17 @@ class SendCash extends Component<Props> {
 							<div className={styles.sendFromTitle}>SEND FROM</div>
 
 							<div className={styles.sendFromCheckboxContainer}>
-								<span><input type="radio" name="sendFromType" checked />Transparent address</span>
-								<span><input type="radio" name="sendFromType" />Private address</span>
+								<div className={styles.radioButtonContainer}>
+									<input id="radio1" type="radio" name="sendFromType" value="1" checked="checked" />
+									<label for="radio1"><span><span /></span>Transparent address</label>
+								</div>
+								<div className={styles.radioButtonContainer}>
+									<input id="radio2" type="radio" name="sendFromType" value="2" />
+									<label for="radio2"><span><span /></span>Private address</label>
+								</div>
+
+								{/* <span><input type="radio" name="sendFromType" checked /></span>
+								<span><input type="radio" name="sendFromType" /></span> */}
 							</div>
 						</div>
 
