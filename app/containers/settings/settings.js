@@ -1,18 +1,22 @@
 // @flow
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { SystemInfoState } from '../../state/reducers/system-info/system-info.reducer';
+
 import RounedInput, { RoundedInputAddon } from '../../components/rounded-input';
-// import { SendCashActions, SendCashState } from '../../state/reducers/send-cash/send-cash.reducer'
 import styles from './settings.scss';
 import HLayout from '../../theme/h-box-layout.scss';
 import VLayout from '../../theme/v-box-layout.scss';
 
-const config = require('electron').remote.require('electron-settings');
+import { appStore } from '../../state/store/configureStore';
+import { SystemInfoState } from '../../state/reducers/system-info/system-info.reducer';
+import {
+  SettingsActions,
+  SettingsState
+} from '../../state/reducers/settings/settings.reducer';
 
 type Props = {
+  settings: SettingsState,
   systemInfo: SystemInfoState
-  // sendCash: SendCashState
 };
 
 /**
@@ -37,7 +41,7 @@ class Settings extends Component<Props> {
   }
 
   getEnableTorToggleButtonClasses() {
-    return config.get('manageDaemon.enableTor', false)
+    return this.props.settings.isTorEnabled
       ? `${styles.toggleButton} ${styles.toggleButtonOn}`
       : `${styles.toggleButton}`;
   }
@@ -79,18 +83,9 @@ class Settings extends Component<Props> {
    * @param {*} event
    * @memberof Settings
    */
-  onStopLocalNodeClicked(event) {
-    this.eventConfirm(event);
-    // appStore.dispatch(SettingsActions.stopStartLocalNode())
-  }
-
-  /**
-   * @param {*} event
-   * @memberof Settings
-   */
   onEnableTorToggleClicked(event) {
     this.eventConfirm(event);
-    // appStore.dispatch(SettingsActions.stopStartLocalNode())
+    appStore.dispatch(SettingsActions.toggleEnableTor());
   }
 
   /**
@@ -255,6 +250,7 @@ class Settings extends Component<Props> {
 }
 
 const mapStateToProps = state => ({
+  settings: state.settings,
   systemInfo: state.systemInfo,
   sendCash: state.sendCash
 });
