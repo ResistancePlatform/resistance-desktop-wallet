@@ -670,4 +670,81 @@ export class ResistanceCliService {
         sendCashPollingIntervalId = setInterval(() => getAsyncOperationStatus(operationId), sendCashPollingIntervalSetting)
     }
 
+
+    /**
+     * @returns {Observable<any>}
+     * @memberof ResistanceCliService
+     */
+    getWalletAddressAndBalance(isPrivate: boolean): Observable<any> {
+        const cli = getResistanceClientInstance()
+        const promiseArr = isPrivate ? [this.getWalletPrivateAddresses(cli)] : [
+            this.getWalletAllPublicAddresses(cli),
+            this.getWalletPublicAddressesWithUnspentOutputs(cli)
+        ]
+
+        const queryPromise = Promise.all(promiseArr)
+            .then(result => {
+                console.log(`result: `, result)
+                let privateAddressesResult = null
+                let PublicAddressesResult = null
+                let PublicAddressesUnspendResult = null
+                const addressResultSet = new Set()
+
+                if (isPrivate) {
+                    privateAddressesResult = result[0][0]
+
+                    if (Array.isArray(privateAddressesResult)) {
+                        for (let index = 0; index < privateAddressesResult.length; index++) {
+                            addressResultSet.add(privateAddressesResult[index])
+                        }
+                    }
+
+                } else {
+                    PublicAddressesResult = result[0][0]
+                    PublicAddressesUnspendResult = result[1][0]
+
+                    if (Array.isArray(PublicAddressesResult)) {
+                        const publicAddresses = PublicAddressesResult.map(tempValue => tempValue.address)
+                        for (let index = 0; index < publicAddresses.length; index++) {
+                            addressResultSet.add(publicAddresses[index])
+                        }
+                    }
+
+                    if (Array.isArray(PublicAddressesUnspendResult)) {
+                        const publicAddresses = PublicAddressesUnspendResult.map(tempValue => tempValue.address)
+                        for (let index = 0; index < publicAddresses.length; index++) {
+                            addressResultSet.add(publicAddresses[index])
+                        }
+                    }
+                }
+
+                const combinedAddresses = Array.from(addressResultSet).map(addr => ({
+                    balance: 0,
+                    confirmed: false,
+                    address: addr
+                }))
+                this.logger.debug(this, `getWalletPublicAddressAndBalance`, `combinedAddresses: `, ConsoleTheme.testing, combinedAddresses)
+                return combinedAddresses
+            })
+            .then(combinedAddresses => {
+                if (Array.isArray(combinedAddresses)) {
+                    const tempPromiseArr = combinedAddresses.map(tempAddressRow => this.getAddressBalance(cli, tempAddressRow))
+                    return Promise.all(tempPromiseArr)
+                }
+
+                return []
+            })
+            .then(addresses => {
+                this.logger.debug(this, `getWalletPublicAddressAndBalance`, `addresses: `, ConsoleTheme.testing, addresses)
+                return addresses
+            })
+            .catch(error => {
+                this.logger.debug(this, `getWalletPublicAddressAndBalance`, `Error happen: `, ConsoleTheme.error, error)
+                return []
+            })
+
+        return from(queryPromise).pipe(take(1))
+    }
+
+
 }

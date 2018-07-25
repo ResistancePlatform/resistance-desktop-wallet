@@ -1,6 +1,7 @@
 @import "../theme/vars.scss";
 
 .roundedInputContainer {
+    position: relative;
     padding: 0 1.3rem;
 
     border: 1.5px solid $BASE_COLOR_BODER_GRAY;

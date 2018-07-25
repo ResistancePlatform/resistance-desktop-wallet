@@ -3,6 +3,13 @@ import { AppAction } from '../appAction'
 
 export type ProcessingOperationStatus = '' | 'queued' | 'executing' | 'cancelled' | 'failed' | 'success'
 
+export type SendFromRadioButtonType = 'transparent' | 'private'
+
+export type AddressDropdownItem = {
+	address: string,
+	balance: number
+}
+
 export type ProcessingOperation = {
 	operationId: string,
 	status: ProcessingOperationStatus,
@@ -15,7 +22,10 @@ export type SendCashState = {
 	fromAddress: string,
 	toAddress: string,
 	amount: number,
-	currentOperation: ProcessingOperation | null
+	currentOperation: ProcessingOperation | null,
+	showDropdownMenu: boolean,
+	sendFromRadioButtonType: SendFromRadioButtonType,
+	addressList: AddressDropdownItem[]
 }
 
 const sendCashActionTypePrefix = 'SEND_CASH_ACTION'
@@ -32,6 +42,11 @@ export const SendCashActions = {
 	SEND_CASH_SUCCESS: `${sendCashActionTypePrefix}: SEND_CASH_SUCCESS`,
 	SEND_CASH_FAIL: `${sendCashActionTypePrefix}: SEND_CASH_FAIL`,
 	UPDATE_SEND_OPERATION_STATUS: `${sendCashActionTypePrefix}: UPDATE_SEND_OPERATION_STATUS`,
+	UPDATE_DROPDOWN_MENU_VISIBILITY: `${sendCashActionTypePrefix}: UPDATE_DROPDOWN_MENU_VISIBILITY`,
+	GET_ADDRESS_LIST: `${sendCashActionTypePrefix}: GET_ADDRESS_LIST`,
+	GET_ADDRESS_LIST_SUCCESS: `${sendCashActionTypePrefix}: GET_ADDRESS_LIST_SUCCESS`,
+	GET_ADDRESS_LIST_FAIL: `${sendCashActionTypePrefix}: GET_ADDRESS_LIST_FAIL`,
+	UPDATE_SEND_FROM_RADIO_BUTTON_TYPE: `${sendCashActionTypePrefix}: UPDATE_SEND_FROM_RADIO_BUTTON_TYPE`,
 
 	togglePrivateSend: (): AppAction => ({ type: SendCashActions.TOGGLE_PRIVATE_SEND }),
 	updateFromAddress: (address: string) => ({ type: SendCashActions.UPDATE_FROM_ADDRESS, payload: address }),
@@ -41,8 +56,12 @@ export const SendCashActions = {
 	sendCashSuccess: () => ({ type: SendCashActions.SEND_CASH_SUCCESS }),
 	sendCashFail: (errorMessage: string, clearCurrentOperation: boolean) => ({ type: SendCashActions.SEND_CASH_FAIL, payload: { errorMessage, clearCurrentOperation } }),
 	updateSendOperationStatus: (progressingTransaction: ProcessingOperation) => ({ type: SendCashActions.UPDATE_SEND_OPERATION_STATUS, payload: progressingTransaction }),
-
+	updateDropdownMenuVisibility: (show: boolean): AppAction => ({ type: SendCashActions.UPDATE_DROPDOWN_MENU_VISIBILITY, payload: show }),
 	showUserErrorMessage: (title: string, message: string) => ({ type: SendCashActions.SHOW_USER_ERROR_MESSAGE, payload: { title, message } }),
+	getAddressList: (isPrivate: boolean) => ({ type: SendCashActions.GET_ADDRESS_LIST, payload: isPrivate }),
+	getAddressListSuccess: (addressList: AddressDropdownItem[]) => ({ type: SendCashActions.GET_ADDRESS_LIST_SUCCESS, payload: addressList }),
+	getAddressListFail: () => ({ type: SendCashActions.GET_ADDRESS_LIST_FAIL }),
+	updateSendFromRadioButtonType: (selectedValue: string): AppAction => ({ type: SendCashActions.UPDATE_SEND_FROM_RADIO_BUTTON_TYPE, payload: selectedValue }),
 
 	empty: (): AppAction => ({ type: SendCashActions.EMPTY })
 }
@@ -52,7 +71,10 @@ const initState: SendCashState = {
 	fromAddress: '',
 	toAddress: '',
 	amount: 0,
-	currentOperation: null
+	currentOperation: null,
+	showDropdownMenu: false,
+	sendFromRadioButtonType: 'transparent',
+	addressList: []
 }
 
 export const SendCashReducer = (state: SendCashState = initState, action: AppAction) => {
@@ -117,6 +139,18 @@ export const SendCashReducer = (state: SendCashState = initState, action: AppAct
 
 		case SendCashActions.UPDATE_SEND_OPERATION_STATUS:
 			return { ...state, currentOperation: action.payload }
+
+		case SendCashActions.UPDATE_DROPDOWN_MENU_VISIBILITY:
+			return { ...state, showDropdownMenu: action.payload }
+
+		case SendCashActions.GET_ADDRESS_LIST_SUCCESS:
+			return { ...state, addressList: action.payload }
+
+		case SendCashActions.GET_ADDRESS_LIST_FAIL:
+			return { ...state, addressList: null }
+
+		case SendCashActions.UPDATE_SEND_FROM_RADIO_BUTTON_TYPE:
+			return { ...state, sendFromRadioButtonType: action.payload }
 
 		default:
 			return state

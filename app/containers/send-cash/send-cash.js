@@ -2,6 +2,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import RounedInput, { RoundedInputAddon } from '../../components/rounded-input'
+import AddressDropdownPopupMenu from '../../components/send-cash/address-drodown-popup-menu'
 import { SendCashActions, SendCashState } from '../../state/reducers/send-cash/send-cash.reducer'
 import { appStore } from '../../state/store/configureStore'
 import styles from './send-cash.scss'
@@ -19,6 +20,17 @@ type Props = {
  */
 class SendCash extends Component<Props> {
 	props: Props
+	fromAddressInputDomRef: any
+
+	constructor(props) {
+		super(props)
+
+		// create a ref to `fromAddress` <RounedInput>
+		this.fromAddressDomRef = (element) => {
+			this.fromAddressInputDomRef = element
+			console.log(`element: `, element)
+		}
+	}
 
 	/**
 	 * @memberof SendCash
@@ -61,8 +73,9 @@ class SendCash extends Component<Props> {
 		appStore.dispatch(SendCashActions.togglePrivateSend())
 	}
 
-	onFromAddressDropdownClicked(addonType) {
-		console.log(`onFromAddressDropdownClicked: ${addonType}`)
+	onFromAddressDropdownClicked() {
+		appStore.dispatch(SendCashActions.getAddressList(true))
+		appStore.dispatch(SendCashActions.updateDropdownMenuVisibility(true))
 	}
 
 	onFromAddressInputChanged(value) {
@@ -89,6 +102,32 @@ class SendCash extends Component<Props> {
 	getOperationProgressBarStyles() {
 		const flexValue = this.props.sendCash.currentOperation.percent / 100
 		return { flex: flexValue }
+	}
+
+	getDropdownMenuStyles() {
+		return this.props.sendCash && this.props.sendCash.showDropdownMenu ? 'block' : 'none'
+	}
+
+	commonMenuItemEventHandler(event) {
+		this.eventConfirm(event)
+		appStore.dispatch(SendCashActions.updateDropdownMenuVisibility(false))
+	}
+
+	hideDropdownMenu(event) {
+		this.commonMenuItemEventHandler(event)
+	}
+
+	onPickupAddressHandler(event, selectedAddress: string) {
+		this.commonMenuItemEventHandler(event)
+		
+		// Update `<RounedInput> --> <input>` value manually, seems don't have the better option at this moment!!!
+		this.fromAddressInputDomRef.fromAddressDomRef.current.value = selectedAddress
+
+		appStore.dispatch(SendCashActions.updateFromAddress(selectedAddress))
+	}
+
+	onSendFromRadioButtonChange(event, selectedValue: string) {
+		appStore.dispatch(SendCashActions.updateSendFromRadioButtonType(selectedValue))
 	}
 
 	renderProgressRow() {
@@ -136,7 +175,9 @@ class SendCash extends Component<Props> {
 
 		return (
 			// Layout container
-			<div className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
+			<div
+				className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}
+			>
 
 				{ /* Route content */}
 				<div className={[styles.sendCashContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
@@ -152,12 +193,28 @@ class SendCash extends Component<Props> {
 
 							<div className={styles.sendFromCheckboxContainer}>
 								<div className={styles.radioButtonContainer}>
-									<input id="radio1" type="radio" name="sendFromType" value="1" checked="checked" />
-									<label for="radio1"><span><span /></span>Transparent address</label>
+									<input
+										readOnly
+										id="radio1"
+										type="radio"
+										name="sendFromType"
+										value="transparent"
+										checked={this.props.sendCash.sendFromRadioButtonType === 'transparent'}
+										onClick={(event) => this.onSendFromRadioButtonChange(event, 'transparent')}
+									/>
+									<label htmlFor="radio1"><span><span /></span>Transparent address</label>
 								</div>
 								<div className={styles.radioButtonContainer}>
-									<input id="radio2" type="radio" name="sendFromType" value="2" />
-									<label for="radio2"><span><span /></span>Private address</label>
+									<input
+										readOnly
+										id="radio2"
+										type="radio"
+										name="sendFromType"
+										value="private"
+										checked={this.props.sendCash.sendFromRadioButtonType === 'private'}
+										onClick={(event) => this.onSendFromRadioButtonChange(event, 'private')}
+									/>
+									<label htmlFor="radio2"><span><span /></span>Private address</label>
 								</div>
 
 								{/* <span><input type="radio" name="sendFromType" checked /></span>
@@ -172,7 +229,16 @@ class SendCash extends Component<Props> {
 								title='FROM ADDRESS'
 								addon={fromAddressAddon}
 								onInputChange={(value) => this.onFromAddressInputChanged(value)}
-							/>
+								ref={this.fromAddressDomRef}
+							>
+								{ /* Dropdown menu container */}
+								<div className={styles.dropdownMenu} style={{ display: this.getDropdownMenuStyles() }}>
+									<AddressDropdownPopupMenu
+										addressList={this.props.sendCash.addressList}
+										onPickupAddress={(event, address) => this.onPickupAddressHandler(event, address)}
+									/>
+								</div>
+							</RounedInput>
 
 							{ /* Toggle button */}
 							<div className={styles.sendPrivatelyToggleContainer}>

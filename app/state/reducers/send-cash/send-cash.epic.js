@@ -1,5 +1,5 @@
 // @flow
-import { map, tap } from 'rxjs/operators'
+import { map, tap, switchMap } from 'rxjs/operators'
 import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { AppAction } from '../appAction'
@@ -78,9 +78,20 @@ const sendCashFailEpic = (action$: ActionsObservable<AppAction>) => action$.pipe
     map(() => SendCashActions.empty())
 )
 
+const getAddressListEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+    ofType(SendCashActions.GET_ADDRESS_LIST),
+    tap((action: AppAction) => logger.debug(epicInstanceName, `getAddressListEpic`, action.type, ConsoleTheme.testing)),
+    switchMap(() => {
+        const sendCashState = state$.value.sendCash
+        return resistanceCliService.getWalletAddressAndBalance(sendCashState.sendFromRadioButtonType === 'private')
+    }),
+    map(result => SendCashActions.getAddressListSuccess(result))
+)
+
 export const SendCashEpics = (action$, state$) => merge(
     showUserErrorMessageEpic(action$, state$),
     sendCashEpic(action$, state$),
     sendCashSuccessEpic(action$, state$),
-    sendCashFailEpic(action$, state$)
+    sendCashFailEpic(action$, state$),
+    getAddressListEpic(action$, state$)
 )

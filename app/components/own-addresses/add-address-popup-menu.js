@@ -47,7 +47,7 @@ export default class AddAddressPopupMenu extends Component<Props> {
 
 	render() {
 		return (
-			<div className={[styles.AddAddressPopupMenuContainer].join(' ')} data-tid="transaction-list-container">
+			<div className={[styles.AddAddressPopupMenuContainer].join(' ')}>
 				<div
 					className={styles.menuItem}
 					onClick={(event) => this.onAddNewTransparentAddressClicked(event)}

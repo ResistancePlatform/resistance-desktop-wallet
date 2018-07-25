@@ -19,12 +19,16 @@ type Props = {
 
 export default class RoundedInput extends Component<Props> {
     props: Props
+    fromAddressDomRef: any
+    
+    constructor(props) {
+        super(props)
+        this.fromAddressDomRef = React.createRef()
+    }
 
     inputOnchangeEventHandler(event) {
-        // event.preventDefault()
         event.stopPropagation()
-        const newValue = event.target.value;
-        // console.log('inputOnchangeEventHandler: ', newValue)
+        const newValue = event.target.value
 
         if (this.props.onInputChange) {
             this.props.onInputChange(newValue)
@@ -80,11 +84,13 @@ export default class RoundedInput extends Component<Props> {
 
                 <div className={styles.roundedInputTextArea}>
                     <input
+                        ref={this.fromAddressDomRef}
                         type={this.props.onlyNumberAllowed ? "number" : "text"}
                         onChange={(event) => this.inputOnchangeEventHandler(event)}
                     />
                     {this.renderAddon()}
                 </div>
+                {this.props.children ? this.props.children : null}
             </div>
         )
     }
