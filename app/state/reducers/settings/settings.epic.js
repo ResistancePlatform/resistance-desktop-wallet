@@ -12,7 +12,7 @@ import { SettingsActions } from './settings.reducer'
 const epicInstanceName = 'SettingsEpics'
 
 const logger = new LoggerService()
-const config = require('electron').remote.require('electron-settings')
+const config = require('electron-settings')
 
 const resistanceService = new ResistanceService()
 const minerService = new MinerService()
