@@ -20,7 +20,7 @@ const startGettingDaemonInfoEpic = (action$: ActionsObservable<AppAction>) => ac
 
 const startGettingBlockChainInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
     ofType(SystemInfoActions.START_GETTING_BLOCKCHAIN_INFO),
-    tap((action: AppAction) =>logger.debug(epicInstanceName, `startGettingBlockChainInfoEpic`, action.type, ConsoleTheme.testing)),
+    tap((action: AppAction) => logger.debug(epicInstanceName, `startGettingBlockChainInfoEpic`, action.type, ConsoleTheme.testing)),
 
     // This action SHOULD only be dispatched once, return nothing !!!
     tap(() => resistanceCliService.startPollingBlockChainInfo()),

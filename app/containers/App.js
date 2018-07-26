@@ -43,7 +43,7 @@ export default class App extends React.Component<Props> {
 							<Route exact path="/overview" component={Overview} />
 							<Route exact path="/own-addresses" component={OwnAddress} />
 							<Route exact path="/send-cash" component={SendCash} />
-							<Route exact path="/settings" component={Settings} /> 
+							<Route exact path="/settings" component={Settings} />
 							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
 						</Switch>
 					</div>
