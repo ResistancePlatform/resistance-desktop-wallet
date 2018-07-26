@@ -1,14 +1,18 @@
 @import "../../theme/vars.scss";
 @import "../../theme/generic-component.scss";
+@import "../../theme/toggle-button.scss";
 
 @mixin settingButton() {
     @include roundedButton(true);
-    margin-left: 0;    
+    margin-left: 0;
+}
+
+button:disabled, button[disabled] {
+    @include roundedButton(false);
 }
 
 .settingsContainer {
     padding: 3rem 2rem;
-
     min-width: 30rem;
 }
 
@@ -37,7 +41,7 @@ div[name="repeat-password"] {
 
 .savePasswordButton {
     @include settingButton();
-    
+
     margin-bottom: 2rem;
 }
 
@@ -51,6 +55,12 @@ div[name="repeat-password"] {
 
     .manageDaemonTitle {
         margin-bottom: 1.5rem;
+    }
+
+    .manageDaemonBody {
+      div, button {
+        display: inline-block;
+      }
     }
 }
 
@@ -74,7 +84,7 @@ div[name="repeat-password"] {
 
     .manageWalletTitle {
         margin-bottom: 1.5rem;
-    }    
+    }
 }
 
 .backupWalletNodeButton {
