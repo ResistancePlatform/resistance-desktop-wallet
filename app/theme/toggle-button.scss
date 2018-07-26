@@ -10,6 +10,10 @@
     }
 }
 
+.toggleButtonContainer:disabled, .toggleButtonContainer[disabled] {
+    @include roundedButton(false);
+}
+
 // Generic Toggle button
 .toggleButton {
     position: absolute;

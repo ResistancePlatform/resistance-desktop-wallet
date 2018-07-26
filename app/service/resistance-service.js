@@ -85,14 +85,16 @@ export class ResistanceService {
           console.log(errorMessage);
           reject(errorMessage);
         } else {
-          osService.killPid(pid, err => {
-            if (err) {
-              reject(err);
-            } else {
+          osService
+            .killPid(pid)
+            .then(() => {
               console.log('Process %s has been killed!', pid);
               resolve();
-            }
-          });
+              return null;
+            })
+            .catch(err => {
+              reject(err);
+            });
         }
       };
 

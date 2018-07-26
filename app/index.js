@@ -49,6 +49,9 @@ const initAppState: AppState = {
     addressList: []
   },
   settings: {
+    isDaemonUpdating: false,
+    isTorUpdating: false,
+    isMinerUpdating: false,
     isTorEnabled: false,
     isMinerEnabled: true
   }

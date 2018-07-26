@@ -219,6 +219,7 @@ class Settings extends Component<Props> {
               <div className={styles.manageDaemonTitle}>MANAGE DAEMON</div>
 
               <div className={styles.manageDaemonBody}>
+                {/* disabled={this.props.settings.isDaemonUpdating} */}
                 <button
                   className={styles.stopLocalNodeButton}
                   onClick={event => this.onStartStopLocalNodeClicked(event)}
@@ -243,6 +244,8 @@ class Settings extends Component<Props> {
                   <div className={styles.toggleButtonContainerTitle}>
                     Enable Mining
                   </div>
+
+                  {/* disabled={this.props.settings.isMinerUpdating} */}
                   <div
                     className={this.getEnableMiningToggleButtonClasses()}
                     onClick={event => this.onEnableMiningToggleClicked(event)}
@@ -256,6 +259,7 @@ class Settings extends Component<Props> {
                 </div>
 
                 {/* Enable Tor toggle */}
+                {/* disabled={this.props.settings.isTorUpdating} */}
                 <div
                   className={styles.toggleButtonContainer}
                   style={{ paddingLeft: '5rem' }}
