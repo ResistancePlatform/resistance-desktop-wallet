@@ -93,8 +93,8 @@ class SystemInfo extends Component<Props> {
 				</div>
 
 				{ /* Buttons */}
-				<button className={[styles.walletInFinderButton].join(' ')}>WALLET IN FINDER</button>
-				<button className={[styles.installationPathButton].join(' ')}>INSTALLATION PATH</button>
+				{/* <button className={[styles.walletInFinderButton].join(' ')}>WALLET IN FINDER</button>
+				<button className={[styles.installationPathButton].join(' ')}>INSTALLATION PATH</button> */}
 			</div>
 		)
 	}
