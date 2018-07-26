@@ -77,9 +77,18 @@ const toggleEnableTorEpic = (action$: ActionsObservable<AppAction>, state$) => a
 
 const failTorProcessEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
 	ofType(SettingsActions.TOR_PROCESS_FAILED),
-	tap((action: AppAction) => logger.debug(epicInstanceName, `failTorEpic`, action.type, ConsoleTheme.testing)),
+	tap((action: AppAction) => logger.debug(epicInstanceName, `failTorProcessEpic`, action.type, ConsoleTheme.testing)),
 	tap((action: AppAction) => {
     dialogService.showError(`Tor process failed`, action.payload.errorMessage)
+  }),
+	map(() => SettingsActions.empty())
+)
+
+const failTorProcessMurderEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+	ofType(SettingsActions.TOR_PROCESS_MURDER_FAILED),
+	tap((action: AppAction) => logger.debug(epicInstanceName, `failTorProcessMurderEpic`, action.type, ConsoleTheme.testing)),
+	tap((action: AppAction) => {
+    dialogService.showError(`Error stopping Tor`, action.payload.errorMessage)
   }),
 	map(() => SettingsActions.empty())
 )
@@ -89,5 +98,6 @@ export const SettingsEpics = (action$, state$) => merge(
 	stopLocalNodeEpic(action$, state$),
 	toggleEnableMinerEpic(action$, state$),
 	toggleEnableTorEpic(action$, state$),
-	failTorProcessEpic(action$, state$)
+	failTorProcessEpic(action$, state$),
+	failTorProcessMurderEpic(action$, state$)
 )

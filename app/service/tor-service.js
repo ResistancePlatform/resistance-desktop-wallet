@@ -73,7 +73,6 @@ export class TorService {
     osService.getPid('tor-proxy').then(pid => {
       if (!pid) {
         console.log("Tor isn't running")
-        resolve()
       } else {
         osService.killPid(pid).then(() => {
           console.log('Process %s has been killed!', pid)

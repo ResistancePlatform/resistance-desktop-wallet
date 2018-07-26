@@ -73,7 +73,6 @@ export const SettingsReducer = (state: SettingsState = initState, action: AppAct
 		case SettingsActions.TOR_PROCESS_MURDER_FAILED:
 			return { ...state, isTorEnabled: true }
 
-
 		default:
 			return state
 	}
