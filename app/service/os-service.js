@@ -1,4 +1,5 @@
 // @flow
+import path from 'path'
 
 /**
  * ES6 singleton
@@ -38,7 +39,15 @@ export class OSService {
 	 * @returns {string}
 	 */
 	getBinariesPath() {
-		return `${__dirname}/bin/${this.getOS()}`
+    let resourcesPath
+
+    if (/[\\/](Electron\.app|Electron|Electron\.exe)[\\/]/i.test(process.execPath)) {
+      resourcesPath = process.cwd()
+    } else {
+      resourcesPath = process.resourcesPath
+    }
+
+    return path.join(resourcesPath, 'bin', this.getOS())
 	}
 
 	/**

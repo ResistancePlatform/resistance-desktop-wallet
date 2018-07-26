@@ -1,4 +1,5 @@
 // @flow
+import { remote } from 'electron'
 
 import { OSService } from './os-service'
 
@@ -13,7 +14,6 @@ const osService = new OSService()
 
 const torProcess = 'tor-proxy'
 const startTorString = `${torProcess}`
-const torLog = ' &> tor.log'
 
 /**
  * @export
@@ -39,6 +39,7 @@ export class TorService {
 	start() {
 		return osService.getPid(torProcess).then(pid => {
 			if (!pid) {
+        const torLog = ` &> "${remote.app.getPath('userData')}/tor.log"`
 				const command = `${osService.getBinariesPath()}/${startTorString}${torLog}`
 				console.log(command)
 
