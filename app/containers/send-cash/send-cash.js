@@ -59,7 +59,7 @@ class SendCash extends Component<Props> {
 	getSendTips() {
 		const prefixTips = `You are about to send money from`
 		return this.props.sendCash.isPrivateSendOn
-			? `${prefixTips} Private (Z) address to Private address. This transaction will be invisible to everyone.`
+			? `${prefixTips} a Private (Z) address to another Private (Z) address. This transaction will be private and invisible to all other users.`
 			: `${prefixTips} Transparent (K1,JZ) address to Transparent address. This transaction will be visible to everyone.`
 	}
 
