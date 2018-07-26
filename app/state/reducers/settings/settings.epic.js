@@ -69,9 +69,7 @@ const toggleEnableTorEpic = (action$: ActionsObservable<AppAction>, state$) => a
 			console.log('Starting Tor')
 			torService.start()
 		} else {
-			torService.stop().catch(err => {
-        dialogService.showError(`Unable to stop Tor`, err)
-      })
+			torService.stop()
 		}
 	}),
 	map(() => SettingsActions.empty())
