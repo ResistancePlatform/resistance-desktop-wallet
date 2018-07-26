@@ -150,7 +150,7 @@ class Settings extends Component<Props> {
     const passwordAddon: RoundedInputAddon = {
       enable: false,
       type: 'TEXT_PLACEHOLDER',
-      onAddonClicked: null,
+      onAddonClicked: () => {},
       value: ''
     };
 
