@@ -4,6 +4,7 @@ import { merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 
 import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
+import { DialogService } from '../../../service/dialog-service';
 import { ResistanceService } from '../../../service/resistance-service'
 import { MinerService } from '../../../service/miner-service'
 import { TorService } from '../../../service/tor-service'
@@ -12,6 +13,7 @@ import { SettingsActions } from './settings.reducer'
 const epicInstanceName = 'SettingsEpics'
 
 const logger = new LoggerService()
+const dialogService: DialogService = new DialogService();
 const config = require('electron-settings')
 
 const resistanceService = new ResistanceService()
@@ -67,9 +69,20 @@ const toggleEnableTorEpic = (action$: ActionsObservable<AppAction>, state$) => a
 			console.log('Starting Tor')
 			torService.start()
 		} else {
-			torService.stop()
+			torService.stop().catch(err => {
+        dialogService.showError(`Unable to stop Tor`, err)
+      })
 		}
 	}),
+	map(() => SettingsActions.empty())
+)
+
+const failTorProcessEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+	ofType(SettingsActions.TOR_PROCESS_FAILED),
+	tap((action: AppAction) => logger.debug(epicInstanceName, `failTorEpic`, action.type, ConsoleTheme.testing)),
+	tap((action: AppAction) => {
+    dialogService.showError(`Tor process failed`, action.payload.errorMessage)
+  }),
 	map(() => SettingsActions.empty())
 )
 
@@ -77,5 +90,6 @@ export const SettingsEpics = (action$, state$) => merge(
 	startLocalNodeEpic(action$, state$),
 	stopLocalNodeEpic(action$, state$),
 	toggleEnableMinerEpic(action$, state$),
-	toggleEnableTorEpic(action$, state$)
+	toggleEnableTorEpic(action$, state$),
+	failTorProcessEpic(action$, state$)
 )

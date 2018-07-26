@@ -24,6 +24,23 @@ export class OSService {
 	}
 
 	/**
+	 * We CANNOT use:
+	 *   import { appStore } from '../state/store/configureStore'
+	 *
+	 * As that will import BEFORE the `appStore` be created !!!
+	 * We have to require the latest `appStore` to make sure it has been created !!!
+	 *
+	 * @param {AppAction} action
+	 * @memberof ResistanceCliService
+	 */
+	dispatchAction(action: AppAction) {
+		const storeModule = require('../state/store/configureStore')
+		if (storeModule && storeModule.appStore) {
+			storeModule.appStore.dispatch(action)
+		}
+	}
+
+	/**
 	 * @memberof OSService
 	 * @returns {string}
 	 */
