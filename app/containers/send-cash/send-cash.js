@@ -53,7 +53,7 @@ class SendCash extends Component<Props> {
 	}
 
 	getSendLockClasses() {
-		return this.props.sendCash.isPrivateSendOn ? `fa fa-lock` : `fa fa-unlock`
+		return this.props.sendCash.isPrivateSendOn ? `icon-private-lock` : `icon-private-unlock`
 	}
 
 	getSendTips() {

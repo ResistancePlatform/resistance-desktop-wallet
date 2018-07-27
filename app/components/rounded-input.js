@@ -57,7 +57,7 @@ export default class RoundedInput extends Component<Props> {
 					onClick={event => this.onMyAddonClick(event)}
 					onKeyDown={event => this.onMyAddonClick(event)}
 				>
-					<i className="fa fa-file-o" />
+					<i className="icon-paste" />
 					<span className={styles.addOnPaste}>PASTE</span>
 				</span>
 			)
@@ -68,7 +68,7 @@ export default class RoundedInput extends Component<Props> {
 					onClick={event => this.onMyAddonClick(event)}
 					onKeyDown={event => this.onMyAddonClick(event)}
 				>
-					<i className="fa fa-chevron-down" />
+					<i className="icon-arrow-down" />
 				</span>
 			)
 		} else if (this.props.addon.type === 'TEXT_PLACEHOLDER') {

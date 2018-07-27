@@ -46,10 +46,13 @@
 
 
 .roundedInputAddonPaste {
+    position: relative;
     color: $BASE_COLOR_PURPLE;
 
     .addOnPaste {
-        margin-left: 0.5rem;
+        position: absolute;
+        top: -0.03rem;
+        left: 1.5rem;
     }
 }
 

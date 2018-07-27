@@ -102,9 +102,10 @@ class OwnAddresses extends Component<Props> {
 							<div className={[styles.topBarButtonContainer, HLayout.hBoxChild].join(' ')}>
 								<button onClick={(event) => this.onShowPrivteKeyClicked(event)} onKeyDown={(event) => this.onShowPrivteKeyClicked(event)} > SHOW PRIVATE KEY</button>
 								<button onClick={(event) => this.onRefreshClicked(event)} onKeyDown={(event) => this.onRefreshClicked(event)} > REFRESH</button>
-								<div className={styles.addAddressButtonContainer} onClick={(event) => this.onAddNewAddressClicked(event)} onKeyDown={(event) => this.onAddNewAddressClicked(event)} >
-									<button className={styles.addNewAddressButton} >+ ADD NEW ADDRESS</button>
-									<div className={styles.addNewAddressButtonAddon} ><i className="fa fa-chevron-down" /></div>
+								<div className={[styles.addAddressButtonContainer].join(' ')} onClick={(event) => this.onAddNewAddressClicked(event)} onKeyDown={(event) => this.onAddNewAddressClicked(event)} >
+									<button className={styles.addNewAddressButton} >+ ADD NEW ADDRESS
+										<span className="icon-arrow-down" />
+									</button>
 
 									{ /* Dropdown menu container */}
 									<div className={styles.dropdownMenu} style={{ display: this.getDropdownMenuStyles() }}>

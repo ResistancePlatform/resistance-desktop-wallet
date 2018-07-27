@@ -39,30 +39,12 @@ button {
 }
 
 .addNewAddressButton {
+    position: relative;
     @include roundedButton(true);
 
-    border-right: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    padding-right: 0.5rem;
+    padding-right: 2rem;
 }
 
-.addNewAddressButtonAddon {
-    display: inline-block;
-    cursor: pointer;
-
-    width: 1rem;
-    padding: 0.55rem 1.2rem 0.54rem 0.4rem;
-
-    background-color: $BASE_COLOR_PURPLE;
-
-    border: 2px solid $BASE_COLOR_PURPLE;
-    border-left: 1px solid $BASE_COLOR_DARK_BLUE;
-    border-top-right-radius: 5rem;
-    border-bottom-right-radius: 5rem;
-
-    font-size: 0.75rem; 
-}
 
 .dropdownMenu {
     position: relative;

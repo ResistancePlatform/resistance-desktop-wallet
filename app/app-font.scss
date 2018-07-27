@@ -24,6 +24,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-arrow-down:before {
+  content: "\e90e";
+  font-size: 1.2rem;
+  position: absolute;
+  right: 0.5rem;
+  top: 0.35rem;
+}
 .icon-status-stop:before {
   content: "\e90c";
 }
@@ -46,12 +53,18 @@
 }
 .icon-private-lock:before {
   content: "\e903";
+  font-size: 1.5rem;
 }
 .icon-private-unlock:before {
   content: "\e904";
+  font-size: 1.5rem;
+  color: rgb(67, 75, 109);
 }
 .icon-paste:before {
   content: "\e905";
+  font-size: 1.2rem;
+  position: absolute;
+  top: -0.15rem;  
 }
 .icon-close:before {
   content: "\e906";
