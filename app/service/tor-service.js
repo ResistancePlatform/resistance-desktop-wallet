@@ -1,6 +1,4 @@
 // @flow
-import { remote } from 'electron'
-
 import { OSService } from './os-service'
 import { SettingsActions } from '../state/reducers/settings/settings.reducer'
 
@@ -26,25 +24,25 @@ export class TorService {
 	 * Creates an instance of TorService.
 	 * @memberof TorService
 	 */
-	constructor() {
-		if (!instance) {
-			instance = this
-		}
+  constructor() {
+    if (!instance) {
+      instance = this
+    }
 
-		return instance
-	}
+    return instance
+  }
 
 	/**
 	 * @memberof TorService
 	 */
-	start() {
+  start() {
     const errorHandler = (err) => {
       osService.dispatchAction(SettingsActions.failTorProcess(`${err}`))
     }
 
     osService.getPid(torProcess).then(pid => {
       if (!pid) {
-        const torLog = ` &> "${remote.app.getPath('userData')}/tor.log"`
+        const torLog = ` &> "${osService.getAppDataPath()}/tor.log"`
         const command = `${osService.getBinariesPath()}/${startTorString}${torLog}`
         console.log(command)
 
@@ -61,12 +59,12 @@ export class TorService {
     }).catch((err) => {
       errorHandler(err)
     })
-	}
+  }
 
 	/**
 	 * @memberof TorService
 	 */
-	stop() {
+  stop() {
     const errorHandler = (err) => {
       osService.dispatchAction(SettingsActions.failTorProcessMurder(`${err}`))
     }
@@ -85,5 +83,5 @@ export class TorService {
       errorHandler(err)
     })
 
-	}
+  }
 }

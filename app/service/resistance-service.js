@@ -1,6 +1,4 @@
 // @flow
-import { remote } from 'electron'
-
 import { OSService } from './os-service'
 
 /**
@@ -55,7 +53,11 @@ export class ResistanceService {
 
 			if (!daemonPid) {
 				startString = `${osService.getBinariesPath()}/${startDaemonString}`
-        const resistanceLog = ` &> "${remote.app.getPath('userData')}/resistanced.log"`
+				console.log(`startString: ${startString}`)
+
+				const resistanceLog = ` &> "${osService.getAppDataPath()}/resistanced.log"`
+				console.log(`resistanceLog: ${resistanceLog}`)
+
 				if (isTorEnabled) {
 					console.log('Starting daemon with tor...')
 					startString = `${startString} ${torSwitch}${resistanceLog}`

@@ -1,6 +1,6 @@
 {
   "name": "electron-react-boilerplate",
-  "productName": "ElectronReact",
+  "productName": "ResistanceWallet",
   "version": "0.13.3",
   "description": "Resistance cross-platform desktop wallet",
   "scripts": {

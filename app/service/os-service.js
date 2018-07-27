@@ -1,4 +1,5 @@
 // @flow
+import { remote } from 'electron'
 import path from 'path'
 
 /**
@@ -18,7 +19,7 @@ export class OSService {
 	 * @memberof OSService
 	 */
 	constructor() {
-		if (!instance) { instance = this}
+		if (!instance) { instance = this }
 
 		return instance
 	}
@@ -56,15 +57,23 @@ export class OSService {
 	 * @returns {string}
 	 */
 	getBinariesPath() {
-    let resourcesPath
+		let resourcesPath
 
-    if (/[\\/](Electron\.app|Electron|Electron\.exe)[\\/]/i.test(process.execPath)) {
-      resourcesPath = process.cwd()
-    } else {
-      resourcesPath = process.resourcesPath
-    }
+		if (/[\\/](Electron\.app|Electron|Electron\.exe)[\\/]/i.test(process.execPath)) {
+			resourcesPath = process.cwd()
+		} else {
+			resourcesPath = process.resourcesPath
+		}
 
-    return path.join(resourcesPath, 'bin', this.getOS())
+		console.log(`getBinariesPath: ${path.join(resourcesPath, 'bin', this.getOS())}`)
+		return path.join(resourcesPath, 'bin', this.getOS())
+	}
+
+	/**
+	 * @memberof OSService
+	 */
+	getAppDataPath() {
+		return (this.getOS() === `macos`) ? `${remote.app.getPath('appData')}/ResistanceWallet` : `${remote.app.getPath('appData')}\\ResistanceWallet`
 	}
 
 	/**
