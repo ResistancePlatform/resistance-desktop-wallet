@@ -11,6 +11,8 @@ import { appStore } from '../../state/store/configureStore'
 import { SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
 import { SettingsActions, SettingsState } from '../../state/reducers/settings/settings.reducer'
 
+const config = require('electron-settings')
+
 type Props = {
 	settings: SettingsState,
 	systemInfo: SystemInfoState
@@ -136,6 +138,15 @@ class Settings extends Component<Props> {
 		this.eventConfirm(event)
 		console.log(`onBackupWalletClicked---->`)
 	}
+
+  componentWillUpdate(nextProps) {
+    if (nextProps.settings.isMinerEnabled !== this.props.settings.isMinerEnabled) {
+      config.set('manageDaemon.enableMiner', nextProps.settings.isMinerEnabled)
+    }
+    if (nextProps.settings.isTorEnabled !== this.props.settings.isTorEnabled) {
+      config.set('manageDaemon.enableTor', nextProps.isTorEnabled)
+    }
+  }
 
 	/**
 	 * @returns

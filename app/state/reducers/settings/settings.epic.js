@@ -14,7 +14,6 @@ const epicInstanceName = 'SettingsEpics'
 
 const logger = new LoggerService()
 const dialogService: DialogService = new DialogService();
-const config = require('electron-settings')
 
 const resistanceService = new ResistanceService()
 const minerService = new MinerService()
@@ -34,7 +33,6 @@ const stopLocalNodeEpic = (action$: ActionsObservable<AppAction>) => action$.pip
 	ofType(SettingsActions.STOP_LOCAL_NODE),
 	tap((action: AppAction) => logger.debug(epicInstanceName, `stopLocalNodeEpic`, action.type, ConsoleTheme.testing)),
 	tap(() => {
-		config.set('manageDaemon.enableMiner', false)
 		minerService.stop()
 		resistanceService.stop()
 	}),
@@ -46,7 +44,6 @@ const toggleEnableMinerEpic = (action$: ActionsObservable<AppAction>, state$) =>
 	tap((action: AppAction) => logger.debug(epicInstanceName, `toggleEnableMinerEpic`, action.type, ConsoleTheme.testing)),
 	tap(() => {
 		const settingsState = state$.value.settings
-		config.set('manageDaemon.enableMiner', settingsState.isMinerEnabled)
 
 		if (settingsState.isMinerEnabled) {
 			console.log('Starting Miner')
@@ -63,7 +60,6 @@ const toggleEnableTorEpic = (action$: ActionsObservable<AppAction>, state$) => a
 	tap((action: AppAction) => logger.debug(epicInstanceName, `toggleEnableTorEpic`, action.type, ConsoleTheme.testing)),
 	tap(() => {
 		const settingsState = state$.value.settings
-		config.set('manageDaemon.enableTor', settingsState.isTorEnabled)
 
 		if (settingsState.isTorEnabled) {
 			console.log('Starting Tor')

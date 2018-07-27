@@ -9,8 +9,8 @@ import { SettingsActions } from '../state/reducers/settings/settings.reducer'
  */
 let instance = null
 
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
+const util = require('util')
+const exec = util.promisify(require('child_process').exec)
 
 const osService = new OSService()
 
@@ -54,6 +54,7 @@ export class TorService {
           console.log(`stderr: ${err.stderr}`)
           errorHandler(err)
         })
+
       } else {
         console.log('Tor is already running')
       }
