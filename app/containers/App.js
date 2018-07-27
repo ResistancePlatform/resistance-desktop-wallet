@@ -12,6 +12,8 @@ import styles from './App.scss'
 import HLayout from '../theme/h-box-layout.scss'
 import VLayout from '../theme/v-box-layout.scss'
 
+import { appStore } from '../state/store/configureStore'
+import { SettingsActions } from '../state/reducers/settings/settings.reducer'
 
 type Props = {};
 
@@ -23,6 +25,10 @@ type Props = {};
  */
 export default class App extends React.Component<Props> {
 	props: Props;
+
+  componentDidMount() {
+    appStore.dispatch(SettingsActions.startLocalNode())
+  }
 
 	render() {
 		return (

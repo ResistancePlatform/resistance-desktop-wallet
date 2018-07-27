@@ -1,4 +1,5 @@
 // @flow
+import { remote } from 'electron'
 
 import { OSService } from './os-service'
 
@@ -11,7 +12,6 @@ const { exec } = require('child_process')
 
 const osService = new OSService()
 
-const minerdLog = ' &> minerd.log'
 const startMinerString = 'minerd -o http://127.0.0.1:18432 --background --no-stratum --no-getwork --user=test123 --pass=test123'
 
 /**
@@ -37,6 +37,7 @@ export class MinerService {
 		return osService.getPid('resistanced').then(daemonPid => {
 			console.log(`Daemon PID is: ${daemonPid}`)
 
+      const minerdLog = ` &> "${remote.app.getPath('userData')}/minerd.log"`
 			const execMiner = () => {
 				exec(
 					`${osService.getBinariesPath()}/${startMinerString}${minerdLog}`,

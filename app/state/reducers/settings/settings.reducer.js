@@ -22,11 +22,22 @@ export const SettingsActions = {
 	TOGGLE_ENABLE_TOR: `${settingsActionTypePrefix}: TOGGLE_ENABLE_TOR`,
 	TOGGLE_ENABLE_MINER: `${settingsActionTypePrefix}: TOGGLE_ENABLE_MINER`,
 
+  TOR_PROCESS_FAILED: `${settingsActionTypePrefix}: TOR_PROCESS_FAILED`,
+  TOR_PROCESS_MURDER_FAILED: `${settingsActionTypePrefix}: TOR_PROCESS_MURDER_FAILED`,
+
 	finishDaemonUpdate: (): AppAction => ({ type: SettingsActions.DAEMON_FINISHED_UPDATING }),
 	startLocalNode: (): AppAction => ({ type: SettingsActions.START_LOCAL_NODE }),
 	stopLocalNode: (): AppAction => ({ type: SettingsActions.STOP_LOCAL_NODE }),
 	toggleEnableMiner: (): AppAction => ({ type: SettingsActions.TOGGLE_ENABLE_MINER }),
 	toggleEnableTor: (): AppAction => ({ type: SettingsActions.TOGGLE_ENABLE_TOR }),
+  failTorProcess: (errorMessage): AppAction => ({
+    type: SettingsActions.TOR_PROCESS_FAILED,
+    payload: {errorMessage}
+  }),
+  failTorProcessMurder: (errorMessage): AppAction => ({
+    type: SettingsActions.TOR_PROCESS_MURDER_FAILED,
+    payload: {errorMessage}
+  }),
 
 	empty: (): AppAction => ({ type: SettingsActions.EMPTY })
 }
@@ -55,6 +66,12 @@ export const SettingsReducer = (state: SettingsState = initState, action: AppAct
 
 		case SettingsActions.TOGGLE_ENABLE_MINER:
 			return { ...state, isMinerEnabled: !state.isMinerEnabled }
+
+		case SettingsActions.TOR_PROCESS_FAILED:
+			return { ...state, isTorEnabled: false }
+
+		case SettingsActions.TOR_PROCESS_MURDER_FAILED:
+			return { ...state, isTorEnabled: true }
 
 		default:
 			return state

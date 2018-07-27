@@ -4,6 +4,7 @@ import { merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 
 import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
+import { DialogService } from '../../../service/dialog-service';
 import { ResistanceService } from '../../../service/resistance-service'
 import { MinerService } from '../../../service/miner-service'
 import { TorService } from '../../../service/tor-service'
@@ -12,7 +13,7 @@ import { SettingsActions } from './settings.reducer'
 const epicInstanceName = 'SettingsEpics'
 
 const logger = new LoggerService()
-const config = require('electron-settings')
+const dialogService: DialogService = new DialogService();
 
 const resistanceService = new ResistanceService()
 const minerService = new MinerService()
@@ -32,7 +33,6 @@ const stopLocalNodeEpic = (action$: ActionsObservable<AppAction>) => action$.pip
 	ofType(SettingsActions.STOP_LOCAL_NODE),
 	tap((action: AppAction) => logger.debug(epicInstanceName, `stopLocalNodeEpic`, action.type, ConsoleTheme.testing)),
 	tap(() => {
-		config.set('manageDaemon.enableMiner', false)
 		minerService.stop()
 		resistanceService.stop()
 	}),
@@ -44,7 +44,6 @@ const toggleEnableMinerEpic = (action$: ActionsObservable<AppAction>, state$) =>
 	tap((action: AppAction) => logger.debug(epicInstanceName, `toggleEnableMinerEpic`, action.type, ConsoleTheme.testing)),
 	tap(() => {
 		const settingsState = state$.value.settings
-		config.set('manageDaemon.enableMiner', settingsState.isMinerEnabled)
 
 		if (settingsState.isMinerEnabled) {
 			console.log('Starting Miner')
@@ -61,7 +60,6 @@ const toggleEnableTorEpic = (action$: ActionsObservable<AppAction>, state$) => a
 	tap((action: AppAction) => logger.debug(epicInstanceName, `toggleEnableTorEpic`, action.type, ConsoleTheme.testing)),
 	tap(() => {
 		const settingsState = state$.value.settings
-		config.set('manageDaemon.enableTor', settingsState.isTorEnabled)
 
 		if (settingsState.isTorEnabled) {
 			console.log('Starting Tor')
@@ -73,9 +71,29 @@ const toggleEnableTorEpic = (action$: ActionsObservable<AppAction>, state$) => a
 	map(() => SettingsActions.empty())
 )
 
+const failTorProcessEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+	ofType(SettingsActions.TOR_PROCESS_FAILED),
+	tap((action: AppAction) => logger.debug(epicInstanceName, `failTorProcessEpic`, action.type, ConsoleTheme.testing)),
+	tap((action: AppAction) => {
+    dialogService.showError(`Tor process failed`, action.payload.errorMessage)
+  }),
+	map(() => SettingsActions.empty())
+)
+
+const failTorProcessMurderEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+	ofType(SettingsActions.TOR_PROCESS_MURDER_FAILED),
+	tap((action: AppAction) => logger.debug(epicInstanceName, `failTorProcessMurderEpic`, action.type, ConsoleTheme.testing)),
+	tap((action: AppAction) => {
+    dialogService.showError(`Error stopping Tor`, action.payload.errorMessage)
+  }),
+	map(() => SettingsActions.empty())
+)
+
 export const SettingsEpics = (action$, state$) => merge(
 	startLocalNodeEpic(action$, state$),
 	stopLocalNodeEpic(action$, state$),
 	toggleEnableMinerEpic(action$, state$),
-	toggleEnableTorEpic(action$, state$)
+	toggleEnableTorEpic(action$, state$),
+	failTorProcessEpic(action$, state$),
+	failTorProcessMurderEpic(action$, state$)
 )

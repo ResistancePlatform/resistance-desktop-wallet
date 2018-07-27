@@ -1,4 +1,5 @@
 // @flow
+import path from 'path'
 
 /**
  * ES6 singleton
@@ -23,6 +24,23 @@ export class OSService {
 	}
 
 	/**
+	 * We CANNOT use:
+	 *   import { appStore } from '../state/store/configureStore'
+	 *
+	 * As that will import BEFORE the `appStore` be created !!!
+	 * We have to require the latest `appStore` to make sure it has been created !!!
+	 *
+	 * @param {AppAction} action
+	 * @memberof ResistanceCliService
+	 */
+	dispatchAction(action: AppAction) {
+		const storeModule = require('../state/store/configureStore')
+		if (storeModule && storeModule.appStore) {
+			storeModule.appStore.dispatch(action)
+		}
+	}
+
+	/**
 	 * @memberof OSService
 	 * @returns {string}
 	 */
@@ -38,7 +56,15 @@ export class OSService {
 	 * @returns {string}
 	 */
 	getBinariesPath() {
-		return `${__dirname}/bin/${this.getOS()}`
+    let resourcesPath
+
+    if (/[\\/](Electron\.app|Electron|Electron\.exe)[\\/]/i.test(process.execPath)) {
+      resourcesPath = process.cwd()
+    } else {
+      resourcesPath = process.resourcesPath
+    }
+
+    return path.join(resourcesPath, 'bin', this.getOS())
 	}
 
 	/**

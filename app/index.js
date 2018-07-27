@@ -57,9 +57,9 @@ const initAppState: AppState = {
 	}
 }
 
-Object.assign({}, initAppState.settings, {
-	isMinerEnabled: config.get('manageDaemon.enableMiner', true),
-	isTorEnabled: config.get('manageDaemon.enableTor', false)
+Object.assign(initAppState.settings, {
+  isMinerEnabled: config.get('manageDaemon.enableMiner', true),
+  isTorEnabled: config.get('manageDaemon.enableTor', false)
 })
 
 const store = configureStore(initAppState)

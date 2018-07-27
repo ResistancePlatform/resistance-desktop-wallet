@@ -1,4 +1,5 @@
 // @flow
+import { remote } from 'electron'
 
 import { OSService } from './os-service'
 
@@ -11,7 +12,6 @@ const { exec } = require('child_process')
 
 const osService = new OSService()
 
-const resistanceLog = ' &> resistanced.log'
 const startDaemonString = 'resistanced -testnet'
 const torSwitch = '-proxy=127.0.0.1:9050'
 
@@ -55,6 +55,7 @@ export class ResistanceService {
 
 			if (!daemonPid) {
 				startString = `${osService.getBinariesPath()}/${startDaemonString}`
+        const resistanceLog = ` &> "${remote.app.getPath('userData')}/resistanced.log"`
 				if (isTorEnabled) {
 					console.log('Starting daemon with tor...')
 					startString = `${startString} ${torSwitch}${resistanceLog}`

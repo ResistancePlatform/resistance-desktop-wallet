@@ -1,19 +1,21 @@
 // @flow
+import { remote } from 'electron'
 
 import { OSService } from './os-service'
+import { SettingsActions } from '../state/reducers/settings/settings.reducer'
 
 /**
  * ES6 singleton
  */
 let instance = null
 
-const { exec } = require('child_process')
+const util = require('util')
+const exec = util.promisify(require('child_process').exec)
 
 const osService = new OSService()
 
 const torProcess = 'tor-proxy'
 const startTorString = `${torProcess}`
-const torLog = ' &> tor.log'
 
 /**
  * @export
@@ -34,50 +36,54 @@ export class TorService {
 
 	/**
 	 * @memberof TorService
-	 * @returns {Promise<any>}
 	 */
 	start() {
-		return osService.getPid(torProcess).then(pid => {
-			if (!pid) {
-				const command = `${osService.getBinariesPath()}/${startTorString}${torLog}`
-				console.log(command)
+    const errorHandler = (err) => {
+      osService.dispatchAction(SettingsActions.failTorProcess(`${err}`))
+    }
 
-				exec(command, (err, stdout, stderr) => {
-					if (err) {
-						// Node couldn't execute the command
-						console.log(err)
-						console.log(`stdout: ${stdout}`)
-						console.log(`stderr: ${stderr}`)
-						return
-					}
+    osService.getPid(torProcess).then(pid => {
+      if (!pid) {
+        const torLog = ` &> "${remote.app.getPath('userData')}/tor.log"`
+        const command = `${osService.getBinariesPath()}/${startTorString}${torLog}`
+        console.log(command)
 
-					// The *entire* stdout and stderr (buffered)
-					console.log(`Tor Started Successfully`)
-					console.log(`stdout: ${stdout}`)
-					console.log(`stderr: ${stderr}`)
-				})
-			} else {
-				console.log('Tor is already running')
-			}
+        exec(command).catch((err) => {
+          console.log('Tor process failed!')
+          console.log(`stdout: ${err.stdout}`)
+          console.log(`stderr: ${err.stderr}`)
+          errorHandler(err)
+        })
 
-			return null
-		})
+      } else {
+        console.log('Tor is already running')
+      }
+    }).catch((err) => {
+      errorHandler(err)
+    })
 	}
 
 	/**
 	 * @memberof TorService
 	 */
 	stop() {
-		return osService.getPid('tor-proxy').then(pid => {
-			if (!pid) {
-				console.log("Tor isn't running")
-			} else {
-				return osService.killPid(pid).then(() => {
-					console.log('Process %s has been killed!', pid)
-					return null
-				})
-			}
-			return null
-		})
+    const errorHandler = (err) => {
+      osService.dispatchAction(SettingsActions.failTorProcessMurder(`${err}`))
+    }
+
+    osService.getPid('tor-proxy').then(pid => {
+      if (!pid) {
+        console.log("Tor isn't running")
+      } else {
+        osService.killPid(pid).then(() => {
+          console.log('Process %s has been killed!', pid)
+        }).catch((err) => {
+          errorHandler(err)
+        })
+      }
+    }).catch((err) => {
+      errorHandler(err)
+    })
+
 	}
 }
