@@ -12,15 +12,16 @@
  */
 import * as fs from 'fs';
 import path from 'path'
+import { exec } from 'child_process'
 
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow } from 'electron'
 
-import MenuBuilder from './menu';
+import MenuBuilder from './menu'
 
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
-  const sourceMapSupport = require('source-map-support');
+  const sourceMapSupport = require('source-map-support')
   sourceMapSupport.install();
 }
 
@@ -30,7 +31,7 @@ if (
 ) {
   require('electron-debug')();
   const path = require('path');
-  const p = path.join(__dirname, '..', 'app', 'node_modules');
+  const p = path.join(__dirname, '..', 'app', 'node_modules')
   require('module').globalPaths.push(p);
 }
 
@@ -107,7 +108,24 @@ app.on('window-all-closed', () => {
   }
 });
 
+
 app.on('ready', async () => {
+  app.on('before-quit', () => {
+    console.log(`Killing all child processes...`)
+    for (let processName of ['resistanced', 'minerd', 'tor-proxy']) {
+      let cmd
+
+      if (getOsType() === 'windows') {
+        cmd = `taskkill /im ${processName}.exe`
+      } else {
+        cmd = `killall ${processName}`
+      }
+      console.log('Executing', cmd)
+      exec(cmd)
+    }
+    console.log(`Done`)
+  })
+
   if (
     process.env.NODE_ENV === 'development' ||
     process.env.DEBUG_PROD === 'true'
@@ -125,7 +143,7 @@ app.on('ready', async () => {
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
