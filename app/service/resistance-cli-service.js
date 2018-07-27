@@ -682,7 +682,7 @@ export class ResistanceCliService {
 						const failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Operation has been cancelled.`
 						this.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
 					} else {
-						initProgressPercent += 2
+						initProgressPercent += 1
 						const newProgressPercent =
 							initProgressPercent <= 100 ? initProgressPercent : 100
 						const inProgressOperation: ProcessingOperation = {
