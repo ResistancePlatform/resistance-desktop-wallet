@@ -81,8 +81,19 @@ const checkAndCreateWalletAppFolder = () => {
   }
 }
 
-checkAndCreateDaemonConfig();
-checkAndCreateWalletAppFolder();
+const setLibraryPathOnMacOSX = () => {
+  // Make dependencies included in the library path working on Mac OS X
+  if (getOsType() === 'macos') {
+    const binPath = path.join(process.resourcesPath, 'bin', getOsType())
+    const oldPath = process.env.DYLD_LIBRARY_PATH
+    process.env.DYLD_LIBRARY_PATH = `${binPath}:${oldPath ? oldPath : ''}`
+    console.log(`DYLD_LIBRARY_PATH changed to`, process.env.DYLD_LIBRARY_PATH)
+  }
+}
+
+checkAndCreateDaemonConfig()
+checkAndCreateWalletAppFolder()
+setLibraryPathOnMacOSX()
 
 /**
  * Add event listeners...

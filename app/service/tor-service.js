@@ -12,7 +12,6 @@ const exec = util.promisify(require('child_process').exec)
 
 const osService = new OSService()
 
-let torPid
 const torProcess = 'tor-proxy'
 const startTorString = `${torProcess}`
 
