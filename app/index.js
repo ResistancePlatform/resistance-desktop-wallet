@@ -4,9 +4,15 @@ import { AppContainer } from 'react-hot-loader'
 import Root from './containers/Root'
 import { configureStore, history } from './state/store/configureStore'
 import { AppState } from './state/reducers/appState'
+import { OSService } from './service/os-service'
 import './app.global.scss'
 
 const config = require('electron-settings')
+
+// Set the customized 'electron-settings' path
+const osService = new OSService()
+config.setPath(osService.getAppSettingFile())
+
 
 const initAppState: AppState = {
 	navi: {
@@ -58,8 +64,8 @@ const initAppState: AppState = {
 }
 
 Object.assign(initAppState.settings, {
-  isMinerEnabled: config.get('manageDaemon.enableMiner', true),
-  isTorEnabled: config.get('manageDaemon.enableTor', false)
+	isMinerEnabled: config.get('manageDaemon.enableMiner', true),
+	isTorEnabled: config.get('manageDaemon.enableTor', false)
 })
 
 const store = configureStore(initAppState)

@@ -77,6 +77,15 @@ export class OSService {
 	}
 
 	/**
+	 * @returns
+	 * @memberof OSService
+	 */
+	getAppSettingFile() {
+		const settingFileName = `wallet-settings.json`
+		return (this.getOS() === `macos`) ? `${this.getAppDataPath()}/${settingFileName}` : `${this.getAppDataPath()}\\${settingFileName}`
+	}
+
+	/**
 	 * @param {string} pid
 	 * @memberof OSService
 	 * @returns {Promise<any>}
