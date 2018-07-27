@@ -11,7 +11,10 @@
  * @flow
  */
 import * as fs from 'fs';
+import path from 'path'
+
 import { app, BrowserWindow } from 'electron';
+
 import MenuBuilder from './menu';
 
 let mainWindow = null;
@@ -45,17 +48,27 @@ const getOsType = () => process.platform === 'darwin' ? `macos` : `windows`;
 
 const checkAndCreateDaemonConfig = () => {
   const osType = getOsType()
-  const configFolder = (osType === `macos`) ? `${app.getPath('appData')}/Resistance` : `${app.getPath('appData')}\\Resistance`;
-  const configFile = (osType === `macos`) ? `${configFolder}/resistance.conf` : `${configFolder}\\resistance.conf`;
-  const fileContent = (osType === `macos`) ? `rpcuser=test123\nrpcpassword=test123` : `rpcuser=test123\r\nrpcpassword=test123`;
+
+  const configFolder = path.join(app.getPath('appData'), `Resistance`)
+  const configFile = path.join(configFolder, `resistance.conf`)
+
+  const fileContent = [
+    `port=18233`,
+    `rpcport=18232`,
+    `rpcuser=test123`,
+    `rpcpassword=test123`
+  ].join((osType === `windows`) ? `\r\n` : `\n`)
 
   console.log(`\n\nconfigFile: ${configFile}\n\n`)
   console.log(`\n\nfileContent: ${fileContent}\n\n`)
 
+  if (!fs.existsSync(configFolder)) {
+    fs.mkdirSync(configFolder)
+  }
+
   if (!fs.existsSync(configFile)) {
-    fs.mkdirSync(configFolder);
-    fs.writeFileSync(configFile, fileContent, { encoding: 'utf-8' });
-    console.log(`\nWrite Daemon File Successed>>>\n`);
+    fs.writeFileSync(configFile, fileContent, { encoding: 'utf-8' })
+    console.log(`\nWrite Daemon File Succeded>>>\n`)
   }
 }
 

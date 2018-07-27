@@ -20,8 +20,8 @@ let instance = null
  * Get back the new resistance client instance
  */
 const getResistanceClientInstance = () => new Client({
-	network: 'regtest',
-	port: 18432,
+	network: 'testnet',
+	port: 18232,
 	username: 'test123',
 	password: 'test123',
 	timeout: 500

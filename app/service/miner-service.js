@@ -10,7 +10,8 @@ const { exec } = require('child_process')
 
 const osService = new OSService()
 
-const startMinerString = 'minerd -o http://127.0.0.1:18432 --background --no-stratum --no-getwork --user=test123 --pass=test123'
+const minerProcess = 'minerd'
+const minerArgs = '-o http://127.0.0.1:18232 --no-stratum --no-getwork --user=test123 --pass=test123'
 
 /**
  * @export
@@ -33,12 +34,15 @@ export class MinerService {
 	 */
 	start() {
 		return osService.getPid('resistanced').then(daemonPid => {
-			console.log(`Daemon PID is: ${daemonPid}`)
+			console.log(`Resistance daemon PID is: ${daemonPid}`)
 
-      const minerdLog = ` &> "${osService.getAppDataPath()}/minerd.log"`
+      const args = osService.getOS() === 'windows' ? minerArgs : `${minerArgs} --background`
+      const command = osService.getCommandString(minerProcess, args)
+      console.log(command)
+
 			const execMiner = () => {
 				exec(
-					`${osService.getBinariesPath()}/${startMinerString}${minerdLog}`,
+					command,
 					(err, stdout, stderr) => {
 						if (err) {
 							// Node couldn't execute the command
@@ -55,7 +59,7 @@ export class MinerService {
 			}
 
 			if (daemonPid) {
-				return osService.getPid('minerd').then(minerPid => {
+				return osService.getPid(minerProcess).then(minerPid => {
 					if (!minerPid) {
 						execMiner()
 					} else {
@@ -96,7 +100,7 @@ export class MinerService {
 				}
 			}
 
-			return osService.getPid('minerd').then(killMiner)
+			return osService.getPid(minerProcess).then(killMiner)
 		})
 	}
 }

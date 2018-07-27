@@ -10,7 +10,8 @@ const { exec } = require('child_process')
 
 const osService = new OSService()
 
-const startDaemonString = 'resistanced -testnet'
+const resistancedArgs = '-testnet'
+const resistancedProcess = 'resistanced'
 const torSwitch = '-proxy=127.0.0.1:9050'
 
 /**
@@ -33,11 +34,11 @@ export class ResistanceService {
 	 * @returns {Promise<any>}
 	 */
 	start(isTorEnabled: boolean) {
-		let startString
+		let command
 
-		return osService.getPid('resistanced').then(daemonPid => {
+		return osService.getPid(resistancedProcess).then(daemonPid => {
 			const execDaemon = () => {
-				exec(startString, (err, stdout, stderr) => {
+				exec(command, (err, stdout, stderr) => {
 					if (err) {
 						// Node couldn't execute the command
 						console.log(err)
@@ -52,19 +53,8 @@ export class ResistanceService {
 			}
 
 			if (!daemonPid) {
-				startString = `${osService.getBinariesPath()}/${startDaemonString}`
-				console.log(`startString: ${startString}`)
-
-				const resistanceLog = ` &> "${osService.getAppDataPath()}/resistanced.log"`
-				console.log(`resistanceLog: ${resistanceLog}`)
-
-				if (isTorEnabled) {
-					console.log('Starting daemon with tor...')
-					startString = `${startString} ${torSwitch}${resistanceLog}`
-				} else {
-					console.log('Starting daemon without tor...')
-					startString = `${startString}${resistanceLog}`
-				}
+        const args = isTorEnabled ? `${args} ${torSwitch}` : resistancedArgs
+        command = osService.getCommandString(resistancedProcess, args)
 				execDaemon()
 			} else {
 				console.log('Daemon is already running')
@@ -99,7 +89,7 @@ export class ResistanceService {
 				}
 			}
 
-			return osService.getPid('resistanced').then(killDaemon)
+			return osService.getPid(resistancedProcess).then(killDaemon)
 		})
 	}
 }

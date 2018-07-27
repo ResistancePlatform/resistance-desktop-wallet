@@ -12,6 +12,7 @@ const exec = util.promisify(require('child_process').exec)
 
 const osService = new OSService()
 
+let torPid
 const torProcess = 'tor-proxy'
 const startTorString = `${torProcess}`
 
@@ -42,8 +43,7 @@ export class TorService {
 
     osService.getPid(torProcess).then(pid => {
       if (!pid) {
-        const torLog = ` &> "${osService.getAppDataPath()}/tor.log"`
-        const command = `${osService.getBinariesPath()}/${startTorString}${torLog}`
+        const command = osService.getCommandString(torProcess)
         console.log(command)
 
         exec(command).catch((err) => {
