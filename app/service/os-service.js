@@ -109,7 +109,7 @@ export class OSService {
   execProcess(processName, args = '', errorHandler = (err) => {}) {
     this.getPid(processName).then(pid => {
       if (!pid) {
-        const command = this.getCommandString(processName)
+        const command = this.getCommandString(processName, args)
         console.log(`Executing command:`, command)
 
         const pid = exec(command, (err, stdout, stderr) => {
@@ -182,7 +182,6 @@ export class OSService {
 					command: processName
 				},
 				(err, resultList) => {
-      console.log('nslooup', processName, err)
 					if (err) {
 						reject(err)
 					}
