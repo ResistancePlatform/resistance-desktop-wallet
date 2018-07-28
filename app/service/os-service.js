@@ -117,7 +117,10 @@ export class OSService {
             console.log(`Process ${processName} has failed!`)
             console.log(`stdout: ${stdout}`)
             console.log(`stderr: ${stderr}`)
-            errorHandler(err)
+            if (this.getOS() !== 'windows') {
+              // TODO: suppress expected errors explicitly
+              errorHandler(err)
+            }
           }
         }).pid
 

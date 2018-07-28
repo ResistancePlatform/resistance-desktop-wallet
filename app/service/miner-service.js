@@ -31,21 +31,11 @@ export class MinerService {
 	 * @memberof MinerService
 	 */
 	start() {
-		osService.getPid('resistanced').then(daemonPid => {
-      const errorHandler = (err) => {
-        osService.dispatchAction(SettingsActions.failMinerProcess(`${err}`))
-      }
-			console.log(`Resistance daemon PID is: ${daemonPid}`)
-
-      if (daemonPid) {
-        const args = osService.getOS() === 'windows' ? minerArgs : `${minerArgs} --background`
-        osService.execProcess(minerProcess, args, errorHandler)
-      } else {
-        const errorMessage = 'Daemon must be running to start miner'
-        console.log(errorMessage)
-        errorHandler(errorMessage)
-      }
-		})
+    const errorHandler = (err) => {
+      osService.dispatchAction(SettingsActions.failMinerProcess(`${err}`))
+    }
+    const args = osService.getOS() === 'windows' ? minerArgs : `${minerArgs} --background`
+    osService.execProcess(minerProcess, args, errorHandler)
 	}
 
 	/**

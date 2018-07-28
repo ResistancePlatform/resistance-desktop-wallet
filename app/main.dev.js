@@ -116,7 +116,7 @@ app.on('ready', async () => {
       let cmd
 
       if (getOsType() === 'windows') {
-        cmd = `taskkill /im ${processName}.exe`
+        cmd = `taskkill /F /im ${processName}.exe`
       } else {
         cmd = `killall ${processName}`
       }
