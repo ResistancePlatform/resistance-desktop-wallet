@@ -91,6 +91,24 @@ const toggleEnableTorEpic = (action$: ActionsObservable<AppAction>, state$) => a
 	map(() => SettingsActions.empty())
 )
 
+const failLocalNodeProcessEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+	ofType(SettingsActions.LOCAL_NODE_PROCESS_FAILED),
+	tap((action: AppAction) => logger.debug(epicInstanceName, `failLocalNodeProcessEpic`, action.type, ConsoleTheme.testing)),
+	tap((action: AppAction) => {
+    dialogService.showError(`Local node process failed`, action.payload.errorMessage)
+  }),
+	map(() => SettingsActions.empty())
+)
+
+const failMinerProcessEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+	ofType(SettingsActions.MINER_PROCESS_FAILED),
+	tap((action: AppAction) => logger.debug(epicInstanceName, `failMinerProcessEpic`, action.type, ConsoleTheme.testing)),
+	tap((action: AppAction) => {
+    dialogService.showError(`Miner process failed`, action.payload.errorMessage)
+  }),
+	map(() => SettingsActions.empty())
+)
+
 const failTorProcessEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
 	ofType(SettingsActions.TOR_PROCESS_FAILED),
 	tap((action: AppAction) => logger.debug(epicInstanceName, `failTorProcessEpic`, action.type, ConsoleTheme.testing)),
@@ -116,6 +134,8 @@ export const SettingsEpics = (action$, state$) => merge(
 	toggleEnableMinerEpic(action$, state$),
 	enableTorEpic(action$, state$),
 	toggleEnableTorEpic(action$, state$),
+	failLocalNodeProcessEpic(action$, state$),
+	failMinerProcessEpic(action$, state$),
 	failTorProcessEpic(action$, state$),
 	failTorProcessMurderEpic(action$, state$)
 )

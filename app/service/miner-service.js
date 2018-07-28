@@ -1,5 +1,6 @@
 // @flow
 import { OSService } from './os-service'
+import { SettingsActions } from '../state/reducers/settings/settings.reducer'
 
 /**
  * ES6 singleton
@@ -31,7 +32,9 @@ export class MinerService {
 	 */
 	start() {
 		osService.getPid('resistanced').then(daemonPid => {
-      const errorHandler = (err) => { }
+      const errorHandler = (err) => {
+        osService.dispatchAction(SettingsActions.failMinerProcess(`${err}`))
+      }
 			console.log(`Resistance daemon PID is: ${daemonPid}`)
 
       if (daemonPid) {

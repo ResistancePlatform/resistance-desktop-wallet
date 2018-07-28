@@ -1,5 +1,6 @@
 // @flow
 import { OSService } from './os-service'
+import { SettingsActions } from '../state/reducers/settings/settings.reducer'
 
 /**
  * ES6 singleton
@@ -31,7 +32,9 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
 	start(isTorEnabled: boolean) {
-    const errorHandler = (err) => { }
+    const errorHandler = (err) => {
+      osService.dispatchAction(SettingsActions.failLocalNodeProcess(`${err}`))
+    }
     const args = isTorEnabled ? `${resistancedArgs} ${torSwitch}` : resistancedArgs
     osService.execProcess(resistancedProcess, args, errorHandler)
 	}
