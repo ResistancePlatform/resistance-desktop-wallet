@@ -1,6 +1,8 @@
 // @flow
 import { remote } from 'electron'
 import path from 'path'
+import { exec } from 'child_process'
+
 
 /**
  * ES6 singleton
@@ -65,15 +67,28 @@ export class OSService {
 			resourcesPath = process.resourcesPath
 		}
 
-		console.log(`getBinariesPath: ${path.join(resourcesPath, 'bin', this.getOS())}`)
 		return path.join(resourcesPath, 'bin', this.getOS())
 	}
 
 	/**
 	 * @memberof OSService
 	 */
+	getLogString(logFileName: string) {
+    const fullPath = path.join(this.getAppDataPath(), logFileName)
+    return this.getOS() == 'windows' ?  ` > "${fullPath}" 2>&1` : ` &> "${fullPath}"`
+	}
+
+  getCommandString(command, args = '') {
+    const fullPath = path.join(this.getBinariesPath(), command)
+    const logString = this.getLogString(`${command}.log`)
+    return `${fullPath} ${args} ${logString}`
+  }
+
+	/**
+	 * @memberof OSService
+	 */
 	getAppDataPath() {
-		return (this.getOS() === `macos`) ? `${remote.app.getPath('appData')}/ResistanceWallet` : `${remote.app.getPath('appData')}\\ResistanceWallet`
+    return path.join(remote.app.getPath('appData'), 'ResistanceWallet')
 	}
 
 	/**
@@ -84,6 +99,60 @@ export class OSService {
 		const settingFileName = `wallet-settings.json`
 		return (this.getOS() === `macos`) ? `${this.getAppDataPath()}/${settingFileName}` : `${this.getAppDataPath()}\\${settingFileName}`
 	}
+
+	/**
+	 * @param {string} processName
+	 * @param {string} args
+	 * @param {function} errorHandler
+	 * @memberof OSService
+	 */
+  execProcess(processName, args = '', errorHandler = (err) => {}) {
+    this.getPid(processName).then(pid => {
+      if (!pid) {
+        const command = this.getCommandString(processName, args)
+        console.log(`Executing command:`, command)
+
+        const pid = exec(command, (err, stdout, stderr) => {
+          if (err) {
+            console.log(`Process ${processName} has failed!`)
+            console.log(`stdout: ${stdout}`)
+            console.log(`stderr: ${stderr}`)
+            if (this.getOS() !== 'windows') {
+              // TODO: suppress expected errors explicitly
+              errorHandler(err)
+            }
+          }
+        }).pid
+
+      } else {
+        console.log(`Process ${processName} is already running`)
+      }
+    }).catch((err) => {
+      errorHandler(err)
+    })
+  }
+
+	/**
+	 * @param {string} processName
+	 * @param {string} args
+	 * @param {function} errorHandler
+	 * @memberof OSService
+	 */
+  killProcess(processName, errorHandler = (err) => {}) {
+    this.getPid(processName).then(pid => {
+      if (!pid) {
+        console.log(`Process ${processName} isn't running`)
+      } else {
+        this.killPid(pid).then(() => {
+          console.log('Process %s has been killed!', pid)
+        }).catch((err) => {
+          errorHandler(err)
+        })
+      }
+    }).catch((err) => {
+      errorHandler(err)
+    })
+  }
 
 	/**
 	 * @param {string} pid

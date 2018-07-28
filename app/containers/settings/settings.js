@@ -144,7 +144,7 @@ class Settings extends Component<Props> {
       config.set('manageDaemon.enableMiner', nextProps.settings.isMinerEnabled)
     }
     if (nextProps.settings.isTorEnabled !== this.props.settings.isTorEnabled) {
-      config.set('manageDaemon.enableTor', nextProps.isTorEnabled)
+      config.set('manageDaemon.enableTor', nextProps.settings.isTorEnabled)
     }
   }
 

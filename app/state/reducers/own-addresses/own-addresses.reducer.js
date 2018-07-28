@@ -9,7 +9,7 @@ export type AddressRow = {
 
 export type OwnAddressesState = {
 	addresses?: AddressRow[],
-	showDropdownMenu?: boolan
+	showDropdownMenu?: boolean
 }
 
 const ownAddressesActionTypePrefix = 'OWN_ADDRESSES_ACTION'

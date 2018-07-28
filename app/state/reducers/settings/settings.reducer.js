@@ -18,9 +18,14 @@ export const SettingsActions = {
 
 	START_LOCAL_NODE: `${settingsActionTypePrefix}: START_LOCAL_NODE`,
 	STOP_LOCAL_NODE: `${settingsActionTypePrefix}: STOP_LOCAL_NODE`,
+	LOCAL_NODE_PROCESS_FAILED: `${settingsActionTypePrefix}: LOCAL_NODE_PROCESS_FAILED`,
 
+  ENABLE_TOR: `${settingsActionTypePrefix}: ENABLE_TOR`,
 	TOGGLE_ENABLE_TOR: `${settingsActionTypePrefix}: TOGGLE_ENABLE_TOR`,
+
+  ENABLE_MINER: `${settingsActionTypePrefix}: ENABLE_MINER`,
 	TOGGLE_ENABLE_MINER: `${settingsActionTypePrefix}: TOGGLE_ENABLE_MINER`,
+  MINER_PROCESS_FAILED: `${settingsActionTypePrefix}: MINER_PROCESS_FAILED`,
 
   TOR_PROCESS_FAILED: `${settingsActionTypePrefix}: TOR_PROCESS_FAILED`,
   TOR_PROCESS_MURDER_FAILED: `${settingsActionTypePrefix}: TOR_PROCESS_MURDER_FAILED`,
@@ -28,8 +33,18 @@ export const SettingsActions = {
 	finishDaemonUpdate: (): AppAction => ({ type: SettingsActions.DAEMON_FINISHED_UPDATING }),
 	startLocalNode: (): AppAction => ({ type: SettingsActions.START_LOCAL_NODE }),
 	stopLocalNode: (): AppAction => ({ type: SettingsActions.STOP_LOCAL_NODE }),
+	enableMiner: (): AppAction => ({ type: SettingsActions.ENABLE_MINER }),
 	toggleEnableMiner: (): AppAction => ({ type: SettingsActions.TOGGLE_ENABLE_MINER }),
+	enableTor: (): AppAction => ({ type: SettingsActions.ENABLE_TOR }),
 	toggleEnableTor: (): AppAction => ({ type: SettingsActions.TOGGLE_ENABLE_TOR }),
+  failLocalNodeProcess: (errorMessage): AppAction => ({
+    type: SettingsActions.LOCAL_NODE_PROCESS_FAILED,
+    payload: {errorMessage}
+  }),
+  failMinerProcess: (errorMessage): AppAction => ({
+    type: SettingsActions.MINER_PROCESS_FAILED,
+    payload: {errorMessage}
+  }),
   failTorProcess: (errorMessage): AppAction => ({
     type: SettingsActions.TOR_PROCESS_FAILED,
     payload: {errorMessage}
@@ -61,11 +76,20 @@ export const SettingsReducer = (state: SettingsState = initState, action: AppAct
 		case SettingsActions.STOP_LOCAL_NODE:
 			return { ...state, isMinerEnabled: false, isDaemonUpdating: true }
 
+		case SettingsActions.ENABLE_TOR:
+			return { ...state, isTorEnabled: true }
+
 		case SettingsActions.TOGGLE_ENABLE_TOR:
 			return { ...state, isTorEnabled: !state.isTorEnabled }
 
+		case SettingsActions.ENABLE_MINER:
+			return { ...state, isMinerEnabled: true }
+
 		case SettingsActions.TOGGLE_ENABLE_MINER:
 			return { ...state, isMinerEnabled: !state.isMinerEnabled }
+
+		case SettingsActions.MINER_PROCESS_FAILED:
+			return { ...state, isMinerEnabled: false }
 
 		case SettingsActions.TOR_PROCESS_FAILED:
 			return { ...state, isTorEnabled: false }

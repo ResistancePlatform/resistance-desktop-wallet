@@ -39,6 +39,16 @@ const stopLocalNodeEpic = (action$: ActionsObservable<AppAction>) => action$.pip
 	map(() => SettingsActions.empty())
 )
 
+const enableMinerEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+	ofType(SettingsActions.ENABLE_MINER),
+	tap((action: AppAction) => logger.debug(epicInstanceName, `enableMinerEpic`, action.type, ConsoleTheme.testing)),
+	tap(() => {
+    console.log('Starting Miner')
+    minerService.start()
+	}),
+	map(() => SettingsActions.empty())
+)
+
 const toggleEnableMinerEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
 	ofType(SettingsActions.TOGGLE_ENABLE_MINER),
 	tap((action: AppAction) => logger.debug(epicInstanceName, `toggleEnableMinerEpic`, action.type, ConsoleTheme.testing)),
@@ -51,6 +61,16 @@ const toggleEnableMinerEpic = (action$: ActionsObservable<AppAction>, state$) =>
 		} else {
 			minerService.stop()
 		}
+	}),
+	map(() => SettingsActions.empty())
+)
+
+const enableTorEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+	ofType(SettingsActions.ENABLE_TOR),
+	tap((action: AppAction) => logger.debug(epicInstanceName, `enableTorEpic`, action.type, ConsoleTheme.testing)),
+	tap(() => {
+			console.log('Starting Tor')
+			torService.start()
 	}),
 	map(() => SettingsActions.empty())
 )
@@ -68,6 +88,24 @@ const toggleEnableTorEpic = (action$: ActionsObservable<AppAction>, state$) => a
 			torService.stop()
 		}
 	}),
+	map(() => SettingsActions.empty())
+)
+
+const failLocalNodeProcessEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+	ofType(SettingsActions.LOCAL_NODE_PROCESS_FAILED),
+	tap((action: AppAction) => logger.debug(epicInstanceName, `failLocalNodeProcessEpic`, action.type, ConsoleTheme.testing)),
+	tap((action: AppAction) => {
+    dialogService.showError(`Local node process failed`, action.payload.errorMessage)
+  }),
+	map(() => SettingsActions.empty())
+)
+
+const failMinerProcessEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+	ofType(SettingsActions.MINER_PROCESS_FAILED),
+	tap((action: AppAction) => logger.debug(epicInstanceName, `failMinerProcessEpic`, action.type, ConsoleTheme.testing)),
+	tap((action: AppAction) => {
+    dialogService.showError(`Miner process failed`, action.payload.errorMessage)
+  }),
 	map(() => SettingsActions.empty())
 )
 
@@ -92,8 +130,12 @@ const failTorProcessMurderEpic = (action$: ActionsObservable<AppAction>, state$)
 export const SettingsEpics = (action$, state$) => merge(
 	startLocalNodeEpic(action$, state$),
 	stopLocalNodeEpic(action$, state$),
+  enableMinerEpic(action$, state$),
 	toggleEnableMinerEpic(action$, state$),
+	enableTorEpic(action$, state$),
 	toggleEnableTorEpic(action$, state$),
+	failLocalNodeProcessEpic(action$, state$),
+	failMinerProcessEpic(action$, state$),
 	failTorProcessEpic(action$, state$),
 	failTorProcessMurderEpic(action$, state$)
 )

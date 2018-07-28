@@ -27,7 +27,26 @@ export default class App extends React.Component<Props> {
 	props: Props;
 
   componentDidMount() {
-    appStore.dispatch(SettingsActions.startLocalNode())
+    const settings = appStore.getState().settings
+
+    const startNode = () => {
+      appStore.dispatch(SettingsActions.startLocalNode())
+    }
+
+    const startMiner = () => {
+      appStore.dispatch(SettingsActions.enableMiner())
+    }
+
+    if (settings.isTorEnabled) {
+      appStore.dispatch(SettingsActions.enableTor())
+      setTimeout(startNode, 200);
+    } else {
+      startNode()
+    }
+
+    if (settings.isMinerEnabled) {
+      setTimeout(startMiner, 1000);
+    }
   }
 
 	render() {

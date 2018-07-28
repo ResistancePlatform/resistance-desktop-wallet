@@ -59,7 +59,7 @@ const initAppState: AppState = {
 		isTorUpdating: false,
 		isMinerUpdating: false,
 		isTorEnabled: false,
-		isMinerEnabled: true
+		isMinerEnabled: false
 	}
 }
 

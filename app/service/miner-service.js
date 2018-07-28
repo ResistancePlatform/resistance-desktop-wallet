@@ -1,16 +1,16 @@
 // @flow
 import { OSService } from './os-service'
+import { SettingsActions } from '../state/reducers/settings/settings.reducer'
 
 /**
  * ES6 singleton
  */
 let instance = null
 
-const { exec } = require('child_process')
-
 const osService = new OSService()
 
-const startMinerString = 'minerd -o http://127.0.0.1:18432 --background --no-stratum --no-getwork --user=test123 --pass=test123'
+const minerProcess = 'minerd'
+const minerArgs = '-o http://127.0.0.1:18232 --no-stratum --no-getwork --user=test123 --pass=test123'
 
 /**
  * @export
@@ -29,74 +29,20 @@ export class MinerService {
 
 	/**
 	 * @memberof MinerService
-	 * @returns {Promise<any>}
 	 */
 	start() {
-		return osService.getPid('resistanced').then(daemonPid => {
-			console.log(`Daemon PID is: ${daemonPid}`)
-
-      const minerdLog = ` &> "${osService.getAppDataPath()}/minerd.log"`
-			const execMiner = () => {
-				exec(
-					`${osService.getBinariesPath()}/${startMinerString}${minerdLog}`,
-					(err, stdout, stderr) => {
-						if (err) {
-							// Node couldn't execute the command
-							console.log(err)
-							console.log(`STDOUT: ${stdout}`)
-							console.log(`STDERR: ${stderr}`)
-						} else {
-							// The *entire* stdout and stderr (buffered)
-							console.log(`STDOUT: ${stdout}`)
-							console.log(`STDERR: ${stderr}`)
-						}
-					}
-				)
-			}
-
-			if (daemonPid) {
-				return osService.getPid('minerd').then(minerPid => {
-					if (!minerPid) {
-						execMiner()
-					} else {
-						console.log('Miner is already running')
-					}
-					return null
-				})
-			}
-
-			console.log('Daemon must be running to start miner')
-			// TODO: add Promise reject
-
-			return null
-		})
+    const errorHandler = (err) => {
+      osService.dispatchAction(SettingsActions.failMinerProcess(`${err}`))
+    }
+    const args = osService.getOS() === 'windows' ? minerArgs : `${minerArgs} --background`
+    osService.execProcess(minerProcess, args, errorHandler)
 	}
 
 	/**
 	 * @memberof MinerService
-	 * @returns {Promise<any>}
 	 */
 	stop() {
-		return new Promise((resolve, reject) => {
-			const killMiner = pid => {
-				let errorMessage
-
-				if (!pid) {
-					errorMessage = `Miner isn't running`
-					console.log(errorMessage)
-					reject(errorMessage)
-				} else {
-					osService.killPid(pid, err => {
-						if (err) {
-							reject(err)
-						} else {
-							resolve()
-						}
-					})
-				}
-			}
-
-			return osService.getPid('minerd').then(killMiner)
-		})
+    const errorHandler = (err) => { }
+    osService.killProcess(minerProcess, errorHandler)
 	}
 }

@@ -11,13 +11,17 @@
  * @flow
  */
 import * as fs from 'fs';
-import { app, BrowserWindow } from 'electron';
-import MenuBuilder from './menu';
+import path from 'path'
+import { exec } from 'child_process'
+
+import { app, BrowserWindow } from 'electron'
+
+import MenuBuilder from './menu'
 
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
-  const sourceMapSupport = require('source-map-support');
+  const sourceMapSupport = require('source-map-support')
   sourceMapSupport.install();
 }
 
@@ -27,7 +31,7 @@ if (
 ) {
   require('electron-debug')();
   const path = require('path');
-  const p = path.join(__dirname, '..', 'app', 'node_modules');
+  const p = path.join(__dirname, '..', 'app', 'node_modules')
   require('module').globalPaths.push(p);
 }
 
@@ -45,17 +49,27 @@ const getOsType = () => process.platform === 'darwin' ? `macos` : `windows`;
 
 const checkAndCreateDaemonConfig = () => {
   const osType = getOsType()
-  const configFolder = (osType === `macos`) ? `${app.getPath('appData')}/Resistance` : `${app.getPath('appData')}\\Resistance`;
-  const configFile = (osType === `macos`) ? `${configFolder}/resistance.conf` : `${configFolder}\\resistance.conf`;
-  const fileContent = (osType === `macos`) ? `rpcuser=test123\nrpcpassword=test123` : `rpcuser=test123\r\nrpcpassword=test123`;
+
+  const configFolder = path.join(app.getPath('appData'), `Resistance`)
+  const configFile = path.join(configFolder, `resistance.conf`)
+
+  const fileContent = [
+    `port=18233`,
+    `rpcport=18232`,
+    `rpcuser=test123`,
+    `rpcpassword=test123`
+  ].join((osType === `windows`) ? `\r\n` : `\n`)
 
   console.log(`\n\nconfigFile: ${configFile}\n\n`)
   console.log(`\n\nfileContent: ${fileContent}\n\n`)
 
+  if (!fs.existsSync(configFolder)) {
+    fs.mkdirSync(configFolder)
+  }
+
   if (!fs.existsSync(configFile)) {
-    fs.mkdirSync(configFolder);
-    fs.writeFileSync(configFile, fileContent, { encoding: 'utf-8' });
-    console.log(`\nWrite Daemon File Successed>>>\n`);
+    fs.writeFileSync(configFile, fileContent, { encoding: 'utf-8' })
+    console.log(`\nWrite Daemon File Succeded>>>\n`)
   }
 }
 
@@ -68,8 +82,19 @@ const checkAndCreateWalletAppFolder = () => {
   }
 }
 
-checkAndCreateDaemonConfig();
-checkAndCreateWalletAppFolder();
+const setLibraryPathOnMacOSX = () => {
+  // Make dependencies included in the library path working on Mac OS X
+  if (getOsType() === 'macos') {
+    const binPath = path.join(process.resourcesPath, 'bin', getOsType())
+    const oldPath = process.env.DYLD_LIBRARY_PATH
+    process.env.DYLD_LIBRARY_PATH = `${binPath}:${oldPath ? oldPath : ''}`
+    console.log(`DYLD_LIBRARY_PATH changed to`, process.env.DYLD_LIBRARY_PATH)
+  }
+}
+
+checkAndCreateDaemonConfig()
+checkAndCreateWalletAppFolder()
+setLibraryPathOnMacOSX()
 
 /**
  * Add event listeners...
@@ -83,7 +108,24 @@ app.on('window-all-closed', () => {
   }
 });
 
+
 app.on('ready', async () => {
+  app.on('before-quit', () => {
+    console.log(`Killing all child processes...`)
+    for (let processName of ['resistanced', 'minerd', 'tor-proxy']) {
+      let cmd
+
+      if (getOsType() === 'windows') {
+        cmd = `taskkill /F /im ${processName}.exe`
+      } else {
+        cmd = `killall ${processName}`
+      }
+      console.log('Executing', cmd)
+      exec(cmd)
+    }
+    console.log(`Done`)
+  })
+
   if (
     process.env.NODE_ENV === 'development' ||
     process.env.DEBUG_PROD === 'true'
@@ -101,7 +143,7 @@ app.on('ready', async () => {
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
