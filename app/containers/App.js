@@ -33,6 +33,10 @@ export default class App extends React.Component<Props> {
       appStore.dispatch(SettingsActions.startLocalNode())
     }
 
+    const startMiner = () => {
+      appStore.dispatch(SettingsActions.enableMiner())
+    }
+
     if (settings.isTorEnabled) {
       appStore.dispatch(SettingsActions.enableTor())
       setTimeout(startNode, 200);
@@ -40,9 +44,9 @@ export default class App extends React.Component<Props> {
       startNode()
     }
 
-    // if (settings.isMinerEnabled) {
-    //   appStore.dispatch(SettingsActions.startMiner())
-    // }
+    if (settings.isMinerEnabled) {
+      setTimeout(startMiner, 1000);
+    }
   }
 
 	render() {

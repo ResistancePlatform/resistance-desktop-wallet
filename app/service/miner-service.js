@@ -38,7 +38,7 @@ export class MinerService {
         const args = osService.getOS() === 'windows' ? minerArgs : `${minerArgs} --background`
         osService.execProcess(minerProcess, args, errorHandler)
       } else {
-        errorMessage = 'Daemon must be running to start miner'
+        const errorMessage = 'Daemon must be running to start miner'
         console.log(errorMessage)
         errorHandler(errorMessage)
       }

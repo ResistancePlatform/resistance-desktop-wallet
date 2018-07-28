@@ -39,6 +39,16 @@ const stopLocalNodeEpic = (action$: ActionsObservable<AppAction>) => action$.pip
 	map(() => SettingsActions.empty())
 )
 
+const enableMinerEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+	ofType(SettingsActions.ENABLE_MINER),
+	tap((action: AppAction) => logger.debug(epicInstanceName, `enableMinerEpic`, action.type, ConsoleTheme.testing)),
+	tap(() => {
+    console.log('Starting Miner')
+    minerService.start()
+	}),
+	map(() => SettingsActions.empty())
+)
+
 const toggleEnableMinerEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
 	ofType(SettingsActions.TOGGLE_ENABLE_MINER),
 	tap((action: AppAction) => logger.debug(epicInstanceName, `toggleEnableMinerEpic`, action.type, ConsoleTheme.testing)),
@@ -102,6 +112,7 @@ const failTorProcessMurderEpic = (action$: ActionsObservable<AppAction>, state$)
 export const SettingsEpics = (action$, state$) => merge(
 	startLocalNodeEpic(action$, state$),
 	stopLocalNodeEpic(action$, state$),
+  enableMinerEpic(action$, state$),
 	toggleEnableMinerEpic(action$, state$),
 	enableTorEpic(action$, state$),
 	toggleEnableTorEpic(action$, state$),

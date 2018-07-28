@@ -31,6 +31,7 @@ export const SettingsActions = {
 	finishDaemonUpdate: (): AppAction => ({ type: SettingsActions.DAEMON_FINISHED_UPDATING }),
 	startLocalNode: (): AppAction => ({ type: SettingsActions.START_LOCAL_NODE }),
 	stopLocalNode: (): AppAction => ({ type: SettingsActions.STOP_LOCAL_NODE }),
+	enableMiner: (): AppAction => ({ type: SettingsActions.ENABLE_MINER }),
 	toggleEnableMiner: (): AppAction => ({ type: SettingsActions.TOGGLE_ENABLE_MINER }),
 	enableTor: (): AppAction => ({ type: SettingsActions.ENABLE_TOR }),
 	toggleEnableTor: (): AppAction => ({ type: SettingsActions.TOGGLE_ENABLE_TOR }),
@@ -70,6 +71,9 @@ export const SettingsReducer = (state: SettingsState = initState, action: AppAct
 
 		case SettingsActions.TOGGLE_ENABLE_TOR:
 			return { ...state, isTorEnabled: !state.isTorEnabled }
+
+		case SettingsActions.ENABLE_MINER:
+			return { ...state, isMinerEnabled: true }
 
 		case SettingsActions.TOGGLE_ENABLE_MINER:
 			return { ...state, isMinerEnabled: !state.isMinerEnabled }
