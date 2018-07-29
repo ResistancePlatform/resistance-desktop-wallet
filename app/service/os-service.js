@@ -109,8 +109,13 @@ export class OSService {
   execProcess(processName, args = '', errorHandler = (err) => {}) {
     this.getPid(processName).then(pid => {
       if (!pid) {
-        const command = this.getCommandString(processName, args)
+        let command = this.getCommandString(processName, args)
         console.log(`Executing command:`, command)
+
+        if (this.getOS() === 'macos') {
+          // exec's options.env doesn't work for some reason
+          command = `sh -c 'DYLD_LIBRARY_PATH="${this.getBinariesPath()}" ${command}'`
+        }
 
         const pid = exec(command, (err, stdout, stderr) => {
           if (err) {

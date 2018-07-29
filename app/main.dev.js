@@ -12,12 +12,14 @@
  */
 import * as fs from 'fs';
 import path from 'path'
-import { exec } from 'child_process'
+import { execSync } from 'child_process'
 
 import { app, BrowserWindow } from 'electron'
 
+import { OSService } from './service/os-service'
 import MenuBuilder from './menu'
 
+const osService = new OSService()
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -82,19 +84,26 @@ const checkAndCreateWalletAppFolder = () => {
   }
 }
 
-const setLibraryPathOnMacOSX = () => {
-  // Make dependencies included in the library path working on Mac OS X
-  if (getOsType() === 'macos') {
-    const binPath = path.join(process.resourcesPath, 'bin', getOsType())
-    const oldPath = process.env.DYLD_LIBRARY_PATH
-    process.env.DYLD_LIBRARY_PATH = `${binPath}:${oldPath ? oldPath : ''}`
-    console.log(`DYLD_LIBRARY_PATH changed to`, process.env.DYLD_LIBRARY_PATH)
+const checkAndFetchZCashParams = () => {
+  const zcashParamsFolder = path.join(app.getPath('appData'), 'ZcashParams')
+
+  if (!fs.existsSync(zcashParamsFolder)) {
+    console.log('Launching ZCash parameters fetching script in a new terminal window...')
+
+    const initScript = (getOsType() === 'windows' ? 'init-configure.bat' : 'resistanceinit.sh')
+    const fetchZCashParams = path.join(osService.getBinariesPath(), initScript)
+
+    const command = (getOsType() === 'windows')
+      ? `start cmd.exe /C ${fetchZCashParams}`
+      : `open -Wa Terminal ${fetchZCashParams}`
+    execSync(command)
+    console.log('Done')
   }
 }
 
 checkAndCreateDaemonConfig()
 checkAndCreateWalletAppFolder()
-setLibraryPathOnMacOSX()
+checkAndFetchZCashParams()
 
 /**
  * Add event listeners...
@@ -121,7 +130,7 @@ app.on('ready', async () => {
         cmd = `killall ${processName}`
       }
       console.log('Executing', cmd)
-      exec(cmd)
+      execSync(cmd)
     }
     console.log(`Done`)
   })
