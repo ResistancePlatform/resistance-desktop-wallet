@@ -601,9 +601,10 @@ export class ResistanceCliService {
 		 *
 		 */
 		const getSendCashPromise = (fAddress: string, tAddress: string, amountNeedToSend: number): Promise<any> => {
+			const amountAfterDeductTheFransactionFee = amountNeedToSend - 0.0001
 			const sendCashParams = [
 				fAddress,
-				[{ address: tAddress, amount: amountNeedToSend }]
+				[{ address: tAddress, amount: amountAfterDeductTheFransactionFee }]
 			]
 
 			// sendmany "T address here" [{“address”:”t address”, “amount”:0.005}, {“address”:”z address”,”amount”:0.03, “memo”:”f508af…”}]
