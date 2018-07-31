@@ -7,7 +7,7 @@ import { LoggerService, ConsoleTheme } from './logger-service'
 import { getFormattedDateString } from '../utils/data-util'
 import { AppAction } from '../state/reducers/appAction'
 import { BlockChainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
-import { Balances, Transaction, OverviewActions } from '../state/reducers/overview/overview.reducer'
+import { Balances, OverviewActions } from '../state/reducers/overview/overview.reducer'
 import { AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
 import { SendCashActions, ProcessingOperation } from '../state/reducers/send-cash/send-cash.reducer'
 
@@ -245,7 +245,8 @@ export class ResistanceCliService {
 		/**
 		 *
 		 */
-		const getAsyncTransactionDataFromWallet = () => {
+		const getAsyncTransactionDataFromWallet = async () => {
+
 			const getDirection = (value: string) => {
 				if (value === 'receive') return 'In'
 				else if (value === 'send') return 'Out'
@@ -271,42 +272,145 @@ export class ResistanceCliService {
 			const getPublicTransactionsCmd = () => [
 				{ method: 'listtransactions', parameters: ['', 200] }
 			]
-			// const getWalletZAddressesCmd = () => [{ method: 'z_listaddresses' }]
-			// const getWalletZReceivedTransactionsCmd = (zAddress) => [{ method: 'z_listreceivedbyaddress', parameters: [zAddress, 0] }]
+			const getWalletZAddressesCmd = () => [{ method: 'z_listaddresses' }]
+			const getWalletZReceivedTransactionsCmd = (zAddress) => [{ method: 'z_listreceivedbyaddress', parameters: [zAddress, 0] }]
+			const getWalletTransactionCmd = (transactionId) => [{ method: 'gettransaction', parameters: [transactionId] }]
 
-			const responseTransactions = { transactions: null, optionalError: null }
+			// t_add --> t_addr:
 
-			const getPublicTransactionsPromise = cli
-				.command(getPublicTransactionsCmd())
+			// Public --- IN --- t_addr
+			// Public --- OUT --- t_addr
+
+			// t_add --> z_addr:
+
+			// Public -- OUT -- Z Address not listed in Wallet
+			// Private -- IN -- z_Addr
+
+			// z_add --> t_addr
+
+			// Public -- IN -- t_addr
+			// Private -- IN -- z_addr
+
+			// z_add --> z_addr
+
+			// Private  -- IN -- z_addr1
+			// Private -- IN -- z_addr2
+
+			const getPrivateTransactionsPromise = async () => {
+				try {
+					// First, we get all the private addresses, and then for each one, we get all their transactions
+					const privateAddresses = await cli.command(getWalletZAddressesCmd()).then(tempResult => tempResult[0])
+					if (Array.isArray(privateAddresses) && privateAddresses.length > 0) {
+						let queryResultWithAddressArr = []
+						for (let index = 0; index < privateAddresses.length; index++) {
+							const tempAddress = privateAddresses[index];
+							const addressTransactions = await cli.command(getWalletZReceivedTransactionsCmd(tempAddress)).then(tempResult => tempResult[0])
+
+							// 	 [{
+							// 	 amount: 49.9999,
+							// 	 jsindex: 0,
+							// 	 jsoutindex: 1,
+							// 	 memo: "f600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+							// 	 txid: "1bf41fc600962cc22104d1e2884527537a0d8d8eaac97fbabb1d5887b73ee066"
+							// 	 }]
+							if (Array.isArray(addressTransactions) && addressTransactions.length > 0) {
+								const addressTransactionsWithPrivateAddress = addressTransactions.map(tran => Object.assign({}, tran, { address: tempAddress }))
+								queryResultWithAddressArr = [...queryResultWithAddressArr, ...addressTransactionsWithPrivateAddress]
+							}
+						}
+
+						// this.logger.debug(this, `getPrivateTransactionsPromise`, `queryResultWithAddressArr: `, ConsoleTheme.testing, queryResultWithAddressArr)
+
+						const tempTransactionList = queryResultWithAddressArr.map(result => ({
+							type: `\u2605 T (Private)`,
+							direction: getDirection(`receive`),
+							confirmed: 0,
+							amount: getAmount(result.amount),
+							date: null,
+							originalTime: 0,
+							destinationAddress: result.address,
+							transactionId: result.txid
+						}))
+
+						// At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`, 
+						// we need to get that info by viewing the detail of the transaction, and then put it back !
+						for (let index = 0; index < tempTransactionList.length; index++) {
+							const tempTransaction = tempTransactionList[index];
+							const transactionDetail = await cli.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
+							tempTransaction.confirmed = getConfirmed(transactionDetail.confirmations)
+							tempTransaction.date = getDate(transactionDetail.time)
+							tempTransaction.originalTime = transactionDetail.time
+						}
+
+						return tempTransactionList
+					}
+
+					return []
+				}
+				catch (error) {
+					this.logger.debug(this, `startPollingTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
+					return []
+				}
+			}
+
+
+			const getPublicTransactionsPromise = cli.command(getPublicTransactionsCmd())
 				.then(result => result[0])
 				.then(result => {
 					if (Array.isArray(result)) {
-						const transactionList: Array<Transaction> = result.map(
+						return result.map(
 							originalTransaction => ({
-								type: `T (Public)`,
+								type: `\u2605 T (Public)`,
 								direction: getDirection(originalTransaction.category),
 								confirmed: getConfirmed(originalTransaction.confirmations),
 								amount: getAmount(originalTransaction.amount),
 								date: getDate(originalTransaction.time),
-								destinationAddress: originalTransaction.address,
+								originalTime: originalTransaction.time,
+								destinationAddress: originalTransaction.address ? originalTransaction.address : `[ Z Address not listed in Wallet ]`,
 								transactionId: originalTransaction.txid
 							})
 						)
-						responseTransactions.transactions = transactionList
-						delete responseTransactions.optionalError
-					} else {
-						// 'result' should be an error
-						responseTransactions.optionalError = result
 					}
+
+					return []
+				})
+				.catch(error => {
+					this.logger.debug(this, `getPublicTransactionsPromise`, `subscribe error: `, ConsoleTheme.error, error)
+					return []
+				})
+
+			const responseTransactions = { transactions: null, optionalError: null }
+			const queryPromiseArr = [
+				getPublicTransactionsPromise,
+				getPrivateTransactionsPromise()
+			]
+
+			const combineQueryPromise = Promise.all(queryPromiseArr)
+				.then(result => {i
+					const combinedTransactionList = [...result[0], ...result[1]]
+
+					// At this point, we got all combined `public address` and `private address` transaction list, but we need to sort by date !!!
+					const sortedByDateTransactions = combinedTransactionList.sort((trans1, trans2) => {
+						const time1 = trans1.originalTime
+						const time2 = trans2.originalTime
+
+						if (time1 > time2) return 1
+						else if (time1 < time2) return -1
+
+						return 0
+					})
+					responseTransactions.transactions = sortedByDateTransactions
+					delete responseTransactions.optionalError
+
 					return responseTransactions
 				})
 				.catch(error => {
-					console.error(error)
+					this.logger.debug(this, `startPollingTransactionsDataFromWallet`, `Promise.all error: `, ConsoleTheme.error, error)
 					responseTransactions.optionalError = error
 					return responseTransactions
 				})
 
-			from(getPublicTransactionsPromise)
+			from(combineQueryPromise)
 				.pipe(take(1))
 				.subscribe(
 					result => {
@@ -326,10 +430,7 @@ export class ResistanceCliService {
 
 		// The periodic run
 		this.stopPollingTransactionsDataFromWallet()
-		transactionDataFromWalletPollingIntervalId = setInterval(
-			() => getAsyncTransactionDataFromWallet(),
-			transactionDataFromWalletPollingIntervalSetting
-		)
+		transactionDataFromWalletPollingIntervalId = setInterval(() => getAsyncTransactionDataFromWallet(), transactionDataFromWalletPollingIntervalSetting)
 	}
 
 	/**

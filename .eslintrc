@@ -32,12 +32,14 @@
     "no-lonely-if": "off",
     "no-plusplus": "off",
     "no-unneeded-ternary": "off",
+    "no-await-in-loop": "warn",
     "class-methods-use-this": "off",
     "promise/param-names": "error",
     "promise/always-return": "error",
     "promise/catch-or-return": "error",
     "promise/no-native": "off",
     "prefer-destructuring": "warn",
+    "prefer-spread": "warn",
     "react/sort-comp": ["error", {
       "order": ["type-annotations", "static-methods", "lifecycle", "everything-else", "render"]
     }],
