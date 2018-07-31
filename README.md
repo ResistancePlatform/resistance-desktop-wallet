@@ -7,7 +7,7 @@
 ## Install
 
 ```bash
-cd your-project-name
+cd resistance-desktop-wallet
 yarn
 ```
 **Note**: If you can't use [yarn](https://github.com/yarnpkg/yarn), run `npm install`.
@@ -70,6 +70,13 @@ npm run test-e2e
 DEBUG_PROD=true npm run package
 ```
 <hr><br>
+
+## Application icons
+Use the following gist to generate new icons from one 1024x1024 image with transparency:
+https://gist.github.com/iwuvjhdva/b6329f82a445cc563b143bf014f0c112
+
+## How to update binaries
+To be written.
 
 ## How to add modules to the project
 
