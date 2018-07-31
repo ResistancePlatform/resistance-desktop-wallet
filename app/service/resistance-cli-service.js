@@ -386,7 +386,7 @@ export class ResistanceCliService {
 			]
 
 			const combineQueryPromise = Promise.all(queryPromiseArr)
-				.then(result => {i
+				.then(result => {
 					const combinedTransactionList = [...result[0], ...result[1]]
 
 					// At this point, we got all combined `public address` and `private address` transaction list, but we need to sort by date !!!

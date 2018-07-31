@@ -20,8 +20,8 @@ export default class TransactionList extends Component<Props> {
 		}
 
 		// const tableContent = `<table></table>`
-		const tableBody = this.props.transactions.map((transaction) => (
-			<div className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')} key={transaction.transactionId}>
+		const tableBody = this.props.transactions.map((transaction, index) => (
+			<div className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')} key={index}>
 				<div className={styles.tableBodyRowColumnType} >{transaction.type}</div>
 				<div className={styles.tableBodyRowColumnDirection}>{transaction.direction}</div>
 				<div className={styles.tableBodyRowColumnConfirmed}>{transaction.confirmed}</div>
