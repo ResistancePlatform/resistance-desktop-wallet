@@ -54,7 +54,7 @@
     ],
     "react/jsx-indent": "off",
     "react/no-array-index-key": "off",
-    "react/jsx-indent-props": "off"    
+    "react/jsx-indent-props": "off"
   },
   "plugins": [
     "flowtype",
@@ -65,8 +65,11 @@
   ],
   "settings": {
     "import/resolver": {
-      "webpack": {
-        "config": "webpack.config.eslint.js"
+      "node": {
+        "extensions": [
+          ".js",
+          ".node"
+        ]
       }
     }
   }

@@ -1,6 +1,6 @@
 // @flow
 import { createActions, handleActions } from 'redux-actions'
-import { preloadedAppState } from 'state/reducers/appState'
+import { preloadedAppState } from '../appState'
 
 export type SettingsState = {
 	isDaemonUpdating: boolean,

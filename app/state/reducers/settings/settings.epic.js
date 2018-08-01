@@ -1,5 +1,5 @@
 // @flow
-import { map, tap, ignoreElements } from 'rxjs/operators'
+import { tap, ignoreElements } from 'rxjs/operators'
 import { merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 
@@ -32,7 +32,7 @@ const stopLocalNodeEpic = (action$: ActionsObservable<any>) => action$.pipe(
   ignoreElements()
 )
 
-const enableMinerEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+const enableMinerEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(SettingsActions.enableMiner().type),
 	tap(() => {
     minerService.start()
@@ -54,7 +54,7 @@ const toggleEnableMinerEpic = (action$: ActionsObservable<any>, state$) => actio
   ignoreElements()
 )
 
-const enableTorEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+const enableTorEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(SettingsActions.enableTor().type),
 	tap(() => {
 			torService.start()
@@ -76,7 +76,7 @@ const toggleEnableTorEpic = (action$: ActionsObservable<any>, state$) => action$
   ignoreElements()
 )
 
-const localNodeProcessFailedEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+const localNodeProcessFailedEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(SettingsActions.localNodeProcessFailed().type),
 	tap((action: any) => {
     dialogService.showError(`Local node process failed`, action.payload.errorMessage)
@@ -84,7 +84,7 @@ const localNodeProcessFailedEpic = (action$: ActionsObservable<any>, state$) => 
   ignoreElements()
 )
 
-const minerProcessFailedEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+const minerProcessFailedEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(SettingsActions.minerProcessFailed().type),
 	tap((action: any) => {
     dialogService.showError(`Miner process failed`, action.payload.errorMessage)
@@ -92,7 +92,7 @@ const minerProcessFailedEpic = (action$: ActionsObservable<any>, state$) => acti
   ignoreElements()
 )
 
-const torProcessFailedEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+const torProcessFailedEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(SettingsActions.torProcessFailed().type),
 	tap((action: any) => {
     dialogService.showError(`Tor process failed`, action.payload.errorMessage)
@@ -100,7 +100,7 @@ const torProcessFailedEpic = (action$: ActionsObservable<any>, state$) => action
   ignoreElements()
 )
 
-const torProcessMurderFailedEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+const torProcessMurderFailedEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(SettingsActions.torProcessMurderFailed().type),
 	tap((action: any) => {
     dialogService.showError(`Error stopping Tor`, action.payload.errorMessage)
