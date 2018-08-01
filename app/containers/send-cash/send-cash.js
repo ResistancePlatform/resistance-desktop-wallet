@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import RounedInput, { RoundedInputAddon } from '../../components/rounded-input'
+import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import AddressDropdownPopupMenu from '../../components/send-cash/address-drodown-popup-menu'
 import { SendCashActions, SendCashState } from '../../state/reducers/send-cash/send-cash.reducer'
 import { appStore } from '../../state/store/configureStore'
@@ -241,7 +241,7 @@ class SendCash extends Component<Props> {
 
 						{/* From address */}
 						<div className={styles.fromAddressContainer}>
-							<RounedInput
+							<RoundedInput
 								name="from-address"
 								title="FROM ADDRESS"
 								addon={fromAddressAddon}
@@ -255,9 +255,9 @@ class SendCash extends Component<Props> {
 										onPickupAddress={(event, address) =>
 											this.onPickupAddressHandler(event, address)
 										}
-									/>
+									/>re
 								</div>
-							</RounedInput>
+							</RoundedInput>
 
 							{/* Toggle button */}
 							<div className={styles.sendPrivatelyToggleContainer}>
@@ -277,7 +277,7 @@ class SendCash extends Component<Props> {
 						</div>
 
 						{/* Destination address */}
-						<RounedInput
+						<RoundedInput
 							name="destination-address"
 							title="DESTINATION ADDRESS"
 							addon={destAddressAddon}
@@ -286,7 +286,7 @@ class SendCash extends Component<Props> {
 
 						{/* Amount */}
 						<div className={styles.amountContainer}>
-							<RounedInput
+							<RoundedInput
 								name="amount"
 								title="AMOUNT"
 								onlyNumberAllowed="true"

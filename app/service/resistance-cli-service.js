@@ -394,8 +394,8 @@ export class ResistanceCliService {
 						const time1 = trans1.originalTime
 						const time2 = trans2.originalTime
 
-						if (time1 > time2) return 1
-						else if (time1 < time2) return -1
+						if (time1 > time2) return -1
+						else if (time1 < time2) return 1
 
 						return 0
 					})
