@@ -1,5 +1,6 @@
 // @flow
-import { createActions, handleActions } from 'redux-actions';
+import { createActions, handleActions } from 'redux-actions'
+import { preloadedAppState } from 'state/reducers/appState'
 
 export type SettingsState = {
 	isDaemonUpdating: boolean,
@@ -7,14 +8,6 @@ export type SettingsState = {
 	isMinerUpdating: boolean,
 	isTorEnabled: boolean,
 	isMinerEnabled: boolean
-}
-
-const defaultState = {
-	isDaemonUpdating: false,
-	isTorUpdating: false,
-	isMinerUpdating: false,
-	isTorEnabled: false,
-	isMinerEnabled: true
 }
 
 export const SettingsActions = createActions(
@@ -71,5 +64,5 @@ export const SettingsReducer = handleActions(
       ...state, isTorEnabled: true
     }),
   },
-  defaultState
+  preloadedAppState.settings
 )
