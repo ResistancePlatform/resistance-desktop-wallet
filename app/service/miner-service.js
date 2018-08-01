@@ -32,7 +32,7 @@ export class MinerService {
 	 */
 	start() {
     const errorHandler = (err) => {
-      osService.dispatchAction(SettingsActions.failMinerProcess(`${err}`))
+      osService.dispatchAction(SettingsActions.minerProcessFailed(`${err}`))
     }
     const args = osService.getOS() === 'windows' ? minerArgs : `${minerArgs} --background`
     osService.execProcess(minerProcess, args, errorHandler)

@@ -33,7 +33,7 @@ export class ResistanceService {
 	 */
 	start(isTorEnabled: boolean) {
     const errorHandler = (err) => {
-      osService.dispatchAction(SettingsActions.failLocalNodeProcess(`${err}`))
+      osService.dispatchAction(SettingsActions.localNodeProcessFailed(`${err}`))
     }
     const args = isTorEnabled ? `${resistancedArgs} ${torSwitch}` : resistancedArgs
     osService.execProcess(resistancedProcess, args, errorHandler)
