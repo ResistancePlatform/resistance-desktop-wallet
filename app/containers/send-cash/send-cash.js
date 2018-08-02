@@ -181,10 +181,10 @@ class SendCash extends Component<Props> {
 
 		return (
 			// Layout container
-			<div 
+			<div
 				className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}
 				onClick={(event) => this.hideDropdownMenu(event)}
-				onKeyDown={(event) => this.hideDropdownMenu(event)}
+				onKeyDown={() => { }}
 			>
 				{/* Route content */}
 				<div className={[styles.sendCashContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
