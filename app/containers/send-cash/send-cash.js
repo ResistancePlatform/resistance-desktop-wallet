@@ -20,21 +20,33 @@ type Props = {
 class SendCash extends Component<Props> {
 	props: Props
 	fromAddressInputDomRef: any
+	toAddressInputDomRef: any
+	amountInputDomRef: any
 
 	constructor(props) {
 		super(props)
 
-		// create a ref to `fromAddress` <RounedInput>
-		this.fromAddressDomRef = element => {
-			this.fromAddressInputDomRef = element
-			console.log(`element: `, element)
-		}
+		// create a ref to specified <input> which inside <RounedInput>
+		this.fromAddressDomRef = (element) => { this.fromAddressInputDomRef = element };
+		this.toAddressDomRef = (element) => { this.toAddressInputDomRef = element };
+		this.amountAddressDomRef = (element) => { this.amountInputDomRef = element };
 	}
 
 	/**
 	 * @memberof SendCash
 	 */
-	componentDidMount() { }
+	componentDidMount() {
+		const currentAppState = appStore.getState()
+		const currentSendCashState = currentAppState && currentAppState.sendCash ? currentAppState.sendCash : {
+			fromAddress: '',
+			toAddress: '',
+			amount: 0
+		}
+
+		this.fromAddressInputDomRef.inputDomRef.current.value = currentSendCashState.fromAddress
+		this.toAddressInputDomRef.inputDomRef.current.value = currentSendCashState.toAddress
+		this.amountInputDomRef.inputDomRef.current.value = currentSendCashState.amount
+	}
 
 	/**
 	 * @memberof SendCash
@@ -120,7 +132,7 @@ class SendCash extends Component<Props> {
 		this.commonMenuItemEventHandler(event)
 
 		// Update `<RounedInput> --> <input>` value manually, seems don't have the better option at this moment!!!
-		this.fromAddressInputDomRef.fromAddressDomRef.current.value = selectedAddress
+		this.fromAddressInputDomRef.inputDomRef.current.value = selectedAddress
 
 		appStore.dispatch(SendCashActions.updateFromAddress(selectedAddress))
 	}
@@ -286,6 +298,7 @@ class SendCash extends Component<Props> {
 							title="DESTINATION ADDRESS"
 							addon={destAddressAddon}
 							onInputChange={value => this.onDestAddressInputChanged(value)}
+							ref={this.toAddressDomRef}
 						/>
 
 						{/* Amount */}
@@ -296,6 +309,7 @@ class SendCash extends Component<Props> {
 								onlyNumberAllowed="true"
 								addon={amountAddressAddon}
 								onInputChange={value => this.onAmountAddressInputChanged(value)}
+								ref={this.amountAddressDomRef}
 							/>
 							<div className={styles.transactionFeeContainer}>
 								<span className={styles.part1}>TRANSACTION FEE: </span>

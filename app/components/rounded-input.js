@@ -20,11 +20,11 @@ type Props = {
 
 export default class RoundedInput extends Component<Props> {
 	props: Props
-	fromAddressDomRef: any
+	inputDomRef: any
 
 	constructor(props) {
 		super(props)
-		this.fromAddressDomRef = React.createRef()
+		this.inputDomRef = React.createRef()
 	}
 
 	inputOnchangeEventHandler(event) {
@@ -89,7 +89,7 @@ export default class RoundedInput extends Component<Props> {
 
 				<div className={styles.roundedInputTextArea}>
 					<input
-						ref={this.fromAddressDomRef}
+						ref={this.inputDomRef}
 						type={this.props.onlyNumberAllowed ? 'number' : 'text'}
 						onChange={event => this.inputOnchangeEventHandler(event)}
 					/>
