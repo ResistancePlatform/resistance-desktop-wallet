@@ -64,11 +64,9 @@ export const preloadedAppState: AppState = {
 		addressList: []
 	},
 	settings: {
-		isDaemonUpdating: false,
-		isTorUpdating: false,
-		isMinerUpdating: false,
 		isTorEnabled: false,
-		isMinerEnabled: false
+		isMinerEnabled: false,
+    childProcessUpdate: {}
 	}
 }
 

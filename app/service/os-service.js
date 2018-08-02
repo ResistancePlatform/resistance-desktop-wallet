@@ -10,11 +10,29 @@ let instance = null
 
 const ps = require('ps-node')
 
+export type ChildProcessName = 'NODE' | 'TOR' | 'MINER'
+
+const childProcessCommands = {
+  NODE: 'resistanced',
+  MINER: 'minerd',
+  TOR: 'tor-proxy'
+}
+
 /**
  * @export
  * @class OSService
  */
 export class OSService {
+
+	/**
+	 * @memberof OSService
+	 */
+  ChildProcessCommands: {
+    NODE: 'resistanced',
+    MINER: 'minerd',
+    TOR: 'tor-proxy'
+  }
+
 	/**
 	 * Creates an instance of OSService.
 	 * @memberof OSService
@@ -47,10 +65,7 @@ export class OSService {
 	 * @returns {string}
 	 */
 	getOS() {
-		if (process.platform === 'darwin') {
-			return 'macos'
-		}
-		return 'windows'
+    return process.platform === 'darwin' ? 'macos' : 'windows'
 	}
 
 	/**
@@ -72,20 +87,6 @@ export class OSService {
 	/**
 	 * @memberof OSService
 	 */
-	getLogString(logFileName: string) {
-    const fullPath = path.join(this.getAppDataPath(), logFileName)
-    return this.getOS() === 'windows' ?  ` > "${fullPath}" 2>&1` : ` &> "${fullPath}"`
-	}
-
-  getCommandString(command, args = '') {
-    const fullPath = path.join(this.getBinariesPath(), command)
-    const logString = this.getLogString(`${command}.log`)
-    return `${fullPath} ${args} ${logString}`
-  }
-
-	/**
-	 * @memberof OSService
-	 */
 	getAppDataPath() {
     return path.join(remote.app.getPath('appData'), 'ResistanceWallet')
 	}
@@ -96,7 +97,7 @@ export class OSService {
 	 */
 	getAppSettingFile() {
 		const settingFileName = `wallet-settings.json`
-		return (this.getOS() === `macos`) ? `${this.getAppDataPath()}/${settingFileName}` : `${this.getAppDataPath()}\\${settingFileName}`
+    return path.join(this.getAppDataPath(), settingFileName)
 	}
 
 	/**
@@ -115,7 +116,7 @@ export class OSService {
 	 * @param {string[]} args
 	 * @memberof OSService
 	 */
-  execProcess(processName, args = []) {
+  execProcess(processName: ChildProcessName, args = []) {
     const actions = this.getSettingsActions()
 
     const errorHandler = (err) => {
@@ -132,27 +133,30 @@ export class OSService {
     }).then(() => {
       let options
       let isUpdateFinished = false
-      const commandPath = path.join(this.getBinariesPath(), processName)
+      const commandPath = path.join(this.getBinariesPath(), childProcessCommands[processName])
 
       if (this.getOS() === 'macos') {
         options = {
-          env: Object.assign({}, process.env, {
+          env: {
+            ...process.env,
             DYLD_LIBRARY_PATH: `"${this.getBinariesPath()}"`
-          })
+          }
         }
       }
 
       console.log(`Executing command ${commandPath}.`)
       const childProcess = spawn(commandPath, args, options)
 
-      this.dispatchAction(actions.childProcessUpdateStarted(processName))
-
       const onUpdateFinished = () => {
         if (!isUpdateFinished) {
           isUpdateFinished = true
-          this.dispatchAction(actions.childProcessUpdateFinished(processName))
+          this.dispatchAction(actions.childProcessStarted(processName))
         }
       }
+
+      // Logging
+      // const fullPath = path.join(this.getAppDataPath(), logFileName)
+      // return this.getOS() === 'windows' ?  ` > "${fullPath}" 2>&1` : ` &> "${fullPath}"`
 
       childProcess.stdout.on('data', onUpdateFinished)
       childProcess.stderr.on('data', onUpdateFinished)
@@ -170,19 +174,17 @@ export class OSService {
 	 * @param {function} errorHandler
 	 * @memberof OSService
 	 */
-  killProcess(processName) {
+  killProcess(processName: ChildProcessName) {
     const actions = this.getSettingsActions()
 
-    this.dispatchAction(actions.childProcessUpdateStarted(processName))
-
-    this.getPid(processName).then(pid => {
+    this.getPid(childProcessCommands[processName]).then(pid => {
       if (pid) {
         return this.killPid(pid)
       }
       console.log(`Process ${processName} isn't running`)
       return Promise.resolve()
     }).then(() => {
-      this.dispatchAction(actions.childProcessUpdateFinished(processName))
+      this.dispatchAction(actions.childProcessMurdered(processName))
       return Promise.resolve()
     }).catch((err) => {
       this.dispatchAction(actions.childProcessMurderFailed(processName, err.toString()))

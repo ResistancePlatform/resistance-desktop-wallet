@@ -1,5 +1,5 @@
 // @flow
-import { tap, ignoreElements } from 'rxjs/operators'
+import { tap, filter, mapTo, ignoreElements } from 'rxjs/operators'
 import { merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 
@@ -23,56 +23,34 @@ const startLocalNodeEpic = (action$: ActionsObservable<any>, state$) => action$.
   ignoreElements()
 )
 
-const stopLocalNodeEpic = (action$: ActionsObservable<any>) => action$.pipe(
+const stopLocalNodeEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(SettingsActions.stopLocalNode().type),
-	tap(() => {
-		minerService.stop()
-		resistanceService.stop()
-	}),
-  ignoreElements()
+	tap(() => { resistanceService.stop() }),
+  filter(() => state$.value.isMinerEnabled),
+  mapTo(SettingsActions.disableMiner())
 )
 
 const enableMinerEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(SettingsActions.enableMiner().type),
-	tap(() => {
-    minerService.start()
-	}),
+	tap(() => { minerService.start() }),
   ignoreElements()
 )
 
-const toggleEnableMinerEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
-	ofType(SettingsActions.toggleEnableMiner().type),
-	tap(() => {
-		const settingsState = state$.value.settings
-
-		if (settingsState.isMinerEnabled) {
-			minerService.start()
-		} else {
-			minerService.stop()
-		}
-	}),
+const disableMinerEpic = (action$: ActionsObservable<any>) => action$.pipe(
+	ofType(SettingsActions.disableMiner().type),
+	tap(() => { minerService.stop() }),
   ignoreElements()
 )
 
 const enableTorEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(SettingsActions.enableTor().type),
-	tap(() => {
-			torService.start()
-	}),
+	tap(() => { torService.start() }),
   ignoreElements()
 )
 
-const toggleEnableTorEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
-	ofType(SettingsActions.toggleEnableTor().type),
-	tap(() => {
-		const settingsState = state$.value.settings
-
-		if (settingsState.isTorEnabled) {
-			torService.start()
-		} else {
-			torService.stop()
-		}
-	}),
+const disableTorEpic = (action$: ActionsObservable<any>) => action$.pipe(
+	ofType(SettingsActions.disableTor().type),
+  tap(() => { torService.stop() }),
   ignoreElements()
 )
 
@@ -96,9 +74,9 @@ export const SettingsEpics = (action$, state$) => merge(
 	startLocalNodeEpic(action$, state$),
 	stopLocalNodeEpic(action$, state$),
   enableMinerEpic(action$, state$),
-	toggleEnableMinerEpic(action$, state$),
+	disableMinerEpic(action$, state$),
 	enableTorEpic(action$, state$),
-	toggleEnableTorEpic(action$, state$),
+	disableTorEpic(action$, state$),
 	childProcessFailedEpic(action$, state$),
 	childProcessMurderFailedEpic(action$, state$)
 )

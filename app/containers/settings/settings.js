@@ -30,6 +30,15 @@ class Settings extends Component<Props> {
 	 */
 	componentDidMount() { }
 
+  componentWillUpdate(nextProps) {
+    if (nextProps.settings.isMinerEnabled !== this.props.settings.isMinerEnabled) {
+      config.set('manageDaemon.enableMiner', nextProps.settings.isMinerEnabled)
+    }
+    if (nextProps.settings.isTorEnabled !== this.props.settings.isTorEnabled) {
+      config.set('manageDaemon.enableTor', nextProps.settings.isTorEnabled)
+    }
+  }
+
 	/**
 	 * @param {*} event
 	 * @memberof Settings
@@ -38,6 +47,11 @@ class Settings extends Component<Props> {
 		event.preventDefault()
 		event.stopPropagation()
 	}
+
+  getMiningDisabledAttribute() {
+    const isLocalNodeOffline = this.props.systemInfo.daemonInfo.status !== 'RUNNING'
+    return isLocalNodeOffline || this.props.settings.childProcessUpdate.MINER
+  }
 
 	getToggleButtonClasses(on) {
 		return on ? `${styles.toggleButton} ${styles.toggleButtonOn}` : `${styles.toggleButton}`
@@ -106,10 +120,10 @@ class Settings extends Component<Props> {
 	 */
 	onEnableMiningToggleClicked(event) {
 		this.eventConfirm(event)
-
-		if (this.props.systemInfo.daemonInfo.status === 'RUNNING') {
-			appStore.dispatch(SettingsActions.toggleEnableMiner())
-		}
+    const action = this.props.settings.isMinerEnabled
+      ? SettingsActions.enableMiner()
+      : SettingsActions.disableMiner()
+      appStore.dispatch(action)
 	}
 
 	/**
@@ -118,7 +132,10 @@ class Settings extends Component<Props> {
 	 */
 	onEnableTorToggleClicked(event) {
 		this.eventConfirm(event)
-		appStore.dispatch(SettingsActions.toggleEnableTor())
+    const action = this.props.settings.isTorEnabled
+      ? SettingsActions.enableTor()
+      : SettingsActions.disableTor()
+		appStore.dispatch(action)
 	}
 
 	/**
@@ -138,15 +155,6 @@ class Settings extends Component<Props> {
 		this.eventConfirm(event)
 		console.log(`onBackupWalletClicked---->`)
 	}
-
-  componentWillUpdate(nextProps) {
-    if (nextProps.settings.isMinerEnabled !== this.props.settings.isMinerEnabled) {
-      config.set('manageDaemon.enableMiner', nextProps.settings.isMinerEnabled)
-    }
-    if (nextProps.settings.isTorEnabled !== this.props.settings.isTorEnabled) {
-      config.set('manageDaemon.enableTor', nextProps.settings.isTorEnabled)
-    }
-  }
 
 	/**
 	 * @returns
@@ -207,11 +215,11 @@ class Settings extends Component<Props> {
 							<div className={styles.manageDaemonTitle}>MANAGE DAEMON</div>
 
 							<div className={styles.manageDaemonBody}>
-								{/* disabled={this.props.settings.isDaemonUpdating} */}
 								<button
 									className={styles.stopLocalNodeButton}
 									onClick={event => this.onStartStopLocalNodeClicked(event)}
 									onKeyDown={event => this.onStartStopLocalNodeClicked(event)}
+                  disabled={this.props.settings.childProcessUpdate.NODE}
 								>
 									{this.props.systemInfo.daemonInfo.status === 'RUNNING' ? 'STOP LOCAL NODE' : 'START LOCAL NODE'}
 								</button>
@@ -231,11 +239,11 @@ class Settings extends Component<Props> {
 										Enable Mining
 									</div>
 
-									{/* disabled={this.props.settings.isMinerUpdating} */}
 									<div
 										className={this.getEnableMiningToggleButtonClasses()}
 										onClick={event => this.onEnableMiningToggleClicked(event)}
 										onKeyDown={event => this.onEnableMiningToggleClicked(event)}
+                    disabled={this.getMiningDisabledAttribute()}
 									>
 										<div className={styles.toggleButtonSwitcher} />
 										<div className={styles.toggleButtonText}>
@@ -245,7 +253,6 @@ class Settings extends Component<Props> {
 								</div>
 
 								{/* Enable Tor toggle */}
-								{/* disabled={this.props.settings.isTorUpdating} */}
 								<div className={styles.toggleButtonContainer} style={{ paddingLeft: '5rem' }}>
 									<div className={styles.toggleButtonContainerTitle}>
 										Enable Tor
@@ -255,6 +262,7 @@ class Settings extends Component<Props> {
 										className={this.getEnableTorToggleButtonClasses()}
 										onClick={event => this.onEnableTorToggleClicked(event)}
 										onKeyDown={event => this.onEnableTorToggleClicked(event)}
+                    disabled={this.props.settings.childProcessUpdate.TOR}
 									>
 										<div className={styles.toggleButtonSwitcher} />
 										<div className={styles.toggleButtonText}>

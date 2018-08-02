@@ -9,8 +9,7 @@ let instance = null
 
 const osService = new OSService()
 
-const torProcess = 'tor-proxy'
-const torProcessArgs = []
+const torCommandArgs = []
 
 /**
  * @export
@@ -33,13 +32,13 @@ export class TorService {
 	 * @memberof TorService
 	 */
   start() {
-    osService.execProcess(torProcess, torProcessArgs)
+    osService.execProcess('TOR', torCommandArgs)
   }
 
 	/**
 	 * @memberof TorService
 	 */
   stop() {
-    osService.killProcess(torProcess)
+    osService.killProcess('TOR')
   }
 }
