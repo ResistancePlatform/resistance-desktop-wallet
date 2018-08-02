@@ -181,7 +181,11 @@ class SendCash extends Component<Props> {
 
 		return (
 			// Layout container
-			<div className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
+			<div 
+				className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}
+				onClick={(event) => this.hideDropdownMenu(event)}
+				onKeyDown={(event) => this.hideDropdownMenu(event)}
+			>
 				{/* Route content */}
 				<div className={[styles.sendCashContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
 
@@ -260,7 +264,7 @@ class SendCash extends Component<Props> {
 							</RoundedInput>
 
 							{/* Toggle button */}
-							<div className={styles.sendPrivatelyToggleContainer}>
+							<div className={[styles.sendPrivatelyToggleContainer, HLayout.hBoxContainer].join(' ')}>
 								<div className={styles.sendPrivateTitle}>SEND PRIVATELY</div>
 
 								<div

@@ -1,6 +1,5 @@
 @import "../../theme/vars.scss";
 @import "../../theme/generic-component.scss";
-@import "../../theme/toggle-button.scss";
 
 .sendCashContainer {
     padding: 3rem 2rem;
@@ -52,10 +51,72 @@
     }
 }
 
+.dropdownMenu {
+    height: 0; // Fixed the container height issue
+}
+
+.toggleButton {
+    display: block !important;
+
+    position: relative;
+    width: 3.8rem;
+    height: 1.4rem;
+    margin-left: 1rem;
+    padding: 0.2rem;
+
+    cursor: pointer;
+
+    background-color: $SEND_CASH_TOGGLE_BUTTON_BACKGROUND_COLOR;
+    border-radius: 5rem;
+
+    .toggleButtonSwitcher {
+        margin-left: 0.1rem;
+        margin-top: 0.025rem;
+
+        height: 1.35rem;
+        width: 1.35rem;
+
+        border-radius: 5rem;
+        background-color: $SEND_CASH_TOGGLE_BUTTON_SWITCHER_COLOR;
+    }
+
+    .toggleButtonText {
+        position: absolute;
+        right: 0.5rem;
+        top: 0.5rem;
+
+        color: $SEND_CASH_TOGGLE_BUTTON_TEXT_COLOR
+    }
+}
+
+// Generic Toggle button turned ON
+.toggleButtonOn {
+    .toggleButtonSwitcher {
+        margin-left: 2.3rem;
+    }
+
+    .toggleButtonText {
+        left: 0.5rem;
+        right: unset;
+        color: $SEND_CASH_TOGGLE_BUTTON_SWITCHER_COLOR;
+    }
+}
+
 .sendPrivatelyToggleContainer {
+    position: absolute;
+    left: 26rem;
+    top: 0;
+
+    display: flex !important;
+    align-items: center;
+    height: 2rem;
+
     margin-left: 1rem;
 
     .sendPrivateTitle {
+        display: block !important;
+
+        white-space: nowrap;
         color: $BASE_COLOR_BUTTON_FONT_GRAY;
     }
 }
