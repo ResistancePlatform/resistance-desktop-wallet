@@ -14,7 +14,7 @@
 let instance = null
 
 /**
- * 
+ *
  */
 export const ConsoleTheme = {
     normal: '',
@@ -42,11 +42,11 @@ export class LoggerService {
     }
 
     /**
-     * @param {(Object | string)} objRef 
-     * @param {string} methodName 
-     * @param {string} msg 
-     * @param {string} consoleTheme 
-     * @param {*} [extraData] 
+     * @param {(Object | string)} objRef
+     * @param {string} methodName
+     * @param {string} msg
+     * @param {string} consoleTheme
+     * @param {*} [extraData]
      * @memberof LoggerService
      */
     debug(objRef: Object | string, methodName: string, msg: string, displayFormat: string, extraData?: any) {

@@ -37,7 +37,7 @@ export class TorService {
 	 */
   start() {
     const errorHandler = (err) => {
-      osService.dispatchAction(SettingsActions.failTorProcess(`${err}`))
+      osService.dispatchAction(SettingsActions.torProcessFailed(`${err}`))
     }
     osService.execProcess(torProcess, '', errorHandler)
   }
@@ -47,7 +47,7 @@ export class TorService {
 	 */
   stop() {
     const errorHandler = (err) => {
-      osService.dispatchAction(SettingsActions.failTorProcessMurder(`${err}`))
+      osService.dispatchAction(SettingsActions.torProcessMurderFailed(`${err}`))
     }
     osService.killProcess(torProcess, errorHandler)
   }
