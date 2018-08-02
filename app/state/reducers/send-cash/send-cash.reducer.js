@@ -53,6 +53,7 @@ export const SendCashActions = {
   GET_ADDRESS_LIST_SUCCESS: `${sendCashActionTypePrefix}: GET_ADDRESS_LIST_SUCCESS`,
   GET_ADDRESS_LIST_FAIL: `${sendCashActionTypePrefix}: GET_ADDRESS_LIST_FAIL`,
   UPDATE_SEND_FROM_RADIO_BUTTON_TYPE: `${sendCashActionTypePrefix}: UPDATE_SEND_FROM_RADIO_BUTTON_TYPE`,
+  PASTE_TO_ADDRESS_FROM_CLIPBOARD: `${sendCashActionTypePrefix}: PASTE_TO_ADDRESS_FROM_CLIPBOARD`,
 
   togglePrivateSend: (): AppAction => ({
     type: SendCashActions.TOGGLE_PRIVATE_SEND
@@ -100,6 +101,7 @@ export const SendCashActions = {
     type: SendCashActions.UPDATE_SEND_FROM_RADIO_BUTTON_TYPE,
     payload: selectedValue
   }),
+  pasteToAddressFromClipboard: () => ({ type: SendCashActions.PASTE_TO_ADDRESS_FROM_CLIPBOARD }),
 
   empty: (): AppAction => ({ type: SendCashActions.EMPTY })
 };

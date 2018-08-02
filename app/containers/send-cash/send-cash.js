@@ -93,8 +93,14 @@ class SendCash extends Component<Props> {
 		appStore.dispatch(SendCashActions.updateFromAddress(value))
 	}
 
-	onDestAddressPasteClicked(addonType) {
-		console.log(`onDestAddressPasteClicked: ${addonType}`)
+	onDestAddressPasteClicked() {
+		appStore.dispatch(SendCashActions.pasteToAddressFromClipboard())
+
+		// Just a workaround at this moment!!!
+		setTimeout(() => {
+			const currentAppState = appStore.getState()
+			this.toAddressInputDomRef.inputDomRef.current.value = currentAppState.sendCash.toAddress
+		}, 100);
 	}
 
 	onDestAddressInputChanged(value) {
@@ -181,7 +187,7 @@ class SendCash extends Component<Props> {
 		const destAddressAddon: RoundedInputAddon = {
 			enable: true,
 			type: 'PASTE',
-			onAddonClicked: this.onDestAddressPasteClicked
+			onAddonClicked: () => this.onDestAddressPasteClicked()
 		}
 
 		const amountAddressAddon: RoundedInputAddon = {
