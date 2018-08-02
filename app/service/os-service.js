@@ -1,8 +1,7 @@
 // @flow
-import { remote } from 'electron'
 import path from 'path'
-import { exec } from 'child_process'
-
+import { remote } from 'electron'
+import { spawn } from 'child_process'
 
 /**
  * ES6 singleton
@@ -33,10 +32,10 @@ export class OSService {
 	 * As that will import BEFORE the `appStore` be created !!!
 	 * We have to require the latest `appStore` to make sure it has been created !!!
 	 *
-	 * @param {AppAction} action
+	 * @param {Object} action
 	 * @memberof ResistanceCliService
 	 */
-	dispatchAction(action: AppAction) {
+	dispatchAction(action) {
 		const storeModule = require('../state/store/configureStore')
 		if (storeModule && storeModule.appStore) {
 			storeModule.appStore.dispatch(action)
@@ -64,7 +63,7 @@ export class OSService {
 		if (/[\\/](Electron\.app|Electron|Electron\.exe)[\\/]/i.test(process.execPath)) {
 			resourcesPath = process.cwd()
 		} else {
-			resourcesPath = process.resourcesPath
+			[resourcesPath] = process.resourcesPath
 		}
 
 		return path.join(resourcesPath, 'bin', this.getOS())
@@ -75,7 +74,7 @@ export class OSService {
 	 */
 	getLogString(logFileName: string) {
     const fullPath = path.join(this.getAppDataPath(), logFileName)
-    return this.getOS() == 'windows' ?  ` > "${fullPath}" 2>&1` : ` &> "${fullPath}"`
+    return this.getOS() === 'windows' ?  ` > "${fullPath}" 2>&1` : ` &> "${fullPath}"`
 	}
 
   getCommandString(command, args = '') {
@@ -101,40 +100,68 @@ export class OSService {
 	}
 
 	/**
-	 * @param {string} processName
-	 * @param {string} args
-	 * @param {function} errorHandler
+   * Avoid circular dependency in appState.js
+   *
+	 * @returns {SettingsActions}
 	 * @memberof OSService
 	 */
-  execProcess(processName, args = '', errorHandler = (err) => {}) {
+  getSettingsActions() {
+    const settingsReducerModule = require('../state/reducers/settings/settings.reducer')
+    return settingsReducerModule.SettingsActions
+  }
+
+	/**
+	 * @param {string} processName
+	 * @param {string[]} args
+	 * @memberof OSService
+	 */
+  execProcess(processName, args = []) {
+    const actions = this.getSettingsActions()
+
+    const errorHandler = (err) => {
+      console.log(`Process ${processName} has failed!`)
+      this.dispatchAction(actions.childProcessFailed(processName, err.toString()))
+    }
+
     this.getPid(processName).then(pid => {
-      if (!pid) {
-        let command = this.getCommandString(processName, args)
-        console.log(`Executing command:`, command)
-
-        if (this.getOS() === 'macos') {
-          // exec's options.env doesn't work for some reason
-          command = `sh -c 'DYLD_LIBRARY_PATH="${this.getBinariesPath()}" ${command}'`
-        }
-
-        const pid = exec(command, (err, stdout, stderr) => {
-          if (err) {
-            console.log(`Process ${processName} has failed!`)
-            console.log(`stdout: ${stdout}`)
-            console.log(`stderr: ${stderr}`)
-            if (this.getOS() !== 'windows') {
-              // TODO: suppress expected errors explicitly
-              errorHandler(err)
-            }
-          }
-        }).pid
-
-      } else {
+      if (pid) {
         console.log(`Process ${processName} is already running`)
+        return this.killPid(pid)
       }
-    }).catch((err) => {
-      errorHandler(err)
-    })
+      return Promise.resolve()
+    }).then(() => {
+      let options
+      let isUpdateFinished = false
+      const commandPath = path.join(this.getBinariesPath(), processName)
+
+      if (this.getOS() === 'macos') {
+        options = {
+          env: Object.assign({}, process.env, {
+            DYLD_LIBRARY_PATH: `"${this.getBinariesPath()}"`
+          })
+        }
+      }
+
+      console.log(`Executing command ${commandPath}.`)
+      const childProcess = spawn(commandPath, args, options)
+
+      this.dispatchAction(actions.childProcessUpdateStarted(processName))
+
+      const onUpdateFinished = () => {
+        if (!isUpdateFinished) {
+          isUpdateFinished = true
+          this.dispatchAction(actions.childProcessUpdateFinished(processName))
+        }
+      }
+
+      childProcess.stdout.on('data', onUpdateFinished)
+      childProcess.stderr.on('data', onUpdateFinished)
+
+      childProcess.on('error', errorHandler)
+
+      return Promise.resolve()
+    }).catch(errorHandler)
+
   }
 
 	/**
@@ -143,20 +170,24 @@ export class OSService {
 	 * @param {function} errorHandler
 	 * @memberof OSService
 	 */
-  killProcess(processName, errorHandler = (err) => {}) {
+  killProcess(processName) {
+    const actions = this.getSettingsActions()
+
+    this.dispatchAction(actions.childProcessUpdateStarted(processName))
+
     this.getPid(processName).then(pid => {
-      if (!pid) {
-        console.log(`Process ${processName} isn't running`)
-      } else {
-        this.killPid(pid).then(() => {
-          console.log('Process %s has been killed!', pid)
-        }).catch((err) => {
-          errorHandler(err)
-        })
+      if (pid) {
+        return this.killPid(pid)
       }
+      console.log(`Process ${processName} isn't running`)
+      return Promise.resolve()
+    }).then(() => {
+      this.dispatchAction(actions.childProcessUpdateFinished(processName))
+      return Promise.resolve()
     }).catch((err) => {
-      errorHandler(err)
+      this.dispatchAction(actions.childProcessMurderFailed(processName, err.toString()))
     })
+
   }
 
 	/**
@@ -171,7 +202,7 @@ export class OSService {
 					reject(err)
 				}
 				console.log('Process %s has been killed!', pid)
-				resolve()
+				resolve(pid)
 			})
 		})
 	}

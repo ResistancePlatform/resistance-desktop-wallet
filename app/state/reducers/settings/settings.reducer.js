@@ -12,19 +12,27 @@ export type SettingsState = {
 
 export const SettingsActions = createActions(
   {
-    DAEMON_FINISHED_UPDATING: undefined,
     START_LOCAL_NODE: undefined,
     STOP_LOCAL_NODE: undefined,
-    LOCAL_NODE_PROCESS_FAILED: (errorMessage) => ({ errorMessage }),
 
     ENABLE_MINER: undefined,
-    TOGGLE_ENABLE_MINER: undefined,
-    MINER_PROCESS_FAILED: (errorMessage) => ({ errorMessage }),
+    DISABLE_MINER: undefined,
 
     ENABLE_TOR: undefined,
+    DISABLE_TOR: undefined,
+
+    TOGGLE_ENABLE_MINER: undefined,
     TOGGLE_ENABLE_TOR: undefined,
-    TOR_PROCESS_FAILED: (errorMessage) => ({ errorMessage }),
-    TOR_PROCESS_MURDER_FAILED: (errorMessage) => ({ errorMessage }),
+
+    // TOR_PROCESS_FAILED: (errorMessage) => ({ errorMessage }),
+    // TOR_PROCESS_MURDER_FAILED: (errorMessage) => ({ errorMessage }),
+    // MINER_PROCESS_FAILED: (errorMessage) => ({ errorMessage }),
+    // LOCAL_NODE_PROCESS_FAILED: (errorMessage) => ({ errorMessage }),
+
+    CHILD_PROCESS_UPDATE_STARTED: processName => ({ processName }),
+    CHILD_PROCESS_UPDATE_FINISHED: processName => ({ processName }),
+    CHILD_PROCESS_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
+    CHILD_PROCESS_MURDER_FAILED: (processName, errorMessage) => ({ processName, errorMessage })
   },
   {
     prefix: 'APP/SETTINGS'
