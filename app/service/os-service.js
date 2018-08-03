@@ -1,7 +1,8 @@
 // @flow
 import path from 'path'
-import { remote } from 'electron'
 import { spawn } from 'child_process'
+import { createWriteStream } from 'fs'
+import { remote } from 'electron'
 
 /**
  * ES6 singleton
@@ -12,7 +13,7 @@ const ps = require('ps-node')
 
 export type ChildProcessName = 'NODE' | 'TOR' | 'MINER'
 
-const childProcessCommands = {
+const ChildProcessCommands = {
   NODE: 'resistanced',
   MINER: 'minerd',
   TOR: 'tor-proxy'
@@ -23,15 +24,7 @@ const childProcessCommands = {
  * @class OSService
  */
 export class OSService {
-
-	/**
-	 * @memberof OSService
-	 */
-  ChildProcessCommands: {
-    NODE: 'resistanced',
-    MINER: 'minerd',
-    TOR: 'tor-proxy'
-  }
+  subjectsToKill = {}
 
 	/**
 	 * Creates an instance of OSService.
@@ -124,7 +117,7 @@ export class OSService {
       this.dispatchAction(actions.childProcessFailed(processName, err.toString()))
     }
 
-    const command = childProcessCommands[processName]
+    const command = ChildProcessCommands[processName]
 
     this.getPid(command).then(pid => {
       if (pid) {
@@ -156,10 +149,6 @@ export class OSService {
         }
       }
 
-      // Logging
-      // const fullPath = path.join(this.getAppDataPath(), logFileName)
-      // return this.getOS() === 'windows' ?  ` > "${fullPath}" 2>&1` : ` &> "${fullPath}"`
-
       childProcess.stdout.on('data', onUpdateFinished)
       childProcess.stderr.on('data', onUpdateFinished)
 
@@ -167,8 +156,18 @@ export class OSService {
       childProcess.on('close', (code) => {
         if (code !== 0) {
           this.dispatchAction(actions.childProcessFailed(processName, `Process ${processName} exited with code ${code}.`))
+        } else if (!this.subjectsToKill[processName]) {
+          this.dispatchAction(actions.childProcessFailed(processName, `Process ${processName} unexpectedly exited.`))
         }
+
+        this.subjectsToKill[processName] = false
       })
+
+      const logFile = path.join(this.getAppDataPath(), `${command}.log`)
+      const logStream = createWriteStream(logFile, {flags: 'a'});
+
+      childProcess.stdout.pipe(logStream);
+      childProcess.stderr.pipe(logStream);
 
       return Promise.resolve()
     }).catch(errorHandler)
@@ -184,8 +183,9 @@ export class OSService {
   killProcess(processName: ChildProcessName) {
     const actions = this.getSettingsActions()
 
-    this.getPid(childProcessCommands[processName]).then(pid => {
+    this.getPid(ChildProcessCommands[processName]).then(pid => {
       if (pid) {
+        this.subjectsToKill[processName] = true
         return this.killPid(pid)
       }
       console.log(`Process ${processName} isn't running`)

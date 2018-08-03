@@ -214,16 +214,6 @@ class Settings extends Component<Props> {
 						<div className={styles.manageDaemonContainer}>
 							<div className={styles.manageDaemonTitle}>MANAGE DAEMON</div>
 
-              <div>
-              NODE {this.props.settings.childProcessUpdate.NODE ? 'yes' : 'no'}
-              </div>
-              <div>
-              MINER {this.props.settings.childProcessUpdate.MINER ? 'yes' : 'no'}
-              </div>
-              <div>
-              TOR {this.props.settings.childProcessUpdate.TOR ? 'yes' : 'no'}
-              </div>
-
 							<div className={styles.manageDaemonBody}>
 								<button
 									className={styles.stopLocalNodeButton}

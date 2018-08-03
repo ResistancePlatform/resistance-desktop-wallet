@@ -32,7 +32,6 @@ if (
   process.env.DEBUG_PROD === 'true'
 ) {
   require('electron-debug')();
-  const path = require('path');
   const p = path.join(__dirname, '..', 'app', 'node_modules')
   require('module').globalPaths.push(p);
 }
@@ -121,7 +120,11 @@ app.on('window-all-closed', () => {
 app.on('ready', async () => {
   app.on('before-quit', () => {
     console.log(`Killing all child processes...`)
-    for (let processName of ['resistanced', 'minerd', 'tor-proxy']) {
+    const processNames = ['resistanced', 'minerd', 'tor-proxy']
+
+    // osService.initiateShutdown()
+
+    processNames.forEach(processName => {
       let cmd
 
       if (getOsType() === 'windows') {
@@ -131,7 +134,7 @@ app.on('ready', async () => {
       }
       console.log('Executing', cmd)
       execSync(cmd)
-    }
+    })
     console.log(`Done`)
   })
 
