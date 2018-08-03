@@ -152,9 +152,15 @@ class SendCash extends Component<Props> {
 	}
 
 	/** ONLY FOR TETING PURPOSE !!! */
-	// simulateOperation(start?: boolean) {
-	// 	appStore.dispatch(start ? SendCashActions.testStartOperation() : SendCashActions.testStopOperation())
-	// }
+	simulateOperation(start?: boolean) {
+		appStore.dispatch(start ? SendCashActions.testStartOperation() : SendCashActions.testStopOperation())
+		// console.log(`testActions: `, testActions)
+		// console.log(`start: `, testActions.start())
+		// console.log(`stop: `, testActions.stop())
+		// console.log(`updateFromAddress: `, testActions.updateFromAddress('11123213', '222222'))
+		// console.log(`updateFromAddress.toString(): ${testActions.updateFromAddress}` )
+		// console.log(`updateOperation: `, testActions.updateOperation('operation-1123', 'executing --->'))
+	}
 
 	renderProgressRow() {
 		if (!this.props.sendCash || !this.props.sendCash.currentOperation) {
@@ -374,8 +380,8 @@ class SendCash extends Component<Props> {
 						</div>
 
 						{/* ONLY FOR TESTING PURPOSE !!!! */}
-						{/* <button onClick={() => this.simulateOperation(true)}> Start Test Operation </button>
-						<button onClick={() => this.simulateOperation()}> Stop Test Operation </button> */}
+						<button onClick={() => this.simulateOperation(true)}> Start Test Operation </button>
+						<button onClick={() => this.simulateOperation()}> Stop Test Operation </button>
 					</div>
 				</div>
 			</div>
