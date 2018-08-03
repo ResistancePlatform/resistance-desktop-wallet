@@ -8,7 +8,7 @@ let instance = null
 
 const osService = new OSService()
 
-const resistancedArgs = ['-testnet']
+const resistancedArgs = ['-testnet', '-showmetrics']
 const torSwitch = '-proxy=127.0.0.1:9050'
 
 /**

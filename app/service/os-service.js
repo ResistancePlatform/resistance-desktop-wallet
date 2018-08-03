@@ -124,22 +124,24 @@ export class OSService {
       this.dispatchAction(actions.childProcessFailed(processName, err.toString()))
     }
 
-    this.getPid(processName).then(pid => {
+    const command = childProcessCommands[processName]
+
+    this.getPid(command).then(pid => {
       if (pid) {
-        console.log(`Process ${processName} is already running`)
+        console.log(`Process ${processName} is already running, PID ${pid}`)
         return this.killPid(pid)
       }
       return Promise.resolve()
     }).then(() => {
       let options
       let isUpdateFinished = false
-      const commandPath = path.join(this.getBinariesPath(), childProcessCommands[processName])
+      const commandPath = path.join(this.getBinariesPath(), command)
 
       if (this.getOS() === 'macos') {
         options = {
           env: {
             ...process.env,
-            DYLD_LIBRARY_PATH: `"${this.getBinariesPath()}"`
+            DYLD_LIBRARY_PATH: this.getBinariesPath()
           }
         }
       }
@@ -162,6 +164,11 @@ export class OSService {
       childProcess.stderr.on('data', onUpdateFinished)
 
       childProcess.on('error', errorHandler)
+      childProcess.on('close', (code) => {
+        if (code !== 0) {
+          this.dispatchAction(actions.childProcessFailed(processName, `Process ${processName} exited with code ${code}.`))
+        }
+      })
 
       return Promise.resolve()
     }).catch(errorHandler)

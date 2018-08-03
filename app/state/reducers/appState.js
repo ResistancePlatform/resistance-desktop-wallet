@@ -66,7 +66,11 @@ export const preloadedAppState: AppState = {
 	settings: {
 		isTorEnabled: false,
 		isMinerEnabled: false,
-    childProcessUpdate: {}
+    childProcessUpdate: {
+      NODE: false,
+      MINER: false,
+      TOR: false
+    }
 	}
 }
 

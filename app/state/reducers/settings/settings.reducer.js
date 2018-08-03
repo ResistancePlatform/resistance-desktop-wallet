@@ -5,7 +5,11 @@ import { preloadedAppState } from '../appState'
 export type SettingsState = {
 	isTorEnabled: boolean,
 	isMinerEnabled: boolean,
-  childProcessUpdate: Object
+  childProcessUpdate: {
+      NODE: boolean,
+      MINER: boolean,
+      TOR: boolean
+  }
 }
 
 export const SettingsActions = createActions(
@@ -31,14 +35,14 @@ export const SettingsActions = createActions(
 
 const getChildProcessUpdateFinishedState = (state, action) => {
   const newState = {...state}
-  newState.childProcessUpdate[action.processName] = false
+  newState.childProcessUpdate[action.payload.processName] = false
   return newState
 }
 
 const getChildProcessUpdateFailedState = (state, action, isEnabled) => {
   const newState = getChildProcessUpdateFinishedState(state, action)
 
-  switch (action.processName) {
+  switch (action.payload.processName) {
     case 'TOR':
       newState.isTorEnabled = isEnabled
       break
@@ -80,7 +84,7 @@ export const SettingsReducer = handleActions(
     [SettingsActions.enableTor]: state => ({
       ...state,
       childProcessUpdate: { ...state.childProcessUpdate, TOR: true },
-      isTorEnabled: true,
+      isTorEnabled: true
     }),
     [SettingsActions.disableTor]: state => ({
       ...state,

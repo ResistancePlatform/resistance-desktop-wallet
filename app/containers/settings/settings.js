@@ -121,8 +121,8 @@ class Settings extends Component<Props> {
 	onEnableMiningToggleClicked(event) {
 		this.eventConfirm(event)
     const action = this.props.settings.isMinerEnabled
-      ? SettingsActions.enableMiner()
-      : SettingsActions.disableMiner()
+      ? SettingsActions.disableMiner()
+      : SettingsActions.enableMiner()
       appStore.dispatch(action)
 	}
 
@@ -133,8 +133,8 @@ class Settings extends Component<Props> {
 	onEnableTorToggleClicked(event) {
 		this.eventConfirm(event)
     const action = this.props.settings.isTorEnabled
-      ? SettingsActions.enableTor()
-      : SettingsActions.disableTor()
+      ? SettingsActions.disableTor()
+      : SettingsActions.enableTor()
 		appStore.dispatch(action)
 	}
 
@@ -214,12 +214,22 @@ class Settings extends Component<Props> {
 						<div className={styles.manageDaemonContainer}>
 							<div className={styles.manageDaemonTitle}>MANAGE DAEMON</div>
 
+              <div>
+              NODE {this.props.settings.childProcessUpdate.NODE ? 'yes' : 'no'}
+              </div>
+              <div>
+              MINER {this.props.settings.childProcessUpdate.MINER ? 'yes' : 'no'}
+              </div>
+              <div>
+              TOR {this.props.settings.childProcessUpdate.TOR ? 'yes' : 'no'}
+              </div>
+
 							<div className={styles.manageDaemonBody}>
 								<button
 									className={styles.stopLocalNodeButton}
 									onClick={event => this.onStartStopLocalNodeClicked(event)}
 									onKeyDown={event => this.onStartStopLocalNodeClicked(event)}
-                  disabled={this.props.settings.childProcessUpdate.NODE}
+                  disabled={this.props.settings.childProcessUpdate.NODE === true}
 								>
 									{this.props.systemInfo.daemonInfo.status === 'RUNNING' ? 'STOP LOCAL NODE' : 'START LOCAL NODE'}
 								</button>
