@@ -81,7 +81,11 @@ class SendCash extends Component<Props> {
 
 	onPrivateSendToggleClicked(event) {
 		this.eventConfirm(event)
-		appStore.dispatch(SendCashActions.togglePrivateSend())
+		const shouldDisableInput = Boolean(this.props.sendCash.currentOperation && this.props.sendCash.currentOperation.operationId)
+
+		if (!shouldDisableInput) {
+			appStore.dispatch(SendCashActions.togglePrivateSend())
+		}
 	}
 
 	onFromAddressDropdownClicked() {
@@ -294,6 +298,7 @@ class SendCash extends Component<Props> {
 								<div className={styles.sendPrivateTitle}>SEND PRIVATELY</div>
 
 								<div
+									disabled={shouldDisableInput}
 									className={this.getPrivatelyToggleButtonClasses()}
 									onClick={event => this.onPrivateSendToggleClicked(event)}
 									onKeyDown={event => this.onPrivateSendToggleClicked(event)}

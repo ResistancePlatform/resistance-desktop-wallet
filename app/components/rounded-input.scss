@@ -41,21 +41,40 @@
         span {
             cursor: pointer;
         }
+
+        .roundedInputAddonPaste {
+            position: relative;
+            color: $BASE_COLOR_PURPLE;
+
+            .addOnPaste {
+                position: absolute;
+                top: -0.03rem;
+                left: 1.5rem;
+            }
+        }
+
+        .roundedInputAddonTextPlaceholder {
+            color: $BASE_COLOR_BUTTON_FONT_GRAY;
+            cursor: default;
+        }
     }    
 }
 
+.roundedInputContainer[disabled] {
+    .roundedInputTextArea {
 
-.roundedInputAddonPaste {
-    position: relative;
-    color: $BASE_COLOR_PURPLE;
+        .roundedInputAddonDropdown {
+            cursor: default;
+        }
 
-    .addOnPaste {
-        position: absolute;
-        top: -0.03rem;
-        left: 1.5rem;
+        .roundedInputAddonPaste {
+            opacity: 0.6;
+            cursor: default;
+
+            span {
+                cursor: default;
+            }
+        }
     }
 }
 
-.roundedInputAddonTextPlaceholder {
-    color: $BASE_COLOR_BUTTON_FONT_GRAY;
-}

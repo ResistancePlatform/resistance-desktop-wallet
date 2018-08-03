@@ -83,7 +83,11 @@ export default class RoundedInput extends Component<Props> {
 
 	render() {
 		return (
-			<div className={styles.roundedInputContainer} name={this.props.name}>
+			<div
+				name={this.props.name}
+				disabled={this.props.disabled}
+				className={styles.roundedInputContainer}
+			>
 				<div className={styles.roundedInputTitle}>
 					{this.props.title ? this.props.title : ''}
 				</div>

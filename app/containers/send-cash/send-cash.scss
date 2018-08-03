@@ -69,6 +69,11 @@
     background-color: $SEND_CASH_TOGGLE_BUTTON_BACKGROUND_COLOR;
     border-radius: 5rem;
 
+    &:disabled {
+        opacity: 0.6;
+        cursor: initial;
+    }
+
     .toggleButtonSwitcher {
         margin-left: 0.1rem;
         margin-top: 0.025rem;
@@ -89,7 +94,7 @@
     }
 }
 
-// Generic Toggle button turned ON
+// Toggle button turned ON
 .toggleButtonOn {
     .toggleButtonSwitcher {
         margin-left: 2.3rem;
@@ -101,6 +106,16 @@
         color: $SEND_CASH_TOGGLE_BUTTON_SWITCHER_COLOR;
     }
 }
+
+// Toggle button disabled
+.toggleButton[disabled] {
+    cursor: default;
+
+    .toggleButtonSwitcher {
+        opacity: 0.6;
+    }
+}
+
 
 .sendPrivatelyToggleContainer {
     position: absolute;
@@ -254,11 +269,6 @@ div[name="amount"] {
         color: $BASE_COLOR_WHITE;
     }
 
-}
-
-button[name="send-cash"][disabled] {
-    opacity: 0.8;
-    cursor: not-allowed;
 }
 
 

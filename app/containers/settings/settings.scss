@@ -7,10 +7,6 @@
     margin-left: 0;
 }
 
-button:disabled, button[disabled] {
-    @include roundedButton(false);
-}
-
 .settingsContainer {
     padding: 3rem 2rem;
     min-width: 30rem;
