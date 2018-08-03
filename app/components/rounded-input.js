@@ -15,6 +15,7 @@ type Props = {
 	onlyNumberAllowed: boolean | undefined,
 	onInputChange: value => void,
 	addon: RoundedInputAddon,
+	disabled?: boolean,
 	children: any
 }
 
@@ -40,7 +41,7 @@ export default class RoundedInput extends Component<Props> {
 		event.preventDefault()
 		event.stopPropagation()
 
-		if (this.props.addon.onAddonClicked) {
+		if (this.props.addon.onAddonClicked && !this.props.disabled) {
 			this.props.addon.onAddonClicked(this.props.addon.type)
 		}
 	}
@@ -91,6 +92,7 @@ export default class RoundedInput extends Component<Props> {
 					<input
 						ref={this.inputDomRef}
 						type={this.props.onlyNumberAllowed ? 'number' : 'text'}
+						disabled={this.props.disabled}
 						onChange={event => this.inputOnchangeEventHandler(event)}
 					/>
 					{this.renderAddon()}

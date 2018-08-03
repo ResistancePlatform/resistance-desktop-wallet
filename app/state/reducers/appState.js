@@ -8,6 +8,7 @@ import { SendCashState } from '../reducers/send-cash/send-cash.reducer'
 import { SettingsState } from '../reducers/settings/settings.reducer'
 
 const config = require('electron-settings')
+
 const osService = new OSService()
 
 // Set the customized 'electron-settings' path
