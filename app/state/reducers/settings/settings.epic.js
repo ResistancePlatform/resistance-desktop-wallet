@@ -48,18 +48,13 @@ const enableTorEpic = (action$: ActionsObservable<any>) => action$.pipe(
   ignoreElements()
 )
 
-const disableTorEpic = (action$: ActionsObservable<any>) => action$.pipe(
-	ofType(SettingsActions.disableTor().type),
-  tap(() => { torService.stop() }),
-  ignoreElements()
-)
-
 const childProcessFailedEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(SettingsActions.childProcessFailed().type),
 	tap((action) => {
-    dialogService.showError(`Error launching ${action.payload.processName}`, action.payload.errorMessage)
+    dialogService.showError(`Process ${action.payload.processName} has failed`, action.payload.errorMessage)
   }),
-  ignoreElements()
+  filter((action) => action.payload.processName === 'TOR'),
+  mapTo(SettingsActions.stopLocalNode())
 )
 
 const childProcessMurderFailedEpic = (action$: ActionsObservable<any>) => action$.pipe(
@@ -76,7 +71,6 @@ export const SettingsEpics = (action$, state$) => merge(
   enableMinerEpic(action$, state$),
 	disableMinerEpic(action$, state$),
 	enableTorEpic(action$, state$),
-	disableTorEpic(action$, state$),
 	childProcessFailedEpic(action$, state$),
 	childProcessMurderFailedEpic(action$, state$)
 )

@@ -38,6 +38,7 @@ export class OSService {
 
       processNames.forEach(processName => {
         childProcesses[processName] = {
+          pid: null,
           instance: null,
           isGettingKilled: false
         }
@@ -75,10 +76,14 @@ export class OSService {
       if (item.instance !== null && !item.instance.killed) {
         global.childProcesses[processName].isGettingKilled = true
 
-        console.log(`Killing child process ${processName} with PID ${item.instance.pid}`)
+        console.log(`Killing child process ${processName} with PID ${item.instance.pid} ${item.pid}`)
 
         // childProcess.kill() doesn't work for an unknown reason
-        ps.kill(item.instance.pid)
+        if (item.pid) {
+          ps.kill(item.pid)
+        } else {
+          ps.kill(item.instance.pid)
+        }
       }
     })
   }
@@ -169,6 +174,8 @@ export class OSService {
         }
       }
 
+      const childProcessInfo = remote.getGlobal('childProcesses')[processName]
+
       console.log(`Executing command ${commandPath}.`)
       const childProcess = spawn(commandPath, args, options)
 
@@ -176,6 +183,13 @@ export class OSService {
         if (!isUpdateFinished) {
           isUpdateFinished = true
           this.dispatchAction(actions.childProcessStarted(processName))
+
+          // Pid can be different from the instance for the Miner
+          this.getPid(command).then(pid => {
+            childProcessInfo.pid = pid
+            return Promise.resolve()
+          }).catch()
+
         }
       }
 
@@ -183,9 +197,6 @@ export class OSService {
       childProcess.stderr.on('data', onUpdateFinished)
 
       childProcess.on('error', errorHandler)
-
-
-      const childProcessInfo = remote.getGlobal('childProcesses')[processName]
 
       childProcess.on('close', (code) => {
         if (code !== 0) {
@@ -198,10 +209,10 @@ export class OSService {
       })
 
       const logFile = path.join(this.getAppDataPath(), `${command}.log`)
-      const logStream = createWriteStream(logFile, {flags: 'a'});
+      const logStream = createWriteStream(logFile, {flags: 'a'})
 
-      childProcess.stdout.pipe(logStream);
-      childProcess.stderr.pipe(logStream);
+      childProcess.stdout.pipe(logStream)
+      childProcess.stderr.pipe(logStream)
 
       childProcessInfo.instance = childProcess
 
