@@ -24,14 +24,27 @@ const ChildProcessCommands = {
  * @class OSService
  */
 export class OSService {
-  subjectsToKill = {}
-
 	/**
 	 * Creates an instance of OSService.
 	 * @memberof OSService
 	 */
 	constructor() {
 		if (!instance) { instance = this }
+
+    // Create a global var to store child processes information for the cleanup
+    if (process.type === 'browser' && global.childProcesses === undefined) {
+      const childProcesses = {}
+      const processNames = ['NODE', 'MINER', 'TOR']
+
+      processNames.forEach(processName => {
+        childProcesses[processName] = {
+          instance: null,
+          isGettingKilled: false
+        }
+      })
+
+      global.childProcesses = childProcesses
+    }
 
 		return instance
 	}
@@ -52,6 +65,23 @@ export class OSService {
 			storeModule.appStore.dispatch(action)
 		}
 	}
+
+	/**
+	 *
+	 * @memberof OSService
+	 */
+  stopChildProcesses() {
+    Object.entries(global.childProcesses).forEach(([processName, item]) => {
+      if (item.instance !== null && !item.instance.killed) {
+        global.childProcesses[processName].isGettingKilled = true
+
+        console.log(`Killing child process ${processName} with PID ${item.instance.pid}`)
+
+        // childProcess.kill() doesn't work for an unknown reason
+        ps.kill(item.instance.pid)
+      }
+    })
+  }
 
 	/**
 	 * @memberof OSService
@@ -153,14 +183,18 @@ export class OSService {
       childProcess.stderr.on('data', onUpdateFinished)
 
       childProcess.on('error', errorHandler)
+
+
+      const childProcessInfo = remote.getGlobal('childProcesses')[processName]
+
       childProcess.on('close', (code) => {
         if (code !== 0) {
           this.dispatchAction(actions.childProcessFailed(processName, `Process ${processName} exited with code ${code}.`))
-        } else if (!this.subjectsToKill[processName]) {
+        } else if (!childProcessInfo.isGettingKilled) {
           this.dispatchAction(actions.childProcessFailed(processName, `Process ${processName} unexpectedly exited.`))
         }
 
-        this.subjectsToKill[processName] = false
+        childProcessInfo.isGettingKilled = false
       })
 
       const logFile = path.join(this.getAppDataPath(), `${command}.log`)
@@ -168,6 +202,8 @@ export class OSService {
 
       childProcess.stdout.pipe(logStream);
       childProcess.stderr.pipe(logStream);
+
+      childProcessInfo.instance = childProcess
 
       return Promise.resolve()
     }).catch(errorHandler)
@@ -185,7 +221,8 @@ export class OSService {
 
     this.getPid(ChildProcessCommands[processName]).then(pid => {
       if (pid) {
-        this.subjectsToKill[processName] = true
+        const childProcessInfo = remote.getGlobal('childProcesses')[processName]
+        childProcessInfo.isGettingKilled = true
         return this.killPid(pid)
       }
       console.log(`Process ${processName} isn't running`)

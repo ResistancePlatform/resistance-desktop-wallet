@@ -116,25 +116,10 @@ app.on('window-all-closed', () => {
   }
 });
 
-
 app.on('ready', async () => {
   app.on('before-quit', () => {
     console.log(`Killing all child processes...`)
-    const processNames = ['resistanced', 'minerd', 'tor-proxy']
-
-    // osService.initiateShutdown()
-
-    processNames.forEach(processName => {
-      let cmd
-
-      if (getOsType() === 'windows') {
-        cmd = `taskkill /F /im ${processName}.exe`
-      } else {
-        cmd = `killall ${processName}`
-      }
-      console.log('Executing', cmd)
-      execSync(cmd)
-    })
+    osService.stopChildProcesses()
     console.log(`Done`)
   })
 
