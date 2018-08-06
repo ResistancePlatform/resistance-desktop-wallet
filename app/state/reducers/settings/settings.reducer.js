@@ -1,6 +1,6 @@
 // @flow
 import { createActions, handleActions } from 'redux-actions'
-import { preloadedAppState } from '../appState'
+import { defaultAppState } from '../default-app-state'
 
 export type SettingsState = {
 	isTorEnabled: boolean,
@@ -106,6 +106,4 @@ export const SettingsReducer = handleActions(
       getChildProcessUpdateFailedState(state, action, true)
     )
 
-  },
-  preloadedAppState.settings
-)
+  }, defaultAppState)

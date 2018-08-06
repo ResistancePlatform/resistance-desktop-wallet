@@ -36,15 +36,8 @@ const allowToSend = (sendCashState: SendCashState) => {
 	return 'ok'
 }
 
-const showUserErrorMessageEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-	ofType(SendCashActions.SHOW_USER_ERROR_MESSAGE),
-	tap((action: AppAction) => logger.debug(epicInstanceName, `showUserErrorMessageEpic`, action.type, ConsoleTheme.testing)),
-	tap((action: AppAction) => dialogService.showError(action.payload.title, action.payload.message)),
-	map(() => SendCashActions.empty())
-)
-
 const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
-	ofType(SendCashActions.SEND_CASH),
+	ofType(SendCashActions.sendCash),
 	tap((action: AppAction) => logger.debug(epicInstanceName, `sendCashEpic`, action.type, ConsoleTheme.testing)),
 	map(() => {
 		if (isPrevSendTransactionInProgress(state$.value.sendCash)) {
@@ -60,7 +53,7 @@ const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.
 	}),
 	tap((action: AppAction) => {
 		// Only fire real send if no error above
-		if (action.type === SendCashActions.EMPTY) {
+		if (action.type === SendCashActions.empty().type) {
 			const state = state$.value.sendCash
 
 			// Run in Async, `resistanceCliService` will update the state by firing one or more `updateSendOperationStatus()` action
@@ -70,7 +63,7 @@ const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.
 )
 
 const sendCashSuccessEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
-	ofType(SendCashActions.SEND_CASH_SUCCESS),
+	ofType(SendCashActions.sendCashSuccess),
 	tap((action: AppAction) => logger.debug(epicInstanceName, `sendCashSuccessEpic`, action.type, ConsoleTheme.testing)),
 	tap(() => {
 		const sendCashState = state$.value.sendCash
@@ -85,14 +78,14 @@ const sendCashSuccessEpic = (action$: ActionsObservable<AppAction>, state$) => a
 )
 
 const sendCashFailEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-	ofType(SendCashActions.SEND_CASH_FAIL),
+	ofType(SendCashActions.sendCashFail),
 	tap((action: AppAction) => logger.debug(epicInstanceName, `sendCashFailEpic`, action.type, ConsoleTheme.testing)),
 	tap((action: AppAction) => dialogService.showError(`Cash Send Fail`, action.payload.errorMessage)),
 	map(() => SendCashActions.empty())
 )
 
 const getAddressListEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
-	ofType(SendCashActions.GET_ADDRESS_LIST),
+	ofType(SendCashActions.getAddressList),
 	tap((action: AppAction) => logger.debug(epicInstanceName, `getAddressListEpic`, action.type, ConsoleTheme.testing)),
 	switchMap(() => {
 		const sendCashState = state$.value.sendCash
@@ -104,13 +97,12 @@ const getAddressListEpic = (action$: ActionsObservable<AppAction>, state$) => ac
 )
 
 const pasteToAddressFromClipboardEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-	ofType(SendCashActions.PASTE_TO_ADDRESS_FROM_CLIPBOARD),
+	ofType(SendCashActions.pasteToAddressFromClipboard),
 	tap((action: AppAction) => logger.debug(epicInstanceName, `pasteToAddressFromClipboardEpic`, action.type, ConsoleTheme.testing)),
 	map(() => SendCashActions.updateToAddress(clipboardService.getContent()))
 )
 
 export const SendCashEpics = (action$, state$) => merge(
-	showUserErrorMessageEpic(action$, state$),
 	sendCashEpic(action$, state$),
 	sendCashSuccessEpic(action$, state$),
 	sendCashFailEpic(action$, state$),
