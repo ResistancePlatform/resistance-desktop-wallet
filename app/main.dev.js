@@ -12,12 +12,14 @@
  */
 import * as fs from 'fs';
 import path from 'path'
-import { execSync } from 'child_process'
 
 import { app, BrowserWindow } from 'electron'
 
 import { OSService } from './service/os-service'
 import MenuBuilder from './menu'
+
+const ProgressBar = require('electron-progressbar');
+
 
 const osService = new OSService()
 let mainWindow = null;
@@ -46,10 +48,8 @@ const installExtensions = async () => {
   ).catch(console.log);
 };
 
-const getOsType = () => process.platform === 'darwin' ? `macos` : `windows`;
-
 const checkAndCreateDaemonConfig = () => {
-  const osType = getOsType()
+  const osType = osService.getOS()
 
   const configFolder = path.join(app.getPath('appData'), `Resistance`)
   const configFile = path.join(configFolder, `resistance.conf`)
@@ -75,7 +75,7 @@ const checkAndCreateDaemonConfig = () => {
 }
 
 const checkAndCreateWalletAppFolder = () => {
-  const osType = getOsType()
+  const osType = osService.getOS()
   const walletAppFolder = (osType === `macos`) ? `${app.getPath('appData')}/ResistanceWallet` : `${app.getPath('appData')}\\ResistanceWallet`;
 
   if (!fs.existsSync(walletAppFolder)) {
@@ -83,26 +83,53 @@ const checkAndCreateWalletAppFolder = () => {
   }
 }
 
-const checkAndFetchZCashParams = () => {
+const zcashParametersPresent = () => {
   const zcashParamsFolder = path.join(app.getPath('appData'), 'ZcashParams')
-
-  if (!fs.existsSync(zcashParamsFolder)) {
-    console.log('Launching ZCash parameters fetching script in a new terminal window...')
-
-    const initScript = (getOsType() === 'windows' ? 'init-configure.bat' : 'resistanceinit.sh')
-    const fetchZCashParams = path.join(osService.getBinariesPath(), initScript)
-
-    const command = (getOsType() === 'windows')
-      ? `start cmd.exe /C ${fetchZCashParams}`
-      : `open -Wa Terminal ${fetchZCashParams}`
-    execSync(command)
-    console.log('Done')
-  }
+  return fs.existsSync(zcashParamsFolder)
 }
+
+const fetchZcashParams = async (parentWindow) => {
+	const progressBar = new ProgressBar({
+		text: 'Preparing data...',
+		detail: 'Wait...',
+    browserWindow: {
+      parent: parentWindow
+    }
+	})
+
+	progressBar
+		.on('completed', () => {
+			console.info(`completed...`)
+			progressBar.detail = 'Fetching Zcash parameters. Exiting...'
+		})
+		.on('aborted', () => {
+			console.info(`aborted...`)
+		})
+
+  const timeout = ms => new Promise(resolve => setTimeout(resolve, ms))
+  await timeout(5000)
+  progressBar.setCompleted()
+}
+
+// const checkAndFetchZCashParams = () => {
+//   const zcashParamsFolder = path.join(app.getPath('appData'), 'ZcashParams')
+//
+//   if (!fs.existsSync(zcashParamsFolder)) {
+//     console.log('Launching ZCash parameters fetching script in a new terminal window...')
+//
+//     const initScript = (osService.getOS() === 'windows' ? 'init-configure.bat' : 'resistanceinit.sh')
+//     const fetchZCashParams = path.join(osService.getBinariesPath(), initScript)
+//
+//     const command = (osService.getOS() === 'windows')
+//       ? `start cmd.exe /C ${fetchZCashParams}`
+//       : `open -Wa Terminal ${fetchZCashParams}`
+//     execSync(command)
+//     console.log('Done')
+//   }
+// }
 
 checkAndCreateDaemonConfig()
 checkAndCreateWalletAppFolder()
-checkAndFetchZCashParams()
 
 /**
  * Add event listeners...
@@ -127,7 +154,7 @@ app.on('ready', async () => {
     process.env.NODE_ENV === 'development' ||
     process.env.DEBUG_PROD === 'true'
   ) {
-    await installExtensions();
+    await installExtensions()
   }
 
   mainWindow = new BrowserWindow({
@@ -138,6 +165,10 @@ app.on('ready', async () => {
     show: false,
     frame: false
   });
+
+  if (!zcashParametersPresent()) {
+    await fetchZcashParams(mainWindow)
+  }
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
   // mainWindow.webContents.openDevTools();
