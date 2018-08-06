@@ -1,6 +1,5 @@
 // @flow
 import { OSService } from './os-service'
-import { SettingsActions } from '../state/reducers/settings/settings.reducer'
 
 /**
  * ES6 singleton
@@ -9,8 +8,7 @@ let instance = null
 
 const osService = new OSService()
 
-const minerProcess = 'minerd'
-const minerArgs = '-o http://127.0.0.1:18232 --no-stratum --no-getwork --user=test123 --pass=test123'
+const minerCommandArgs = ['-o', 'http://127.0.0.1:18232', '--no-stratum', '--no-getwork', '--user=test123', '--pass=test123']
 
 /**
  * @export
@@ -31,18 +29,14 @@ export class MinerService {
 	 * @memberof MinerService
 	 */
 	start() {
-    const errorHandler = (err) => {
-      osService.dispatchAction(SettingsActions.minerProcessFailed(`${err}`))
-    }
-    const args = osService.getOS() === 'windows' ? minerArgs : `${minerArgs} --background`
-    osService.execProcess(minerProcess, args, errorHandler)
+    const args = osService.getOS() === 'windows' ? minerCommandArgs : minerCommandArgs.concat(['--background'])
+    osService.execProcess('MINER', args)
 	}
 
 	/**
 	 * @memberof MinerService
 	 */
 	stop() {
-    const errorHandler = (err) => { }
-    osService.killProcess(minerProcess, errorHandler)
+    osService.killProcess('MINER')
 	}
 }

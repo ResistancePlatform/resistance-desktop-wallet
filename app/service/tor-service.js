@@ -1,6 +1,5 @@
 // @flow
 import { OSService } from './os-service'
-import { SettingsActions } from '../state/reducers/settings/settings.reducer'
 
 
 /**
@@ -8,12 +7,9 @@ import { SettingsActions } from '../state/reducers/settings/settings.reducer'
  */
 let instance = null
 
-const util = require('util')
-
 const osService = new OSService()
 
-const torProcess = 'tor-proxy'
-const startTorString = `${torProcess}`
+const torCommandArgs = []
 
 /**
  * @export
@@ -36,19 +32,13 @@ export class TorService {
 	 * @memberof TorService
 	 */
   start() {
-    const errorHandler = (err) => {
-      osService.dispatchAction(SettingsActions.torProcessFailed(`${err}`))
-    }
-    osService.execProcess(torProcess, '', errorHandler)
+    osService.execProcess('TOR', torCommandArgs)
   }
 
 	/**
 	 * @memberof TorService
 	 */
   stop() {
-    const errorHandler = (err) => {
-      osService.dispatchAction(SettingsActions.torProcessMurderFailed(`${err}`))
-    }
-    osService.killProcess(torProcess, errorHandler)
+    osService.killProcess('TOR')
   }
 }

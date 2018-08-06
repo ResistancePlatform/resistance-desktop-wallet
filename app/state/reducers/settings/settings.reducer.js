@@ -3,63 +3,107 @@ import { createActions, handleActions } from 'redux-actions'
 import { defaultAppState } from '../default-app-state'
 
 export type SettingsState = {
-  isDaemonUpdating: boolean,
-  isTorUpdating: boolean,
-  isMinerUpdating: boolean,
-  isTorEnabled: boolean,
-  isMinerEnabled: boolean
+	isTorEnabled: boolean,
+	isMinerEnabled: boolean,
+  childProcessUpdate: {
+      NODE: boolean,
+      MINER: boolean,
+      TOR: boolean
+  }
 }
 
 export const SettingsActions = createActions(
   {
-    DAEMON_FINISHED_UPDATING: undefined,
     START_LOCAL_NODE: undefined,
     STOP_LOCAL_NODE: undefined,
-    LOCAL_NODE_PROCESS_FAILED: (errorMessage) => ({ errorMessage }),
 
     ENABLE_MINER: undefined,
-    TOGGLE_ENABLE_MINER: undefined,
-    MINER_PROCESS_FAILED: (errorMessage) => ({ errorMessage }),
+    DISABLE_MINER: undefined,
 
     ENABLE_TOR: undefined,
-    TOGGLE_ENABLE_TOR: undefined,
-    TOR_PROCESS_FAILED: (errorMessage) => ({ errorMessage }),
-    TOR_PROCESS_MURDER_FAILED: (errorMessage) => ({ errorMessage }),
+    DISABLE_TOR: undefined,
+
+    CHILD_PROCESS_STARTED: processName => ({ processName }),
+    CHILD_PROCESS_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
+    CHILD_PROCESS_MURDERED: processName => ({ processName }),
+    CHILD_PROCESS_MURDER_FAILED: (processName, errorMessage) => ({ processName, errorMessage })
   },
   {
     prefix: 'APP/SETTINGS'
   }
 )
 
-export const SettingsReducer = handleActions({
-  [SettingsActions.daemonFinishedUpdating]: state => ({
-    ...state, isDaemonUpdating: false
-  }),
-  [SettingsActions.startLocalNode]: state => ({
-    ...state, isDaemonUpdating: true
-  }),
-  [SettingsActions.stopLocalNode]: state => ({
-    ...state, isMinerEnabled: false, isDaemonUpdating: true
-  }),
-  [SettingsActions.enableMiner]: state => ({
-    ...state, isMinerEnabled: true
-  }),
-  [SettingsActions.toggleEnableMiner]: state => ({
-    ...state, isMinerEnabled: !state.isMinerEnabled
-  }),
-  [SettingsActions.minerProcessFailed]: state => ({
-    ...state, isMinerEnabled: false
-  }),
-  [SettingsActions.enableTor]: state => ({
-    ...state, isTorEnabled: true
-  }),
-  [SettingsActions.toggleEnableTor]: state => ({
-    ...state, isTorEnabled: !state.isTorEnabled
-  }),
-  [SettingsActions.torProcessFailed]: state => ({
-    ...state, isTorEnabled: false
-  }),
-  [SettingsActions.torProcessMurderFailed]: state => ({
-    ...state, isTorEnabled: true
-  }),
-}, defaultAppState)
+const getChildProcessUpdateFinishedState = (state, action) => {
+  const newState = {...state}
+  newState.childProcessUpdate[action.payload.processName] = false
+  return newState
+}
+
+const getChildProcessUpdateFailedState = (state, action, isEnabled) => {
+  const newState = getChildProcessUpdateFinishedState(state, action)
+
+  switch (action.payload.processName) {
+    case 'TOR':
+      newState.isTorEnabled = isEnabled
+      break
+    case 'MINER':
+      newState.isMinerEnabled = isEnabled
+      break
+    default:
+  }
+
+  return newState
+}
+
+export const SettingsReducer = handleActions(
+  {
+    // Local Node
+    [SettingsActions.startLocalNode]: state => ({
+      ...state,
+      childProcessUpdate: { ...state.childProcessUpdate, NODE: true }
+    }),
+    [SettingsActions.stopLocalNode]: state => ({
+      ...state,
+      childProcessUpdate: { ...state.childProcessUpdate, NODE: true },
+      isMinerEnabled: false
+    }),
+
+    // Miner
+    [SettingsActions.enableMiner]: state => ({
+      ...state,
+      childProcessUpdate: { ...state.childProcessUpdate, MINER: true },
+      isMinerEnabled: true
+    }),
+    [SettingsActions.disableMiner]: state => ({
+      ...state,
+      childProcessUpdate: { ...state.childProcessUpdate, MINER: true },
+      isMinerEnabled: false
+    }),
+
+    // Tor
+    [SettingsActions.enableTor]: state => ({
+      ...state,
+      childProcessUpdate: { ...state.childProcessUpdate, TOR: true },
+      isTorEnabled: true
+    }),
+    [SettingsActions.disableTor]: state => ({
+      ...state,
+      childProcessUpdate: { ...state.childProcessUpdate, TOR: true },
+      isTorEnabled: false
+    }),
+
+    // Child process updates
+    [SettingsActions.childProcessStarted]: (state, action) => (
+      getChildProcessUpdateFinishedState(state, action)
+    ),
+    [SettingsActions.childProcessFailed]: (state, action) => (
+      getChildProcessUpdateFailedState(state, action, false)
+    ),
+    [SettingsActions.childProcessMurdered]: (state, action) => (
+      getChildProcessUpdateFinishedState(state, action)
+    ),
+    [SettingsActions.childProcessMurderFailed]: (state, action) => (
+      getChildProcessUpdateFailedState(state, action, true)
+    )
+
+  }, defaultAppState)
