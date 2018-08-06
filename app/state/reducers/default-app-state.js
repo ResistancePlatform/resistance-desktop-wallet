@@ -49,11 +49,13 @@ export const defaultAppState: AppState = {
 		addressList: []
 	},
 	settings: {
-		isDaemonUpdating: false,
-		isTorUpdating: false,
-		isMinerUpdating: false,
-		isTorEnabled: config.get('manageDaemon.enableTor', false),
-		isMinerEnabled: config.get('manageDaemon.enableMiner', true),
+		isTorEnabled: false,
+		isMinerEnabled: false,
+		childProcessUpdate: {
+			NODE: false,
+			MINER: false,
+			TOR: false
+		}
 	}
 }
 
