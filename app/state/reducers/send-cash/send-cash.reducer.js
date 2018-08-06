@@ -1,218 +1,136 @@
 // @flow
-import { AppAction } from '../appAction';
+import { createActions, handleActions } from 'redux-actions'
+import { defaultAppState } from '../default-app-state'
+
 
 export type ProcessingOperationStatus =
-  | ''
-  | 'queued'
-  | 'executing'
-  | 'cancelled'
-  | 'failed'
-  | 'success';
+	| ''
+	| 'queued'
+	| 'executing'
+	| 'cancelled'
+	| 'failed'
+	| 'success'
 
-export type SendFromRadioButtonType = 'transparent' | 'private';
+export type SendFromRadioButtonType = 'transparent' | 'private'
 
 export type AddressDropdownItem = {
-  address: string,
-  balance: number
-};
+	address: string,
+	balance: number
+}
 
 export type ProcessingOperation = {
-  operationId: string,
-  status: ProcessingOperationStatus,
-  percent: number,
-  result: any
-};
+	operationId: string,
+	status: ProcessingOperationStatus,
+	percent: number,
+	result: any
+}
 
 export type SendCashState = {
-  isPrivateSendOn: boolean,
-  fromAddress: string,
-  toAddress: string,
-  amount: number,
-  currentOperation: ProcessingOperation | null,
-  showDropdownMenu: boolean,
-  sendFromRadioButtonType: SendFromRadioButtonType,
-  addressList: AddressDropdownItem[]
-};
+	isPrivateSendOn: boolean,
+	fromAddress: string,
+	toAddress: string,
+	amount: number,
+	currentOperation: ProcessingOperation | null,
+	showDropdownMenu: boolean,
+	sendFromRadioButtonType: SendFromRadioButtonType,
+	addressList: AddressDropdownItem[]
+}
 
-const sendCashActionTypePrefix = 'SEND_CASH_ACTION';
+export const SendCashActions = createActions({
+	// Action define format: 
+	// [Action type string/Object key]: payload creator function
 
-export const SendCashActions = {
-  EMPTY: `${sendCashActionTypePrefix}: EMPTY`,
+	EMPTY: undefined,
+	TOGGLE_PRIVATE_SEND: undefined,
+	UPDATE_FROM_ADDRESS: (address: string) => address,
+	UPDATE_TO_ADDRESS: (address: string) => address,
+	UPDATE_AMOUNT: (amount: number) => amount,
+	SEND_CASH: undefined,
+	SEND_CASH_SUCCESS: undefined,
+	SEND_CASH_FAIL: (errorMessage: string, clearCurrentOperation: boolean) => ({errorMessage, clearCurrentOperation}),
+	UPDATE_SEND_OPERATION_STATUS: (progressingTransaction: ProcessingOperation) => progressingTransaction,
+	UPDATE_DROPDOWN_MENU_VISIBILITY: (show: boolean) => show,
+	GET_ADDRESS_LIST: (isPrivate: boolean) => isPrivate,
+	GET_ADDRESS_LIST_SUCCESS: (addressList: AddressDropdownItem[]) => addressList,
+	GET_ADDRESS_LIST_FAIL: undefined,
+	UPDATE_SEND_FROM_RADIO_BUTTON_TYPE: (selectedValue: string) => selectedValue,
+	PASTE_TO_ADDRESS_FROM_CLIPBOARD: undefined,
+	TEST_START_OPERATION: undefined,
+	TEST_STOP_OPERATION: undefined
+}, { prefixe: `APP/SEND_CASH` })
 
-  TOGGLE_PRIVATE_SEND: `${sendCashActionTypePrefix}: TOGGLE_PRIVATE_SEND`,
-  UPDATE_FROM_ADDRESS: `${sendCashActionTypePrefix}: UPDATE_FROM_ADDRESS`,
-  UPDATE_TO_ADDRESS: `${sendCashActionTypePrefix}: UPDATE_TO_ADDRESS`,
-  UPDATE_AMOUNT: `${sendCashActionTypePrefix}: UPDATE_AMOUNT`,
-  SHOW_USER_ERROR_MESSAGE: `${sendCashActionTypePrefix}: SHOW_USER_ERROR_MESSAGE`,
-  SEND_CASH: `${sendCashActionTypePrefix}: SEND_CASH`,
-  SEND_CASH_SUCCESS: `${sendCashActionTypePrefix}: SEND_CASH_SUCCESS`,
-  SEND_CASH_FAIL: `${sendCashActionTypePrefix}: SEND_CASH_FAIL`,
-  UPDATE_SEND_OPERATION_STATUS: `${sendCashActionTypePrefix}: UPDATE_SEND_OPERATION_STATUS`,
-  UPDATE_DROPDOWN_MENU_VISIBILITY: `${sendCashActionTypePrefix}: UPDATE_DROPDOWN_MENU_VISIBILITY`,
-  GET_ADDRESS_LIST: `${sendCashActionTypePrefix}: GET_ADDRESS_LIST`,
-  GET_ADDRESS_LIST_SUCCESS: `${sendCashActionTypePrefix}: GET_ADDRESS_LIST_SUCCESS`,
-  GET_ADDRESS_LIST_FAIL: `${sendCashActionTypePrefix}: GET_ADDRESS_LIST_FAIL`,
-  UPDATE_SEND_FROM_RADIO_BUTTON_TYPE: `${sendCashActionTypePrefix}: UPDATE_SEND_FROM_RADIO_BUTTON_TYPE`,
-  PASTE_TO_ADDRESS_FROM_CLIPBOARD: `${sendCashActionTypePrefix}: PASTE_TO_ADDRESS_FROM_CLIPBOARD`,
 
-  togglePrivateSend: (): AppAction => ({
-    type: SendCashActions.TOGGLE_PRIVATE_SEND
-  }),
-  updateFromAddress: (address: string) => ({
-    type: SendCashActions.UPDATE_FROM_ADDRESS,
-    payload: address
-  }),
-  updateToAddress: (address: string) => ({
-    type: SendCashActions.UPDATE_TO_ADDRESS,
-    payload: address
-  }),
-  updateAmount: (amount: number) => ({
-    type: SendCashActions.UPDATE_AMOUNT,
-    payload: amount
-  }),
-  sendCash: () => ({ type: SendCashActions.SEND_CASH }),
-  sendCashSuccess: () => ({ type: SendCashActions.SEND_CASH_SUCCESS }),
-  sendCashFail: (errorMessage: string, clearCurrentOperation: boolean) => ({
-    type: SendCashActions.SEND_CASH_FAIL,
-    payload: { errorMessage, clearCurrentOperation }
-  }),
-  updateSendOperationStatus: (progressingTransaction: ProcessingOperation) => ({
-    type: SendCashActions.UPDATE_SEND_OPERATION_STATUS,
-    payload: progressingTransaction
-  }),
-  updateDropdownMenuVisibility: (show: boolean): AppAction => ({
-    type: SendCashActions.UPDATE_DROPDOWN_MENU_VISIBILITY,
-    payload: show
-  }),
-  showUserErrorMessage: (title: string, message: string) => ({
-    type: SendCashActions.SHOW_USER_ERROR_MESSAGE,
-    payload: { title, message }
-  }),
-  getAddressList: (isPrivate: boolean) => ({
-    type: SendCashActions.GET_ADDRESS_LIST,
-    payload: isPrivate
-  }),
-  getAddressListSuccess: (addressList: AddressDropdownItem[]) => ({
-    type: SendCashActions.GET_ADDRESS_LIST_SUCCESS,
-    payload: addressList
-  }),
-  getAddressListFail: () => ({ type: SendCashActions.GET_ADDRESS_LIST_FAIL }),
-  updateSendFromRadioButtonType: (selectedValue: string): AppAction => ({
-    type: SendCashActions.UPDATE_SEND_FROM_RADIO_BUTTON_TYPE,
-    payload: selectedValue
-  }),
-  pasteToAddressFromClipboard: () => ({ type: SendCashActions.PASTE_TO_ADDRESS_FROM_CLIPBOARD }),
+/**
+ * @param {*} tempAddress
+ */
+const isPrivateAddress = (tempAddress: string) => tempAddress === '' || tempAddress.startsWith('z')
 
-  empty: (): AppAction => ({ type: SendCashActions.EMPTY })
-};
+/**
+ * @param {*} tempState
+ */
+const handlePrivateSend = (tempState: SendCashState) => {
+	const { isPrivateSendOn, fromAddress, toAddress } = tempState
+	const newValue = !isPrivateSendOn
 
-const initState: SendCashState = {
-  isPrivateSendOn: false,
-  fromAddress: '',
-  toAddress: '',
-  amount: 0,
-  currentOperation: null,
-  showDropdownMenu: false,
-  sendFromRadioButtonType: 'transparent',
-  addressList: []
-};
+	if (newValue) {
+		// need to check address
+		return isPrivateAddress(fromAddress) && isPrivateAddress(toAddress)
+			? { ...tempState, isPrivateSendOn: newValue }
+			: tempState
+	}
+	return { ...tempState, isPrivateSendOn: newValue }
+}
 
-export const SendCashReducer = (
-  state: SendCashState = initState,
-  action: AppAction
-) => {
-  /**
-   * @param {*} tempAddress
-   */
-  const isPrivateAddress = (tempAddress: string) =>
-    tempAddress === '' || tempAddress.startsWith('z');
-  // const isTransparentAddress = (tempAddress: string) => tempAddress === '' || tempAddress.startsWith('k')
+/**
+ * @param {*} tempState
+ * @param {*} newAddress
+ * @param {*} isUpdateFromAddress
+ */
+const handleAddressUpdate = (tempState: SendCashState, newAddress: string, isUpdateFromAddress: boolean) => {
+	const { isPrivateSendOn, fromAddress, toAddress } = tempState
+	let newPrivateSendOnValue = isPrivateSendOn
 
-  /**
-   * @param {*} tempState
-   */
-  const handlePrivateSend = (tempState: SendCashState) => {
-    const { isPrivateSendOn, fromAddress, toAddress } = tempState;
-    const newValue = !isPrivateSendOn;
+	if (isUpdateFromAddress) {
+		newPrivateSendOnValue = isPrivateAddress(newAddress) && isPrivateAddress(toAddress)
+		return {
+			...tempState,
+			fromAddress: newAddress,
+			isPrivateSendOn: newPrivateSendOnValue
+		}
+	}
 
-    if (newValue) {
-      // need to check address
-      return isPrivateAddress(fromAddress) && isPrivateAddress(toAddress)
-        ? { ...state, isPrivateSendOn: newValue }
-        : state;
-    }
-    return { ...state, isPrivateSendOn: newValue };
-  };
+	newPrivateSendOnValue = isPrivateAddress(newAddress) && isPrivateAddress(fromAddress)
+	return {
+		...tempState,
+		toAddress: newAddress,
+		isPrivateSendOn: newPrivateSendOnValue
+	}
+}
 
-  /**
-   * @param {*} tempState
-   * @param {*} newAddress
-   * @param {*} isUpdateFromAddress
-   */
-  const handleAddressUpdate = (
-    tempState: SendCashState,
-    newAddress: string,
-    isUpdateFromAddress: boolean
-  ) => {
-    const { isPrivateSendOn, fromAddress, toAddress } = tempState;
-    let newPrivateSendOnValue = isPrivateSendOn;
 
-    if (isUpdateFromAddress) {
-      newPrivateSendOnValue =
-        isPrivateAddress(newAddress) && isPrivateAddress(toAddress);
-      return {
-        ...state,
-        fromAddress: newAddress,
-        isPrivateSendOn: newPrivateSendOnValue
-      };
-    }
+export const SendCashReducer = handleActions({
+	// Reducer define format: 
+	// [Action type string/action function name (.toString)]: (state, action) => state
 
-    newPrivateSendOnValue =
-      isPrivateAddress(newAddress) && isPrivateAddress(fromAddress);
-    return {
-      ...state,
-      toAddress: newAddress,
-      isPrivateSendOn: newPrivateSendOnValue
-    };
-  };
-
-  switch (action.type) {
-    case SendCashActions.TOGGLE_PRIVATE_SEND:
-      return handlePrivateSend(state);
-
-    case SendCashActions.UPDATE_FROM_ADDRESS:
-      return handleAddressUpdate(state, action.payload, true);
-
-    case SendCashActions.UPDATE_TO_ADDRESS:
-      return handleAddressUpdate(state, action.payload, false);
-
-    case SendCashActions.UPDATE_AMOUNT:
-      return { ...state, amount: action.payload };
-
-    case SendCashActions.SEND_CASH_SUCCESS:
-      return { ...state, currentOperation: null };
-
-    case SendCashActions.SEND_CASH_FAIL:
-      return action.payload.clearCurrentOperation
-        ? { ...state, currentOperation: null }
-        : state;
-
-    case SendCashActions.UPDATE_SEND_OPERATION_STATUS:
-      return { ...state, currentOperation: action.payload };
-
-    case SendCashActions.UPDATE_DROPDOWN_MENU_VISIBILITY:
-      return { ...state, showDropdownMenu: action.payload };
-
-    case SendCashActions.GET_ADDRESS_LIST_SUCCESS:
-      return { ...state, addressList: action.payload };
-
-    case SendCashActions.GET_ADDRESS_LIST_FAIL:
-      return { ...state, addressList: null };
-
-    case SendCashActions.UPDATE_SEND_FROM_RADIO_BUTTON_TYPE:
-      return { ...state, sendFromRadioButtonType: action.payload };
-
-    default:
-      return state;
-  }
-};
+	[SendCashActions.togglePrivateSend]: (state) => handlePrivateSend(state),
+	[SendCashActions.updateFromAddress]: (state, action) => handleAddressUpdate(state, action.payload, true),
+	[SendCashActions.updateToAddress]: (state, action) => handleAddressUpdate(state, action.payload, false),
+	[SendCashActions.updateAmount]: (state, action) => ({ ...state, amount: action.payload }),
+	[SendCashActions.sendCashSuccess]: (state) => ({ ...state, currentOperation: null }),
+	[SendCashActions.sendCashFail]: (state, action) => action.payload.clearCurrentOperation ? { ...state, currentOperation: null } : state,
+	[SendCashActions.updateSendOperationStatus]: (state, action) => ({ ...state, currentOperation: action.payload }),
+	[SendCashActions.updateDropdownMenuVisibility]: (state, action) => ({ ...state, showDropdownMenu: action.payload }),
+	[SendCashActions.getAddressListSuccess]: (state, action) => ({ ...state, addressList: action.payload }),
+	[SendCashActions.getAddressListFail]: (state) => ({ ...state, addressList: null }),
+	[SendCashActions.updateSendFromRadioButtonType]: (state, action) => ({ ...state, sendFromRadioButtonType: action.payload }),
+	[SendCashActions.testStartOperation]: (state) => ({
+		...state,
+		currentOperation: {
+			operationId: 'Hello',
+			status: 'executing',
+			percent: 58,
+			result: null
+		}
+	}),
+	[SendCashActions.testStopOperation]: (state) => ({ ...state, currentOperation: null })
+}, defaultAppState.sendCash)

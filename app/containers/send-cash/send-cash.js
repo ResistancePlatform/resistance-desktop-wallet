@@ -81,7 +81,11 @@ class SendCash extends Component<Props> {
 
 	onPrivateSendToggleClicked(event) {
 		this.eventConfirm(event)
-		appStore.dispatch(SendCashActions.togglePrivateSend())
+		const shouldDisableInput = Boolean(this.props.sendCash.currentOperation && this.props.sendCash.currentOperation.operationId)
+
+		if (!shouldDisableInput) {
+			appStore.dispatch(SendCashActions.togglePrivateSend())
+		}
 	}
 
 	onFromAddressDropdownClicked() {
@@ -147,6 +151,17 @@ class SendCash extends Component<Props> {
 		appStore.dispatch(SendCashActions.updateSendFromRadioButtonType(selectedValue))
 	}
 
+	/** ONLY FOR TETING PURPOSE !!! */
+	simulateOperation(start?: boolean) {
+		appStore.dispatch(start ? SendCashActions.testStartOperation() : SendCashActions.testStopOperation())
+		// console.log(`testActions: `, testActions)
+		// console.log(`start: `, testActions.start())
+		// console.log(`stop: `, testActions.stop())
+		// console.log(`updateFromAddress: `, testActions.updateFromAddress('11123213', '222222'))
+		// console.log(`updateFromAddress.toString(): ${testActions.updateFromAddress}` )
+		// console.log(`updateOperation: `, testActions.updateOperation('operation-1123', 'executing --->'))
+	}
+
 	renderProgressRow() {
 		if (!this.props.sendCash || !this.props.sendCash.currentOperation) {
 			return null
@@ -196,6 +211,8 @@ class SendCash extends Component<Props> {
 			value: 'RES',
 			onAddonClicked: () => { }
 		}
+
+		const shouldDisableInput = Boolean(this.props.sendCash.currentOperation && this.props.sendCash.currentOperation.operationId)
 
 		return (
 			// Layout container
@@ -267,6 +284,7 @@ class SendCash extends Component<Props> {
 								name="from-address"
 								title="FROM ADDRESS"
 								addon={fromAddressAddon}
+								disabled={shouldDisableInput}
 								onInputChange={value => this.onFromAddressInputChanged(value)}
 								ref={this.fromAddressDomRef}
 							>
@@ -286,6 +304,7 @@ class SendCash extends Component<Props> {
 								<div className={styles.sendPrivateTitle}>SEND PRIVATELY</div>
 
 								<div
+									disabled={shouldDisableInput}
 									className={this.getPrivatelyToggleButtonClasses()}
 									onClick={event => this.onPrivateSendToggleClicked(event)}
 									onKeyDown={event => this.onPrivateSendToggleClicked(event)}
@@ -303,6 +322,7 @@ class SendCash extends Component<Props> {
 							name="destination-address"
 							title="DESTINATION ADDRESS"
 							addon={destAddressAddon}
+							disabled={shouldDisableInput}
 							onInputChange={value => this.onDestAddressInputChanged(value)}
 							ref={this.toAddressDomRef}
 						/>
@@ -314,6 +334,7 @@ class SendCash extends Component<Props> {
 								title="AMOUNT"
 								onlyNumberAllowed="true"
 								addon={amountAddressAddon}
+								disabled={shouldDisableInput}
 								onInputChange={value => this.onAmountAddressInputChanged(value)}
 								ref={this.amountAddressDomRef}
 							/>
@@ -357,6 +378,10 @@ class SendCash extends Component<Props> {
 							the list. Freshly mined coins may only be sent to a Private (Z)
 							address.
 						</div>
+
+						{/* ONLY FOR TESTING PURPOSE !!!! */}
+						<button onClick={() => this.simulateOperation(true)}> Start Test Operation </button>
+						<button onClick={() => this.simulateOperation()}> Stop Test Operation </button>
 					</div>
 				</div>
 			</div>
