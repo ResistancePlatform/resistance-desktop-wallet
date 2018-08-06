@@ -16,12 +16,13 @@ import path from 'path'
 import { app, BrowserWindow } from 'electron'
 
 import { OSService } from './service/os-service'
+import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
-
-const ProgressBar = require('electron-progressbar');
 
 
 const osService = new OSService()
+const fetchParamsService = new FetchParametersService()
+
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -75,58 +76,12 @@ const checkAndCreateDaemonConfig = () => {
 }
 
 const checkAndCreateWalletAppFolder = () => {
-  const osType = osService.getOS()
-  const walletAppFolder = (osType === `macos`) ? `${app.getPath('appData')}/ResistanceWallet` : `${app.getPath('appData')}\\ResistanceWallet`;
+  const walletAppFolder = path.join(app.getPath('appData'), 'ResistanceWallet')
 
   if (!fs.existsSync(walletAppFolder)) {
     fs.mkdirSync(walletAppFolder);
   }
 }
-
-const zcashParametersPresent = () => {
-  const zcashParamsFolder = path.join(app.getPath('appData'), 'ZcashParams')
-  return fs.existsSync(zcashParamsFolder)
-}
-
-const fetchZcashParams = async (parentWindow) => {
-	const progressBar = new ProgressBar({
-		text: 'Preparing data...',
-		detail: 'Wait...',
-    browserWindow: {
-      parent: parentWindow
-    }
-	})
-
-	progressBar
-		.on('completed', () => {
-			console.info(`completed...`)
-			progressBar.detail = 'Fetching Zcash parameters. Exiting...'
-		})
-		.on('aborted', () => {
-			console.info(`aborted...`)
-		})
-
-  const timeout = ms => new Promise(resolve => setTimeout(resolve, ms))
-  await timeout(5000)
-  progressBar.setCompleted()
-}
-
-// const checkAndFetchZCashParams = () => {
-//   const zcashParamsFolder = path.join(app.getPath('appData'), 'ZcashParams')
-//
-//   if (!fs.existsSync(zcashParamsFolder)) {
-//     console.log('Launching ZCash parameters fetching script in a new terminal window...')
-//
-//     const initScript = (osService.getOS() === 'windows' ? 'init-configure.bat' : 'resistanceinit.sh')
-//     const fetchZCashParams = path.join(osService.getBinariesPath(), initScript)
-//
-//     const command = (osService.getOS() === 'windows')
-//       ? `start cmd.exe /C ${fetchZCashParams}`
-//       : `open -Wa Terminal ${fetchZCashParams}`
-//     execSync(command)
-//     console.log('Done')
-//   }
-// }
 
 checkAndCreateDaemonConfig()
 checkAndCreateWalletAppFolder()
@@ -166,8 +121,8 @@ app.on('ready', async () => {
     frame: false
   });
 
-  if (!zcashParametersPresent()) {
-    await fetchZcashParams(mainWindow)
+  if (!fetchParamsService.checkPresence()) {
+    await fetchParamsService.fetch(mainWindow)
   }
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
