@@ -250,7 +250,6 @@ export class FetchParametersService {
 
     const calcFromStats = stats => {
       const data = `${fileName};${stats.size};${stats.ctime.toISOString()};${stats.mtime.toISOString()}`
-      console.log('Calculating from', data)
       return crypto.createHash('md5').update(data).digest("hex")
     }
 
