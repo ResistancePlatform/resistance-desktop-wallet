@@ -147,10 +147,6 @@ class SendCash extends Component<Props> {
 		appStore.dispatch(SendCashActions.updateFromAddress(selectedAddress))
 	}
 
-	onSendFromRadioButtonChange(event, selectedValue: string) {
-		appStore.dispatch(SendCashActions.updateSendFromRadioButtonType(selectedValue))
-	}
-
 
 	renderProgressRow() {
 		if (!this.props.sendCash || !this.props.sendCash.currentOperation) {
@@ -217,56 +213,6 @@ class SendCash extends Component<Props> {
 					<div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapperContainer].join(' ')}>
 						{/* Title bar */}
 						<div className={styles.titleBar}>Send Cash</div>
-
-						{/* Send from */}
-						<div className={styles.sendFromContainer}>
-							<div className={styles.sendFromTitle}>SEND FROM</div>
-
-							<div className={styles.sendFromCheckboxContainer}>
-								<div className={styles.radioButtonContainer}>
-									<input
-										readOnly
-										id="radio1"
-										type="radio"
-										name="sendFromType"
-										value="transparent"
-										checked={
-											this.props.sendCash.sendFromRadioButtonType ===
-											'transparent'
-										}
-										onClick={event =>
-											this.onSendFromRadioButtonChange(event, 'transparent')
-										}
-									/>
-									<label htmlFor="radio1">
-										<span>
-											<span />
-										</span>Transparent address
-									</label>
-								</div>
-								<div className={styles.radioButtonContainer}>
-									<input
-										readOnly
-										id="radio2"
-										type="radio"
-										name="sendFromType"
-										value="private"
-										checked={
-											this.props.sendCash.sendFromRadioButtonType === 'private'
-										}
-										onClick={event =>
-											this.onSendFromRadioButtonChange(event, 'private')
-										}
-									/>
-									<label htmlFor="radio2">
-										<span>
-											<span />
-										</span>Private address
-									</label>
-								</div>
-
-							</div>
-						</div>
 
 						{/* From address */}
 						<div className={styles.fromAddressContainer}>

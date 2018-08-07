@@ -53,7 +53,6 @@ export const SendCashActions = createActions({
 	GET_ADDRESS_LIST: (isPrivate: boolean) => isPrivate,
 	GET_ADDRESS_LIST_SUCCESS: (addressList: AddressDropdownItem[]) => addressList,
 	GET_ADDRESS_LIST_FAIL: undefined,
-	UPDATE_SEND_FROM_RADIO_BUTTON_TYPE: (selectedValue: string) => selectedValue,
 	PASTE_TO_ADDRESS_FROM_CLIPBOARD: undefined
 }, { prefixe: `APP/SEND_CASH` })
 
@@ -119,6 +118,5 @@ export const SendCashReducer = handleActions({
 	[SendCashActions.updateSendOperationStatus]: (state, action) => ({ ...state, currentOperation: action.payload }),
 	[SendCashActions.updateDropdownMenuVisibility]: (state, action) => ({ ...state, showDropdownMenu: action.payload }),
 	[SendCashActions.getAddressListSuccess]: (state, action) => ({ ...state, addressList: action.payload }),
-	[SendCashActions.getAddressListFail]: (state) => ({ ...state, addressList: null }),
-	[SendCashActions.updateSendFromRadioButtonType]: (state, action) => ({ ...state, sendFromRadioButtonType: action.payload })
+	[SendCashActions.getAddressListFail]: (state) => ({ ...state, addressList: null })
 }, defaultAppState.sendCash)
