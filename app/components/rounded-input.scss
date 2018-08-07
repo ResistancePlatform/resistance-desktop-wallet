@@ -57,6 +57,33 @@
             color: $BASE_COLOR_BUTTON_FONT_GRAY;
             cursor: default;
         }
+
+        span.tooltips {
+            // visibility: hidden; // Hidden by default
+
+            position: absolute;
+            bottom: 125%;
+            left: 40%;
+            width: 22rem;
+
+            padding: 0.5rem 1.5rem;
+
+            background-color: $BASE_COLOR_BODER_GRAY;
+            border-radius: 5rem;
+            font-size: 0.7rem;
+            font-style: italic;
+
+            &:after  {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: $BASE_COLOR_BODER_GRAY transparent transparent transparent;
+            }
+        }
     }    
 }
 

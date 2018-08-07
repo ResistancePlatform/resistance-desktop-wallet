@@ -42,6 +42,7 @@ export const defaultAppState: AppState = {
 		isPrivateTransactions: false,
 		fromAddress: '',
 		toAddress: '',
+		inputTooltips: '',
 		amount: 0,
 		currentOperation: null,
 		showDropdownMenu: false,

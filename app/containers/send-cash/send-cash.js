@@ -221,6 +221,8 @@ class SendCash extends Component<Props> {
 								title="FROM ADDRESS"
 								addon={fromAddressAddon}
 								disabled={shouldDisableInput}
+								enableTooltips="true"
+								tooltipsContent={this.props.sendCash.inputTooltips}
 								onInputChange={value => this.onFromAddressInputChanged(value)}
 								ref={this.fromAddressDomRef}
 							>
@@ -259,6 +261,8 @@ class SendCash extends Component<Props> {
 							title="DESTINATION ADDRESS"
 							addon={destAddressAddon}
 							disabled={shouldDisableInput}
+							enableTooltips="true"
+							tooltipsContent={this.props.sendCash.inputTooltips}
 							onInputChange={value => this.onDestAddressInputChanged(value)}
 							ref={this.toAddressDomRef}
 						/>

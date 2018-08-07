@@ -155,7 +155,16 @@
     }
 }
 
-// Overwrite the CSS to change the width
+// Overwrite the CSS for the <RoundedInput> --> <input> --> <span> left
+div[name="from-address"] {
+    span[class*="tooltips"] {
+        &:after {
+            left: 25% !important;
+        }
+    }
+}
+
+// Overwrite the CSS for the <input> width, and the <RoundedInput> --> <input> --> <span> left
 div[name="destination-address"] {
     margin-bottom: 1rem;
 
@@ -165,6 +174,10 @@ div[name="destination-address"] {
         min-width: 20rem !important;
         max-width: 25rem !important;
         width: 21rem !important;
+    }
+
+    span[class*="tooltips"] {
+        left: 27% !important;
     }
 }
 

@@ -3,7 +3,7 @@ import { map, tap, switchMap } from 'rxjs/operators'
 import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { AppAction } from '../appAction'
-import { SendCashActions, SendCashState } from './send-cash.reducer'
+import { SendCashActions, SendCashState, checkPrivateTransactionRule } from './send-cash.reducer'
 import { ResistanceCliService } from '../../../service/resistance-cli-service'
 import { DialogService } from '../../../service/dialog-service'
 import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
@@ -37,39 +37,6 @@ const allowToSend = (sendCashState: SendCashState) => {
 	return 'ok'
 }
 
-const isAllowByPrivateRule = (sendCashState: SendCashState) => {
-	let checkResult = 'ok'
-
-	// [Enabled] rules:
-	// t_addr-- > z_addr SUCCESS
-	// z_addr-- > z_addr SUCCESS
-	// z_addr-- > t_addr SUCCESS
-	// t_addr-- > t_addr SUCCESS
-	if (sendCashState.isPrivateTransactions) return checkResult
-
-	// [Disabled] rules:
-	// t_addr --> z_addr ERROR
-	// z_addr --> z_addr ERROR
-	// z_addr --> t_addr ERROR
-	// t_addr --> t_addr SUCCESS
-	const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')
-	const isTransparentAddress = (tempAddress: string) => tempAddress.startsWith('r')
-	const transparentAddressDesc = `Transparent (K1,JZ) address`
-	const privateAddressDesc = `Private (Z) address`
-	const prefixMessage = 'Sending cash '
-	const postFixMessage = ' is forbitten when "Private Transactions" is off.'
-	if (isTransparentAddress(sendCashState.fromAddress) && isPrivateAddress(sendCashState.toAddress)) {
-		checkResult = `${prefixMessage}from a ${transparentAddressDesc} to a ${privateAddressDesc}${postFixMessage}`
-	}
-	else if (isPrivateAddress(sendCashState.fromAddress) && isPrivateAddress(sendCashState.toAddress)) {
-		checkResult = `${prefixMessage}from a ${privateAddressDesc} to a ${privateAddressDesc}${postFixMessage}`
-	}
-	else if (isPrivateAddress(sendCashState.fromAddress) && isTransparentAddress(sendCashState.toAddress)) {
-		checkResult = `${prefixMessage}from a ${privateAddressDesc} to a ${transparentAddressDesc}${postFixMessage}`
-	}
-
-	return checkResult
-}
 
 const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
 	ofType(SendCashActions.sendCash),
@@ -84,9 +51,9 @@ const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.
 			return SendCashActions.sendCashFail(isAllowedToSend, false)
 		}
 
-		const isAllowByPrivateRuleResult = isAllowByPrivateRule(state$.value.sendCash)
-		if (isAllowByPrivateRuleResult !== 'ok') {
-			return SendCashActions.sendCashFail(isAllowByPrivateRuleResult, false)
+		const checkRuleResult = checkPrivateTransactionRule(state$.value.sendCash)
+		if (checkRuleResult !== 'ok') {
+			return SendCashActions.sendCashFail(checkRuleResult, false)
 		}
 
 		return SendCashActions.empty()

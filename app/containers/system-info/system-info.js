@@ -8,8 +8,6 @@ import { AppState } from '../../state/reducers/appState'
 import styles from './system-info.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 
-console.log(`appStore from system-info.js: `, appStore)
-
 type Props = {
 	systemInfo: SystemInfoState
 }
