@@ -1,9 +1,11 @@
 // @flow
 
+import { remote } from 'electron'
 import Client from 'bitcoin-core'
 import { from, Observable } from 'rxjs'
 import { map, tap, take } from 'rxjs/operators'
 import { LoggerService, ConsoleTheme } from './logger-service'
+
 import { getFormattedDateString } from '../utils/data-util'
 import { AppAction } from '../state/reducers/appAction'
 import { BlockChainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
@@ -19,13 +21,26 @@ let instance = null
 /**
  * Get back the new resistance client instance
  */
-const getResistanceClientInstance = () => new Client({
-	network: 'testnet',
-	port: 18232,
-	username: 'test123',
-	password: 'test123',
-	timeout: 500
-})
+const getResistanceClientInstance = () => {
+  const nodeConfig = remote.getGlobal('resistanceNodeConfig')
+  let network
+
+  if (nodeConfig.testnet) {
+    network = 'testnet'
+  } else if (nodeConfig.regtest) {
+    network = 'regtest'
+  }
+
+  const client = new Client({
+    network,
+    port: nodeConfig.rpcport,
+    username: nodeConfig.rpcuser,
+    password: nodeConfig.rpcpassword,
+    timeout: 500
+  })
+
+  return client
+}
 
 let daemonInfoPollingIntervalId = -1
 const daemonInfoPollingIntervalSetting = 2 * 1000
@@ -304,6 +319,7 @@ export class ResistanceCliService {
 						let queryResultWithAddressArr = []
 						for (let index = 0; index < privateAddresses.length; index++) {
 							const tempAddress = privateAddresses[index];
+              /* eslint-disable-next-line no-await-in-loop */
 							const addressTransactions = await cli.command(getWalletZReceivedTransactionsCmd(tempAddress)).then(tempResult => tempResult[0])
 
 							// 	 [{
@@ -332,10 +348,11 @@ export class ResistanceCliService {
 							transactionId: result.txid
 						}))
 
-						// At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`, 
+						// At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`,
 						// we need to get that info by viewing the detail of the transaction, and then put it back !
 						for (let index = 0; index < tempTransactionList.length; index++) {
 							const tempTransaction = tempTransactionList[index];
+              /* eslint-disable-next-line no-await-in-loop */
 							const transactionDetail = await cli.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
 							tempTransaction.confirmed = getConfirmed(transactionDetail.confirmations)
 							tempTransaction.date = getDate(transactionDetail.time)
