@@ -25,10 +25,10 @@ const sproutFiles = [
 ]
 
 // Shorter files for testing purposes
-// const sproutUrl = 'https://www.sample-videos.com/audio/mp3'
+// const sproutUrl = 'https://www.sample-videos.com/video/mp4/480'
 // const sproutFiles = [
-//   { name: 'crowd-cheering.mp3', checksum: "7e2ff94a87ec49018844d915832acc9bffce3138688a9f2913a69316441fcb7e" },
-//   { name: 'wave.mp3', checksum: "45c182f54afaa5969fe157a72e87820bf8eb41f993f03aa45b8de8a924743ee0" }
+//   { name: 'big_buck_bunny_480p_5mb.mp4', checksum: "287d49daf0fa4c0a12aa31404fd408b1156669084496c8031c0e1a4ce18c5247" },
+//   { name: 'big_buck_bunny_480p_1mb.mp4', checksum: "6b83d01a1bddbb6481001d8bb644bd4eb376922a4cf363fda9c14826534e17b3" }
 // ]
 
 /**
@@ -145,6 +145,7 @@ export class FetchParametersService {
       }
 
       this.progressBar.setCompleted()
+      this.progressBar.close()
     }
   }
 
@@ -155,7 +156,7 @@ export class FetchParametersService {
   createProgressBar(): ProgressBar {
     const progressBar = new ProgressBar({
       indeterminate: false,
-
+      closeOnComplete: false,
       text: `Fetching Resistance parameters...`,
       detail: `This will take awhile, but it's just a one time operation :)`,
       browserWindow: {
