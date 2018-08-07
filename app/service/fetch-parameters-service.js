@@ -132,7 +132,7 @@ export class FetchParametersService {
       try {
         /* eslint-disable no-await-in-loop */
 
-        await this.createDownloadPromise(fileName, index)
+        await this.downloadSproutKey(fileName, index)
         this.progressBar.detail = `Calculating checksum for ${fileName}...`
         await this.verifyChecksum(fileName, sproutFiles[index].checksum)
         await this.saveQuickFileHash(fileName)
@@ -165,7 +165,7 @@ export class FetchParametersService {
     return progressBar
   }
 
-  createDownloadPromise(fileName, index) {
+  downloadSproutKey(fileName, index) {
     let totalBytes
 
     const onProgress = progress => {
