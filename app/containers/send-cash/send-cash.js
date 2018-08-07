@@ -59,24 +59,24 @@ class SendCash extends Component<Props> {
 	}
 
 	getPrivatelyToggleButtonClasses() {
-		return this.props.sendCash.isPrivateSendOn
+		return this.props.sendCash.isPrivateTransactions
 			? `${styles.toggleButton} ${styles.toggleButtonOn}`
 			: `${styles.toggleButton}`
 	}
 
 	getSendLockClasses() {
-		return this.props.sendCash.isPrivateSendOn ? `icon-private-lock` : `icon-private-unlock`
+		return this.props.sendCash.isPrivateTransactions ? `icon-private-lock` : `icon-private-unlock`
 	}
 
 	getSendTips() {
 		const prefixTips = `You are about to send money from`
-		return this.props.sendCash.isPrivateSendOn
+		return this.props.sendCash.isPrivateTransactions
 			? `${prefixTips} a Private (Z) address to another Private (Z) address. This transaction will be private and invisible to all other users.`
 			: `${prefixTips} Transparent (K1,JZ) address to Transparent address. This transaction will be visible to everyone.`
 	}
 
 	getPrivatelyToggleButtonText() {
-		return this.props.sendCash.isPrivateSendOn ? `ON` : `OFF`
+		return this.props.sendCash.isPrivateTransactions ? `ON` : `OFF`
 	}
 
 	onPrivateSendToggleClicked(event) {
@@ -237,7 +237,7 @@ class SendCash extends Component<Props> {
 
 							{/* Toggle button */}
 							<div className={[styles.sendPrivatelyToggleContainer, HLayout.hBoxContainer].join(' ')}>
-								<div className={styles.sendPrivateTitle}>SEND PRIVATELY</div>
+								<div className={styles.sendPrivateTitle}>Private Transactions</div>
 
 								<div
 									disabled={shouldDisableInput}

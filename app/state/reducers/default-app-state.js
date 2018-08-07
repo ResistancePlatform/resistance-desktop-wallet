@@ -39,7 +39,7 @@ export const defaultAppState: AppState = {
 		showDropdownMenu: false
 	},
 	sendCash: {
-		isPrivateSendOn: false,
+		isPrivateTransactions: false,
 		fromAddress: '',
 		toAddress: '',
 		amount: 0,

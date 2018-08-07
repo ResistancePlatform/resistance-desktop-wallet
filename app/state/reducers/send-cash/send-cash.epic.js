@@ -9,6 +9,7 @@ import { DialogService } from '../../../service/dialog-service'
 import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
 import { ClipboardService } from '../../../service/clipboard-service'
 
+
 const epicInstanceName = 'SendCashEpics'
 const resistanceCliService = new ResistanceCliService()
 const dialogService: DialogService = new DialogService()
@@ -36,6 +37,40 @@ const allowToSend = (sendCashState: SendCashState) => {
 	return 'ok'
 }
 
+const isAllowByPrivateRule = (sendCashState: SendCashState) => {
+	let checkResult = 'ok'
+
+	// [Enabled] rules:
+	// t_addr-- > z_addr SUCCESS
+	// z_addr-- > z_addr SUCCESS
+	// z_addr-- > t_addr SUCCESS
+	// t_addr-- > t_addr SUCCESS
+	if (sendCashState.isPrivateTransactions) return checkResult
+
+	// [Disabled] rules:
+	// t_addr --> z_addr ERROR
+	// z_addr --> z_addr ERROR
+	// z_addr --> t_addr ERROR
+	// t_addr --> t_addr SUCCESS
+	const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')
+	const isTransparentAddress = (tempAddress: string) => tempAddress.startsWith('r')
+	const transparentAddressDesc = `Transparent (K1,JZ) address`
+	const privateAddressDesc = `Private (Z) address`
+	const prefixMessage = 'Sending cash '
+	const postFixMessage = ' is forbitten when "Private Transactions" is off.'
+	if (isTransparentAddress(sendCashState.fromAddress) && isPrivateAddress(sendCashState.toAddress)) {
+		checkResult = `${prefixMessage}from a ${transparentAddressDesc} to a ${privateAddressDesc}${postFixMessage}`
+	}
+	else if (isPrivateAddress(sendCashState.fromAddress) && isPrivateAddress(sendCashState.toAddress)) {
+		checkResult = `${prefixMessage}from a ${privateAddressDesc} to a ${privateAddressDesc}${postFixMessage}`
+	}
+	else if (isPrivateAddress(sendCashState.fromAddress) && isTransparentAddress(sendCashState.toAddress)) {
+		checkResult = `${prefixMessage}from a ${privateAddressDesc} to a ${transparentAddressDesc}${postFixMessage}`
+	}
+
+	return checkResult
+}
+
 const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
 	ofType(SendCashActions.sendCash),
 	tap((action: AppAction) => logger.debug(epicInstanceName, `sendCashEpic`, action.type, ConsoleTheme.testing)),
@@ -47,6 +82,11 @@ const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.
 		const isAllowedToSend = allowToSend(state$.value.sendCash)
 		if (isAllowedToSend !== 'ok') {
 			return SendCashActions.sendCashFail(isAllowedToSend, false)
+		}
+
+		const isAllowByPrivateRuleResult = isAllowByPrivateRule(state$.value.sendCash)
+		if (isAllowByPrivateRuleResult !== 'ok') {
+			return SendCashActions.sendCashFail(isAllowByPrivateRuleResult, false)
 		}
 
 		return SendCashActions.empty()

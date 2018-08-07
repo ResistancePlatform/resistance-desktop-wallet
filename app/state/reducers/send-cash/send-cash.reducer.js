@@ -26,7 +26,7 @@ export type ProcessingOperation = {
 }
 
 export type SendCashState = {
-	isPrivateSendOn: boolean,
+	isPrivateTransactions: boolean,
 	fromAddress: string,
 	toAddress: string,
 	amount: number,
@@ -57,26 +57,6 @@ export const SendCashActions = createActions({
 }, { prefixe: `APP/SEND_CASH` })
 
 
-/**
- * @param {*} tempAddress
- */
-const isPrivateAddress = (tempAddress: string) => tempAddress === '' || tempAddress.startsWith('z')
-
-/**
- * @param {*} tempState
- */
-const handlePrivateSend = (tempState: SendCashState) => {
-	const { isPrivateSendOn, fromAddress, toAddress } = tempState
-	const newValue = !isPrivateSendOn
-
-	if (newValue) {
-		// need to check address
-		return isPrivateAddress(fromAddress) && isPrivateAddress(toAddress)
-			? { ...tempState, isPrivateSendOn: newValue }
-			: tempState
-	}
-	return { ...tempState, isPrivateSendOn: newValue }
-}
 
 /**
  * @param {*} tempState
@@ -84,23 +64,20 @@ const handlePrivateSend = (tempState: SendCashState) => {
  * @param {*} isUpdateFromAddress
  */
 const handleAddressUpdate = (tempState: SendCashState, newAddress: string, isUpdateFromAddress: boolean) => {
-	const { isPrivateSendOn, fromAddress, toAddress } = tempState
-	let newPrivateSendOnValue = isPrivateSendOn
+	// const { isPrivateTransactions, fromAddress, toAddress } = tempState
 
 	if (isUpdateFromAddress) {
-		newPrivateSendOnValue = isPrivateAddress(newAddress) && isPrivateAddress(toAddress)
+		// newPrivateSendOnValue = isPrivateAddress(newAddress) && isPrivateAddress(toAddress)
 		return {
 			...tempState,
-			fromAddress: newAddress,
-			isPrivateSendOn: newPrivateSendOnValue
+			fromAddress: newAddress
 		}
 	}
 
-	newPrivateSendOnValue = isPrivateAddress(newAddress) && isPrivateAddress(fromAddress)
+	// newPrivateSendOnValue = isPrivateAddress(newAddress) && isPrivateAddress(fromAddress)
 	return {
 		...tempState,
-		toAddress: newAddress,
-		isPrivateSendOn: newPrivateSendOnValue
+		toAddress: newAddress
 	}
 }
 
@@ -109,7 +86,7 @@ export const SendCashReducer = handleActions({
 	// Reducer define format: 
 	// [Action type string/action function name (.toString)]: (state, action) => state
 
-	[SendCashActions.togglePrivateSend]: (state) => handlePrivateSend(state),
+	[SendCashActions.togglePrivateSend]: (state) => ({ ...state, isPrivateTransactions: !state.isPrivateTransactions }),
 	[SendCashActions.updateFromAddress]: (state, action) => handleAddressUpdate(state, action.payload, true),
 	[SendCashActions.updateToAddress]: (state, action) => handleAddressUpdate(state, action.payload, false),
 	[SendCashActions.updateAmount]: (state, action) => ({ ...state, amount: action.payload }),
