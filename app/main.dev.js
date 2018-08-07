@@ -121,7 +121,7 @@ app.on('ready', async () => {
     frame: false
   });
 
-  if (!fetchParamsService.checkPresence()) {
+  if (!await fetchParamsService.checkPresence()) {
     await fetchParamsService.fetch(mainWindow)
   }
 
