@@ -170,11 +170,12 @@ export class FetchParametersService {
     let totalBytes
 
     const onProgress = progress => {
-      const rate = Math.round(progress * 100)
+      const rate = progress * 100
+      const roundedRate = Math.round(rate)
       const totalMb = (totalBytes / 1024 / 1024).toFixed(2)
       const receivedMb = (progress  * totalMb).toFixed(2)
       this.progressBar.value = rate
-      this.progressBar.detail = `Downloading ${fileName}, received ${receivedMb}MB out of ${totalMb}MB (${rate}%)...`
+      this.progressBar.detail = `Downloading ${fileName}, received ${receivedMb}MB out of ${totalMb}MB (${roundedRate}%)...`
     }
 
     const onStarted = item => {
