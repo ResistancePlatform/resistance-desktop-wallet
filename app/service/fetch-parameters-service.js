@@ -5,23 +5,24 @@ import path from 'path'
 import { app, dialog } from 'electron'
 import { download } from 'electron-dl'
 
+const crypto = require('crypto');
 const ProgressBar = require('electron-progressbar');
 
 
 const paramsFolderName = 'ZcashParams'
 
-const sproutUrl = `https://z.cash/downloads`
-const sproutFiles = [
-  { name: 'sprout-proving.key', checkSum: "8bc20a7f013b2b58970cddd2e7ea028975c88ae7ceb9259a5344a16bc2c0eef7" },
-  { name: 'sprout-verifying.key', checkSum: "4bd498dae0aacfd8e98dc306338d017d9c08dd0918ead18172bd0aec2fc5df82" }
-]
+// const sproutUrl = `https://z.cash/downloads`
+// const sproutFiles = [
+//   { name: 'sprout-proving.key', checksum: "8bc20a7f013b2b58970cddd2e7ea028975c88ae7ceb9259a5344a16bc2c0eef7" },
+//   { name: 'sprout-verifying.key', checksum: "4bd498dae0aacfd8e98dc306338d017d9c08dd0918ead18172bd0aec2fc5df82" }
+// ]
 
 // Shorter files for testing purposes
-// const sproutUrl = 'https://www.sample-videos.com/audio/mp3'
-// const sproutFiles = [
-//   { name: 'crowd-cheering.mp3', checkSum: "8bc20a7f013b2b58970cddd2e7ea028975c88ae7ceb9259a5344a16bc2c0eef7" },
-//   { name: 'wave.mp3', checkSum: "4bd498dae0aacfd8e98dc306338d017d9c08dd0918ead18172bd0aec2fc5df82" }
-// ]
+const sproutUrl = 'https://www.sample-videos.com/audio/mp3'
+const sproutFiles = [
+  { name: 'crowd-cheering.mp3', checksum: "7e2ff94a87ec49018844d915832acc9bffce3138688a9f2913a69316441fcb7e" },
+  { name: 'wave.mp3', checksum: "45c182f54afaa5969fe157a72e87820bf8eb41f993f03aa45b8de8a924743ee0" }
+]
 
 /**
  * ES6 singleton
@@ -57,6 +58,10 @@ export class FetchParametersService {
     if (!fs.existsSync(resistanceParamsFolder)) {
       return false
     }
+
+    // Check hash sum for every file
+
+    return false
   }
 
 	/**
@@ -85,9 +90,11 @@ export class FetchParametersService {
 
       try {
         await this.createDownloadPromise(fileName, index) // eslint-disable-line no-await-in-loop
+        await this.verifyChecksum(fileName, sproutFiles[index].checksum) // eslint-disable-line no-await-in-loop
       } catch(err) {
-        dialog.showErrorBox(`Unable to fetch Resistance parameters`, `Error message: ${err}`)
+        dialog.showErrorBox(`Unable to fetch Resistance parameters`, err.toString())
         app.quit()
+        break
       }
 
       this.progressBar.setCompleted()
@@ -138,4 +145,35 @@ export class FetchParametersService {
 
     return downloadPromise
   }
+
+  verifyChecksum(fileName, checksum) {
+    const filePath = path.join(this.getResistanceParamsFolder(), fileName)
+    const hash = crypto.createHash('sha256')
+    const stream = fs.ReadStream(filePath)
+
+    this.progressBar.detail = `Calculating checksum for ${fileName}...`
+
+    hash.setEncoding('hex')
+    stream.pipe(hash)
+
+    const promise = new Promise((resolve, reject) => {
+      stream.on('error', (err) => {
+        reject(new Error(`Unable to read from ${fileName}, the error message was: ${err}`))
+      })
+
+      stream.on('end', () => {
+        hash.end()
+        const calculatedChecksum = hash.read()
+        console.log(calculatedChecksum)
+        if (calculatedChecksum === checksum) {
+          resolve()
+        } else {
+          reject(new Error(`Checksum doesn't match for ${fileName}, download failed.`))
+        }
+      })
+    })
+
+    return promise
+  }
+
 }
