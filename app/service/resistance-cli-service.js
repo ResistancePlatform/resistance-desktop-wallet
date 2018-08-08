@@ -595,78 +595,6 @@ export class ResistanceCliService {
 			})
 	}
 
-	getWalletOwnAddresses(): Observable<any> {
-		const cli = getResistanceClientInstance()
-		const promiseArr = [
-			this.getWalletPrivateAddresses(cli),
-			this.getWalletAllPublicAddresses(cli),
-			this.getWalletPublicAddressesWithUnspentOutputs(cli)
-		]
-
-		const queryPromise = Promise.all(promiseArr)
-			.then(result => {
-				console.log(`result: `, result)
-				const privateAddressesResult = result[0][0]
-				const PublicAddressesResult = result[1][0]
-				const PublicAddressesUnspendResult = result[2][0]
-
-				const addressResultSet = new Set()
-
-				if (Array.isArray(privateAddressesResult)) {
-					for (let index = 0; index < privateAddressesResult.length; index++) {
-						addressResultSet.add(privateAddressesResult[index])
-					}
-				}
-
-				if (Array.isArray(PublicAddressesResult)) {
-					const publicAddresses = PublicAddressesResult.map(
-						tempValue => tempValue.address
-					)
-					for (let index = 0; index < publicAddresses.length; index++) {
-						addressResultSet.add(publicAddresses[index])
-					}
-				}
-
-				if (Array.isArray(PublicAddressesUnspendResult)) {
-					const publicAddresses = PublicAddressesUnspendResult.map(
-						tempValue => tempValue.address
-					)
-					for (let index = 0; index < publicAddresses.length; index++) {
-						addressResultSet.add(publicAddresses[index])
-					}
-				}
-
-				const combinedAddresses = Array.from(addressResultSet).map(addr => ({
-					balance: 0,
-					confirmed: false,
-					address: addr
-				}))
-				this.logger.debug(this, `getWalletOwnAddresses`, `combinedAddresses: `, ConsoleTheme.testing, combinedAddresses)
-
-				return combinedAddresses
-			})
-			.then(combinedAddresses => {
-				if (Array.isArray(combinedAddresses)) {
-					const tempPromiseArr = combinedAddresses.map(tempAddressRow =>
-						this.getAddressBalance(cli, tempAddressRow)
-					)
-					return Promise.all(tempPromiseArr)
-				}
-
-				return []
-			})
-			.then(addresses => {
-				this.logger.debug(this, `getWalletOwnAddresses`, `addresses: `, ConsoleTheme.testing, addresses)
-				return addresses
-			})
-			.catch(error => {
-				this.logger.debug(this, `getWalletOwnAddresses`, `Error happen: `, ConsoleTheme.error, error)
-				return []
-			})
-
-		return from(queryPromise).pipe(take(1))
-	}
-
 	/**
 	 * @param {boolean} [isPrivate]
 	 * @returns {Observable<any>}
@@ -677,7 +605,7 @@ export class ResistanceCliService {
 		const createNewAddressPromise = cli
 			.command([{ method: isPrivate ? `z_getnewaddress` : `getnewaddress` }])
 			.then(newAddress => {
-				this.logger.debug(this, `createNewAddress`, `create ${isPrivate ? 'private ' : 'transparent '} address: `, ConsoleTheme.error, newAddress)
+				this.logger.debug(this, `createNewAddress`, `create ${isPrivate ? 'private ' : 'transparent '} address: `, ConsoleTheme.testing, newAddress)
 				return newAddress
 			})
 			.catch(error => {
@@ -813,49 +741,42 @@ export class ResistanceCliService {
 
 
 	/**
-	 * @param {boolean} isPrivateTransactionMode
 	 * @returns {Observable<any>}
 	 * @memberof ResistanceCliService
 	 */
-	getWalletAddressAndBalance(isPrivateTransactionMode: boolean): Observable<any> {
+	getWalletAddressAndBalance(): Observable<any> {
 		const cli = getResistanceClientInstance()
-		const promiseArr = isPrivateTransactionMode ? [this.getWalletPrivateAddresses(cli)] : [
+		const promiseArr = [
 			this.getWalletAllPublicAddresses(cli),
-			this.getWalletPublicAddressesWithUnspentOutputs(cli)
+			this.getWalletPublicAddressesWithUnspentOutputs(cli),
+			this.getWalletPrivateAddresses(cli)
 		]
 
 		const queryPromise = Promise.all(promiseArr)
 			.then(result => {
-				console.log(`result: `, result)
-				let privateAddressesResult = null
-				let PublicAddressesResult = null
-				let PublicAddressesUnspendResult = null
+				// console.log(`result: `, result)
+				const PublicAddressesResult = result[0][0]
+				const PublicAddressesUnspendResult = result[1][0]
+				const privateAddressesResult = result[2][0]
 				const addressResultSet = new Set()
 
-				if (isPrivateTransactionMode) {
-					privateAddressesResult = result[0][0]
-
-					if (Array.isArray(privateAddressesResult)) {
-						for (let index = 0; index < privateAddressesResult.length; index++) {
-							addressResultSet.add(privateAddressesResult[index])
-						}
+				if (Array.isArray(PublicAddressesResult)) {
+					const publicAddresses = PublicAddressesResult.map(tempValue => tempValue.address)
+					for (let index = 0; index < publicAddresses.length; index++) {
+						addressResultSet.add(publicAddresses[index])
 					}
-				} else {
-					PublicAddressesResult = result[0][0]
-					PublicAddressesUnspendResult = result[1][0]
+				}
 
-					if (Array.isArray(PublicAddressesResult)) {
-						const publicAddresses = PublicAddressesResult.map(tempValue => tempValue.address)
-						for (let index = 0; index < publicAddresses.length; index++) {
-							addressResultSet.add(publicAddresses[index])
-						}
+				if (Array.isArray(PublicAddressesUnspendResult)) {
+					const publicAddresses = PublicAddressesUnspendResult.map(tempValue => tempValue.address)
+					for (let index = 0; index < publicAddresses.length; index++) {
+						addressResultSet.add(publicAddresses[index])
 					}
+				}
 
-					if (Array.isArray(PublicAddressesUnspendResult)) {
-						const publicAddresses = PublicAddressesUnspendResult.map(tempValue => tempValue.address)
-						for (let index = 0; index < publicAddresses.length; index++) {
-							addressResultSet.add(publicAddresses[index])
-						}
+				if (Array.isArray(privateAddressesResult)) {
+					for (let index = 0; index < privateAddressesResult.length; index++) {
+						addressResultSet.add(privateAddressesResult[index])
 					}
 				}
 
@@ -864,7 +785,7 @@ export class ResistanceCliService {
 					confirmed: false,
 					address: addr
 				}))
-				this.logger.debug(this, `getWalletPublicAddressAndBalance`, `combinedAddresses: `, ConsoleTheme.testing, combinedAddresses)
+				this.logger.debug(this, `getWalletAddressAndBalance`, `combinedAddresses: `, ConsoleTheme.testing, combinedAddresses)
 				return combinedAddresses
 			})
 			.then(combinedAddresses => {
@@ -876,11 +797,11 @@ export class ResistanceCliService {
 				return []
 			})
 			.then(addresses => {
-				this.logger.debug(this, `getWalletPublicAddressAndBalance`, `addresses: `, ConsoleTheme.testing, addresses)
+				this.logger.debug(this, `getWalletAddressAndBalance`, `addresses: `, ConsoleTheme.testing, addresses)
 				return addresses
 			})
 			.catch(error => {
-				this.logger.debug(`getWalletPublicAddressAndBalance`, `Error happen: `, ConsoleTheme.error, error)
+				this.logger.debug(`getWalletAddressAndBalance`, `Error happen: `, ConsoleTheme.error, error)
 				return []
 			})
 

@@ -14,7 +14,7 @@ const logger = new LoggerService()
 const getOwnAddressesEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
     ofType(OwnAddressesActions.GET_OWN_ADDRESSES),
     tap((action: AppAction) => logger.debug(epicInstanceName, `getOwnAddressesEpic`, action.type, ConsoleTheme.testing)),
-    switchMap(() => resistanceCliService.getWalletOwnAddresses()),
+    switchMap(() => resistanceCliService.getWalletAddressAndBalance()),
     map(result => OwnAddressesActions.getOwnAddressesSuccess(result))
 )
 
