@@ -15,7 +15,8 @@ export type SendFromRadioButtonType = 'transparent' | 'private'
 
 export type AddressDropdownItem = {
 	address: string,
-	balance: number
+	balance: number,
+	disabled?: boolean
 }
 
 export type ProcessingOperation = {

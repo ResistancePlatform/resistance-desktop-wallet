@@ -740,11 +740,14 @@ export class ResistanceCliService {
 	}
 
 
+
 	/**
+	 * @param {boolean} sortByGroupBalance
+	 * @param {boolean} disableThePrivateAddress
 	 * @returns {Observable<any>}
 	 * @memberof ResistanceCliService
 	 */
-	getWalletAddressAndBalance(): Observable<any> {
+	getWalletAddressAndBalance(sortByGroupBalance?: boolean, disableThePrivateAddress?: boolean): Observable<any> {
 		const cli = getResistanceClientInstance()
 		const promiseArr = [
 			this.getWalletAllPublicAddresses(cli),
@@ -758,33 +761,37 @@ export class ResistanceCliService {
 				const PublicAddressesResult = result[0][0]
 				const PublicAddressesUnspendResult = result[1][0]
 				const privateAddressesResult = result[2][0]
-				const addressResultSet = new Set()
+				const publicAddressResultSet = new Set()
+				const privateAddressResultSet = new Set()
 
 				if (Array.isArray(PublicAddressesResult)) {
 					const publicAddresses = PublicAddressesResult.map(tempValue => tempValue.address)
 					for (let index = 0; index < publicAddresses.length; index++) {
-						addressResultSet.add(publicAddresses[index])
+						publicAddressResultSet.add(publicAddresses[index])
 					}
 				}
 
 				if (Array.isArray(PublicAddressesUnspendResult)) {
 					const publicAddresses = PublicAddressesUnspendResult.map(tempValue => tempValue.address)
 					for (let index = 0; index < publicAddresses.length; index++) {
-						addressResultSet.add(publicAddresses[index])
+						publicAddressResultSet.add(publicAddresses[index])
 					}
 				}
 
 				if (Array.isArray(privateAddressesResult)) {
 					for (let index = 0; index < privateAddressesResult.length; index++) {
-						addressResultSet.add(privateAddressesResult[index])
+						privateAddressResultSet.add(privateAddressesResult[index])
 					}
 				}
 
-				const combinedAddresses = Array.from(addressResultSet).map(addr => ({
-					balance: 0,
-					confirmed: false,
-					address: addr
-				}))
+				const combinedAddresses = [...Array.from(publicAddressResultSet), ...Array.from(privateAddressesResult)]
+					.map(addr => ({
+						balance: 0,
+						confirmed: false,
+						address: addr,
+						disabled: false
+					}))
+
 				this.logger.debug(this, `getWalletAddressAndBalance`, `combinedAddresses: `, ConsoleTheme.testing, combinedAddresses)
 				return combinedAddresses
 			})
@@ -798,7 +805,40 @@ export class ResistanceCliService {
 			})
 			.then(addresses => {
 				this.logger.debug(this, `getWalletAddressAndBalance`, `addresses: `, ConsoleTheme.testing, addresses)
-				return addresses
+
+				let addressList = null
+
+				// Sort for each groups
+				if (sortByGroupBalance) {
+					const publicAddressesBeforeSort = []
+					const privateAddressesBeforeSort = []
+
+					for (let index = 0; index < addresses.length; index++) {
+						const tempAddressItem = addresses[index];
+						if (tempAddressItem.address.startsWith('z')) {
+							privateAddressesBeforeSort.push(tempAddressItem)
+						} else {
+							publicAddressesBeforeSort.push(tempAddressItem)
+						}
+					}
+
+					const publicAddressesAfterSort = publicAddressesBeforeSort.sort((item1, item2) => item2.balance - item1.balance)
+					const privateAddressesAfterSort = privateAddressesBeforeSort.sort((item1, item2) => item2.balance - item1.balance)
+
+					addressList = [...publicAddressesAfterSort, ...privateAddressesAfterSort]
+				} else {
+					addressList = addresses
+				}
+
+				if (disableThePrivateAddress) {
+					const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')
+					// return addressList.map(tempAddressItem => isPrivateAddress(tempAddressItem.address) ? { ...tempAddressItem, disabled: true } : tempAddressItem)
+					const processedAddressList = addressList.map(tempAddressItem => isPrivateAddress(tempAddressItem.address) ? { ...tempAddressItem, disabled: true } : tempAddressItem)
+					this.logger.debug(this, `getWalletAddressAndBalance`, `processedAddressList: `, ConsoleTheme.testing, processedAddressList)
+					return processedAddressList
+				}
+
+				return addressList
 			})
 			.catch(error => {
 				this.logger.debug(`getWalletAddressAndBalance`, `Error happen: `, ConsoleTheme.error, error)

@@ -40,7 +40,10 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 
 		return this.props.addressList.map((addressItem, index) => (
 			<div
-				className={index === this.props.addressList.length - 1 ? styles.lastMenuItem : styles.menuItem}
+				className={[
+					index === this.props.addressList.length - 1 ? styles.lastMenuItem : styles.menuItem,
+					addressItem.disabled ? styles.disabledMenItem : ''
+				].join(' ')}
 				onClick={event => this.onAddressItemClicked(event, addressItem.address ? addressItem.address : '')}
 				onKeyDown={() => { }}
 				key={index}

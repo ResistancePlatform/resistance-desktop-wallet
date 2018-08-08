@@ -44,6 +44,17 @@ $POP_UP_MENU_CONTAINER_WIDTH: 91.5%;
     border-bottom: none;
 }
 
+.disabledMenItem {
+    // Disable the cursor change and ':hover' effect
+    pointer-events:none;
+
+    color: $SEND_CASH_DROPDOWN_LIST_DISABLE_FONT_COLOR;
+
+    .itemRowBalance {
+        color: $SEND_CASH_DROPDOWN_LIST_DISABLE_FONT_COLOR;
+    }
+}
+
 .itemRowAddress {
     max-width: 75%;
     overflow: hidden;
