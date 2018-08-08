@@ -12,14 +12,17 @@
  */
 import * as fs from 'fs';
 import path from 'path'
-import { execSync } from 'child_process'
 
 import { app, BrowserWindow } from 'electron'
 
 import { OSService } from './service/os-service'
+import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
 
+
 const osService = new OSService()
+const fetchParamsService = new FetchParametersService()
+
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -46,10 +49,8 @@ const installExtensions = async () => {
   ).catch(console.log);
 };
 
-const getOsType = () => process.platform === 'darwin' ? `macos` : `windows`;
-
 const checkAndCreateDaemonConfig = () => {
-  const osType = getOsType()
+  const osType = osService.getOS()
 
   const configFolder = path.join(app.getPath('appData'), `Resistance`)
   const configFile = path.join(configFolder, `resistance.conf`)
@@ -75,34 +76,15 @@ const checkAndCreateDaemonConfig = () => {
 }
 
 const checkAndCreateWalletAppFolder = () => {
-  const osType = getOsType()
-  const walletAppFolder = (osType === `macos`) ? `${app.getPath('appData')}/ResistanceWallet` : `${app.getPath('appData')}\\ResistanceWallet`;
+  const walletAppFolder = path.join(app.getPath('appData'), 'ResistanceWallet')
 
   if (!fs.existsSync(walletAppFolder)) {
     fs.mkdirSync(walletAppFolder);
   }
 }
 
-const checkAndFetchZCashParams = () => {
-  const zcashParamsFolder = path.join(app.getPath('appData'), 'ZcashParams')
-
-  if (!fs.existsSync(zcashParamsFolder)) {
-    console.log('Launching ZCash parameters fetching script in a new terminal window...')
-
-    const initScript = (getOsType() === 'windows' ? 'init-configure.bat' : 'resistanceinit.sh')
-    const fetchZCashParams = path.join(osService.getBinariesPath(), initScript)
-
-    const command = (getOsType() === 'windows')
-      ? `start cmd.exe /C ${fetchZCashParams}`
-      : `open -Wa Terminal ${fetchZCashParams}`
-    execSync(command)
-    console.log('Done')
-  }
-}
-
 checkAndCreateDaemonConfig()
 checkAndCreateWalletAppFolder()
-checkAndFetchZCashParams()
 
 /**
  * Add event listeners...
@@ -127,7 +109,7 @@ app.on('ready', async () => {
     process.env.NODE_ENV === 'development' ||
     process.env.DEBUG_PROD === 'true'
   ) {
-    await installExtensions();
+    await installExtensions()
   }
 
   mainWindow = new BrowserWindow({
@@ -138,6 +120,10 @@ app.on('ready', async () => {
     show: false,
     frame: false
   });
+
+  if (!await fetchParamsService.checkPresence()) {
+    await fetchParamsService.fetch(mainWindow)
+  }
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
   // mainWindow.webContents.openDevTools();

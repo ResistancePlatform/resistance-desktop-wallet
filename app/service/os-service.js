@@ -2,7 +2,7 @@
 import path from 'path'
 import { spawn } from 'child_process'
 import { createWriteStream } from 'fs'
-import { remote } from 'electron'
+import { app, remote } from 'electron'
 
 /**
  * ES6 singleton
@@ -116,7 +116,8 @@ export class OSService {
 	 * @memberof OSService
 	 */
 	getAppDataPath() {
-    return path.join(remote.app.getPath('appData'), 'ResistanceWallet')
+    const validApp = process.type === 'renderer' ? remote.app : app
+    return path.join(validApp.getPath('appData'), 'ResistanceWallet')
 	}
 
 	/**
