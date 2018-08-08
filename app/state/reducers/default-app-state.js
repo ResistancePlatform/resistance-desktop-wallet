@@ -51,6 +51,7 @@ export const defaultAppState: AppState = {
 	settings: {
 		isTorEnabled: false,
 		isMinerEnabled: false,
+    isStatusModalOpen: false,
 		childProcessUpdate: {
 			NODE: false,
 			MINER: false,

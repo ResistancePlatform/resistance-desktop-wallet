@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import Modal from 'react-modal'
 
 import RounedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import styles from './settings.scss'
@@ -12,6 +13,7 @@ import { SystemInfoState } from '../../state/reducers/system-info/system-info.re
 import { SettingsActions, SettingsState } from '../../state/reducers/settings/settings.reducer'
 
 const config = require('electron-settings')
+const StatusModal = require('./settings.status-modal')
 
 type Props = {
 	settings: SettingsState,
@@ -28,7 +30,9 @@ class Settings extends Component<Props> {
 	/**
 	 * @memberof Settings
 	 */
-	componentDidMount() { }
+	componentDidMount() {
+    Modal.setAppElement('#App')
+  }
 
   componentWillUpdate(nextProps) {
     if (nextProps.settings.isMinerEnabled !== this.props.settings.isMinerEnabled) {
@@ -144,8 +148,13 @@ class Settings extends Component<Props> {
 	 */
 	onShowStatusClicked(event) {
 		this.eventConfirm(event)
-		console.log(`onShowStatusClicked---->`)
+		appStore.dispatch(SettingsActions.openStatusModal())
 	}
+
+  onCloseStatusModalClicked(event) {
+		this.eventConfirm(event)
+		appStore.dispatch(SettingsActions.closeStatusModal())
+  }
 
 	/**
 	 * @param {*} event
@@ -174,6 +183,8 @@ class Settings extends Component<Props> {
 				{/* Route content */}
 				<div className={[styles.settingsContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
 					<div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapperContainer].join(' ')}>
+            <StatusModal parent={this}/>
+
 						{/* Title bar */}
 						<div className={styles.titleBar}>Settings</div>
 
@@ -228,7 +239,6 @@ class Settings extends Component<Props> {
 									className={styles.showStatusButton}
 									onClick={event => this.onShowStatusClicked(event)}
 									onKeyDown={event => this.onShowStatusClicked(event)}
-									disabled
 								>
 									SHOW STATUS
 								</button>

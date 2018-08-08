@@ -5,6 +5,7 @@ import { defaultAppState } from '../default-app-state'
 export type SettingsState = {
 	isTorEnabled: boolean,
 	isMinerEnabled: boolean,
+  isStatusModalOpen: boolean,
   childProcessUpdate: {
       NODE: boolean,
       MINER: boolean,
@@ -14,6 +15,9 @@ export type SettingsState = {
 
 export const SettingsActions = createActions(
   {
+    OPEN_STATUS_MODAL: undefined,
+    CLOSE_STATUS_MODAL: undefined,
+
     START_LOCAL_NODE: undefined,
     STOP_LOCAL_NODE: undefined,
 
@@ -57,6 +61,14 @@ const getChildProcessUpdateFailedState = (state, action, isEnabled) => {
 
 export const SettingsReducer = handleActions(
   {
+    // Status Modal
+    [SettingsActions.openStatusModal]: state => ({
+      ...state, isStatusModalOpen: true
+    }),
+    [SettingsActions.closeStatusModal]: state => ({
+      ...state, isStatusModalOpen: false
+    }),
+
     // Local Node
     [SettingsActions.startLocalNode]: state => ({
       ...state,

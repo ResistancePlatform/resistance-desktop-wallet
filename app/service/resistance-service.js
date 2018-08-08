@@ -25,6 +25,7 @@ const configFileContents = [
   `rpcport=18232`,
   `rpcuser=resuser`,
   `rpcpassword=%generatedPassword%`,
+  ``
 ].join(EOL)
 
 
