@@ -15,7 +15,8 @@ export const defaultAppState: AppState = {
 	systemInfo: {
 		daemonInfo: {
 			status: `NOT_RUNNING`,
-			residentSizeMB: 0
+      residentSizeMB: 0,
+      getInfoResult: {}
 		},
 		blockChainInfo: {
 			connectionCount: 0,

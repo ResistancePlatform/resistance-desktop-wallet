@@ -107,11 +107,13 @@ export class ResistanceCliService {
 			const daemonInfo: DaemonInfo = {
 				status: 'RUNNING',
 				residentSizeMB: 0,
-				optionalError: null
+        optionalError: null,
+        getInfoResult: {}
 			}
 
 			const getInfoPromise = cli.getInfo()
-				.then(() => {
+				.then((result) => {
+          daemonInfo.getInfoResult = result
 					delete daemonInfo.optionalError
 					return daemonInfo
 				})

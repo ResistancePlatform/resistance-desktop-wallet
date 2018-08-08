@@ -140,6 +140,11 @@ export class OSService {
     return settingsReducerModule.SettingsActions
   }
 
+  getLogFilePath(processName: string) {
+    const command = ChildProcessCommands[processName]
+    return  path.join(this.getAppDataPath(), `${command}.log`)
+  }
+
 	/**
 	 * @param {string} processName
 	 * @param {string[]} args
@@ -209,7 +214,7 @@ export class OSService {
         childProcessInfo.isGettingKilled = false
       })
 
-      const logFile = path.join(this.getAppDataPath(), `${command}.log`)
+      const logFile = this.getLogFilePath(processName)
       const logStream = createWriteStream(logFile, {flags: 'a'})
 
       childProcess.stdout.pipe(logStream)

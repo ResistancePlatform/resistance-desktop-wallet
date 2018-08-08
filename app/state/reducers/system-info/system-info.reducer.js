@@ -5,7 +5,8 @@ export type DaemonStatus = 'RUNNING' | 'NOT_RUNNING' | 'UNABLE_TO_ASCERTAIN'
 
 export type DaemonInfo = {
 	status?: DaemonStatus,
-	residentSizeMB?: number
+  residentSizeMB?: number,
+  getInfoResult: Object
 }
 
 export type BlockChainInfo = {
@@ -42,7 +43,8 @@ export const SystemInfoActions = {
 const initState: SystemInfoState = {
 	daemonInfo: {
 		status: `NOT_RUNNING`,
-		residentSizeMB: 0
+    residentSizeMB: 0,
+    getInfoResult: {}
 	},
 	blockChainInfo: {
 		connectionCount: 0,
