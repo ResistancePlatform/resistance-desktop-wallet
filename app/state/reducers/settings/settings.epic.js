@@ -51,7 +51,9 @@ const enableTorEpic = (action$: ActionsObservable<any>) => action$.pipe(
 const childProcessFailedEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(SettingsActions.childProcessFailed().type),
 	tap((action) => {
-    dialogService.showError(`Process ${action.payload.processName} has failed`, action.payload.errorMessage)
+    if (process.env.NODE_ENV !== 'development') {
+      dialogService.showError(`Process ${action.payload.processName} has failed`, action.payload.errorMessage)
+    }
   }),
   filter((action) => action.payload.processName === 'TOR'),
   mapTo(SettingsActions.stopLocalNode())
