@@ -1,0 +1,11 @@
+@import "../../theme/vars.scss";
+
+.statusModal {
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  right: 15%;
+  bottom: 15&;
+  background: $MODAL_BACKGROUND_COLOR;
+}
+

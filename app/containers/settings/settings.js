@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import Modal from 'react-modal'
 
 import RounedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import styles from './settings.scss'
@@ -11,9 +10,9 @@ import VLayout from '../../theme/v-box-layout.scss'
 import { appStore } from '../../state/store/configureStore'
 import { SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
 import { SettingsActions, SettingsState } from '../../state/reducers/settings/settings.reducer'
+import StatusModal from '../../components/settings/status-modal'
 
 const config = require('electron-settings')
-const StatusModal = require('./settings.status-modal')
 
 type Props = {
 	settings: SettingsState,
@@ -26,13 +25,6 @@ type Props = {
  */
 class Settings extends Component<Props> {
 	props: Props
-
-	/**
-	 * @memberof Settings
-	 */
-	componentDidMount() {
-    Modal.setAppElement('#App')
-  }
 
   componentWillUpdate(nextProps) {
     if (nextProps.settings.isMinerEnabled !== this.props.settings.isMinerEnabled) {
@@ -151,11 +143,6 @@ class Settings extends Component<Props> {
 		appStore.dispatch(SettingsActions.openStatusModal())
 	}
 
-  onCloseStatusModalClicked(event) {
-		this.eventConfirm(event)
-		appStore.dispatch(SettingsActions.closeStatusModal())
-  }
-
 	/**
 	 * @param {*} event
 	 * @memberof Settings
@@ -183,7 +170,7 @@ class Settings extends Component<Props> {
 				{/* Route content */}
 				<div className={[styles.settingsContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
 					<div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapperContainer].join(' ')}>
-            <StatusModal parent={this}/>
+            <StatusModal />
 
 						{/* Title bar */}
 						<div className={styles.titleBar}>Settings</div>
