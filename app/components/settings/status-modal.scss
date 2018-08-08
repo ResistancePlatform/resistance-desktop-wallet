@@ -1,23 +1,35 @@
+@import "../../theme/generic-component.scss";
 @import "../../theme/vars.scss";
 
 .statusModal {
   position: absolute;
-  top: 15%;
-  left: 15%;
-  right: 15%;
-  bottom: 15&;
+  padding: 0.6rem 0.6rem;
+  top: 13%;
+  left: 10%;
+  right: 10%;
+  bottom: 15%;
   background: $MODAL_BACKGROUND_COLOR;
+  border: 1.5px solid $BASE_COLOR_BODER_GRAY;
+  border-radius: 0.3rem;
+
+  &:focus {
+    outline: none;
+  }
+
 }
 
-.modalTitle {
-  text-align: center;
-  font-size: 1.1rem;
-  margin-bottom: 2rem;
+.modalOverlay {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 @mixin modalToolbarButton {
   -webkit-app-region: no-drag;
-  display: inline-block;
+  // display: inline-block;
 
   width: 0.8rem;
   height: 0.8rem;
@@ -32,7 +44,60 @@
   }
 }
 
-.closeButton {
-  @include modalToolbarButton();
-  background-color: $NAVI_BAR_TOOLBAR_BUTTON_CLOSE_COLOR;
+.modalTitle {
+  font-size: 1rem;
+  // margin-bottom: 2rem;
+
+  .closeButton {
+    @include modalToolbarButton();
+    background-color: $NAVI_BAR_TOOLBAR_BUTTON_CLOSE_COLOR;
+    float: left;
+  }
+
+  .titleText {
+    overflow: hidden;
+    text-align: center;
+  }
+}
+
+.statusModalBody {
+  display: block;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    td {
+      border: 1.5px solid $BASE_COLOR_BODER_GRAY;
+      padding: 0.3rem;
+
+      div {
+        overflow: hidden;
+      }
+    }
+  }
+
+
+  .tabList {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  .tab {
+    display: inline-block;
+    border: 1px solid transparent;
+    border-bottom: none;
+    bottom: -1px;
+    position: relative;
+    list-style: none;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+}
+
+.statusModalFooter {
+  display: block;
+  padding-top: 1rem;
+  text-align: right;
 }

@@ -4,12 +4,12 @@ import { connect } from 'react-redux'
 import Modal from 'react-modal'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { LazyLog } from 'react-lazylog'
+import classNames from 'classnames'
 
 import 'react-tabs/style/react-tabs.scss'
 import { OSService } from '../../service/os-service'
 import { appStore } from '../../state/store/configureStore'
 import { SettingsActions, SettingsState } from '../../state/reducers/settings/settings.reducer'
-import VLayout from '../../theme/v-box-layout.scss'
 import styles from './status-modal.scss'
 
 const osService = new OSService()
@@ -51,67 +51,71 @@ class StatusModal extends Component<Props> {
     return (
       <Modal
         isOpen={this.props.settings.isStatusModalOpen}
-        className={[styles.statusModal, VLayout.vBoxContainer].join(' ')}
+        className={classNames(styles.statusModal)}
+        overlayClassName={styles.modalOverlay}
         contentLabel="Services Status"
       >
-        <div className={[styles.modalTitle, VLayout.vBoxChild].join(' ')}>
+        <div className={classNames(styles.modalTitle)}>
           <div
             className={styles.closeButton}
             onClick={event => this.onCloseStatusModalClicked(event)}
             onKeyDown={event => this.onCloseStatusModalClicked(event)}
           />
-          Services Status
+          <div className={styles.titleText}>
+            Services Status
+          </div>
         </div>
 
-        <Tabs>
-          <TabList>
-            <Tab>Local Node</Tab>
-            <Tab>Miner</Tab>
-            <Tab>Tor</Tab>
-          </TabList>
+        <div className={classNames(styles.statusModalBody)}>
+          <Tabs>
+            <TabList className={styles.tabList}>
+              <Tab className={styles.tab}>Local Node</Tab>
+              <Tab className={styles.tab}>Miner</Tab>
+              <Tab className={styles.tab}>Tor</Tab>
+            </TabList>
 
-          <TabPanel>
-            Local Node Status
-            <table>
-              <tbody>
-                <tr>
-                  <td>Balance</td><td>{nodeInfo.balance}</td>
-                  <td>Blocks</td><td>{nodeInfo.blocks}</td>
-                  <td>Connections</td><td>{nodeInfo.connections}</td>
-                  <td>Difficulty</td><td>{nodeInfo.difficulty}</td>
-                  <td>Errors</td><td>{nodeInfo.errors}</td>
-                  <td>Key Pool Oldest</td><td>{nodeInfo.keypoololdest}</td>
-                  <td>Key Pool Size</td><td>{nodeInfo.keypoolsize}</td>
-                  <td>Pay TX Fee</td><td>{nodeInfo.paytxfee}</td>
-                  <td>Protocol Version</td><td>{nodeInfo.protocolversion}</td>
-                  <td>Proxy</td><td>{nodeInfo.proxy}</td>
-                  <td>Relay Fee</td><td>{nodeInfo.relayfee}</td>
-                  <td>Testnet</td><td>{nodeInfo.testnet}</td>
-                  <td>Time Offset</td><td>{nodeInfo.timeoffset}</td>
-                  <td>Version</td><td>{nodeInfo.version}</td>
-                  <td>Wallet Version</td><td>{nodeInfo.walletversion}</td>
-                </tr>
-              </tbody>
-            </table>
-          </TabPanel>
+            <TabPanel>
+              <table>
+                <tbody>
+                  <tr><td width="30%">Balance</td><td>{nodeInfo.balance}</td></tr>
+                  <tr><td>Blocks</td><td>{nodeInfo.blocks}</td></tr>
+                  <tr><td>Connections</td><td>{nodeInfo.connections}</td></tr>
+                  <tr><td>Difficulty</td><td>{nodeInfo.difficulty}</td></tr>
+                  <tr><td>Errors</td><td><div>{nodeInfo.errors}</div></td></tr>
+                  <tr><td>Key Pool Oldest</td><td>{nodeInfo.keypoololdest}</td></tr>
+                  <tr><td>Key Pool Size</td><td>{nodeInfo.keypoolsize}</td></tr>
+                  <tr><td>Pay TX Fee</td><td>{nodeInfo.paytxfee}</td></tr>
+                  <tr><td>Protocol Version</td><td>{nodeInfo.protocolversion}</td></tr>
+                  <tr><td>Proxy</td><td>{nodeInfo.proxy}</td></tr>
+                  <tr><td>Relay Fee</td><td>{nodeInfo.relayfee}</td></tr>
+                  <tr><td>Testnet</td><td>{nodeInfo.testnet}</td></tr>
+                  <tr><td>Time Offset</td><td>{nodeInfo.timeoffset}</td></tr>
+                  <tr><td>Version</td><td>{nodeInfo.version}</td></tr>
+                  <tr><td>Wallet Version</td><td>{nodeInfo.walletversion}</td></tr>
+                </tbody>
+              </table>
+            </TabPanel>
 
-          <TabPanel>
-            Miner Status
-            <p>Log Output</p>
-            <LazyLog url={this.minerLogPath} follow />
-          </TabPanel>
+            <TabPanel>
+              Miner Status
+              <p>Log Output</p>
+              <LazyLog url={this.minerLogPath} follow />
+            </TabPanel>
 
-          <TabPanel>
-            Tor Status
-          </TabPanel>
-        </Tabs>
+            <TabPanel>
+              Tor Status
+            </TabPanel>
+          </Tabs>
+        </div>
 
-        <button
-          onClick={event => this.onCloseStatusModalClicked(event)}
-          onKeyDown={event => this.onCloseStatusModalClicked(event)}
-        >
-          Close
-        </button>
+        <div className={styles.statusModalFooter}>
+          <button
+            onClick={event => this.onCloseStatusModalClicked(event)}
+            onKeyDown={event => this.onCloseStatusModalClicked(event)}
+          >
+            Close
+          </button>
+        </div>
 
       </Modal>
     )
