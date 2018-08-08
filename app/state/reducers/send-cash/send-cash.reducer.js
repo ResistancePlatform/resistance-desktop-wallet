@@ -78,7 +78,7 @@ export const checkPrivateTransactionRule = (tempState: SendCashState) => {
 	// t_addr --> t_addr SUCCESS
 	const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')
 	const isTransparentAddress = (tempAddress: string) => tempAddress.startsWith('r')
-	const transparentAddressDesc = `Transparent (K1,JZ) address`
+	const transparentAddressDesc = `Transparent (R) address`
 	const privateAddressDesc = `Private (Z) address`
 	const prefixMessage = 'Sending cash '
 	const postFixMessage = ' is forbitten when "Private Transactions" is off.'

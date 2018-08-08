@@ -72,7 +72,7 @@ class SendCash extends Component<Props> {
 		const prefixTips = `You are about to send money from`
 		return this.props.sendCash.isPrivateTransactions
 			? `${prefixTips} a Private (Z) address to another Private (Z) address. This transaction will be private and invisible to all other users.`
-			: `${prefixTips} Transparent (K1,JZ) address to Transparent address. This transaction will be visible to everyone.`
+			: `${prefixTips} Transparent (R) address to Transparent address. This transaction will be visible to everyone.`
 	}
 
 	getPrivatelyToggleButtonText() {
@@ -309,8 +309,8 @@ class SendCash extends Component<Props> {
 						{/* Memo */}
 						<div className={styles.memoConatiner}>
 							<span className={styles.memoTitle}>Memo:</span>
-							When sending cash from a Transparent (K1,JZ) address, the
-							remaining balance is sent to another out-generated K1,JZ address.
+							When sending cash from a Transparent (R) address, the
+							remaining balance is sent to another out-generated r address.
 							When sending from a Private (Z) address, the remaining unsent
 							balance remains with the Z address. In both case the original
 							sending address cannot be usef for sending again unit the
