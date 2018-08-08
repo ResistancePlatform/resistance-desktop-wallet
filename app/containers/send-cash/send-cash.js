@@ -134,6 +134,8 @@ class SendCash extends Component<Props> {
 	onPickupAddressHandler(event, selectedAddress: string) {
 		this.commonMenuItemEventHandler(event)
 
+		if (!selectedAddress || selectedAddress.trim() === '') return
+
 		// Update `<RounedInput> --> <input>` value manually, seems don't have the better option at this moment!!!
 		this.fromAddressInputDomRef.inputDomRef.current.value = selectedAddress
 

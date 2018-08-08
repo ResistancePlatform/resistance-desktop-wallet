@@ -30,8 +30,8 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 			return (
 				<div
 					className={styles.lastMenuItem}
-					onClick={event => this.onAddressItemClicked(event)}
-					onKeyDown={event => this.onAddressItemClicked(event)}
+					onClick={event => this.onAddressItemClicked(event, '')}
+					onKeyDown={() => { }}
 				>
 					Have no any available address
 				</div>
@@ -41,9 +41,9 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 		return this.props.addressList.map((addressItem, index) => (
 			<div
 				className={index === this.props.addressList.length - 1 ? styles.lastMenuItem : styles.menuItem}
-				onClick={event => this.onAddressItemClicked(event, addressItem.address)}
-				onKeyDown={event => this.onAddressItemClicked(event, addressItem.address)}
-				key={addressItem.address}
+				onClick={event => this.onAddressItemClicked(event, addressItem.address ? addressItem.address : '')}
+				onKeyDown={() => { }}
+				key={index}
 			>
 				<div className={styles.itemRowAddress}>{addressItem.address}</div>
 				<div className={styles.itemRowBalance}>
