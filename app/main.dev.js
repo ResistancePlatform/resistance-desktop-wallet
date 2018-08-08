@@ -16,12 +16,14 @@ import path from 'path'
 import { app, BrowserWindow } from 'electron'
 
 import { OSService } from './service/os-service'
+import { ResistanceService } from './service/resistance-service'
 import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
 
 
 const osService = new OSService()
 const fetchParamsService = new FetchParametersService()
+const resistanceService = new ResistanceService()
 
 let mainWindow = null;
 
@@ -49,32 +51,6 @@ const installExtensions = async () => {
   ).catch(console.log);
 };
 
-const checkAndCreateDaemonConfig = () => {
-  const osType = osService.getOS()
-
-  const configFolder = path.join(app.getPath('appData'), `Resistance`)
-  const configFile = path.join(configFolder, `resistance.conf`)
-
-  const fileContent = [
-    `port=18233`,
-    `rpcport=18232`,
-    `rpcuser=test123`,
-    `rpcpassword=test123`
-  ].join((osType === `windows`) ? `\r\n` : `\n`)
-
-  console.log(`\n\nconfigFile: ${configFile}\n\n`)
-  console.log(`\n\nfileContent: ${fileContent}\n\n`)
-
-  if (!fs.existsSync(configFolder)) {
-    fs.mkdirSync(configFolder)
-  }
-
-  if (!fs.existsSync(configFile)) {
-    fs.writeFileSync(configFile, fileContent, { encoding: 'utf-8' })
-    console.log(`\nWrite Daemon File Succeded>>>\n`)
-  }
-}
-
 const checkAndCreateWalletAppFolder = () => {
   const walletAppFolder = path.join(app.getPath('appData'), 'ResistanceWallet')
 
@@ -83,7 +59,10 @@ const checkAndCreateWalletAppFolder = () => {
   }
 }
 
-checkAndCreateDaemonConfig()
+
+// Propagate Resistance node config for the RPC service
+global.resistanceNodeConfig = resistanceService.checkAndCreateConfig()
+
 checkAndCreateWalletAppFolder()
 
 /**
