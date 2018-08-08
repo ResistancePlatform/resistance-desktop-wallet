@@ -27,6 +27,8 @@ export type ProcessingOperation = {
 
 export type SendCashState = {
 	isPrivateTransactions: boolean,
+	lockIcon: 'Lock' | 'Unlock',
+	lockTips: string,
 	fromAddress: string,
 	toAddress: string,
 	inputTooltips: string,
@@ -58,6 +60,9 @@ export const SendCashActions = createActions({
 }, { prefixe: `APP/SEND_CASH` })
 
 
+const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')
+const isTransparentAddress = (tempAddress: string) => tempAddress.startsWith('r')
+
 /**
  * @param {*} tempState
  */
@@ -76,8 +81,6 @@ export const checkPrivateTransactionRule = (tempState: SendCashState) => {
 	// z_addr --> z_addr ERROR
 	// z_addr --> t_addr ERROR
 	// t_addr --> t_addr SUCCESS
-	const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')
-	const isTransparentAddress = (tempAddress: string) => tempAddress.startsWith('r')
 	const transparentAddressDesc = `Transparent (R) address`
 	const privateAddressDesc = `Private (Z) address`
 	const prefixMessage = 'Sending cash '
@@ -107,7 +110,36 @@ const handleAddressUpdate = (tempState: SendCashState, newAddress: string, isUpd
 	const tempCheckResult = checkPrivateTransactionRule(newState)
 	const newInputTooltips = tempCheckResult === 'ok' ? '' : tempCheckResult
 
-	return ({ ...newState, inputTooltips: newInputTooltips })
+	// The new `lockIcon` and `lockTips`
+	/**
+	 * t_addr --> z_addr -- Unlock. You are sending money from a Transparent (r) Address to a Private (Z) Address. This transaction will be partially shielded.
+	 *
+	 * z_addr --> z_addr -- Lock. You are sending money from a Private (Z) Address to a Private (Z) Address. This transaction will be fully shielded and invisible to all users.
+	 *
+	 * z_addr --> t_addr -- Unlock. You are sending money from a Private (Z) Address to a Transparent (r) Address. This transaction will be partially shielded.
+	 *
+	 * t_addr --> t_addr -- Unlock. You are sending money from a Transparent (r) Address to a Transparent (r) Address. This transaction will be fully transparent and visible to every user.
+	 */
+	const fromAddress = newState.fromAddress
+	const toAddress = newState.toAddress
+	let lockIcon = 'Unlock'
+	let lockTips = `You are sending money from a Transparent (R) Address to a Transparent (R) Address. This transaction will be fully transparent and visible to every user.`
+
+	if (isTransparentAddress(fromAddress) && isPrivateAddress(toAddress)) {
+		lockIcon = `Unlock`
+		lockTips = `You are sending money from a Transparent (R) Address to a Private (Z) Address. This transaction will be partially shielded.`
+	} else if (isPrivateAddress(fromAddress) && isPrivateAddress(toAddress)) {
+		lockIcon = `Lock`
+		lockTips = `You are sending money from a Private (Z) Address to a Private (Z) Address. This transaction will be fully shielded and invisible to all users.`
+	} else if (isPrivateAddress(fromAddress) && isTransparentAddress(toAddress)) {
+		lockIcon = `Unlock`
+		lockTips = `You are sending money from a Private (Z) Address to a Transparent (R) Address. This transaction will be partially shielded.`
+	} else if (isTransparentAddress(fromAddress) && isTransparentAddress(toAddress)) {
+		lockIcon = `Unlock`
+		lockTips = `You are sending money from a Transparent (R) Address to a Transparent (R) Address. This transaction will be fully transparent and visible to every user.`
+	}
+
+	return ({ ...newState, inputTooltips: newInputTooltips, lockIcon, lockTips })
 }
 
 /**

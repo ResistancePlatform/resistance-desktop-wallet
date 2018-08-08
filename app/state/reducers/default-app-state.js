@@ -40,6 +40,8 @@ export const defaultAppState: AppState = {
 	},
 	sendCash: {
 		isPrivateTransactions: false,
+		lockIcon: 'Unlock',
+		lockTips: 'You are sending money from a Transparent (R) Address to a Transparent (R) Address. This transaction will be fully transparent and visible to every user.',
 		fromAddress: '',
 		toAddress: '',
 		inputTooltips: '',

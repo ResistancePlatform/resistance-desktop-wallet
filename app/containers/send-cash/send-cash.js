@@ -65,14 +65,7 @@ class SendCash extends Component<Props> {
 	}
 
 	getSendLockClasses() {
-		return this.props.sendCash.isPrivateTransactions ? `icon-private-lock` : `icon-private-unlock`
-	}
-
-	getSendTips() {
-		const prefixTips = `You are about to send money from`
-		return this.props.sendCash.isPrivateTransactions
-			? `${prefixTips} a Private (Z) address to another Private (Z) address. This transaction will be private and invisible to all other users.`
-			: `${prefixTips} Transparent (R) address to Transparent address. This transaction will be visible to everyone.`
+		return this.props.sendCash.lockIcon === 'Lock' ? `icon-private-lock` : `icon-private-unlock`
 	}
 
 	getPrivatelyToggleButtonText() {
@@ -299,7 +292,7 @@ class SendCash extends Component<Props> {
 								<div className={styles.descIcon}>
 									<i className={this.getSendLockClasses()} />
 								</div>
-								<div className={styles.descContent}>{this.getSendTips()}</div>
+								<div className={styles.descContent}>{this.props.sendCash.lockTips}</div>
 							</div>
 						</div>
 
