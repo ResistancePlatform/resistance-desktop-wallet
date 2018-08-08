@@ -811,13 +811,15 @@ export class ResistanceCliService {
 		sendCashPollingIntervalId = setInterval(() => getAsyncOperationStatus(operationId), sendCashPollingIntervalSetting)
 	}
 
+
 	/**
+	 * @param {boolean} isPrivateTransactionMode
 	 * @returns {Observable<any>}
 	 * @memberof ResistanceCliService
 	 */
-	getWalletAddressAndBalance(isPrivate: boolean): Observable<any> {
+	getWalletAddressAndBalance(isPrivateTransactionMode: boolean): Observable<any> {
 		const cli = getResistanceClientInstance()
-		const promiseArr = isPrivate ? [this.getWalletPrivateAddresses(cli)] : [
+		const promiseArr = isPrivateTransactionMode ? [this.getWalletPrivateAddresses(cli)] : [
 			this.getWalletAllPublicAddresses(cli),
 			this.getWalletPublicAddressesWithUnspentOutputs(cli)
 		]
@@ -830,7 +832,7 @@ export class ResistanceCliService {
 				let PublicAddressesUnspendResult = null
 				const addressResultSet = new Set()
 
-				if (isPrivate) {
+				if (isPrivateTransactionMode) {
 					privateAddressesResult = result[0][0]
 
 					if (Array.isArray(privateAddressesResult)) {

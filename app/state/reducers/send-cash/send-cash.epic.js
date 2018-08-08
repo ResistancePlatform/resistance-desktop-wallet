@@ -96,9 +96,7 @@ const getAddressListEpic = (action$: ActionsObservable<AppAction>, state$) => ac
 	tap((action: AppAction) => logger.debug(epicInstanceName, `getAddressListEpic`, action.type, ConsoleTheme.testing)),
 	switchMap(() => {
 		const sendCashState = state$.value.sendCash
-		return resistanceCliService.getWalletAddressAndBalance(
-			sendCashState.sendFromRadioButtonType === 'private'
-		)
+		return resistanceCliService.getWalletAddressAndBalance(sendCashState.isPrivateTransactions)
 	}),
 	map(result => SendCashActions.getAddressListSuccess(result))
 )
