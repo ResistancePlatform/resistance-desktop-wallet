@@ -3,11 +3,12 @@ import { map, tap, switchMap } from 'rxjs/operators'
 import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { AppAction } from '../appAction'
-import { SendCashActions, SendCashState } from './send-cash.reducer'
+import { SendCashActions, SendCashState, checkPrivateTransactionRule } from './send-cash.reducer'
 import { ResistanceCliService } from '../../../service/resistance-cli-service'
 import { DialogService } from '../../../service/dialog-service'
 import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
 import { ClipboardService } from '../../../service/clipboard-service'
+
 
 const epicInstanceName = 'SendCashEpics'
 const resistanceCliService = new ResistanceCliService()
@@ -36,6 +37,7 @@ const allowToSend = (sendCashState: SendCashState) => {
 	return 'ok'
 }
 
+
 const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
 	ofType(SendCashActions.sendCash),
 	tap((action: AppAction) => logger.debug(epicInstanceName, `sendCashEpic`, action.type, ConsoleTheme.testing)),
@@ -47,6 +49,11 @@ const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.
 		const isAllowedToSend = allowToSend(state$.value.sendCash)
 		if (isAllowedToSend !== 'ok') {
 			return SendCashActions.sendCashFail(isAllowedToSend, false)
+		}
+
+		const checkRuleResult = checkPrivateTransactionRule(state$.value.sendCash)
+		if (checkRuleResult !== 'ok') {
+			return SendCashActions.sendCashFail(checkRuleResult, false)
 		}
 
 		return SendCashActions.empty()
@@ -89,9 +96,7 @@ const getAddressListEpic = (action$: ActionsObservable<AppAction>, state$) => ac
 	tap((action: AppAction) => logger.debug(epicInstanceName, `getAddressListEpic`, action.type, ConsoleTheme.testing)),
 	switchMap(() => {
 		const sendCashState = state$.value.sendCash
-		return resistanceCliService.getWalletAddressAndBalance(
-			sendCashState.sendFromRadioButtonType === 'private'
-		)
+		return resistanceCliService.getWalletAddressAndBalance(true, !sendCashState.isPrivateTransactions)
 	}),
 	map(result => SendCashActions.getAddressListSuccess(result))
 )

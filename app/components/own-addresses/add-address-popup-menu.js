@@ -53,7 +53,7 @@ export default class AddAddressPopupMenu extends Component<Props> {
 					onClick={event => this.onAddNewTransparentAddressClicked(event)}
 					onKeyDown={event => this.onAddNewTransparentAddressClicked(event)}
 				>
-				NEW TRANSPARENT (K1, JZ) ADDRESS
+				NEW TRANSPARENT (R) ADDRESS
 				</div>
 				<div
 					className={styles.menuItem}

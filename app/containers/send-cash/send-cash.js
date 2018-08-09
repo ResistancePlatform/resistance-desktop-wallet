@@ -59,24 +59,17 @@ class SendCash extends Component<Props> {
 	}
 
 	getPrivatelyToggleButtonClasses() {
-		return this.props.sendCash.isPrivateSendOn
+		return this.props.sendCash.isPrivateTransactions
 			? `${styles.toggleButton} ${styles.toggleButtonOn}`
 			: `${styles.toggleButton}`
 	}
 
 	getSendLockClasses() {
-		return this.props.sendCash.isPrivateSendOn ? `icon-private-lock` : `icon-private-unlock`
-	}
-
-	getSendTips() {
-		const prefixTips = `You are about to send money from`
-		return this.props.sendCash.isPrivateSendOn
-			? `${prefixTips} a Private (Z) address to another Private (Z) address. This transaction will be private and invisible to all other users.`
-			: `${prefixTips} Transparent (K1,JZ) address to Transparent address. This transaction will be visible to everyone.`
+		return this.props.sendCash.lockIcon === 'Lock' ? `icon-private-lock` : `icon-private-unlock`
 	}
 
 	getPrivatelyToggleButtonText() {
-		return this.props.sendCash.isPrivateSendOn ? `ON` : `OFF`
+		return this.props.sendCash.isPrivateTransactions ? `ON` : `OFF`
 	}
 
 	onPrivateSendToggleClicked(event) {
@@ -141,14 +134,12 @@ class SendCash extends Component<Props> {
 	onPickupAddressHandler(event, selectedAddress: string) {
 		this.commonMenuItemEventHandler(event)
 
+		if (!selectedAddress || selectedAddress.trim() === '') return
+
 		// Update `<RounedInput> --> <input>` value manually, seems don't have the better option at this moment!!!
 		this.fromAddressInputDomRef.inputDomRef.current.value = selectedAddress
 
 		appStore.dispatch(SendCashActions.updateFromAddress(selectedAddress))
-	}
-
-	onSendFromRadioButtonChange(event, selectedValue: string) {
-		appStore.dispatch(SendCashActions.updateSendFromRadioButtonType(selectedValue))
 	}
 
 
@@ -218,56 +209,6 @@ class SendCash extends Component<Props> {
 						{/* Title bar */}
 						<div className={styles.titleBar}>Send Cash</div>
 
-						{/* Send from */}
-						<div className={styles.sendFromContainer}>
-							<div className={styles.sendFromTitle}>SEND FROM</div>
-
-							<div className={styles.sendFromCheckboxContainer}>
-								<div className={styles.radioButtonContainer}>
-									<input
-										readOnly
-										id="radio1"
-										type="radio"
-										name="sendFromType"
-										value="transparent"
-										checked={
-											this.props.sendCash.sendFromRadioButtonType ===
-											'transparent'
-										}
-										onClick={event =>
-											this.onSendFromRadioButtonChange(event, 'transparent')
-										}
-									/>
-									<label htmlFor="radio1">
-										<span>
-											<span />
-										</span>Transparent address
-									</label>
-								</div>
-								<div className={styles.radioButtonContainer}>
-									<input
-										readOnly
-										id="radio2"
-										type="radio"
-										name="sendFromType"
-										value="private"
-										checked={
-											this.props.sendCash.sendFromRadioButtonType === 'private'
-										}
-										onClick={event =>
-											this.onSendFromRadioButtonChange(event, 'private')
-										}
-									/>
-									<label htmlFor="radio2">
-										<span>
-											<span />
-										</span>Private address
-									</label>
-								</div>
-
-							</div>
-						</div>
-
 						{/* From address */}
 						<div className={styles.fromAddressContainer}>
 							<RoundedInput
@@ -275,6 +216,8 @@ class SendCash extends Component<Props> {
 								title="FROM ADDRESS"
 								addon={fromAddressAddon}
 								disabled={shouldDisableInput}
+								enableTooltips="true"
+								tooltipsContent={this.props.sendCash.inputTooltips}
 								onInputChange={value => this.onFromAddressInputChanged(value)}
 								ref={this.fromAddressDomRef}
 							>
@@ -282,16 +225,14 @@ class SendCash extends Component<Props> {
 								<div className={styles.dropdownMenu} style={{ display: this.getDropdownMenuStyles() }}>
 									<AddressDropdownPopupMenu
 										addressList={this.props.sendCash.addressList}
-										onPickupAddress={(event, address) =>
-											this.onPickupAddressHandler(event, address)
-										}
+										onPickupAddress={(event, address) =>this.onPickupAddressHandler(event, address)}
 									/>re
 								</div>
 							</RoundedInput>
 
 							{/* Toggle button */}
 							<div className={[styles.sendPrivatelyToggleContainer, HLayout.hBoxContainer].join(' ')}>
-								<div className={styles.sendPrivateTitle}>SEND PRIVATELY</div>
+								<div className={styles.sendPrivateTitle}>Private Transactions</div>
 
 								<div
 									disabled={shouldDisableInput}
@@ -313,6 +254,8 @@ class SendCash extends Component<Props> {
 							title="DESTINATION ADDRESS"
 							addon={destAddressAddon}
 							disabled={shouldDisableInput}
+							enableTooltips="true"
+							tooltipsContent={this.props.sendCash.inputTooltips}
 							onInputChange={value => this.onDestAddressInputChanged(value)}
 							ref={this.toAddressDomRef}
 						/>
@@ -349,7 +292,7 @@ class SendCash extends Component<Props> {
 								<div className={styles.descIcon}>
 									<i className={this.getSendLockClasses()} />
 								</div>
-								<div className={styles.descContent}>{this.getSendTips()}</div>
+								<div className={styles.descContent}>{this.props.sendCash.lockTips}</div>
 							</div>
 						</div>
 
@@ -359,8 +302,8 @@ class SendCash extends Component<Props> {
 						{/* Memo */}
 						<div className={styles.memoConatiner}>
 							<span className={styles.memoTitle}>Memo:</span>
-							When sending cash from a Transparent (K1,JZ) address, the
-							remaining balance is sent to another out-generated K1,JZ address.
+							When sending cash from a Transparent (R) address, the
+							remaining balance is sent to another out-generated r address.
 							When sending from a Private (Z) address, the remaining unsent
 							balance remains with the Z address. In both case the original
 							sending address cannot be usef for sending again unit the

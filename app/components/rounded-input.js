@@ -16,25 +16,38 @@ type Props = {
 	onInputChange: value => void,
 	addon: RoundedInputAddon,
 	disabled?: boolean,
+	enableTooltips?: boolean | undefined,
+	tooltipsContent?: string,
 	children: any
 }
 
 export default class RoundedInput extends Component<Props> {
 	props: Props
 	inputDomRef: any
+	focusedOrTyping: boolean
 
 	constructor(props) {
 		super(props)
+		this.focusedOrTyping = false
 		this.inputDomRef = React.createRef()
 	}
 
 	inputOnchangeEventHandler(event) {
 		event.stopPropagation()
 		const newValue = event.target.value
+		this.focusedOrTyping = true
 
 		if (this.props.onInputChange) {
 			this.props.onInputChange(newValue)
 		}
+	}
+
+	onInputFocusEventHandler() {
+		this.focusedOrTyping = true
+	}
+
+	onInputBlurEventHandler() {
+		this.focusedOrTyping = false
 	}
 
 	onMyAddonClick(event) {
@@ -81,6 +94,22 @@ export default class RoundedInput extends Component<Props> {
 		}
 	}
 
+	renderTooltips() {
+		/**
+		 * Only show the `tooltips` when:
+		 * - props.enableTooltips: true
+		 * - props.tooltipsContent: non-empty
+		 * - <input> is focused or typing
+		 */
+		const shouldHideShowTooltips = Boolean(!this.focusedOrTyping || !this.props.enableTooltips || !this.props.tooltipsContent || !this.props.tooltipsContent.trim() === '')
+		// console.log(`renderTooltips - shouldHideShowTooltips: ${shouldHideShowTooltips}`)
+		if (shouldHideShowTooltips) return null
+
+		return (
+			<span className={styles.tooltips}>{this.props.tooltipsContent}</span>
+		)
+	}
+
 	render() {
 		return (
 			<div
@@ -98,8 +127,11 @@ export default class RoundedInput extends Component<Props> {
 						type={this.props.onlyNumberAllowed ? 'number' : 'text'}
 						disabled={this.props.disabled}
 						onChange={event => this.inputOnchangeEventHandler(event)}
+						onFocus={(event) => this.onInputFocusEventHandler(event)}
+						onBlur={(event) => this.onInputBlurEventHandler(event)}
 					/>
 					{this.renderAddon()}
+					{this.renderTooltips()}
 				</div>
 				{this.props.children ? this.props.children : null}
 			</div>
