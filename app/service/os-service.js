@@ -222,10 +222,8 @@ export class OSService {
       childProcess.on('error', errorHandler)
 
       childProcess.on('close', (code) => {
-        if (code !== 0) {
-          this.dispatchAction(actions.childProcessFailed(processName, `Process ${processName} exited with code ${code}.`))
-        } else if (!childProcessInfo.isGettingKilled) {
-          this.dispatchAction(actions.childProcessFailed(processName, `Process ${processName} unexpectedly exited.`))
+        if (!childProcessInfo.isGettingKilled) {
+          this.dispatchAction(actions.childProcessFailed(processName, `Process ${processName} unexpectedly exited with code ${code}.`))
         }
 
         childProcessInfo.isGettingKilled = false
