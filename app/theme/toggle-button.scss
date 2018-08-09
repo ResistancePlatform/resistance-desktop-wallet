@@ -25,7 +25,7 @@
 
     cursor: pointer;
 
-    background-color: $SEND_CASH_TOGGLE_BUTTON_BACKGROUND_COLOR;
+    background-color: $BASE_COLOR_DARK_BLUE_2;
     border-radius: 5rem;
 
     .toggleButtonSwitcher {
@@ -36,7 +36,7 @@
         width: 1.35rem;
 
         border-radius: 5rem;
-        background-color: $SEND_CASH_TOGGLE_BUTTON_SWITCHER_COLOR;
+        background-color: $BASE_COLOR_PURPLE;
     }
 
     .toggleButtonText {
@@ -44,8 +44,16 @@
         right: 0.5rem;
         top: 0.5rem;
 
-        color: $SEND_CASH_TOGGLE_BUTTON_TEXT_COLOR
+        color: $BASE_COLOR_GRAY;
     }
+}
+
+.toggleButton[disabled] {
+  pointer-events: none;
+
+  .toggleButtonSwitcher {
+    background-color: $BASE_COLOR_BODER_GRAY;
+  }
 }
 
 // Generic Toggle button turned ON

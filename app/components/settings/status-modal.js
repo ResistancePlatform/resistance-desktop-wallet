@@ -49,6 +49,7 @@ class StatusModal extends Component<Props> {
         statusClassNames.push(styles.green)
         break
       case 'STARTING':
+      case 'RESTARTING':
       case 'STOPPING':
         statusClassNames.push(styles.yellow)
         break

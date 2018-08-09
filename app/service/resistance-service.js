@@ -84,6 +84,16 @@ export class ResistanceService {
 	}
 
 	/**
+   * Restarts resistanced
+   *
+	 * @memberof ResistanceService
+	 */
+	restart(isTorEnabled: boolean) {
+    const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs
+    osService.restartProcess('NODE', args)
+	}
+
+	/**
    * Stops resistanced
    *
 	 * @memberof ResistanceService

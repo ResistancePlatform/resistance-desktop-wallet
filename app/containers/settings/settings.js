@@ -8,15 +8,13 @@ import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
 import { appStore } from '../../state/store/configureStore'
-import { SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
 import { SettingsActions, SettingsState } from '../../state/reducers/settings/settings.reducer'
 import StatusModal from '../../components/settings/status-modal'
 
 const config = require('electron-settings')
 
 type Props = {
-	settings: SettingsState,
-	systemInfo: SystemInfoState
+	settings: SettingsState
 }
 
 /**
@@ -46,12 +44,17 @@ class Settings extends Component<Props> {
 
   getIsChildProcessUpdating(processName) {
     const processStatus = this.props.settings.childProcessesStatus[processName]
-    return processStatus === 'STARTING' || processStatus === 'STOPPING'
+    const updateStatuses = ['STARTING', 'STOPPING', 'RESTARTING']
+    return updateStatuses.indexOf(processStatus) !== -1
   }
 
   getMiningDisabledAttribute() {
-    const isLocalNodeOffline = this.props.systemInfo.daemonInfo.status !== 'RUNNING'
+    const isLocalNodeOffline = this.props.settings.childProcessesStatus.NODE !== 'RUNNING'
     return isLocalNodeOffline || this.getIsChildProcessUpdating('MINER')
+  }
+
+  getTorDisabledAttribute() {
+    return this.getIsChildProcessUpdating('NODE') || this.getIsChildProcessUpdating('TOR')
   }
 
   getStartStopLocalNodeButtonLabel() {
@@ -272,7 +275,7 @@ class Settings extends Component<Props> {
 										className={this.getEnableTorToggleButtonClasses()}
 										onClick={event => this.onEnableTorToggleClicked(event)}
 										onKeyDown={event => this.onEnableTorToggleClicked(event)}
-                    disabled={this.getIsChildProcessUpdating('TOR')}
+                    disabled={this.getTorDisabledAttribute()}
 									>
 										<div className={styles.toggleButtonSwitcher} />
 										<div className={styles.toggleButtonText}>
@@ -304,8 +307,6 @@ class Settings extends Component<Props> {
 
 const mapStateToProps = state => ({
 	settings: state.settings,
-	systemInfo: state.systemInfo,
-	sendCash: state.sendCash
 })
 
 export default connect(mapStateToProps, null)(Settings)

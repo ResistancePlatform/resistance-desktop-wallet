@@ -17,6 +17,7 @@ export const SettingsActions = createActions(
     CLOSE_STATUS_MODAL: undefined,
 
     START_LOCAL_NODE: undefined,
+    RESTART_LOCAL_NODE: undefined,
     STOP_LOCAL_NODE: undefined,
 
     ENABLE_MINER: undefined,
@@ -27,6 +28,7 @@ export const SettingsActions = createActions(
 
     CHILD_PROCESS_STARTED: processName => ({ processName }),
     CHILD_PROCESS_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
+    CHILD_PROCESS_RESTART_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
     CHILD_PROCESS_MURDERED: processName => ({ processName }),
     CHILD_PROCESS_MURDER_FAILED: (processName, errorMessage) => ({ processName, errorMessage })
   },
@@ -71,6 +73,10 @@ export const SettingsReducer = handleActions(
     [SettingsActions.startLocalNode]: state => ({
       ...state,
       childProcessesStatus: { ...state.childProcessesStatus, NODE: 'STARTING' }
+    }),
+    [SettingsActions.restartLocalNode]: state => ({
+      ...state,
+      childProcessesStatus: { ...state.childProcessesStatus, NODE: 'RESTARTING' }
     }),
     [SettingsActions.stopLocalNode]: state => ({
       ...state,
