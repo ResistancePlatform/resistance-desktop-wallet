@@ -99,8 +99,7 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
 	stop() {
-    const errorHandler = () => { }
-    osService.killProcess('NODE', errorHandler)
+    osService.killProcess('NODE')
 	}
 
 	/**
