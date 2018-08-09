@@ -30,6 +30,9 @@ export const SystemInfoActions = createActions(
 
     START_GETTING_BLOCKCHAIN_INFO: undefined,
     GOT_BLOCKCHAIN_INFO: (blockChainInfo: BlockChainInfo) => ({ blockChainInfo }),
+
+    OPEN_WALLET_IN_FILE_MANAGER: undefined,
+    OPEN_INSTALLATION_FOLDER: undefined
   },
   {
     prefix: 'APP/SYSTEM_INFO'
