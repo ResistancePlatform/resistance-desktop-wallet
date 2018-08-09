@@ -67,14 +67,18 @@ class StatusModal extends Component<Props> {
         </div>
 
         <div className={classNames(styles.statusModalBody)}>
-          <Tabs>
+          <Tabs
+            className={styles.tabs}
+            selectedTabClassName={styles.selectedTab}
+            selectedTabPanelClassName={styles.selectedTabPanel}
+          >
             <TabList className={styles.tabList}>
               <Tab className={styles.tab}>Local Node</Tab>
               <Tab className={styles.tab}>Miner</Tab>
               <Tab className={styles.tab}>Tor</Tab>
             </TabList>
 
-            <TabPanel>
+            <TabPanel className={styles.tabPanel}>
               <table>
                 <tbody>
                   <tr><td width="30%">Balance</td><td>{nodeInfo.balance}</td></tr>
@@ -97,14 +101,10 @@ class StatusModal extends Component<Props> {
             </TabPanel>
 
             <TabPanel>
-              Miner Status
-              <p>Log Output</p>
-              <LazyLog url={this.minerLogPath} follow />
+              <LazyLog url={this.minerLogPath} follow style={{ backgroundColor: 'rgb(21, 26, 53)' }} />
             </TabPanel>
 
-            <TabPanel>
-              Tor Status
-            </TabPanel>
+            <TabPanel />
           </Tabs>
         </div>
 
