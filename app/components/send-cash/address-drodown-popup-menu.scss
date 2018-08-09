@@ -55,6 +55,10 @@ $POP_UP_MENU_CONTAINER_WIDTH: 91.5%;
     }
 }
 
+.groupLastItem {
+    border-bottom: 1px solid $SEND_CASH_DROPDOWN_LIST_SEPARATED_LINE_COLOR;
+}
+
 .itemRowAddress {
     max-width: 75%;
     overflow: hidden;

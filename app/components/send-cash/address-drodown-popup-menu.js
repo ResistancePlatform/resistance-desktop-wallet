@@ -2,6 +2,7 @@
 import React, { Component } from 'react'
 import { AddressDropdownItem } from '../../state/reducers/send-cash/send-cash.reducer'
 import styles from './address-drodown-popup-menu.scss'
+import { timestamp } from '../../../node_modules/rxjs/operators';
 
 type Props = {
 	addressList?: AddressDropdownItem[],
@@ -23,6 +24,15 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 		}
 	}
 
+	checkAndApplyLastGroupItemClass(tempIndex) {
+		const addressList = this.props.addressList
+		const currentItem = addressList[tempIndex]
+		const nextItem = tempIndex < addressList.length ? addressList[tempIndex + 1] : null
+		const isTheLastGroupItem = currentItem && currentItem.address.startsWith('r') && nextItem && nextItem.address.startsWith('z')
+		console.log(`isTheLastGroupItem: ${isTheLastGroupItem}, address: ${currentItem.address}`)
+		return isTheLastGroupItem ? styles.groupLastItem : ''
+	}
+
 	renderAddressItems() {
 		if (!this.props.addressList ||
 			!Array.isArray(this.props.addressList) ||
@@ -42,7 +52,8 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 			<div
 				className={[
 					index === this.props.addressList.length - 1 ? styles.lastMenuItem : styles.menuItem,
-					addressItem.disabled ? styles.disabledMenItem : ''
+					addressItem.disabled ? styles.disabledMenItem : '',
+					this.checkAndApplyLastGroupItemClass(index)
 				].join(' ')}
 				onClick={event => this.onAddressItemClicked(event, addressItem.address ? addressItem.address : '')}
 				onKeyDown={() => { }}
