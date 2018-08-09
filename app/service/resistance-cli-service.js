@@ -544,7 +544,7 @@ export class ResistanceCliService {
 				.subscribe((blockchainInfo: BlockChainInfo) => {
 					this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe blockchainInfo: `, ConsoleTheme.testing, blockchainInfo)
 
-					this.dispatchAction(SystemInfoActions.gotBlockChainInfo(blockchainInfo))
+					this.dispatchAction(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
 				},
 					error => this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe error: `, ConsoleTheme.error, error)
 					// () => this.logger.debug(this, `startPollingBlockChainInfo`, `observable completed.`, ConsoleTheme.testing)

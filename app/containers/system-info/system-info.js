@@ -24,7 +24,7 @@ class SystemInfo extends Component<Props> {
 	 */
 	componentDidMount() {
 		appStore.dispatch(SystemInfoActions.startGettingDaemonInfo())
-		appStore.dispatch(SystemInfoActions.startGettingBlockChainInfo())
+		appStore.dispatch(SystemInfoActions.startGettingBlockchainInfo())
 	}
 
 	displayLastBlockTime(tempDate: Date | null) {
@@ -91,8 +91,8 @@ class SystemInfo extends Component<Props> {
 				</div>
 
 				{ /* Buttons */}
-				{/* <button className={[styles.walletInFinderButton].join(' ')}>WALLET IN FINDER</button>
-				<button className={[styles.installationPathButton].join(' ')}>INSTALLATION PATH</button> */}
+				<button className={[styles.walletInFinderButton].join(' ')}>WALLET IN FINDER</button>
+				<button className={[styles.installationPathButton].join(' ')}>INSTALLATION PATH</button>
 			</div>
 		)
 	}
