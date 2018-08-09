@@ -1,4 +1,5 @@
 // @flow
+import { remote } from 'electron'
 import { OSService } from './os-service'
 
 /**
@@ -8,7 +9,7 @@ let instance = null
 
 const osService = new OSService()
 
-const minerCommandArgs = ['-o', 'http://127.0.0.1:18232', '--no-stratum', '--no-getwork', '--user=test123', '--pass=test123']
+const minerCommandExtraArgs = ['--no-stratum', '--no-getwork']
 
 /**
  * @export
@@ -29,7 +30,19 @@ export class MinerService {
 	 * @memberof MinerService
 	 */
 	start() {
-    const args = osService.getOS() === 'windows' ? minerCommandArgs : minerCommandArgs.concat(['--background'])
+    const nodeConfig = remote.getGlobal('resistanceNodeConfig')
+    const args = minerCommandExtraArgs.slice()
+
+    // Local node address
+    args.unshift('-o', `http://127.0.0.1:${nodeConfig.rpcport}`)
+
+    // RPC credentials
+    args.push(`--user=${nodeConfig.rpcuser}`, `--pass=${nodeConfig.rpcpassword}`)
+
+    if (osService.getOS() === 'windows') {
+      args.push('--background')
+    }
+
     osService.execProcess('MINER', args)
 	}
 

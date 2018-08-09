@@ -2,6 +2,7 @@
 import React, { Component } from 'react'
 import { AddressDropdownItem } from '../../state/reducers/send-cash/send-cash.reducer'
 import styles from './address-drodown-popup-menu.scss'
+import { timestamp } from '../../../node_modules/rxjs/operators';
 
 type Props = {
 	addressList?: AddressDropdownItem[],
@@ -23,6 +24,15 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 		}
 	}
 
+	checkAndApplyLastGroupItemClass(tempIndex) {
+		const addressList = this.props.addressList
+		const currentItem = addressList[tempIndex]
+		const nextItem = tempIndex < addressList.length ? addressList[tempIndex + 1] : null
+		const isTheLastGroupItem = currentItem && currentItem.address.startsWith('r') && nextItem && nextItem.address.startsWith('z')
+		console.log(`isTheLastGroupItem: ${isTheLastGroupItem}, address: ${currentItem.address}`)
+		return isTheLastGroupItem ? styles.groupLastItem : ''
+	}
+
 	renderAddressItems() {
 		if (!this.props.addressList ||
 			!Array.isArray(this.props.addressList) ||
@@ -30,8 +40,8 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 			return (
 				<div
 					className={styles.lastMenuItem}
-					onClick={event => this.onAddressItemClicked(event)}
-					onKeyDown={event => this.onAddressItemClicked(event)}
+					onClick={event => this.onAddressItemClicked(event, '')}
+					onKeyDown={() => { }}
 				>
 					Have no any available address
 				</div>
@@ -40,10 +50,14 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 
 		return this.props.addressList.map((addressItem, index) => (
 			<div
-				className={index === this.props.addressList.length - 1 ? styles.lastMenuItem : styles.menuItem}
-				onClick={event => this.onAddressItemClicked(event, addressItem.address)}
-				onKeyDown={event => this.onAddressItemClicked(event, addressItem.address)}
-				key={addressItem.address}
+				className={[
+					index === this.props.addressList.length - 1 ? styles.lastMenuItem : styles.menuItem,
+					addressItem.disabled ? styles.disabledMenItem : '',
+					this.checkAndApplyLastGroupItemClass(index)
+				].join(' ')}
+				onClick={event => this.onAddressItemClicked(event, addressItem.address ? addressItem.address : '')}
+				onKeyDown={() => { }}
+				key={index}
 			>
 				<div className={styles.itemRowAddress}>{addressItem.address}</div>
 				<div className={styles.itemRowBalance}>

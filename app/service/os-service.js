@@ -199,7 +199,7 @@ export class OSService {
 
       const childProcessInfo = remote.getGlobal('childProcesses')[processName]
 
-      console.log(`Executing command ${commandPath}.`)
+      console.log(`Executing command ${commandPath} with arguments ${args.join(' ')}.`)
       const childProcess = spawn(commandPath, args, options)
 
       const onUpdateFinished = () => {
