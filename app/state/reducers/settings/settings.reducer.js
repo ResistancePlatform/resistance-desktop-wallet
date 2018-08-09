@@ -13,6 +13,8 @@ export type SettingsState = {
 
 export const SettingsActions = createActions(
   {
+    EMPTY: undefined,
+
     OPEN_STATUS_MODAL: undefined,
     CLOSE_STATUS_MODAL: undefined,
 
@@ -80,8 +82,7 @@ export const SettingsReducer = handleActions(
     }),
     [SettingsActions.stopLocalNode]: state => ({
       ...state,
-      childProcessesStatus: { ...state.childProcessesStatus, NODE: 'STOPPING' },
-      isMinerEnabled: false
+      childProcessesStatus: { ...state.childProcessesStatus, NODE: 'STOPPING' }
     }),
 
     // Miner

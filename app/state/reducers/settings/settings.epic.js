@@ -1,5 +1,5 @@
 // @flow
-import { tap, filter, mapTo, ignoreElements } from 'rxjs/operators'
+import { tap, filter, map, mapTo } from 'rxjs/operators'
 import { merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 
@@ -20,7 +20,7 @@ const startLocalNodeEpic = (action$: ActionsObservable<any>, state$) => action$.
 		const settingsState = state$.value.settings
 		resistanceService.start(settingsState.isTorEnabled)
 	}),
-  ignoreElements()
+  mapTo(SettingsActions.empty())
 )
 
 const restartLocalNodeEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
@@ -29,7 +29,7 @@ const restartLocalNodeEpic = (action$: ActionsObservable<any>, state$) => action
 		const settingsState = state$.value.settings
 		resistanceService.restart(settingsState.isTorEnabled)
 	}),
-  ignoreElements()
+  mapTo(SettingsActions.empty())
 )
 
 const stopLocalNodeEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
@@ -42,13 +42,13 @@ const stopLocalNodeEpic = (action$: ActionsObservable<any>, state$) => action$.p
 const enableMinerEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(SettingsActions.enableMiner().type),
 	tap(() => { minerService.start() }),
-  ignoreElements()
+  mapTo(SettingsActions.empty())
 )
 
 const disableMinerEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(SettingsActions.disableMiner().type),
 	tap(() => { minerService.stop() }),
-  ignoreElements()
+  mapTo(SettingsActions.empty())
 )
 
 const enableTorEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
@@ -73,8 +73,17 @@ const childProcessFailedEpic = (action$: ActionsObservable<any>) => action$.pipe
       dialogService.showError(`Child process failure`, errorMessage)
     }
   }),
-  filter((action) => action.payload.processName === 'TOR'),
-  mapTo(SettingsActions.stopLocalNode())
+	map((action) => {
+    if (action.payload.processName === 'NODE') {
+        return SettingsActions.disableMiner()
+    }
+
+    if (action.payload.processName === 'TOR') {
+        return SettingsActions.stopLocalNode()
+    }
+
+    return SettingsActions.empty()
+  })
 )
 
 const childProcessMurderFailedEpic = (action$: ActionsObservable<any>) => action$.pipe(
@@ -83,7 +92,7 @@ const childProcessMurderFailedEpic = (action$: ActionsObservable<any>) => action
     const errorMessage = `Failed to stop ${action.payload.processName}.\n${action.payload.errorMessage}`
     dialogService.showError(`Stop child process error`, errorMessage)
   }),
-  ignoreElements()
+  mapTo(SettingsActions.empty())
 )
 
 export const SettingsEpics = (action$, state$) => merge(

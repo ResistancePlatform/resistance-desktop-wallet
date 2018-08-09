@@ -77,7 +77,7 @@ export class OSService {
       if (item.instance !== null && !item.instance.killed) {
         global.childProcesses[processName].isGettingKilled = true
 
-        console.log(`Killing child process ${processName} with PID ${item.instance.pid} ${item.pid}`)
+        console.log(`Killing child process ${processName} with PID ${item.instance.pid}`)
 
         // childProcess.kill() doesn't work for an unknown reason
         if (item.pid) {
