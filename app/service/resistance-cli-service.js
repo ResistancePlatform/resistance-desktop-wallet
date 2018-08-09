@@ -2,8 +2,8 @@
 
 import { remote } from 'electron'
 import Client from 'bitcoin-core'
-import { from, Observable } from 'rxjs'
-import { map, tap, take } from 'rxjs/operators'
+import { from, Observable, of } from 'rxjs'
+import { map, tap, take, catchError } from 'rxjs/operators'
 import { LoggerService, ConsoleTheme } from './logger-service'
 
 import { getFormattedDateString } from '../utils/data-util'
@@ -22,24 +22,24 @@ let instance = null
  * Get back the new resistance client instance
  */
 const getResistanceClientInstance = () => {
-  const nodeConfig = remote.getGlobal('resistanceNodeConfig')
-  let network
+	const nodeConfig = remote.getGlobal('resistanceNodeConfig')
+	let network
 
-  if (nodeConfig.testnet) {
-    network = 'testnet'
-  } else if (nodeConfig.regtest) {
-    network = 'regtest'
-  }
+	if (nodeConfig.testnet) {
+		network = 'testnet'
+	} else if (nodeConfig.regtest) {
+		network = 'regtest'
+	}
 
-  const client = new Client({
-    network,
-    port: nodeConfig.rpcport,
-    username: nodeConfig.rpcuser,
-    password: nodeConfig.rpcpassword,
-    timeout: 500
-  })
+	const client = new Client({
+		network,
+		port: nodeConfig.rpcport,
+		username: nodeConfig.rpcuser,
+		password: nodeConfig.rpcpassword,
+		timeout: 500
+	})
 
-  return client
+	return client
 }
 
 let daemonInfoPollingIntervalId = -1
@@ -319,7 +319,7 @@ export class ResistanceCliService {
 						let queryResultWithAddressArr = []
 						for (let index = 0; index < privateAddresses.length; index++) {
 							const tempAddress = privateAddresses[index];
-              /* eslint-disable-next-line no-await-in-loop */
+							/* eslint-disable-next-line no-await-in-loop */
 							const addressTransactions = await cli.command(getWalletZReceivedTransactionsCmd(tempAddress)).then(tempResult => tempResult[0])
 
 							// 	 [{
@@ -352,7 +352,7 @@ export class ResistanceCliService {
 						// we need to get that info by viewing the detail of the transaction, and then put it back !
 						for (let index = 0; index < tempTransactionList.length; index++) {
 							const tempTransaction = tempTransactionList[index];
-              /* eslint-disable-next-line no-await-in-loop */
+							/* eslint-disable-next-line no-await-in-loop */
 							const transactionDetail = await cli.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
 							tempTransaction.confirmed = getConfirmed(transactionDetail.confirmations)
 							tempTransaction.date = getDate(transactionDetail.time)
@@ -619,18 +619,16 @@ export class ResistanceCliService {
 	 */
 	createNewAddress(isPrivate?: boolean): Observable<any> {
 		const cli = getResistanceClientInstance()
-		const createNewAddressPromise = cli
-			.command([{ method: isPrivate ? `z_getnewaddress` : `getnewaddress` }])
-			.then(newAddress => {
-				this.logger.debug(this, `createNewAddress`, `create ${isPrivate ? 'private ' : 'transparent '} address: `, ConsoleTheme.testing, newAddress)
-				return newAddress
-			})
-			.catch(error => {
-				this.logger.debug(this, `createNewAddress`, `Error happen: `, ConsoleTheme.error, error)
-				return ''
-			})
+		const createNewAddressPromise = cli.command([{ method: isPrivate ? `z_getnewaddress` : `getnewaddress` }])
 
-		return from(createNewAddressPromise).pipe(take(1))
+		return from(createNewAddressPromise).pipe(
+			map(result => result[0]),
+			tap(newAddress => this.logger.debug(this, `createNewAddress`, `create ${isPrivate ? 'private ' : 'transparent '} address: `, ConsoleTheme.testing, newAddress)),
+			catchError(error => {
+				this.logger.debug(this, `createNewAddress`, `Error happen: `, ConsoleTheme.error, error)
+				return of('')
+			})
+		)
 	}
 
 	/**
