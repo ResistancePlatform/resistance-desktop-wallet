@@ -12,6 +12,7 @@ let instance = null
 const ps = require('ps-node')
 
 export type ChildProcessName = 'NODE' | 'TOR' | 'MINER'
+export type ChildProcessStatus = 'RUNNING' | 'STARTING' | 'FAILED' | 'STOPPING' | 'MURDER FAILED' | 'NOT RUNNING'
 
 const ChildProcessCommands = {
   NODE: 'resistanced',

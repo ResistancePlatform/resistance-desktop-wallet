@@ -44,9 +44,20 @@ class Settings extends Component<Props> {
 		event.stopPropagation()
 	}
 
+  getIsChildProcessUpdating(processName) {
+    const processStatus = this.props.settings.childProcessesStatus[processName]
+    return processStatus === 'STARTING' || processStatus === 'STOPPING'
+  }
+
   getMiningDisabledAttribute() {
     const isLocalNodeOffline = this.props.systemInfo.daemonInfo.status !== 'RUNNING'
-    return isLocalNodeOffline || this.props.settings.childProcessUpdate.MINER
+    return isLocalNodeOffline || this.getIsChildProcessUpdating('MINER')
+  }
+
+  getStartStopLocalNodeButtonLabel() {
+    const nodeStatus = this.props.settings.childProcessesStatus.NODE
+    const startStatuses = ['NOT RUNNING', 'STARTING', 'FAILED']
+    return startStatuses.indexOf(nodeStatus) !== -1 ? 'Start Local Node' : 'Stop Local Node'
   }
 
 	getToggleButtonClasses(on) {
@@ -101,10 +112,12 @@ class Settings extends Component<Props> {
 	onStartStopLocalNodeClicked(event) {
 		this.eventConfirm(event)
 
-		switch (this.props.systemInfo.daemonInfo.status) {
+		switch (this.props.settings.childProcessesStatus.NODE) {
 			case 'RUNNING':
+			case 'MURDER FAILED':
 				return appStore.dispatch(SettingsActions.stopLocalNode())
-			case 'NOT_RUNNING':
+			case 'NOT RUNNING':
+			case 'FAILED':
 				return appStore.dispatch(SettingsActions.startLocalNode())
 			default:
 		}
@@ -217,9 +230,9 @@ class Settings extends Component<Props> {
 									className={styles.stopLocalNodeButton}
 									onClick={event => this.onStartStopLocalNodeClicked(event)}
 									onKeyDown={event => this.onStartStopLocalNodeClicked(event)}
-                  disabled={this.props.settings.childProcessUpdate.NODE === true}
+                  disabled={this.getIsChildProcessUpdating('NODE')}
 								>
-									{this.props.systemInfo.daemonInfo.status === 'RUNNING' ? 'STOP LOCAL NODE' : 'START LOCAL NODE'}
+                  {this.getStartStopLocalNodeButtonLabel()}
 								</button>
 
 								<button
@@ -259,7 +272,7 @@ class Settings extends Component<Props> {
 										className={this.getEnableTorToggleButtonClasses()}
 										onClick={event => this.onEnableTorToggleClicked(event)}
 										onKeyDown={event => this.onEnableTorToggleClicked(event)}
-                    disabled={this.props.settings.childProcessUpdate.TOR}
+                    disabled={this.getIsChildProcessUpdating('TOR')}
 									>
 										<div className={styles.toggleButtonSwitcher} />
 										<div className={styles.toggleButtonText}>

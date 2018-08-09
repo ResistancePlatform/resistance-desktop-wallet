@@ -20,13 +20,7 @@ type Props = {
 }
 
 class StatusModal extends Component<Props> {
-  minerLogPath: undefined
 	props: Props
-
-	constructor() {
-    super()
-    this.minerLogPath = osService.getLogFilePath('MINER')
-  }
 
 	/**
 	 * @memberof StatusModal
@@ -39,6 +33,35 @@ class StatusModal extends Component<Props> {
 		event.preventDefault()
 		event.stopPropagation()
 	}
+
+  getChildProcessStatusClassNames(processName: ChildProcessName) {
+    const processStatus = this.props.settings.childProcessesStatus[processName]
+    const statusClassNames = [styles.statusIcon]
+
+    if (processStatus === 'RUNNING' || processStatus === 'STARTING') {
+      statusClassNames.push('icon-status-running')
+    } else {
+      statusClassNames.push('icon-status-stop')
+    }
+
+    switch (processStatus) {
+      case 'RUNNING':
+        statusClassNames.push(styles.green)
+        break
+      case 'STARTING':
+      case 'STOPPING':
+        statusClassNames.push(styles.yellow)
+        break
+      case 'NOT RUNNING':
+      case 'FAILED':
+      case 'MURDER FAILED':
+        statusClassNames.push(styles.red)
+        break
+      default:
+    }
+
+    return statusClassNames.join(' ')
+  }
 
   onCloseStatusModalClicked(event) {
 		this.eventConfirm(event)
@@ -73,9 +96,28 @@ class StatusModal extends Component<Props> {
             selectedTabPanelClassName={styles.selectedTabPanel}
           >
             <TabList className={styles.tabList}>
-              <Tab className={styles.tab}>Local Node</Tab>
-              <Tab className={styles.tab}>Miner</Tab>
-              <Tab className={styles.tab}>Tor</Tab>
+              <Tab className={styles.tab}>Get Info</Tab>
+              <Tab className={styles.tab}>
+                <i
+                  className={this.getChildProcessStatusClassNames('NODE')}
+                  title={this.props.settings.childProcessesStatus.NODE}
+                />
+                Node Log
+              </Tab>
+              <Tab className={styles.tab}>
+                <i
+                  className={this.getChildProcessStatusClassNames('MINER')}
+                  title={this.props.settings.childProcessesStatus.MINER}
+                />
+                Miner Log
+              </Tab>
+              <Tab className={styles.tab}>
+                <i
+                  className={this.getChildProcessStatusClassNames('TOR')}
+                  title={this.props.settings.childProcessesStatus.TOR}
+                />
+                Tor Log
+              </Tab>
             </TabList>
 
             <TabPanel className={styles.tabPanel}>
@@ -101,10 +143,16 @@ class StatusModal extends Component<Props> {
             </TabPanel>
 
             <TabPanel>
-              <LazyLog url={this.minerLogPath} follow style={{ backgroundColor: 'rgb(21, 26, 53)' }} />
+              <LazyLog url={osService.getLogFilePath('NODE')} follow style={{ backgroundColor: 'rgb(21, 26, 53)' }} />
             </TabPanel>
 
-            <TabPanel />
+            <TabPanel>
+              <LazyLog url={osService.getLogFilePath('MINER')} follow style={{ backgroundColor: 'rgb(21, 26, 53)' }} />
+            </TabPanel>
+
+            <TabPanel>
+              <LazyLog url={osService.getLogFilePath('TOR')} follow style={{ backgroundColor: 'rgb(21, 26, 53)' }} />
+            </TabPanel>
           </Tabs>
         </div>
 

@@ -53,10 +53,10 @@ export const defaultAppState: AppState = {
 		isTorEnabled: false,
 		isMinerEnabled: false,
     isStatusModalOpen: false,
-		childProcessUpdate: {
-			NODE: false,
-			MINER: false,
-			TOR: false
+		childProcessesStatus: {
+			NODE: 'NOT RUNNING',
+			MINER: 'NOT RUNNING',
+			TOR: 'NOT RUNNING'
 		}
 	}
 }

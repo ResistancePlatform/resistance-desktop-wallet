@@ -1,16 +1,14 @@
 // @flow
 import { createActions, handleActions } from 'redux-actions'
+
 import { defaultAppState } from '../default-app-state'
+import { ChildProcessName, ChildProcessStatus } from '../../../service/os-service'
 
 export type SettingsState = {
 	isTorEnabled: boolean,
 	isMinerEnabled: boolean,
   isStatusModalOpen: boolean,
-  childProcessUpdate: {
-      NODE: boolean,
-      MINER: boolean,
-      TOR: boolean
-  }
+  childProcessesStatus: { [ChildProcessName]: ChildProcessStatus }
 }
 
 export const SettingsActions = createActions(
@@ -37,14 +35,14 @@ export const SettingsActions = createActions(
   }
 )
 
-const getChildProcessUpdateFinishedState = (state, action) => {
+const getChildProcessUpdateFinishedState = (state, action, processStatus: ChildProcessStatus) => {
   const newState = {...state}
-  newState.childProcessUpdate[action.payload.processName] = false
+  newState.childProcessesStatus[action.payload.processName] = processStatus
   return newState
 }
 
-const getChildProcessUpdateFailedState = (state, action, isEnabled) => {
-  const newState = getChildProcessUpdateFinishedState(state, action)
+const getChildProcessUpdateFailedState = (state, action, processStatus: ChildProcessStatus, isEnabled) => {
+  const newState = getChildProcessUpdateFinishedState(state, action, processStatus)
 
   switch (action.payload.processName) {
     case 'TOR':
@@ -72,50 +70,50 @@ export const SettingsReducer = handleActions(
     // Local Node
     [SettingsActions.startLocalNode]: state => ({
       ...state,
-      childProcessUpdate: { ...state.childProcessUpdate, NODE: true }
+      childProcessesStatus: { ...state.childProcessesStatus, NODE: 'STARTING' }
     }),
     [SettingsActions.stopLocalNode]: state => ({
       ...state,
-      childProcessUpdate: { ...state.childProcessUpdate, NODE: true },
+      childProcessesStatus: { ...state.childProcessesStatus, NODE: 'STOPPING' },
       isMinerEnabled: false
     }),
 
     // Miner
     [SettingsActions.enableMiner]: state => ({
       ...state,
-      childProcessUpdate: { ...state.childProcessUpdate, MINER: true },
+      childProcessesStatus: { ...state.childProcessesStatus, MINER: 'STARTING' },
       isMinerEnabled: true
     }),
     [SettingsActions.disableMiner]: state => ({
       ...state,
-      childProcessUpdate: { ...state.childProcessUpdate, MINER: true },
+      childProcessesStatus: { ...state.childProcessesStatus, MINER: 'STOPPING' },
       isMinerEnabled: false
     }),
 
     // Tor
     [SettingsActions.enableTor]: state => ({
       ...state,
-      childProcessUpdate: { ...state.childProcessUpdate, TOR: true },
+      childProcessesStatus: { ...state.childProcessesStatus, TOR: 'STARTING' },
       isTorEnabled: true
     }),
     [SettingsActions.disableTor]: state => ({
       ...state,
-      childProcessUpdate: { ...state.childProcessUpdate, TOR: true },
+      childProcessesStatus: { ...state.childProcessesStatus, TOR: 'STOPPING' },
       isTorEnabled: false
     }),
 
     // Child process updates
     [SettingsActions.childProcessStarted]: (state, action) => (
-      getChildProcessUpdateFinishedState(state, action)
+      getChildProcessUpdateFinishedState(state, action, 'RUNNING')
     ),
     [SettingsActions.childProcessFailed]: (state, action) => (
-      getChildProcessUpdateFailedState(state, action, false)
+      getChildProcessUpdateFailedState(state, action, 'FAILED', false)
     ),
     [SettingsActions.childProcessMurdered]: (state, action) => (
-      getChildProcessUpdateFinishedState(state, action)
+      getChildProcessUpdateFinishedState(state, action, 'NOT RUNNING')
     ),
     [SettingsActions.childProcessMurderFailed]: (state, action) => (
-      getChildProcessUpdateFailedState(state, action, true)
+      getChildProcessUpdateFailedState(state, action, 'MURDER FAILED', true)
     )
 
   }, defaultAppState)
