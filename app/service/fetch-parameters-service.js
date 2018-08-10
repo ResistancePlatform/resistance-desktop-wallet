@@ -16,7 +16,7 @@ const osService = new OSService()
 config.setPath(osService.getAppSettingFile())
 
 const quickHashesConfigKey = 'resistanceParameters.quickHashes'
-const paramsFolderName = 'ZcashParams'
+const paramsFolderName = 'ResistanceParams'
 
 const sproutUrl = `https://z.cash/downloads`
 const sproutFiles = [
