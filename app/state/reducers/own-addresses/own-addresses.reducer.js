@@ -17,13 +17,14 @@ export const OwnAddressesActions = createActions(
   {
     EMPTY: undefined,
 
-    GET_OWN_ADDRESSES: undefined,
-    GET_OWN_ADDRESSES_SUCCESS: (addresses: AddressRow[]) => ({ addresses }),
-    GET_OWN_ADDRESSES_FAIL: undefined,
+    START_GETTING_OWN_ADDRESSES: undefined,
+    STOP_GETTING_OWN_ADDRESSES: undefined,
+    GOT_OWN_ADDRESSES: (addresses: AddressRow[]) => ({ addresses }),
+    GET_OWN_ADDRESSES_FAILURE: undefined,
 
-    UPDATE_DROPDOWN_MENU_VISIBILITY: (show: boolean) => ({ show }),
+    CREATE_NEW_ADDRESS: (isPrivate: boolean) => ({ isPrivate }),
 
-    CREATE_NEW_ADDRESS: (isPrivate: boolean) => ({ isPrivate })
+    UPDATE_DROPDOWN_MENU_VISIBILITY: (show: boolean) => ({ show })
   },
   {
     prefix: 'APP/OWN_ADDRESSES'
@@ -32,10 +33,10 @@ export const OwnAddressesActions = createActions(
 
 export const OwnAddressesReducer = handleActions(
   {
-    [OwnAddressesActions.getOwnAddressesSuccess]: (state, action) => ({
+    [OwnAddressesActions.gotOwnAddresses]: (state, action) => ({
       ...state, addresses: action.payload.addresses
     }),
-    [OwnAddressesActions.getOwnAddressesFail]: state => ({
+    [OwnAddressesActions.getOwnAddressesFailure]: state => ({
       ...state, addresses: []
     }),
     [OwnAddressesActions.updateDropdownMenuVisibility]: (state, action) => ({
