@@ -5,7 +5,6 @@ $TOP_BAR_HEIGHT: 5rem;
 
 .ownAddressesContainer {
     padding: 2rem;
-
     min-width: 30rem;
 }
 
@@ -22,7 +21,8 @@ $TOP_BAR_HEIGHT: 5rem;
 }
 
 .topBarButtonContainer {
-    text-align: right;
+  text-align: right;
+  margin-right: 5rem;
 }
 
 .addAddressButtonContainer {
