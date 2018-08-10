@@ -117,11 +117,10 @@ class SystemInfo extends Component<Props> {
 
 				</div>
 
-				{ /* Buttons */}
+				{/* Buttons - don't add onKeyDown() handler, otherwise Finder will become active on Cmd-commands (like Cmd-Q) */}
         <button
           className={styles.walletInFileManagerButton}
           onClick={event => this.onWalletInFileManagerClicked(event)}
-          onKeyDown={event => this.onWalletInFileManagerClicked(event)}
         >
           {this.getWalletInFileManagerLabel()}
         </button>
@@ -129,7 +128,6 @@ class SystemInfo extends Component<Props> {
         <button
           className={styles.installationFolderButton}
           onClick={event => this.onInstallationFolderClicked(event)}
-          onKeyDown={event => this.onInstallationFolderClicked(event)}
         >
           Installation Folder
         </button>

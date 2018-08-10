@@ -52,7 +52,7 @@ $SYSTEM_INFO_BAR_HEIGHT: 5.5rem;
 }
 
 .walletInFileManagerButton {
-    @include roundedButton(false);
+    @include roundedButton(true);
 }
 
 .installationFolderButton {

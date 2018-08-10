@@ -6,8 +6,12 @@ import { ActionsObservable, ofType } from 'redux-observable'
 
 import { SystemInfoActions } from './system-info.reducer'
 import { ResistanceCliService } from '../../../service/resistance-cli-service'
+import { ResistanceService } from '../../../service/resistance-service'
+import { OSService } from '../../../service/os-service'
 
 const resistanceCliService = new ResistanceCliService()
+const resistanceService = new ResistanceService()
+const osService = new OSService()
 
 const startGettingDaemonInfoEpic = (action$: ActionsObservable<any>) => action$.pipe(
   ofType(SystemInfoActions.startGettingDaemonInfo().type),
@@ -25,7 +29,7 @@ const startGettingBlockchainInfoEpic = (action$: ActionsObservable<any>) => acti
 const openWalletInFileManagerEpic = (action$: ActionsObservable<any>) => action$.pipe(
   ofType(SystemInfoActions.openWalletInFileManager().type),
   tap(() => {
-    shell.showItemInFolder('/')
+    shell.openItem(resistanceService.getWalletPath())
   }),
   mapTo(SystemInfoActions.empty())
 )
@@ -33,7 +37,7 @@ const openWalletInFileManagerEpic = (action$: ActionsObservable<any>) => action$
 const openInstallationFolderEpic = (action$: ActionsObservable<any>) => action$.pipe(
   ofType(SystemInfoActions.openInstallationFolder().type),
   tap(() => {
-    shell.showItemInFolder('/')
+    shell.openItem(osService.getInstallationPath())
   }),
   mapTo(SystemInfoActions.empty())
 )

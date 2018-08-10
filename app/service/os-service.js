@@ -98,6 +98,17 @@ export class OSService {
 	}
 
 	/**
+   * Returns application install path.
+   *
+	 * @memberof OSService
+	 * @returns {string}
+	 */
+  getInstallationPath() {
+    const walkUpPath = this.getOS() === 'windows' ? '/../../../' : '/../../../../'
+    return path.join(remote.app.getAppPath(), walkUpPath)
+  }
+
+	/**
 	 * @memberof OSService
 	 * @returns {string}
 	 */
