@@ -107,13 +107,13 @@ export class ResistanceCliService {
 			const daemonInfo: DaemonInfo = {
 				status: 'RUNNING',
 				residentSizeMB: 0,
-        optionalError: null,
-        getInfoResult: {}
+				optionalError: null,
+				getInfoResult: {}
 			}
 
 			const getInfoPromise = cli.getInfo()
 				.then((result) => {
-          daemonInfo.getInfoResult = result
+					daemonInfo.getInfoResult = result
 					delete daemonInfo.optionalError
 					return daemonInfo
 				})
@@ -603,6 +603,15 @@ export class ResistanceCliService {
 			.then(result => {
 				const confirmedBalance = result[0]
 				const unconfirmedBalance = result[1]
+
+				if (confirmedBalance.name === 'RpcError' || unconfirmedBalance.name === 'RpcError') {
+					return Object.assign(addressRow, {
+						balance: -1,
+						confirmed: false,
+						errorMessage: confirmedBalance.name === 'RpcError' ? confirmedBalance.message : unconfirmedBalance.message
+					})
+				}
+
 				const isConfirmed = confirmedBalance === unconfirmedBalance
 				const tempBalance = isConfirmed ? confirmedBalance : unconfirmedBalance
 				const fixedBalanceStr = typeof tempBalance === 'string' ? parseFloat(tempBalance).toFixed(2) : tempBalance.toFixed(2)
@@ -610,6 +619,15 @@ export class ResistanceCliService {
 				return Object.assign(addressRow, {
 					balance: parseFloat(fixedBalanceStr),
 					confirmed: isConfirmed
+				})
+			})
+			.catch(error => {
+				this.logger.debug(this, `getAddressBalance`, `Error happen: `, ConsoleTheme.error, error)
+
+				return Object.assign(addressRow, {
+					balance: -1,
+					confirmed: false,
+					errorMessage: error.message
 				})
 			})
 	}
@@ -858,7 +876,7 @@ export class ResistanceCliService {
 				return addressList
 			})
 			.catch(error => {
-				this.logger.debug(`getWalletAddressAndBalance`, `Error happen: `, ConsoleTheme.error, error)
+				this.logger.debug(this, `getWalletAddressAndBalance`, `Error happen: `, ConsoleTheme.error, error)
 				return []
 			})
 

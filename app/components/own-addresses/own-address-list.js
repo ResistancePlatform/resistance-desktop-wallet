@@ -12,6 +12,12 @@ type Props = {
 export default class OwnAddressList extends Component<Props> {
 	props: Props
 
+	getBalanceDisplay(tempAddressRow: AddressRow) {
+		if (!tempAddressRow || tempAddressRow.balance === null || tempAddressRow.balance === undefined) return `0`
+
+		return tempAddressRow.balance === -1 ? `ERROR` : tempAddressRow.balance.toFixed(2)
+	}
+
 	getAddressTable() {
 		if (!this.props.addresses || this.props.addresses.length <= 0) {
 			return (
@@ -19,11 +25,11 @@ export default class OwnAddressList extends Component<Props> {
 			)
 		}
 
-		const tableBody = this.props.addresses.map((addrewwRow) => (
-			<div className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')} key={addrewwRow.address}>
-				<div className={styles.tableBodyRowColumnBalance} >{addrewwRow.balance ? addrewwRow.balance.toFixed(2) : 0}</div>
-				<div className={styles.tableBodyRowColumnConfirmed}>{addrewwRow.confirmed ? 'YES' : 'NO'}</div>
-				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnAddress].join(' ')}>{addrewwRow.address}</div>
+		const tableBody = this.props.addresses.map((addressRow) => (
+			<div className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')} key={addressRow.address}>
+				<div className={styles.tableBodyRowColumnBalance} >{this.getBalanceDisplay(addressRow)}</div>
+				<div className={styles.tableBodyRowColumnConfirmed}>{addressRow.confirmed ? 'YES' : 'NO'}</div>
+				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnAddress].join(' ')}>{addressRow.address}</div>
 			</div>
 		))
 
