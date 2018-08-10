@@ -5,7 +5,7 @@ import Client from 'bitcoin-core'
 import { from, Observable, of } from 'rxjs'
 import { map, tap, take, catchError } from 'rxjs/operators'
 import { LoggerService, ConsoleTheme } from './logger-service'
-
+import { DialogService } from './dialog-service'
 import { getFormattedDateString } from '../utils/data-util'
 import { AppAction } from '../state/reducers/appAction'
 import { BlockChainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
@@ -60,6 +60,7 @@ const sendCashPollingIntervalSetting = 2 * 1000
  */
 export class ResistanceCliService {
 	logger: LoggerService
+	dialogService: DialogService
 
 	/**
 	 *Creates an instance of ResistanceCliService.
@@ -72,6 +73,7 @@ export class ResistanceCliService {
 
 		this.time = new Date()
 		this.logger = new LoggerService()
+		this.dialogService = new DialogService()
 
 		return instance
 	}
@@ -863,6 +865,16 @@ export class ResistanceCliService {
 					addressList = [...publicAddressesAfterSort, ...privateAddressesAfterSort]
 				} else {
 					addressList = addresses
+				}
+
+				// Show the error to user
+				const errorAddressItems = addressList.filter(tempAddressItem => tempAddressItem.balance === -1 && tempAddressItem.errorMessage)
+				if (errorAddressItems && errorAddressItems.length > 0) {
+					const tempErrorMessage = errorAddressItems
+						.map(tempAddressItem => `[${tempAddressItem.address}]:\n ${tempAddressItem.errorMessage}\n\n`)
+						.join('\n')
+					const showMessge = `Error happen when getting the balance for the addresses below: \n\n${tempErrorMessage}`
+					this.dialogService.showError(`Address balance error`, showMessge)
 				}
 
 				if (disableThePrivateAddress) {
