@@ -20,7 +20,7 @@ export const OwnAddressesActions = createActions(
     START_GETTING_OWN_ADDRESSES: undefined,
     STOP_GETTING_OWN_ADDRESSES: undefined,
     GOT_OWN_ADDRESSES: (addresses: AddressRow[]) => ({ addresses }),
-    GET_OWN_ADDRESSES_FAILURE: undefined,
+    GET_OWN_ADDRESSES_FAILURE:  (errorMessage: string) => ({ errorMessage }),
 
     CREATE_NEW_ADDRESS: (isPrivate: boolean) => ({ isPrivate }),
 
