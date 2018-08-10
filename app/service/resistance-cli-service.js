@@ -874,7 +874,7 @@ export class ResistanceCliService {
 						.map(tempAddressItem => `[${tempAddressItem.address}]:\n ${tempAddressItem.errorMessage}\n\n`)
 						.join('\n')
 					const showMessge = `Error happen when getting the balance for the addresses below: \n\n${tempErrorMessage}`
-					this.dialogService.showError(`Address balance error`, showMessge)
+					setTimeout(() => this.dialogService.showError(`Address balance error`, showMessge), 500)
 				}
 
 				if (disableThePrivateAddress) {
