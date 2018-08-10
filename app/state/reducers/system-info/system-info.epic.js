@@ -42,9 +42,9 @@ const openInstallationFolderEpic = (action$: ActionsObservable<any>) => action$.
   mapTo(SystemInfoActions.empty())
 )
 
-export const SystemInfoEpics = (action$, store) => merge(
-  openWalletInFileManagerEpic(action$, store),
-  openInstallationFolderEpic(action$, store),
-  startGettingDaemonInfoEpic(action$, store),
-  startGettingBlockchainInfoEpic(action$, store)
+export const SystemInfoEpics = (action$, state$) => merge(
+  openWalletInFileManagerEpic(action$, state$),
+  openInstallationFolderEpic(action$, state$),
+  startGettingDaemonInfoEpic(action$, state$),
+  startGettingBlockchainInfoEpic(action$, state$)
 )
