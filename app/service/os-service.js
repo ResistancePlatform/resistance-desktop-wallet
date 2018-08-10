@@ -12,6 +12,7 @@ let instance = null
 const ps = require('ps-node')
 
 export type ChildProcessName = 'NODE' | 'TOR' | 'MINER'
+export type ChildProcessStatus = 'RUNNING' | 'STARTING' | 'RESTARTING' | 'FAILED' | 'STOPPING' | 'MURDER FAILED' | 'NOT RUNNING'
 
 const ChildProcessCommands = {
   NODE: 'resistanced',
@@ -76,7 +77,7 @@ export class OSService {
       if (item.instance !== null && !item.instance.killed) {
         global.childProcesses[processName].isGettingKilled = true
 
-        console.log(`Killing child process ${processName} with PID ${item.instance.pid} ${item.pid}`)
+        console.log(`Killing child process ${processName} with PID ${item.instance.pid}`)
 
         // childProcess.kill() doesn't work for an unknown reason
         if (item.pid) {
@@ -140,7 +141,28 @@ export class OSService {
     return settingsReducerModule.SettingsActions
   }
 
+  getLogFilePath(processName: string) {
+    const command = ChildProcessCommands[processName]
+    return  path.join(this.getAppDataPath(), `${command}.log`)
+  }
+
 	/**
+   * Restarts a child process by name using killProcess() and execProcess() methods.
+   *
+	 * @param {string} processName
+	 * @param {string[]} args
+	 * @memberof OSService
+	 */
+  restartProcess(processName: ChildProcessName, args = []) {
+    console.log(`Restarting ${processName} process.`)
+    this.killProcess(processName, () => {
+      this.execProcess(processName, args)
+    })
+  }
+
+	/**
+   * Starts a child process with a given name and sends status update messages.
+   *
 	 * @param {string} processName
 	 * @param {string[]} args
 	 * @memberof OSService
@@ -149,7 +171,7 @@ export class OSService {
     const actions = this.getSettingsActions()
 
     const errorHandler = (err) => {
-      console.log(`Process ${processName} has failed!`)
+      console.error(`Process ${processName} has failed!`)
       this.dispatchAction(actions.childProcessFailed(processName, err.toString()))
     }
 
@@ -200,16 +222,14 @@ export class OSService {
       childProcess.on('error', errorHandler)
 
       childProcess.on('close', (code) => {
-        if (code !== 0) {
-          this.dispatchAction(actions.childProcessFailed(processName, `Process ${processName} exited with code ${code}.`))
-        } else if (!childProcessInfo.isGettingKilled) {
-          this.dispatchAction(actions.childProcessFailed(processName, `Process ${processName} unexpectedly exited.`))
+        if (!childProcessInfo.isGettingKilled) {
+          this.dispatchAction(actions.childProcessFailed(processName, `Process ${processName} unexpectedly exited with code ${code}.`))
         }
 
         childProcessInfo.isGettingKilled = false
       })
 
-      const logFile = path.join(this.getAppDataPath(), `${command}.log`)
+      const logFile = this.getLogFilePath(processName)
       const logStream = createWriteStream(logFile, {flags: 'a'})
 
       childProcess.stdout.pipe(logStream)
@@ -223,12 +243,14 @@ export class OSService {
   }
 
 	/**
+   * Kills a child process by name and sends status update messages.
+   * Provide customSuccessHandler to suppress CHILD_PROCESS_MURDERED message.
+   *
 	 * @param {string} processName
-	 * @param {string} args
-	 * @param {function} errorHandler
+	 * @param {function} customSuccessHandler
 	 * @memberof OSService
 	 */
-  killProcess(processName: ChildProcessName) {
+  killProcess(processName: ChildProcessName, customSuccessHandler) {
     const actions = this.getSettingsActions()
 
     this.getPid(ChildProcessCommands[processName]).then(pid => {
@@ -240,7 +262,11 @@ export class OSService {
       console.log(`Process ${processName} isn't running`)
       return Promise.resolve()
     }).then(() => {
-      this.dispatchAction(actions.childProcessMurdered(processName))
+      if (customSuccessHandler) {
+        customSuccessHandler()
+      } else {
+        this.dispatchAction(actions.childProcessMurdered(processName))
+      }
       return Promise.resolve()
     }).catch((err) => {
       this.dispatchAction(actions.childProcessMurderFailed(processName, err.toString()))

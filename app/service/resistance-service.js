@@ -25,6 +25,7 @@ const configFileContents = [
   `rpcport=18232`,
   `rpcuser=resuser`,
   `rpcpassword=%generatedPassword%`,
+  ``
 ].join(EOL)
 
 
@@ -83,13 +84,22 @@ export class ResistanceService {
 	}
 
 	/**
+   * Restarts resistanced
+   *
+	 * @memberof ResistanceService
+	 */
+	restart(isTorEnabled: boolean) {
+    const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs
+    osService.restartProcess('NODE', args)
+	}
+
+	/**
    * Stops resistanced
    *
 	 * @memberof ResistanceService
 	 */
 	stop() {
-    const errorHandler = () => { }
-    osService.killProcess('NODE', errorHandler)
+    osService.killProcess('NODE')
 	}
 
 	/**

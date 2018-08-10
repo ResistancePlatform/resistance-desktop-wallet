@@ -26,3 +26,6 @@ body {
   @include full-screen();
 }
 
+button {
+  text-transform: uppercase;
+}

@@ -8,14 +8,13 @@ import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
 import { appStore } from '../../state/store/configureStore'
-import { SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
 import { SettingsActions, SettingsState } from '../../state/reducers/settings/settings.reducer'
+import StatusModal from '../../components/settings/status-modal'
 
 const config = require('electron-settings')
 
 type Props = {
-	settings: SettingsState,
-	systemInfo: SystemInfoState
+	settings: SettingsState
 }
 
 /**
@@ -24,11 +23,6 @@ type Props = {
  */
 class Settings extends Component<Props> {
 	props: Props
-
-	/**
-	 * @memberof Settings
-	 */
-	componentDidMount() { }
 
   componentWillUpdate(nextProps) {
     if (nextProps.settings.isMinerEnabled !== this.props.settings.isMinerEnabled) {
@@ -48,9 +42,25 @@ class Settings extends Component<Props> {
 		event.stopPropagation()
 	}
 
+  getIsChildProcessUpdating(processName) {
+    const processStatus = this.props.settings.childProcessesStatus[processName]
+    const updateStatuses = ['STARTING', 'STOPPING', 'RESTARTING']
+    return updateStatuses.indexOf(processStatus) !== -1
+  }
+
   getMiningDisabledAttribute() {
-    const isLocalNodeOffline = this.props.systemInfo.daemonInfo.status !== 'RUNNING'
-    return isLocalNodeOffline || this.props.settings.childProcessUpdate.MINER
+    const isLocalNodeOffline = this.props.settings.childProcessesStatus.NODE !== 'RUNNING'
+    return isLocalNodeOffline || this.getIsChildProcessUpdating('MINER')
+  }
+
+  getTorDisabledAttribute() {
+    return this.getIsChildProcessUpdating('NODE') || this.getIsChildProcessUpdating('TOR')
+  }
+
+  getStartStopLocalNodeButtonLabel() {
+    const nodeStatus = this.props.settings.childProcessesStatus.NODE
+    const startStatuses = ['NOT RUNNING', 'STARTING', 'FAILED']
+    return startStatuses.indexOf(nodeStatus) !== -1 ? 'Start Local Node' : 'Stop Local Node'
   }
 
 	getToggleButtonClasses(on) {
@@ -105,10 +115,12 @@ class Settings extends Component<Props> {
 	onStartStopLocalNodeClicked(event) {
 		this.eventConfirm(event)
 
-		switch (this.props.systemInfo.daemonInfo.status) {
+		switch (this.props.settings.childProcessesStatus.NODE) {
 			case 'RUNNING':
+			case 'MURDER FAILED':
 				return appStore.dispatch(SettingsActions.stopLocalNode())
-			case 'NOT_RUNNING':
+			case 'NOT RUNNING':
+			case 'FAILED':
 				return appStore.dispatch(SettingsActions.startLocalNode())
 			default:
 		}
@@ -144,7 +156,7 @@ class Settings extends Component<Props> {
 	 */
 	onShowStatusClicked(event) {
 		this.eventConfirm(event)
-		console.log(`onShowStatusClicked---->`)
+		appStore.dispatch(SettingsActions.openStatusModal())
 	}
 
 	/**
@@ -174,6 +186,8 @@ class Settings extends Component<Props> {
 				{/* Route content */}
 				<div className={[styles.settingsContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
 					<div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapperContainer].join(' ')}>
+            <StatusModal />
+
 						{/* Title bar */}
 						<div className={styles.titleBar}>Settings</div>
 
@@ -219,16 +233,15 @@ class Settings extends Component<Props> {
 									className={styles.stopLocalNodeButton}
 									onClick={event => this.onStartStopLocalNodeClicked(event)}
 									onKeyDown={event => this.onStartStopLocalNodeClicked(event)}
-                  disabled={this.props.settings.childProcessUpdate.NODE === true}
+                  disabled={this.getIsChildProcessUpdating('NODE')}
 								>
-									{this.props.systemInfo.daemonInfo.status === 'RUNNING' ? 'STOP LOCAL NODE' : 'START LOCAL NODE'}
+                  {this.getStartStopLocalNodeButtonLabel()}
 								</button>
 
 								<button
 									className={styles.showStatusButton}
 									onClick={event => this.onShowStatusClicked(event)}
 									onKeyDown={event => this.onShowStatusClicked(event)}
-									disabled
 								>
 									SHOW STATUS
 								</button>
@@ -262,7 +275,7 @@ class Settings extends Component<Props> {
 										className={this.getEnableTorToggleButtonClasses()}
 										onClick={event => this.onEnableTorToggleClicked(event)}
 										onKeyDown={event => this.onEnableTorToggleClicked(event)}
-                    disabled={this.props.settings.childProcessUpdate.TOR}
+                    disabled={this.getTorDisabledAttribute()}
 									>
 										<div className={styles.toggleButtonSwitcher} />
 										<div className={styles.toggleButtonText}>
@@ -294,8 +307,6 @@ class Settings extends Component<Props> {
 
 const mapStateToProps = state => ({
 	settings: state.settings,
-	systemInfo: state.systemInfo,
-	sendCash: state.sendCash
 })
 
 export default connect(mapStateToProps, null)(Settings)
