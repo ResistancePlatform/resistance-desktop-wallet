@@ -51,8 +51,9 @@
 .toggleButton[disabled] {
   pointer-events: none;
 
-  .toggleButtonSwitcher {
-    background-color: $BASE_COLOR_BODER_GRAY;
+  .toggleButtonSwitcher, .toggleButtonText {
+    opacity: 0.6;
+    cursor: default;
   }
 }
 
