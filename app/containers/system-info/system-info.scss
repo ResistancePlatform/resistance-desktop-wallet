@@ -52,11 +52,11 @@ $SYSTEM_INFO_BAR_HEIGHT: 5.5rem;
 }
 
 .walletInFileManagerButton {
-    @include roundedButton(true);
+    @include roundedButton();
 }
 
 .installationFolderButton {
-    @include roundedButton(true);
+    @include roundedButton();
 
     margin-left: 1rem;
 }
