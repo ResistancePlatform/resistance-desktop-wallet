@@ -2,7 +2,6 @@
 import React, { Component } from 'react'
 import { AddressDropdownItem } from '../../state/reducers/send-cash/send-cash.reducer'
 import styles from './address-drodown-popup-menu.scss'
-import { timestamp } from '../../../node_modules/rxjs/operators';
 
 type Props = {
 	addressList?: AddressDropdownItem[],
@@ -29,8 +28,14 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 		const currentItem = addressList[tempIndex]
 		const nextItem = tempIndex < addressList.length ? addressList[tempIndex + 1] : null
 		const isTheLastGroupItem = currentItem && currentItem.address.startsWith('r') && nextItem && nextItem.address.startsWith('z')
-		console.log(`isTheLastGroupItem: ${isTheLastGroupItem}, address: ${currentItem.address}`)
+
 		return isTheLastGroupItem ? styles.groupLastItem : ''
+	}
+
+	getBalanceDisplay(tempAddressItem: AddressDropdownItem) {
+		if (!tempAddressItem || tempAddressItem.balance === null || tempAddressItem.balance === undefined) return `0 RES`
+
+		return tempAddressItem.balance === -1 ? `ERROR` : `${tempAddressItem.balance.toFixed(2)} RES`
 	}
 
 	renderAddressItems() {
@@ -61,7 +66,7 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 			>
 				<div className={styles.itemRowAddress}>{addressItem.address}</div>
 				<div className={styles.itemRowBalance}>
-					{addressItem.balance.toString()} RES
+					{this.getBalanceDisplay(addressItem)}
 				</div>
 			</div>
 		))

@@ -58,7 +58,7 @@ export const SendCashActions = createActions({
 	GET_ADDRESS_LIST_SUCCESS: (addressList: AddressDropdownItem[]) => addressList,
 	GET_ADDRESS_LIST_FAIL: undefined,
 	PASTE_TO_ADDRESS_FROM_CLIPBOARD: undefined
-}, { prefixe: `APP/SEND_CASH` })
+}, { prefix: `APP/SEND_CASH` })
 
 
 const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')

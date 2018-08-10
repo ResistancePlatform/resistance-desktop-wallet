@@ -5,7 +5,7 @@ import Client from 'bitcoin-core'
 import { from, Observable, of } from 'rxjs'
 import { map, tap, take, catchError } from 'rxjs/operators'
 import { LoggerService, ConsoleTheme } from './logger-service'
-
+import { DialogService } from './dialog-service'
 import { getFormattedDateString } from '../utils/data-util'
 import { AppAction } from '../state/reducers/appAction'
 import { BlockChainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
@@ -60,6 +60,7 @@ const sendCashPollingIntervalSetting = 2 * 1000
  */
 export class ResistanceCliService {
 	logger: LoggerService
+	dialogService: DialogService
 
 	/**
 	 *Creates an instance of ResistanceCliService.
@@ -72,6 +73,7 @@ export class ResistanceCliService {
 
 		this.time = new Date()
 		this.logger = new LoggerService()
+		this.dialogService = new DialogService()
 
 		return instance
 	}
@@ -107,13 +109,13 @@ export class ResistanceCliService {
 			const daemonInfo: DaemonInfo = {
 				status: 'RUNNING',
 				residentSizeMB: 0,
-        optionalError: null,
-        getInfoResult: {}
+				optionalError: null,
+				getInfoResult: {}
 			}
 
 			const getInfoPromise = cli.getInfo()
 				.then((result) => {
-          daemonInfo.getInfoResult = result
+					daemonInfo.getInfoResult = result
 					delete daemonInfo.optionalError
 					return daemonInfo
 				})
@@ -603,6 +605,15 @@ export class ResistanceCliService {
 			.then(result => {
 				const confirmedBalance = result[0]
 				const unconfirmedBalance = result[1]
+
+				if (confirmedBalance.name === 'RpcError' || unconfirmedBalance.name === 'RpcError') {
+					return Object.assign(addressRow, {
+						balance: -1,
+						confirmed: false,
+						errorMessage: confirmedBalance.name === 'RpcError' ? confirmedBalance.message : unconfirmedBalance.message
+					})
+				}
+
 				const isConfirmed = confirmedBalance === unconfirmedBalance
 				const tempBalance = isConfirmed ? confirmedBalance : unconfirmedBalance
 				const fixedBalanceStr = typeof tempBalance === 'string' ? parseFloat(tempBalance).toFixed(2) : tempBalance.toFixed(2)
@@ -610,6 +621,15 @@ export class ResistanceCliService {
 				return Object.assign(addressRow, {
 					balance: parseFloat(fixedBalanceStr),
 					confirmed: isConfirmed
+				})
+			})
+			.catch(error => {
+				this.logger.debug(this, `getAddressBalance`, `Error happen: `, ConsoleTheme.error, error)
+
+				return Object.assign(addressRow, {
+					balance: -1,
+					confirmed: false,
+					errorMessage: error.message
 				})
 			})
 	}
@@ -847,6 +867,16 @@ export class ResistanceCliService {
 					addressList = addresses
 				}
 
+				// Show the error to user
+				const errorAddressItems = addressList.filter(tempAddressItem => tempAddressItem.balance === -1 && tempAddressItem.errorMessage)
+				if (errorAddressItems && errorAddressItems.length > 0) {
+					const tempErrorMessage = errorAddressItems
+						.map(tempAddressItem => `[${tempAddressItem.address}]:\n ${tempAddressItem.errorMessage}\n\n`)
+						.join('\n')
+					const showMessge = `Error happen when getting the balance for the addresses below: \n\n${tempErrorMessage}`
+					setTimeout(() => this.dialogService.showError(`Address balance error`, showMessge), 500)
+				}
+
 				if (disableThePrivateAddress) {
 					const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')
 					// return addressList.map(tempAddressItem => isPrivateAddress(tempAddressItem.address) ? { ...tempAddressItem, disabled: true } : tempAddressItem)
@@ -858,7 +888,7 @@ export class ResistanceCliService {
 				return addressList
 			})
 			.catch(error => {
-				this.logger.debug(`getWalletAddressAndBalance`, `Error happen: `, ConsoleTheme.error, error)
+				this.logger.debug(this, `getWalletAddressAndBalance`, `Error happen: `, ConsoleTheme.error, error)
 				return []
 			})
 
