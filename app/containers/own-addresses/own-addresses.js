@@ -28,6 +28,13 @@ class OwnAddresses extends Component<Props> {
 		appStore.dispatch(OwnAddressesActions.startGettingOwnAddresses())
 	}
 
+	/**
+	 * @memberof OwnAddresses
+	 */
+	componentWillUnmount() {
+		appStore.dispatch(OwnAddressesActions.stopGettingOwnAddresses())
+	}
+
 	eventConfirm(event) {
 		event.preventDefault()
 		event.stopPropagation()

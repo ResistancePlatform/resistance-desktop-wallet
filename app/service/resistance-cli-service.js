@@ -736,7 +736,7 @@ export class ResistanceCliService {
 				})
 		}
 
-		this.pollingIntervalId.sendCash = setInterval(() => getAsyncOperationStatus(operationId), pollingIntervalValues.sendCash)
+		this.pollingIntervalIds.sendCash = setInterval(() => getAsyncOperationStatus(operationId), pollingIntervalValues.sendCash)
 	}
 
 	/**
@@ -864,15 +864,15 @@ export class ResistanceCliService {
 	 */
   startGettingOwnAddresses() {
     const handler = () => {
-      this.getWalletAddressAndBalance(false).then(result => {
+      this.getWalletAddressAndBalance(false).subscribe(result => {
         this.dispatchAction(OwnAddressesActions.gotOwnAddresses(result))
         return Promise.resolve()
-      }).catch(err => {
+      }, err => {
         this.dispatchAction(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
       })
 
     }
-    this.startPolling('ownAddresses', () => handler)
+    this.startPolling('ownAddresses', () => handler())
   }
 
 	/**
