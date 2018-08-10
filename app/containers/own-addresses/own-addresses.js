@@ -51,7 +51,7 @@ class OwnAddresses extends Component<Props> {
 
 	onRefreshClicked(event) {
 		this.eventConfirm(event)
-    throw new Error("Not implemented")
+		appStore.dispatch(OwnAddressesActions.startGettingOwnAddresses())
 	}
 
 	onAddNewAddressClicked(event) {
