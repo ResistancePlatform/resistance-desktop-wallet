@@ -866,7 +866,6 @@ export class ResistanceCliService {
     const handler = () => {
       this.getWalletAddressAndBalance(false).subscribe(result => {
         this.dispatchAction(OwnAddressesActions.gotOwnAddresses(result))
-        return Promise.resolve()
       }, err => {
         this.dispatchAction(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
       })

@@ -1,5 +1,5 @@
 // @flow
-import { tap, mapTo, switchMap } from 'rxjs/operators'
+import { tap, map, mapTo, switchMap } from 'rxjs/operators'
 import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { OwnAddressesActions } from './own-addresses.reducer'
@@ -22,7 +22,7 @@ const stopGettingOwnAddressesEpic = (action$: ActionsObservable<any>) => action$
 const createNewAddressesEpic = (action$: ActionsObservable<any>) => action$.pipe(
   ofType(OwnAddressesActions.createNewAddress(true).type),
   switchMap((action) => rpcService.createNewAddress(action.payload.isPrivate)),
-  mapTo(OwnAddressesActions.empty())
+  map(result => result ? OwnAddressesActions.startGettingOwnAddresses() : OwnAddressesActions.empty())
 )
 
 export const OwnAddressesEpics = (action$, state$) => merge(
