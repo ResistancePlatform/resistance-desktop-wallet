@@ -150,7 +150,7 @@ export class ResistanceCliService {
 						this.logger.debug(
 							this,
 							`startPollingDaemonStatus`,
-							`Error happen: `,
+							`Error happened: `,
 							ConsoleTheme.error,
 							error
 						)
@@ -624,7 +624,7 @@ export class ResistanceCliService {
 				})
 			})
 			.catch(error => {
-				this.logger.debug(this, `getAddressBalance`, `Error happen: `, ConsoleTheme.error, error)
+				this.logger.debug(this, `getAddressBalance`, `Error happened: `, ConsoleTheme.error, error)
 
 				return Object.assign(addressRow, {
 					balance: -1,
@@ -647,7 +647,7 @@ export class ResistanceCliService {
 			map(result => result[0]),
 			tap(newAddress => this.logger.debug(this, `createNewAddress`, `create ${isPrivate ? 'private ' : 'transparent '} address: `, ConsoleTheme.testing, newAddress)),
 			catchError(error => {
-				this.logger.debug(this, `createNewAddress`, `Error happen: `, ConsoleTheme.error, error)
+				this.logger.debug(this, `createNewAddress`, `Error happened: `, ConsoleTheme.error, error)
 				return of('')
 			})
 		)
@@ -698,7 +698,7 @@ export class ResistanceCliService {
 				return 'done'
 			})
 			.catch(error => {
-				this.logger.debug(this, `sendCash`, `Error happen: `, ConsoleTheme.error, error)
+				this.logger.debug(this, `sendCash`, `Error happened: `, ConsoleTheme.error, error)
 
 				// Make sure pass "true" to "clearCurrentOperation" !!!
 				this.dispatchAction(SendCashActions.sendCashFail(error.message, true))
@@ -741,7 +741,7 @@ export class ResistanceCliService {
 					} else if (tempStatus && tempStatus.status === 'failed') {
 						this.stopPollingOperationStatus()
 
-						const failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Unknow error happen.`
+						const failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Unknow ed.`
 						this.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
 					} else if (tempStatus && tempStatus.status === 'cancelled') {
 						this.stopPollingOperationStatus()
@@ -765,7 +765,7 @@ export class ResistanceCliService {
 					return 'done'
 				})
 				.catch(error => {
-					this.logger.debug(this, `getAsyncOperationStatus`, `Error happen: `, ConsoleTheme.error, error)
+					this.logger.debug(this, `getAsyncOperationStatus`, `Error happened: `, ConsoleTheme.error, error)
 
 					// Make sure pass "true" to "clearCurrentOperation" !!!
 					this.dispatchAction(SendCashActions.sendCashFail(error.message, true))
@@ -873,8 +873,8 @@ export class ResistanceCliService {
 					const tempErrorMessage = errorAddressItems
 						.map(tempAddressItem => `[${tempAddressItem.address}]:\n ${tempAddressItem.errorMessage}\n\n`)
 						.join('\n')
-					const showMessge = `Error happen when getting the balance for the addresses below: \n\n${tempErrorMessage}`
-					setTimeout(() => this.dialogService.showError(`Address balance error`, showMessge), 500)
+					const showMessage = `Error happened when getting the balance for the addresses below: \n\n${tempErrorMessage}`
+					setTimeout(() => this.dialogService.showError(`Address balance error`, showMessage), 500)
 				}
 
 				if (disableThePrivateAddress) {
@@ -888,7 +888,7 @@ export class ResistanceCliService {
 				return addressList
 			})
 			.catch(error => {
-				this.logger.debug(this, `getWalletAddressAndBalance`, `Error happen: `, ConsoleTheme.error, error)
+				this.logger.debug(this, `getWalletAddressAndBalance`, `Error happened: `, ConsoleTheme.error, error)
 				return []
 			})
 
