@@ -1,31 +1,32 @@
 // @flow
-import { map, tap, switchMap } from 'rxjs/operators'
+import { tap, map, mapTo, switchMap } from 'rxjs/operators'
 import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
-import { AppAction } from '../appAction'
 import { OwnAddressesActions } from './own-addresses.reducer'
 import { ResistanceCliService } from '../../../service/resistance-cli-service'
-import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
 
-const epicInstanceName = 'OwnAddressesEpics'
-const resistanceCliService = new ResistanceCliService()
-const logger = new LoggerService()
+const rpcService = new ResistanceCliService()
 
-const getOwnAddressesEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-    ofType(OwnAddressesActions.GET_OWN_ADDRESSES),
-    tap((action: AppAction) => logger.debug(epicInstanceName, `getOwnAddressesEpic`, action.type, ConsoleTheme.testing)),
-    switchMap(() => resistanceCliService.getWalletAddressAndBalance(false)),
-    map(result => OwnAddressesActions.getOwnAddressesSuccess(result))
+const startGettingOwnAddressesEpic = (action$: ActionsObservable<any>) => action$.pipe(
+  ofType(OwnAddressesActions.startGettingOwnAddresses().type),
+  tap(() => { rpcService.startGettingOwnAddresses() }),
+  mapTo(OwnAddressesActions.empty())
 )
 
-const createNewAddressesEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-    ofType(OwnAddressesActions.CREATE_NEW_ADDRESS),
-    tap((action: AppAction) => logger.debug(epicInstanceName, `createNewAddressesEpic`, action.type, ConsoleTheme.testing)),
-    switchMap((action: AppAction) => resistanceCliService.createNewAddress(action.payload)),
-    map(result => result && result !== '' ? OwnAddressesActions.getOwnAddresses() : OwnAddressesActions.empty())
+const stopGettingOwnAddressesEpic = (action$: ActionsObservable<any>) => action$.pipe(
+  ofType(OwnAddressesActions.stopGettingOwnAddresses().type),
+  tap(() => { rpcService.stopGettingOwnAddresses() }),
+  mapTo(OwnAddressesActions.empty())
+)
+
+const createNewAddressesEpic = (action$: ActionsObservable<any>) => action$.pipe(
+  ofType(OwnAddressesActions.createNewAddress(true).type),
+  switchMap((action) => rpcService.createNewAddress(action.payload.isPrivate)),
+  map(result => result ? OwnAddressesActions.startGettingOwnAddresses() : OwnAddressesActions.empty())
 )
 
 export const OwnAddressesEpics = (action$, state$) => merge(
-    getOwnAddressesEpic(action$, state$),
-    createNewAddressesEpic(action$, state$)
+  startGettingOwnAddressesEpic(action$, state$),
+  stopGettingOwnAddressesEpic(action$, state$),
+  createNewAddressesEpic(action$, state$)
 )

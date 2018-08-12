@@ -1,33 +1,50 @@
 // @flow
-import { map, tap } from 'rxjs/operators'
+import { shell } from 'electron'
+import { tap, mapTo } from 'rxjs/operators'
 import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
-import { AppAction } from '../appAction'
+
 import { SystemInfoActions } from './system-info.reducer'
 import { ResistanceCliService } from '../../../service/resistance-cli-service'
-import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
+import { ResistanceService } from '../../../service/resistance-service'
+import { OSService } from '../../../service/os-service'
 
-const epicInstanceName = 'SystemInfoEpics'
 const resistanceCliService = new ResistanceCliService()
-const logger = new LoggerService()
+const resistanceService = new ResistanceService()
+const osService = new OSService()
 
-const startGettingDaemonInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-    ofType(SystemInfoActions.START_GETTING_DAEMON_INFO),
-    tap((action: AppAction) => logger.debug(epicInstanceName, `startGettingDaemonInfoEpic`, action.type, ConsoleTheme.testing)),
-    tap(() => resistanceCliService.startPollingDaemonStatus()),
-    map(() => SystemInfoActions.empty())
+const startGettingDaemonInfoEpic = (action$: ActionsObservable<any>) => action$.pipe(
+  ofType(SystemInfoActions.startGettingDaemonInfo().type),
+  tap(() => resistanceCliService.startPollingDaemonStatus()),
+    mapTo(SystemInfoActions.empty())
 )
 
-const startGettingBlockChainInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-    ofType(SystemInfoActions.START_GETTING_BLOCKCHAIN_INFO),
-    tap((action: AppAction) => logger.debug(epicInstanceName, `startGettingBlockChainInfoEpic`, action.type, ConsoleTheme.testing)),
-
-    // This action SHOULD only be dispatched once, return nothing !!!
-    tap(() => resistanceCliService.startPollingBlockChainInfo()),
-    map(() => SystemInfoActions.empty())
+const startGettingBlockchainInfoEpic = (action$: ActionsObservable<any>) => action$.pipe(
+  ofType(SystemInfoActions.startGettingBlockchainInfo().type),
+  // This action SHOULD only be dispatched once, return nothing!!!
+  tap(() => resistanceCliService.startPollingBlockChainInfo()),
+  mapTo(SystemInfoActions.empty())
 )
 
-export const SystemInfoEpics = (action$, store) => merge(
-    startGettingDaemonInfoEpic(action$, store),
-    startGettingBlockChainInfoEpic(action$, store)
+const openWalletInFileManagerEpic = (action$: ActionsObservable<any>) => action$.pipe(
+  ofType(SystemInfoActions.openWalletInFileManager().type),
+  tap(() => {
+    shell.openItem(resistanceService.getWalletPath())
+  }),
+  mapTo(SystemInfoActions.empty())
+)
+
+const openInstallationFolderEpic = (action$: ActionsObservable<any>) => action$.pipe(
+  ofType(SystemInfoActions.openInstallationFolder().type),
+  tap(() => {
+    shell.openItem(osService.getInstallationPath())
+  }),
+  mapTo(SystemInfoActions.empty())
+)
+
+export const SystemInfoEpics = (action$, state$) => merge(
+  openWalletInFileManagerEpic(action$, state$),
+  openInstallationFolderEpic(action$, state$),
+  startGettingDaemonInfoEpic(action$, state$),
+  startGettingBlockchainInfoEpic(action$, state$)
 )

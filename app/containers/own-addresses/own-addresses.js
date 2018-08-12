@@ -25,7 +25,14 @@ class OwnAddresses extends Component<Props> {
 	 * @memberof OwnAddresses
 	 */
 	componentDidMount() {
-		appStore.dispatch(OwnAddressesActions.getOwnAddresses())
+		appStore.dispatch(OwnAddressesActions.startGettingOwnAddresses())
+	}
+
+	/**
+	 * @memberof OwnAddresses
+	 */
+	componentWillUnmount() {
+		appStore.dispatch(OwnAddressesActions.stopGettingOwnAddresses())
 	}
 
 	eventConfirm(event) {
@@ -44,7 +51,7 @@ class OwnAddresses extends Component<Props> {
 
 	onRefreshClicked(event) {
 		this.eventConfirm(event)
-		appStore.dispatch(OwnAddressesActions.getOwnAddresses())
+		appStore.dispatch(OwnAddressesActions.startGettingOwnAddresses())
 	}
 
 	onAddNewAddressClicked(event) {

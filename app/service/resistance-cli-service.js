@@ -4,13 +4,14 @@ import { remote } from 'electron'
 import Client from 'bitcoin-core'
 import { from, Observable, of } from 'rxjs'
 import { map, tap, take, catchError } from 'rxjs/operators'
+
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { DialogService } from './dialog-service'
 import { getFormattedDateString } from '../utils/data-util'
 import { AppAction } from '../state/reducers/appAction'
 import { BlockChainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions } from '../state/reducers/overview/overview.reducer'
-import { AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
+import { OwnAddressesActions, AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
 import { SendCashActions, ProcessingOperation } from '../state/reducers/send-cash/send-cash.reducer'
 
 /**
@@ -19,7 +20,7 @@ import { SendCashActions, ProcessingOperation } from '../state/reducers/send-cas
 let instance = null
 
 /**
- * Get back the new resistance client instance
+ * Create a new resistance client instance.
  */
 const getResistanceClientInstance = () => {
 	const nodeConfig = remote.getGlobal('resistanceNodeConfig')
@@ -42,17 +43,14 @@ const getResistanceClientInstance = () => {
 	return client
 }
 
-let daemonInfoPollingIntervalId = -1
-const daemonInfoPollingIntervalSetting = 2 * 1000
-let blockchainInfoPollingIntervalId = -1
-const blockchainInfoPollingIntervalSetting = 4 * 1000
-let walletInfoPollingIntervalId = -1
-const walletInfoPollingIntervalSetting = 2 * 1000
-let transactionDataFromWalletPollingIntervalId = -1
-const transactionDataFromWalletPollingIntervalSetting = 5 * 1000
-
-let sendCashPollingIntervalId = -1
-const sendCashPollingIntervalSetting = 2 * 1000
+const pollingIntervalValues = {
+  daemon: 2 * 1000,
+  blockchainInfo: 4 * 1000,
+  walletInfo: 2 * 1000,
+  transactionDataFromTheWallet: 5 * 1000,
+  sendCash: 2 * 1000,
+  ownAddresses: 4 * 1000
+}
 
 /**
  * @export
@@ -61,6 +59,15 @@ const sendCashPollingIntervalSetting = 2 * 1000
 export class ResistanceCliService {
 	logger: LoggerService
 	dialogService: DialogService
+
+  pollingIntervalIds = {
+    daemon: -1,
+    blockchainInfo: -1,
+    walletInfo: -1,
+    transactionDataFromTheWallet: -1,
+    sendCash: -1,
+    ownAddresses: -1
+  }
 
 	/**
 	 *Creates an instance of ResistanceCliService.
@@ -158,28 +165,14 @@ export class ResistanceCliService {
 				)
 		}
 
-		// The first run
-		getAsyncDaemonInfo()
-
-		// The periodic run
-		if (daemonInfoPollingIntervalId !== -1) {
-			clearInterval(daemonInfoPollingIntervalId)
-			daemonInfoPollingIntervalId = -1
-		}
-		daemonInfoPollingIntervalId = setInterval(
-			() => getAsyncDaemonInfo(),
-			daemonInfoPollingIntervalSetting
-		)
+    this.startPolling('daemon', () => getAsyncDaemonInfo())
 	}
 
 	/**
 	 * @memberof ResistanceCliService
 	 */
 	stopPollingWalletInfo() {
-		if (walletInfoPollingIntervalId !== -1) {
-			clearInterval(walletInfoPollingIntervalId)
-			walletInfoPollingIntervalId = -1
-		}
+    this.stopPolling('walletInfo')
 	}
 
 	/**
@@ -234,25 +227,14 @@ export class ResistanceCliService {
 				)
 		}
 
-		// The first run
-		getAsyncWalletInfo()
-
-		// The periodic run
-		this.stopPollingWalletInfo()
-		walletInfoPollingIntervalId = setInterval(
-			() => getAsyncWalletInfo(),
-			walletInfoPollingIntervalSetting
-		)
+    this.startPolling('walletInfo', () => getAsyncWalletInfo())
 	}
 
 	/**
 	 * @memberof ResistanceCliService
 	 */
 	stopPollingTransactionsDataFromWallet() {
-		if (transactionDataFromWalletPollingIntervalId !== -1) {
-			clearInterval(transactionDataFromWalletPollingIntervalId)
-			transactionDataFromWalletPollingIntervalId = -1
-		}
+    this.stopPolling('transactionDataFromTheWallet')
 	}
 
 	/**
@@ -446,22 +428,14 @@ export class ResistanceCliService {
 				)
 		}
 
-		// The first run
-		getAsyncTransactionDataFromWallet()
-
-		// The periodic run
-		this.stopPollingTransactionsDataFromWallet()
-		transactionDataFromWalletPollingIntervalId = setInterval(() => getAsyncTransactionDataFromWallet(), transactionDataFromWalletPollingIntervalSetting)
+    this.startPolling('transactionDataFromTheWallet', () => getAsyncTransactionDataFromWallet())
 	}
 
 	/**
 	 * @memberof ResistanceCliService
 	 */
 	stopPollingBlockChainInfo() {
-		if (blockchainInfoPollingIntervalId !== -1) {
-			clearInterval(blockchainInfoPollingIntervalId)
-			blockchainInfoPollingIntervalId = -1
-		}
+    this.stopPolling('blockchainInfo')
 	}
 
 	/**
@@ -546,22 +520,14 @@ export class ResistanceCliService {
 				.subscribe((blockchainInfo: BlockChainInfo) => {
 					this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe blockchainInfo: `, ConsoleTheme.testing, blockchainInfo)
 
-					this.dispatchAction(SystemInfoActions.gotBlockChainInfo(blockchainInfo))
+					this.dispatchAction(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
 				},
 					error => this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe error: `, ConsoleTheme.error, error)
 					// () => this.logger.debug(this, `startPollingBlockChainInfo`, `observable completed.`, ConsoleTheme.testing)
 				)
 		}
 
-		// The first run
-		getAsyncBlockchainInfo()
-
-		// The periodic run
-		this.stopPollingBlockChainInfo()
-		blockchainInfoPollingIntervalId = setInterval(
-			() => getAsyncBlockchainInfo(),
-			blockchainInfoPollingIntervalSetting
-		)
+    this.startPolling('blockchainInfo', () => getAsyncBlockchainInfo())
 	}
 
 	/**
@@ -709,10 +675,7 @@ export class ResistanceCliService {
 	 * @memberof ResistanceCliService
 	 */
 	stopPollingOperationStatus() {
-		if (sendCashPollingIntervalId !== -1) {
-			clearInterval(sendCashPollingIntervalId)
-			sendCashPollingIntervalId = -1
-		}
+    this.stopPolling('sendCash')
 	}
 
 	/**
@@ -773,10 +736,8 @@ export class ResistanceCliService {
 				})
 		}
 
-		sendCashPollingIntervalId = setInterval(() => getAsyncOperationStatus(operationId), sendCashPollingIntervalSetting)
+		this.pollingIntervalIds.sendCash = setInterval(() => getAsyncOperationStatus(operationId), pollingIntervalValues.sendCash)
 	}
-
-
 
 	/**
 	 * @param {boolean} sortByGroupBalance
@@ -893,5 +854,61 @@ export class ResistanceCliService {
 			})
 
 		return from(queryPromise).pipe(take(1))
+	}
+
+
+	/**
+   * Start getting own addresses with an interval.
+   *
+	 * @memberof ResistanceCliService
+	 */
+  startGettingOwnAddresses() {
+    const handler = () => {
+      this.getWalletAddressAndBalance(false).subscribe(result => {
+        this.dispatchAction(OwnAddressesActions.gotOwnAddresses(result))
+      }, err => {
+        this.dispatchAction(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
+      })
+
+    }
+    this.startPolling('ownAddresses', () => handler())
+  }
+
+	/**
+   * Start polling.
+   *
+	 * @memberof ResistanceCliService
+	 */
+  stopGettingOwnAddresses() {
+    this.stopPolling('ownAddresses')
+  }
+
+	/**
+   * Start polling.
+   *
+	 * @memberof ResistanceCliService
+	 */
+  startPolling(entityName: string, handler) {
+    this.stopPolling(entityName)
+
+    // Trigger immediately at the first time
+    handler()
+
+		this.pollingIntervalIds[entityName] = setInterval(
+      handler,
+			pollingIntervalValues[entityName]
+		)
+	}
+
+	/**
+   * Stop polling.
+   *
+	 * @memberof ResistanceCliService
+	 */
+	stopPolling(entityName: string) {
+		if (this.pollingIntervalIds[entityName] !== -1) {
+			clearInterval(this.pollingIntervalIds[entityName])
+			this.pollingIntervalIds[entityName] = -1
+		}
 	}
 }

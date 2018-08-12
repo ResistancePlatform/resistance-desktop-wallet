@@ -3,7 +3,7 @@ import { EOL } from 'os'
 import * as fs from 'fs';
 import path from 'path'
 
-import { app } from 'electron'
+import { app, remote } from 'electron'
 
 import { OSService } from './os-service'
 
@@ -17,6 +17,7 @@ let instance = null
 
 const osService = new OSService()
 
+const walletFolderName = 'testnet3'
 const configFolderName = 'Resistance'
 const configFileName = 'resistance.conf'
 const configFileContents = [
@@ -39,6 +40,7 @@ const torSwitch = '-proxy=127.0.0.1:9050'
 export class ResistanceService {
 	/**
 	 * Creates an instance of ResistanceService.
+   *
 	 * @memberof ResistanceService
 	 */
 	constructor() {
@@ -48,13 +50,27 @@ export class ResistanceService {
 	}
 
 	/**
+	 * Returns Resistance service data path.
+   *
+	 * @memberof ResistanceService
+	 */
+  getDataPath() {
+    const validApp = process.type === 'renderer' ? remote.app : app
+    return path.join(validApp.getPath('appData'), configFolderName)
+  }
+
+  getWalletPath() {
+    return path.join(this.getDataPath(), walletFolderName)
+  }
+
+	/**
    * Checks if Resistance node config is present and creates one if it doesn't.
    *
 	 * @memberof ResistanceService
 	 * @returns {Object} Node configuration dictionary
 	 */
   checkAndCreateConfig(): Object {
-    const configFolder = path.join(app.getPath('appData'), configFolderName)
+    const configFolder = this.getDataPath()
     const configFile = path.join(configFolder, configFileName)
 
     if (!fs.existsSync(configFolder)) {

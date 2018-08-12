@@ -1,5 +1,6 @@
 // @flow
-import { AppAction } from '../appAction'
+import { createActions, handleActions } from 'redux-actions'
+import { defaultAppState } from '../default-app-state'
 
 export type AddressRow = {
 	balance: number,
@@ -12,48 +13,33 @@ export type OwnAddressesState = {
 	showDropdownMenu?: boolean
 }
 
-const ownAddressesActionTypePrefix = 'OWN_ADDRESSES_ACTION'
+export const OwnAddressesActions = createActions(
+  {
+    EMPTY: undefined,
 
-export const OwnAddressesActions = {
-	EMPTY: `${ownAddressesActionTypePrefix}: EMPTY`,
+    START_GETTING_OWN_ADDRESSES: undefined,
+    STOP_GETTING_OWN_ADDRESSES: undefined,
+    GOT_OWN_ADDRESSES: (addresses: AddressRow[]) => ({ addresses }),
+    GET_OWN_ADDRESSES_FAILURE:  (errorMessage: string) => ({ errorMessage }),
 
-	GET_OWN_ADDRESSES: `${ownAddressesActionTypePrefix}: GET_OWN_ADDRESSES`,
-	GET_OWN_ADDRESSES_SUCCESS: `${ownAddressesActionTypePrefix}: GET_OWN_ADDRESSES_SUCCESS`,
-	GET_OWN_ADDRESSES_FAIL: `${ownAddressesActionTypePrefix}: GET_OWN_ADDRESSES_FAIL`,
+    CREATE_NEW_ADDRESS: (isPrivate: boolean) => ({ isPrivate }),
 
-	UPDATE_DROPDOWN_MENU_VISIBILITY: `${ownAddressesActionTypePrefix}: UPDATE_DROPDOWN_MENU_VISIBILITY`,
+    UPDATE_DROPDOWN_MENU_VISIBILITY: (show: boolean) => ({ show })
+  },
+  {
+    prefix: 'APP/OWN_ADDRESSES'
+  }
+)
 
-	CREATE_NEW_ADDRESS: `${ownAddressesActionTypePrefix}: CREATE_NEW_ADDRESS`,
-
-	getOwnAddresses: (): AppAction => ({ type: OwnAddressesActions.GET_OWN_ADDRESSES }),
-	getOwnAddressesSuccess: (addresses: AddressRow[]): AppAction => ({ type: OwnAddressesActions.GET_OWN_ADDRESSES_SUCCESS, payload: addresses }),
-	getOwnAddressesFail: (): AppAction => ({ type: OwnAddressesActions.GET_OWN_ADDRESSES_FAIL }),
-
-	updateDropdownMenuVisibility: (show: boolean): AppAction => ({ type: OwnAddressesActions.UPDATE_DROPDOWN_MENU_VISIBILITY, payload: show }),
-
-	createNewAddress: (isPrivate: boolean): AppAction => ({ type: OwnAddressesActions.CREATE_NEW_ADDRESS, payload: isPrivate }),
-
-	empty: (): AppAction => ({ type: OwnAddressesActions.EMPTY })
-}
-
-const initState: OwnAddressesState = {
-	addresses: [],
-	showDropdownMenu: false
-}
-
-export const OwnAddressesReducer = (state: OwnAddressesState = initState, action: AppAction) => {
-
-	switch (action.type) {
-		case OwnAddressesActions.GET_OWN_ADDRESSES_SUCCESS:
-			return { ...state, addresses: action.payload }
-
-		case OwnAddressesActions.GET_OWN_ADDRESSES_FAIL:
-			return { ...state, addresses: [] }
-
-		case OwnAddressesActions.UPDATE_DROPDOWN_MENU_VISIBILITY:
-			return { ...state, showDropdownMenu: action.payload }
-
-		default:
-			return state
-	}
-}
+export const OwnAddressesReducer = handleActions(
+  {
+    [OwnAddressesActions.gotOwnAddresses]: (state, action) => ({
+      ...state, addresses: action.payload.addresses
+    }),
+    [OwnAddressesActions.getOwnAddressesFailure]: state => ({
+      ...state, addresses: []
+    }),
+    [OwnAddressesActions.updateDropdownMenuVisibility]: (state, action) => ({
+      ...state, showDropdownMenu: action.payload.show
+    })
+  }, defaultAppState)

@@ -35,7 +35,7 @@ export default class TransactionList extends Component<Props> {
 			<div className={[styles.tableContainer].join(' ')}>
 				<div className={[HLayout.hBoxContainer, styles.tableHeader].join(' ')}>
 					<div className={styles.tableHeaderColumnType}>Type</div>
-					<div className={styles.tableHeaderColumnDirection}>Diretion</div>
+					<div className={styles.tableHeaderColumnDirection}>Direction</div>
 					<div className={styles.tableHeaderColumnConfirmed}>Confirmed</div>
 					<div className={styles.tableHeaderColumnAmount}>Amount</div>
 					<div className={styles.tableHeaderColumnDate}>Date</div>

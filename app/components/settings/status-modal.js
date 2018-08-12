@@ -1,4 +1,6 @@
 // @flow
+import * as fs from 'fs';
+
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Modal from 'react-modal'
@@ -7,7 +9,7 @@ import { LazyLog } from 'react-lazylog'
 import classNames from 'classnames'
 
 import 'react-tabs/style/react-tabs.scss'
-import { OSService } from '../../service/os-service'
+import { OSService, ChildProcessName } from '../../service/os-service'
 import { appStore } from '../../state/store/configureStore'
 import { SettingsActions, SettingsState } from '../../state/reducers/settings/settings.reducer'
 import styles from './status-modal.scss'
@@ -16,23 +18,58 @@ const osService = new OSService()
 
 type Props = {
 	settings: SettingsState,
-	systemInfo: SystemInfoState
+  systemInfo: SystemInfoState
 }
 
 class StatusModal extends Component<Props> {
 	props: Props
+  processLogFileExists: { [ChildProcessName]: boolean }
+
+  constructor(props) {
+    super(props)
+    this.processLogFileExists = {}
+  }
 
 	/**
 	 * @memberof StatusModal
 	 */
 	componentDidMount() {
     Modal.setAppElement('#App')
+    this.checkLogFilesExistence()
   }
 
 	eventConfirm(event) {
 		event.preventDefault()
 		event.stopPropagation()
 	}
+
+	/**
+   * Check every process log file for accessibility.
+   *
+	 * @memberof StatusModal
+	 */
+  checkLogFilesExistence() {
+    const processNames = ['NODE', 'MINER', 'TOR']
+
+    processNames.forEach((processName) => {
+      const logFilePath = osService.getLogFilePath(processName)
+      fs.access(logFilePath, err => {
+        this.processLogFileExists[processName] = !err
+      })
+    })
+  }
+
+  getLazyLogElement(processName: ChildProcessName) {
+    if (this.processLogFileExists[processName]) {
+      return (
+        <LazyLog url={osService.getLogFilePath(processName)} selectableLines follow style={{ backgroundColor: 'rgb(21, 26, 53)' }} />
+      )
+    }
+
+    return (
+      <span>The log file for {processName} doesn&apos;t exist yet. Start the process in order to have something here.</span>
+    )
+  }
 
   getChildProcessStatusClassNames(processName: ChildProcessName) {
     const processStatus = this.props.settings.childProcessesStatus[processName]
@@ -95,6 +132,7 @@ class StatusModal extends Component<Props> {
             className={styles.tabs}
             selectedTabClassName={styles.selectedTab}
             selectedTabPanelClassName={styles.selectedTabPanel}
+            onSelect={() => {this.checkLogFilesExistence()}}
           >
             <TabList className={styles.tabList}>
               <Tab className={styles.tab}>Get Info</Tab>
@@ -144,15 +182,16 @@ class StatusModal extends Component<Props> {
             </TabPanel>
 
             <TabPanel>
-              <LazyLog url={osService.getLogFilePath('NODE')} follow style={{ backgroundColor: 'rgb(21, 26, 53)' }} />
+              {this.getLazyLogElement('NODE')}
+
             </TabPanel>
 
             <TabPanel>
-              <LazyLog url={osService.getLogFilePath('MINER')} follow style={{ backgroundColor: 'rgb(21, 26, 53)' }} />
+              {this.getLazyLogElement('MINER')}
             </TabPanel>
 
             <TabPanel>
-              <LazyLog url={osService.getLogFilePath('TOR')} follow style={{ backgroundColor: 'rgb(21, 26, 53)' }} />
+              {this.getLazyLogElement('TOR')}
             </TabPanel>
           </Tabs>
         </div>
@@ -173,7 +212,7 @@ class StatusModal extends Component<Props> {
 
 const mapStateToProps = state => ({
 	settings: state.settings,
-	systemInfo: state.systemInfo
+  systemInfo: state.systemInfo,
 })
 
 export default connect(mapStateToProps, null)(StatusModal)

@@ -51,11 +51,11 @@ $SYSTEM_INFO_BAR_HEIGHT: 5.5rem;
     color: $SYSTEM_INFO_BAR_NOT_RUNNING_ICON_COLOR;
 }
 
-.walletInFinderButton {
+.walletInFileManagerButton {
     @include roundedButton();
 }
 
-.installationPathButton {
+.installationFolderButton {
     @include roundedButton();
 
     margin-left: 1rem;

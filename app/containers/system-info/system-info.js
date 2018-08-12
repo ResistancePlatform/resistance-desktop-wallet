@@ -1,12 +1,16 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
+
+import { OSService } from '../../service/os-service'
 import { SystemInfoActions, SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
 import { appStore } from '../../state/store/configureStore'
 import { AppState } from '../../state/reducers/appState'
 
 import styles from './system-info.scss'
 import HLayout from '../../theme/h-box-layout.scss'
+
+const osService = new OSService()
 
 type Props = {
 	systemInfo: SystemInfoState
@@ -24,8 +28,31 @@ class SystemInfo extends Component<Props> {
 	 */
 	componentDidMount() {
 		appStore.dispatch(SystemInfoActions.startGettingDaemonInfo())
-		appStore.dispatch(SystemInfoActions.startGettingBlockChainInfo())
+		appStore.dispatch(SystemInfoActions.startGettingBlockchainInfo())
 	}
+
+	/**
+	 * @param {*} event
+	 * @memberof Settings
+	 */
+	eventConfirm(event) {
+		event.preventDefault()
+		event.stopPropagation()
+	}
+
+  getWalletInFileManagerLabel() {
+    return osService.getOS() === 'windows' ? 'Wallet in Explorer' : 'Wallet in Finder';
+  }
+
+  onWalletInFileManagerClicked(event) {
+    this.eventConfirm(event)
+    appStore.dispatch(SystemInfoActions.openWalletInFileManager())
+  }
+
+  onInstallationFolderClicked(event) {
+    this.eventConfirm(event)
+    appStore.dispatch(SystemInfoActions.openInstallationFolder())
+  }
 
 	displayLastBlockTime(tempDate: Date | null) {
 		if (tempDate === undefined || tempDate === null || tempDate === false) {
@@ -90,9 +117,20 @@ class SystemInfo extends Component<Props> {
 
 				</div>
 
-				{ /* Buttons */}
-				{/* <button className={[styles.walletInFinderButton].join(' ')}>WALLET IN FINDER</button>
-				<button className={[styles.installationPathButton].join(' ')}>INSTALLATION PATH</button> */}
+				{/* Buttons - don't add onKeyDown() handler, otherwise Finder will become active on Cmd-commands (like Cmd-Q) */}
+        <button
+          className={styles.walletInFileManagerButton}
+          onClick={event => this.onWalletInFileManagerClicked(event)}
+        >
+          {this.getWalletInFileManagerLabel()}
+        </button>
+
+        <button
+          className={styles.installationFolderButton}
+          onClick={event => this.onInstallationFolderClicked(event)}
+        >
+          Installation Folder
+        </button>
 			</div>
 		)
 	}
