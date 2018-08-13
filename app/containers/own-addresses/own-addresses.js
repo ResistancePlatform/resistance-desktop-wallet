@@ -49,11 +49,6 @@ class OwnAddresses extends Component<Props> {
 		this.eventConfirm(event)
 	}
 
-	onRefreshClicked(event) {
-		this.eventConfirm(event)
-		appStore.dispatch(OwnAddressesActions.startGettingOwnAddresses())
-	}
-
 	onAddNewAddressClicked(event) {
 		this.eventConfirm(event)
 		appStore.dispatch(OwnAddressesActions.updateDropdownMenuVisibility(true))
@@ -108,7 +103,6 @@ class OwnAddresses extends Component<Props> {
 							<div className={styles.topBarTitle}>Own Addresses</div>
 							<div className={[styles.topBarButtonContainer, HLayout.hBoxChild].join(' ')}>
 								<button onClick={(event) => this.onShowPrivteKeyClicked(event)} onKeyDown={(event) => this.onShowPrivteKeyClicked(event)} > SHOW PRIVATE KEY</button>
-								<button onClick={(event) => this.onRefreshClicked(event)} onKeyDown={(event) => this.onRefreshClicked(event)} > REFRESH</button>
 								<div className={[styles.addAddressButtonContainer].join(' ')} onClick={(event) => this.onAddNewAddressClicked(event)} onKeyDown={(event) => this.onAddNewAddressClicked(event)} >
 									<button className={styles.addNewAddressButton} >+ ADD NEW ADDRESS
 										<span className="icon-arrow-down" />
