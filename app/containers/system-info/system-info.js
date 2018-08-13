@@ -115,6 +115,13 @@ class SystemInfo extends Component<Props> {
 						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockChainInfo.connectionCount}</div>
 					</div>
 
+					<div className={styles.statusColumnWrapper}>
+						<div className={styles.statusColoumnTitle}>ICONS</div>
+            <div className={styles.statusColoumnValue}>
+								<span><i className={['icon-status-running', styles.daemonIsRunning].join(' ')} />
+            </div>
+					</div>
+
 				</div>
 
 				{/* Buttons - don't add onKeyDown() handler, otherwise Finder will become active on Cmd-commands (like Cmd-Q) */}
