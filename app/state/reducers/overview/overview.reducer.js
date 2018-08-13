@@ -12,6 +12,30 @@ export type Transaction = {
 	transactionId?: string
 }
 
+export type DetailPerAcount = {
+	account: string,
+	address: string,
+	category: string,
+	amount: string,
+	vout: number,
+	size: number
+}
+
+export type TransactionDetail = {
+	amount: string,
+	confirmations: number,
+	generated: boolean,
+	blockhash: string,
+	blockindex: number,
+	blocktime: number,
+	expiryheight: number,
+	txid: string,
+	time: number;
+	timereceived: number,
+	details: Array<DetailPerAcount>,
+	hex: string
+}
+
 export type Balances = {
 	transparentBalance: number,
 	transparentUnconfirmedBalance?: number,
@@ -23,7 +47,14 @@ export type Balances = {
 
 export type OverviewState = {
 	balances?: Balances,
-	transactions?: Array<Transaction>
+	transactions?: Array<Transaction>,
+	popupMenu?: {
+		show: boolean,
+		posX: number,
+		posY: number,
+		popupTransactionId: string
+	},
+	transactionDetail?: TransactionDetail | null | string
 }
 
 export const OverviewActions = createActions(
@@ -40,7 +71,14 @@ export const OverviewActions = createActions(
 
 		MAIN_WINDOW_CLOSE: undefined,
 		MAIN_WINDOW_MINIMIZE: undefined,
-		MAIN_WINDOW_MAXIMIZE: undefined
+		MAIN_WINDOW_MAXIMIZE: undefined,
+
+		UPDATE_POPUP_MENU_VISIBILITY: (show: boolean, posX: number, posY: number, popupTransactionId: string) => ({ show, posX, posY, popupTransactionId }),
+
+		SHOW_TRANSACTION_DETAIL: (transactionId: string) => transactionId,
+		SHOW_TRANSACTION_DETAIL_SUCCESS: (transactionDetail: TransactionDetail) => transactionDetail,
+		SHOW_TRANSACTION_DETAIL_FAIL: (errorMessage: string) => errorMessage,
+		BACK_TO_TRANSACTION_LIST: undefined
 	},
 	{
 		prefix: 'APP/OVERVIEW_ACTION'
@@ -49,5 +87,17 @@ export const OverviewActions = createActions(
 
 export const OverviewReducer = handleActions({
 	[OverviewActions.gotWalletInfo]: (state, action) => ({ ...state, balances: action.payload }),
-	[OverviewActions.gotTransactionDataFromWallet]: (state, action) => ({ ...state, transactions: action.payload })
+	[OverviewActions.gotTransactionDataFromWallet]: (state, action) => ({ ...state, transactions: action.payload }),
+	[OverviewActions.updatePopupMenuVisibility]: (state, action) => ({
+		...state,
+		popupMenu: {
+			show: action.payload.show,
+			posX: action.payload.posX,
+			posY: action.payload.posY,
+			popupTransactionId: action.payload.popupTransactionId
+		}
+	}),
+	[OverviewActions.showTransactionDetailSuccess]: (state, action) => ({ ...state, transactionDetail: action.payload }),
+	[OverviewActions.showTransactionDetailFail]: (state, action) => ({ ...state, transactionDetail: action.payload }),
+	[OverviewActions.backToTransactionList]: (state) => ({ ...state, transactionDetail: null })
 }, defaultAppState)

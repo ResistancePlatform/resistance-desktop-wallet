@@ -28,7 +28,7 @@ $TRANSACTION_LIST_COLUMN_DATE_WIDTH: 9rem;
 }
 
 .tableContainer {
-
+    position: relative;
 }
 
 .tableHeader {
@@ -62,6 +62,7 @@ $TRANSACTION_LIST_COLUMN_DATE_WIDTH: 9rem;
 
 .tableBodyRow {
     font-weight: 300;
+    cursor: default;
 
     div {
         padding: 0.8rem 0;

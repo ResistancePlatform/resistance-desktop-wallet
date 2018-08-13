@@ -1,0 +1,17 @@
+@import "../../theme/vars.scss";
+
+$POP_UP_MENU_CONTAINER_WIDTH: 91.5%;
+
+.transactionPopupMenuContainer {
+    padding: 0.3rem 1.3rem;
+    width: $POP_UP_MENU_CONTAINER_WIDTH;
+    min-width: $POP_UP_MENU_CONTAINER_WIDTH;
+
+    position: absolute;
+    background-color: $OWN_ADDRESSES_DROPDOWN_MENU_BACKGROUND_COLOR;
+
+    text-align: left;
+    border-radius: 0.35rem;
+
+    z-index: 1;
+}

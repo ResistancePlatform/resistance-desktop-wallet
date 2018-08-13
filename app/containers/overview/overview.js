@@ -5,6 +5,7 @@ import { OverviewActions } from '../../state/reducers/overview/overview.reducer'
 import { appStore } from '../../state/store/configureStore'
 import Balance from '../../components/overview/Balance'
 import TransactionList from '../../components/overview/TransactionList'
+import TransactionPopupMenu from '../../components/overview/transaction-popup-menu'
 import styles from './overview.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
@@ -37,6 +38,40 @@ class Overview extends Component<Props> {
 		appStore.dispatch(OverviewActions.stopGettingTransactionDataFromWallet())
 	}
 
+	onTransactionRowClickHandler(event: any, transactionId: string) {
+		if (event.type === 'contextmenu') {
+			appStore.dispatch(OverviewActions.updatePopupMenuVisibility(true, event.clientX, event.clientY, transactionId))
+		} else {
+			appStore.dispatch(OverviewActions.updatePopupMenuVisibility(false, -1, -1, ''))
+		}
+	}
+
+	onMenuItemClickedHandler(name: string) {
+		appStore.dispatch(OverviewActions.updatePopupMenuVisibility(false, -1, -1, ''))
+		console.log(`onMenuItemClickedHandler - name: ${name}`)
+
+		switch (name) {
+			case "COPY_VALUE": {
+				break
+			}
+			case "EXPORT_DATA_TO_.CSV": {
+				break
+			}
+			case "SHOW_DETAILS": {
+				break
+			}
+			case "SHOW_IN_BLOCK_EXPLORER": {
+				break
+			}
+			case "SHOW_TRANSACTION_MEMO": {
+				break
+			}
+			default: {
+				break
+			}
+		}
+	}
+
 	/**
 	 * @returns
 	 * @memberof Overview
@@ -51,7 +86,16 @@ class Overview extends Component<Props> {
 
 					<div className={[HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
 						<Balance balances={this.props.overview.balances} />
-						<TransactionList transactions={this.props.overview.transactions} />
+						<TransactionList
+							transactions={this.props.overview.transactions}
+							onTransactionRowClick={this.onTransactionRowClickHandler}
+						/>
+						<TransactionPopupMenu
+							show={this.props.overview.popupMenu.show}
+							posX={this.props.overview.popupMenu.posX ? this.props.overview.popupMenu.posX : -1}
+							posY={this.props.overview.popupMenu.posY ? this.props.overview.popupMenu.posY : -1}
+							onMenuItemClicked={this.onMenuItemClickedHandler}
+						/>
 					</div>
 				</div>
 

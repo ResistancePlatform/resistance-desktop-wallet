@@ -1,5 +1,5 @@
 // @flow
-import { map, tap } from 'rxjs/operators'
+import { map, tap, switchMap } from 'rxjs/operators'
 import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { AppAction } from '../appAction'
@@ -39,10 +39,18 @@ const stopGettingTransactionDataFromWalletEpic = (action$: ActionsObservable<App
     map(() => OverviewActions.empty())
 )
 
+const showTransactionDetailEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+    ofType(OverviewActions.showTransactionDetail),
+    tap((action: AppAction) => logger.debug(epicInstanceName, `showTransactionDetailEpic`, action.type, ConsoleTheme.testing)),
+    switchMap((action) => resistanceCliService.getTransactionDetail(action.payload))
+)
+
+
 
 export const OverviewEpics = (action$, state$) => merge(
     startGettingWalletInfoEpic(action$, state$),
     stopGettingWalletInfoEpic(action$, state$),
     startGettingTransactionDataFromWalletEpic(action$, state$),
-    stopGettingTransactionDataFromWalletEpic(action$, state$)
+    stopGettingTransactionDataFromWalletEpic(action$, state$),
+    showTransactionDetailEpic(action$, state$)
 )
