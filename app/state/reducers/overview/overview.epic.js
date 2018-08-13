@@ -12,28 +12,28 @@ const resistanceCliService = new ResistanceCliService()
 const logger = new LoggerService()
 
 const startGettingWalletInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-    ofType(OverviewActions.START_GETTING_WALLET_INFO),
+    ofType(OverviewActions.startGettingWalletInfo),
     tap((action: AppAction) => logger.debug(epicInstanceName, `startGettingWalletInfoEpic`, action.type, ConsoleTheme.testing)),
     tap(() => resistanceCliService.startPollingWalletInfo()),
     map(() => OverviewActions.empty())
 )
 
 const stopGettingWalletInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-    ofType(OverviewActions.STOP_GETTING_WALLET_INFO),
+    ofType(OverviewActions.stopGettingWalletInfo),
     tap((action: AppAction) => logger.debug(epicInstanceName, `stopGettingWalletInfoEpic`, action.type, ConsoleTheme.testing)),
     tap(() => resistanceCliService.stopPollingWalletInfo()),
     map(() => OverviewActions.empty())
 )
 
 const startGettingTransactionDataFromWalletEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-    ofType(OverviewActions.START_GETTING_TRANSACTION_DATA_FROM_WALLET),
+    ofType(OverviewActions.startGettingTransactionDataFromWallet),
     tap((action: AppAction) => logger.debug(epicInstanceName, `startGettingTransactionDataFromWalletEpic`, action.type, ConsoleTheme.testing)),
     tap(() => resistanceCliService.startPollingTransactionsDataFromWallet()),
     map(() => OverviewActions.empty())
 )
 
 const stopGettingTransactionDataFromWalletEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-    ofType(OverviewActions.STOP_GETTING_TRANSACTION_DATA_FROM_WALLET),
+    ofType(OverviewActions.stopGettingTransactionDataFromWallet),
     tap((action: AppAction) => logger.debug(epicInstanceName, `stopGettingTransactionDataFromWalletEpic`, action.type, ConsoleTheme.testing)),
     tap(() => resistanceCliService.stopPollingTransactionsDataFromWallet()),
     map(() => OverviewActions.empty())
