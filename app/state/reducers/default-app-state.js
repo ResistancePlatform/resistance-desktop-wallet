@@ -22,7 +22,11 @@ export const defaultAppState: AppState = {
 			connectionCount: 0,
 			blockchainSynchronizedPercentage: 0,
 			lastBlockDate: null
-		}
+    },
+    miner: {
+      hashingPower: 0,
+      minedBlocksNumber: 0
+    }
 	},
 	overview: {
 		balances: {

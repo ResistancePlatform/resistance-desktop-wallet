@@ -60,3 +60,13 @@ $SYSTEM_INFO_BAR_HEIGHT: 5.5rem;
 
     margin-left: 1rem;
 }
+
+.statusIcon {
+  width: 16px;
+  height: 16px;
+  color: gray;
+
+  &.active {
+    color: green;
+  }
+}
