@@ -871,7 +871,9 @@ export class ResistanceCliService {
       })
 
     }
-    this.startPolling('ownAddresses', () => handler())
+    handler()
+    // TODO: Re-enable after fixing the 500 error problem
+    // this.startPolling('ownAddresses', () => handler())
   }
 
 	/**
@@ -880,7 +882,8 @@ export class ResistanceCliService {
 	 * @memberof ResistanceCliService
 	 */
   stopGettingOwnAddresses() {
-    this.stopPolling('ownAddresses')
+    // TODO: Re-enable after fixing the 500 error problem
+    // this.stopPolling('ownAddresses')
   }
 
 	/**
