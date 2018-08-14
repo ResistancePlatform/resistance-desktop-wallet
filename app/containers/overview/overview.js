@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
+
 import { OverviewActions } from '../../state/reducers/overview/overview.reducer'
 import { appStore } from '../../state/store/configureStore'
 import Balance from '../../components/overview/Balance'
@@ -13,7 +14,8 @@ import VLayout from '../../theme/v-box-layout.scss'
 
 
 type Props = {
-	overview: OverviewState
+  overview: OverviewState,
+  settings: SettingsState
 }
 
 /**
@@ -22,22 +24,43 @@ type Props = {
  */
 class Overview extends Component<Props> {
 	props: Props
+  isLocalNodePollingStarted: boolean
 
 	/**
 	 * @memberof Overview
 	 */
 	componentDidMount() {
-		appStore.dispatch(OverviewActions.startGettingWalletInfo())
-		appStore.dispatch(OverviewActions.startGettingTransactionDataFromWallet())
+    this.isLocalNodePollingStarted = false
+    this.checkLocalNodeStatusAndStartPolling()
 	}
+
+	/**
+	 * @param {*} nextProps
+	 * @memberof Overview
+	 */
+  componentDidUpdate() {
+    this.checkLocalNodeStatusAndStartPolling()
+  }
 
 	/**
 	 * @memberof Overview
 	 */
 	componentWillUnmount() {
+    this.isLocalNodePollingStarted = false
 		appStore.dispatch(OverviewActions.stopGettingWalletInfo())
 		appStore.dispatch(OverviewActions.stopGettingTransactionDataFromWallet())
 	}
+
+	/**
+	 * @memberof Overview
+	 */
+  checkLocalNodeStatusAndStartPolling() {
+    if (!this.isLocalNodePollingStarted && this.props.settings.childProcessesStatus.NODE === 'RUNNING') {
+      this.isLocalNodePollingStarted = true
+      appStore.dispatch(OverviewActions.startGettingWalletInfo())
+      appStore.dispatch(OverviewActions.startGettingTransactionDataFromWallet())
+    }
+  }
 
 	/**
 	 * @param {*} event
@@ -133,7 +156,8 @@ class Overview extends Component<Props> {
 
 
 const mapStateToProps = (state) => ({
-	overview: state.overview
+	overview: state.overview,
+	settings: state.settings
 })
 
 export default connect(mapStateToProps, null)(Overview);
