@@ -39,10 +39,14 @@ const stopGettingTransactionDataFromWalletEpic = (action$: ActionsObservable<App
     map(() => OverviewActions.empty())
 )
 
-const showTransactionDetailEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const showTransactionDetailEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
     ofType(OverviewActions.showTransactionDetail),
     tap((action: AppAction) => logger.debug(epicInstanceName, `showTransactionDetailEpic`, action.type, ConsoleTheme.testing)),
-    switchMap((action) => resistanceCliService.getTransactionDetail(action.payload))
+    switchMap(() => {
+        const overviewState = state$.value.overview
+        return resistanceCliService.getTransactionDetail(overviewState.popupMenu.popupTransactionId)
+    }),
+    map(result => typeof result === 'object' ? OverviewActions.showTransactionDetailSuccess(result) : OverviewActions.showTransactionDetailFail(result))
 )
 
 

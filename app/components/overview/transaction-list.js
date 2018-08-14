@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react'
 import { Transaction } from '../../state/reducers/overview/overview.reducer'
-import styles from './TransactionList.scss'
+import styles from './transaction-list.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
@@ -65,7 +65,7 @@ export default class TransactionList extends Component<Props> {
 
 	render() {
 		return (
-			<div className={[VLayout.vBoxChild, styles.transactionListContainer].join(' ')} data-tid="transaction-list-container">
+			<div className={[VLayout.vBoxChild, styles.transactionListContainer].join(' ')}>
 				<div className={styles.title}>Transactions</div>
 				{this.getTransactionTable()}
 			</div>

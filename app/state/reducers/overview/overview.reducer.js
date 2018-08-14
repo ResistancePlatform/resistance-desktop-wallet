@@ -21,21 +21,6 @@ export type DetailPerAcount = {
 	size: number
 }
 
-export type TransactionDetail = {
-	amount: string,
-	confirmations: number,
-	generated: boolean,
-	blockhash: string,
-	blockindex: number,
-	blocktime: number,
-	expiryheight: number,
-	txid: string,
-	time: number;
-	timereceived: number,
-	details: Array<DetailPerAcount>,
-	hex: string
-}
-
 export type Balances = {
 	transparentBalance: number,
 	transparentUnconfirmedBalance?: number,
@@ -54,7 +39,7 @@ export type OverviewState = {
 		posY: number,
 		popupTransactionId: string
 	},
-	transactionDetail?: TransactionDetail | null | string
+	transactionDetail?: object | null | string
 }
 
 export const OverviewActions = createActions(
@@ -75,7 +60,7 @@ export const OverviewActions = createActions(
 
 		UPDATE_POPUP_MENU_VISIBILITY: (show: boolean, posX: number, posY: number, popupTransactionId: string) => ({ show, posX, posY, popupTransactionId }),
 
-		SHOW_TRANSACTION_DETAIL: (transactionId: string) => transactionId,
+		SHOW_TRANSACTION_DETAIL: undefined,
 		SHOW_TRANSACTION_DETAIL_SUCCESS: (transactionDetail: TransactionDetail) => transactionDetail,
 		SHOW_TRANSACTION_DETAIL_FAIL: (errorMessage: string) => errorMessage,
 		BACK_TO_TRANSACTION_LIST: undefined
