@@ -15,8 +15,8 @@ export const defaultAppState: AppState = {
 	systemInfo: {
 		daemonInfo: {
 			status: `NOT_RUNNING`,
-      residentSizeMB: 0,
-      getInfoResult: {}
+			residentSizeMB: 0,
+			getInfoResult: {}
 		},
 		blockChainInfo: {
 			connectionCount: 0,
@@ -37,7 +37,14 @@ export const defaultAppState: AppState = {
 			totalBalance: 0,
 			totalUnconfirmedBalance: 0
 		},
-		transactions: []
+		transactions: [],
+		popupMenu: {
+			show: false,
+			posX: -1,
+			posY: -1,
+			popupTransactionId: ''
+		},
+		transactionDetail: null
 	},
 	ownAddresses: {
 		addresses: [],
@@ -59,7 +66,7 @@ export const defaultAppState: AppState = {
 	settings: {
 		isTorEnabled: false,
 		isMinerEnabled: false,
-    isStatusModalOpen: false,
+		isStatusModalOpen: false,
 		childProcessesStatus: {
 			NODE: 'NOT RUNNING',
 			MINER: 'NOT RUNNING',

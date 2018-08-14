@@ -1,0 +1,34 @@
+@import "../../theme/vars.scss";
+
+$POP_UP_MENU_CONTAINER_WIDTH: 12rem;
+
+.transactionPopupMenuContainer {
+    padding: 0.3rem 1.3rem;
+    width: $POP_UP_MENU_CONTAINER_WIDTH;
+    min-width: $POP_UP_MENU_CONTAINER_WIDTH;
+
+    position: absolute;
+    background-color: $TRANSACTION_POPUP_MENU_BACKGROUND_COLOR;
+
+    text-align: left;
+    border-radius: 0.35rem;
+
+    z-index: 1;
+    cursor: pointer;
+}
+
+.menuItem {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid $BASE_COLOR_BODER_GRAY;
+
+    color: $TRANSACTION_POPUP_MENU_FONT_COLOR;
+    font-size: 0.65rem;
+
+    &:hover {
+        color: $BASE_COLOR_PURPLE;
+    }
+}
+
+.lastMenuItem {
+    border-bottom: none;
+}

@@ -34,6 +34,7 @@
     "no-plusplus": "off",
     "no-unneeded-ternary": "off",
     "no-await-in-loop": "warn",
+    "no-param-reassign": "off",
     "class-methods-use-this": "off",
     "promise/param-names": "error",
     "promise/always-return": "error",

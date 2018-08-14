@@ -1,5 +1,6 @@
 // @flow
-import { AppAction } from '../appAction'
+import { createActions, handleActions } from 'redux-actions'
+import { defaultAppState } from '../default-app-state'
 
 export type Transaction = {
 	type?: string,
@@ -22,59 +23,57 @@ export type Balances = {
 
 export type OverviewState = {
 	balances?: Balances,
-	transactions?: Array<Transaction>
-}
-
-const overviewActionTypePrefix = 'OVERVIEW_ACTION'
-
-export const OverviewActions = {
-	EMPTY: `${overviewActionTypePrefix}: EMPTY`,
-
-	START_GETTING_WALLET_INFO: `${overviewActionTypePrefix}: START_GETTING_WALLET_INFO`,
-	STOP_GETTING_WALLET_INFO: `${overviewActionTypePrefix}: STOP_GETTING_WALLET_INFO`,
-	GOT_WALLET_INFO: `${overviewActionTypePrefix}: GOT_WALLET_INFO`,
-
-	START_GETTING_TRANSACTION_DATA_FROM_WALLET: `${overviewActionTypePrefix}: START_GETTING_TRANSACTION_DATA_FROM_WALLET`,
-	STOP_GETTING_TRANSACTION_DATA_FROM_WALLET: `${overviewActionTypePrefix}: STOP_GETTING_TRANSACTION_DATA_FROM_WALLET`,
-	GOT_TRANSACTION_DATA_FROM_WALLET: `${overviewActionTypePrefix}: GOT_TRANSACTION_DATA_FROM_WALLET`,
-
-	MAIN_WINDOW_CLOSE: `${overviewActionTypePrefix}: MAIN_WINDOW_CLOSE`,
-	MAIN_WINDOW_MINIMIZE: `${overviewActionTypePrefix}: MAIN_WINDOW_MINIMIZE`,
-	MAIN_WINDOW_MAXIMIZE: `${overviewActionTypePrefix}: MAIN_WINDOW_MAXIMIZE`,
-
-	startGettingWalletInfo: (): AppAction => ({ type: OverviewActions.START_GETTING_WALLET_INFO }),
-	stopGettingWalletInfo: (): AppAction => ({ type: OverviewActions.STOP_GETTING_WALLET_INFO }),
-	gotWalletInfo: (balances: Balances): AppAction => ({ type: OverviewActions.GOT_WALLET_INFO, payload: balances }),
-
-	startGettingTransactionDataFromWallet: (): AppAction => ({ type: OverviewActions.START_GETTING_TRANSACTION_DATA_FROM_WALLET }),
-	stopGettingTransactionDataFromWallet: (): AppAction => ({ type: OverviewActions.STOP_GETTING_TRANSACTION_DATA_FROM_WALLET }),
-	gotTransactionDataFromWallet: (transactions: Array<Transaction>): AppAction => ({ type: OverviewActions.GOT_TRANSACTION_DATA_FROM_WALLET, payload: transactions }),
-
-	empty: (): AppAction => ({ type: OverviewActions.EMPTY })
-}
-
-const initState: OverviewState = {
-	balances: {
-		transparentBalance: 0,
-		transparentUnconfirmedBalance: 0,
-		privateBalance: 0,
-		privateUnconfirmedBalance: 0,
-		totalBalance: 0,
-		totalUnconfirmedBalance: 0
+	transactions?: Array<Transaction>,
+	popupMenu?: {
+		show: boolean,
+		posX: number,
+		posY: number,
+		popupTransactionId: string
 	},
-	transactions: []
+	transactionDetail?: object | null | string
 }
 
-export const OverviewReducer = (state: OverviewState = initState, action: AppAction) => {
+export const OverviewActions = createActions(
+	{
+		EMPTY: undefined,
 
-	switch (action.type) {
-		case OverviewActions.GOT_WALLET_INFO:
-			return { ...state, balances: action.payload }
+		START_GETTING_WALLET_INFO: undefined,
+		STOP_GETTING_WALLET_INFO: undefined,
+		GOT_WALLET_INFO: (balances: Balances) => balances,
 
-		case OverviewActions.GOT_TRANSACTION_DATA_FROM_WALLET:
-			return { ...state, transactions: action.payload }
+		START_GETTING_TRANSACTION_DATA_FROM_WALLET: undefined,
+		STOP_GETTING_TRANSACTION_DATA_FROM_WALLET: undefined,
+		GOT_TRANSACTION_DATA_FROM_WALLET: (transactions: Array<Transaction>) => transactions,
 
-		default:
-			return state
+		MAIN_WINDOW_CLOSE: undefined,
+		MAIN_WINDOW_MINIMIZE: undefined,
+		MAIN_WINDOW_MAXIMIZE: undefined,
+
+		UPDATE_POPUP_MENU_VISIBILITY: (show: boolean, posX: number, posY: number, popupTransactionId: string) => ({ show, posX, posY, popupTransactionId }),
+
+		SHOW_TRANSACTION_DETAIL: undefined,
+		SHOW_TRANSACTION_DETAIL_SUCCESS: (transactionDetail: TransactionDetail) => transactionDetail,
+		SHOW_TRANSACTION_DETAIL_FAIL: (errorMessage: string) => errorMessage,
+		BACK_TO_TRANSACTION_LIST: undefined
+	},
+	{
+		prefix: 'APP/OVERVIEW_ACTION'
 	}
-}
+)
+
+export const OverviewReducer = handleActions({
+	[OverviewActions.gotWalletInfo]: (state, action) => ({ ...state, balances: action.payload }),
+	[OverviewActions.gotTransactionDataFromWallet]: (state, action) => ({ ...state, transactions: action.payload }),
+	[OverviewActions.updatePopupMenuVisibility]: (state, action) => ({
+		...state,
+		popupMenu: {
+			show: action.payload.show,
+			posX: action.payload.posX,
+			posY: action.payload.posY,
+			popupTransactionId: action.payload.popupTransactionId
+		}
+	}),
+	[OverviewActions.showTransactionDetailSuccess]: (state, action) => ({ ...state, transactionDetail: action.payload }),
+	[OverviewActions.showTransactionDetailFail]: (state, action) => ({ ...state, transactionDetail: action.payload }),
+	[OverviewActions.backToTransactionList]: (state) => ({ ...state, transactionDetail: null })
+}, defaultAppState)
