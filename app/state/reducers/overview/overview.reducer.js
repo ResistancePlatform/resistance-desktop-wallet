@@ -12,15 +12,6 @@ export type Transaction = {
 	transactionId?: string
 }
 
-export type DetailPerAcount = {
-	account: string,
-	address: string,
-	category: string,
-	amount: string,
-	vout: number,
-	size: number
-}
-
 export type Balances = {
 	transparentBalance: number,
 	transparentUnconfirmedBalance?: number,
