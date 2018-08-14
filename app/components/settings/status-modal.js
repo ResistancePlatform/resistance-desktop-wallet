@@ -131,7 +131,6 @@ class StatusModal extends Component<Props> {
     const processName = processNames[this.state.selectedTabIndex - 1]
     const logFilePath = osService.getLogFilePath(processName)
     const pathWithRefreshKey = `${logFilePath}?refreshPathKey=${this.refreshPathKey}`
-    console.log(pathWithRefreshKey)
 
     this.setState({ processLogFilesPath:  { ...this.state.processLogFilesPath, [processName]: pathWithRefreshKey } })
     this.refreshPathKey++
