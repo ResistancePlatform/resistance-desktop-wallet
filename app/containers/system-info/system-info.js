@@ -87,8 +87,7 @@ class SystemInfo extends Component<Props> {
     const tooltip = [
       `Mining in progress...`,
       `Hashing power: ${minerInfo.hashingPower} khash/s`,
-      `Blocks mined, session: ${minerInfo.minedBlocksNumber}`,
-      `Blocks mined, total: ${minerInfo.totalMinedBlocksNumber}`
+      `Mined blocks number: ${minerInfo.minedBlocksNumber}`
     ].join(EOL)
 
     return tooltip
@@ -139,40 +138,41 @@ class SystemInfo extends Component<Props> {
 						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockChainInfo.connectionCount}</div>
 					</div>
 
-					<div className={styles.statusColumnWrapper}>
-						<div className={styles.statusColoumnTitle}>ICONS</div>
-            <div className={styles.statusColoumnValue}>
-              <i
-                className={classNames('icon-add', styles.statusIcon, { [styles.active]: this.props.settings.childProcessesStatus.MINER === 'RUNNING' })}
-                title={this.getMinerStatusIconTitle()}
-              />
-              <i
-                className={classNames('icon-arrow-right', styles.statusIcon, { [styles.active]: this.props.settings.childProcessesStatus.TOR === 'RUNNING' })}
-                title={`Tor status: ${this.props.settings.childProcessesStatus.TOR}`}
-              />
-              <i
-                className={classNames('icon-private-lock', styles.statusIcon, { [styles.active]: this.props.sendCash.isPrivateTransactions })}
-                title={`Private transactions are ${this.props.sendCash.isPrivateTransactions ? 'enabled' : 'disabled'}.`}
-              />
-            </div>
-					</div>
-
 				</div>
 
-				{/* Buttons - don't add onKeyDown() handler, otherwise Finder will become active on Cmd-commands (like Cmd-Q) */}
-        <button
-          className={styles.walletInFileManagerButton}
-          onClick={event => this.onWalletInFileManagerClicked(event)}
-        >
-          {this.getWalletInFileManagerLabel()}
-        </button>
+        <div className={styles.statusButtonsContainer}>
+          {/* Buttons - don't add onKeyDown() handler, otherwise Finder will become active on Cmd-commands (like Cmd-Q) */}
+          <button
+            className={styles.walletInFileManagerButton}
+            onClick={event => this.onWalletInFileManagerClicked(event)}
+          >
+            {this.getWalletInFileManagerLabel()}
+          </button>
 
-        <button
-          className={styles.installationFolderButton}
-          onClick={event => this.onInstallationFolderClicked(event)}
-        >
-          Installation Folder
-        </button>
+          <button
+            className={styles.installationFolderButton}
+            onClick={event => this.onInstallationFolderClicked(event)}
+          >
+            Installation Folder
+          </button>
+        </div>
+
+
+        <div className={styles.statusCustomIconsContainer}>
+          <i
+            className={classNames(styles.customIconMining, styles.statusIcon, { [styles.active]: this.props.settings.childProcessesStatus.MINER === 'RUNNING' })}
+            title={this.getMinerStatusIconTitle()}
+          />
+          <i
+            className={classNames(styles.customIconPrivacy, styles.statusIcon, { [styles.active]: this.props.sendCash.isPrivateTransactions })}
+            title={`Private transactions are ${this.props.sendCash.isPrivateTransactions ? 'enabled' : 'disabled'}.`}
+          />
+          <i
+            className={classNames(styles.customIconTor, styles.statusIcon, { [styles.active]: this.props.settings.childProcessesStatus.TOR === 'RUNNING' })}
+            title={`Tor status: ${this.props.settings.childProcessesStatus.TOR}`}
+          />
+        </div>
+
 			</div>
 		)
 	}

@@ -61,12 +61,51 @@ $SYSTEM_INFO_BAR_HEIGHT: 5.5rem;
     margin-left: 1rem;
 }
 
+.statusButtonsContainer {
+  margin-right: -1.4rem;
+}
+
+.statusCustomIconsContainer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin-right: 3px;
+}
+
 .statusIcon {
-  width: 16px;
-  height: 16px;
-  color: gray;
+  color: $BASE_COLOR_INACTIVE_ICON;
 
   &.active {
-    color: green;
+    color: $BASE_COLOR_ACTIVE_ICON;
   }
+}
+
+@font-face {
+  font-family: 'custom-icons';
+  src:  url(fonts/custom-icons.woff2) format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class*="customIcon"] {
+  font-family: 'custom-icons' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  font-size: 1.4rem;
+  margin-right: 6px;
+}
+
+.customIconTor:before {
+  content: "a";
+}
+.customIconMining:before {
+  content: "b";
+}
+.customIconPrivacy:before {
+  content: "c";
 }
