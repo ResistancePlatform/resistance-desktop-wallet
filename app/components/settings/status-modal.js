@@ -7,6 +7,7 @@ import Modal from 'react-modal'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { LazyLog } from 'react-lazylog'
 import classNames from 'classnames'
+import {toastr} from 'react-redux-toastr'
 
 import 'react-tabs/style/react-tabs.scss'
 import { OSService, ChildProcessName } from '../../service/os-service'
@@ -232,6 +233,12 @@ class StatusModal extends Component<Props> {
         </div>
 
         <div className={styles.statusModalFooter}>
+          <button
+            onClick={() => toastr.success('The title', 'The message')}
+          >
+            Toast
+          </button>
+
           <button
             onClick={event => this.onRefreshClicked(event)}
             onKeyDown={event => this.onRefreshClicked(event)}
