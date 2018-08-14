@@ -1,0 +1,98 @@
+@import "../../theme/vars.scss";
+
+$TRANSACTION_LIST_COLUMN_NAME_WIDTH: 10rem;
+
+.transactionDetailListContainer {
+    justify-content: flex-start;
+    padding: 2rem;
+
+    background-color: $TRANSACTION_LIST_BACKGROUND_COLOR;
+
+    color: $TRANSACTION_LIST_BODY_FONT_COLOR;
+
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.backToTransactionList {
+    position: relative;
+    margin-bottom: 1.6rem;
+
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: $BASE_COLOR_PURPLE;
+    cursor: pointer;
+
+    .arrow {
+        display: block;
+
+        position: absolute;
+        left: 0;
+        top: -0.05rem;
+
+        margin-right: 0.5rem;
+    }
+
+    .text {
+        display: block;
+
+        position: absolute;
+        left: 1.2rem;
+        top: 0
+    }
+}
+
+.title {
+    margin-bottom: 1.5rem;
+
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+.hasNoDetail {
+    font-size: 1.2rem;
+    font-weight: 300;
+}
+
+.error {
+    font-size: 1.2rem;
+    font-weight: 300;
+}
+
+.tableContainer {
+    position: relative;
+}
+
+.tableHeader {
+    div {
+        display: inline-block;
+        color: $TRANSACTION_LIST_HEADER_FONT_COLOR;
+        font-size: 0.8rem;
+    }
+}
+
+.tableHeaderColumnName {
+    width: $TRANSACTION_LIST_COLUMN_NAME_WIDTH;
+}
+
+.tableBodyRow {
+    font-weight: 300;
+    cursor: default;
+
+    div {
+        padding: 0.8rem 0;
+
+        display: inline-block;
+
+        font-size: 0.7rem;
+
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        border-bottom: 1px solid $TRANSACTION_LIST_BODY_SEPARATOR_COLOR;
+    }
+}
+
+.tableBodyRowColumnName {
+    width: $TRANSACTION_LIST_COLUMN_NAME_WIDTH;
+}

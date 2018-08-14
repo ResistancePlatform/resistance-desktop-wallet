@@ -7,7 +7,7 @@ import { map, tap, take, catchError } from 'rxjs/operators'
 
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { DialogService } from './dialog-service'
-import { getFormattedDateString } from '../utils/data-util'
+import { getTransactionAmount, getTransactionConfirmed, getTransactionDate, getTransactionDirection } from '../utils/data-util'
 import { AppAction } from '../state/reducers/appAction'
 import { BlockChainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions } from '../state/reducers/overview/overview.reducer'
@@ -44,12 +44,12 @@ const getResistanceClientInstance = () => {
 }
 
 const pollingIntervalValues = {
-  daemon: 2 * 1000,
-  blockchainInfo: 4 * 1000,
-  walletInfo: 2 * 1000,
-  transactionDataFromTheWallet: 5 * 1000,
-  sendCash: 2 * 1000,
-  ownAddresses: 4 * 1000
+	daemon: 2 * 1000,
+	blockchainInfo: 4 * 1000,
+	walletInfo: 2 * 1000,
+	transactionDataFromTheWallet: 5 * 1000,
+	sendCash: 2 * 1000,
+	ownAddresses: 4 * 1000
 }
 
 /**
@@ -60,14 +60,14 @@ export class ResistanceCliService {
 	logger: LoggerService
 	dialogService: DialogService
 
-  pollingIntervalIds = {
-    daemon: -1,
-    blockchainInfo: -1,
-    walletInfo: -1,
-    transactionDataFromTheWallet: -1,
-    sendCash: -1,
-    ownAddresses: -1
-  }
+	pollingIntervalIds = {
+		daemon: -1,
+		blockchainInfo: -1,
+		walletInfo: -1,
+		transactionDataFromTheWallet: -1,
+		sendCash: -1,
+		ownAddresses: -1
+	}
 
 	/**
 	 *Creates an instance of ResistanceCliService.
@@ -165,14 +165,14 @@ export class ResistanceCliService {
 				)
 		}
 
-    this.startPolling('daemon', () => getAsyncDaemonInfo())
+		this.startPolling('daemon', () => getAsyncDaemonInfo())
 	}
 
 	/**
 	 * @memberof ResistanceCliService
 	 */
 	stopPollingWalletInfo() {
-    this.stopPolling('walletInfo')
+		this.stopPolling('walletInfo')
 	}
 
 	/**
@@ -227,14 +227,14 @@ export class ResistanceCliService {
 				)
 		}
 
-    this.startPolling('walletInfo', () => getAsyncWalletInfo())
+		this.startPolling('walletInfo', () => getAsyncWalletInfo())
 	}
 
 	/**
 	 * @memberof ResistanceCliService
 	 */
 	stopPollingTransactionsDataFromWallet() {
-    this.stopPolling('transactionDataFromTheWallet')
+		this.stopPolling('transactionDataFromTheWallet')
 	}
 
 	/**
@@ -247,27 +247,6 @@ export class ResistanceCliService {
 		 *
 		 */
 		const getAsyncTransactionDataFromWallet = async () => {
-
-			const getDirection = (value: string) => {
-				if (value === 'receive') return 'In'
-				else if (value === 'send') return 'Out'
-				else if (value === 'generate') return 'Mined'
-				else if (value === 'immature') return 'Immature'
-
-				return value
-			}
-
-			const getConfirmed = (value: number) => (value !== 0 ? 'Yes' : 'No')
-
-			const getAmount = (value: number | string) => {
-				const tempFloat = typeof value === 'string' ? parseFloat(value).toFixed(2) : value.toFixed(2)
-				return tempFloat.startsWith('-') ? tempFloat.substring(1) : tempFloat
-			}
-
-			const getDate = (value: number) => {
-				const tempDate = new Date(value * 1000)
-				return getFormattedDateString(tempDate)
-			}
 
 			const cli = getResistanceClientInstance()
 			const getPublicTransactionsCmd = () => [
@@ -325,9 +304,9 @@ export class ResistanceCliService {
 
 						const tempTransactionList = queryResultWithAddressArr.map(result => ({
 							type: `\u2605 T (Private)`,
-							direction: getDirection(`receive`),
+							direction: getTransactionDirection(`receive`),
 							confirmed: 0,
-							amount: getAmount(result.amount),
+							amount: getTransactionAmount(result.amount),
 							date: null,
 							originalTime: 0,
 							destinationAddress: result.address,
@@ -340,8 +319,8 @@ export class ResistanceCliService {
 							const tempTransaction = tempTransactionList[index];
 							/* eslint-disable-next-line no-await-in-loop */
 							const transactionDetail = await cli.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
-							tempTransaction.confirmed = getConfirmed(transactionDetail.confirmations)
-							tempTransaction.date = getDate(transactionDetail.time)
+							tempTransaction.confirmed = getTransactionConfirmed(transactionDetail.confirmations)
+							tempTransaction.date = getTransactionDate(transactionDetail.time)
 							tempTransaction.originalTime = transactionDetail.time
 						}
 
@@ -364,10 +343,10 @@ export class ResistanceCliService {
 						return result.map(
 							originalTransaction => ({
 								type: `\u2605 T (Public)`,
-								direction: getDirection(originalTransaction.category),
-								confirmed: getConfirmed(originalTransaction.confirmations),
-								amount: getAmount(originalTransaction.amount),
-								date: getDate(originalTransaction.time),
+								direction: getTransactionDirection(originalTransaction.category),
+								confirmed: getTransactionConfirmed(originalTransaction.confirmations),
+								amount: getTransactionAmount(originalTransaction.amount),
+								date: getTransactionDate(originalTransaction.time),
 								originalTime: originalTransaction.time,
 								destinationAddress: originalTransaction.address ? originalTransaction.address : `[ Z Address not listed in Wallet ]`,
 								transactionId: originalTransaction.txid
@@ -428,14 +407,14 @@ export class ResistanceCliService {
 				)
 		}
 
-    this.startPolling('transactionDataFromTheWallet', () => getAsyncTransactionDataFromWallet())
+		this.startPolling('transactionDataFromTheWallet', () => getAsyncTransactionDataFromWallet())
 	}
 
 	/**
 	 * @memberof ResistanceCliService
 	 */
 	stopPollingBlockChainInfo() {
-    this.stopPolling('blockchainInfo')
+		this.stopPolling('blockchainInfo')
 	}
 
 	/**
@@ -527,7 +506,7 @@ export class ResistanceCliService {
 				)
 		}
 
-    this.startPolling('blockchainInfo', () => getAsyncBlockchainInfo())
+		this.startPolling('blockchainInfo', () => getAsyncBlockchainInfo())
 	}
 
 	/**
@@ -675,7 +654,7 @@ export class ResistanceCliService {
 	 * @memberof ResistanceCliService
 	 */
 	stopPollingOperationStatus() {
-    this.stopPolling('sendCash')
+		this.stopPolling('sendCash')
 	}
 
 	/**
@@ -876,6 +855,7 @@ export class ResistanceCliService {
     // this.startPolling('ownAddresses', () => handler())
   }
 
+
 	/**
    * Start polling.
    *
@@ -891,14 +871,14 @@ export class ResistanceCliService {
    *
 	 * @memberof ResistanceCliService
 	 */
-  startPolling(entityName: string, handler) {
-    this.stopPolling(entityName)
+	startPolling(entityName: string, handler) {
+		this.stopPolling(entityName)
 
-    // Trigger immediately at the first time
-    handler()
+		// Trigger immediately at the first time
+		handler()
 
 		this.pollingIntervalIds[entityName] = setInterval(
-      handler,
+			handler,
 			pollingIntervalValues[entityName]
 		)
 	}
@@ -913,5 +893,49 @@ export class ResistanceCliService {
 			clearInterval(this.pollingIntervalIds[entityName])
 			this.pollingIntervalIds[entityName] = -1
 		}
+	}
+
+
+	/**
+	 * @param {string} transactionId
+	 * @memberof ResistanceCliService
+	 */
+	getTransactionDetail(transactionId: string) {
+		const cli = getResistanceClientInstance()
+		const queryPromise = cli.command([{ method: 'gettransaction', parameters: [transactionId] }])
+
+		return from(queryPromise).pipe(
+			map(results => results[0]),
+			tap(result => this.logger.debug(this, `getTransactionDetail`, `result: `, ConsoleTheme.testing, result)),
+			map(result => {
+				if (result.name === 'RpcError') {
+					return result.message
+				}
+
+				const tempObj = {}
+				Object.keys(result.details[0]).reduce((objToReturn, key) => {
+					if (key === 'amount') {
+						objToReturn[`details[0].${key}`] = getTransactionAmount(result.details[0][`${key}`], 4)
+					} else {
+						objToReturn[`details[0].${key}`] = result.details[0][`${key}`]
+					}
+
+					return objToReturn
+				}, tempObj)
+
+				const detailResult = { ...result, amount: getTransactionAmount(result.amount, 4), ...tempObj }
+				delete detailResult.details
+				delete detailResult.vjoinsplit
+				delete detailResult.walletconflicts
+
+				this.logger.debug(this, `getTransactionDetail`, `detailResult: `, ConsoleTheme.testing, detailResult)
+
+				return detailResult
+			}),
+			catchError(error => {
+				this.logger.debug(this, `getTransactionDetail`, `Error happened: `, ConsoleTheme.error, error)
+				return of(error.message)
+			})
+		)
 	}
 }
