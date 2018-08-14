@@ -49,14 +49,14 @@ class OwnAddresses extends Component<Props> {
 		this.eventConfirm(event)
 	}
 
-	onRefreshClicked(event) {
-		this.eventConfirm(event)
-		appStore.dispatch(OwnAddressesActions.startGettingOwnAddresses())
-	}
-
 	onAddNewAddressClicked(event) {
 		this.eventConfirm(event)
 		appStore.dispatch(OwnAddressesActions.updateDropdownMenuVisibility(true))
+	}
+
+	onRefreshClicked(event) {
+		this.eventConfirm(event)
+		appStore.dispatch(OwnAddressesActions.startGettingOwnAddresses())
 	}
 
 	hideDropdownMenu(event) {

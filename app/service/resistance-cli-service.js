@@ -841,26 +841,30 @@ export class ResistanceCliService {
    *
 	 * @memberof ResistanceCliService
 	 */
-	startGettingOwnAddresses() {
-		const handler = () => {
-			this.getWalletAddressAndBalance(false).subscribe(result => {
-				this.dispatchAction(OwnAddressesActions.gotOwnAddresses(result))
-			}, err => {
-				this.dispatchAction(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
-			})
+  startGettingOwnAddresses() {
+    const handler = () => {
+      this.getWalletAddressAndBalance(false).subscribe(result => {
+        this.dispatchAction(OwnAddressesActions.gotOwnAddresses(result))
+      }, err => {
+        this.dispatchAction(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
+      })
 
-		}
-		this.startPolling('ownAddresses', () => handler())
-	}
+    }
+    handler()
+    // TODO: Re-enable after fixing the 500 error problem
+    // this.startPolling('ownAddresses', () => handler())
+  }
+
 
 	/**
    * Start polling.
    *
 	 * @memberof ResistanceCliService
 	 */
-	stopGettingOwnAddresses() {
-		this.stopPolling('ownAddresses')
-	}
+  stopGettingOwnAddresses() {
+    // TODO: Re-enable after fixing the 500 error problem
+    // this.stopPolling('ownAddresses')
+  }
 
 	/**
    * Start polling.

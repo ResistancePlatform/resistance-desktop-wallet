@@ -97,29 +97,44 @@ app.on('ready', async () => {
     minWidth: 1024,
     width: 1024,
     show: false,
-    frame: false
+    frame: false,
+    backgroundColor: '#1d2440',
   });
 
   if (!await fetchParamsService.checkPresence()) {
     await fetchParamsService.fetch(mainWindow)
   }
 
-  mainWindow.loadURL(`file://${__dirname}/app.html`);
-  // mainWindow.webContents.openDevTools();
+  mainWindow.loadURL(`file://${__dirname}/app.html`)
+  // mainWindow.webContents.openDevTools()
 
-  // @TODO: Use 'ready-to-show' event
-  //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
-  mainWindow.webContents.on('did-finish-load', () => {
-    if (!mainWindow) {
-      throw new Error('"mainWindow" is not defined');
+  // Showing the window if DOM finished loading and the content has been rendered
+
+  let isReadyToShow = false
+  let isDomFinishedLoading = false
+
+  const showMainWindow = () => {
+      mainWindow.show()
+      mainWindow.focus()
+  }
+
+  mainWindow.once('ready-to-show', () => {
+    isReadyToShow = true
+    if (isDomFinishedLoading) {
+      showMainWindow()
     }
-    mainWindow.show();
-    mainWindow.focus();
-  });
+  })
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    isDomFinishedLoading = true
+    if (isReadyToShow) {
+      showMainWindow()
+    }
+  })
 
   mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
+    mainWindow = null
+  })
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
