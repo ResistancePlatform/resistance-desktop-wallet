@@ -97,3 +97,7 @@ $TRANSACTION_LIST_COLUMN_DATE_WIDTH: 9rem;
 .tableBodyRowColumnDate {
     width: $TRANSACTION_LIST_COLUMN_DATE_WIDTH;
 }
+
+.tableBodyRowColumnAddress {
+    width: 13rem; // Fix the bug which causes the balance container over out of the screen
+}
