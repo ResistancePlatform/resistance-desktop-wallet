@@ -2,6 +2,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
+import RpcPolling from '../../components/rpc-polling/rpc-polling'
 import { OverviewActions } from '../../state/reducers/overview/overview.reducer'
 import { appStore } from '../../state/store/configureStore'
 import Balance from '../../components/overview/Balance'
@@ -12,10 +13,11 @@ import styles from './overview.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
+const walletInfoPollingInterval = 2.0
+const transactionsPollingInterval = 5.0
 
 type Props = {
-  overview: OverviewState,
-  settings: SettingsState
+  overview: OverviewState
 }
 
 /**
@@ -24,43 +26,6 @@ type Props = {
  */
 class Overview extends Component<Props> {
 	props: Props
-  isLocalNodePollingStarted: boolean
-
-	/**
-	 * @memberof Overview
-	 */
-	componentDidMount() {
-    this.isLocalNodePollingStarted = false
-    this.checkLocalNodeStatusAndStartPolling()
-	}
-
-	/**
-	 * @param {*} nextProps
-	 * @memberof Overview
-	 */
-  componentDidUpdate() {
-    this.checkLocalNodeStatusAndStartPolling()
-  }
-
-	/**
-	 * @memberof Overview
-	 */
-	componentWillUnmount() {
-    this.isLocalNodePollingStarted = false
-		appStore.dispatch(OverviewActions.stopGettingWalletInfo())
-		appStore.dispatch(OverviewActions.stopGettingTransactionDataFromWallet())
-	}
-
-	/**
-	 * @memberof Overview
-	 */
-  checkLocalNodeStatusAndStartPolling() {
-    if (!this.isLocalNodePollingStarted && this.props.settings.childProcessesStatus.NODE === 'RUNNING') {
-      this.isLocalNodePollingStarted = true
-      appStore.dispatch(OverviewActions.startGettingWalletInfo())
-      appStore.dispatch(OverviewActions.startGettingTransactionDataFromWallet())
-    }
-  }
 
 	/**
 	 * @param {*} event
@@ -144,6 +109,24 @@ class Overview extends Component<Props> {
 			// Layout container
 			<div className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
 
+        <RpcPolling
+          interval={walletInfoPollingInterval}
+          actions={{
+            polling: OverviewActions.getWalletInfo,
+            success: OverviewActions.gotWalletInfo,
+            failure: OverviewActions.getWalletInfoFailure
+          }}
+        />
+
+        <RpcPolling
+          interval={transactionsPollingInterval}
+          actions={{
+            polling: OverviewActions.getTransactionDataFromWallet,
+            success: OverviewActions.gotTransactionDataFromWallet,
+            failure: OverviewActions.getTransactionDataFromWalletFailure
+          }}
+        />
+
 				{ /* Route content */}
 				<div className={[styles.overviewContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
 					{renderContent}
@@ -156,8 +139,7 @@ class Overview extends Component<Props> {
 
 
 const mapStateToProps = (state) => ({
-	overview: state.overview,
-	settings: state.settings
+	overview: state.overview
 })
 
 export default connect(mapStateToProps, null)(Overview);

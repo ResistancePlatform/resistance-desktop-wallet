@@ -37,13 +37,13 @@ export const OverviewActions = createActions(
 	{
 		EMPTY: undefined,
 
-		START_GETTING_WALLET_INFO: undefined,
-		STOP_GETTING_WALLET_INFO: undefined,
+		GET_WALLET_INFO: undefined,
 		GOT_WALLET_INFO: (balances: Balances) => balances,
+		GET_WALLET_INFO_FAILURE: (errorMessage: string) => errorMessage,
 
-		START_GETTING_TRANSACTION_DATA_FROM_WALLET: undefined,
-		STOP_GETTING_TRANSACTION_DATA_FROM_WALLET: undefined,
+    GET_TRANSACTION_DATA_FROM_WALLET: undefined,
 		GOT_TRANSACTION_DATA_FROM_WALLET: (transactions: Array<Transaction>) => transactions,
+		GET_TRANSACTION_DATA_FROM_WALLET_FAILURE: (errorMessage: string) => errorMessage,
 
 		MAIN_WINDOW_CLOSE: undefined,
 		MAIN_WINDOW_MINIMIZE: undefined,

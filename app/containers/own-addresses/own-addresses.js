@@ -11,6 +11,7 @@ import styles from './own-addresses.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
+const pollingInterval = 4.0
 
 type Props = {
 	ownAddresses: OwnAddressesState
@@ -86,7 +87,7 @@ class OwnAddresses extends Component<Props> {
 				onKeyDown={(event) => this.hideDropdownMenu(event)}
 			>
         <RpcPolling
-          interval={4.0}
+          interval={pollingInterval}
           actions={{
             polling: OwnAddressesActions.getOwnAddresses,
             success: OwnAddressesActions.gotOwnAddresses,

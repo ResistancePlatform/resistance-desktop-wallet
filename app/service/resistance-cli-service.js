@@ -46,10 +46,7 @@ const getResistanceClientInstance = () => {
 const pollingIntervalValues = {
 	daemon: 2 * 1000,
 	blockchainInfo: 4 * 1000,
-	walletInfo: 2 * 1000,
-	transactionDataFromTheWallet: 5 * 1000,
-	sendCash: 2 * 1000,
-	ownAddresses: 4 * 1000
+	sendCash: 2 * 1000
 }
 
 /**
@@ -63,10 +60,7 @@ export class ResistanceCliService {
 	pollingIntervalIds = {
 		daemon: -1,
 		blockchainInfo: -1,
-		walletInfo: -1,
-		transactionDataFromTheWallet: -1,
-		sendCash: -1,
-		ownAddresses: -1
+		sendCash: -1
 	}
 
 	/**
@@ -169,246 +163,221 @@ export class ResistanceCliService {
 	}
 
 	/**
-	 * @memberof ResistanceCliService
-	 */
-	stopPollingWalletInfo() {
-		this.stopPolling('walletInfo')
-	}
-
-	/**
-	 * Polling the wallet info per 2 second (after the first run)
+	 * Request the wallet information.
 	 *
 	 * @memberof ResistanceCliService
 	 */
-	startPollingWalletInfo() {
-		/**
-		 *
-		 */
-		const getAsyncWalletInfo = () => {
-			const cli = getResistanceClientInstance()
-			const commandList = [
-				{ method: 'z_gettotalbalance' },
-				{ method: 'z_gettotalbalance', parameters: [0] }
-			]
+  requestWalletInfo() {
+    const cli = getResistanceClientInstance()
 
-			from(cli.command(commandList))
-				.pipe(
-					tap(result =>
-						this.logger.debug(
-							this,
-							`startPollingWalletInfo`,
-							`result: `,
-							ConsoleTheme.testing,
-							result
-						)
-					),
-					map(result => ({
-						transparentBalance: parseFloat(result[0].transparent),
-						privateBalance: parseFloat(result[0].private),
-						totalBalance: parseFloat(result[0].total),
-						transparentUnconfirmedBalance: parseFloat(result[1].transparent),
-						privateUnconfirmedBalance: parseFloat(result[1].private),
-						totalUnconfirmedBalance: parseFloat(result[1].total)
-					}))
-				)
-				.subscribe(
-					(result: Balances) => {
-						this.dispatchAction(OverviewActions.gotWalletInfo(result))
-					},
-					error =>
-						this.logger.debug(
-							this,
-							`startPollingWalletInfo`,
-							`subscribe error: `,
-							ConsoleTheme.error,
-							error
-						)
-					// () => this.logger.debug(this, `startPollingWalletInfo`, `observable completed.`, ConsoleTheme.testing)
-				)
-		}
+    const commandList = [
+      { method: 'z_gettotalbalance' },
+      { method: 'z_gettotalbalance', parameters: [0] }
+    ]
 
-		this.startPolling('walletInfo', () => getAsyncWalletInfo())
-	}
+    from(cli.command(commandList))
+    .pipe(
+      tap(result =>
+          this.logger.debug(
+            this,
+            `startPollingWalletInfo`,
+            `result: `,
+            ConsoleTheme.testing,
+            result
+          )
+         ),
+         map(result => ({
+           transparentBalance: parseFloat(result[0].transparent),
+           privateBalance: parseFloat(result[0].private),
+           totalBalance: parseFloat(result[0].total),
+           transparentUnconfirmedBalance: parseFloat(result[1].transparent),
+           privateUnconfirmedBalance: parseFloat(result[1].private),
+           totalUnconfirmedBalance: parseFloat(result[1].total)
+         }))
+    )
+    .subscribe(
+      (result: Balances) => {
+        this.dispatchAction(OverviewActions.gotWalletInfo(result))
+      },
+      error => {
+        this.logger.debug(
+          this,
+          `startPollingWalletInfo`,
+          `subscribe error: `,
+          ConsoleTheme.error,
+          error
+        )
+        this.dispatchAction(OverviewActions.getWalletInfoFailure(`Subscribe error: ${error}`))
+      }
+    )
+  }
 
 	/**
-	 * @memberof ResistanceCliService
-	 */
-	stopPollingTransactionsDataFromWallet() {
-		this.stopPolling('transactionDataFromTheWallet')
-	}
-
-	/**
-	 * Polling the wallet transactions per 5 second (after the first run)
+	 * Request wallet transactions.
 	 *
 	 * @memberof ResistanceCliService
 	 */
-	startPollingTransactionsDataFromWallet() {
-		/**
-		 *
-		 */
-		const getAsyncTransactionDataFromWallet = async () => {
+  requestTransactionsDataFromWallet() {
+    const cli = getResistanceClientInstance()
+    const getPublicTransactionsCmd = () => [
+      { method: 'listtransactions', parameters: ['', 200] }
+    ]
+    const getWalletZAddressesCmd = () => [{ method: 'z_listaddresses' }]
+    const getWalletZReceivedTransactionsCmd = (zAddress) => [{ method: 'z_listreceivedbyaddress', parameters: [zAddress, 0] }]
+    const getWalletTransactionCmd = (transactionId) => [{ method: 'gettransaction', parameters: [transactionId] }]
 
-			const cli = getResistanceClientInstance()
-			const getPublicTransactionsCmd = () => [
-				{ method: 'listtransactions', parameters: ['', 200] }
-			]
-			const getWalletZAddressesCmd = () => [{ method: 'z_listaddresses' }]
-			const getWalletZReceivedTransactionsCmd = (zAddress) => [{ method: 'z_listreceivedbyaddress', parameters: [zAddress, 0] }]
-			const getWalletTransactionCmd = (transactionId) => [{ method: 'gettransaction', parameters: [transactionId] }]
+    // t_add --> t_addr:
 
-			// t_add --> t_addr:
+    // Public --- IN --- t_addr
+    // Public --- OUT --- t_addr
 
-			// Public --- IN --- t_addr
-			// Public --- OUT --- t_addr
+    // t_add --> z_addr:
 
-			// t_add --> z_addr:
+    // Public -- OUT -- Z Address not listed in Wallet
+    // Private -- IN -- z_Addr
 
-			// Public -- OUT -- Z Address not listed in Wallet
-			// Private -- IN -- z_Addr
+    // z_add --> t_addr
 
-			// z_add --> t_addr
+    // Public -- IN -- t_addr
+    // Private -- IN -- z_addr
 
-			// Public -- IN -- t_addr
-			// Private -- IN -- z_addr
+    // z_add --> z_addr
 
-			// z_add --> z_addr
+    // Private  -- IN -- z_addr1
+    // Private -- IN -- z_addr2
 
-			// Private  -- IN -- z_addr1
-			// Private -- IN -- z_addr2
+    const getPrivateTransactionsPromise = async () => {
+      try {
+        // First, we get all the private addresses, and then for each one, we get all their transactions
+        const privateAddresses = await cli.command(getWalletZAddressesCmd()).then(tempResult => tempResult[0])
+        if (Array.isArray(privateAddresses) && privateAddresses.length > 0) {
+          let queryResultWithAddressArr = []
+          for (let index = 0; index < privateAddresses.length; index++) {
+            const tempAddress = privateAddresses[index];
+            /* eslint-disable-next-line no-await-in-loop */
+            const addressTransactions = await cli.command(getWalletZReceivedTransactionsCmd(tempAddress)).then(tempResult => tempResult[0])
 
-			const getPrivateTransactionsPromise = async () => {
-				try {
-					// First, we get all the private addresses, and then for each one, we get all their transactions
-					const privateAddresses = await cli.command(getWalletZAddressesCmd()).then(tempResult => tempResult[0])
-					if (Array.isArray(privateAddresses) && privateAddresses.length > 0) {
-						let queryResultWithAddressArr = []
-						for (let index = 0; index < privateAddresses.length; index++) {
-							const tempAddress = privateAddresses[index];
-							/* eslint-disable-next-line no-await-in-loop */
-							const addressTransactions = await cli.command(getWalletZReceivedTransactionsCmd(tempAddress)).then(tempResult => tempResult[0])
+            // 	 [{
+            // 	 amount: 49.9999,
+            // 	 jsindex: 0,
+            // 	 jsoutindex: 1,
+            // 	 memo: "f600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            // 	 txid: "1bf41fc600962cc22104d1e2884527537a0d8d8eaac97fbabb1d5887b73ee066"
+            // 	 }]
+            if (Array.isArray(addressTransactions) && addressTransactions.length > 0) {
+              const addressTransactionsWithPrivateAddress = addressTransactions.map(tran => Object.assign({}, tran, { address: tempAddress }))
+              queryResultWithAddressArr = [...queryResultWithAddressArr, ...addressTransactionsWithPrivateAddress]
+            }
+          }
 
-							// 	 [{
-							// 	 amount: 49.9999,
-							// 	 jsindex: 0,
-							// 	 jsoutindex: 1,
-							// 	 memo: "f600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-							// 	 txid: "1bf41fc600962cc22104d1e2884527537a0d8d8eaac97fbabb1d5887b73ee066"
-							// 	 }]
-							if (Array.isArray(addressTransactions) && addressTransactions.length > 0) {
-								const addressTransactionsWithPrivateAddress = addressTransactions.map(tran => Object.assign({}, tran, { address: tempAddress }))
-								queryResultWithAddressArr = [...queryResultWithAddressArr, ...addressTransactionsWithPrivateAddress]
-							}
-						}
+          // this.logger.debug(this, `getPrivateTransactionsPromise`, `queryResultWithAddressArr: `, ConsoleTheme.testing, queryResultWithAddressArr)
 
-						// this.logger.debug(this, `getPrivateTransactionsPromise`, `queryResultWithAddressArr: `, ConsoleTheme.testing, queryResultWithAddressArr)
+          const tempTransactionList = queryResultWithAddressArr.map(result => ({
+            type: `\u2605 T (Private)`,
+            direction: getTransactionDirection(`receive`),
+            confirmed: 0,
+            amount: getTransactionAmount(result.amount),
+            date: null,
+            originalTime: 0,
+            destinationAddress: result.address,
+            transactionId: result.txid
+          }))
 
-						const tempTransactionList = queryResultWithAddressArr.map(result => ({
-							type: `\u2605 T (Private)`,
-							direction: getTransactionDirection(`receive`),
-							confirmed: 0,
-							amount: getTransactionAmount(result.amount),
-							date: null,
-							originalTime: 0,
-							destinationAddress: result.address,
-							transactionId: result.txid
-						}))
+          // At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`,
+          // we need to get that info by viewing the detail of the transaction, and then put it back !
+          for (let index = 0; index < tempTransactionList.length; index++) {
+            const tempTransaction = tempTransactionList[index];
+            /* eslint-disable-next-line no-await-in-loop */
+            const transactionDetail = await cli.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
+            tempTransaction.confirmed = getTransactionConfirmed(transactionDetail.confirmations)
+            tempTransaction.date = getTransactionDate(transactionDetail.time)
+            tempTransaction.originalTime = transactionDetail.time
+          }
 
-						// At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`,
-						// we need to get that info by viewing the detail of the transaction, and then put it back !
-						for (let index = 0; index < tempTransactionList.length; index++) {
-							const tempTransaction = tempTransactionList[index];
-							/* eslint-disable-next-line no-await-in-loop */
-							const transactionDetail = await cli.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
-							tempTransaction.confirmed = getTransactionConfirmed(transactionDetail.confirmations)
-							tempTransaction.date = getTransactionDate(transactionDetail.time)
-							tempTransaction.originalTime = transactionDetail.time
-						}
+          return tempTransactionList
+        }
 
-						return tempTransactionList
-					}
-
-					return []
-				}
-				catch (error) {
-					this.logger.debug(this, `startPollingTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
-					return []
-				}
-			}
+        return []
+      }
+      catch (error) {
+        this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
+        return []
+      }
+    }
 
 
-			const getPublicTransactionsPromise = cli.command(getPublicTransactionsCmd())
-				.then(result => result[0])
-				.then(result => {
-					if (Array.isArray(result)) {
-						return result.map(
-							originalTransaction => ({
-								type: `\u2605 T (Public)`,
-								direction: getTransactionDirection(originalTransaction.category),
-								confirmed: getTransactionConfirmed(originalTransaction.confirmations),
-								amount: getTransactionAmount(originalTransaction.amount),
-								date: getTransactionDate(originalTransaction.time),
-								originalTime: originalTransaction.time,
-								destinationAddress: originalTransaction.address ? originalTransaction.address : `[ Z Address not listed in Wallet ]`,
-								transactionId: originalTransaction.txid
-							})
-						)
-					}
+    const getPublicTransactionsPromise = cli.command(getPublicTransactionsCmd())
+    .then(result => result[0])
+    .then(result => {
+      if (Array.isArray(result)) {
+        return result.map(
+          originalTransaction => ({
+            type: `\u2605 T (Public)`,
+            direction: getTransactionDirection(originalTransaction.category),
+            confirmed: getTransactionConfirmed(originalTransaction.confirmations),
+            amount: getTransactionAmount(originalTransaction.amount),
+            date: getTransactionDate(originalTransaction.time),
+            originalTime: originalTransaction.time,
+            destinationAddress: originalTransaction.address ? originalTransaction.address : `[ Z Address not listed in Wallet ]`,
+            transactionId: originalTransaction.txid
+          })
+        )
+      }
 
-					return []
-				})
-				.catch(error => {
-					this.logger.debug(this, `getPublicTransactionsPromise`, `subscribe error: `, ConsoleTheme.error, error)
-					return []
-				})
+      return []
+    })
+    .catch(error => {
+      this.logger.debug(this, `getPublicTransactionsPromise`, `subscribe error: `, ConsoleTheme.error, error)
+      return []
+    })
 
-			const responseTransactions = { transactions: null, optionalError: null }
-			const queryPromiseArr = [
-				getPublicTransactionsPromise,
-				getPrivateTransactionsPromise()
-			]
+    const responseTransactions = { transactions: null, optionalError: null }
+    const queryPromiseArr = [
+      getPublicTransactionsPromise,
+      getPrivateTransactionsPromise()
+    ]
 
-			const combineQueryPromise = Promise.all(queryPromiseArr)
-				.then(result => {
-					const combinedTransactionList = [...result[0], ...result[1]]
+    const combineQueryPromise = Promise.all(queryPromiseArr)
+    .then(result => {
+      const combinedTransactionList = [...result[0], ...result[1]]
 
-					// At this point, we got all combined `public address` and `private address` transaction list, but we need to sort by date !!!
-					const sortedByDateTransactions = combinedTransactionList.sort((trans1, trans2) => {
-						const time1 = trans1.originalTime
-						const time2 = trans2.originalTime
+      // At this point, we got all combined `public address` and `private address` transaction list, but we need to sort by date !!!
+      const sortedByDateTransactions = combinedTransactionList.sort((trans1, trans2) => {
+        const time1 = trans1.originalTime
+        const time2 = trans2.originalTime
 
-						if (time1 > time2) return -1
-						else if (time1 < time2) return 1
+        if (time1 > time2) return -1
+          else if (time1 < time2) return 1
 
-						return 0
-					})
-					responseTransactions.transactions = sortedByDateTransactions
-					delete responseTransactions.optionalError
+            return 0
+      })
+      responseTransactions.transactions = sortedByDateTransactions
+      delete responseTransactions.optionalError
 
-					return responseTransactions
-				})
-				.catch(error => {
-					this.logger.debug(this, `startPollingTransactionsDataFromWallet`, `Promise.all error: `, ConsoleTheme.error, error)
-					responseTransactions.optionalError = error
-					return responseTransactions
-				})
+      return responseTransactions
+    })
+    .catch(error => {
+      this.logger.debug(this, `requestTransactionsDataFromWallet`, `Promise.all error: `, ConsoleTheme.error, error)
+      responseTransactions.optionalError = error
+      return responseTransactions
+    })
 
-			from(combineQueryPromise)
-				.pipe(take(1))
-				.subscribe(
-					result => {
-						this.logger.debug(this, `startPollingTransactionsDataFromWallet`, `subscribe result: `, ConsoleTheme.testing, result)
+    from(combineQueryPromise)
+    .pipe(take(1))
+    .subscribe(
+      result => {
+        this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe result: `, ConsoleTheme.testing, result)
 
-						if (result.transactions && (result.optionalError === null || result.optionalError === undefined)) {
-							this.dispatchAction(OverviewActions.gotTransactionDataFromWallet(result.transactions))
-						}
-					},
-					error => this.logger.debug(this, `startPollingTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
-					// () => this.logger.debug(this, `startPollingBlockChainInfo`, `observable completed.`, ConsoleTheme.testing)
-				)
-		}
-
-		this.startPolling('transactionDataFromTheWallet', () => getAsyncTransactionDataFromWallet())
-	}
+        if (result.transactions && (result.optionalError === null || result.optionalError === undefined)) {
+          this.dispatchAction(OverviewActions.gotTransactionDataFromWallet(result.transactions))
+        }
+      },
+      error => {
+        this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
+        this.dispatchAction(OverviewActions.getTransactionDataFromWalletFailure(`Subscribe error: ${error}`))
+      }
+    )
+  }
 
 	/**
 	 * @memberof ResistanceCliService
