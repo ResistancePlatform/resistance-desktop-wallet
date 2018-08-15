@@ -1,3 +1,7 @@
+:global {
+  @import 'react-redux-toastr/src/styles/index.scss';
+}
+
 @import "../theme/full-screen.scss";
 @import "../theme/vars.scss";
 

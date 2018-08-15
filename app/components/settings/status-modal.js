@@ -218,7 +218,6 @@ class StatusModal extends Component<Props> {
 
             <TabPanel>
               {this.getLazyLogElement('NODE')}
-
             </TabPanel>
 
             <TabPanel>

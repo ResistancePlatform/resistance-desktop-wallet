@@ -2,14 +2,13 @@
 import { tap, filter, map, mapTo } from 'rxjs/operators'
 import { merge } from 'rxjs'
 import { ofType } from 'redux-observable'
+import { toastr } from 'react-redux-toastr'
 
-import { DialogService } from '../../../service/dialog-service';
 import { ResistanceService } from '../../../service/resistance-service'
 import { MinerService } from '../../../service/miner-service'
 import { TorService } from '../../../service/tor-service'
 import { SettingsActions } from './settings.reducer'
 
-const dialogService: DialogService = new DialogService()
 const resistanceService = new ResistanceService()
 const minerService = new MinerService()
 const torService = new TorService()
@@ -54,6 +53,7 @@ const disableMinerEpic = (action$: ActionsObservable<any>) => action$.pipe(
 const enableTorEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(SettingsActions.enableTor().type),
 	tap(() => { torService.start() }),
+  tap(() => { toastr.info(`Restarting the local node due to Tor activation.`) }),
   filter(() => state$.value.settings.childProcessesStatus.NODE === 'RUNNING'),
   mapTo(SettingsActions.restartLocalNode())
 )
@@ -61,6 +61,7 @@ const enableTorEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
 const disableTorEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(SettingsActions.disableTor().type),
 	tap(() => { torService.stop() }),
+  tap(() => { toastr.info(`Restarting the local node due to Tor shutdown.`) }),
   filter(() => state$.value.settings.childProcessesStatus.NODE === 'RUNNING'),
   mapTo(SettingsActions.restartLocalNode())
 )
@@ -68,10 +69,8 @@ const disableTorEpic = (action$: ActionsObservable<any>, state$) => action$.pipe
 const childProcessFailedEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(SettingsActions.childProcessFailed().type),
 	tap((action) => {
-    if (process.env.NODE_ENV !== 'development') {
-      const errorMessage =`Process ${action.payload.processName} has failed.\n${action.payload.errorMessage}`
-      dialogService.showError(`Child process failure`, errorMessage)
-    }
+    const errorMessage =`Process ${action.payload.processName} has failed.\n${action.payload.errorMessage}`
+    toastr.error(`Child process failure`, errorMessage)
   }),
 	map((action) => {
     if (action.payload.processName === 'NODE') {
@@ -90,7 +89,7 @@ const childProcessMurderFailedEpic = (action$: ActionsObservable<any>) => action
 	ofType(SettingsActions.childProcessMurderFailed().type),
 	tap((action) => {
     const errorMessage = `Failed to stop ${action.payload.processName}.\n${action.payload.errorMessage}`
-    dialogService.showError(`Stop child process error`, errorMessage)
+    toastr.error(`Stop child process error`, errorMessage)
   }),
   mapTo(SettingsActions.empty())
 )

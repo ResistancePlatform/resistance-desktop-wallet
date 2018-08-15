@@ -3,6 +3,8 @@ import { combineEpics, createEpicMiddleware } from 'redux-observable'
 import { createHashHistory } from 'history'
 import { routerMiddleware } from 'react-router-redux'
 import { createLogger } from 'redux-logger'
+import {reducer as toastrReducer} from 'react-redux-toastr'
+
 import { NaviReducer } from '../reducers/navi/navi.reducer'
 import { NaviEpics } from '../reducers/navi/navi.epic'
 import { SystemInfoReducer } from '../reducers/system-info/system-info.reducer'
@@ -19,6 +21,7 @@ import { SettingsEpics } from '../reducers/settings/settings.epic'
 export const history = createHashHistory()
 
 const appReducers = combineReducers({
+  toastr: toastrReducer,
 	navi: NaviReducer,
 	systemInfo: SystemInfoReducer,
 	overview: OverviewReducer,
