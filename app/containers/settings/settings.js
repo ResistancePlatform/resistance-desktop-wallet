@@ -24,6 +24,10 @@ type Props = {
 class Settings extends Component<Props> {
 	props: Props
 
+	/**
+	 * @param {*} nextProps
+	 * @memberof Settings
+	 */
   componentWillUpdate(nextProps) {
     if (nextProps.settings.isMinerEnabled !== this.props.settings.isMinerEnabled) {
       config.set('manageDaemon.enableMiner', nextProps.settings.isMinerEnabled)
