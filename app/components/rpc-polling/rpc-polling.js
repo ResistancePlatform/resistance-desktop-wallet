@@ -6,8 +6,7 @@ import { connect } from 'react-redux'
 
 import { appStore } from '../../state/store/configureStore'
 import { SettingsState } from '../../state/reducers/settings/settings.reducer'
-
-const responseActionTimeout = 10.0
+import { RpcPollingActions, RpcPollingState } from '../../state/reducers/rpc-polling/rpc-polling.reducer'
 
 type ActionKind = 'polling' | 'success' | 'failure'
 
@@ -15,17 +14,14 @@ type Props = {
   interval: float,
   actions: { [ActionKind]: func },
   onError?: func,
-	settings: SettingsState
-}
-
-type State = {
-  isResponseActionReceived: boolean
+	settings: SettingsState,
+  rpcPolling: RpcPollingState
 }
 
 class RpcPolling extends Component<Props> {
 	props: Props
-  state: State
 
+  isActive: boolean
   isActionQueued: boolean
   intervalId: number
 
@@ -34,19 +30,19 @@ class RpcPolling extends Component<Props> {
 	 */
   constructor(props) {
     super(props)
-
-    this.state = {
-      isResponseActionReceived: false
-    }
-
-    this.isActionQueued = false
     this.intervalId = -1
+    this.isActionQueued = false
   }
 
 	/**
 	 * @memberof RpcPolling
 	 */
 	componentDidMount() {
+    const actions = this.props.actions
+    this.isActive = false
+    appStore.dispatch(RpcPollingActions.registerActions(
+      actions.polling.toString(), actions.success.toString(), actions.failure.toString()
+    ))
     this.start()
 	}
 
@@ -70,6 +66,7 @@ class RpcPolling extends Component<Props> {
 			clearInterval(this.intervalId)
       this.intervalId = -1
 		}
+    appStore.dispatch(RpcPollingActions.unregisterActions(this.props.actions.polling.toString()))
 	}
 
 	/**
@@ -85,8 +82,21 @@ class RpcPolling extends Component<Props> {
   }
 
   dispatchActionIfNodeReady() {
+    const pollingActionType = this.props.actions.polling.toString()
+
+    console.log("YEAH")
+    console.log(pollingActionType)
+    console.log(this.props.rpcPolling.actionsResponseReceived)
+
+    // Make sure a response to the previously dispatched action has been received
+    if (this.isActive && !this.props.rpcPolling.actionsResponseReceived[pollingActionType]) {
+      console.log(`Polling action ${pollingActionType} takes longer than expected, waiting...`)
+      return
+    }
+
     if (this.props.settings.childProcessesStatus.NODE === 'RUNNING') {
       this.isActionQueued = false
+      this.isActive = true
       appStore.dispatch(this.props.actions.polling())
     } else {
       this.isActionQueued = true
@@ -106,7 +116,8 @@ class RpcPolling extends Component<Props> {
 }
 
 const mapStateToProps = state => ({
-	settings: state.settings
+	settings: state.settings,
+  rpcPolling: state.rpcPolling
 })
 
 export default connect(mapStateToProps, null)(RpcPolling)

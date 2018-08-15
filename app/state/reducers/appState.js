@@ -1,4 +1,5 @@
 // @flow
+import { RpcPollingState } from '../reducers/rpc-polling/rpc-polling.reducer'
 import { NaviState } from '../reducers/navi/navi.reducer'
 import { SystemInfoState } from '../reducers/system-info/system-info.reducer'
 import { OverviewState } from '../reducers/overview/overview.reducer'
@@ -7,6 +8,7 @@ import { SendCashState } from '../reducers/send-cash/send-cash.reducer'
 import { SettingsState } from '../reducers/settings/settings.reducer'
 
 export type AppState = {
+	rpcPolling: RpcPollingState,
 	navi: NaviState,
 	systemInfo: SystemInfoState,
 	overview: OverviewState,
