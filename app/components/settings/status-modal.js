@@ -33,6 +33,9 @@ class StatusModal extends Component<Props> {
   state: ModalState
   refreshPathKey: number
 
+	/**
+	 * @memberof StatusModal
+	 */
   constructor(props) {
     super(props)
     this.state = {

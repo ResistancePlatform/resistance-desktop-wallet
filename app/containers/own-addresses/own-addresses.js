@@ -44,7 +44,7 @@ class OwnAddresses extends Component<Props> {
 
 	onRefreshClicked(event) {
 		this.eventConfirm(event)
-		appStore.dispatch(OwnAddressesActions.startGettingOwnAddresses())
+		appStore.dispatch(OwnAddressesActions.getOwnAddresses())
 	}
 
 	hideDropdownMenu(event) {
@@ -88,9 +88,9 @@ class OwnAddresses extends Component<Props> {
         <RpcPolling
           interval={4.0}
           actions={{
-            polling: OwnAddressesActions.getOwnAddresses(),
-            success: OwnAddressesActions.gotOwnAddresses(),
-            failure: OwnAddressesActions.getOwnAddressesFailure()
+            polling: OwnAddressesActions.getOwnAddresses,
+            success: OwnAddressesActions.gotOwnAddresses,
+            failure: OwnAddressesActions.getOwnAddressesFailure
           }}
         />
 

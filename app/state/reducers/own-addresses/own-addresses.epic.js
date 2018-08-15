@@ -3,30 +3,25 @@ import { tap, map, mapTo, switchMap } from 'rxjs/operators'
 import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { OwnAddressesActions } from './own-addresses.reducer'
+
+import { AppAction } from '../appAction'
 import { ResistanceCliService } from '../../../service/resistance-cli-service'
 
 const rpcService = new ResistanceCliService()
 
-const startGettingOwnAddressesEpic = (action$: ActionsObservable<any>) => action$.pipe(
-  ofType(OwnAddressesActions.startGettingOwnAddresses().type),
-  tap(() => { rpcService.startGettingOwnAddresses() }),
+const getOwnAddressesEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+  ofType(OwnAddressesActions.getOwnAddresses.toString()),
+  tap(() => { rpcService.requestOwnAddresses() }),
   mapTo(OwnAddressesActions.empty())
 )
 
-const stopGettingOwnAddressesEpic = (action$: ActionsObservable<any>) => action$.pipe(
-  ofType(OwnAddressesActions.stopGettingOwnAddresses().type),
-  tap(() => { rpcService.stopGettingOwnAddresses() }),
-  mapTo(OwnAddressesActions.empty())
-)
-
-const createNewAddressesEpic = (action$: ActionsObservable<any>) => action$.pipe(
-  ofType(OwnAddressesActions.createNewAddress(true).type),
+const createNewAddressesEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+  ofType(OwnAddressesActions.createNewAddress.toString()),
   switchMap((action) => rpcService.createNewAddress(action.payload.isPrivate)),
-  map(result => result ? OwnAddressesActions.startGettingOwnAddresses() : OwnAddressesActions.empty())
+  map(result => result ? OwnAddressesActions.getOwnAddresses() : OwnAddressesActions.empty())
 )
 
 export const OwnAddressesEpics = (action$, state$) => merge(
-  startGettingOwnAddressesEpic(action$, state$),
-  stopGettingOwnAddressesEpic(action$, state$),
+  getOwnAddressesEpic(action$, state$),
   createNewAddressesEpic(action$, state$)
 )

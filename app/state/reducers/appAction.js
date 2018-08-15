@@ -1,5 +1,6 @@
 // @flow
 export type AppAction = {
     type: string,
-    payload?: any
+    payload?: any,
+    meta?: any
 }
