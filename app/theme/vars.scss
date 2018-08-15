@@ -14,6 +14,8 @@ $BASE_COLOR_DARK_BLUE_2:rgb(21, 26, 53);
 $BASE_COLOR_FONT_GRAY: rgb(90, 98, 131);
 $BASE_COLOR_ACTIVE_ICON: rgb(0, 212, 146);
 $BASE_COLOR_INACTIVE_ICON: $BASE_COLOR_FONT_GRAY;
+$BASE_COLOR_FAILURE_ICON: rgb(255, 97, 87);
+
 // $BASE_COLOR_FONT_GRAY: rgb(60, 65, 87);
 
 
@@ -38,9 +40,6 @@ $NAVI_BAR_ITEM_ICON_ACTIVE_COLOR: rgb(6, 121, 170);
 $SYSTEM_INFO_BAR_BACKGROUND_COLOR: rgb(37, 44, 73);
 $SYSTEM_INFO_BAR_TITLE_FONT_COLOR: $BASE_COLOR_GRAY;
 $SYSTEM_INFO_BAR_BODY_FONT_COLOR: $BASE_COLOR_WHITE;
-$SYSTEM_INFO_BAR_RUNNING_ICON_COLOR: $BASE_COLOR_ACTIVE_ICON;
-$SYSTEM_INFO_BAR_NOT_RUNNING_ICON_COLOR: rgb(255, 97, 87);
-
 
 
 // ------------------------------------------------------------------------------------------------------
@@ -66,7 +65,7 @@ $TRANSACTION_POPUP_MENU_FONT_COLOR: #dadce4;
 // ------------------------------------------------------------------------------------------------------
 // Own addresses
 // ------------------------------------------------------------------------------------------------------
- $OWN_ADDRESSES_DROPDOWN_MENU_BACKGROUND_COLOR: rgb(37, 44, 73);
+$OWN_ADDRESSES_DROPDOWN_MENU_BACKGROUND_COLOR: rgb(37, 44, 73);
 
 
  // ------------------------------------------------------------------------------------------------------

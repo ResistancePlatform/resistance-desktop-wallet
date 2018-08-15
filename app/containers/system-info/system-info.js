@@ -5,6 +5,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import classNames from 'classnames'
 
+import RpcPolling from '../../components/rpc-polling/rpc-polling'
 import { OSService } from '../../service/os-service'
 import { SystemInfoActions, SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
 import { appStore } from '../../state/store/configureStore'
@@ -14,6 +15,9 @@ import styles from './system-info.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 
 const osService = new OSService()
+
+const daemonInfoPollingInterval = 2.0
+const blockchainInfoPollingInterval = 4.0
 
 type Props = {
 	systemInfo: SystemInfoState,
@@ -29,14 +33,6 @@ class SystemInfo extends Component<Props> {
 	props: Props
 
 	/**
-	 * @memberof SystemInfo
-	 */
-	componentDidMount() {
-		appStore.dispatch(SystemInfoActions.startGettingDaemonInfo())
-		appStore.dispatch(SystemInfoActions.startGettingBlockchainInfo())
-	}
-
-	/**
 	 * @param {*} event
 	 * @memberof Settings
 	 */
@@ -44,6 +40,29 @@ class SystemInfo extends Component<Props> {
 		event.preventDefault()
 		event.stopPropagation()
 	}
+
+	/**
+	 * @memberof Settings
+	 */
+  getLocalNodeStatusClassNames() {
+    // TODO: Replace with ChildProcessStatusIcon component
+    const processStatus = this.props.settings.childProcessesStatus.NODE
+    const statusClassNames = [styles.nodeStatusIcon]
+
+    if (processStatus === 'RUNNING' || processStatus === 'STARTING') {
+      statusClassNames.push('icon-status-running')
+    } else {
+      statusClassNames.push('icon-status-stop')
+    }
+
+    const color = osService.getChildProcessStatusColor(processStatus)
+
+    if (color) {
+      statusClassNames.push(styles[color])
+    }
+
+    return statusClassNames.join(' ')
+  }
 
   getWalletInFileManagerLabel() {
     return osService.getOS() === 'windows' ? 'Wallet in Explorer' : 'Wallet in Finder';
@@ -100,6 +119,23 @@ class SystemInfo extends Component<Props> {
 	render() {
 		return (
 			<div className={[styles.systemInfoContainer, HLayout.hBoxContainer].join(' ')}>
+        <RpcPolling
+          interval={daemonInfoPollingInterval}
+          actions={{
+            polling: SystemInfoActions.getDaemonInfo,
+            success: SystemInfoActions.gotDaemonInfo,
+            failure: SystemInfoActions.getDaemonInfoFailure
+          }}
+        />
+        <RpcPolling
+          interval={blockchainInfoPollingInterval}
+          actions={{
+            polling: SystemInfoActions.getBlockchainInfo,
+            success: SystemInfoActions.gotBlockchainInfo,
+            failure: SystemInfoActions.getBlockchainInfoFailure
+          }}
+        />
+
 				{ /* Status column container */}
 				<div className={[styles.statusContainer, HLayout.hBoxChild].join(' ')}>
 
@@ -107,10 +143,7 @@ class SystemInfo extends Component<Props> {
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>RESISTANCE STATUS</div>
 						<div className={styles.statusColoumnValue}>
-							{this.props.systemInfo.daemonInfo.status === 'RUNNING' ?
-								<span><i className={['icon-status-running', styles.daemonIsRunning].join(' ')} /><span>Running</span></span> :
-								<span><i className={['icon-status-stop', styles.daemonIsNotRunning].join(' ')} /><span>NOT RUNNING</span></span>
-							}
+              <span className={styles.nodeStatusContainer}><i className={this.getLocalNodeStatusClassNames()} /><span>{this.props.settings.childProcessesStatus.NODE}</span></span>
 						</div>
 					</div>
 

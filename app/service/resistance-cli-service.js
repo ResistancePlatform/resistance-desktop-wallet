@@ -44,8 +44,6 @@ const getResistanceClientInstance = () => {
 }
 
 const pollingIntervalValues = {
-	daemon: 2 * 1000,
-	blockchainInfo: 4 * 1000,
 	sendCash: 2 * 1000
 }
 
@@ -58,8 +56,6 @@ export class ResistanceCliService {
 	dialogService: DialogService
 
 	pollingIntervalIds = {
-		daemon: -1,
-		blockchainInfo: -1,
 		sendCash: -1
 	}
 
@@ -97,70 +93,64 @@ export class ResistanceCliService {
 	}
 
 	/**
-	 * Polling the daemon status per 2 second (after the first run), for getting the `resistanced` running status and memory usage
+	 * Reques Resistance node running status and memory usage.
 	 *
 	 * @memberof ResistanceCliService
 	 */
-	startPollingDaemonStatus() {
-		/**
-		 *
-		 */
-		const getAsyncDaemonInfo = () => {
-			const cli = getResistanceClientInstance()
-			const daemonInfo: DaemonInfo = {
-				status: 'RUNNING',
-				residentSizeMB: 0,
-				optionalError: null,
-				getInfoResult: {}
-			}
+  requestDaemonInfo() {
+    const cli = getResistanceClientInstance()
+    const daemonInfo: DaemonInfo = {
+      status: 'RUNNING',
+      residentSizeMB: 0,
+      optionalError: null,
+      getInfoResult: {}
+    }
 
-			const getInfoPromise = cli.getInfo()
-				.then((result) => {
-					daemonInfo.getInfoResult = result
-					delete daemonInfo.optionalError
-					return daemonInfo
-				})
-				.catch(error => {
-					console.error(error)
-					daemonInfo.optionalError = error
-					return daemonInfo
-				})
+    const getInfoPromise = cli.getInfo()
+    .then((result) => {
+      daemonInfo.getInfoResult = result
+      delete daemonInfo.optionalError
+      return daemonInfo
+    })
+    .catch(error => {
+      console.error(error)
+      daemonInfo.optionalError = error
+      return daemonInfo
+    })
 
-			from(getInfoPromise)
-				.pipe(take(1))
-				.subscribe(
-					(result: DaemonInfo) => {
-						const daemonInfoResult = Object.assign(result)
+    from(getInfoPromise)
+    .pipe(take(1))
+    .subscribe(
+      (result: DaemonInfo) => {
+        const daemonInfoResult = Object.assign(result)
 
-						if (daemonInfoResult.optionalError) {
-							if (
-								daemonInfoResult.optionalError.code &&
-								daemonInfoResult.optionalError.code === 'ECONNREFUSED'
-							) {
-								daemonInfoResult.status = 'NOT_RUNNING'
-							} else {
-								daemonInfoResult.status = 'UNABLE_TO_ASCERTAIN'
-							}
-						}
+        if (daemonInfoResult.optionalError) {
+          if (
+            daemonInfoResult.optionalError.code &&
+            daemonInfoResult.optionalError.code === 'ECONNREFUSED'
+          ) {
+            daemonInfoResult.status = 'NOT_RUNNING'
+          } else {
+            daemonInfoResult.status = 'UNABLE_TO_ASCERTAIN'
+          }
+        }
 
-						this.dispatchAction(
-							SystemInfoActions.gotDaemonInfo(daemonInfoResult)
-						)
-					},
-					error =>
-						this.logger.debug(
-							this,
-							`startPollingDaemonStatus`,
-							`Error happened: `,
-							ConsoleTheme.error,
-							error
-						)
-					// () => this.logger.debug(this, `startPollingDaemonStatus`, `observable completed.`, ConsoleTheme.testing)
-				)
-		}
-
-		this.startPolling('daemon', () => getAsyncDaemonInfo())
-	}
+        this.dispatchAction(
+          SystemInfoActions.gotDaemonInfo(daemonInfoResult)
+        )
+      },
+      error => {
+        this.logger.debug(
+          this,
+          `startPollingDaemonStatus`,
+          `Error happened: `,
+          ConsoleTheme.error,
+          error
+        )
+        SystemInfoActions.getDaemonInfoFailure(`Error occurred: ${error}`)
+      }
+    )
+  }
 
 	/**
 	 * Request the wallet information.
@@ -380,103 +370,90 @@ export class ResistanceCliService {
   }
 
 	/**
-	 * @memberof ResistanceCliService
-	 */
-	stopPollingBlockChainInfo() {
-		this.stopPolling('blockchainInfo')
-	}
-
-	/**
-	 * Polling the block chain info per 5 second (after the first run)
+	 * Request blockchain information.
 	 *
 	 * @memberof ResistanceCliService
 	 */
-	startPollingBlockChainInfo() {
-		/**
-		 * @param {*} tempDate
-		 */
-		const getBlockchainSynchronizedPercentage = (tempDate: Date) => {
-			// TODO: Get the start date right after ZCash release - from first block!!!
-			const startDate = new Date('28 Oct 2016 02:00:00 GMT')
-			const nowDate = new Date()
+  requestBlockchainInfo() {
+    const cli = getResistanceClientInstance()
+    const finalResult: BlockChainInfo = {
+      connectionCount: 0,
+      blockchainSynchronizedPercentage: 0,
+      lastBlockDate: null,
+      optionalError: null
+    }
 
-			const fullTime = nowDate.getTime() - startDate.getTime()
-			const remainingTime = nowDate.getTime() - tempDate.getTime()
+    // const getConnectionCountCommand = () => [{ method: 'getconnectioncount' }]
+    // const getBlockCountCommand = () => [{ method: 'getblockcount' }]
+    // const getBlockHashCommand = (blockIndex: number) => [{ method: 'getblockhash', parameters: [blockIndex] }]
+    // const getBlockCommand = (blockhash: string) => [{ method: 'getblock', parameters: [blockhash] }]
 
-			// After 20 min we report 100% anyway
-			if (remainingTime > 20 * 60 * 1000) {
-				let dPercentage = 100 - remainingTime / fullTime * 100
-				if (dPercentage < 0) {
-					dPercentage = 0
-				} else if (dPercentage > 100) {
-					dPercentage = 100
-				}
+    const getBlockChainInfoPromise = cli.getConnectionCount()
+    .then(result => {
+      finalResult.connectionCount = result
+      return cli.getBlockCount()
+    })
+    .then(result => cli.getBlockHash(result))
+    .then(result => cli.getBlock(result))
+    .then(result => {
+      this.logger.debug(this, `startPollingBlockChainInfo`, `blockInfo`, ConsoleTheme.testing, result)
 
-				// Also set a member that may be queried
-				return parseFloat(dPercentage.toFixed(2))
-			}
+      finalResult.lastBlockDate = new Date(result.time * 1000)
+      finalResult.blockchainSynchronizedPercentage = this.getBlockchainSynchronizedPercentage(finalResult.lastBlockDate)
+      delete finalResult.optionalError
+      return finalResult
+    })
+    .catch(error => {
+      console.error(error)
+      finalResult.optionalError = error
+      return finalResult
+    })
 
-			return 100
+    from(getBlockChainInfoPromise)
+    .pipe(take(1))
+    .subscribe((blockchainInfo: BlockChainInfo) => {
+      this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe blockchainInfo: `, ConsoleTheme.testing, blockchainInfo)
+      this.dispatchAction(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
+    },
+    error => {
+      this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe error: `, ConsoleTheme.error, error)
+      this.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`Subscribe error: ${error}`))
+    })
+  }
 
-			// // Just in case early on the call returns some junk date
-			// if (info.lastBlockDate.before(startDate)) {
-			//     // TODO: write log that we fix minimum date! - this condition should not occur
-			//     info.lastBlockDate = startDate
-			// }
-		}
+  /**
+   * @param {*} tempDate
+   * @memberof ResistanceCliService
+   */
+  getBlockchainSynchronizedPercentage(tempDate: Date) {
+    // TODO: Get the start date right after ZCash release - from first block!!!
+    const startDate = new Date('28 Oct 2016 02:00:00 GMT')
+    const nowDate = new Date()
 
-		/**
-		 *
-		 */
-		const getAsyncBlockchainInfo = () => {
-			const cli = getResistanceClientInstance()
-			const finalResult: BlockChainInfo = {
-				connectionCount: 0,
-				blockchainSynchronizedPercentage: 0,
-				lastBlockDate: null,
-				optionalError: null
-			}
+    const fullTime = nowDate.getTime() - startDate.getTime()
+    const remainingTime = nowDate.getTime() - tempDate.getTime()
 
-			// const getConnectionCountCommand = () => [{ method: 'getconnectioncount' }]
-			// const getBlockCountCommand = () => [{ method: 'getblockcount' }]
-			// const getBlockHashCommand = (blockIndex: number) => [{ method: 'getblockhash', parameters: [blockIndex] }]
-			// const getBlockCommand = (blockhash: string) => [{ method: 'getblock', parameters: [blockhash] }]
+    // After 20 min we report 100% anyway
+    if (remainingTime > 20 * 60 * 1000) {
+      let dPercentage = 100 - remainingTime / fullTime * 100
+      if (dPercentage < 0) {
+        dPercentage = 0
+      } else if (dPercentage > 100) {
+        dPercentage = 100
+      }
 
-			const getBlockChainInfoPromise = cli.getConnectionCount()
-				.then(result => {
-					finalResult.connectionCount = result
-					return cli.getBlockCount()
-				})
-				.then(result => cli.getBlockHash(result))
-				.then(result => cli.getBlock(result))
-				.then(result => {
-					this.logger.debug(this, `startPollingBlockChainInfo`, `blockInfo`, ConsoleTheme.testing, result)
+      // Also set a member that may be queried
+      return parseFloat(dPercentage.toFixed(2))
+    }
 
-					finalResult.lastBlockDate = new Date(result.time * 1000)
-					finalResult.blockchainSynchronizedPercentage = getBlockchainSynchronizedPercentage(finalResult.lastBlockDate)
-					delete finalResult.optionalError
-					return finalResult
-				})
-				.catch(error => {
-					console.error(error)
-					finalResult.optionalError = error
-					return finalResult
-				})
+    return 100
 
-			from(getBlockChainInfoPromise)
-				.pipe(take(1))
-				.subscribe((blockchainInfo: BlockChainInfo) => {
-					this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe blockchainInfo: `, ConsoleTheme.testing, blockchainInfo)
-
-					this.dispatchAction(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
-				},
-					error => this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe error: `, ConsoleTheme.error, error)
-					// () => this.logger.debug(this, `startPollingBlockChainInfo`, `observable completed.`, ConsoleTheme.testing)
-				)
-		}
-
-		this.startPolling('blockchainInfo', () => getAsyncBlockchainInfo())
-	}
+    // // Just in case early on the call returns some junk date
+    // if (info.lastBlockDate.before(startDate)) {
+    //     // TODO: write log that we fix minimum date! - this condition should not occur
+    //     info.lastBlockDate = startDate
+    // }
+  }
 
 	/**
 	 * @param {Client} cli

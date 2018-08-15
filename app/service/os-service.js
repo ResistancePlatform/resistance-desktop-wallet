@@ -69,6 +69,28 @@ export class OSService {
 	}
 
 	/**
+	 * Returns child process status alarm color, 'green', 'red' or 'yellow'
+   *
+	 * @param {Object} action
+	 * @memberof ResistanceCliService
+	 */
+  getChildProcessStatusColor(processStatus) {
+    switch (processStatus) {
+      case 'RUNNING':
+        return 'green'
+      case 'STARTING':
+      case 'RESTARTING':
+      case 'STOPPING':
+        return 'yellow'
+      case 'NOT RUNNING':
+      case 'FAILED':
+      case 'MURDER FAILED':
+        return 'red'
+      default:
+    }
+  }
+
+	/**
 	 *
 	 * @memberof OSService
 	 */

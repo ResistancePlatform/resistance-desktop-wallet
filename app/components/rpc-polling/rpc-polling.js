@@ -84,11 +84,8 @@ class RpcPolling extends Component<Props> {
   dispatchActionIfNodeReady() {
     const pollingActionType = this.props.actions.polling.toString()
 
-    console.log("YEAH")
-    console.log(pollingActionType)
-    console.log(this.props.rpcPolling.actionsResponseReceived)
-
     // Make sure a response to the previously dispatched action has been received
+    // TODO: Add response timeout, like 30s
     if (this.isActive && !this.props.rpcPolling.actionsResponseReceived[pollingActionType]) {
       console.log(`Polling action ${pollingActionType} takes longer than expected, waiting...`)
       return
