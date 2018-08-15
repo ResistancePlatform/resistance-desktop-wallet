@@ -16,18 +16,30 @@ import styles from './status-modal.scss'
 
 const osService = new OSService()
 
+const processNames = ['NODE', 'MINER', 'TOR']
+
 type Props = {
 	settings: SettingsState,
   systemInfo: SystemInfoState
 }
 
+type ModalState = {
+  processLogFilesPath: { [ChildProcessName]: string },
+  selectedTabIndex: number
+}
+
 class StatusModal extends Component<Props> {
 	props: Props
-  processLogFileExists: { [ChildProcessName]: boolean }
+  state: ModalState
+  refreshPathKey: number
 
   constructor(props) {
     super(props)
-    this.processLogFileExists = {}
+    this.state = {
+      processLogFilesPath: {},
+      selectedTabIndex: 0
+    }
+    this.refreshPathKey = 0
   }
 
 	/**
@@ -43,26 +55,33 @@ class StatusModal extends Component<Props> {
 		event.stopPropagation()
 	}
 
+  onTabSelected(index: number) {
+    this.setState({ selectedTabIndex: index })
+    this.checkLogFilesExistence()
+  }
+
 	/**
    * Check every process log file for accessibility.
    *
 	 * @memberof StatusModal
 	 */
   checkLogFilesExistence() {
-    const processNames = ['NODE', 'MINER', 'TOR']
-
     processNames.forEach((processName) => {
-      const logFilePath = osService.getLogFilePath(processName)
+      let logFilePath = osService.getLogFilePath(processName)
+
       fs.access(logFilePath, err => {
-        this.processLogFileExists[processName] = !err
+        if (err) {
+          logFilePath = null
+        }
+        this.setState({ processLogFilesPath:  { ...this.state.processLogFilesPath, [processName]: logFilePath } })
       })
     })
   }
 
   getLazyLogElement(processName: ChildProcessName) {
-    if (this.processLogFileExists[processName]) {
+    if (this.state.processLogFilesPath[processName]) {
       return (
-        <LazyLog url={osService.getLogFilePath(processName)} selectableLines follow style={{ backgroundColor: 'rgb(21, 26, 53)' }} />
+        <LazyLog url={this.state.processLogFilesPath[processName]} selectableLines follow style={{ backgroundColor: 'rgb(21, 26, 53)' }} />
       )
     }
 
@@ -101,7 +120,23 @@ class StatusModal extends Component<Props> {
     return statusClassNames.join(' ')
   }
 
-  onCloseStatusModalClicked(event) {
+  getIsRefreshButtonDisabled() {
+    const processName = processNames[this.state.selectedTabIndex - 1]
+    return this.state.selectedTabIndex === 0 || this.state.processLogFilesPath[processName] === null
+  }
+
+  onRefreshClicked(event) {
+		this.eventConfirm(event)
+
+    const processName = processNames[this.state.selectedTabIndex - 1]
+    const logFilePath = osService.getLogFilePath(processName)
+    const pathWithRefreshKey = `${logFilePath}?refreshPathKey=${this.refreshPathKey}`
+
+    this.setState({ processLogFilesPath:  { ...this.state.processLogFilesPath, [processName]: pathWithRefreshKey } })
+    this.refreshPathKey++
+  }
+
+  onCloseClicked(event) {
 		this.eventConfirm(event)
 		appStore.dispatch(SettingsActions.closeStatusModal())
   }
@@ -119,8 +154,8 @@ class StatusModal extends Component<Props> {
         <div className={classNames(styles.modalTitle)}>
           <div
             className={styles.closeButton}
-            onClick={event => this.onCloseStatusModalClicked(event)}
-            onKeyDown={event => this.onCloseStatusModalClicked(event)}
+            onClick={event => this.onCloseClicked(event)}
+            onKeyDown={event => this.onCloseClicked(event)}
           />
           <div className={styles.titleText}>
             Services Status
@@ -132,7 +167,7 @@ class StatusModal extends Component<Props> {
             className={styles.tabs}
             selectedTabClassName={styles.selectedTab}
             selectedTabPanelClassName={styles.selectedTabPanel}
-            onSelect={() => {this.checkLogFilesExistence()}}
+            onSelect={(index) => {this.onTabSelected(index)}}
           >
             <TabList className={styles.tabList}>
               <Tab className={styles.tab}>Get Info</Tab>
@@ -198,8 +233,16 @@ class StatusModal extends Component<Props> {
 
         <div className={styles.statusModalFooter}>
           <button
-            onClick={event => this.onCloseStatusModalClicked(event)}
-            onKeyDown={event => this.onCloseStatusModalClicked(event)}
+            onClick={event => this.onRefreshClicked(event)}
+            onKeyDown={event => this.onRefreshClicked(event)}
+            disabled={this.getIsRefreshButtonDisabled()}
+          >
+            Refresh
+          </button>
+
+          <button
+            onClick={event => this.onCloseClicked(event)}
+            onKeyDown={event => this.onCloseClicked(event)}
           >
             Close
           </button>
