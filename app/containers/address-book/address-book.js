@@ -99,10 +99,6 @@ class AddressBook extends Component<Props> {
 	onAddressHandler(event, action: string, addressRow: AddressBookRow) {
 		this.commonMenuItemEventHandler(event)
 		switch (action) {
-			case 'add':
-				appStore.dispatch(AddressBookActions.addAddress(addressRow))
-				break
-
 			case 'remove':
 				appStore.dispatch(AddressBookActions.removeAddress(addressRow))
 				break
@@ -141,6 +137,22 @@ class AddressBook extends Component<Props> {
 			const currentAppState = appStore.getState()
 			this.addressInputDomRef.inputDomRef.current.value = currentAppState.addressBook.newAddressDialog.address
 		}, 100);
+	}
+
+	/**
+	 * @param {*} event
+	 */
+	onCancelButtonClicked(event) {
+		this.eventConfirm(event)
+		appStore.dispatch(AddressBookActions.updateNewAddressDialogVisibility(false))
+	}
+
+	/**
+	 * @param {*} event
+	 */
+	onAddButtonClicked(event) {
+		this.eventConfirm(event)
+		appStore.dispatch(AddressBookActions.addAddress())
 	}
 
 	/**
@@ -190,6 +202,22 @@ class AddressBook extends Component<Props> {
 					onInputChange={value => this.onAddressInputChanged(value)}
 					ref={this.addressDomRef}
 				/>
+
+				{ /* Buttons */}
+				<div className={styles.buttonContainer}>
+					<button
+						className={styles.cancelButton}
+						onClick={(event) => this.onCancelButtonClicked(event)}
+						onKeyDown={() => { }}
+					>CANCEL
+					</button>
+					<button
+						className={styles.addButton}
+						onClick={(event) => this.onAddButtonClicked(event)}
+						onKeyDown={() => { }}
+					>ADD
+					</button>
+				</div>
 			</div>
 		)
 	}

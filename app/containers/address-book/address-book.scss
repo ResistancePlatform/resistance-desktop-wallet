@@ -51,6 +51,8 @@ button {
     -webkit-box-shadow: 5px 5px 59px -2px $ADDRESS_BOOK_NEW_ADDRESS_DIALOG_SHADOW_COLOR;
     -moz-box-shadow: 5px 5px 59px -2px $ADDRESS_BOOK_NEW_ADDRESS_DIALOG_SHADOW_COLOR;
     box-shadow: 5px 5px 59px -2px $ADDRESS_BOOK_NEW_ADDRESS_DIALOG_SHADOW_COLOR;
+
+    z-index: 1;
 }
 
 .closeButton {
@@ -79,4 +81,20 @@ div[name="new-address-address"] {
     div[class*="roundedInputTitle"] {
         width: 5rem;
     }
+}
+
+.buttonContainer {
+    text-align: right;    
+}
+
+.cancelButton {
+    width: 6rem;
+
+    background-color: transparent;
+    border: 1.5px solid $BASE_COLOR_BODER_GRAY;
+    color: $BASE_COLOR_BUTTON_FONT_GRAY;
+}
+
+.addButton {
+    width: 6rem;
 }
