@@ -7,6 +7,7 @@ import Overview from './overview/overview'
 import OwnAddress from './own-addresses/own-addresses'
 import SendCash from './send-cash/send-cash'
 import Settings from './settings/settings'
+import AddressBook from './address-book/address-book'
 
 import styles from './App.scss'
 import HLayout from '../theme/h-box-layout.scss'
@@ -69,6 +70,7 @@ export default class App extends React.Component<Props> {
 							<Route exact path="/own-addresses" component={OwnAddress} />
 							<Route exact path="/send-cash" component={SendCash} />
 							<Route exact path="/settings" component={Settings} />
+							<Route exact path="/address-book" component={AddressBook} />
 							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
 						</Switch>
 					</div>

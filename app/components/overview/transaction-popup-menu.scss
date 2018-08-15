@@ -15,6 +15,10 @@ $POP_UP_MENU_CONTAINER_WIDTH: 12rem;
 
     z-index: 1;
     cursor: pointer;
+
+    -webkit-box-shadow: 5px 5px 59px -2px $TRANSACTION_POPUP_MENU_SHADOW_COLOR;
+    -moz-box-shadow: 5px 5px 59px -2px $TRANSACTION_POPUP_MENU_SHADOW_COLOR;
+    box-shadow: 5px 5px 59px -2px $TRANSACTION_POPUP_MENU_SHADOW_COLOR;
 }
 
 .menuItem {

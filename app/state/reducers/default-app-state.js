@@ -22,11 +22,11 @@ export const defaultAppState: AppState = {
 			connectionCount: 0,
 			blockchainSynchronizedPercentage: 0,
 			lastBlockDate: null
-    },
-    miner: {
-      hashingPower: 0,
-      minedBlocksNumber: 0
-    }
+		},
+		miner: {
+			hashingPower: 0,
+			minedBlocksNumber: 0
+		}
 	},
 	overview: {
 		balances: {
@@ -72,6 +72,11 @@ export const defaultAppState: AppState = {
 			MINER: 'NOT RUNNING',
 			TOR: 'NOT RUNNING'
 		}
+	},
+	addressBook: {
+		addresses: [],
+		showDropdownMenu: false,
+		newAddressDialog: null
 	}
 }
 
