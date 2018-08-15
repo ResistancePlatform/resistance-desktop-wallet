@@ -615,7 +615,8 @@ export class ResistanceCliService {
 			const amountAfterDeductTheFransactionFee = amountNeedToSend - 0.0001
 			const sendCashParams = [
 				fAddress,
-				[{ address: tAddress, amount: amountAfterDeductTheFransactionFee }]
+        [{ address: tAddress, amount: amountAfterDeductTheFransactionFee }],
+        0  // Confirmations number, important!
 			]
 
 			// sendmany "T address here" [{“address”:”t address”, “amount”:0.005}, {“address”:”z address”,”amount”:0.03, “memo”:”f508af…”}]
