@@ -1,6 +1,8 @@
 // @flow
 import { remote } from 'electron'
+
 import { OSService } from './os-service'
+import { SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 
 /**
  * ES6 singleton
@@ -43,7 +45,7 @@ export class MinerService {
       args.push('--background')
     }
 
-    osService.execProcess('MINER', args)
+    osService.execProcess('MINER', args, this.handleStdout)
 	}
 
 	/**
@@ -52,4 +54,16 @@ export class MinerService {
 	stop() {
     osService.killProcess('MINER')
 	}
+
+  handleStdout(data: Buffer) {
+    const regex = /^.* accepted: \d+\/(\d+) \(100.00%\), (\d+\.\d+) khash\/s \(yay!!!\)$/m
+    const matchResult = data.toString().match(regex)
+
+    if (matchResult) {
+      const hashPower = parseFloat(matchResult[2])
+      const blocksNumber = parseInt(matchResult[1], 10)
+      osService.dispatchAction(SystemInfoActions.updateMinerInfo(hashPower, blocksNumber))
+    }
+  }
+
 }

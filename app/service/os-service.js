@@ -176,9 +176,11 @@ export class OSService {
    *
 	 * @param {string} processName
 	 * @param {string[]} args
+	 * @param {function} stdoutHandler
+	 * @param {function} stderrHandler
 	 * @memberof OSService
 	 */
-  execProcess(processName: ChildProcessName, args = []) {
+  execProcess(processName: ChildProcessName, args = [], stdoutHandler) {
     const actions = this.getSettingsActions()
 
     const errorHandler = (err) => {
@@ -213,7 +215,7 @@ export class OSService {
       console.log(`Executing command ${commandPath} with arguments ${args.join(' ')}.`)
       const childProcess = spawn(commandPath, args, options)
 
-      const onUpdateFinished = () => {
+      const onData = (data: Buffer) => {
         if (!isUpdateFinished) {
           isUpdateFinished = true
           this.dispatchAction(actions.childProcessStarted(processName))
@@ -225,10 +227,14 @@ export class OSService {
           }).catch()
 
         }
+
+        if (stdoutHandler) {
+          stdoutHandler(data)
+        }
       }
 
-      childProcess.stdout.on('data', onUpdateFinished)
-      childProcess.stderr.on('data', onUpdateFinished)
+      childProcess.stdout.on('data', onData)
+      childProcess.stderr.on('data', onData)
 
       childProcess.on('error', errorHandler)
 

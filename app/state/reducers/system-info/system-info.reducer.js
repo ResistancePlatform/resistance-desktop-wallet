@@ -18,7 +18,11 @@ export type BlockChainInfo = {
 
 export type SystemInfoState = {
 	daemonInfo?: DaemonInfo,
-	blockChainInfo?: BlockChainInfo
+  blockChainInfo?: BlockChainInfo,
+  miner: {
+    hashingPower: float,
+    minedBlocksNumber: number
+  }
 }
 
 export const SystemInfoActions = createActions(
@@ -32,7 +36,9 @@ export const SystemInfoActions = createActions(
     GOT_BLOCKCHAIN_INFO: (blockChainInfo: BlockChainInfo) => ({ blockChainInfo }),
 
     OPEN_WALLET_IN_FILE_MANAGER: undefined,
-    OPEN_INSTALLATION_FOLDER: undefined
+    OPEN_INSTALLATION_FOLDER: undefined,
+
+    UPDATE_MINER_INFO: (hashingPower, minedBlocksNumber) => ({ hashingPower, minedBlocksNumber })
   },
   {
     prefix: 'APP/SYSTEM_INFO'
@@ -46,5 +52,8 @@ export const SystemInfoReducer = handleActions(
     }),
     [SystemInfoActions.gotBlockchainInfo]: (state, action) => ({
       ...state, blockChainInfo: action.payload.blockChainInfo
+    }),
+    [SystemInfoActions.updateMinerInfo]: (state, action) => ({
+      ...state, miner: action.payload
     })
   }, defaultAppState)
