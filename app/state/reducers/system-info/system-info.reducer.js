@@ -2,10 +2,7 @@
 import { createActions, handleActions } from 'redux-actions'
 import { defaultAppState } from '../default-app-state'
 
-export type DaemonInfo = {
-  residentSizeMB?: number,
-  getInfoResult: Object
-}
+export type DaemonInfo = { [string]: any }
 
 export type BlockChainInfo = {
 	connectionCount: number,

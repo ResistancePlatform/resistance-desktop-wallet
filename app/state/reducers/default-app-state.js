@@ -17,11 +17,7 @@ export const defaultAppState: AppState = {
 		currentNaviPath: '/overview'
 	},
 	systemInfo: {
-		daemonInfo: {
-			status: `NOT_RUNNING`,
-			residentSizeMB: 0,
-			getInfoResult: {}
-		},
+		daemonInfo: {},
 		blockChainInfo: {
 			connectionCount: 0,
 			blockchainSynchronizedPercentage: 0,

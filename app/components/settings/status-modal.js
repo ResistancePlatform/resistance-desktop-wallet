@@ -134,7 +134,7 @@ class StatusModal extends Component<Props> {
   }
 
   render() {
-    const nodeInfo = this.props.systemInfo.daemonInfo.getInfoResult
+    const nodeInfo = this.props.systemInfo.daemonInfo
 
     return (
       <Modal

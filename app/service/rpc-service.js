@@ -25,7 +25,7 @@ let instance = null
 /**
  * Create a new resistance client instance.
  */
-const getResistanceClientInstance = () => {
+const getClientInstance = () => {
 	const nodeConfig = remote.getGlobal('resistanceNodeConfig')
 	let network
 
@@ -101,47 +101,17 @@ export class RpcService {
 	 * @memberof RpcService
 	 */
   requestDaemonInfo() {
-    const cli = getResistanceClientInstance()
-    const daemonInfo: DaemonInfo = {
-      residentSizeMB: 0,
-      optionalError: null,
-      getInfoResult: {}
-    }
+    const client = getClientInstance()
 
-    const getInfoPromise = cli.getInfo()
-    .then((result) => {
-      daemonInfo.getInfoResult = result
-      delete daemonInfo.optionalError
-      return daemonInfo
-    })
-    .catch(error => {
-      console.error(error)
-      daemonInfo.optionalError = error
-      return daemonInfo
-    })
-
-    from(getInfoPromise)
-    .pipe(take(1))
-    .subscribe(
-      (result: DaemonInfo) => {
-        const daemonInfoResult = Object.assign(result)
-        this.dispatchAction(
-          SystemInfoActions.gotDaemonInfo(daemonInfoResult)
-        )
-      },
-      error => {
-        this.logger.debug(
-          this,
-          `requestDaemonInfo`,
-          `Error happened: `,
-          ConsoleTheme.error,
-          error
-        )
-        this.dispatchAction(
-          SystemInfoActions.getDaemonInfoFailure(`Error occurred: ${error}`)
-        )
-      }
-    )
+    client.getInfo()
+      .then((info: DaemonInfo) => {
+        this.dispatchAction(SystemInfoActions.gotDaemonInfo(info))
+        return Promise.resolve()
+      })
+      .catch(err => {
+        const errorMessage = `Unable to get local node info: ${err}`
+        this.dispatchAction(SystemInfoActions.getDaemonInfoFailure(errorMessage))
+      })
   }
 
 	/**
@@ -150,14 +120,14 @@ export class RpcService {
 	 * @memberof RpcService
 	 */
   requestWalletInfo() {
-    const cli = getResistanceClientInstance()
+    const client = getClientInstance()
 
     const commandList = [
       { method: 'z_gettotalbalance' },
       { method: 'z_gettotalbalance', parameters: [0] }
     ]
 
-    from(cli.command(commandList))
+    from(client.command(commandList))
     .pipe(
       tap(result =>
           this.logger.debug(
@@ -200,7 +170,7 @@ export class RpcService {
 	 * @memberof RpcService
 	 */
   requestTransactionsDataFromWallet() {
-    const cli = getResistanceClientInstance()
+    const client = getClientInstance()
     const getPublicTransactionsCmd = () => [
       { method: 'listtransactions', parameters: ['', 200] }
     ]
@@ -231,13 +201,13 @@ export class RpcService {
     const getPrivateTransactionsPromise = async () => {
       try {
         // First, we get all the private addresses, and then for each one, we get all their transactions
-        const privateAddresses = await cli.command(getWalletZAddressesCmd()).then(tempResult => tempResult[0])
+        const privateAddresses = await client.command(getWalletZAddressesCmd()).then(tempResult => tempResult[0])
         if (Array.isArray(privateAddresses) && privateAddresses.length > 0) {
           let queryResultWithAddressArr = []
           for (let index = 0; index < privateAddresses.length; index++) {
             const tempAddress = privateAddresses[index];
             /* eslint-disable-next-line no-await-in-loop */
-            const addressTransactions = await cli.command(getWalletZReceivedTransactionsCmd(tempAddress)).then(tempResult => tempResult[0])
+            const addressTransactions = await client.command(getWalletZReceivedTransactionsCmd(tempAddress)).then(tempResult => tempResult[0])
 
             // 	 [{
             // 	 amount: 49.9999,
@@ -270,7 +240,7 @@ export class RpcService {
           for (let index = 0; index < tempTransactionList.length; index++) {
             const tempTransaction = tempTransactionList[index];
             /* eslint-disable-next-line no-await-in-loop */
-            const transactionDetail = await cli.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
+            const transactionDetail = await client.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
             tempTransaction.confirmed = getTransactionConfirmed(transactionDetail.confirmations)
             tempTransaction.date = getTransactionDate(transactionDetail.time)
             tempTransaction.originalTime = transactionDetail.time
@@ -288,7 +258,7 @@ export class RpcService {
     }
 
 
-    const getPublicTransactionsPromise = cli.command(getPublicTransactionsCmd())
+    const getPublicTransactionsPromise = client.command(getPublicTransactionsCmd())
     .then(result => result[0])
     .then(result => {
       if (Array.isArray(result)) {
@@ -393,7 +363,7 @@ export class RpcService {
 	 * @memberof RpcService
 	 */
   requestBlockchainInfo() {
-    const cli = getResistanceClientInstance()
+    const client = getClientInstance()
     const finalResult: BlockChainInfo = {
       connectionCount: 0,
       blockchainSynchronizedPercentage: 0,
@@ -406,13 +376,13 @@ export class RpcService {
     // const getBlockHashCommand = (blockIndex: number) => [{ method: 'getblockhash', parameters: [blockIndex] }]
     // const getBlockCommand = (blockhash: string) => [{ method: 'getblock', parameters: [blockhash] }]
 
-    const getBlockChainInfoPromise = cli.getConnectionCount()
+    const getBlockChainInfoPromise = client.getConnectionCount()
     .then(result => {
       finalResult.connectionCount = result
-      return cli.getBlockCount()
+      return client.getBlockCount()
     })
-    .then(result => cli.getBlockHash(result))
-    .then(result => cli.getBlock(result))
+    .then(result => client.getBlockHash(result))
+    .then(result => client.getBlock(result))
     .then(result => {
       this.logger.debug(this, `startPollingBlockChainInfo`, `blockInfo`, ConsoleTheme.testing, result)
 
@@ -474,40 +444,40 @@ export class RpcService {
   }
 
 	/**
-	 * @param {Client} cli
+	 * @param {Client} client
 	 * @returns {Promise<any>}
 	 * @memberof RpcService
 	 */
-	getWalletPrivateAddresses(cli: Client): Promise<any> {
-		return cli.command([{ method: 'z_listaddresses' }])
+	getWalletPrivateAddresses(client: Client): Promise<any> {
+		return client.command([{ method: 'z_listaddresses' }])
 	}
 
 	/**
-	 * @param {Client} cli
+	 * @param {Client} client
 	 * @returns {Promise<any>}
 	 * @memberof RpcService
 	 */
-	getWalletAllPublicAddresses(cli: Client): Promise<any> {
-		return cli.command([{ method: 'listreceivedbyaddress', parameters: [0, true] }])
+	getWalletAllPublicAddresses(client: Client): Promise<any> {
+		return client.command([{ method: 'listreceivedbyaddress', parameters: [0, true] }])
 	}
 
 	/**
-	 * @param {Client} cli
+	 * @param {Client} client
 	 * @returns {Promise<any>}
 	 * @memberof RpcService
 	 */
-	getWalletPublicAddressesWithUnspentOutputs(cli: Client): Promise<any> {
-		return cli.command([{ method: 'listunspent', parameters: [0] }])
+	getWalletPublicAddressesWithUnspentOutputs(client: Client): Promise<any> {
+		return client.command([{ method: 'listunspent', parameters: [0] }])
 	}
 
 	/**
-	 * @param {Client} cli
+	 * @param {Client} client
 	 * @param {string} address
 	 * @returns {Promise<any>}
 	 * @memberof RpcService
 	 */
-	getAddressBalance(cli: Client, addressRow: AddressRow): Promise<any> {
-		return cli.command([
+	getAddressBalance(client: Client, addressRow: AddressRow): Promise<any> {
+		return client.command([
 			{ method: 'z_getbalance', parameters: [addressRow.address] },
 			{ method: 'z_getbalance', parameters: [addressRow.address, 0] }
 		])
@@ -549,8 +519,8 @@ export class RpcService {
 	 * @memberof RpcService
 	 */
 	createNewAddress(isPrivate?: boolean): Observable<any> {
-		const cli = getResistanceClientInstance()
-		const createNewAddressPromise = cli.command([{ method: isPrivate ? `z_getnewaddress` : `getnewaddress` }])
+		const client = getClientInstance()
+		const createNewAddressPromise = client.command([{ method: isPrivate ? `z_getnewaddress` : `getnewaddress` }])
 
 		return from(createNewAddressPromise).pipe(
 			map(result => result[0]),
@@ -570,7 +540,7 @@ export class RpcService {
 	 * @memberof RpcService
 	 */
 	sendCash(fromAddress: string, toAddress: string, amountToSend: number) {
-		const cli = getResistanceClientInstance()
+		const client = getClientInstance()
 
 		/**
 		 *
@@ -584,7 +554,7 @@ export class RpcService {
 			]
 
 			// sendmany "T address here" [{“address”:”t address”, “amount”:0.005}, {“address”:”z address”,”amount”:0.03, “memo”:”f508af…”}]
-			return cli.command([{ method: `z_sendmany`, parameters: sendCashParams }])
+			return client.command([{ method: `z_sendmany`, parameters: sendCashParams }])
 		}
 
 		getSendCashPromise(fromAddress, toAddress, amountToSend)
@@ -631,9 +601,9 @@ export class RpcService {
 		let initProgressPercent = 0
 
 		const getAsyncOperationStatus = (operId: string) => {
-			const cli = getResistanceClientInstance()
+			const client = getClientInstance()
 			const params = [operId]
-			const promise = cli.command([
+			const promise = client.command([
 				{ method: `z_getoperationstatus`, parameters: [params] }
 			])
 
@@ -693,11 +663,11 @@ export class RpcService {
 	 * @memberof RpcService
 	 */
 	getWalletAddressAndBalance(sortByGroupBalance?: boolean, disableThePrivateAddress?: boolean): Observable<any> {
-		const cli = getResistanceClientInstance()
+		const client = getClientInstance()
 		const promiseArr = [
-			this.getWalletAllPublicAddresses(cli),
-			this.getWalletPublicAddressesWithUnspentOutputs(cli),
-			this.getWalletPrivateAddresses(cli)
+			this.getWalletAllPublicAddresses(client),
+			this.getWalletPublicAddressesWithUnspentOutputs(client),
+			this.getWalletPrivateAddresses(client)
 		]
 
 		const queryPromise = Promise.all(promiseArr)
@@ -742,7 +712,7 @@ export class RpcService {
 			})
 			.then(combinedAddresses => {
 				if (Array.isArray(combinedAddresses)) {
-					const tempPromiseArr = combinedAddresses.map(tempAddressRow => this.getAddressBalance(cli, tempAddressRow))
+					const tempPromiseArr = combinedAddresses.map(tempAddressRow => this.getAddressBalance(client, tempAddressRow))
 					return Promise.all(tempPromiseArr)
 				}
 
@@ -852,8 +822,8 @@ export class RpcService {
 	 * @memberof RpcService
 	 */
 	getTransactionDetail(transactionId: string) {
-		const cli = getResistanceClientInstance()
-		const queryPromise = cli.command([{ method: 'gettransaction', parameters: [transactionId] }])
+		const client = getClientInstance()
+		const queryPromise = client.command([{ method: 'gettransaction', parameters: [transactionId] }])
 
 		return from(queryPromise).pipe(
 			map(results => results[0]),
