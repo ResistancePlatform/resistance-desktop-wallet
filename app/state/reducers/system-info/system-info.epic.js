@@ -14,19 +14,19 @@ const resistanceService = new ResistanceService()
 const osService = new OSService()
 
 const getDaemonInfoEpic = (action$: ActionsObservable<any>) => action$.pipe(
-  ofType(SystemInfoActions.getDaemonInfo().type),
+  ofType(SystemInfoActions.getDaemonInfo.toString()),
   tap(() => rpcService.requestDaemonInfo()),
   mapTo(SystemInfoActions.empty())
 )
 
 const getBlockchainInfoEpic = (action$: ActionsObservable<any>) => action$.pipe(
-  ofType(SystemInfoActions.getBlockchainInfo().type),
+  ofType(SystemInfoActions.getBlockchainInfo.toString()),
   tap(() => rpcService.requestBlockchainInfo()),
   mapTo(SystemInfoActions.empty())
 )
 
 const openWalletInFileManagerEpic = (action$: ActionsObservable<any>) => action$.pipe(
-  ofType(SystemInfoActions.openWalletInFileManager().type),
+  ofType(SystemInfoActions.openWalletInFileManager.toString()),
   tap(() => {
     shell.openItem(resistanceService.getWalletPath())
   }),
@@ -34,7 +34,7 @@ const openWalletInFileManagerEpic = (action$: ActionsObservable<any>) => action$
 )
 
 const openInstallationFolderEpic = (action$: ActionsObservable<any>) => action$.pipe(
-  ofType(SystemInfoActions.openInstallationFolder().type),
+  ofType(SystemInfoActions.openInstallationFolder.toString()),
   tap(() => {
     shell.openItem(osService.getInstallationPath())
   }),

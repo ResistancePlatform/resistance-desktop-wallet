@@ -4,9 +4,9 @@ import { remote } from 'electron'
 import Client from 'bitcoin-core'
 import { from, Observable, of } from 'rxjs'
 import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
+import { toastr } from 'react-redux-toastr'
 
 import { LoggerService, ConsoleTheme } from './logger-service'
-import { DialogService } from './dialog-service'
 import { AddressBookService } from './address-book-service'
 
 import { getTransactionAmount, getTransactionConfirmed, getTransactionDate, getTransactionDirection } from '../utils/data-util'
@@ -56,7 +56,6 @@ const pollingIntervalValues = {
  */
 export class RpcService {
 	logger: LoggerService
-	dialogService: DialogService
 	addressBookService: AddressBookService
 
 	pollingIntervalIds = {
@@ -74,7 +73,6 @@ export class RpcService {
 
 		this.time = new Date()
 		this.logger = new LoggerService()
-		this.dialogService = new DialogService()
 		this.addressBookService = new AddressBookService()
 
 		return instance
@@ -105,7 +103,6 @@ export class RpcService {
   requestDaemonInfo() {
     const cli = getResistanceClientInstance()
     const daemonInfo: DaemonInfo = {
-      status: 'RUNNING',
       residentSizeMB: 0,
       optionalError: null,
       getInfoResult: {}
@@ -128,18 +125,6 @@ export class RpcService {
     .subscribe(
       (result: DaemonInfo) => {
         const daemonInfoResult = Object.assign(result)
-
-        if (daemonInfoResult.optionalError) {
-          if (
-            daemonInfoResult.optionalError.code &&
-            daemonInfoResult.optionalError.code === 'ECONNREFUSED'
-          ) {
-            daemonInfoResult.status = 'NOT_RUNNING'
-          } else {
-            daemonInfoResult.status = 'UNABLE_TO_ASCERTAIN'
-          }
-        }
-
         this.dispatchAction(
           SystemInfoActions.gotDaemonInfo(daemonInfoResult)
         )
@@ -147,12 +132,14 @@ export class RpcService {
       error => {
         this.logger.debug(
           this,
-          `startPollingDaemonStatus`,
+          `requestDaemonInfo`,
           `Error happened: `,
           ConsoleTheme.error,
           error
         )
-        SystemInfoActions.getDaemonInfoFailure(`Error occurred: ${error}`)
+        this.dispatchAction(
+          SystemInfoActions.getDaemonInfoFailure(`Error occurred: ${error}`)
+        )
       }
     )
   }
@@ -787,12 +774,12 @@ export class RpcService {
 
 				// Show the error to user
 				const errorAddressItems = addressList.filter(tempAddressItem => tempAddressItem.balance === -1 && tempAddressItem.errorMessage)
+
 				if (errorAddressItems && errorAddressItems.length > 0) {
-					const tempErrorMessage = errorAddressItems
-						.map(tempAddressItem => `[${tempAddressItem.address}]:\n ${tempAddressItem.errorMessage}\n\n`)
-						.join('\n')
-					const showMessage = `Error happened when getting the balance for the addresses below: \n\n${tempErrorMessage}`
-					setTimeout(() => this.dialogService.showError(`Address balance error`, showMessage), 500)
+          const errorMessages = errorAddressItems.map(tempAddressItem => `"${tempAddressItem.errorMessage}"`)
+					const uniqueErrorMessages = new Set(errorMessages).join(', ')
+					const displayMessage = `Error fetching balances for ${errorAddressItems.length} out of ${addressList.length} addresses. Error messages included: ${uniqueErrorMessages}.`
+          toastr.error(`Address balance error`, displayMessage)
 				}
 
 				if (disableThePrivateAddress) {

@@ -2,10 +2,7 @@
 import { createActions, handleActions } from 'redux-actions'
 import { defaultAppState } from '../default-app-state'
 
-export type DaemonStatus = 'RUNNING' | 'NOT_RUNNING' | 'UNABLE_TO_ASCERTAIN'
-
 export type DaemonInfo = {
-	status?: DaemonStatus,
   residentSizeMB?: number,
   getInfoResult: Object
 }
