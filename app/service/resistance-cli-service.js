@@ -6,7 +6,6 @@ import { from, Observable, of } from 'rxjs'
 import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
 
 import { LoggerService, ConsoleTheme } from './logger-service'
-import { DialogService } from './dialog-service'
 import { AddressBookService } from './address-book-service'
 
 import { getTransactionAmount, getTransactionConfirmed, getTransactionDate, getTransactionDirection } from '../utils/data-util'
@@ -56,7 +55,6 @@ const pollingIntervalValues = {
  */
 export class ResistanceCliService {
 	logger: LoggerService
-	dialogService: DialogService
 	addressBookService: AddressBookService
 
 	pollingIntervalIds = {
@@ -74,7 +72,6 @@ export class ResistanceCliService {
 
 		this.time = new Date()
 		this.logger = new LoggerService()
-		this.dialogService = new DialogService()
 		this.addressBookService = new AddressBookService()
 
 		return instance
@@ -792,7 +789,8 @@ export class ResistanceCliService {
 						.map(tempAddressItem => `[${tempAddressItem.address}]:\n ${tempAddressItem.errorMessage}\n\n`)
 						.join('\n')
 					const showMessage = `Error happened when getting the balance for the addresses below: \n\n${tempErrorMessage}`
-					setTimeout(() => this.dialogService.showError(`Address balance error`, showMessage), 500)
+          console.error(`Suppressing the error message for Luke:`, showMessage)
+					// setTimeout(() => this.dialogService.showError(`Address balance error`, showMessage), 500)
 				}
 
 				if (disableThePrivateAddress) {
