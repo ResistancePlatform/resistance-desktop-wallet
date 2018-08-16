@@ -67,3 +67,7 @@ $ADDRESS_BOOK_LIST_COLUMN_NAME_WIDTH: 10rem;
 .tableBodyRowColumnName {
     width: $ADDRESS_BOOK_LIST_COLUMN_NAME_WIDTH;
 }
+
+.tableBodyRowColumnValue {
+    overflow-y: scroll;
+}

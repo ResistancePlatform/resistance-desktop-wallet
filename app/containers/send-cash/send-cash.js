@@ -104,6 +104,16 @@ class SendCash extends Component<Props> {
 		appStore.dispatch(SendCashActions.updateToAddress(value))
 	}
 
+	onDestAddressEnterPressed() {
+		appStore.dispatch(SendCashActions.checkAddressBookByName())
+
+		// Just a workaround at this moment!!!
+		setTimeout(() => {
+			const currentAppState = appStore.getState()
+			this.toAddressInputDomRef.inputDomRef.current.value = currentAppState.sendCash.toAddress
+		}, 250);
+	}
+
 	onAmountAddressInputChanged(value) {
 		appStore.dispatch(SendCashActions.updateAmount(parseFloat(value)))
 	}
@@ -225,7 +235,7 @@ class SendCash extends Component<Props> {
 								<div className={styles.dropdownMenu} style={{ display: this.getDropdownMenuStyles() }}>
 									<AddressDropdownPopupMenu
 										addressList={this.props.sendCash.addressList}
-										onPickupAddress={(event, address) =>this.onPickupAddressHandler(event, address)}
+										onPickupAddress={(event, address) => this.onPickupAddressHandler(event, address)}
 									/>re
 								</div>
 							</RoundedInput>
@@ -257,6 +267,7 @@ class SendCash extends Component<Props> {
 							enableTooltips="true"
 							tooltipsContent={this.props.sendCash.inputTooltips}
 							onInputChange={value => this.onDestAddressInputChanged(value)}
+							onEnterPressed={() => this.onDestAddressEnterPressed()}
 							ref={this.toAddressDomRef}
 						/>
 

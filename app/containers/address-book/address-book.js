@@ -229,35 +229,27 @@ class AddressBook extends Component<Props> {
 		return (
 			// Layout container
 			<div
-				className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}
+				className={[styles.AddressBookContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}
 				onClick={(event) => this.hideDropdownMenu(event)}
 				onKeyDown={() => { }}
 			>
-				{ /* Route content */}
-				<div className={[styles.AddressBookContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
-
-					<div className={[HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
-
-						{/* Top bar */}
-						<div className={[styles.topBar, HLayout.hBoxContainer].join(' ')}>
-							<div className={styles.topBarTitle}>Address Book</div>
-							<div className={[styles.topBarButtonContainer, HLayout.hBoxChild].join(' ')}>
-								<button
-									onClick={(event) => this.onAddNewButtonClicked(event)}
-									onKeyDown={() => { }}
-								>
-									<span className={styles.addIcon}>&#43;</span><span>ADD NEW ADDRESS</span>
-								</button>
-							</div>
-						</div>
-
-						{this.renderNewAddressDialog()}
-
-						{/* Address book list */}
-						<AddressBookList addresses={this.props.addressBook.addresses} />
+				{/* Top bar */}
+				<div className={[styles.topBar, HLayout.hBoxContainer].join(' ')}>
+					<div className={styles.topBarTitle}>Address Book</div>
+					<div className={[styles.topBarButtonContainer, HLayout.hBoxChild].join(' ')}>
+						<button
+							onClick={(event) => this.onAddNewButtonClicked(event)}
+							onKeyDown={() => { }}
+						>
+							<span className={styles.addIcon}>&#43;</span><span>ADD NEW ADDRESS</span>
+						</button>
 					</div>
 				</div>
 
+				{this.renderNewAddressDialog()}
+
+				{/* Address book list */}
+				<AddressBookList addresses={this.props.addressBook.addresses} />
 			</div >
 		)
 	}
