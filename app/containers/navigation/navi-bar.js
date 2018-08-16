@@ -11,7 +11,7 @@ type Props = {
 	navi: NaviState
 }
 
-export class NaviBar extends Component<Props> {
+class NaviBar extends Component<Props> {
 	props: Props
 
 	onCloseClicked(event) {
@@ -57,10 +57,10 @@ export class NaviBar extends Component<Props> {
 					<span className="icon-send-cash" />
 					<NavLink to="/send-cash">Send Cash</NavLink>
 				</div>
-				{/* <div className={[this.getNaviBarItemClasses('/address-book'), HLayout.hBoxContainer].join(' ')}>
+				<div className={[this.getNaviBarItemClasses('/address-book'), HLayout.hBoxContainer].join(' ')}>
 					<span className="icon-address-book" />
 					<NavLink to="/address-book">Address Book</NavLink>
-				</div> */}
+				</div>
 				<div className={[this.getNaviBarItemClasses('/settings'), HLayout.hBoxContainer].join(' ')}>
 					<span className="icon-settings" />
 					<NavLink to="/settings">Settings</NavLink>
