@@ -16,3 +16,63 @@
 .routeContentContainer {
     background-color: $BASE_COLOR_DARK_BLUE;
 }
+
+
+/* Toastr styling */
+:global {
+  .redux-toastr {
+    .bottom-right {
+      width: auto !important;
+      margin-bottom: 105px !important;
+    }
+
+    .rrt-left-container {
+      width: 0 !important;
+      display: none !important;
+    }
+
+    .rrt-middle-container {
+      height: 100% !important;
+      padding-left: 0.9rem !important;
+      vertical-align: middle !important;
+      width: 100% !important;
+      margin-left: 0 !important;
+      font-family: 'Quicksand', Arial, Helvetica, Helvetica Neue, serif !important;
+      font-weight: 300 !important;
+      font-size: 0.7rem !important;
+      text-transform: uppercase !important;
+
+      .rrt-title {
+        height: 100% !important;
+        vertical-align: middle !important;
+        font-size: 0.7rem !important;
+        font-weight: 500 !important;
+      }
+
+    }
+
+    .rrt-right-container {
+      width: 2.7rem !important;
+    }
+
+    .close-toastr {
+      opacity: 1 !important;
+      margin-right: 1rem !important;
+    }
+    .rrt-success {
+      background-color: $TOASTR_SUCCESS !important;
+    }
+
+    .rrt-warning {
+      background-color: $TOASTR_WARNING !important;
+    }
+
+    .rrt-info {
+      background-color: $TOASTR_INFO !important;
+    }
+
+    .rrt-error {
+      background-color: $TOASTR_ERROR !important;
+    }
+  }
+}

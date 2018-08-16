@@ -21,7 +21,9 @@ export default class Root extends Component<Props> {
           </ConnectedRouter>
 
           <ReduxToastr
-            timeOut={4000}
+            className='customToastr'
+            timeOut={400000}
+            position="bottom-right"
             preventDuplicates
             closeOnToastrClick
           />
