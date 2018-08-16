@@ -33,6 +33,12 @@ const getBlockchainInfoEpic = (action$: ActionsObservable<AppAction>) => action$
   mapTo(SystemInfoActions.empty())
 )
 
+const getBlockchainInfoFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+  ofType(SystemInfoActions.getBlockchainInfoFailure.toString()),
+  tap((action) => toastr.error(action.payload.errorMessage)),
+  mapTo(SystemInfoActions.empty())
+)
+
 const openWalletInFileManagerEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
   ofType(SystemInfoActions.openWalletInFileManager.toString()),
   tap(() => {
@@ -54,5 +60,6 @@ export const SystemInfoEpics = (action$, state$) => merge(
   openInstallationFolderEpic(action$, state$),
   getDaemonInfoEpic(action$, state$),
   getDaemonInfoFailureEpic(action$, state$),
-  getBlockchainInfoEpic(action$, state$)
+  getBlockchainInfoEpic(action$, state$),
+  getBlockchainInfoFailureEpic(action$, state$)
 )
