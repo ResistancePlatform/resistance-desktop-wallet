@@ -905,7 +905,7 @@ export class ResistanceCliService {
  * @memberof RpcService
  */
 function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise<any> {
-  let commands: Object[] = []
+  const commands: Object[] = []
 
   addressRows.forEach(address => {
     const confirmedCmd = { method: 'z_getbalance', parameters: [address.address] }
@@ -918,8 +918,8 @@ function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise
 
       const addresses = addressRows.map((address, index) => {
 
-        const confirmedBalance = balances[index << 1]
-        const unconfirmedBalance = balances[(index << 1) + 1]
+        const confirmedBalance = balances[index * 2]
+        const unconfirmedBalance = balances[index * 2 + 1]
 
         if (typeof(confirmedBalance) === 'object' || typeof(unconfirmedBalance) === 'object') {
           return {
@@ -943,16 +943,14 @@ function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise
       return addresses
     })
     .catch(err => {
-      this.logger.debug(this, `getAddressesBalance`, `Error occurred: `, ConsoleTheme.error, error)
+      this.logger.debug(this, `getAddressesBalance`, `Error occurred: `, ConsoleTheme.error, err)
 
-      const addresses = addressRows.map((address, index) => {
-        return {
-            ...address,
-            balance: -1,
-            confirmed: false,
-            errorMessage: err.toString()
-        }
-      })
+      const addresses = addressRows.map(address => ({
+        ...address,
+        balance: -1,
+        confirmed: false,
+        errorMessage: err.toString()
+      }))
 
       return addresses
     })
