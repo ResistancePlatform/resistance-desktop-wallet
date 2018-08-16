@@ -6,6 +6,7 @@ import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
 import { LoggerService, ConsoleTheme } from './logger-service'
+import { OSService } from './os-service'
 import { AddressBookService } from './address-book-service'
 
 import { getTransactionAmount, getTransactionConfirmed, getTransactionDate, getTransactionDirection } from '../utils/data-util'
@@ -55,6 +56,7 @@ const pollingIntervalValues = {
  */
 export class RpcService {
 	logger: LoggerService
+  osService: OSService
 	addressBookService: AddressBookService
 
 	pollingIntervalIds = {
@@ -72,26 +74,10 @@ export class RpcService {
 
 		this.time = new Date()
 		this.logger = new LoggerService()
+		this.osService = new OSService()
 		this.addressBookService = new AddressBookService()
 
 		return instance
-	}
-
-	/**
-	 * We CANNOT use:
-	 *   import { appStore } from '../state/store/configureStore'
-	 *
-	 * As that will import BEFORE the `appStore` be created !!!
-	 * We have to require the latest `appStore` to make sure it has been created !!!
-	 *
-	 * @param {AppAction} action
-	 * @memberof RpcService
-	 */
-	dispatchAction(action: AppAction) {
-		const storeModule = require('../state/store/configureStore')
-		if (storeModule && storeModule.appStore) {
-			storeModule.appStore.dispatch(action)
-		}
 	}
 
 	/**
@@ -104,12 +90,12 @@ export class RpcService {
 
     client.getInfo()
       .then((info: DaemonInfo) => {
-        this.dispatchAction(SystemInfoActions.gotDaemonInfo(info))
+        this.osService.dispatchAction(SystemInfoActions.gotDaemonInfo(info))
         return Promise.resolve()
       })
       .catch(err => {
         const errorMessage = `Unable to get Resistance local node info: ${err}`
-        this.dispatchAction(SystemInfoActions.getDaemonInfoFailure(errorMessage))
+        this.osService.dispatchAction(SystemInfoActions.getDaemonInfoFailure(errorMessage))
       })
   }
 
@@ -148,7 +134,7 @@ export class RpcService {
     )
     .subscribe(
       (result: Balances) => {
-        this.dispatchAction(OverviewActions.gotWalletInfo(result))
+        this.osService.dispatchAction(OverviewActions.gotWalletInfo(result))
       },
       error => {
         this.logger.debug(
@@ -158,7 +144,7 @@ export class RpcService {
           ConsoleTheme.error,
           error
         )
-        this.dispatchAction(OverviewActions.getWalletInfoFailure(`Subscribe error: ${error}`))
+        this.osService.dispatchAction(OverviewActions.getWalletInfoFailure(`Subscribe error: ${error}`))
       }
     )
   }
@@ -346,12 +332,12 @@ export class RpcService {
         this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe result: `, ConsoleTheme.testing, result)
 
         if (result.transactions && (result.optionalError === null || result.optionalError === undefined)) {
-          this.dispatchAction(OverviewActions.gotTransactionDataFromWallet(result.transactions))
+          this.osService.dispatchAction(OverviewActions.gotTransactionDataFromWallet(result.transactions))
         }
       },
       error => {
         this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
-        this.dispatchAction(OverviewActions.getTransactionDataFromWalletFailure(`Subscribe error: ${error}`))
+        this.osService.dispatchAction(OverviewActions.getTransactionDataFromWalletFailure(`Subscribe error: ${error}`))
       }
     )
   }
@@ -381,12 +367,12 @@ export class RpcService {
         this.logger.debug(this, `requestBlockchainInfo`, `gotBlockchainInfo`, ConsoleTheme.testing, result)
         blockchainInfo.lastBlockDate = new Date(result.time * 1000)
         blockchainInfo.blockchainSynchronizedPercentage = this.getBlockchainSynchronizedPercentage(blockchainInfo.lastBlockDate)
-        this.dispatchAction(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
+        this.osService.dispatchAction(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
         return Promise.resolve()
       })
       .catch(err => {
         this.logger.debug(this, `startPollingBlockchainInfo`, `getBlockchainInfoFailure`, ConsoleTheme.error, err)
-        this.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`Unable to get blockchain info: ${err}`))
+        this.osService.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`Unable to get blockchain info: ${err}`))
       })
   }
 
@@ -556,7 +542,7 @@ export class RpcService {
 				this.logger.debug(this, `sendCash`, `Error happened: `, ConsoleTheme.error, error)
 
 				// Make sure pass "true" to "clearCurrentOperation" !!!
-				this.dispatchAction(SendCashActions.sendCashFail(error.message, true))
+				this.osService.dispatchAction(SendCashActions.sendCashFail(error.message, true))
 			})
 	}
 
@@ -593,17 +579,17 @@ export class RpcService {
           switch(tempStatus && tempStatus.status) {
             case 'success':
               this.stopPollingOperationStatus()
-              this.dispatchAction(SendCashActions.sendCashSuccess())
+              this.osService.dispatchAction(SendCashActions.sendCashSuccess())
               break
             case 'failed':
               this.stopPollingOperationStatus()
               failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Unknown.`
-              this.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
+              this.osService.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
               break
             case 'cancelled':
               this.stopPollingOperationStatus()
               failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Operation has been cancelled.`
-              this.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
+              this.osService.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
               break
             default:
               initProgressPercent += 1
@@ -614,7 +600,7 @@ export class RpcService {
                 percent: newProgressPercent,
                 result: tempStatus.result
               }
-              this.dispatchAction(SendCashActions.updateSendOperationStatus(inProgressOperation))
+              this.osService.dispatchAction(SendCashActions.updateSendOperationStatus(inProgressOperation))
           }
 
 					return 'done'
@@ -623,7 +609,7 @@ export class RpcService {
 					this.logger.debug(this, `getAsyncOperationStatus`, `Error happened: `, ConsoleTheme.error, error)
 
 					// Make sure pass "true" to "clearCurrentOperation" !!!
-					this.dispatchAction(SendCashActions.sendCashFail(error.message, true))
+					this.osService.dispatchAction(SendCashActions.sendCashFail(error.message, true))
 					this.stopPollingOperationStatus()
 				})
 		}
@@ -756,9 +742,9 @@ export class RpcService {
 	 */
   requestOwnAddresses() {
     this.getWalletAddressAndBalance(false).subscribe(result => {
-      this.dispatchAction(OwnAddressesActions.gotOwnAddresses(result))
+      this.osService.dispatchAction(OwnAddressesActions.gotOwnAddresses(result))
     }, err => {
-      this.dispatchAction(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
+      this.osService.dispatchAction(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
     })
   }
 
