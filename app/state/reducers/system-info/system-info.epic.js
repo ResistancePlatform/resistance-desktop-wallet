@@ -9,20 +9,19 @@ import { ResistanceCliService } from '../../../service/resistance-cli-service'
 import { ResistanceService } from '../../../service/resistance-service'
 import { OSService } from '../../../service/os-service'
 
-const resistanceCliService = new ResistanceCliService()
+const rpcService = new ResistanceCliService()
 const resistanceService = new ResistanceService()
 const osService = new OSService()
 
-const startGettingDaemonInfoEpic = (action$: ActionsObservable<any>) => action$.pipe(
-  ofType(SystemInfoActions.startGettingDaemonInfo().type),
-  tap(() => resistanceCliService.startPollingDaemonStatus()),
-    mapTo(SystemInfoActions.empty())
+const getDaemonInfoEpic = (action$: ActionsObservable<any>) => action$.pipe(
+  ofType(SystemInfoActions.getDaemonInfo().type),
+  tap(() => rpcService.requestDaemonInfo()),
+  mapTo(SystemInfoActions.empty())
 )
 
-const startGettingBlockchainInfoEpic = (action$: ActionsObservable<any>) => action$.pipe(
-  ofType(SystemInfoActions.startGettingBlockchainInfo().type),
-  // This action SHOULD only be dispatched once, return nothing!!!
-  tap(() => resistanceCliService.startPollingBlockChainInfo()),
+const getBlockchainInfoEpic = (action$: ActionsObservable<any>) => action$.pipe(
+  ofType(SystemInfoActions.getBlockchainInfo().type),
+  tap(() => rpcService.requestBlockchainInfo()),
   mapTo(SystemInfoActions.empty())
 )
 
@@ -45,6 +44,6 @@ const openInstallationFolderEpic = (action$: ActionsObservable<any>) => action$.
 export const SystemInfoEpics = (action$, state$) => merge(
   openWalletInFileManagerEpic(action$, state$),
   openInstallationFolderEpic(action$, state$),
-  startGettingDaemonInfoEpic(action$, state$),
-  startGettingBlockchainInfoEpic(action$, state$)
+  getDaemonInfoEpic(action$, state$),
+  getBlockchainInfoEpic(action$, state$)
 )

@@ -43,12 +43,18 @@ $SYSTEM_INFO_BAR_HEIGHT: 5.5rem;
     }
 }
 
-.daemonIsRunning {
-    color: $SYSTEM_INFO_BAR_RUNNING_ICON_COLOR;
-}
+.nodeStatusContainer {
+  .green {
+    color: $BASE_COLOR_ACTIVE_ICON;
+  }
 
-.daemonIsNotRunning {
-    color: $SYSTEM_INFO_BAR_NOT_RUNNING_ICON_COLOR;
+  .yellow {
+    color: yellow;
+  }
+
+  .red {
+    color: $BASE_COLOR_FAILURE_ICON;
+  }
 }
 
 .walletInFileManagerButton {

@@ -5,6 +5,7 @@ import { routerMiddleware } from 'react-router-redux'
 import { createLogger } from 'redux-logger'
 import {reducer as toastrReducer} from 'react-redux-toastr'
 
+import { RpcPollingReducer } from '../reducers/rpc-polling/rpc-polling.reducer'
 import { NaviReducer } from '../reducers/navi/navi.reducer'
 import { NaviEpics } from '../reducers/navi/navi.epic'
 import { SystemInfoReducer } from '../reducers/system-info/system-info.reducer'
@@ -24,6 +25,7 @@ export const history = createHashHistory()
 
 const appReducers = combineReducers({
   toastr: toastrReducer,
+  rpcPolling: RpcPollingReducer,
 	navi: NaviReducer,
 	systemInfo: SystemInfoReducer,
 	overview: OverviewReducer,

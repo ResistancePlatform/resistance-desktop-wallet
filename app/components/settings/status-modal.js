@@ -33,6 +33,9 @@ class StatusModal extends Component<Props> {
   state: ModalState
   refreshPathKey: number
 
+	/**
+	 * @memberof StatusModal
+	 */
   constructor(props) {
     super(props)
     this.state = {
@@ -100,21 +103,10 @@ class StatusModal extends Component<Props> {
       statusClassNames.push('icon-status-stop')
     }
 
-    switch (processStatus) {
-      case 'RUNNING':
-        statusClassNames.push(styles.green)
-        break
-      case 'STARTING':
-      case 'RESTARTING':
-      case 'STOPPING':
-        statusClassNames.push(styles.yellow)
-        break
-      case 'NOT RUNNING':
-      case 'FAILED':
-      case 'MURDER FAILED':
-        statusClassNames.push(styles.red)
-        break
-      default:
+    const color = osService.getChildProcessStatusColor(processStatus)
+
+    if (color) {
+      statusClassNames.push(styles[color])
     }
 
     return statusClassNames.join(' ')

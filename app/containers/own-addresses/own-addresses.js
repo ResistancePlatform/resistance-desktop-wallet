@@ -1,6 +1,8 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+
+import RpcPolling from '../../components/rpc-polling/rpc-polling'
 import { OwnAddressesActions, OwnAddressesState } from '../../state/reducers/own-addresses/own-addresses.reducer'
 import { appStore } from '../../state/store/configureStore'
 import OwnAddressList from '../../components/own-addresses/own-address-list'
@@ -9,6 +11,7 @@ import styles from './own-addresses.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
+const pollingInterval = 4.0
 
 type Props = {
 	ownAddresses: OwnAddressesState
@@ -20,20 +23,6 @@ type Props = {
  */
 class OwnAddresses extends Component<Props> {
 	props: Props
-
-	/**
-	 * @memberof OwnAddresses
-	 */
-	componentDidMount() {
-		appStore.dispatch(OwnAddressesActions.startGettingOwnAddresses())
-	}
-
-	/**
-	 * @memberof OwnAddresses
-	 */
-	componentWillUnmount() {
-		appStore.dispatch(OwnAddressesActions.stopGettingOwnAddresses())
-	}
 
 	eventConfirm(event) {
 		event.preventDefault()
@@ -52,11 +41,6 @@ class OwnAddresses extends Component<Props> {
 	onAddNewAddressClicked(event) {
 		this.eventConfirm(event)
 		appStore.dispatch(OwnAddressesActions.updateDropdownMenuVisibility(true))
-	}
-
-	onRefreshClicked(event) {
-		this.eventConfirm(event)
-		appStore.dispatch(OwnAddressesActions.startGettingOwnAddresses())
 	}
 
 	hideDropdownMenu(event) {
@@ -97,6 +81,14 @@ class OwnAddresses extends Component<Props> {
 				onClick={(event) => this.hideDropdownMenu(event)}
 				onKeyDown={(event) => this.hideDropdownMenu(event)}
 			>
+        <RpcPolling
+          interval={pollingInterval}
+          actions={{
+            polling: OwnAddressesActions.getOwnAddresses,
+            success: OwnAddressesActions.gotOwnAddresses,
+            failure: OwnAddressesActions.getOwnAddressesFailure
+          }}
+        />
 
 				{ /* Route content */}
 				<div className={[styles.ownAddressesContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
@@ -108,7 +100,6 @@ class OwnAddresses extends Component<Props> {
 							<div className={styles.topBarTitle}>Own Addresses</div>
 							<div className={[styles.topBarButtonContainer, HLayout.hBoxChild].join(' ')}>
 								<button onClick={(event) => this.onShowPrivteKeyClicked(event)} onKeyDown={(event) => this.onShowPrivteKeyClicked(event)} > SHOW PRIVATE KEY</button>
-								<button onClick={(event) => this.onRefreshClicked(event)} onKeyDown={(event) => this.onRefreshClicked(event)} > REFRESH</button>
 								<div className={[styles.addAddressButtonContainer].join(' ')} onClick={(event) => this.onAddNewAddressClicked(event)} onKeyDown={(event) => this.onAddNewAddressClicked(event)} >
 									<button className={styles.addNewAddressButton} >+ ADD NEW ADDRESS
 										<span className="icon-arrow-down" />

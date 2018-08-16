@@ -47,12 +47,7 @@ const getResistanceClientInstance = () => {
 }
 
 const pollingIntervalValues = {
-	daemon: 2 * 1000,
-	blockchainInfo: 4 * 1000,
-	walletInfo: 2 * 1000,
-	transactionDataFromTheWallet: 5 * 1000,
-	sendCash: 2 * 1000,
-	ownAddresses: 4 * 1000
+	sendCash: 2 * 1000
 }
 
 /**
@@ -65,12 +60,7 @@ export class ResistanceCliService {
 	addressBookService: AddressBookService
 
 	pollingIntervalIds = {
-		daemon: -1,
-		blockchainInfo: -1,
-		walletInfo: -1,
-		transactionDataFromTheWallet: -1,
-		sendCash: -1,
-		ownAddresses: -1
+		sendCash: -1
 	}
 
 	/**
@@ -108,437 +98,393 @@ export class ResistanceCliService {
 	}
 
 	/**
-	 * Polling the daemon status per 2 second (after the first run), for getting the `resistanced` running status and memory usage
+	 * Reques Resistance node running status and memory usage.
 	 *
 	 * @memberof ResistanceCliService
 	 */
-	startPollingDaemonStatus() {
-		/**
-		 *
-		 */
-		const getAsyncDaemonInfo = () => {
-			const cli = getResistanceClientInstance()
-			const daemonInfo: DaemonInfo = {
-				status: 'RUNNING',
-				residentSizeMB: 0,
-				optionalError: null,
-				getInfoResult: {}
-			}
+  requestDaemonInfo() {
+    const cli = getResistanceClientInstance()
+    const daemonInfo: DaemonInfo = {
+      status: 'RUNNING',
+      residentSizeMB: 0,
+      optionalError: null,
+      getInfoResult: {}
+    }
 
-			const getInfoPromise = cli.getInfo()
-				.then((result) => {
-					daemonInfo.getInfoResult = result
-					delete daemonInfo.optionalError
-					return daemonInfo
-				})
-				.catch(error => {
-					console.error(error)
-					daemonInfo.optionalError = error
-					return daemonInfo
-				})
+    const getInfoPromise = cli.getInfo()
+    .then((result) => {
+      daemonInfo.getInfoResult = result
+      delete daemonInfo.optionalError
+      return daemonInfo
+    })
+    .catch(error => {
+      console.error(error)
+      daemonInfo.optionalError = error
+      return daemonInfo
+    })
 
-			from(getInfoPromise)
-				.pipe(take(1))
-				.subscribe(
-					(result: DaemonInfo) => {
-						const daemonInfoResult = Object.assign(result)
+    from(getInfoPromise)
+    .pipe(take(1))
+    .subscribe(
+      (result: DaemonInfo) => {
+        const daemonInfoResult = Object.assign(result)
 
-						if (daemonInfoResult.optionalError) {
-							if (
-								daemonInfoResult.optionalError.code &&
-								daemonInfoResult.optionalError.code === 'ECONNREFUSED'
-							) {
-								daemonInfoResult.status = 'NOT_RUNNING'
-							} else {
-								daemonInfoResult.status = 'UNABLE_TO_ASCERTAIN'
-							}
-						}
+        if (daemonInfoResult.optionalError) {
+          if (
+            daemonInfoResult.optionalError.code &&
+            daemonInfoResult.optionalError.code === 'ECONNREFUSED'
+          ) {
+            daemonInfoResult.status = 'NOT_RUNNING'
+          } else {
+            daemonInfoResult.status = 'UNABLE_TO_ASCERTAIN'
+          }
+        }
 
-						this.dispatchAction(
-							SystemInfoActions.gotDaemonInfo(daemonInfoResult)
-						)
-					},
-					error =>
-						this.logger.debug(
-							this,
-							`startPollingDaemonStatus`,
-							`Error happened: `,
-							ConsoleTheme.error,
-							error
-						)
-					// () => this.logger.debug(this, `startPollingDaemonStatus`, `observable completed.`, ConsoleTheme.testing)
-				)
-		}
-
-		this.startPolling('daemon', () => getAsyncDaemonInfo())
-	}
+        this.dispatchAction(
+          SystemInfoActions.gotDaemonInfo(daemonInfoResult)
+        )
+      },
+      error => {
+        this.logger.debug(
+          this,
+          `startPollingDaemonStatus`,
+          `Error happened: `,
+          ConsoleTheme.error,
+          error
+        )
+        SystemInfoActions.getDaemonInfoFailure(`Error occurred: ${error}`)
+      }
+    )
+  }
 
 	/**
-	 * @memberof ResistanceCliService
-	 */
-	stopPollingWalletInfo() {
-		this.stopPolling('walletInfo')
-	}
-
-	/**
-	 * Polling the wallet info per 2 second (after the first run)
+	 * Request the wallet information.
 	 *
 	 * @memberof ResistanceCliService
 	 */
-	startPollingWalletInfo() {
-		/**
-		 *
-		 */
-		const getAsyncWalletInfo = () => {
-			const cli = getResistanceClientInstance()
-			const commandList = [
-				{ method: 'z_gettotalbalance' },
-				{ method: 'z_gettotalbalance', parameters: [0] }
-			]
+  requestWalletInfo() {
+    const cli = getResistanceClientInstance()
 
-			from(cli.command(commandList))
-				.pipe(
-					tap(result =>
-						this.logger.debug(
-							this,
-							`startPollingWalletInfo`,
-							`result: `,
-							ConsoleTheme.testing,
-							result
-						)
-					),
-					map(result => ({
-						transparentBalance: parseFloat(result[0].transparent),
-						privateBalance: parseFloat(result[0].private),
-						totalBalance: parseFloat(result[0].total),
-						transparentUnconfirmedBalance: parseFloat(result[1].transparent),
-						privateUnconfirmedBalance: parseFloat(result[1].private),
-						totalUnconfirmedBalance: parseFloat(result[1].total)
-					}))
-				)
-				.subscribe(
-					(result: Balances) => {
-						this.dispatchAction(OverviewActions.gotWalletInfo(result))
-					},
-					error =>
-						this.logger.debug(
-							this,
-							`startPollingWalletInfo`,
-							`subscribe error: `,
-							ConsoleTheme.error,
-							error
-						)
-					// () => this.logger.debug(this, `startPollingWalletInfo`, `observable completed.`, ConsoleTheme.testing)
-				)
-		}
+    const commandList = [
+      { method: 'z_gettotalbalance' },
+      { method: 'z_gettotalbalance', parameters: [0] }
+    ]
 
-		this.startPolling('walletInfo', () => getAsyncWalletInfo())
-	}
+    from(cli.command(commandList))
+    .pipe(
+      tap(result =>
+          this.logger.debug(
+            this,
+            `startPollingWalletInfo`,
+            `result: `,
+            ConsoleTheme.testing,
+            result
+          )
+         ),
+         map(result => ({
+           transparentBalance: parseFloat(result[0].transparent),
+           privateBalance: parseFloat(result[0].private),
+           totalBalance: parseFloat(result[0].total),
+           transparentUnconfirmedBalance: parseFloat(result[1].transparent),
+           privateUnconfirmedBalance: parseFloat(result[1].private),
+           totalUnconfirmedBalance: parseFloat(result[1].total)
+         }))
+    )
+    .subscribe(
+      (result: Balances) => {
+        this.dispatchAction(OverviewActions.gotWalletInfo(result))
+      },
+      error => {
+        this.logger.debug(
+          this,
+          `startPollingWalletInfo`,
+          `subscribe error: `,
+          ConsoleTheme.error,
+          error
+        )
+        this.dispatchAction(OverviewActions.getWalletInfoFailure(`Subscribe error: ${error}`))
+      }
+    )
+  }
 
 	/**
-	 * @memberof ResistanceCliService
-	 */
-	stopPollingTransactionsDataFromWallet() {
-		this.stopPolling('transactionDataFromTheWallet')
-	}
-
-	/**
-	 * Polling the wallet transactions per 5 second (after the first run)
+	 * Request wallet transactions.
 	 *
 	 * @memberof ResistanceCliService
 	 */
-	startPollingTransactionsDataFromWallet() {
-		/**
-		 *
-		 */
-		const getAsyncTransactionDataFromWallet = async () => {
+  requestTransactionsDataFromWallet() {
+    const cli = getResistanceClientInstance()
+    const getPublicTransactionsCmd = () => [
+      { method: 'listtransactions', parameters: ['', 200] }
+    ]
+    const getWalletZAddressesCmd = () => [{ method: 'z_listaddresses' }]
+    const getWalletZReceivedTransactionsCmd = (zAddress) => [{ method: 'z_listreceivedbyaddress', parameters: [zAddress, 0] }]
+    const getWalletTransactionCmd = (transactionId) => [{ method: 'gettransaction', parameters: [transactionId] }]
 
-			const cli = getResistanceClientInstance()
-			const getPublicTransactionsCmd = () => [
-				{ method: 'listtransactions', parameters: ['', 200] }
-			]
-			const getWalletZAddressesCmd = () => [{ method: 'z_listaddresses' }]
-			const getWalletZReceivedTransactionsCmd = (zAddress) => [{ method: 'z_listreceivedbyaddress', parameters: [zAddress, 0] }]
-			const getWalletTransactionCmd = (transactionId) => [{ method: 'gettransaction', parameters: [transactionId] }]
+    // t_add --> t_addr:
 
-			// t_add --> t_addr:
+    // Public --- IN --- t_addr
+    // Public --- OUT --- t_addr
 
-			// Public --- IN --- t_addr
-			// Public --- OUT --- t_addr
+    // t_add --> z_addr:
 
-			// t_add --> z_addr:
+    // Public -- OUT -- Z Address not listed in Wallet
+    // Private -- IN -- z_Addr
 
-			// Public -- OUT -- Z Address not listed in Wallet
-			// Private -- IN -- z_Addr
+    // z_add --> t_addr
 
-			// z_add --> t_addr
+    // Public -- IN -- t_addr
+    // Private -- IN -- z_addr
 
-			// Public -- IN -- t_addr
-			// Private -- IN -- z_addr
+    // z_add --> z_addr
 
-			// z_add --> z_addr
+    // Private  -- IN -- z_addr1
+    // Private -- IN -- z_addr2
 
-			// Private  -- IN -- z_addr1
-			// Private -- IN -- z_addr2
+    const getPrivateTransactionsPromise = async () => {
+      try {
+        // First, we get all the private addresses, and then for each one, we get all their transactions
+        const privateAddresses = await cli.command(getWalletZAddressesCmd()).then(tempResult => tempResult[0])
+        if (Array.isArray(privateAddresses) && privateAddresses.length > 0) {
+          let queryResultWithAddressArr = []
+          for (let index = 0; index < privateAddresses.length; index++) {
+            const tempAddress = privateAddresses[index];
+            /* eslint-disable-next-line no-await-in-loop */
+            const addressTransactions = await cli.command(getWalletZReceivedTransactionsCmd(tempAddress)).then(tempResult => tempResult[0])
 
-			const getPrivateTransactionsPromise = async () => {
-				try {
-					// First, we get all the private addresses, and then for each one, we get all their transactions
-					const privateAddresses = await cli.command(getWalletZAddressesCmd()).then(tempResult => tempResult[0])
-					if (Array.isArray(privateAddresses) && privateAddresses.length > 0) {
-						let queryResultWithAddressArr = []
-						for (let index = 0; index < privateAddresses.length; index++) {
-							const tempAddress = privateAddresses[index];
-							/* eslint-disable-next-line no-await-in-loop */
-							const addressTransactions = await cli.command(getWalletZReceivedTransactionsCmd(tempAddress)).then(tempResult => tempResult[0])
+            // 	 [{
+            // 	 amount: 49.9999,
+            // 	 jsindex: 0,
+            // 	 jsoutindex: 1,
+            // 	 memo: "f600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            // 	 txid: "1bf41fc600962cc22104d1e2884527537a0d8d8eaac97fbabb1d5887b73ee066"
+            // 	 }]
+            if (Array.isArray(addressTransactions) && addressTransactions.length > 0) {
+              const addressTransactionsWithPrivateAddress = addressTransactions.map(tran => Object.assign({}, tran, { address: tempAddress }))
+              queryResultWithAddressArr = [...queryResultWithAddressArr, ...addressTransactionsWithPrivateAddress]
+            }
+          }
 
-							// 	 [{
-							// 	 amount: 49.9999,
-							// 	 jsindex: 0,
-							// 	 jsoutindex: 1,
-							// 	 memo: "f600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-							// 	 txid: "1bf41fc600962cc22104d1e2884527537a0d8d8eaac97fbabb1d5887b73ee066"
-							// 	 }]
-							if (Array.isArray(addressTransactions) && addressTransactions.length > 0) {
-								const addressTransactionsWithPrivateAddress = addressTransactions.map(tran => Object.assign({}, tran, { address: tempAddress }))
-								queryResultWithAddressArr = [...queryResultWithAddressArr, ...addressTransactionsWithPrivateAddress]
-							}
-						}
+          // this.logger.debug(this, `getPrivateTransactionsPromise`, `queryResultWithAddressArr: `, ConsoleTheme.testing, queryResultWithAddressArr)
 
-						// this.logger.debug(this, `getPrivateTransactionsPromise`, `queryResultWithAddressArr: `, ConsoleTheme.testing, queryResultWithAddressArr)
+          const tempTransactionList = queryResultWithAddressArr.map(result => ({
+            type: `\u2605 T (Private)`,
+            direction: getTransactionDirection(`receive`),
+            confirmed: 0,
+            amount: getTransactionAmount(result.amount),
+            date: null,
+            originalTime: 0,
+            destinationAddress: result.address,
+            transactionId: result.txid
+          }))
 
-						const tempTransactionList = queryResultWithAddressArr.map(result => ({
-							type: `\u2605 T (Private)`,
-							direction: getTransactionDirection(`receive`),
-							confirmed: 0,
-							amount: getTransactionAmount(result.amount),
-							date: null,
-							originalTime: 0,
-							destinationAddress: result.address,
-							transactionId: result.txid
-						}))
+          // At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`,
+          // we need to get that info by viewing the detail of the transaction, and then put it back !
+          for (let index = 0; index < tempTransactionList.length; index++) {
+            const tempTransaction = tempTransactionList[index];
+            /* eslint-disable-next-line no-await-in-loop */
+            const transactionDetail = await cli.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
+            tempTransaction.confirmed = getTransactionConfirmed(transactionDetail.confirmations)
+            tempTransaction.date = getTransactionDate(transactionDetail.time)
+            tempTransaction.originalTime = transactionDetail.time
+          }
 
-						// At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`,
-						// we need to get that info by viewing the detail of the transaction, and then put it back !
-						for (let index = 0; index < tempTransactionList.length; index++) {
-							const tempTransaction = tempTransactionList[index];
-							/* eslint-disable-next-line no-await-in-loop */
-							const transactionDetail = await cli.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
-							tempTransaction.confirmed = getTransactionConfirmed(transactionDetail.confirmations)
-							tempTransaction.date = getTransactionDate(transactionDetail.time)
-							tempTransaction.originalTime = transactionDetail.time
-						}
+          return tempTransactionList
+        }
 
-						return tempTransactionList
-					}
-
-					return []
-				}
-				catch (error) {
-					this.logger.debug(this, `startPollingTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
-					return []
-				}
-			}
+        return []
+      }
+      catch (error) {
+        this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
+        return []
+      }
+    }
 
 
-			const getPublicTransactionsPromise = cli.command(getPublicTransactionsCmd())
-				.then(result => result[0])
-				.then(result => {
-					if (Array.isArray(result)) {
-						return result.map(
-							originalTransaction => ({
-								type: `\u2605 T (Public)`,
-								direction: getTransactionDirection(originalTransaction.category),
-								confirmed: getTransactionConfirmed(originalTransaction.confirmations),
-								amount: getTransactionAmount(originalTransaction.amount),
-								date: getTransactionDate(originalTransaction.time),
-								originalTime: originalTransaction.time,
-								destinationAddress: originalTransaction.address ? originalTransaction.address : `[ Z Address not listed in Wallet ]`,
-								transactionId: originalTransaction.txid
-							})
-						)
-					}
+    const getPublicTransactionsPromise = cli.command(getPublicTransactionsCmd())
+    .then(result => result[0])
+    .then(result => {
+      if (Array.isArray(result)) {
+        return result.map(
+          originalTransaction => ({
+            type: `\u2605 T (Public)`,
+            direction: getTransactionDirection(originalTransaction.category),
+            confirmed: getTransactionConfirmed(originalTransaction.confirmations),
+            amount: getTransactionAmount(originalTransaction.amount),
+            date: getTransactionDate(originalTransaction.time),
+            originalTime: originalTransaction.time,
+            destinationAddress: originalTransaction.address ? originalTransaction.address : `[ Z Address not listed in Wallet ]`,
+            transactionId: originalTransaction.txid
+          })
+        )
+      }
 
-					return []
-				})
-				.catch(error => {
-					this.logger.debug(this, `getPublicTransactionsPromise`, `subscribe error: `, ConsoleTheme.error, error)
-					return []
-				})
+      return []
+    })
+    .catch(error => {
+      this.logger.debug(this, `getPublicTransactionsPromise`, `subscribe error: `, ConsoleTheme.error, error)
+      return []
+    })
 
-			const responseTransactions = { transactions: null, optionalError: null }
-			const queryPromiseArr = [
-				getPublicTransactionsPromise,
-				getPrivateTransactionsPromise()
-			]
+    const responseTransactions = { transactions: null, optionalError: null }
+    const queryPromiseArr = [
+      getPublicTransactionsPromise,
+      getPrivateTransactionsPromise()
+    ]
 
-			const combineQueryPromise = Promise.all(queryPromiseArr)
-				.then(result => {
-					const combinedTransactionList = [...result[0], ...result[1]]
+    const combineQueryPromise = Promise.all(queryPromiseArr)
+    .then(result => {
+      const combinedTransactionList = [...result[0], ...result[1]]
 
-					// At this point, we got all combined `public address` and `private address` transaction list, but we need to sort by date !!!
-					const sortedByDateTransactions = combinedTransactionList.sort((trans1, trans2) => {
-						const time1 = trans1.originalTime
-						const time2 = trans2.originalTime
+      // At this point, we got all combined `public address` and `private address` transaction list, but we need to sort by date !!!
+      const sortedByDateTransactions = combinedTransactionList.sort((trans1, trans2) => {
+        const time1 = trans1.originalTime
+        const time2 = trans2.originalTime
 
-						if (time1 > time2) return -1
-						else if (time1 < time2) return 1
+        if (time1 > time2) return -1
+          else if (time1 < time2) return 1
 
-						return 0
-					})
-					responseTransactions.transactions = sortedByDateTransactions
-					delete responseTransactions.optionalError
+            return 0
+      })
+      responseTransactions.transactions = sortedByDateTransactions
+      delete responseTransactions.optionalError
 
-					return responseTransactions
-				})
-				.catch(error => {
-					this.logger.debug(this, `startPollingTransactionsDataFromWallet`, `Promise.all error: `, ConsoleTheme.error, error)
-					responseTransactions.optionalError = error
-					return responseTransactions
-				})
+      return responseTransactions
+    })
+    .catch(error => {
+      this.logger.debug(this, `requestTransactionsDataFromWallet`, `Promise.all error: `, ConsoleTheme.error, error)
+      responseTransactions.optionalError = error
+      return responseTransactions
+    })
 
-			from(combineQueryPromise)
-				.pipe(
-					switchMap(result => {
-						console.log(`result ---> `, result)
-						if (!result.transactions || !Array.isArray(result.transactions) || result.transactions.length <= 0) {
-							return result
-						}
+    from(combineQueryPromise)
+    .pipe(
+      switchMap(result => {
+        console.log(`result ---> `, result)
+        if (!result.transactions || !Array.isArray(result.transactions) || result.transactions.length <= 0) {
+          return result
+        }
 
-						return this.addressBookService.loadAddressBook().pipe(
-							map((addressBookRows: AddressBookRow[] | []) => {
-								if (!addressBookRows || addressBookRows.length <= 0) {
-									return result
-								}
+        return this.addressBookService.loadAddressBook().pipe(
+          map((addressBookRows: AddressBookRow[] | []) => {
+            if (!addressBookRows || addressBookRows.length <= 0) {
+              return result
+            }
 
-								result.transactions = result.transactions.map((tempTransaction: Transaction) => {
-									const matchedAddressBookRow = addressBookRows.find(tempAddressRow => tempAddressRow.address === tempTransaction.destinationAddress)
-									return matchedAddressBookRow ? ({
-										...tempTransaction,
-										destinationAddress: matchedAddressBookRow.name
-									}) : tempTransaction
-								})
+            result.transactions = result.transactions.map((tempTransaction: Transaction) => {
+              const matchedAddressBookRow = addressBookRows.find(tempAddressRow => tempAddressRow.address === tempTransaction.destinationAddress)
+              return matchedAddressBookRow ? ({
+                ...tempTransaction,
+                destinationAddress: matchedAddressBookRow.name
+              }) : tempTransaction
+            })
 
-								return result
-							})
-						)
-					}),
-					take(1)
-				)
-				.subscribe(
-					result => {
-						this.logger.debug(this, `startPollingTransactionsDataFromWallet`, `subscribe result: `, ConsoleTheme.testing, result)
+            return result
+          })
+        )
+      }),
+      take(1)
+    )
+    .subscribe(
+      result => {
+        this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe result: `, ConsoleTheme.testing, result)
 
-						if (result.transactions && (result.optionalError === null || result.optionalError === undefined)) {
-							this.dispatchAction(OverviewActions.gotTransactionDataFromWallet(result.transactions))
-						}
-					},
-					error => this.logger.debug(this, `startPollingTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
-					// () => this.logger.debug(this, `startPollingBlockChainInfo`, `observable completed.`, ConsoleTheme.testing)
-				)
-		}
-
-		this.startPolling('transactionDataFromTheWallet', () => getAsyncTransactionDataFromWallet())
-	}
+        if (result.transactions && (result.optionalError === null || result.optionalError === undefined)) {
+          this.dispatchAction(OverviewActions.gotTransactionDataFromWallet(result.transactions))
+        }
+      },
+      error => {
+        this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
+        this.dispatchAction(OverviewActions.getTransactionDataFromWalletFailure(`Subscribe error: ${error}`))
+      }
+    )
+  }
 
 	/**
-	 * @memberof ResistanceCliService
-	 */
-	stopPollingBlockChainInfo() {
-		this.stopPolling('blockchainInfo')
-	}
-
-	/**
-	 * Polling the block chain info per 5 second (after the first run)
+	 * Request blockchain information.
 	 *
 	 * @memberof ResistanceCliService
 	 */
-	startPollingBlockChainInfo() {
-		/**
-		 * @param {*} tempDate
-		 */
-		const getBlockchainSynchronizedPercentage = (tempDate: Date) => {
-			// TODO: Get the start date right after ZCash release - from first block!!!
-			const startDate = new Date('28 Oct 2016 02:00:00 GMT')
-			const nowDate = new Date()
+  requestBlockchainInfo() {
+    const cli = getResistanceClientInstance()
+    const finalResult: BlockChainInfo = {
+      connectionCount: 0,
+      blockchainSynchronizedPercentage: 0,
+      lastBlockDate: null,
+      optionalError: null
+    }
 
-			const fullTime = nowDate.getTime() - startDate.getTime()
-			const remainingTime = nowDate.getTime() - tempDate.getTime()
+    // const getConnectionCountCommand = () => [{ method: 'getconnectioncount' }]
+    // const getBlockCountCommand = () => [{ method: 'getblockcount' }]
+    // const getBlockHashCommand = (blockIndex: number) => [{ method: 'getblockhash', parameters: [blockIndex] }]
+    // const getBlockCommand = (blockhash: string) => [{ method: 'getblock', parameters: [blockhash] }]
 
-			// After 20 min we report 100% anyway
-			if (remainingTime > 20 * 60 * 1000) {
-				let dPercentage = 100 - remainingTime / fullTime * 100
-				if (dPercentage < 0) {
-					dPercentage = 0
-				} else if (dPercentage > 100) {
-					dPercentage = 100
-				}
+    const getBlockChainInfoPromise = cli.getConnectionCount()
+    .then(result => {
+      finalResult.connectionCount = result
+      return cli.getBlockCount()
+    })
+    .then(result => cli.getBlockHash(result))
+    .then(result => cli.getBlock(result))
+    .then(result => {
+      this.logger.debug(this, `startPollingBlockChainInfo`, `blockInfo`, ConsoleTheme.testing, result)
 
-				// Also set a member that may be queried
-				return parseFloat(dPercentage.toFixed(2))
-			}
+      finalResult.lastBlockDate = new Date(result.time * 1000)
+      finalResult.blockchainSynchronizedPercentage = this.getBlockchainSynchronizedPercentage(finalResult.lastBlockDate)
+      delete finalResult.optionalError
+      return finalResult
+    })
+    .catch(error => {
+      console.error(error)
+      finalResult.optionalError = error
+      return finalResult
+    })
 
-			return 100
+    from(getBlockChainInfoPromise)
+    .pipe(take(1))
+    .subscribe((blockchainInfo: BlockChainInfo) => {
+      this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe blockchainInfo: `, ConsoleTheme.testing, blockchainInfo)
+      this.dispatchAction(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
+    },
+    error => {
+      this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe error: `, ConsoleTheme.error, error)
+      this.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`Subscribe error: ${error}`))
+    })
+  }
 
-			// // Just in case early on the call returns some junk date
-			// if (info.lastBlockDate.before(startDate)) {
-			//     // TODO: write log that we fix minimum date! - this condition should not occur
-			//     info.lastBlockDate = startDate
-			// }
-		}
+  /**
+   * @param {*} tempDate
+   * @memberof ResistanceCliService
+   */
+  getBlockchainSynchronizedPercentage(tempDate: Date) {
+    // TODO: Get the start date right after ZCash release - from first block!!!
+    const startDate = new Date('28 Oct 2016 02:00:00 GMT')
+    const nowDate = new Date()
 
-		/**
-		 *
-		 */
-		const getAsyncBlockchainInfo = () => {
-			const cli = getResistanceClientInstance()
-			const finalResult: BlockChainInfo = {
-				connectionCount: 0,
-				blockchainSynchronizedPercentage: 0,
-				lastBlockDate: null,
-				optionalError: null
-			}
+    const fullTime = nowDate.getTime() - startDate.getTime()
+    const remainingTime = nowDate.getTime() - tempDate.getTime()
 
-			// const getConnectionCountCommand = () => [{ method: 'getconnectioncount' }]
-			// const getBlockCountCommand = () => [{ method: 'getblockcount' }]
-			// const getBlockHashCommand = (blockIndex: number) => [{ method: 'getblockhash', parameters: [blockIndex] }]
-			// const getBlockCommand = (blockhash: string) => [{ method: 'getblock', parameters: [blockhash] }]
+    // After 20 min we report 100% anyway
+    if (remainingTime > 20 * 60 * 1000) {
+      let dPercentage = 100 - remainingTime / fullTime * 100
+      if (dPercentage < 0) {
+        dPercentage = 0
+      } else if (dPercentage > 100) {
+        dPercentage = 100
+      }
 
-			const getBlockChainInfoPromise = cli.getConnectionCount()
-				.then(result => {
-					finalResult.connectionCount = result
-					return cli.getBlockCount()
-				})
-				.then(result => cli.getBlockHash(result))
-				.then(result => cli.getBlock(result))
-				.then(result => {
-					this.logger.debug(this, `startPollingBlockChainInfo`, `blockInfo`, ConsoleTheme.testing, result)
+      // Also set a member that may be queried
+      return parseFloat(dPercentage.toFixed(2))
+    }
 
-					finalResult.lastBlockDate = new Date(result.time * 1000)
-					finalResult.blockchainSynchronizedPercentage = getBlockchainSynchronizedPercentage(finalResult.lastBlockDate)
-					delete finalResult.optionalError
-					return finalResult
-				})
-				.catch(error => {
-					console.error(error)
-					finalResult.optionalError = error
-					return finalResult
-				})
+    return 100
 
-			from(getBlockChainInfoPromise)
-				.pipe(take(1))
-				.subscribe((blockchainInfo: BlockChainInfo) => {
-					this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe blockchainInfo: `, ConsoleTheme.testing, blockchainInfo)
-
-					this.dispatchAction(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
-				},
-					error => this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe error: `, ConsoleTheme.error, error)
-					// () => this.logger.debug(this, `startPollingBlockChainInfo`, `observable completed.`, ConsoleTheme.testing)
-				)
-		}
-
-		this.startPolling('blockchainInfo', () => getAsyncBlockchainInfo())
-	}
+    // // Just in case early on the call returns some junk date
+    // if (info.lastBlockDate.before(startDate)) {
+    //     // TODO: write log that we fix minimum date! - this condition should not occur
+    //     info.lastBlockDate = startDate
+    // }
+  }
 
 	/**
 	 * @param {Client} cli
@@ -873,30 +819,13 @@ export class ResistanceCliService {
    *
 	 * @memberof ResistanceCliService
 	 */
-	startGettingOwnAddresses() {
-		const handler = () => {
-			this.getWalletAddressAndBalance(false).subscribe(result => {
-				this.dispatchAction(OwnAddressesActions.gotOwnAddresses(result))
-			}, err => {
-				this.dispatchAction(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
-			})
-
-		}
-		handler()
-		// TODO: Re-enable after fixing the 500 error problem
-		// this.startPolling('ownAddresses', () => handler())
-	}
-
-
-	/**
-   * Start polling.
-   *
-	 * @memberof ResistanceCliService
-	 */
-	stopGettingOwnAddresses() {
-		// TODO: Re-enable after fixing the 500 error problem
-		// this.stopPolling('ownAddresses')
-	}
+  requestOwnAddresses() {
+    this.getWalletAddressAndBalance(false).subscribe(result => {
+      this.dispatchAction(OwnAddressesActions.gotOwnAddresses(result))
+    }, err => {
+      this.dispatchAction(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
+    })
+  }
 
 	/**
    * Start polling.

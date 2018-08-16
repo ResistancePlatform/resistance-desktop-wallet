@@ -9,6 +9,10 @@ config.setPath(osService.getAppSettingFile())
 
 
 export const defaultAppState: AppState = {
+  rpcPolling: {
+    registeredActions: [],
+    actionsResponseReceived: {}
+  },
 	navi: {
 		currentNaviPath: '/overview'
 	},
