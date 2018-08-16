@@ -1,5 +1,4 @@
 // @flow
-
 import { remote } from 'electron'
 import Client from 'bitcoin-core'
 import { from, Observable, of } from 'rxjs'
@@ -109,7 +108,7 @@ export class RpcService {
         return Promise.resolve()
       })
       .catch(err => {
-        const errorMessage = `Unable to get local node info: ${err}`
+        const errorMessage = `Unable to get Resistance local node info: ${err}`
         this.dispatchAction(SystemInfoActions.getDaemonInfoFailure(errorMessage))
       })
   }
@@ -364,49 +363,31 @@ export class RpcService {
 	 */
   requestBlockchainInfo() {
     const client = getClientInstance()
-    const finalResult: BlockChainInfo = {
+
+    const blockchainInfo: BlockChainInfo = {
       connectionCount: 0,
       blockchainSynchronizedPercentage: 0,
-      lastBlockDate: null,
-      optionalError: null
+      lastBlockDate: null
     }
 
-    // const getConnectionCountCommand = () => [{ method: 'getconnectioncount' }]
-    // const getBlockCountCommand = () => [{ method: 'getblockcount' }]
-    // const getBlockHashCommand = (blockIndex: number) => [{ method: 'getblockhash', parameters: [blockIndex] }]
-    // const getBlockCommand = (blockhash: string) => [{ method: 'getblock', parameters: [blockhash] }]
-
-    const getBlockChainInfoPromise = client.getConnectionCount()
-    .then(result => {
-      finalResult.connectionCount = result
-      return client.getBlockCount()
-    })
-    .then(result => client.getBlockHash(result))
-    .then(result => client.getBlock(result))
-    .then(result => {
-      this.logger.debug(this, `startPollingBlockChainInfo`, `blockInfo`, ConsoleTheme.testing, result)
-
-      finalResult.lastBlockDate = new Date(result.time * 1000)
-      finalResult.blockchainSynchronizedPercentage = this.getBlockchainSynchronizedPercentage(finalResult.lastBlockDate)
-      delete finalResult.optionalError
-      return finalResult
-    })
-    .catch(error => {
-      console.error(error)
-      finalResult.optionalError = error
-      return finalResult
-    })
-
-    from(getBlockChainInfoPromise)
-    .pipe(take(1))
-    .subscribe((blockchainInfo: BlockChainInfo) => {
-      this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe blockchainInfo: `, ConsoleTheme.testing, blockchainInfo)
-      this.dispatchAction(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
-    },
-    error => {
-      this.logger.debug(this, `startPollingBlockChainInfo`, `subscribe error: `, ConsoleTheme.error, error)
-      this.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`Subscribe error: ${error}`))
-    })
+    client.getConnectionCount()
+      .then(result => {
+        blockchainInfo.connectionCount = result
+        return client.getBlockCount()
+      })
+      .then(result => client.getBlockHash(result))
+      .then(result => client.getBlock(result))
+      .then(result => {
+        this.logger.debug(this, `requestBlockchainInfo`, `gotBlockchainInfo`, ConsoleTheme.testing, result)
+        blockchainInfo.lastBlockDate = new Date(result.time * 1000)
+        blockchainInfo.blockchainSynchronizedPercentage = this.getBlockchainSynchronizedPercentage(blockchainInfo.lastBlockDate)
+        this.dispatchAction(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
+        return Promise.resolve()
+      })
+      .catch(err => {
+        this.logger.debug(this, `startPollingBlockChainInfo`, `getBlockchainInfoFailure`, ConsoleTheme.error, err)
+        this.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`Unable to get blockchain info: ${err}`))
+      })
   }
 
   /**
