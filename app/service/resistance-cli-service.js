@@ -589,9 +589,13 @@ export class ResistanceCliService {
 			const amountAfterDeductTheFransactionFee = amountNeedToSend - 0.0001
 			const sendCashParams = [
 				fAddress,
-				[{ address: tAddress, amount: amountAfterDeductTheFransactionFee }],
-				0  // Confirmations number, important!
+				[{ address: tAddress, amount: amountAfterDeductTheFransactionFee }]
 			]
+
+      // Confirmations number, important!
+      if (fAddress.startsWith('r') && tAddress.startsWith('r')) {
+        sendCashParams.push(0)
+      }
 
 			// sendmany "T address here" [{“address”:”t address”, “amount”:0.005}, {“address”:”z address”,”amount”:0.03, “memo”:”f508af…”}]
 			return cli.command([{ method: `z_sendmany`, parameters: sendCashParams }])
