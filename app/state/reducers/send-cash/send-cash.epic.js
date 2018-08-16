@@ -1,19 +1,22 @@
 // @flow
 import { map, tap, switchMap } from 'rxjs/operators'
-import { merge } from 'rxjs'
+import { merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { AppAction } from '../appAction'
 import { SendCashActions, SendCashState, checkPrivateTransactionRule } from './send-cash.reducer'
+import { AddressBookRow } from '../address-book/address-book.reducer'
 import { ResistanceCliService } from '../../../service/resistance-cli-service'
 import { DialogService } from '../../../service/dialog-service'
 import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
 import { ClipboardService } from '../../../service/clipboard-service'
+import { AddressBookService } from '../../../service/address-book-service'
 
 
 const epicInstanceName = 'SendCashEpics'
 const resistanceCliService = new ResistanceCliService()
 const dialogService: DialogService = new DialogService()
 const clipboardService = new ClipboardService()
+const addressBookService = new AddressBookService()
 const logger = new LoggerService()
 
 const isPrevSendTransactionInProgress = (sendCashState: SendCashState) =>
@@ -43,7 +46,7 @@ const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.
 	tap((action: AppAction) => logger.debug(epicInstanceName, `sendCashEpic`, action.type, ConsoleTheme.testing)),
 	map(() => {
 		if (isPrevSendTransactionInProgress(state$.value.sendCash)) {
-			return SendCashActions.sendCashFail(`The prev send operation is still in progress.`, )
+			return SendCashActions.sendCashFail(`The prev send operation is still in progress.`)
 		}
 
 		const isAllowedToSend = allowToSend(state$.value.sendCash)
@@ -107,10 +110,37 @@ const pasteToAddressFromClipboardEpic = (action$: ActionsObservable<AppAction>) 
 	map(() => SendCashActions.updateToAddress(clipboardService.getContent()))
 )
 
+const checkAddressBookByNameEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+	ofType(SendCashActions.checkAddressBookByName),
+	tap((action: AppAction) => logger.debug(epicInstanceName, `checkAddressBookByNameEpic`, action.type, ConsoleTheme.testing)),
+	switchMap(() => {
+		const sendCashState = state$.value.sendCash
+		if (sendCashState.toAddress.trim() === '') {
+			return of(SendCashActions.empty())
+		}
+
+		const addressBookState = state$.value.addressBook
+		const addressbookContent$ = addressBookState.addresses && addressBookState.addresses.length > 0 ?
+			of(addressBookState.addresses) : addressBookService.loadAddressBook()
+
+		return addressbookContent$.pipe(
+			map((addressBookRows: AddressBookRow[]) => {
+				if (!addressBookRows || addressBookRows.length <= 0) {
+					return SendCashActions.empty()
+				}
+
+				const matchedAddressRow = addressBookRows.find(tempAddressRow => tempAddressRow.name.toLowerCase() === sendCashState.toAddress.trim().toLowerCase())
+				return matchedAddressRow ? SendCashActions.updateToAddress(matchedAddressRow.address) : SendCashActions.empty()
+			})
+		)
+	})
+)
+
 export const SendCashEpics = (action$, state$) => merge(
 	sendCashEpic(action$, state$),
 	sendCashSuccessEpic(action$, state$),
 	sendCashFailEpic(action$, state$),
 	getAddressListEpic(action$, state$),
-	pasteToAddressFromClipboardEpic(action$, state$)
+	pasteToAddressFromClipboardEpic(action$, state$),
+	checkAddressBookByNameEpic(action$, state$)
 )

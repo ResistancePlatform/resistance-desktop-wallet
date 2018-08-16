@@ -57,7 +57,8 @@ export const SendCashActions = createActions({
 	GET_ADDRESS_LIST: (isPrivate: boolean) => isPrivate,
 	GET_ADDRESS_LIST_SUCCESS: (addressList: AddressDropdownItem[]) => addressList,
 	GET_ADDRESS_LIST_FAIL: undefined,
-	PASTE_TO_ADDRESS_FROM_CLIPBOARD: undefined
+	PASTE_TO_ADDRESS_FROM_CLIPBOARD: undefined,
+	CHECK_ADDRESS_BOOK_BY_NAME: undefined
 }, { prefix: `APP/SEND_CASH` })
 
 

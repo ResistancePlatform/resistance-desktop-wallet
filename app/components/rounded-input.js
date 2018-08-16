@@ -6,7 +6,8 @@ type RoundedInputAddon = {
 	enable: boolean,
 	type: 'PASTE' | 'DROPDOWN' | 'TEXT_PLACEHOLDER',
 	value: string | undefined,
-	onAddonClicked: addonType => void | null | undefined
+	onAddonClicked?: addonType => void,
+	onEnterPressed?: () => void
 }
 
 type Props = {
@@ -56,6 +57,13 @@ export default class RoundedInput extends Component<Props> {
 
 		if (this.props.addon.onAddonClicked && !this.props.disabled) {
 			this.props.addon.onAddonClicked(this.props.addon.type)
+		}
+	}
+
+	onEnterPressedEventHandler(event) {
+		if (event.key === 'Enter' && this.props.onEnterPressed) {
+			// event.target.value
+			this.props.onEnterPressed()
 		}
 	}
 
@@ -129,6 +137,7 @@ export default class RoundedInput extends Component<Props> {
 						onChange={event => this.inputOnchangeEventHandler(event)}
 						onFocus={(event) => this.onInputFocusEventHandler(event)}
 						onBlur={(event) => this.onInputBlurEventHandler(event)}
+						onKeyPress={(event) => this.onEnterPressedEventHandler(event)}
 					/>
 					{this.renderAddon()}
 					{this.renderTooltips()}
