@@ -59,7 +59,7 @@ export class OSService {
 	 * We have to require the latest `appStore` to make sure it has been created !!!
 	 *
 	 * @param {Object} action
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	dispatchAction(action) {
 		const storeModule = require('../state/store/configureStore')
@@ -72,7 +72,7 @@ export class OSService {
 	 * Returns child process status alarm color, 'green', 'red' or 'yellow'
    *
 	 * @param {Object} action
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
   getChildProcessStatusColor(processStatus) {
     switch (processStatus) {

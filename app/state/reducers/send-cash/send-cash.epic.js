@@ -5,7 +5,7 @@ import { ActionsObservable, ofType } from 'redux-observable'
 import { AppAction } from '../appAction'
 import { SendCashActions, SendCashState, checkPrivateTransactionRule } from './send-cash.reducer'
 import { AddressBookRow } from '../address-book/address-book.reducer'
-import { ResistanceCliService } from '../../../service/resistance-cli-service'
+import { RpcService } from '../../../service/rpc-service'
 import { DialogService } from '../../../service/dialog-service'
 import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
 import { ClipboardService } from '../../../service/clipboard-service'
@@ -13,7 +13,7 @@ import { AddressBookService } from '../../../service/address-book-service'
 
 
 const epicInstanceName = 'SendCashEpics'
-const resistanceCliService = new ResistanceCliService()
+const resistanceCliService = new RpcService()
 const dialogService: DialogService = new DialogService()
 const clipboardService = new ClipboardService()
 const addressBookService = new AddressBookService()

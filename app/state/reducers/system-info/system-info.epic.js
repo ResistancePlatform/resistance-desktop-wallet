@@ -5,11 +5,11 @@ import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 
 import { SystemInfoActions } from './system-info.reducer'
-import { ResistanceCliService } from '../../../service/resistance-cli-service'
+import { RpcService } from '../../../service/rpc-service'
 import { ResistanceService } from '../../../service/resistance-service'
 import { OSService } from '../../../service/os-service'
 
-const rpcService = new ResistanceCliService()
+const rpcService = new RpcService()
 const resistanceService = new ResistanceService()
 const osService = new OSService()
 

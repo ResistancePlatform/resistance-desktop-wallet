@@ -4,9 +4,9 @@ import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { AppAction } from '../appAction'
 import { OverviewActions } from './overview.reducer'
-import { ResistanceCliService } from '../../../service/resistance-cli-service'
+import { RpcService } from '../../../service/rpc-service'
 
-const rpcService = new ResistanceCliService()
+const rpcService = new RpcService()
 
 const getWalletInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
     ofType(OverviewActions.getWalletInfo),

@@ -52,9 +52,9 @@ const pollingIntervalValues = {
 
 /**
  * @export
- * @class ResistanceCliService
+ * @class RpcService
  */
-export class ResistanceCliService {
+export class RpcService {
 	logger: LoggerService
 	dialogService: DialogService
 	addressBookService: AddressBookService
@@ -64,8 +64,8 @@ export class ResistanceCliService {
 	}
 
 	/**
-	 *Creates an instance of ResistanceCliService.
-	 * @memberof ResistanceCliService
+	 *Creates an instance of RpcService.
+	 * @memberof RpcService
 	 */
 	constructor() {
 		if (!instance) {
@@ -88,7 +88,7 @@ export class ResistanceCliService {
 	 * We have to require the latest `appStore` to make sure it has been created !!!
 	 *
 	 * @param {AppAction} action
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	dispatchAction(action: AppAction) {
 		const storeModule = require('../state/store/configureStore')
@@ -100,7 +100,7 @@ export class ResistanceCliService {
 	/**
 	 * Reques Resistance node running status and memory usage.
 	 *
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
   requestDaemonInfo() {
     const cli = getResistanceClientInstance()
@@ -160,7 +160,7 @@ export class ResistanceCliService {
 	/**
 	 * Request the wallet information.
 	 *
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
   requestWalletInfo() {
     const cli = getResistanceClientInstance()
@@ -210,7 +210,7 @@ export class ResistanceCliService {
 	/**
 	 * Request wallet transactions.
 	 *
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
   requestTransactionsDataFromWallet() {
     const cli = getResistanceClientInstance()
@@ -403,7 +403,7 @@ export class ResistanceCliService {
 	/**
 	 * Request blockchain information.
 	 *
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
   requestBlockchainInfo() {
     const cli = getResistanceClientInstance()
@@ -454,7 +454,7 @@ export class ResistanceCliService {
 
   /**
    * @param {*} tempDate
-   * @memberof ResistanceCliService
+   * @memberof RpcService
    */
   getBlockchainSynchronizedPercentage(tempDate: Date) {
     // TODO: Get the start date right after ZCash release - from first block!!!
@@ -489,7 +489,7 @@ export class ResistanceCliService {
 	/**
 	 * @param {Client} cli
 	 * @returns {Promise<any>}
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	getWalletPrivateAddresses(cli: Client): Promise<any> {
 		return cli.command([{ method: 'z_listaddresses' }])
@@ -498,7 +498,7 @@ export class ResistanceCliService {
 	/**
 	 * @param {Client} cli
 	 * @returns {Promise<any>}
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	getWalletAllPublicAddresses(cli: Client): Promise<any> {
 		return cli.command([{ method: 'listreceivedbyaddress', parameters: [0, true] }])
@@ -507,7 +507,7 @@ export class ResistanceCliService {
 	/**
 	 * @param {Client} cli
 	 * @returns {Promise<any>}
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	getWalletPublicAddressesWithUnspentOutputs(cli: Client): Promise<any> {
 		return cli.command([{ method: 'listunspent', parameters: [0] }])
@@ -517,7 +517,7 @@ export class ResistanceCliService {
 	 * @param {Client} cli
 	 * @param {string} address
 	 * @returns {Promise<any>}
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	getAddressBalance(cli: Client, addressRow: AddressRow): Promise<any> {
 		return cli.command([
@@ -559,7 +559,7 @@ export class ResistanceCliService {
 	/**
 	 * @param {boolean} [isPrivate]
 	 * @returns {Observable<any>}
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	createNewAddress(isPrivate?: boolean): Observable<any> {
 		const cli = getResistanceClientInstance()
@@ -580,7 +580,7 @@ export class ResistanceCliService {
 	 * @param {string} toAddress
 	 * @param {number} amountToSend
 	 * @returns {Observable<any>}
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	sendCash(fromAddress: string, toAddress: string, amountToSend: number) {
 		const cli = getResistanceClientInstance()
@@ -629,7 +629,7 @@ export class ResistanceCliService {
 	}
 
 	/**
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	stopPollingOperationStatus() {
 		this.stopPolling('sendCash')
@@ -638,7 +638,7 @@ export class ResistanceCliService {
 	/**
 	 * @param {string} operationId
 	 * @returns {Observable<any>}
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	starPollingOperationStatus(operationId: string): Observable<any> {
 		let initProgressPercent = 0
@@ -700,7 +700,7 @@ export class ResistanceCliService {
 	 * @param {boolean} sortByGroupBalance
 	 * @param {boolean} disableThePrivateAddress
 	 * @returns {Observable<any>}
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	getWalletAddressAndBalance(sortByGroupBalance?: boolean, disableThePrivateAddress?: boolean): Observable<any> {
 		const cli = getResistanceClientInstance()
@@ -817,7 +817,7 @@ export class ResistanceCliService {
 	/**
    * Start getting own addresses with an interval.
    *
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
   requestOwnAddresses() {
     this.getWalletAddressAndBalance(false).subscribe(result => {
@@ -830,7 +830,7 @@ export class ResistanceCliService {
 	/**
    * Start polling.
    *
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	startPolling(entityName: string, handler) {
 		this.stopPolling(entityName)
@@ -847,7 +847,7 @@ export class ResistanceCliService {
 	/**
    * Stop polling.
    *
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	stopPolling(entityName: string) {
 		if (this.pollingIntervalIds[entityName] !== -1) {
@@ -859,7 +859,7 @@ export class ResistanceCliService {
 
 	/**
 	 * @param {string} transactionId
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	getTransactionDetail(transactionId: string) {
 		const cli = getResistanceClientInstance()
