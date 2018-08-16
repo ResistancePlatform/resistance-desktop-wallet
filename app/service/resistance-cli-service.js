@@ -4,6 +4,7 @@ import { remote } from 'electron'
 import Client from 'bitcoin-core'
 import { from, Observable, of } from 'rxjs'
 import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
+import { toastr } from 'react-redux-toastr'
 
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { AddressBookService } from './address-book-service'
@@ -749,15 +750,7 @@ export class ResistanceCliService {
 					}))
 
 				this.logger.debug(this, `getWalletAddressAndBalance`, `combinedAddresses: `, ConsoleTheme.testing, combinedAddresses)
-				return combinedAddresses
-			})
-			.then(combinedAddresses => {
-				if (Array.isArray(combinedAddresses)) {
-					const tempPromiseArr = combinedAddresses.map(tempAddressRow => this.getAddressBalance(cli, tempAddressRow))
-					return Promise.all(tempPromiseArr)
-				}
-
-				return []
+				return this::getAddressesBalance(cli, combinedAddresses)
 			})
 			.then(addresses => {
 				this.logger.debug(this, `getWalletAddressAndBalance`, `addresses: `, ConsoleTheme.testing, addresses)
@@ -789,12 +782,10 @@ export class ResistanceCliService {
 				// Show the error to user
 				const errorAddressItems = addressList.filter(tempAddressItem => tempAddressItem.balance === -1 && tempAddressItem.errorMessage)
 				if (errorAddressItems && errorAddressItems.length > 0) {
-					const tempErrorMessage = errorAddressItems
-						.map(tempAddressItem => `[${tempAddressItem.address}]:\n ${tempAddressItem.errorMessage}\n\n`)
-						.join('\n')
-					const showMessage = `Error happened when getting the balance for the addresses below: \n\n${tempErrorMessage}`
-          console.error(`Suppressing the error message for Luke:`, showMessage)
-					// setTimeout(() => this.dialogService.showError(`Address balance error`, showMessage), 500)
+          const errorMessages = errorAddressItems.map(tempAddressItem => `"${tempAddressItem.errorMessage}"`)
+					const uniqueErrorMessages = Array.from(new Set(errorMessages)).join(', ')
+					const displayMessage = `Error fetching balances for ${errorAddressItems.length} out of ${addressList.length} addresses. Error messages included: ${uniqueErrorMessages}.`
+          toastr.error(`Address balance error`, displayMessage)
 				}
 
 				if (disableThePrivateAddress) {
@@ -901,4 +892,70 @@ export class ResistanceCliService {
 			})
 		)
 	}
+}
+
+/* RPC Service private methods */
+
+/**
+ * Gets addresses balances in a batch request.
+ *
+ * @param {Client} client
+ * @param {AddressRow[]} addressRows
+ * @returns {Promise<any>}
+ * @memberof RpcService
+ */
+function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise<any> {
+  let commands: Object[] = []
+
+  addressRows.forEach(address => {
+    const confirmedCmd = { method: 'z_getbalance', parameters: [address.address] }
+    const unconfirmedCmd = { method: 'z_getbalance', parameters: [address.address, 0] }
+    commands.push(confirmedCmd, unconfirmedCmd)
+  })
+
+  const promise = client.command(commands)
+    .then(balances => {
+
+      const addresses = addressRows.map((address, index) => {
+
+        const confirmedBalance = balances[index << 1]
+        const unconfirmedBalance = balances[(index << 1) + 1]
+
+        if (typeof(confirmedBalance) === 'object' || typeof(unconfirmedBalance) === 'object') {
+          return {
+            ...address,
+            balance: -1,
+            confirmed: false,
+            errorMessage: confirmedBalance.message || unconfirmedBalance.message
+          }
+        }
+
+        const isConfirmed = confirmedBalance === unconfirmedBalance
+        const displayBalance = isConfirmed ? confirmedBalance : unconfirmedBalance
+
+        return {
+          ...address,
+          balance: parseFloat(parseFloat(displayBalance).toFixed(4)),
+          confirmed: isConfirmed
+        }
+      })
+
+      return addresses
+    })
+    .catch(err => {
+      this.logger.debug(this, `getAddressesBalance`, `Error occurred: `, ConsoleTheme.error, error)
+
+      const addresses = addressRows.map((address, index) => {
+        return {
+            ...address,
+            balance: -1,
+            confirmed: false,
+            errorMessage: err.toString()
+        }
+      })
+
+      return addresses
+    })
+
+  return promise
 }
