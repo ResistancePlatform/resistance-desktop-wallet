@@ -641,33 +641,36 @@ export class RpcService {
 				.then(result => {
 					const tempStatus = result[0][0]
 
-					if (tempStatus && tempStatus.status === 'success') {
-						this.stopPollingOperationStatus()
+          let failMessage
+          let newProgressPercent
+          let inProgressOperation: ProcessingOperation
 
-						this.dispatchAction(SendCashActions.sendCashSuccess())
-					} else if (tempStatus && tempStatus.status === 'failed') {
-						this.stopPollingOperationStatus()
-
-						const failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Unknow ed.`
-						this.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
-					} else if (tempStatus && tempStatus.status === 'cancelled') {
-						this.stopPollingOperationStatus()
-
-						const failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Operation has been cancelled.`
-						this.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
-					} else {
-						initProgressPercent += 1
-						const newProgressPercent =
-							initProgressPercent <= 100 ? initProgressPercent : 100
-						const inProgressOperation: ProcessingOperation = {
-							operationId: tempStatus.id,
-							status: tempStatus.status,
-							percent: newProgressPercent,
-							result: tempStatus.result
-						}
-
-						this.dispatchAction(SendCashActions.updateSendOperationStatus(inProgressOperation))
-					}
+          switch(tempStatus && tempStatus.status) {
+            case 'success':
+              this.stopPollingOperationStatus()
+              this.dispatchAction(SendCashActions.sendCashSuccess())
+              break
+            case 'failed':
+              this.stopPollingOperationStatus()
+              failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Unknown.`
+              this.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
+              break
+            case 'cancelled':
+              this.stopPollingOperationStatus()
+              failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Operation has been cancelled.`
+              this.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
+              break
+            default:
+              initProgressPercent += 1
+              newProgressPercent = initProgressPercent <= 100 ? initProgressPercent : 100
+              inProgressOperation = {
+                operationId: tempStatus.id,
+                status: tempStatus.status,
+                percent: newProgressPercent,
+                result: tempStatus.result
+              }
+              this.dispatchAction(SendCashActions.updateSendOperationStatus(inProgressOperation))
+          }
 
 					return 'done'
 				})
