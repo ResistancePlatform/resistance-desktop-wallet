@@ -10,7 +10,7 @@ import { AddressBookService } from './address-book-service'
 
 import { getTransactionAmount, getTransactionConfirmed, getTransactionDate, getTransactionDirection } from '../utils/data-util'
 import { AppAction } from '../state/reducers/appAction'
-import { BlockChainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
+import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions, Transaction } from '../state/reducers/overview/overview.reducer'
 import { OwnAddressesActions, AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
 import { SendCashActions, ProcessingOperation } from '../state/reducers/send-cash/send-cash.reducer'
@@ -364,7 +364,7 @@ export class RpcService {
   requestBlockchainInfo() {
     const client = getClientInstance()
 
-    const blockchainInfo: BlockChainInfo = {
+    const blockchainInfo: BlockchainInfo = {
       connectionCount: 0,
       blockchainSynchronizedPercentage: 0,
       lastBlockDate: null
@@ -385,7 +385,7 @@ export class RpcService {
         return Promise.resolve()
       })
       .catch(err => {
-        this.logger.debug(this, `startPollingBlockChainInfo`, `getBlockchainInfoFailure`, ConsoleTheme.error, err)
+        this.logger.debug(this, `startPollingBlockchainInfo`, `getBlockchainInfoFailure`, ConsoleTheme.error, err)
         this.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`Unable to get blockchain info: ${err}`))
       })
   }
@@ -416,12 +416,6 @@ export class RpcService {
     }
 
     return 100
-
-    // // Just in case early on the call returns some junk date
-    // if (info.lastBlockDate.before(startDate)) {
-    //     // TODO: write log that we fix minimum date! - this condition should not occur
-    //     info.lastBlockDate = startDate
-    // }
   }
 
 	/**

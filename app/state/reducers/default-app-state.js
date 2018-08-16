@@ -18,7 +18,7 @@ export const defaultAppState: AppState = {
 	},
 	systemInfo: {
 		daemonInfo: {},
-		blockChainInfo: {
+		blockchainInfo: {
 			connectionCount: 0,
 			blockchainSynchronizedPercentage: 0,
 			lastBlockDate: null
