@@ -3,16 +3,19 @@
 import { remote } from 'electron'
 import Client from 'bitcoin-core'
 import { from, Observable, of } from 'rxjs'
-import { map, tap, take, catchError } from 'rxjs/operators'
+import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
 
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { DialogService } from './dialog-service'
+import { AddressBookService } from './address-book-service'
+
 import { getTransactionAmount, getTransactionConfirmed, getTransactionDate, getTransactionDirection } from '../utils/data-util'
 import { AppAction } from '../state/reducers/appAction'
 import { BlockChainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
-import { Balances, OverviewActions } from '../state/reducers/overview/overview.reducer'
+import { Balances, OverviewActions, Transaction } from '../state/reducers/overview/overview.reducer'
 import { OwnAddressesActions, AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
 import { SendCashActions, ProcessingOperation } from '../state/reducers/send-cash/send-cash.reducer'
+import { AddressBookRow } from '../state/reducers/address-book/address-book.reducer'
 
 /**
  * ES6 singleton
@@ -59,6 +62,7 @@ const pollingIntervalValues = {
 export class ResistanceCliService {
 	logger: LoggerService
 	dialogService: DialogService
+	addressBookService: AddressBookService
 
 	pollingIntervalIds = {
 		daemon: -1,
@@ -81,6 +85,7 @@ export class ResistanceCliService {
 		this.time = new Date()
 		this.logger = new LoggerService()
 		this.dialogService = new DialogService()
+		this.addressBookService = new AddressBookService()
 
 		return instance
 	}
@@ -393,7 +398,33 @@ export class ResistanceCliService {
 				})
 
 			from(combineQueryPromise)
-				.pipe(take(1))
+				.pipe(
+					switchMap(result => {
+						console.log(`result ---> `, result)
+						if (!result.transactions || !Array.isArray(result.transactions) || result.transactions.length <= 0) {
+							return result
+						}
+
+						return this.addressBookService.loadAddressBook().pipe(
+							map((addressBookRows: AddressBookRow[] | []) => {
+								if (!addressBookRows || addressBookRows.length <= 0) {
+									return result
+								}
+
+								result.transactions = result.transactions.map((tempTransaction: Transaction) => {
+									const matchedAddressBookRow = addressBookRows.find(tempAddressRow => tempAddressRow.address === tempTransaction.destinationAddress)
+									return matchedAddressBookRow ? ({
+										...tempTransaction,
+										destinationAddress: matchedAddressBookRow.name
+									}) : tempTransaction
+								})
+
+								return result
+							})
+						)
+					}),
+					take(1)
+				)
 				.subscribe(
 					result => {
 						this.logger.debug(this, `startPollingTransactionsDataFromWallet`, `subscribe result: `, ConsoleTheme.testing, result)
@@ -615,8 +646,8 @@ export class ResistanceCliService {
 			const amountAfterDeductTheFransactionFee = amountNeedToSend - 0.0001
 			const sendCashParams = [
 				fAddress,
-        [{ address: tAddress, amount: amountAfterDeductTheFransactionFee }],
-        0  // Confirmations number, important!
+				[{ address: tAddress, amount: amountAfterDeductTheFransactionFee }],
+				0  // Confirmations number, important!
 			]
 
 			// sendmany "T address here" [{“address”:”t address”, “amount”:0.005}, {“address”:”z address”,”amount”:0.03, “memo”:”f508af…”}]
@@ -842,19 +873,19 @@ export class ResistanceCliService {
    *
 	 * @memberof ResistanceCliService
 	 */
-  startGettingOwnAddresses() {
-    const handler = () => {
-      this.getWalletAddressAndBalance(false).subscribe(result => {
-        this.dispatchAction(OwnAddressesActions.gotOwnAddresses(result))
-      }, err => {
-        this.dispatchAction(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
-      })
+	startGettingOwnAddresses() {
+		const handler = () => {
+			this.getWalletAddressAndBalance(false).subscribe(result => {
+				this.dispatchAction(OwnAddressesActions.gotOwnAddresses(result))
+			}, err => {
+				this.dispatchAction(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
+			})
 
-    }
-    handler()
-    // TODO: Re-enable after fixing the 500 error problem
-    // this.startPolling('ownAddresses', () => handler())
-  }
+		}
+		handler()
+		// TODO: Re-enable after fixing the 500 error problem
+		// this.startPolling('ownAddresses', () => handler())
+	}
 
 
 	/**
@@ -862,10 +893,10 @@ export class ResistanceCliService {
    *
 	 * @memberof ResistanceCliService
 	 */
-  stopGettingOwnAddresses() {
-    // TODO: Re-enable after fixing the 500 error problem
-    // this.stopPolling('ownAddresses')
-  }
+	stopGettingOwnAddresses() {
+		// TODO: Re-enable after fixing the 500 error problem
+		// this.stopPolling('ownAddresses')
+	}
 
 	/**
    * Start polling.
