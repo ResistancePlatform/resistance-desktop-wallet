@@ -61,6 +61,7 @@ $TRANSACTION_LIST_BODY_SEPARATOR_COLOR: rgb(49, 56, 88);
 
 $TRANSACTION_POPUP_MENU_BACKGROUND_COLOR: rgb(37, 44, 73);
 $TRANSACTION_POPUP_MENU_FONT_COLOR: #dadce4;
+$TRANSACTION_POPUP_MENU_SHADOW_COLOR: rgba(28, 35, 62, .75);
 
 // ------------------------------------------------------------------------------------------------------
 // Own addresses
@@ -78,3 +79,19 @@ $SEND_CASH_PROGRESS_BAR_BACKGROUND_IMAGE: linear-gradient(45deg, rgba(0, 158, 21
 $SEND_CASH_INPUT_TOOL_TIPS_BACKGROUND_COLOR: rgba(55, 62, 88, 0.88);
 $SEND_CASH_DROPDOWN_LIST_DISABLE_FONT_COLOR: #5a5f6f;
 $SEND_CASH_DROPDOWN_LIST_SEPARATED_LINE_COLOR: $NAVI_BAR_TOOLBAR_BUTTON_MINIMIZE_COLOR;
+
+
+// ------------------------------------------------------------------------------------------------------
+// Address book
+// ------------------------------------------------------------------------------------------------------
+$ADDRESS_BOOK_LIST_BACKGROUND_COLOR: rgb(29, 36, 64);
+$ADDRESS_BOOK_LIST_HEADER_FONT_COLOR: $BASE_COLOR_FONT_GRAY;
+$ADDRESS_BOOK_LIST_BODY_FONT_COLOR: $BASE_COLOR_WHITE;
+$ADDRESS_BOOK_LIST_BODY_ICON_COLOR: rgb(67, 75, 109);
+$ADDRESS_BOOK_LIST_BODY_SEPARATOR_COLOR: rgb(49, 56, 88);
+
+$ADDRESS_BOOK_NEW_ADDRESS_DIALOG_SHADOW_COLOR: rgba(28, 35, 62, .75);
+
+$ADDRESS_BOOK_LIST_POPUP_MENU_BACKGROUND_COLOR: rgb(37, 44, 73);
+$ADDRESS_BOOK_LIST_POPUP_MENU_FONT_COLOR: #dadce4;
+

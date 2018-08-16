@@ -6,6 +6,8 @@ $POP_UP_MENU_CONTAINER_WIDTH: 91.5%;
     padding: 0.3rem 1.3rem;
     width: $POP_UP_MENU_CONTAINER_WIDTH;
     min-width: $POP_UP_MENU_CONTAINER_WIDTH;
+    max-height: 25rem;
+    overflow-y: scroll;
 
     position: absolute;
     left: -0.1rem;

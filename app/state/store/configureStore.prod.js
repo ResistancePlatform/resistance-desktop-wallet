@@ -18,6 +18,8 @@ import { SendCashReducer } from '../reducers/send-cash/send-cash.reducer'
 import { SendCashEpics } from '../reducers/send-cash/send-cash.epic'
 import { SettingsReducer } from '../reducers/settings/settings.reducer'
 import { SettingsEpics } from '../reducers/settings/settings.epic'
+import { AddressBookReducer } from '../reducers/address-book/address-book.reducer'
+import { AddressBookEpics } from '../reducers/address-book/address-book.epic'
 
 export const history = createHashHistory()
 const appReducers = combineReducers({
@@ -28,7 +30,8 @@ const appReducers = combineReducers({
 	overview: OverviewReducer,
 	ownAddresses: OwnAddressesReducer,
 	sendCash: SendCashReducer,
-	settings: SettingsReducer
+	settings: SettingsReducer,
+	addressBook: AddressBookReducer
 })
 
 export const appEpics = combineEpics(
@@ -37,7 +40,8 @@ export const appEpics = combineEpics(
 	OverviewEpics,
 	OwnAddressesEpics,
 	SendCashEpics,
-	SettingsEpics
+	SettingsEpics,
+	AddressBookEpics
 )
 
 const epicMiddleware = createEpicMiddleware()
