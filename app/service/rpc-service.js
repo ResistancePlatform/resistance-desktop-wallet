@@ -307,49 +307,6 @@ export class RpcService {
 	}
 
 	/**
-	 * @param {Client} client
-	 * @param {string} address
-	 * @returns {Promise<any>}
-	 * @memberof RpcService
-	 */
-	getAddressBalance(client: Client, addressRow: AddressRow): Promise<any> {
-		return client.command([
-			{ method: 'z_getbalance', parameters: [addressRow.address] },
-			{ method: 'z_getbalance', parameters: [addressRow.address, 0] }
-		])
-			.then(result => {
-				const confirmedBalance = result[0]
-				const unconfirmedBalance = result[1]
-
-				if (confirmedBalance.name === 'RpcError' || unconfirmedBalance.name === 'RpcError') {
-					return Object.assign(addressRow, {
-						balance: -1,
-						confirmed: false,
-						errorMessage: confirmedBalance.name === 'RpcError' ? confirmedBalance.message : unconfirmedBalance.message
-					})
-				}
-
-				const isConfirmed = confirmedBalance === unconfirmedBalance
-				const tempBalance = isConfirmed ? confirmedBalance : unconfirmedBalance
-				const fixedBalanceStr = typeof tempBalance === 'string' ? parseFloat(tempBalance).toFixed(2) : tempBalance.toFixed(2)
-
-				return Object.assign(addressRow, {
-					balance: parseFloat(fixedBalanceStr),
-					confirmed: isConfirmed
-				})
-			})
-			.catch(error => {
-				this.logger.debug(this, `getAddressBalance`, `Error happened: `, ConsoleTheme.error, error)
-
-				return Object.assign(addressRow, {
-					balance: -1,
-					confirmed: false,
-					errorMessage: error.message
-				})
-			})
-	}
-
-	/**
 	 * @param {boolean} [isPrivate]
 	 * @returns {Observable<any>}
 	 * @memberof RpcService
@@ -544,15 +501,7 @@ export class RpcService {
 					}))
 
 				this.logger.debug(this, `getWalletAddressAndBalance`, `combinedAddresses: `, ConsoleTheme.testing, combinedAddresses)
-				return combinedAddresses
-			})
-			.then(combinedAddresses => {
-				if (Array.isArray(combinedAddresses)) {
-					const tempPromiseArr = combinedAddresses.map(tempAddressRow => this.getAddressBalance(client, tempAddressRow))
-					return Promise.all(tempPromiseArr)
-				}
-
-				return []
+				return this::getAddressesBalance(client, combinedAddresses)
 			})
 			.then(addresses => {
 				this.logger.debug(this, `getWalletAddressAndBalance`, `addresses: `, ConsoleTheme.testing, addresses)
@@ -782,3 +731,55 @@ async function getPrivateTransactionsPromise(client: Client) {
     return []
   }
 }
+
+/**
+ * @param {Client} client
+ * @param {AddressRow[]} addressRows
+ * @returns {Promise<any>}
+ * @memberof RpcService
+ */
+function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise<any> {
+  let commands: Object[]
+
+  addressRows.forEach(address => {
+    const confirmedCmd = { method: 'z_getbalance', parameters: [address.address] }
+    const unconfirmedCmd = { method: 'z_getbalance', parameters: [address.address, 0] }
+    commands.push(confirmedCmd, unconfirmedCmd)
+  })
+
+  return client.command([
+    { method: 'z_getbalance', parameters: [addressRow.address] },
+    { method: 'z_getbalance', parameters: [addressRow.address, 0] }
+  ])
+    .then(result => {
+      const confirmedBalance = result[0]
+      const unconfirmedBalance = result[1]
+
+      if (confirmedBalance.name === 'RpcError' || unconfirmedBalance.name === 'RpcError') {
+        return Object.assign(addressRow, {
+          balance: -1,
+          confirmed: false,
+          errorMessage: confirmedBalance.name === 'RpcError' ? confirmedBalance.message : unconfirmedBalance.message
+        })
+      }
+
+      const isConfirmed = confirmedBalance === unconfirmedBalance
+      const tempBalance = isConfirmed ? confirmedBalance : unconfirmedBalance
+      const fixedBalanceStr = typeof tempBalance === 'string' ? parseFloat(tempBalance).toFixed(2) : tempBalance.toFixed(2)
+
+      return Object.assign(addressRow, {
+        balance: parseFloat(fixedBalanceStr),
+        confirmed: isConfirmed
+      })
+    })
+    .catch(error => {
+      this.logger.debug(this, `getAddressBalance`, `Error happened: `, ConsoleTheme.error, error)
+
+      return Object.assign(addressRow, {
+        balance: -1,
+        confirmed: false,
+        errorMessage: error.message
+      })
+    })
+}
+
