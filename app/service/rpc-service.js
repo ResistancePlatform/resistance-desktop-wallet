@@ -10,7 +10,6 @@ import { OSService } from './os-service'
 import { AddressBookService } from './address-book-service'
 
 import { getTransactionAmount, getTransactionConfirmed, getTransactionDate, getTransactionDirection } from '../utils/data-util'
-import { AppAction } from '../state/reducers/appAction'
 import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions, Transaction } from '../state/reducers/overview/overview.reducer'
 import { OwnAddressesActions, AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
@@ -72,7 +71,6 @@ export class RpcService {
 			instance = this
 		}
 
-		this.time = new Date()
 		this.logger = new LoggerService()
 		this.osService = new OSService()
 		this.addressBookService = new AddressBookService()
@@ -115,13 +113,7 @@ export class RpcService {
     from(client.command(commandList))
     .pipe(
       tap(result =>
-          this.logger.debug(
-            this,
-            `startPollingWalletInfo`,
-            `result: `,
-            ConsoleTheme.testing,
-            result
-          )
+          this.logger.debug(this, `requestWalletInfo`, `result: `, ConsoleTheme.testing, result)
          ),
          map(result => ({
            transparentBalance: parseFloat(result[0].transparent),
@@ -137,14 +129,8 @@ export class RpcService {
         this.osService.dispatchAction(OverviewActions.gotWalletInfo(result))
       },
       error => {
-        this.logger.debug(
-          this,
-          `startPollingWalletInfo`,
-          `subscribe error: `,
-          ConsoleTheme.error,
-          error
-        )
-        this.osService.dispatchAction(OverviewActions.getWalletInfoFailure(`Subscribe error: ${error}`))
+        this.logger.debug(this, `startPollingWalletInfo`, `subscribe error: `, ConsoleTheme.error, error)
+        this.osService.dispatchAction(OverviewActions.getWalletInfoFailure(`Unable to get wallet info: ${error}`))
       }
     )
   }
@@ -156,92 +142,10 @@ export class RpcService {
 	 */
   requestTransactionsDataFromWallet() {
     const client = getClientInstance()
+
     const getPublicTransactionsCmd = () => [
       { method: 'listtransactions', parameters: ['', 200] }
     ]
-    const getWalletZAddressesCmd = () => [{ method: 'z_listaddresses' }]
-    const getWalletZReceivedTransactionsCmd = (zAddress) => [{ method: 'z_listreceivedbyaddress', parameters: [zAddress, 0] }]
-    const getWalletTransactionCmd = (transactionId) => [{ method: 'gettransaction', parameters: [transactionId] }]
-
-    // t_add --> t_addr:
-
-    // Public --- IN --- t_addr
-    // Public --- OUT --- t_addr
-
-    // t_add --> z_addr:
-
-    // Public -- OUT -- Z Address not listed in Wallet
-    // Private -- IN -- z_Addr
-
-    // z_add --> t_addr
-
-    // Public -- IN -- t_addr
-    // Private -- IN -- z_addr
-
-    // z_add --> z_addr
-
-    // Private  -- IN -- z_addr1
-    // Private -- IN -- z_addr2
-
-    const getPrivateTransactionsPromise = async () => {
-      try {
-        // First, we get all the private addresses, and then for each one, we get all their transactions
-        const privateAddresses = await client.command(getWalletZAddressesCmd()).then(tempResult => tempResult[0])
-        if (Array.isArray(privateAddresses) && privateAddresses.length > 0) {
-          let queryResultWithAddressArr = []
-          for (let index = 0; index < privateAddresses.length; index++) {
-            const tempAddress = privateAddresses[index];
-            /* eslint-disable-next-line no-await-in-loop */
-            const addressTransactions = await client.command(getWalletZReceivedTransactionsCmd(tempAddress)).then(tempResult => tempResult[0])
-
-            // 	 [{
-            // 	 amount: 49.9999,
-            // 	 jsindex: 0,
-            // 	 jsoutindex: 1,
-            // 	 memo: "f600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            // 	 txid: "1bf41fc600962cc22104d1e2884527537a0d8d8eaac97fbabb1d5887b73ee066"
-            // 	 }]
-            if (Array.isArray(addressTransactions) && addressTransactions.length > 0) {
-              const addressTransactionsWithPrivateAddress = addressTransactions.map(tran => Object.assign({}, tran, { address: tempAddress }))
-              queryResultWithAddressArr = [...queryResultWithAddressArr, ...addressTransactionsWithPrivateAddress]
-            }
-          }
-
-          // this.logger.debug(this, `getPrivateTransactionsPromise`, `queryResultWithAddressArr: `, ConsoleTheme.testing, queryResultWithAddressArr)
-
-          const tempTransactionList = queryResultWithAddressArr.map(result => ({
-            type: `\u2605 T (Private)`,
-            direction: getTransactionDirection(`receive`),
-            confirmed: 0,
-            amount: getTransactionAmount(result.amount),
-            date: null,
-            originalTime: 0,
-            destinationAddress: result.address,
-            transactionId: result.txid
-          }))
-
-          // At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`,
-          // we need to get that info by viewing the detail of the transaction, and then put it back !
-          for (let index = 0; index < tempTransactionList.length; index++) {
-            const tempTransaction = tempTransactionList[index];
-            /* eslint-disable-next-line no-await-in-loop */
-            const transactionDetail = await client.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
-            tempTransaction.confirmed = getTransactionConfirmed(transactionDetail.confirmations)
-            tempTransaction.date = getTransactionDate(transactionDetail.time)
-            tempTransaction.originalTime = transactionDetail.time
-          }
-
-          return tempTransactionList
-        }
-
-        return []
-      }
-      catch (error) {
-        this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
-        return []
-      }
-    }
-
 
     const getPublicTransactionsPromise = client.command(getPublicTransactionsCmd())
     .then(result => result[0])
@@ -271,7 +175,7 @@ export class RpcService {
     const responseTransactions = { transactions: null, optionalError: null }
     const queryPromiseArr = [
       getPublicTransactionsPromise,
-      getPrivateTransactionsPromise()
+      this::getPrivateTransactionsPromise(client)
     ]
 
     const combineQueryPromise = Promise.all(queryPromiseArr)
@@ -820,4 +724,59 @@ export class RpcService {
 			})
 		)
 	}
+}
+
+/* RPC Service private methods */
+
+async function getPrivateTransactionsPromise(client: Client) {
+  const getWalletZAddressesCmd = () => [{ method: 'z_listaddresses' }]
+  const getWalletZReceivedTransactionsCmd = (zAddress) => [{ method: 'z_listreceivedbyaddress', parameters: [zAddress, 0] }]
+  const getWalletTransactionCmd = (transactionId) => [{ method: 'gettransaction', parameters: [transactionId] }]
+
+  try {
+    // First, we get all the private addresses, and then for each one, we get all their transactions
+    const privateAddresses = await client.command(getWalletZAddressesCmd()).then(tempResult => tempResult[0])
+    if (Array.isArray(privateAddresses) && privateAddresses.length > 0) {
+      let queryResultWithAddressArr = []
+      for (let index = 0; index < privateAddresses.length; index++) {
+        const tempAddress = privateAddresses[index];
+        /* eslint-disable-next-line no-await-in-loop */
+        const addressTransactions = await client.command(getWalletZReceivedTransactionsCmd(tempAddress)).then(tempResult => tempResult[0])
+        if (Array.isArray(addressTransactions) && addressTransactions.length > 0) {
+          const addressTransactionsWithPrivateAddress = addressTransactions.map(tran => Object.assign({}, tran, { address: tempAddress }))
+          queryResultWithAddressArr = [...queryResultWithAddressArr, ...addressTransactionsWithPrivateAddress]
+        }
+      }
+
+      const tempTransactionList = queryResultWithAddressArr.map(result => ({
+        type: `\u2605 T (Private)`,
+        direction: getTransactionDirection(`receive`),
+        confirmed: 0,
+        amount: getTransactionAmount(result.amount),
+        date: null,
+        originalTime: 0,
+        destinationAddress: result.address,
+        transactionId: result.txid
+      }))
+
+      // At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`,
+      // we need to get that info by viewing the detail of the transaction, and then put it back !
+      for (let index = 0; index < tempTransactionList.length; index++) {
+        const tempTransaction = tempTransactionList[index];
+        /* eslint-disable-next-line no-await-in-loop */
+        const transactionDetail = await client.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
+        tempTransaction.confirmed = getTransactionConfirmed(transactionDetail.confirmations)
+        tempTransaction.date = getTransactionDate(transactionDetail.time)
+        tempTransaction.originalTime = transactionDetail.time
+      }
+
+      return tempTransactionList
+    }
+
+    return []
+  }
+  catch (error) {
+    this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
+    return []
+  }
 }

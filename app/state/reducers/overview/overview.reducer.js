@@ -39,11 +39,11 @@ export const OverviewActions = createActions(
 
 		GET_WALLET_INFO: undefined,
 		GOT_WALLET_INFO: (balances: Balances) => balances,
-		GET_WALLET_INFO_FAILURE: (errorMessage: string) => errorMessage,
+		GET_WALLET_INFO_FAILURE: (errorMessage: string) => ({ errorMessage }),
 
     GET_TRANSACTION_DATA_FROM_WALLET: undefined,
 		GOT_TRANSACTION_DATA_FROM_WALLET: (transactions: Array<Transaction>) => transactions,
-		GET_TRANSACTION_DATA_FROM_WALLET_FAILURE: (errorMessage: string) => errorMessage,
+		GET_TRANSACTION_DATA_FROM_WALLET_FAILURE: (errorMessage: string) => ({ errorMessage }),
 
 		MAIN_WINDOW_CLOSE: undefined,
 		MAIN_WINDOW_MINIMIZE: undefined,
@@ -57,7 +57,7 @@ export const OverviewActions = createActions(
 		BACK_TO_TRANSACTION_LIST: undefined
 	},
 	{
-		prefix: 'APP/OVERVIEW_ACTION'
+		prefix: 'APP/OVERVIEW'
 	}
 )
 
