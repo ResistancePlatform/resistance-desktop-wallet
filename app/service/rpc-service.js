@@ -143,38 +143,9 @@ export class RpcService {
   requestTransactionsDataFromWallet() {
     const client = getClientInstance()
 
-    const getPublicTransactionsCmd = () => [
-      { method: 'listtransactions', parameters: ['', 200] }
-    ]
-
-    const getPublicTransactionsPromise = client.command(getPublicTransactionsCmd())
-    .then(result => result[0])
-    .then(result => {
-      if (Array.isArray(result)) {
-        return result.map(
-          originalTransaction => ({
-            type: `\u2605 T (Public)`,
-            direction: getTransactionDirection(originalTransaction.category),
-            confirmed: getTransactionConfirmed(originalTransaction.confirmations),
-            amount: getTransactionAmount(originalTransaction.amount),
-            date: getTransactionDate(originalTransaction.time),
-            originalTime: originalTransaction.time,
-            destinationAddress: originalTransaction.address ? originalTransaction.address : `[ Z Address not listed in Wallet ]`,
-            transactionId: originalTransaction.txid
-          })
-        )
-      }
-
-      return []
-    })
-    .catch(error => {
-      this.logger.debug(this, `getPublicTransactionsPromise`, `subscribe error: `, ConsoleTheme.error, error)
-      return []
-    })
-
     const responseTransactions = { transactions: null, optionalError: null }
     const queryPromiseArr = [
-      getPublicTransactionsPromise,
+      this::getPublicTransactionsPromise(client),
       this::getPrivateTransactionsPromise(client)
     ]
 
@@ -615,7 +586,7 @@ export class RpcService {
 
 				if (errorAddressItems && errorAddressItems.length > 0) {
           const errorMessages = errorAddressItems.map(tempAddressItem => `"${tempAddressItem.errorMessage}"`)
-					const uniqueErrorMessages = new Set(errorMessages).join(', ')
+					const uniqueErrorMessages = Array.from(new Set(errorMessages)).join(', ')
 					const displayMessage = `Error fetching balances for ${errorAddressItems.length} out of ${addressList.length} addresses. Error messages included: ${uniqueErrorMessages}.`
           toastr.error(`Address balance error`, displayMessage)
 				}
@@ -727,6 +698,37 @@ export class RpcService {
 }
 
 /* RPC Service private methods */
+
+async function getPublicTransactionsPromise(client: Client) {
+  const getPublicTransactionsCmd = () => [
+    { method: 'listtransactions', parameters: ['', 200] }
+  ]
+
+  return client.command(getPublicTransactionsCmd())
+    .then(result => result[0])
+    .then(result => {
+      if (Array.isArray(result)) {
+        return result.map(
+          originalTransaction => ({
+            type: `\u2605 T (Public)`,
+            direction: getTransactionDirection(originalTransaction.category),
+            confirmed: getTransactionConfirmed(originalTransaction.confirmations),
+            amount: getTransactionAmount(originalTransaction.amount),
+            date: getTransactionDate(originalTransaction.time),
+            originalTime: originalTransaction.time,
+            destinationAddress: originalTransaction.address ? originalTransaction.address : `[ Z Address not listed in Wallet ]`,
+            transactionId: originalTransaction.txid
+          })
+        )
+      }
+
+      return []
+    })
+    .catch(error => {
+      this.logger.debug(this, `getPublicTransactionsPromise`, `subscribe error: `, ConsoleTheme.error, error)
+      return []
+    })
+}
 
 async function getPrivateTransactionsPromise(client: Client) {
   const getWalletZAddressesCmd = () => [{ method: 'z_listaddresses' }]

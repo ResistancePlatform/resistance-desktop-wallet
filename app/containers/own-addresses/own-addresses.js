@@ -11,7 +11,7 @@ import styles from './own-addresses.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
-const pollingInterval = 4.0
+const pollingInterval = 5.0
 
 type Props = {
 	ownAddresses: OwnAddressesState
