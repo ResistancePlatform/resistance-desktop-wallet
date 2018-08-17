@@ -143,78 +143,31 @@ export class RpcService {
   requestTransactionsDataFromWallet() {
     const client = getClientInstance()
 
-    const responseTransactions = { transactions: null, optionalError: null }
     const queryPromiseArr = [
       this::getPublicTransactionsPromise(client),
       this::getPrivateTransactionsPromise(client)
     ]
 
     const combineQueryPromise = Promise.all(queryPromiseArr)
-    .then(result => {
-      const combinedTransactionList = [...result[0], ...result[1]]
-
-      // At this point, we got all combined `public address` and `private address` transaction list, but we need to sort by date !!!
-      const sortedByDateTransactions = combinedTransactionList.sort((trans1, trans2) => {
-        const time1 = trans1.originalTime
-        const time2 = trans2.originalTime
-
-        if (time1 > time2) return -1
-          else if (time1 < time2) return 1
-
-            return 0
+      .then(result => {
+        const combinedTransactionList = [...result[0], ...result[1]]
+        const sortedByDateTransactions = combinedTransactionList.sort((trans1, trans2) => (
+          new Date(trans2.originalTime) - new Date(trans1.originalTime)
+        ))
+        return { transactions: sortedByDateTransactions }
       })
-      responseTransactions.transactions = sortedByDateTransactions
-      delete responseTransactions.optionalError
 
-      return responseTransactions
-    })
-    .catch(error => {
-      this.logger.debug(this, `requestTransactionsDataFromWallet`, `Promise.all error: `, ConsoleTheme.error, error)
-      responseTransactions.optionalError = error
-      return responseTransactions
-    })
-
-    from(combineQueryPromise)
-    .pipe(
-      switchMap(result => {
-        console.log(`result ---> `, result)
-        if (!result.transactions || !Array.isArray(result.transactions) || result.transactions.length <= 0) {
-          return result
-        }
-
-        return this.addressBookService.loadAddressBook().pipe(
-          map((addressBookRows: AddressBookRow[] | []) => {
-            if (!addressBookRows || addressBookRows.length <= 0) {
-              return result
-            }
-
-            result.transactions = result.transactions.map((tempTransaction: Transaction) => {
-              const matchedAddressBookRow = addressBookRows.find(tempAddressRow => tempAddressRow.address === tempTransaction.destinationAddress)
-              return matchedAddressBookRow ? ({
-                ...tempTransaction,
-                destinationAddress: matchedAddressBookRow.name
-              }) : tempTransaction
-            })
-
-            return result
-          })
-        )
-      }),
-      take(1)
-    )
-    .subscribe(
-      result => {
-        this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe result: `, ConsoleTheme.testing, result)
-
-        if (result.transactions && (result.optionalError === null || result.optionalError === undefined)) {
+    this::applyAddressBookNamesToTransactions(combineQueryPromise)
+      .subscribe(
+        result => {
+          this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe result: `, ConsoleTheme.testing, result)
           this.osService.dispatchAction(OverviewActions.gotTransactionDataFromWallet(result.transactions))
+        },
+        error => {
+          this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
+          this.osService.dispatchAction(OverviewActions.getTransactionDataFromWalletFailure(`Unable to get transactions from the wallet: ${error}`))
         }
-      },
-      error => {
-        this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
-        this.osService.dispatchAction(OverviewActions.getTransactionDataFromWalletFailure(`Subscribe error: ${error}`))
-      }
-    )
+      )
   }
 
 	/**
@@ -342,9 +295,13 @@ export class RpcService {
 			const amountAfterDeductTheFransactionFee = amountNeedToSend - 0.0001
 			const sendCashParams = [
 				fAddress,
-				[{ address: tAddress, amount: amountAfterDeductTheFransactionFee }],
-				0  // Confirmations number, important!
+				[{ address: tAddress, amount: amountAfterDeductTheFransactionFee }]
 			]
+
+      // Confirmations number, important!
+      if (fAddress.startsWith('r') && tAddress.startsWith('r')) {
+        sendCashParams.push(0)
+      }
 
 			// sendmany "T address here" [{“address”:”t address”, “amount”:0.005}, {“address”:”z address”,”amount”:0.03, “memo”:”f508af…”}]
 			return client.command([{ method: `z_sendmany`, parameters: sendCashParams }])
@@ -649,11 +606,11 @@ export class RpcService {
 /* RPC Service private methods */
 
 async function getPublicTransactionsPromise(client: Client) {
-  const getPublicTransactionsCmd = () => [
+  const command = [
     { method: 'listtransactions', parameters: ['', 200] }
   ]
 
-  return client.command(getPublicTransactionsCmd())
+  return client.command(command)
     .then(result => result[0])
     .then(result => {
       if (Array.isArray(result)) {
@@ -671,12 +628,13 @@ async function getPublicTransactionsPromise(client: Client) {
         )
       }
 
+      if (result.message) {
+        throw new Error(result.message)
+      }
+
       return []
     })
-    .catch(error => {
-      this.logger.debug(this, `getPublicTransactionsPromise`, `subscribe error: `, ConsoleTheme.error, error)
-      return []
-    })
+
 }
 
 async function getPrivateTransactionsPromise(client: Client) {
@@ -684,62 +642,90 @@ async function getPrivateTransactionsPromise(client: Client) {
   const getWalletZReceivedTransactionsCmd = (zAddress) => [{ method: 'z_listreceivedbyaddress', parameters: [zAddress, 0] }]
   const getWalletTransactionCmd = (transactionId) => [{ method: 'gettransaction', parameters: [transactionId] }]
 
-  try {
-    // First, we get all the private addresses, and then for each one, we get all their transactions
-    const privateAddresses = await client.command(getWalletZAddressesCmd()).then(tempResult => tempResult[0])
-    if (Array.isArray(privateAddresses) && privateAddresses.length > 0) {
-      let queryResultWithAddressArr = []
-      for (let index = 0; index < privateAddresses.length; index++) {
-        const tempAddress = privateAddresses[index];
-        /* eslint-disable-next-line no-await-in-loop */
-        const addressTransactions = await client.command(getWalletZReceivedTransactionsCmd(tempAddress)).then(tempResult => tempResult[0])
-        if (Array.isArray(addressTransactions) && addressTransactions.length > 0) {
-          const addressTransactionsWithPrivateAddress = addressTransactions.map(tran => Object.assign({}, tran, { address: tempAddress }))
-          queryResultWithAddressArr = [...queryResultWithAddressArr, ...addressTransactionsWithPrivateAddress]
-        }
+  // First, we get all the private addresses, and then for each one, we get all their transactions
+  const privateAddresses = await client.command(getWalletZAddressesCmd()).then(tempResult => tempResult[0])
+
+  if (Array.isArray(privateAddresses) && privateAddresses.length > 0) {
+    let queryResultWithAddressArr = []
+    for (let index = 0; index < privateAddresses.length; index++) {
+      const tempAddress = privateAddresses[index];
+
+      /* eslint-disable-next-line no-await-in-loop */
+      const addressTransactions = await client.command(getWalletZReceivedTransactionsCmd(tempAddress)).then(tempResult => tempResult[0])
+
+      if (Array.isArray(addressTransactions) && addressTransactions.length > 0) {
+        const addressTransactionsWithPrivateAddress = addressTransactions.map(tran => Object.assign({}, tran, { address: tempAddress }))
+        queryResultWithAddressArr = [...queryResultWithAddressArr, ...addressTransactionsWithPrivateAddress]
       }
-
-      const tempTransactionList = queryResultWithAddressArr.map(result => ({
-        type: `\u2605 T (Private)`,
-        direction: getTransactionDirection(`receive`),
-        confirmed: 0,
-        amount: getTransactionAmount(result.amount),
-        date: null,
-        originalTime: 0,
-        destinationAddress: result.address,
-        transactionId: result.txid
-      }))
-
-      // At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`,
-      // we need to get that info by viewing the detail of the transaction, and then put it back !
-      for (let index = 0; index < tempTransactionList.length; index++) {
-        const tempTransaction = tempTransactionList[index];
-        /* eslint-disable-next-line no-await-in-loop */
-        const transactionDetail = await client.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
-        tempTransaction.confirmed = getTransactionConfirmed(transactionDetail.confirmations)
-        tempTransaction.date = getTransactionDate(transactionDetail.time)
-        tempTransaction.originalTime = transactionDetail.time
-      }
-
-      return tempTransactionList
     }
 
-    return []
+    const tempTransactionList = queryResultWithAddressArr.map(result => ({
+      type: `\u2605 T (Private)`,
+      direction: getTransactionDirection(`receive`),
+      confirmed: 0,
+      amount: getTransactionAmount(result.amount),
+      date: null,
+      originalTime: 0,
+      destinationAddress: result.address,
+      transactionId: result.txid
+    }))
+
+    // At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`,
+    // we need to get that info by viewing the detail of the transaction, and then put it back !
+    for (let index = 0; index < tempTransactionList.length; index++) {
+      const tempTransaction = tempTransactionList[index];
+      /* eslint-disable-next-line no-await-in-loop */
+      const transactionDetail = await client.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
+      tempTransaction.confirmed = getTransactionConfirmed(transactionDetail.confirmations)
+      tempTransaction.date = getTransactionDate(transactionDetail.time)
+      tempTransaction.originalTime = transactionDetail.time
+    }
+
+    return tempTransactionList
   }
-  catch (error) {
-    this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
-    return []
-  }
+
+  return []
+}
+
+function applyAddressBookNamesToTransactions(transactionsPromise) {
+  const observable = from(transactionsPromise)
+    .pipe(
+      switchMap(result => {
+        if (!result.transactions || !result.transactions.length) {
+          return result
+        }
+
+        return this.addressBookService.loadAddressBook().pipe(
+          map((addressBookRows: AddressBookRow[] | []) => {
+            if (!addressBookRows || !addressBookRows.length) {
+              return result
+            }
+
+            result.transactions = result.transactions.map((tempTransaction: Transaction) => {
+              const matchedAddressBookRow = addressBookRows.find(tempAddressRow => tempAddressRow.address === tempTransaction.destinationAddress)
+              return matchedAddressBookRow ? ({ ...tempTransaction, destinationAddress: matchedAddressBookRow.name }) : tempTransaction
+            })
+
+            return result
+          })
+        )
+      }),
+      take(1)
+    )
+
+    return observable
 }
 
 /**
+ * Gets addresses balances in a batch request.
+ *
  * @param {Client} client
  * @param {AddressRow[]} addressRows
  * @returns {Promise<any>}
  * @memberof RpcService
  */
 function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise<any> {
-  let commands: Object[]
+  const commands: Object[] = []
 
   addressRows.forEach(address => {
     const confirmedCmd = { method: 'z_getbalance', parameters: [address.address] }
@@ -747,39 +733,47 @@ function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise
     commands.push(confirmedCmd, unconfirmedCmd)
   })
 
-  return client.command([
-    { method: 'z_getbalance', parameters: [addressRow.address] },
-    { method: 'z_getbalance', parameters: [addressRow.address, 0] }
-  ])
-    .then(result => {
-      const confirmedBalance = result[0]
-      const unconfirmedBalance = result[1]
+  const promise = client.command(commands)
+    .then(balances => {
 
-      if (confirmedBalance.name === 'RpcError' || unconfirmedBalance.name === 'RpcError') {
-        return Object.assign(addressRow, {
-          balance: -1,
-          confirmed: false,
-          errorMessage: confirmedBalance.name === 'RpcError' ? confirmedBalance.message : unconfirmedBalance.message
-        })
-      }
+      const addresses = addressRows.map((address, index) => {
 
-      const isConfirmed = confirmedBalance === unconfirmedBalance
-      const tempBalance = isConfirmed ? confirmedBalance : unconfirmedBalance
-      const fixedBalanceStr = typeof tempBalance === 'string' ? parseFloat(tempBalance).toFixed(2) : tempBalance.toFixed(2)
+        const confirmedBalance = balances[index * 2]
+        const unconfirmedBalance = balances[index * 2 + 1]
 
-      return Object.assign(addressRow, {
-        balance: parseFloat(fixedBalanceStr),
-        confirmed: isConfirmed
+        if (typeof(confirmedBalance) === 'object' || typeof(unconfirmedBalance) === 'object') {
+          return {
+            ...address,
+            balance: -1,
+            confirmed: false,
+            errorMessage: confirmedBalance.message || unconfirmedBalance.message
+          }
+        }
+
+        const isConfirmed = confirmedBalance === unconfirmedBalance
+        const displayBalance = isConfirmed ? confirmedBalance : unconfirmedBalance
+
+        return {
+          ...address,
+          balance: parseFloat(parseFloat(displayBalance).toFixed(4)),
+          confirmed: isConfirmed
+        }
       })
-    })
-    .catch(error => {
-      this.logger.debug(this, `getAddressBalance`, `Error happened: `, ConsoleTheme.error, error)
 
-      return Object.assign(addressRow, {
+      return addresses
+    })
+    .catch(err => {
+      this.logger.debug(this, `getAddressesBalance`, `Error occurred: `, ConsoleTheme.error, err)
+
+      const addresses = addressRows.map(address => ({
+        ...address,
         balance: -1,
         confirmed: false,
-        errorMessage: error.message
-      })
-    })
-}
+        errorMessage: err.toString()
+      }))
 
+      return addresses
+    })
+
+  return promise
+}

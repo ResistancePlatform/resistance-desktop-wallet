@@ -25,11 +25,11 @@ const getWalletInfoFailureEpic = (action$: ActionsObservable<AppAction>) => acti
 const getTransactionDataFromWalletEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
   ofType(OverviewActions.getTransactionDataFromWallet),
   tap(() => rpcService.requestTransactionsDataFromWallet()),
-  map(() => OverviewActions.empty())
+  mapTo(OverviewActions.empty())
 )
 
 const getTransactionDataDromWalletFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-  ofType(OverviewActions.getTransactionDataDromWalletFailure),
+  ofType(OverviewActions.getTransactionDataFromWalletFailure),
   tap((action) => toastr.error(action.payload.errorMessage)),
   mapTo(OverviewActions.empty())
 )

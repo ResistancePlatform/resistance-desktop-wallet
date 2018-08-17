@@ -14,6 +14,7 @@ type Props = {
 export default class Root extends Component<Props> {
 	render() {
 		return (
+
       <Provider store={this.props.store}>
         <div style={{ height: '100%' }}>
           <ConnectedRouter history={this.props.history}>
@@ -22,8 +23,9 @@ export default class Root extends Component<Props> {
 
           <ReduxToastr
             timeOut={4000}
-            preventDuplicates
-            closeOnToastrClick
+            position="bottom-right"
+            transitionIn="fadeIn"
+            transitionOut="fadeOut"
           />
         </div>
       </Provider>
