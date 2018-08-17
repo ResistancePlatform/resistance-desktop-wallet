@@ -198,7 +198,7 @@ export class OSService {
    *
 	 * @param {string} processName
 	 * @param {string[]} args
-	 * @param {function} stdoutHandler
+	 * @param {function} stdoutHandler If returns true the process is considered started.
 	 * @param {function} stderrHandler
 	 * @memberof OSService
 	 */
@@ -238,6 +238,14 @@ export class OSService {
       const childProcess = spawn(commandPath, args, options)
 
       const onData = (data: Buffer) => {
+        if (stdoutHandler) {
+          const handlerResult = stdoutHandler(data)
+
+          if (typeof(handlerResult) === 'boolean' && handlerResult !== true) {
+            return
+          }
+        }
+
         if (!isUpdateFinished) {
           isUpdateFinished = true
           this.dispatchAction(actions.childProcessStarted(processName))
@@ -250,9 +258,6 @@ export class OSService {
 
         }
 
-        if (stdoutHandler) {
-          stdoutHandler(data)
-        }
       }
 
       childProcess.stdout.on('data', onData)

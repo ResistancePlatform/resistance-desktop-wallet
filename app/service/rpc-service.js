@@ -692,7 +692,7 @@ function applyAddressBookNamesToTransactions(transactionsPromise) {
     .pipe(
       switchMap(result => {
         if (!result.transactions || !result.transactions.length) {
-          return result
+          return [result]
         }
 
         return this.addressBookService.loadAddressBook().pipe(
