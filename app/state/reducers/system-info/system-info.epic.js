@@ -23,7 +23,13 @@ const getDaemonInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pip
 
 const getDaemonInfoFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
   ofType(SystemInfoActions.getDaemonInfoFailure.toString()),
-  tap((action) => toastr.error(action.payload.errorMessage)),
+  tap((action) => {
+    if (action.payload.code !== -28) {
+      toastr.error(action.payload.errorMessage)
+    } else {
+      console.log(`Suppressing RPC initialization error display.`, action.payload)
+    }
+  }),
   mapTo(SystemInfoActions.empty())
 )
 
@@ -35,7 +41,13 @@ const getBlockchainInfoEpic = (action$: ActionsObservable<AppAction>) => action$
 
 const getBlockchainInfoFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
   ofType(SystemInfoActions.getBlockchainInfoFailure.toString()),
-  tap((action) => toastr.error(action.payload.errorMessage)),
+  tap((action) => {
+    if (action.payload.code !== -28) {
+      toastr.error(action.payload.errorMessage)
+    } else {
+      console.log(`Suppressing RPC initialization error display.`, action.payload)
+    }
+  }),
   mapTo(SystemInfoActions.empty())
 )
 

@@ -93,7 +93,7 @@ export class RpcService {
       })
       .catch(err => {
         const errorMessage = `Unable to get Resistance local node info: ${err}`
-        this.osService.dispatchAction(SystemInfoActions.getDaemonInfoFailure(errorMessage))
+        this.osService.dispatchAction(SystemInfoActions.getDaemonInfoFailure(errorMessage, err.code))
       })
   }
 
@@ -199,8 +199,8 @@ export class RpcService {
         return Promise.resolve()
       })
       .catch(err => {
-        this.logger.debug(this, `startPollingBlockchainInfo`, `getBlockchainInfoFailure`, ConsoleTheme.error, err)
-        this.osService.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`Unable to get blockchain info: ${err}`))
+        this.logger.debug(this, `requestBlockchainInfo`, `getBlockchainInfoFailure`, ConsoleTheme.error, err)
+        this.osService.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`Unable to get blockchain info: ${err}`, err.code))
       })
   }
 
@@ -605,6 +605,13 @@ export class RpcService {
 
 /* RPC Service private methods */
 
+/**
+ * Private method. Returns public transactions array.
+ *
+ * @param {Client} client
+ * @returns {Promise<any>}
+ * @memberof RpcService
+ */
 async function getPublicTransactionsPromise(client: Client) {
   const command = [
     { method: 'listtransactions', parameters: ['', 200] }
@@ -637,6 +644,13 @@ async function getPublicTransactionsPromise(client: Client) {
 
 }
 
+/**
+ * Private method. Returns private transactions array.
+ *
+ * @param {Client} client
+ * @returns {Promise<any>}
+ * @memberof RpcService
+ */
 async function getPrivateTransactionsPromise(client: Client) {
   const getWalletZAddressesCmd = () => [{ method: 'z_listaddresses' }]
   const getWalletZReceivedTransactionsCmd = (zAddress) => [{ method: 'z_listreceivedbyaddress', parameters: [zAddress, 0] }]
@@ -687,6 +701,13 @@ async function getPrivateTransactionsPromise(client: Client) {
   return []
 }
 
+/**
+ * Private method. Adds address book names to transactions.
+ *
+ * @param {Promise[any]} transactionsPromise Promise returning { transactions: [] } object.
+ * @returns {Observable}
+ * @memberof RpcService
+ */
 function applyAddressBookNamesToTransactions(transactionsPromise) {
   const observable = from(transactionsPromise)
     .pipe(
@@ -717,7 +738,7 @@ function applyAddressBookNamesToTransactions(transactionsPromise) {
 }
 
 /**
- * Gets addresses balances in a batch request.
+ * Private method. Gets addresses balances in a batch request.
  *
  * @param {Client} client
  * @param {AddressRow[]} addressRows

@@ -25,11 +25,11 @@ export const SystemInfoActions = createActions(
 
     GET_DAEMON_INFO: undefined,
     GOT_DAEMON_INFO: (daemonInfo: DaemonInfo) => ({ daemonInfo }),
-    GET_DAEMON_INFO_FAILURE:  (errorMessage: string) => ({ errorMessage }),
+    GET_DAEMON_INFO_FAILURE:  (errorMessage: string, code) => ({ errorMessage, code }),
 
     GET_BLOCKCHAIN_INFO: undefined,
     GOT_BLOCKCHAIN_INFO: (blockchainInfo: BlockchainInfo) => ({ blockchainInfo }),
-    GET_BLOCKCHAIN_INFO_FAILURE:  (errorMessage: string) => ({ errorMessage }),
+    GET_BLOCKCHAIN_INFO_FAILURE:  (errorMessage: string, code) => ({ errorMessage, code }),
 
     OPEN_WALLET_IN_FILE_MANAGER: undefined,
     OPEN_INSTALLATION_FOLDER: undefined,
