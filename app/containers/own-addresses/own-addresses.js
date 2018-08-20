@@ -6,12 +6,15 @@ import RpcPolling from '../../components/rpc-polling/rpc-polling'
 import { OwnAddressesActions, OwnAddressesState } from '../../state/reducers/own-addresses/own-addresses.reducer'
 import { appStore } from '../../state/store/configureStore'
 import OwnAddressList from '../../components/own-addresses/own-address-list'
+import { PopupMenu, PopupMenuItem } from '../../components/popup-menu/popup-menu'
 import AddAddressPopupMenu from '../../components/own-addresses/add-address-popup-menu'
+
 import styles from './own-addresses.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
 const pollingInterval = 5.0
+const addressRowPopupMenuId = 'own-addresses-address-row-popup-menu-id'
 
 type Props = {
 	ownAddresses: OwnAddressesState
@@ -69,6 +72,19 @@ class OwnAddresses extends Component<Props> {
 		this.commonMenuItemEventHandler(event)
 	}
 
+  mergeAllMinedCoinsClicked() {
+  }
+
+  mergeAllTransparentAddressCoinsClicked() {
+  }
+
+  mergeAllPrivateAddressCoinsClicked() {
+  }
+
+  mergeAllCoinsClicked() {
+  }
+
+
 	/**
 	 * @returns
 	 * @memberof OwnAddresses
@@ -119,6 +135,21 @@ class OwnAddresses extends Component<Props> {
 						</div>
 
 						<OwnAddressList addresses={this.props.ownAddresses.addresses} />
+
+            <PopupMenu id={addressRowPopupMenuId}>
+              <PopupMenuItem onClick={() => this.mergeAllMinedCoinsClicked()}>
+                Merge all mined coins here
+              </PopupMenuItem>
+              <PopupMenuItem onClick={() => this.mergeAllTransparentAddressCoinsClicked()}>
+                Merge all transparent address coins here
+              </PopupMenuItem>
+              <PopupMenuItem onClick={() => this.mergeAllPrivateAddressCoinsClicked()}>
+                Merge all private address coins here
+              </PopupMenuItem>
+              <PopupMenuItem onClick={() => this.mergeAllCoinsClicked()}>
+                Merge all coins here
+              </PopupMenuItem>
+            </PopupMenu>
 
 					</div>
 				</div>
