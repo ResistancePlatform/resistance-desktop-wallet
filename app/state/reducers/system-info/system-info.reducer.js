@@ -4,6 +4,8 @@ import { defaultAppState } from '../default-app-state'
 
 export type DaemonInfo = { [string]: any }
 
+export type Operation = { [string]: any }
+
 export type BlockchainInfo = {
 	connectionCount: number,
 	blockchainSynchronizedPercentage: number,
@@ -13,6 +15,7 @@ export type BlockchainInfo = {
 export type SystemInfoState = {
 	daemonInfo?: DaemonInfo,
   blockchainInfo?: BlockchainInfo,
+  operations: Operation[],
   miner: {
     hashingPower: float,
     minedBlocksNumber: number
@@ -31,6 +34,10 @@ export const SystemInfoActions = createActions(
     GOT_BLOCKCHAIN_INFO: (blockchainInfo: BlockchainInfo) => ({ blockchainInfo }),
     GET_BLOCKCHAIN_INFO_FAILURE:  (errorMessage: string, code) => ({ errorMessage, code }),
 
+    GET_OPERATIONS: undefined,
+    GOT_OPERATIONS: (operations: Operation[]) => ({ operations }),
+    GET_OPERATIONS_FAILURE:  (errorMessage: string, code) => ({ errorMessage, code }),
+
     OPEN_WALLET_IN_FILE_MANAGER: undefined,
     OPEN_INSTALLATION_FOLDER: undefined,
 
@@ -48,6 +55,9 @@ export const SystemInfoReducer = handleActions(
     }),
     [SystemInfoActions.gotBlockchainInfo]: (state, action) => ({
       ...state, blockchainInfo: action.payload.blockchainInfo
+    }),
+    [SystemInfoActions.gotOperations]: (state, action) => ({
+      ...state, operations: action.payload.operations
     }),
     [SystemInfoActions.updateMinerInfo]: (state, action) => ({
       ...state, miner: action.payload

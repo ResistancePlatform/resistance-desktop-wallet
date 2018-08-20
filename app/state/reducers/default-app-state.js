@@ -23,6 +23,7 @@ export const defaultAppState: AppState = {
 			blockchainSynchronizedPercentage: 0,
 			lastBlockDate: null
 		},
+    operations: [],
 		miner: {
 			hashingPower: 0,
 			minedBlocksNumber: 0

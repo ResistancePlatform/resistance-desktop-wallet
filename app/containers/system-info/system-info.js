@@ -18,6 +18,7 @@ const osService = new OSService()
 
 const daemonInfoPollingInterval = 2.0
 const blockchainInfoPollingInterval = 4.0
+const operationsPollingInterval = 3.0
 
 type Props = {
 	systemInfo: SystemInfoState,
@@ -127,12 +128,22 @@ class SystemInfo extends Component<Props> {
             failure: SystemInfoActions.getDaemonInfoFailure
           }}
         />
+
         <RpcPolling
           interval={blockchainInfoPollingInterval}
           actions={{
             polling: SystemInfoActions.getBlockchainInfo,
             success: SystemInfoActions.gotBlockchainInfo,
             failure: SystemInfoActions.getBlockchainInfoFailure
+          }}
+        />
+
+        <RpcPolling
+          interval={operationsPollingInterval}
+          actions={{
+            polling: SystemInfoActions.getOperations,
+            success: SystemInfoActions.gotOperations,
+            failure: SystemInfoActions.getOperationsFailure
           }}
         />
 
@@ -192,6 +203,11 @@ class SystemInfo extends Component<Props> {
 
 
         <div className={styles.statusCustomIconsContainer}>
+          <i
+            className={classNames(styles.customIconOperations, styles.statusIcon, { [styles.active]: this.props.systemInfo.operations.length })}
+            title={`Operations: ${this.props.systemInfo.operations.length} pending / 0 complete`}
+          />
+          <span className={styles.operationsIconHint}>10</span>
           <i
             className={classNames(styles.customIconMining, styles.statusIcon, { [styles.active]: this.props.settings.childProcessesStatus.MINER === 'RUNNING' })}
             title={this.getMinerStatusIconTitle()}

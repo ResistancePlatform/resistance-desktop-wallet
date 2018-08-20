@@ -15,6 +15,14 @@ const rpcService = new RpcService()
 const resistanceService = new ResistanceService()
 const osService = new OSService()
 
+function suppressRpcWarmupError(action, callable) {
+    if (action.payload.code !== -28) {
+      callable()
+    } else {
+      console.log(`Suppressing RPC initialization error display:`, action.payload)
+    }
+}
+
 const getDaemonInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
   ofType(SystemInfoActions.getDaemonInfo.toString()),
   tap(() => rpcService.requestDaemonInfo()),
@@ -24,11 +32,7 @@ const getDaemonInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pip
 const getDaemonInfoFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
   ofType(SystemInfoActions.getDaemonInfoFailure.toString()),
   tap((action) => {
-    if (action.payload.code !== -28) {
-      toastr.error(action.payload.errorMessage)
-    } else {
-      console.log(`Suppressing RPC initialization error display.`, action.payload)
-    }
+    suppressRpcWarmupError(action, () => toastr.error(action.payload.errorMessage))
   }),
   mapTo(SystemInfoActions.empty())
 )
@@ -42,11 +46,21 @@ const getBlockchainInfoEpic = (action$: ActionsObservable<AppAction>) => action$
 const getBlockchainInfoFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
   ofType(SystemInfoActions.getBlockchainInfoFailure.toString()),
   tap((action) => {
-    if (action.payload.code !== -28) {
-      toastr.error(action.payload.errorMessage)
-    } else {
-      console.log(`Suppressing RPC initialization error display.`, action.payload)
-    }
+    suppressRpcWarmupError(action, () => toastr.error(action.payload.errorMessage))
+  }),
+  mapTo(SystemInfoActions.empty())
+)
+
+const getOperationsEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+  ofType(SystemInfoActions.getOperations.toString()),
+  tap(() => rpcService.requestOperations()),
+  mapTo(SystemInfoActions.empty())
+)
+
+const getOperationsFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+  ofType(SystemInfoActions.getOperationsFailure.toString()),
+  tap((action) => {
+    suppressRpcWarmupError(action, () => toastr.error(action.payload.errorMessage))
   }),
   mapTo(SystemInfoActions.empty())
 )
@@ -73,5 +87,7 @@ export const SystemInfoEpics = (action$, state$) => merge(
   getDaemonInfoEpic(action$, state$),
   getDaemonInfoFailureEpic(action$, state$),
   getBlockchainInfoEpic(action$, state$),
-  getBlockchainInfoFailureEpic(action$, state$)
+  getBlockchainInfoFailureEpic(action$, state$),
+  getOperationsEpic(action$, state$),
+  getOperationsFailureEpic(action$, state$)
 )
