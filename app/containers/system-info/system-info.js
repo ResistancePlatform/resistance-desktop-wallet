@@ -105,6 +105,47 @@ class SystemInfo extends Component<Props> {
     return tooltip
   }
 
+  getOperationsCount(...args) {
+    const operationsCount = this.props.systemInfo.operations.reduce((counter, operation) => (
+      counter + (args.indexOf(operation.status) === -1 ? 0 : 1)
+    ), 0)
+    return operationsCount
+  }
+
+  getOperationIconHint() {
+    let iconHint
+    const pendingNumber = this.getOperationsCount('queued', 'executing')
+
+    if (pendingNumber) {
+      iconHint = (
+        <span
+          className={styles.operationsIconHint}
+          title={this.getOperationsIconTitle()}
+          onClick={e => this.onOperationsIconClicked(e)}
+          onKeyDown={e => this.onOperationsIconClicked(e)}
+        >
+          {pendingNumber}
+        </span>
+      )
+    }
+    return iconHint
+  }
+
+  getOperationsIconTitle() {
+    if (!this.props.systemInfo.operations.length) {
+      return 'No pending operations.'
+    }
+
+    let failed = ''
+    const failedNumber = this.getOperationsCount('failed')
+
+    if (failedNumber) {
+      failed = `, ${failedNumber}`
+    }
+
+    return `${this.getOperationsCount('queued', 'executing')} pending, ${this.getOperationsCount('success')} complete${failed} operations.`
+  }
+
   onOperationsIconClicked() {
     appStore.dispatch(SystemInfoActions.openOperationsModal())
     return false
@@ -202,11 +243,12 @@ class SystemInfo extends Component<Props> {
         <div className={styles.statusCustomIconsContainer}>
           <i
             className={classNames(styles.customIconOperations, styles.statusIcon, { [styles.active]: this.props.systemInfo.operations.length })}
-            title={`Operations: ${this.props.systemInfo.operations.length} pending / 0 complete`}
+            title={this.getOperationsIconTitle()}
             onClick={e => this.onOperationsIconClicked(e)}
             onKeyDown={e => this.onOperationsIconClicked(e)}
           />
-          <span className={styles.operationsIconHint}>10</span>
+          {this.getOperationIconHint()}
+
           <i
             className={classNames(styles.customIconMining, styles.statusIcon, { [styles.active]: this.props.settings.childProcessesStatus.MINER === 'RUNNING' })}
             title={this.getMinerStatusIconTitle()}

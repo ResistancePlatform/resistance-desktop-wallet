@@ -37,9 +37,9 @@ class OperationsModal extends Component<Props> {
   getOperationRows() {
     const rows = this.props.systemInfo.operations.map(operation => (
       <tr>
-        <td>Unknown</td>
-        <td>Unknown</td>
-        <td>Unknown</td>
+        <td>{operation.method}</td>
+        <td>{operation.params.fromaddress}</td>
+        <td>{operation.params.amounts[0].address}</td>
         <td>{operation.status}</td>
         <td />
       </tr>
@@ -51,7 +51,7 @@ class OperationsModal extends Component<Props> {
     return (
       <Modal
         isOpen={this.props.systemInfo.isOperationsModalOpen}
-        className={classNames(styles.statusModal)}
+        className={styles.operationsModal}
         overlayClassName={styles.modalOverlay}
         contentLabel="Operations"
       >
@@ -66,7 +66,7 @@ class OperationsModal extends Component<Props> {
           </div>
         </div>
 
-        <div className={classNames(styles.statusModalBody)}>
+        <div className={styles.operationsModalBody}>
           <table>
             <thead>
               <tr>
@@ -83,8 +83,9 @@ class OperationsModal extends Component<Props> {
           </table>
         </div>
 
-        <div className={styles.statusModalFooter}>
+        <div className={styles.modalFooter}>
           <button
+            className={styles.closeButton}
             onClick={event => this.onCloseClicked(event)}
             onKeyDown={event => this.onCloseClicked(event)}
           >
