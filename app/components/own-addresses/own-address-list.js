@@ -6,11 +6,19 @@ import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
 type Props = {
-	addresses: AddressRow[]
+	addresses: AddressRow[],
+	onAddressRowClicked: (event: any, address: string) => void
 }
 
 export default class OwnAddressList extends Component<Props> {
 	props: Props
+
+	onRowClicked(event: any, address: string) {
+		if (this.props.onAddressRowClicked) {
+			this.props.onAddressRowClicked(event, address)
+		}
+    return false
+	}
 
 	getBalanceValue(tempAddressRow: AddressRow) {
 		if (!tempAddressRow || tempAddressRow.balance === null || tempAddressRow.balance === undefined) return `0`
@@ -32,11 +40,17 @@ export default class OwnAddressList extends Component<Props> {
 		}
 
 		const tableBody = this.props.addresses.map((addressRow) => (
-			<div className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')} key={addressRow.address}>
-				<div className={styles.tableBodyRowColumnBalance} >{this.getBalanceValue(addressRow)}</div>
-				<div className={styles.tableBodyRowColumnConfirmed}>{this.getConfirmValue(addressRow)}</div>
-				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnAddress].join(' ')}>{addressRow.address}</div>
-			</div>
+      <div
+        className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')}
+        key={addressRow.address}
+        onClick={e => this.rowClicked(e, addressRow.address)}
+        onContextMenu={e => this.rowClicked(e, addressRow.address)}
+        onKeyDown={() => { }}
+      >
+        <div className={styles.tableBodyRowColumnBalance} >{this.getBalanceValue(addressRow)}</div>
+        <div className={styles.tableBodyRowColumnConfirmed}>{this.getConfirmValue(addressRow)}</div>
+        <div className={[HLayout.hBoxChild, styles.tableBodyRowColumnAddress].join(' ')}>{addressRow.address}</div>
+      </div>
 		))
 
 		return (

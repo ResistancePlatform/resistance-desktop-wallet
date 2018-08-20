@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import RpcPolling from '../../components/rpc-polling/rpc-polling'
+import { PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.reducer'
 import { OwnAddressesActions, OwnAddressesState } from '../../state/reducers/own-addresses/own-addresses.reducer'
 import { appStore } from '../../state/store/configureStore'
 import OwnAddressList from '../../components/own-addresses/own-address-list'
@@ -72,6 +73,10 @@ class OwnAddresses extends Component<Props> {
 		this.commonMenuItemEventHandler(event)
 	}
 
+  onAddressRowClicked(event) {
+    appStore.dispatch(PopupMenuActions.show(addressRowPopupMenuId, event.pos.Y, event.pos.X))
+  }
+
   mergeAllMinedCoinsClicked() {
   }
 
@@ -134,7 +139,7 @@ class OwnAddresses extends Component<Props> {
 							</div>
 						</div>
 
-						<OwnAddressList addresses={this.props.ownAddresses.addresses} />
+						<OwnAddressList addresses={this.props.ownAddresses.addresses} onAddressRowClicked={this.onAddressRowClicked} />
 
             <PopupMenu id={addressRowPopupMenuId}>
               <PopupMenuItem onClick={() => this.mergeAllMinedCoinsClicked()}>
