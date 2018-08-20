@@ -30,7 +30,7 @@ const configFileContents = [
 ].join(EOL)
 
 
-const resistancedArgs = ['-showmetrics']
+const resistancedArgs = ['-printtoconsole']
 const torSwitch = '-proxy=127.0.0.1:9050'
 
 /**
@@ -96,7 +96,7 @@ export class ResistanceService {
 	 */
 	start(isTorEnabled: boolean) {
     const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs
-    osService.execProcess('NODE', args)
+    osService.execProcess('NODE', args, this.handleStdout)
 	}
 
 	/**
@@ -134,4 +134,13 @@ export class ResistanceService {
     return PropertiesReader().read(contentsWithPassword).path()
   }
 
+	/**
+   * Called on new data in stdout, returns true if Resistance node has been initialized.
+   *
+   * @param {string} configFilePath
+	 * @memberof ResistanceService
+	 */
+  handleStdout(data: Buffer) {
+    return data.toString().includes(`init message: Done loading`)
+  }
 }

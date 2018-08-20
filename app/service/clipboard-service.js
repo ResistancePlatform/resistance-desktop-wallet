@@ -32,7 +32,7 @@ export class ClipboardService {
 	 * We have to require the latest `appStore` to make sure it has been created !!!
 	 *
 	 * @param {AppAction} action
-	 * @memberof ResistanceCliService
+	 * @memberof RpcService
 	 */
 	dispatchAction(action: AppAction) {
 		const storeModule = require('../state/store/configureStore')

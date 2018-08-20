@@ -3,7 +3,6 @@ import React, { Component } from 'react'
 import { Provider } from 'react-redux'
 import { ConnectedRouter } from 'react-router-redux'
 import ReduxToastr from 'react-redux-toastr'
-import styles from '../theme/toastr/index.scss'
 
 import App from './App'
 
@@ -27,7 +26,6 @@ export default class Root extends Component<Props> {
             position="bottom-right"
             transitionIn="fadeIn"
             transitionOut="fadeOut"
-            preventDuplicates
           />
         </div>
       </Provider>

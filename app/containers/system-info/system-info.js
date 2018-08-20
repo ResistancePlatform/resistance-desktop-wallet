@@ -150,13 +150,13 @@ class SystemInfo extends Component<Props> {
 					{ /* Resistance status coloumn */}
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>SYNCHRONIZED</div>
-						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockChainInfo.blockchainSynchronizedPercentage}%</div>
+						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockchainInfo.blockchainSynchronizedPercentage}%</div>
 					</div>
 
 					{ /* Resistance status coloumn */}
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>UP TO</div>
-						<div className={styles.statusColoumnValue}>{this.displayLastBlockTime(this.props.systemInfo.blockChainInfo.lastBlockDate)}</div>
+						<div className={styles.statusColoumnValue}>{this.displayLastBlockTime(this.props.systemInfo.blockchainInfo.lastBlockDate)}</div>
 					</div>
 
 					{ /* Resistance status coloumn */}
@@ -168,7 +168,7 @@ class SystemInfo extends Component<Props> {
 					{ /* Resistance status coloumn */}
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>CONNECTIONS</div>
-						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockChainInfo.connectionCount}</div>
+						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockchainInfo.connectionCount}</div>
 					</div>
 
 				</div>

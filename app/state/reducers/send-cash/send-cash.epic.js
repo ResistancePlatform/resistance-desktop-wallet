@@ -2,19 +2,19 @@
 import { map, tap, switchMap } from 'rxjs/operators'
 import { merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
+import { toastr } from 'react-redux-toastr'
+
 import { AppAction } from '../appAction'
 import { SendCashActions, SendCashState, checkPrivateTransactionRule } from './send-cash.reducer'
 import { AddressBookRow } from '../address-book/address-book.reducer'
-import { ResistanceCliService } from '../../../service/resistance-cli-service'
-import { DialogService } from '../../../service/dialog-service'
+import { RpcService } from '../../../service/rpc-service'
 import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
 import { ClipboardService } from '../../../service/clipboard-service'
 import { AddressBookService } from '../../../service/address-book-service'
 
 
 const epicInstanceName = 'SendCashEpics'
-const resistanceCliService = new ResistanceCliService()
-const dialogService: DialogService = new DialogService()
+const resistanceCliService = new RpcService()
 const clipboardService = new ClipboardService()
 const addressBookService = new AddressBookService()
 const logger = new LoggerService()
@@ -82,7 +82,7 @@ const sendCashSuccessEpic = (action$: ActionsObservable<AppAction>, state$) => a
 			} RES from address:\n ${sendCashState.fromAddress} \n\n to address:\n ${
 			sendCashState.toAddress
 			}`
-		dialogService.showMessage(`Cash Sent Successfully`, message)
+		toastr.success(`Cash Sent Successfully`, message)
 	}),
 	map(() => SendCashActions.empty())
 )
@@ -90,7 +90,7 @@ const sendCashSuccessEpic = (action$: ActionsObservable<AppAction>, state$) => a
 const sendCashFailEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
 	ofType(SendCashActions.sendCashFail),
 	tap((action: AppAction) => logger.debug(epicInstanceName, `sendCashFailEpic`, action.type, ConsoleTheme.testing)),
-	tap((action: AppAction) => dialogService.showError(`Cash Send Fail`, action.payload.errorMessage)),
+	tap((action: AppAction) => toastr.error(`Cash Send Fail`, action.payload.errorMessage)),
 	map(() => SendCashActions.empty())
 )
 

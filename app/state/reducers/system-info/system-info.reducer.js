@@ -2,15 +2,9 @@
 import { createActions, handleActions } from 'redux-actions'
 import { defaultAppState } from '../default-app-state'
 
-export type DaemonStatus = 'RUNNING' | 'NOT_RUNNING' | 'UNABLE_TO_ASCERTAIN'
+export type DaemonInfo = { [string]: any }
 
-export type DaemonInfo = {
-	status?: DaemonStatus,
-  residentSizeMB?: number,
-  getInfoResult: Object
-}
-
-export type BlockChainInfo = {
+export type BlockchainInfo = {
 	connectionCount: number,
 	blockchainSynchronizedPercentage: number,
 	lastBlockDate: Date | null
@@ -18,7 +12,7 @@ export type BlockChainInfo = {
 
 export type SystemInfoState = {
 	daemonInfo?: DaemonInfo,
-  blockChainInfo?: BlockChainInfo,
+  blockchainInfo?: BlockchainInfo,
   miner: {
     hashingPower: float,
     minedBlocksNumber: number
@@ -31,11 +25,11 @@ export const SystemInfoActions = createActions(
 
     GET_DAEMON_INFO: undefined,
     GOT_DAEMON_INFO: (daemonInfo: DaemonInfo) => ({ daemonInfo }),
-    GET_DAEMON_INFO_FAILURE:  (errorMessage: string) => ({ errorMessage }),
+    GET_DAEMON_INFO_FAILURE:  (errorMessage: string, code) => ({ errorMessage, code }),
 
     GET_BLOCKCHAIN_INFO: undefined,
-    GOT_BLOCKCHAIN_INFO: (blockChainInfo: BlockChainInfo) => ({ blockChainInfo }),
-    GET_BLOCKCHAIN_INFO_FAILURE:  (errorMessage: string) => ({ errorMessage }),
+    GOT_BLOCKCHAIN_INFO: (blockchainInfo: BlockchainInfo) => ({ blockchainInfo }),
+    GET_BLOCKCHAIN_INFO_FAILURE:  (errorMessage: string, code) => ({ errorMessage, code }),
 
     OPEN_WALLET_IN_FILE_MANAGER: undefined,
     OPEN_INSTALLATION_FOLDER: undefined,
@@ -53,7 +47,7 @@ export const SystemInfoReducer = handleActions(
       ...state, daemonInfo: action.payload.daemonInfo
     }),
     [SystemInfoActions.gotBlockchainInfo]: (state, action) => ({
-      ...state, blockChainInfo: action.payload.blockChainInfo
+      ...state, blockchainInfo: action.payload.blockchainInfo
     }),
     [SystemInfoActions.updateMinerInfo]: (state, action) => ({
       ...state, miner: action.payload
