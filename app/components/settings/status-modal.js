@@ -224,6 +224,7 @@ class StatusModal extends Component<Props> {
 
         <div className={styles.statusModalFooter}>
           <button
+            className={styles.refreshButton}
             onClick={event => this.onRefreshClicked(event)}
             onKeyDown={event => this.onRefreshClicked(event)}
             disabled={this.getIsRefreshButtonDisabled()}
@@ -232,6 +233,7 @@ class StatusModal extends Component<Props> {
           </button>
 
           <button
+            className={styles.closeButton}
             onClick={event => this.onCloseClicked(event)}
             onKeyDown={event => this.onCloseClicked(event)}
           >

@@ -19,7 +19,8 @@ export type SystemInfoState = {
   miner: {
     hashingPower: float,
     minedBlocksNumber: number
-  }
+  },
+  isOperationsModalOpen: boolean
 }
 
 export const SystemInfoActions = createActions(
@@ -41,7 +42,10 @@ export const SystemInfoActions = createActions(
     OPEN_WALLET_IN_FILE_MANAGER: undefined,
     OPEN_INSTALLATION_FOLDER: undefined,
 
-    UPDATE_MINER_INFO: (hashingPower, minedBlocksNumber) => ({ hashingPower, minedBlocksNumber })
+    UPDATE_MINER_INFO: (hashingPower, minedBlocksNumber) => ({ hashingPower, minedBlocksNumber }),
+
+    OPEN_OPERATIONS_MODAL: undefined,
+    CLOSE_OPERATIONS_MODAL: undefined
   },
   {
     prefix: 'APP/SYSTEM_INFO'
@@ -59,7 +63,17 @@ export const SystemInfoReducer = handleActions(
     [SystemInfoActions.gotOperations]: (state, action) => ({
       ...state, operations: action.payload.operations
     }),
+
     [SystemInfoActions.updateMinerInfo]: (state, action) => ({
       ...state, miner: action.payload
+    }),
+
+    // Operations Modal
+    [SystemInfoActions.openOperationsModal]: state => ({
+      ...state, isOperationsModalOpen: true
+    }),
+    [SystemInfoActions.closeOperationsModal]: state => ({
+      ...state, isOperationsModalOpen: false
     })
+
   }, defaultAppState)

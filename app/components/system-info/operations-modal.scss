@@ -160,11 +160,7 @@
   right: 0;
   bottom: 0;
 
-  .refreshButton {
-    @include roundedButton(false);
-  }
-
-  .closeButton {
+  button {
     @include roundedButton(true);
   }
 }

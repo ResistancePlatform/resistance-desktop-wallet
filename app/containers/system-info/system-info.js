@@ -10,6 +10,7 @@ import { OSService } from '../../service/os-service'
 import { SystemInfoActions, SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
 import { appStore } from '../../state/store/configureStore'
 import { AppState } from '../../state/reducers/appState'
+import OperationsModal from '../../components/system-info/operations-modal'
 
 import styles from './system-info.scss'
 import HLayout from '../../theme/h-box-layout.scss'
@@ -32,15 +33,6 @@ type Props = {
  */
 class SystemInfo extends Component<Props> {
 	props: Props
-
-	/**
-	 * @param {*} event
-	 * @memberof Settings
-	 */
-	eventConfirm(event) {
-		event.preventDefault()
-		event.stopPropagation()
-	}
 
 	/**
 	 * @memberof Settings
@@ -69,14 +61,14 @@ class SystemInfo extends Component<Props> {
     return osService.getOS() === 'windows' ? 'Wallet in Explorer' : 'Wallet in Finder';
   }
 
-  onWalletInFileManagerClicked(event) {
-    this.eventConfirm(event)
+  onWalletInFileManagerClicked() {
     appStore.dispatch(SystemInfoActions.openWalletInFileManager())
+    return false
   }
 
-  onInstallationFolderClicked(event) {
-    this.eventConfirm(event)
+  onInstallationFolderClicked() {
     appStore.dispatch(SystemInfoActions.openInstallationFolder())
+    return false
   }
 
 	displayLastBlockTime(tempDate: Date | null) {
@@ -111,6 +103,11 @@ class SystemInfo extends Component<Props> {
     ].join(EOL)
 
     return tooltip
+  }
+
+  onOperationsIconClicked() {
+    appStore.dispatch(SystemInfoActions.openOperationsModal())
+    return false
   }
 
 	/**
@@ -206,6 +203,8 @@ class SystemInfo extends Component<Props> {
           <i
             className={classNames(styles.customIconOperations, styles.statusIcon, { [styles.active]: this.props.systemInfo.operations.length })}
             title={`Operations: ${this.props.systemInfo.operations.length} pending / 0 complete`}
+            onClick={e => this.onOperationsIconClicked(e)}
+            onKeyDown={e => this.onOperationsIconClicked(e)}
           />
           <span className={styles.operationsIconHint}>10</span>
           <i
@@ -220,6 +219,8 @@ class SystemInfo extends Component<Props> {
             className={classNames(styles.customIconTor, styles.statusIcon, { [styles.active]: this.props.settings.childProcessesStatus.TOR === 'RUNNING' })}
             title={`Tor status: ${this.props.settings.childProcessesStatus.TOR}`}
           />
+
+          <OperationsModal />
         </div>
 
 			</div>

@@ -27,7 +27,8 @@ export const defaultAppState: AppState = {
 		miner: {
 			hashingPower: 0,
 			minedBlocksNumber: 0
-		}
+		},
+    isOperationsModalOpen: false
 	},
 	overview: {
 		balances: {
