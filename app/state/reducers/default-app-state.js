@@ -13,6 +13,7 @@ export const defaultAppState: AppState = {
     registeredActions: [],
     actionsResponseReceived: {}
   },
+  popupMenu: {},
 	navi: {
 		currentNaviPath: '/overview'
 	},

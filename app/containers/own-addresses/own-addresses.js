@@ -7,7 +7,7 @@ import { PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.red
 import { OwnAddressesActions, OwnAddressesState } from '../../state/reducers/own-addresses/own-addresses.reducer'
 import { appStore } from '../../state/store/configureStore'
 import OwnAddressList from '../../components/own-addresses/own-address-list'
-import { PopupMenu, PopupMenuItem } from '../../components/popup-menu/popup-menu'
+import { PopupMenu, PopupMenuItem } from '../../components/popup-menu'
 import AddAddressPopupMenu from '../../components/own-addresses/add-address-popup-menu'
 
 import styles from './own-addresses.scss'
@@ -73,8 +73,8 @@ class OwnAddresses extends Component<Props> {
 		this.commonMenuItemEventHandler(event)
 	}
 
-  onAddressRowClicked(event) {
-    appStore.dispatch(PopupMenuActions.show(addressRowPopupMenuId, event.pos.Y, event.pos.X))
+  onAddressRowClicked(event, address) {
+    appStore.dispatch(PopupMenuActions.show(addressRowPopupMenuId, event.clientY, event.clientX, address))
   }
 
   mergeAllMinedCoinsClicked() {
