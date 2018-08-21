@@ -83,15 +83,20 @@ class OwnAddresses extends Component<Props> {
     toastr.confirm(`Are you sure want to merge all the mined coins?`, confirmOptions)
   }
 
-  mergeAllTransparentAddressCoinsClicked() {
+  mergeAllTransparentAddressCoinsClicked(event, address) {
+    const confirmOptions = { onOk: () => appStore.dispatch(OwnAddressesActions.mergeAllRAddressCoins(address)) }
+    toastr.confirm(`Are you sure want to merge all the transparent address coins?`, confirmOptions)
   }
 
-  mergeAllPrivateAddressCoinsClicked() {
+  mergeAllPrivateAddressCoinsClicked(event, address) {
+    const confirmOptions = { onOk: () => appStore.dispatch(OwnAddressesActions.mergeAllZAddressCoins(address)) }
+    toastr.confirm(`Are you sure want to merge all the private address coins?`, confirmOptions)
   }
 
-  mergeAllCoinsClicked() {
+  mergeAllCoinsClicked(event, address) {
+    const confirmOptions = { onOk: () => appStore.dispatch(OwnAddressesActions.mergeAllCoins(address)) }
+    toastr.confirm(`Are you sure want to merge all the coins?`, confirmOptions)
   }
-
 
 	/**
 	 * @returns
@@ -148,13 +153,13 @@ class OwnAddresses extends Component<Props> {
               <PopupMenuItem onClick={(e, address) => this.mergeAllMinedCoinsClicked(e, address)}>
                 Merge all mined coins here
               </PopupMenuItem>
-              <PopupMenuItem onClick={() => this.mergeAllTransparentAddressCoinsClicked()}>
+              <PopupMenuItem onClick={(e, address) => this.mergeAllTransparentAddressCoinsClicked(e, address)}>
                 Merge all transparent address coins here
               </PopupMenuItem>
-              <PopupMenuItem onClick={() => this.mergeAllPrivateAddressCoinsClicked()}>
+              <PopupMenuItem onClick={(e, address) => this.mergeAllPrivateAddressCoinsClicked(e, address)}>
                 Merge all private address coins here
               </PopupMenuItem>
-              <PopupMenuItem onClick={() => this.mergeAllCoinsClicked()}>
+              <PopupMenuItem onClick={(e, address) => this.mergeAllCoinsClicked(e, address)}>
                 Merge all coins here
               </PopupMenuItem>
             </PopupMenu>

@@ -28,6 +28,9 @@ export const OwnAddressesActions = createActions(
     MERGE_ALL_Z_ADDRESS_COINS: (zAddress: string) => ({ zAddress }),
     MERGE_ALL_COINS: (zAddress: string) => ({ zAddress }),
 
+    MERGE_COINS_OPERATION_STARTED: (operationId: string) => ({ operationId }),
+    MERGE_COINS_FAILURE: errorMessage => ({ errorMessage }),
+
     UPDATE_DROPDOWN_MENU_VISIBILITY: (show: boolean) => ({ show })
   },
   {

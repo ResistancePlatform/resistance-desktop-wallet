@@ -5,6 +5,7 @@ import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
 import { AppAction } from '../appAction'
+import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { SendCashActions, SendCashState, checkPrivateTransactionRule } from './send-cash.reducer'
 import { AddressBookRow } from '../address-book/address-book.reducer'
 import { RpcService } from '../../../service/rpc-service'
@@ -59,7 +60,8 @@ const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.
 			return SendCashActions.sendCashFail(checkRuleResult, false)
 		}
 
-		return SendCashActions.empty()
+    // Lock local Resistance node and Tor from toggling
+		return SystemInfoActions.newOperationTriggered()
 	}),
 	tap((action: AppAction) => {
 		// Only fire real send if no error above

@@ -525,6 +525,46 @@ export class RpcService {
   }
 
 	/**
+   * Request merge all mined coins operation.
+   *
+	 * @memberof RpcService
+	 */
+  mergeAllMinedCoins(zAddress: string) {
+    const command = getClientInstance().command('z_shieldcoinbase', '*', zAddress)
+    this::performMergeCoinsCommand(command)
+  }
+
+	/**
+   * Request merge all R-address coins operation.
+   *
+	 * @memberof RpcService
+	 */
+  mergeAllRAddressCoins(zAddress: string) {
+    const command = getClientInstance().command('z_mergetoaddress', ['ANY_TADDR'], zAddress)
+    this::performMergeCoinsCommand(command)
+  }
+
+	/**
+   * Request merge all Z-address coins operation.
+   *
+	 * @memberof RpcService
+	 */
+  mergeAllZAddressCoins(zAddress: string) {
+    const command = getClientInstance().command('z_mergetoaddress', ['ANY_ZADDR'], zAddress)
+    this::performMergeCoinsCommand(command)
+  }
+
+	/**
+   * Request merge all coins operation.
+   *
+	 * @memberof RpcService
+	 */
+  mergeAllCoins(zAddress: string) {
+    const command = getClientInstance().command('z_mergetoaddress', ['*'], zAddress)
+    this::performMergeCoinsCommand(command)
+  }
+
+	/**
    * Start polling.
    *
 	 * @memberof RpcService
@@ -819,4 +859,18 @@ function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise
     })
 
   return promise
+}
+
+/**
+ * Private method. Handles merge coins commands by dispatching success and failure messages.
+ *
+ * @param {Promise<any>} commandPromise Result of client.command
+ * @memberof RpcService
+ */
+function performMergeCoinsCommand(commandPromise: Promise<any>) {
+    commandPromise.then((result) => (
+      this.osService.dispatchAction(OwnAddressesActions.mergeCoinsOperationStarted(result.opid))
+    )).catch(err => (
+      this.osService.dispatchAction(OwnAddressesActions.mergeCoinsFailure(`Unable to start merge operation: ${err}`))
+    ))
 }

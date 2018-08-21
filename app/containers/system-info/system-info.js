@@ -35,6 +35,16 @@ class SystemInfo extends Component<Props> {
 	props: Props
 
 	/**
+	 * @param {*} prevProps
+	 * @memberof SystemInfo
+	 */
+  componentDidUpdate(prevProps) {
+    // Display operation completion message
+
+    // prevProps.systemInfo.operations !== this.props.settings.childProcessesStatus.NODE
+  }
+
+	/**
 	 * @memberof Settings
 	 */
   getLocalNodeStatusClassNames() {

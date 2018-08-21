@@ -39,7 +39,7 @@ class OperationsModal extends Component<Props> {
       <tr>
         <td>{operation.method}</td>
         <td>{operation.params.fromaddress}</td>
-        <td>{operation.params.amounts[0].address}</td>
+        <td>{operation.params.amounts && operation.params.amounts[0].address}</td>
         <td>{operation.status}</td>
         <td />
       </tr>
@@ -84,6 +84,14 @@ class OperationsModal extends Component<Props> {
         </div>
 
         <div className={styles.modalFooter}>
+          <button
+            className={styles.clearButton}
+            onClick={event => this.onClearCompletedClicked(event)}
+            onKeyDown={event => this.onClearCompletedClicked(event)}
+          >
+            Clear completed
+          </button>
+
           <button
             className={styles.closeButton}
             onClick={event => this.onCloseClicked(event)}
