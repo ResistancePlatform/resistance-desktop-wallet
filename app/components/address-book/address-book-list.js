@@ -1,10 +1,9 @@
 // @flow
 import React, { Component } from 'react'
-import { AddressBookRow, AddressBookActions } from '../../state/reducers/address-book/address-book.reducer'
+import { AddressBookRow } from '../../state/reducers/address-book/address-book.reducer'
 import styles from './address-book-list.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
-import { appStore } from '../../state/store/configureStore.dev';
 
 type Props = {
 	addresses: AddressBookRow[]
@@ -17,13 +16,6 @@ type Props = {
  */
 export default class AddressBookList extends Component<Props> {
 	props: Props
-
-	/**
-	 * @memberof AddressBookList
-	 */
-	componentDidMount() {
-		appStore.dispatch(AddressBookActions.loadAddressBook())
-	}
 
 	/**
 	 * @returns

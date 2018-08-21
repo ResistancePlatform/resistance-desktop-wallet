@@ -22,6 +22,7 @@ import { AddressBookReducer } from '../reducers/address-book/address-book.reduce
 import { AddressBookEpics } from '../reducers/address-book/address-book.epic'
 
 export const history = createHashHistory()
+
 const appReducers = combineReducers({
   toastr: toastrReducer,
   rpcPolling: RpcPollingReducer,
