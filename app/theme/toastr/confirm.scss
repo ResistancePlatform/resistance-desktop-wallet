@@ -1,3 +1,4 @@
+@import "../generic-component.scss";
 @import './variables.scss';
 
 .rrt-confirm-holder {
@@ -11,65 +12,46 @@
   .shadow {
     width: 100%;
     height: 100%;
-    background-color: rgba(50,58,68, .8);
+    background-color: rgba(255, 255, 255, 0.1);
   }
 
   .rrt-confirm {
-    width: 320px;
-    background-color: white;
+    min-width: 320px;
+    background: $BASE_COLOR_DARK_BLUE;
     position: absolute;
     z-index: 9;
-    top: 20%;
+    top: 40%;
     left: 50%;
     margin-left: -160px;
-    box-shadow: 3px 3px 20px #333;
-    border-radius: 4px;
+    border: 1.5px solid $BASE_COLOR_BODER_GRAY;
+    border-radius: 0.3rem;
     overflow: hidden;
+    padding: 0.6rem;
 
     .rrt-message {
       width: 100%;
-      padding: 5%;
+      padding: 0.4rem;
       min-height: 50px;
-      font-size: 1em;
-      background-color: white;
+      font-size: 0.9rem;
+      background: $BASE_COLOR_DARK_BLUE;
       text-align: center;
-      font-family: 'open-sanscondensed-light', sans-serif;
+      font-family: 'Quicksand', Arial, Helvetica, Helvetica Neue, serif;
       clear: both;
     }
 
     .rrt-buttons-holder {
       display: flex;
+      justify-content: flex-end;
 
       .rrt-button {
-        flex-grow: 1;
-        height: 50px;
-        text-transform: capitalize;
-        border: none;
-        background-color: transparent;
-        padding: 0;
-        margin: 0;
-        float: left;
-        border-top: 1px solid #f0f0f0;
-        font-size: 14px;
-        overflow: hidden;
-        cursor: pointer;
-
-        &:hover {
-          background-color: #f5f5f5;
-        }
+        min-width: 100px;
 
         &.rrt-ok-btn {
-          &:active {
-            background-color: $successBgColor;
-            color: white;
-          }
+          @include roundedButton(true);
         }
 
         &.rrt-cancel-btn {
-          &:active {
-            background-color: $errorBgColor;
-            color: white;
-          }
+          @include roundedButton(false);
         }
 
         &:focus {

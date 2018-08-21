@@ -78,8 +78,9 @@ class OwnAddresses extends Component<Props> {
     appStore.dispatch(PopupMenuActions.show(addressRowPopupMenuId, event.clientY, event.clientX, address))
   }
 
-  mergeAllMinedCoinsClicked() {
-    toastr.warning('mergeAllMinedCoinsClicked')
+  mergeAllMinedCoinsClicked(event, address) {
+    const confirmOptions = { onOk: () => appStore.dispatch(OwnAddressesActions.mergeAllMinedCoins(address)) }
+    toastr.confirm(`Are you sure want to merge all the mined coins?`, confirmOptions)
   }
 
   mergeAllTransparentAddressCoinsClicked() {
