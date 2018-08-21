@@ -4,6 +4,7 @@ import { EOL } from 'os'
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import classNames from 'classnames'
+import { toastr } from 'react-redux-toastr'
 
 import RpcPolling from '../../components/rpc-polling/rpc-polling'
 import { OSService } from '../../service/os-service'
@@ -35,17 +36,60 @@ class SystemInfo extends Component<Props> {
 	props: Props
 
 	/**
+   * Displays operation completion message
+   *
 	 * @param {*} prevProps
 	 * @memberof SystemInfo
 	 */
   componentDidUpdate(prevProps) {
-    // Display operation completion message
+    const prevOperationsMap = prevProps.systemInfo.operations.reduce((map, operation) => (
+      {...map, [operation.id]: operation}
+    ), {})
 
-    // prevProps.systemInfo.operations !== this.props.settings.childProcessesStatus.NODE
+    this.props.systemInfo.operations.forEach(currentOperation => {
+      const prevOperation = prevOperationsMap[currentOperation.id]
+
+      if (prevOperation && !['queued', 'executing'].includes(prevOperation.status)) {
+        return
+      }
+
+      const description = this.humanizeOperationDescription(currentOperation)
+
+      switch (currentOperation.status) {
+        case 'cancelled':
+          toastr.info(`${description} operation cancelled successfully.`)
+          break
+        case 'failed':
+          toastr.error(`${description} operation failed`, currentOperation.error.message)
+          break
+        case 'success':
+          toastr.success(`${description} operation succeeded.`)
+          break
+        default:
+      }
+
+    })
   }
 
 	/**
-	 * @memberof Settings
+	 * @memberof SystemInfo
+	 */
+  humanizeOperationDescription(operation) {
+    switch (operation.method) {
+      case 'z_sendmany':
+          return `Send cash`
+      case 'z_mergetoaddress':
+          return `Merge coins`
+      case 'z_shieldcoinbase':
+          return `Merge all mined coins`
+      default:
+    }
+
+    return operation.method
+  }
+
+	/**
+	 * @memberof SystemInfo
 	 */
   getLocalNodeStatusClassNames() {
     // TODO: Replace with ChildProcessStatusIcon component

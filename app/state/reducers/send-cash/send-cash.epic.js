@@ -65,7 +65,7 @@ const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.
 	}),
 	tap((action: AppAction) => {
 		// Only fire real send if no error above
-		if (action.type === SendCashActions.empty().type) {
+		if (action.type === SystemInfoActions.newOperationTriggered.toString()) {
 			const state = state$.value.sendCash
 
 			// Run in Async, `resistanceCliService` will update the state by firing one or more `updateSendOperationStatus()` action
