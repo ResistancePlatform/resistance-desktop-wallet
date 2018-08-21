@@ -29,6 +29,7 @@ export const defaultAppState: AppState = {
 			hashingPower: 0,
 			minedBlocksNumber: 0
 		},
+    isNewOperationTriggered: false,
     isOperationsModalOpen: false
 	},
 	overview: {

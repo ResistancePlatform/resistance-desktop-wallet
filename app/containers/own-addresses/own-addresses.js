@@ -145,7 +145,7 @@ class OwnAddresses extends Component<Props> {
 						<OwnAddressList addresses={this.props.ownAddresses.addresses} onAddressRowClicked={this.onAddressRowClicked} />
 
             <PopupMenu id={addressRowPopupMenuId}>
-              <PopupMenuItem onClick={() => this.mergeAllMinedCoinsClicked()}>
+              <PopupMenuItem onClick={(e, address) => this.mergeAllMinedCoinsClicked(e, address)}>
                 Merge all mined coins here
               </PopupMenuItem>
               <PopupMenuItem onClick={() => this.mergeAllTransparentAddressCoinsClicked()}>

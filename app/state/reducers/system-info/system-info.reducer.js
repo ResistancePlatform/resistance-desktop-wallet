@@ -20,6 +20,7 @@ export type SystemInfoState = {
     hashingPower: float,
     minedBlocksNumber: number
   },
+  isNewOperationTriggered: boolean,
   isOperationsModalOpen: boolean
 }
 
@@ -35,6 +36,7 @@ export const SystemInfoActions = createActions(
     GOT_BLOCKCHAIN_INFO: (blockchainInfo: BlockchainInfo) => ({ blockchainInfo }),
     GET_BLOCKCHAIN_INFO_FAILURE:  (errorMessage: string, code) => ({ errorMessage, code }),
 
+    NEW_OPERATION_TRIGGERED: undefined,
     GET_OPERATIONS: undefined,
     GOT_OPERATIONS: (operations: Operation[]) => ({ operations }),
     GET_OPERATIONS_FAILURE:  (errorMessage: string, code) => ({ errorMessage, code }),
@@ -60,8 +62,15 @@ export const SystemInfoReducer = handleActions(
     [SystemInfoActions.gotBlockchainInfo]: (state, action) => ({
       ...state, blockchainInfo: action.payload.blockchainInfo
     }),
+
+    [SystemInfoActions.newOperationTriggered]: state => ({
+      ...state, isNewOperationTriggered: true
+    }),
     [SystemInfoActions.gotOperations]: (state, action) => ({
-      ...state, operations: action.payload.operations
+      ...state, operations: action.payload.operations, isNewOperationTriggered: false
+    }),
+    [SystemInfoActions.getOperationsFailure]: state => ({
+      ...state, isNewOperationTriggered: false
     }),
 
     [SystemInfoActions.updateMinerInfo]: (state, action) => ({

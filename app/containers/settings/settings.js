@@ -8,12 +8,14 @@ import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
 import { appStore } from '../../state/store/configureStore'
+import { SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
 import { SettingsActions, SettingsState } from '../../state/reducers/settings/settings.reducer'
 import StatusModal from '../../components/settings/status-modal'
 
 const config = require('electron-settings')
 
 type Props = {
+  systemInfo: SystemInfoState,
 	settings: SettingsState
 }
 
@@ -58,7 +60,7 @@ class Settings extends Component<Props> {
   }
 
   getTorDisabledAttribute() {
-    return this.getIsChildProcessUpdating('NODE') || this.getIsChildProcessUpdating('TOR')
+    return this.getIsChildProcessUpdating('NODE') || this.getIsChildProcessUpdating('TOR') || this.checkPendingOperations()
   }
 
   getStartStopLocalNodeButtonLabel() {
@@ -129,6 +131,22 @@ class Settings extends Component<Props> {
 			default:
 		}
 	}
+
+	/**
+	 * @param {*} event
+	 * @memberof Settings
+	 */
+  checkPendingOperations() {
+    if (this.props.systemInfo.isNewOperationTriggered) {
+      return true
+    }
+
+    const result = this.props.systemInfo.operations.some(operation => (
+      ['queued', 'executing'].indexOf(operation.status) !== -1
+    ))
+
+    return result
+  }
 
 	/**
 	 * @param {*} event
@@ -237,7 +255,7 @@ class Settings extends Component<Props> {
 									className={styles.stopLocalNodeButton}
 									onClick={event => this.onStartStopLocalNodeClicked(event)}
 									onKeyDown={event => this.onStartStopLocalNodeClicked(event)}
-                  disabled={this.getIsChildProcessUpdating('NODE')}
+                  disabled={this.getIsChildProcessUpdating('NODE') || this.checkPendingOperations()}
 								>
                   {this.getStartStopLocalNodeButtonLabel()}
 								</button>
@@ -310,7 +328,8 @@ class Settings extends Component<Props> {
 }
 
 const mapStateToProps = state => ({
-	settings: state.settings,
+  systemInfo: state.systemInfo,
+	settings: state.settings
 })
 
 export default connect(mapStateToProps, null)(Settings)
