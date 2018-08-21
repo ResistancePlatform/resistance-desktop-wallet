@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { toastr } from 'react-redux-toastr'
 
 import RpcPolling from '../../components/rpc-polling/rpc-polling'
 import { PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.reducer'
@@ -78,6 +79,7 @@ class OwnAddresses extends Component<Props> {
   }
 
   mergeAllMinedCoinsClicked() {
+    toastr.warning('mergeAllMinedCoinsClicked')
   }
 
   mergeAllTransparentAddressCoinsClicked() {

@@ -43,9 +43,7 @@ export default class OwnAddressList extends Component<Props> {
       <div
         className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')}
         key={addressRow.address}
-        onClick={e => this.onRowClicked(e, addressRow.address)}
         onContextMenu={e => this.onRowClicked(e, addressRow.address)}
-        onKeyDown={() => { }}
       >
         <div className={styles.tableBodyRowColumnBalance} >{this.getBalanceValue(addressRow)}</div>
         <div className={styles.tableBodyRowColumnConfirmed}>{this.getConfirmValue(addressRow)}</div>

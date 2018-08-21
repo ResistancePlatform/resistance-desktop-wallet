@@ -3,7 +3,8 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
 
-import { PopupMenuState } from '../../state/reducers/popup-menu/popup-menu.reducer'
+import { appStore } from '../../state/store/configureStore'
+import { PopupMenuState, PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.reducer'
 
 import styles from './popup-menu.scss'
 
@@ -20,6 +21,38 @@ class PopupMenu extends Component<Props> {
     children: PropTypes.node.isRequired
   }
 
+	/**
+	 * @memberof PopupMenu
+	 */
+	componentDidMount() {
+    document.addEventListener('mousedown', e => this.handleOutsideClick(e))
+  }
+
+	/**
+	 * @memberof PopupMenu
+	 */
+	componentWillUnmount() {
+    document.removeEventListener('mousedown', e => this.handleOutsideClick(e))
+	}
+
+  handleOutsideClick(event) {
+    const props = this.props.popupMenu[this.props.id]
+
+    if (props && props.isVisible && !this.element.contains(event.target)) {
+      appStore.dispatch(PopupMenuActions.hide(this.props.id))
+    }
+  }
+
+	/**
+	 * @memberof PopupMenu
+	 */
+  elementRef(element) {
+    this.element = element
+  }
+
+	/**
+	 * @memberof PopupMenu
+	 */
   renderChildren() {
     const props = this.props.popupMenu[this.props.id]
 
@@ -29,6 +62,9 @@ class PopupMenu extends Component<Props> {
     }))
   }
 
+	/**
+	 * @memberof PopupMenu
+	 */
 	render() {
     const props = this.props.popupMenu[this.props.id]
 
@@ -46,6 +82,7 @@ class PopupMenu extends Component<Props> {
 			<div
 				className={styles.popupMenuContainer}
 				style={containerStyles}
+        ref={el => this.elementRef(el)}
 			>
         {this.renderChildren()}
 			</div>

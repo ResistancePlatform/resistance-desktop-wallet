@@ -2,7 +2,6 @@
 
 .popupMenuContainer {
     padding: 0.3rem 1.3rem;
-    width: $POPUP_MENU_CONTAINER_WIDTH;
     min-width: $POPUP_MENU_CONTAINER_WIDTH;
 
     position: absolute;
@@ -29,6 +28,8 @@
     &:hover {
         color: $BASE_COLOR_PURPLE;
     }
+
+    text-transform: uppercase;
 }
 
 .lastMenuItem {
