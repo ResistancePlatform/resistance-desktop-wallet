@@ -1,6 +1,7 @@
 @import "../../theme/generic-component.scss";
 @import "../../theme/vars.scss";
 @import "../../theme/modal-dialog.scss";
+@import "../../theme/table.scss";
 
 .operationsModal {
   @extend .modalDialog;
@@ -8,30 +9,29 @@
 
 .operationsModalBody {
   @extend .modalBody;
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-
-    td {
-      padding: 0.25rem;
-
-      div {
-        overflow: hidden;
-      }
-    }
-
-    tr {
-      border-bottom: 1.5px solid $BASE_COLOR_BODER_GRAY;
-    }
-
-    tr:last-child {
-      border-bottom: none;
-    }
-  }
+  padding: 6px;
 }
 
 .clearButton {
   @include roundedButton(false);
+}
+
+.tableColumnOperation {
+  width: 10%;
+}
+
+.tableColumnAmount {
+  width: 10%;
+}
+
+.tableColumnError {
+  width: 40%;
+}
+
+.tableColumnTriggered {
+  width: 20%;
+}
+
+.tableColumnStatus {
+  width: 10%;
 }
