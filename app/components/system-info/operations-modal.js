@@ -44,10 +44,10 @@ class OperationsModal extends Component<Props> {
         className={classNames(HLayout.hBoxContainer, styles.tableBodyRow)}
       >
         <div className={styles.tableColumnOperation} >{humanizeOperationDescription(operation)}</div>
-        <div className={styles.tableColumnAmount}>{operation.amounts && operation.amounts[0].amount}</div>
-        <div className={styles.tableColumnError} >{operation.error && operation.error.message}</div>
         <div className={styles.tableColumnTriggered} >{moment.unix(operation.creation_time).fromNow()}</div>
-        <div className={classNames(HLayout.hBoxChild, styles.tableColumnStatus)}>{operation.status}</div>
+        <div className={classNames(styles.tableColumnStatus)}><span className={classNames(styles.operationStatus, styles[operation.status])}>{operation.status}</span></div>
+        <div className={styles.tableColumnError} >{operation.error && operation.error.message}</div>
+        <div className={styles.tableColumnAmount}>{operation.amounts && operation.amounts[0].amount}</div>
       </div>
     ))
     return rows
@@ -58,12 +58,14 @@ class OperationsModal extends Component<Props> {
       <div className={styles.tableContainer}>
         <div className={classNames(HLayout.hBoxContainer, styles.tableHeader)}>
           <div className={styles.tableColumnOperation}>Operation</div>
-          <div className={styles.tableColumnAmount}>Amount</div>
-          <div className={styles.tableColumnError}>Error</div>
           <div className={styles.tableColumnTriggered}>Triggered</div>
-          <div className={classNames(HLayout.hBoxChild, styles.tableColumnStatus)}>Status</div>
+          <div className={styles.tableColumnStatus}>Status</div>
+          <div className={styles.tableColumnError}>Error</div>
+          <div className={styles.tableColumnAmount}>Amount</div>
         </div>
-        {this.getOperationRows()}
+        <div className={styles.tableRowsContainer}>
+          {this.getOperationRows()}
+        </div>
       </div>
     )
   }
@@ -83,7 +85,7 @@ class OperationsModal extends Component<Props> {
             onKeyDown={event => this.onCloseClicked(event)}
           />
           <div className={styles.titleText}>
-            Operations
+            Operations {this.props.systemInfo.operations.length ? `(${this.props.systemInfo.operations.length})`: ``}
           </div>
         </div>
 
@@ -92,7 +94,6 @@ class OperationsModal extends Component<Props> {
         </div>
 
         <div className={styles.modalFooter}>
-          {/*
           <button
             className={styles.clearButton}
             onClick={event => this.onClearCompletedClicked(event)}
@@ -100,7 +101,6 @@ class OperationsModal extends Component<Props> {
           >
             Clear completed
           </button>
-          */}
 
           <button
             className={styles.closeButton}

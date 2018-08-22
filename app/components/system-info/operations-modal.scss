@@ -16,8 +16,18 @@
   @include roundedButton(false);
 }
 
+.tableContainer {
+  height: 100%;
+}
+
+.tableRowsContainer {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  height: 100%;
+}
+
 .tableColumnOperation {
-  width: 20%;
+  width: 15%;
 }
 
 .tableColumnAmount {
@@ -25,13 +35,38 @@
 }
 
 .tableColumnError {
-  width: 30%;
+  width: 40%;
 }
 
 .tableColumnTriggered {
-  width: 20%;
+  width: 15%;
 }
 
 .tableColumnStatus {
   width: 10%;
+}
+
+.operationStatus {
+  border-radius: 2px;
+  padding: 2px 4px;
+
+  &.queued {
+    background-color: #009dd7;
+  }
+
+	&.executing {
+    background-color: #009dd7;
+  }
+
+	&.cancelled {
+    background-color: #f7a336;
+  }
+
+	&.failed {
+    background-color: #e20063;
+  }
+
+	&.success {
+    background-color: #00d492;
+  }
 }
