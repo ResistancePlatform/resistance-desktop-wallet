@@ -28,14 +28,13 @@ class OperationsModal extends Component<Props> {
     Modal.setAppElement('#App')
   }
 
-	eventConfirm(event) {
-		event.preventDefault()
-		event.stopPropagation()
-	}
+  onClearCompletedClicked() {
+    return false
+  }
 
-  onCloseClicked(event) {
-		this.eventConfirm(event)
+  onCloseClicked() {
 		appStore.dispatch(SystemInfoActions.closeOperationsModal())
+    return false
   }
 
   getOperationRows() {
@@ -102,6 +101,7 @@ class OperationsModal extends Component<Props> {
         </div>
 
         <div className={styles.modalFooter}>
+          {/*
           <button
             className={styles.clearButton}
             onClick={event => this.onClearCompletedClicked(event)}
@@ -109,6 +109,7 @@ class OperationsModal extends Component<Props> {
           >
             Clear completed
           </button>
+          */}
 
           <button
             className={styles.closeButton}
