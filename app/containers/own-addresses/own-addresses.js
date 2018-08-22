@@ -22,12 +22,27 @@ type Props = {
 	ownAddresses: OwnAddressesState
 }
 
+type State = {
+  isZAddressClicked: boolean
+}
+
 /**
  * @class OwnAddresses
  * @extends {Component<Props>}
  */
 class OwnAddresses extends Component<Props> {
 	props: Props
+  state: State
+
+	/**
+	 * @memberof OwnAddresses
+	 */
+  constructor(props) {
+    super(props)
+    this.state = {
+      isZAddressClicked: false
+    }
+  }
 
 	eventConfirm(event) {
 		event.preventDefault()
@@ -75,6 +90,7 @@ class OwnAddresses extends Component<Props> {
 	}
 
   onAddressRowClicked(event, address) {
+    this.setState({ isZAddressClicked: address.toLowerCase().startsWith('z')})
     appStore.dispatch(PopupMenuActions.show(addressRowPopupMenuId, event.clientY, event.clientX, address))
   }
 
@@ -147,12 +163,14 @@ class OwnAddresses extends Component<Props> {
 							</div>
 						</div>
 
-						<OwnAddressList addresses={this.props.ownAddresses.addresses} onAddressRowClicked={this.onAddressRowClicked} />
+            <OwnAddressList addresses={this.props.ownAddresses.addresses} onAddressRowClicked={(e, address) => this.onAddressRowClicked(e, address)} />
 
             <PopupMenu id={addressRowPopupMenuId}>
-              <PopupMenuItem onClick={(e, address) => this.mergeAllMinedCoinsClicked(e, address)}>
-                Merge all mined coins here
-              </PopupMenuItem>
+              {this.state.isZAddressClicked &&
+                <PopupMenuItem onClick={(e, address) => this.mergeAllMinedCoinsClicked(e, address)}>
+                  Merge all mined coins here
+                </PopupMenuItem>
+              }
               <PopupMenuItem onClick={(e, address) => this.mergeAllTransparentAddressCoinsClicked(e, address)}>
                 Merge all transparent address coins here
               </PopupMenuItem>

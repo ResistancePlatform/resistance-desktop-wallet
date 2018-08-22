@@ -17,7 +17,7 @@ $OWN_ADDRESS_LIST_COLUMN_ADDRESS_WIDTH: 60%;
     margin-bottom: 1.6rem;
 
     text-align: left;
-    
+
     font-size: 1.5rem;
     font-weight: 100;
     font-style: normal;
@@ -48,6 +48,8 @@ $OWN_ADDRESS_LIST_COLUMN_ADDRESS_WIDTH: 60%;
 
 
 .tableBodyRow {
+  cursor: default;
+
     div {
         padding: 0.8rem 0;
 

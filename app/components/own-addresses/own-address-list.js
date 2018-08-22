@@ -13,7 +13,11 @@ type Props = {
 export default class OwnAddressList extends Component<Props> {
 	props: Props
 
-	onRowClicked(event: any, address: string) {
+	onContextMenu(event: any, address: string) {
+    event.preventDefault()
+
+    window.getSelection().removeAllRanges()
+
 		if (this.props.onAddressRowClicked) {
 			this.props.onAddressRowClicked(event, address)
 		}
@@ -43,7 +47,7 @@ export default class OwnAddressList extends Component<Props> {
       <div
         className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')}
         key={addressRow.address}
-        onContextMenu={e => this.onRowClicked(e, addressRow.address)}
+        onContextMenu={e => this.onContextMenu(e, addressRow.address)}
       >
         <div className={styles.tableBodyRowColumnBalance} >{this.getBalanceValue(addressRow)}</div>
         <div className={styles.tableBodyRowColumnConfirmed}>{this.getConfirmValue(addressRow)}</div>
