@@ -39,7 +39,13 @@ class OperationsModal extends Component<Props> {
   }
 
   getOperationRows() {
-    const rows = this.props.systemInfo.operations.map(operation => (
+    const sortedOperations = this.props.systemInfo.operations.sort((first, second) => {
+      const isPending = operation => Number(['queued', 'executing'].includes(operation.status))
+      const priorityComparisonResult = isPending(first) - isPending(second)
+      return priorityComparisonResult !== 0 ? priorityComparisonResult : second.creation_time - first.creation_time
+    })
+
+    const rows = sortedOperations.map(operation => (
       <div
         className={classNames(HLayout.hBoxContainer, styles.tableBodyRow)}
       >
@@ -48,6 +54,7 @@ class OperationsModal extends Component<Props> {
         <div className={classNames(styles.tableColumnStatus)}><span className={classNames(styles.operationStatus, styles[operation.status])}>{operation.status}</span></div>
         <div className={styles.tableColumnError} >{operation.error && operation.error.message}</div>
         <div className={styles.tableColumnAmount}>{operation.amounts && operation.amounts[0].amount}</div>
+        <div className={styles.tableColumnFee}>{operation.params && operation.params.fee}</div>
       </div>
     ))
     return rows
@@ -62,6 +69,7 @@ class OperationsModal extends Component<Props> {
           <div className={styles.tableColumnStatus}>Status</div>
           <div className={styles.tableColumnError}>Error</div>
           <div className={styles.tableColumnAmount}>Amount</div>
+          <div className={styles.tableColumnFee}>Fee</div>
         </div>
         <div className={styles.tableRowsContainer}>
           {this.getOperationRows()}

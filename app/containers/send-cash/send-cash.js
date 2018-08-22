@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Subject, Observable, Subscription } from 'rxjs'
+import { Subject, Subscription } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import AddressDropdownPopupMenu from '../../components/send-cash/address-drodown-popup-menu'
