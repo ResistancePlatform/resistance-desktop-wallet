@@ -20,29 +20,32 @@ import { AddressBookRow } from '../state/reducers/address-book/address-book.redu
  * ES6 singleton
  */
 let instance = null
+let clientInstance = null
 
 /**
  * Create a new resistance client instance.
  */
 const getClientInstance = () => {
-	const nodeConfig = remote.getGlobal('resistanceNodeConfig')
-	let network
+  if (!clientInstance) {
+    const nodeConfig = remote.getGlobal('resistanceNodeConfig')
+    let network
 
-	if (nodeConfig.testnet) {
-		network = 'testnet'
-	} else if (nodeConfig.regtest) {
-		network = 'regtest'
-	}
+    if (nodeConfig.testnet) {
+      network = 'testnet'
+    } else if (nodeConfig.regtest) {
+      network = 'regtest'
+    }
 
-	const client = new Client({
-		network,
-		port: nodeConfig.rpcport,
-		username: nodeConfig.rpcuser,
-		password: nodeConfig.rpcpassword,
-		timeout: 500
-	})
+    clientInstance = new Client({
+      network,
+      port: nodeConfig.rpcport,
+      username: nodeConfig.rpcuser,
+      password: nodeConfig.rpcpassword,
+      timeout: 500
+    })
+  }
 
-	return client
+	return clientInstance
 }
 
 const pollingIntervalValues = {
@@ -233,33 +236,6 @@ export class RpcService {
   }
 
 	/**
-	 * @param {Client} client
-	 * @returns {Promise<any>}
-	 * @memberof RpcService
-	 */
-	getWalletPrivateAddresses(client: Client): Promise<any> {
-		return client.command([{ method: 'z_listaddresses' }])
-	}
-
-	/**
-	 * @param {Client} client
-	 * @returns {Promise<any>}
-	 * @memberof RpcService
-	 */
-	getWalletAllPublicAddresses(client: Client): Promise<any> {
-		return client.command([{ method: 'listreceivedbyaddress', parameters: [0, true] }])
-	}
-
-	/**
-	 * @param {Client} client
-	 * @returns {Promise<any>}
-	 * @memberof RpcService
-	 */
-	getWalletPublicAddressesWithUnspentOutputs(client: Client): Promise<any> {
-		return client.command([{ method: 'listunspent', parameters: [0] }])
-	}
-
-	/**
 	 * @param {boolean} [isPrivate]
 	 * @returns {Observable<any>}
 	 * @memberof RpcService
@@ -414,10 +390,11 @@ export class RpcService {
 	 */
 	getWalletAddressAndBalance(sortByGroupBalance?: boolean, disableThePrivateAddress?: boolean): Observable<any> {
 		const client = getClientInstance()
+
 		const promiseArr = [
-			this.getWalletAllPublicAddresses(client),
-			this.getWalletPublicAddressesWithUnspentOutputs(client),
-			this.getWalletPrivateAddresses(client)
+			this::getWalletAllPublicAddresses(client),
+			this::getWalletPublicAddressesWithUnspentOutputs(client),
+			this::getWalletPrivateAddresses(client)
 		]
 
 		const queryPromise = Promise.all(promiseArr)
@@ -517,7 +494,7 @@ export class RpcService {
 
 
 	/**
-   * Start getting own addresses with an interval.
+   * Request own addresses with balances.
    *
 	 * @memberof RpcService
 	 */
@@ -527,6 +504,64 @@ export class RpcService {
     }, err => {
       this.osService.dispatchAction(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
     })
+  }
+
+	/**
+   * Request known local node operations.
+   *
+	 * @memberof RpcService
+	 */
+  requestOperations() {
+		const client = getClientInstance()
+
+    client.command('z_listoperationids').then(operationIds => (
+      client.command('z_getoperationstatus', operationIds)
+    )).then(operations => {
+      this.osService.dispatchAction(SystemInfoActions.gotOperations(operations))
+      return Promise.resolve()
+    }).catch(err => (
+      this.osService.dispatchAction(SystemInfoActions.getOperationsFailure(`Unable to get operations: ${err}`, err.code))
+    ))
+  }
+
+	/**
+   * Request merge all mined coins operation.
+   *
+	 * @memberof RpcService
+	 */
+  mergeAllMinedCoins(zAddress: string) {
+    const command = getClientInstance().command('z_shieldcoinbase', '*', zAddress)
+    this::performMergeCoinsCommand(command)
+  }
+
+	/**
+   * Request merge all R-address coins operation.
+   *
+	 * @memberof RpcService
+	 */
+  mergeAllRAddressCoins(zAddress: string) {
+    const command = getClientInstance().command('z_mergetoaddress', ['ANY_TADDR'], zAddress)
+    this::performMergeCoinsCommand(command)
+  }
+
+	/**
+   * Request merge all Z-address coins operation.
+   *
+	 * @memberof RpcService
+	 */
+  mergeAllZAddressCoins(zAddress: string) {
+    const command = getClientInstance().command('z_mergetoaddress', ['ANY_ZADDR'], zAddress)
+    this::performMergeCoinsCommand(command)
+  }
+
+	/**
+   * Request merge all coins operation.
+   *
+	 * @memberof RpcService
+	 */
+  mergeAllCoins(zAddress: string) {
+    const command = getClientInstance().command('z_mergetoaddress', ['*'], zAddress)
+    this::performMergeCoinsCommand(command)
   }
 
 	/**
@@ -604,6 +639,33 @@ export class RpcService {
 }
 
 /* RPC Service private methods */
+
+/**
+ * @param {Client} client
+ * @returns {Promise<any>}
+ * @memberof RpcService
+ */
+function getWalletPrivateAddresses(client: Client): Promise<any> {
+  return client.command([{ method: 'z_listaddresses' }])
+}
+
+/**
+ * @param {Client} client
+ * @returns {Promise<any>}
+ * @memberof RpcService
+ */
+function getWalletAllPublicAddresses(client: Client): Promise<any> {
+  return client.command([{ method: 'listreceivedbyaddress', parameters: [0, true] }])
+}
+
+/**
+ * @param {Client} client
+ * @returns {Promise<any>}
+ * @memberof RpcService
+ */
+function getWalletPublicAddressesWithUnspentOutputs(client: Client): Promise<any> {
+  return client.command([{ method: 'listunspent', parameters: [0] }])
+}
 
 /**
  * Private method. Returns public transactions array.
@@ -797,4 +859,18 @@ function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise
     })
 
   return promise
+}
+
+/**
+ * Private method. Handles merge coins commands by dispatching success and failure messages.
+ *
+ * @param {Promise<any>} commandPromise Result of client.command
+ * @memberof RpcService
+ */
+function performMergeCoinsCommand(commandPromise: Promise<any>) {
+    commandPromise.then((result) => (
+      this.osService.dispatchAction(OwnAddressesActions.mergeCoinsOperationStarted(result.opid))
+    )).catch(err => (
+      this.osService.dispatchAction(OwnAddressesActions.mergeCoinsFailure(`Unable to start merge operation: ${err}`))
+    ))
 }

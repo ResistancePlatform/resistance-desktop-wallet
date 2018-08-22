@@ -1,0 +1,37 @@
+@import "../../theme/generic-component.scss";
+@import "../../theme/vars.scss";
+@import "../../theme/modal-dialog.scss";
+@import "../../theme/table.scss";
+
+.operationsModal {
+  @extend .modalDialog;
+}
+
+.operationsModalBody {
+  @extend .modalBody;
+  padding: 6px;
+}
+
+.clearButton {
+  @include roundedButton(false);
+}
+
+.tableColumnOperation {
+  width: 20%;
+}
+
+.tableColumnAmount {
+  width: 10%;
+}
+
+.tableColumnError {
+  width: 30%;
+}
+
+.tableColumnTriggered {
+  width: 20%;
+}
+
+.tableColumnStatus {
+  width: 10%;
+}

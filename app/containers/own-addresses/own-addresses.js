@@ -1,17 +1,22 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { toastr } from 'react-redux-toastr'
 
 import RpcPolling from '../../components/rpc-polling/rpc-polling'
+import { PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.reducer'
 import { OwnAddressesActions, OwnAddressesState } from '../../state/reducers/own-addresses/own-addresses.reducer'
 import { appStore } from '../../state/store/configureStore'
 import OwnAddressList from '../../components/own-addresses/own-address-list'
+import { PopupMenu, PopupMenuItem } from '../../components/popup-menu'
 import AddAddressPopupMenu from '../../components/own-addresses/add-address-popup-menu'
+
 import styles from './own-addresses.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
 const pollingInterval = 5.0
+const addressRowPopupMenuId = 'own-addresses-address-row-popup-menu-id'
 
 type Props = {
 	ownAddresses: OwnAddressesState
@@ -69,6 +74,30 @@ class OwnAddresses extends Component<Props> {
 		this.commonMenuItemEventHandler(event)
 	}
 
+  onAddressRowClicked(event, address) {
+    appStore.dispatch(PopupMenuActions.show(addressRowPopupMenuId, event.clientY, event.clientX, address))
+  }
+
+  mergeAllMinedCoinsClicked(event, address) {
+    const confirmOptions = { onOk: () => appStore.dispatch(OwnAddressesActions.mergeAllMinedCoins(address)) }
+    toastr.confirm(`Are you sure want to merge all the mined coins?`, confirmOptions)
+  }
+
+  mergeAllTransparentAddressCoinsClicked(event, address) {
+    const confirmOptions = { onOk: () => appStore.dispatch(OwnAddressesActions.mergeAllRAddressCoins(address)) }
+    toastr.confirm(`Are you sure want to merge all the transparent address coins?`, confirmOptions)
+  }
+
+  mergeAllPrivateAddressCoinsClicked(event, address) {
+    const confirmOptions = { onOk: () => appStore.dispatch(OwnAddressesActions.mergeAllZAddressCoins(address)) }
+    toastr.confirm(`Are you sure want to merge all the private address coins?`, confirmOptions)
+  }
+
+  mergeAllCoinsClicked(event, address) {
+    const confirmOptions = { onOk: () => appStore.dispatch(OwnAddressesActions.mergeAllCoins(address)) }
+    toastr.confirm(`Are you sure want to merge all the coins?`, confirmOptions)
+  }
+
 	/**
 	 * @returns
 	 * @memberof OwnAddresses
@@ -118,7 +147,22 @@ class OwnAddresses extends Component<Props> {
 							</div>
 						</div>
 
-						<OwnAddressList addresses={this.props.ownAddresses.addresses} />
+						<OwnAddressList addresses={this.props.ownAddresses.addresses} onAddressRowClicked={this.onAddressRowClicked} />
+
+            <PopupMenu id={addressRowPopupMenuId}>
+              <PopupMenuItem onClick={(e, address) => this.mergeAllMinedCoinsClicked(e, address)}>
+                Merge all mined coins here
+              </PopupMenuItem>
+              <PopupMenuItem onClick={(e, address) => this.mergeAllTransparentAddressCoinsClicked(e, address)}>
+                Merge all transparent address coins here
+              </PopupMenuItem>
+              <PopupMenuItem onClick={(e, address) => this.mergeAllPrivateAddressCoinsClicked(e, address)}>
+                Merge all private address coins here
+              </PopupMenuItem>
+              <PopupMenuItem onClick={(e, address) => this.mergeAllCoinsClicked(e, address)}>
+                Merge all coins here
+              </PopupMenuItem>
+            </PopupMenu>
 
 					</div>
 				</div>

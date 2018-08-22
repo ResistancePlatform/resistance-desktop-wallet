@@ -109,9 +109,27 @@ $SYSTEM_INFO_BAR_HEIGHT: 5.5rem;
 .customIconTor:before {
   content: "a";
 }
+
 .customIconMining:before {
   content: "b";
 }
+
 .customIconPrivacy:before {
   content: "c";
+}
+
+.customIconOperations:before {
+  content: "d";
+}
+
+.operationsIconHint {
+  color: white;
+  font-size: 0.5rem;
+  background-color: $SYSTEM_INFO_ICON_HINT_COLOR;
+  border-radius: 3px;
+  padding: 0 1px;
+  right: 58px;
+  top: 2px;
+  position: absolute;
+  cursor: default;
 }

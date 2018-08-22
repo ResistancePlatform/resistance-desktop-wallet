@@ -209,6 +209,8 @@
     "font-awesome": "^4.7.0",
     "generate-password": "^1.4.0",
     "history": "^4.7.2",
+    "momentjs": "^2.0.0",
+    "prop-types": "^15.6.2",
     "properties-reader": "^0.0.16",
     "ps-node": "^0.1.6",
     "react": "^16.4.0",
