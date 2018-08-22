@@ -36,6 +36,10 @@ class PopupMenu extends Component<Props> {
 	}
 
   handleOutsideClick(event) {
+    if (!this.element) {
+      return
+    }
+
     const props = this.props.popupMenu[this.props.id]
 
     if (props && props.isVisible && !this.element.contains(event.target)) {
@@ -56,7 +60,7 @@ class PopupMenu extends Component<Props> {
   renderChildren() {
     const props = this.props.popupMenu[this.props.id]
 
-    return React.Children.map(this.props.children, child => React.cloneElement(child, {
+    return React.Children.map(this.props.children, child => child && React.cloneElement(child, {
       id: this.props.id,
       data: props.data
     }))
