@@ -1,69 +1,13 @@
 @import "../../theme/generic-component.scss";
 @import "../../theme/vars.scss";
+@import "../../theme/modal-dialog.scss";
 
 .statusModal {
-  position: absolute;
-  padding: 0.6rem 0.6rem;
-  top: 13%;
-  left: 10%;
-  right: 10%;
-  bottom: 15%;
-  background: $BASE_COLOR_DARK_BLUE;
-  border: 1.5px solid $BASE_COLOR_BODER_GRAY;
-  border-radius: 0.3rem;
-
-  &:focus {
-    outline: none;
-  }
-
-}
-
-.modalOverlay {
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-@mixin modalToolbarButton {
-  -webkit-app-region: no-drag;
-  // display: inline-block;
-
-  width: 0.8rem;
-  height: 0.8rem;
-
-  margin-right: 1rem;
-  border-radius: 20rem;
-
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.8;
-  }
-}
-
-.modalTitle {
-  font-size: 0.7rem;
-  min-height: 1.5rem;
-
-  .closeButton {
-    @include modalToolbarButton();
-    background-color: $NAVI_BAR_TOOLBAR_BUTTON_CLOSE_COLOR;
-    float: left;
-  }
-
-  .titleText {
-    overflow: hidden;
-    text-align: center;
-    text-shadow: 1px 1px 3px #808080;
-  }
+  @extend .modalDialog;
 }
 
 .statusModalBody {
-  height: calc(100% - 6.2rem);
-  font-size: 0.9rem;
+  @extend .modalBody;
 
   table {
     width: 100%;
@@ -154,13 +98,9 @@
 }
 
 .statusModalFooter {
-  height: 2.2rem;
-  padding: 6px 12px;
-  position: absolute;
-  right: 0;
-  bottom: 0;
+  @extend .modalFooter;
 
-  button {
-    @include roundedButton(true);
+  .refreshButton {
+    @include roundedButton(false);
   }
 }

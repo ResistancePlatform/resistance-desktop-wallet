@@ -4,12 +4,15 @@ import { EOL } from 'os'
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import classNames from 'classnames'
+import { toastr } from 'react-redux-toastr'
 
 import RpcPolling from '../../components/rpc-polling/rpc-polling'
 import { OSService } from '../../service/os-service'
 import { SystemInfoActions, SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
 import { appStore } from '../../state/store/configureStore'
 import { AppState } from '../../state/reducers/appState'
+import OperationsModal from '../../components/system-info/operations-modal'
+import humanizeOperationDescription from '../../components/system-info/humanize-operation'
 
 import styles from './system-info.scss'
 import HLayout from '../../theme/h-box-layout.scss'
@@ -18,6 +21,7 @@ const osService = new OSService()
 
 const daemonInfoPollingInterval = 2.0
 const blockchainInfoPollingInterval = 4.0
+const operationsPollingInterval = 3.0
 
 type Props = {
 	systemInfo: SystemInfoState,
@@ -33,16 +37,43 @@ class SystemInfo extends Component<Props> {
 	props: Props
 
 	/**
-	 * @param {*} event
-	 * @memberof Settings
+   * Displays operation completion message
+   *
+	 * @param {*} prevProps
+	 * @memberof SystemInfo
 	 */
-	eventConfirm(event) {
-		event.preventDefault()
-		event.stopPropagation()
-	}
+  componentDidUpdate(prevProps) {
+    const prevOperationsMap = prevProps.systemInfo.operations.reduce((map, operation) => (
+      {...map, [operation.id]: operation}
+    ), {})
+
+    this.props.systemInfo.operations.forEach(currentOperation => {
+      const prevOperation = prevOperationsMap[currentOperation.id]
+
+      if (prevOperation && !['queued', 'executing'].includes(prevOperation.status)) {
+        return
+      }
+
+      const description = humanizeOperationDescription(currentOperation)
+
+      switch (currentOperation.status) {
+        case 'cancelled':
+          toastr.info(`${description} operation cancelled successfully.`)
+          break
+        case 'failed':
+          toastr.error(`${description} operation failed`, currentOperation.error && currentOperation.error.message)
+          break
+        case 'success':
+          toastr.success(`${description} operation succeeded.`)
+          break
+        default:
+      }
+
+    })
+  }
 
 	/**
-	 * @memberof Settings
+	 * @memberof SystemInfo
 	 */
   getLocalNodeStatusClassNames() {
     // TODO: Replace with ChildProcessStatusIcon component
@@ -68,14 +99,14 @@ class SystemInfo extends Component<Props> {
     return osService.getOS() === 'windows' ? 'Wallet in Explorer' : 'Wallet in Finder';
   }
 
-  onWalletInFileManagerClicked(event) {
-    this.eventConfirm(event)
+  onWalletInFileManagerClicked() {
     appStore.dispatch(SystemInfoActions.openWalletInFileManager())
+    return false
   }
 
-  onInstallationFolderClicked(event) {
-    this.eventConfirm(event)
+  onInstallationFolderClicked() {
     appStore.dispatch(SystemInfoActions.openInstallationFolder())
+    return false
   }
 
 	displayLastBlockTime(tempDate: Date | null) {
@@ -112,6 +143,52 @@ class SystemInfo extends Component<Props> {
     return tooltip
   }
 
+  getOperationsCount(...args) {
+    const operationsCount = this.props.systemInfo.operations.reduce((counter, operation) => (
+      counter + (args.indexOf(operation.status) === -1 ? 0 : 1)
+    ), 0)
+    return operationsCount
+  }
+
+  getOperationIconHint() {
+    let iconHint
+    const pendingNumber = this.getOperationsCount('queued', 'executing')
+
+    if (pendingNumber) {
+      iconHint = (
+        <span
+          className={styles.operationsIconHint}
+          title={this.getOperationsIconTitle()}
+          onClick={e => this.onOperationsIconClicked(e)}
+          onKeyDown={e => this.onOperationsIconClicked(e)}
+        >
+          {pendingNumber}
+        </span>
+      )
+    }
+    return iconHint
+  }
+
+  getOperationsIconTitle() {
+    if (!this.props.systemInfo.operations.length) {
+      return 'No pending operations.'
+    }
+
+    let failed = ''
+    const failedNumber = this.getOperationsCount('failed')
+
+    if (failedNumber) {
+      failed = `, ${failedNumber}`
+    }
+
+    return `${this.getOperationsCount('queued', 'executing')} pending, ${this.getOperationsCount('success')} complete${failed} operations.`
+  }
+
+  onOperationsIconClicked() {
+    appStore.dispatch(SystemInfoActions.openOperationsModal())
+    return false
+  }
+
 	/**
 	 * @returns
 	 * @memberof SystemInfo
@@ -127,12 +204,22 @@ class SystemInfo extends Component<Props> {
             failure: SystemInfoActions.getDaemonInfoFailure
           }}
         />
+
         <RpcPolling
           interval={blockchainInfoPollingInterval}
           actions={{
             polling: SystemInfoActions.getBlockchainInfo,
             success: SystemInfoActions.gotBlockchainInfo,
             failure: SystemInfoActions.getBlockchainInfoFailure
+          }}
+        />
+
+        <RpcPolling
+          interval={operationsPollingInterval}
+          actions={{
+            polling: SystemInfoActions.getOperations,
+            success: SystemInfoActions.gotOperations,
+            failure: SystemInfoActions.getOperationsFailure
           }}
         />
 
@@ -193,6 +280,14 @@ class SystemInfo extends Component<Props> {
 
         <div className={styles.statusCustomIconsContainer}>
           <i
+            className={classNames(styles.customIconOperations, styles.statusIcon, { [styles.active]: this.props.systemInfo.operations.length })}
+            title={this.getOperationsIconTitle()}
+            onClick={e => this.onOperationsIconClicked(e)}
+            onKeyDown={e => this.onOperationsIconClicked(e)}
+          />
+          {this.getOperationIconHint()}
+
+          <i
             className={classNames(styles.customIconMining, styles.statusIcon, { [styles.active]: this.props.settings.childProcessesStatus.MINER === 'RUNNING' })}
             title={this.getMinerStatusIconTitle()}
           />
@@ -204,6 +299,8 @@ class SystemInfo extends Component<Props> {
             className={classNames(styles.customIconTor, styles.statusIcon, { [styles.active]: this.props.settings.childProcessesStatus.TOR === 'RUNNING' })}
             title={`Tor status: ${this.props.settings.childProcessesStatus.TOR}`}
           />
+
+          <OperationsModal />
         </div>
 
 			</div>

@@ -13,6 +13,7 @@ export const defaultAppState: AppState = {
     registeredActions: [],
     actionsResponseReceived: {}
   },
+  popupMenu: {},
 	navi: {
 		currentNaviPath: '/overview'
 	},
@@ -23,10 +24,13 @@ export const defaultAppState: AppState = {
 			blockchainSynchronizedPercentage: 0,
 			lastBlockDate: null
 		},
+    operations: [],
 		miner: {
 			hashingPower: 0,
 			minedBlocksNumber: 0
-		}
+		},
+    isNewOperationTriggered: false,
+    isOperationsModalOpen: false
 	},
 	overview: {
 		balances: {
