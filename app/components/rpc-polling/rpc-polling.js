@@ -50,10 +50,13 @@ class RpcPolling extends Component<Props> {
 	 * @param {*} prevProps
 	 * @memberof RpcPolling
 	 */
-  componentDidUpdate(prevProps) {
-    const isNodeStatusChanged = prevProps.settings.childProcessesStatus.NODE !== this.props.settings.childProcessesStatus.NODE
+  componentDidUpdate() {
+    const isNodeRunning = this.props.settings.childProcessesStatus.NODE === 'RUNNING'
 
-    if (isNodeStatusChanged && this.isActionQueued) {
+    /**
+     * Resend mechanism: If already got queued action and `NODE` status is `RUNNING`, then resend the polling action immediate
+     */
+    if (isNodeRunning && this.isActionQueued) {
       this.dispatchActionIfNodeReady()
     }
   }
