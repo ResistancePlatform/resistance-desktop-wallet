@@ -1,6 +1,8 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { Subject, Observable, Subscription } from 'rxjs'
+import { debounceTime } from 'rxjs/operators'
 import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import AddressDropdownPopupMenu from '../../components/send-cash/address-drodown-popup-menu'
 import { SendCashActions, SendCashState } from '../../state/reducers/send-cash/send-cash.reducer'
@@ -23,6 +25,9 @@ class SendCash extends Component<Props> {
 	toAddressInputDomRef: any
 	amountInputDomRef: any
 
+	destAddressValueChangeSubject: Subject<any>
+	destAddressValueChangeSubscription: Subscription
+
 	constructor(props) {
 		super(props)
 
@@ -30,6 +35,8 @@ class SendCash extends Component<Props> {
 		this.fromAddressDomRef = (element) => { this.fromAddressInputDomRef = element };
 		this.toAddressDomRef = (element) => { this.toAddressInputDomRef = element };
 		this.amountAddressDomRef = (element) => { this.amountInputDomRef = element };
+
+		this.destAddressValueChangeSubject = new Subject()
 	}
 
 	/**
@@ -46,12 +53,33 @@ class SendCash extends Component<Props> {
 		this.fromAddressInputDomRef.inputDomRef.current.value = currentSendCashState.fromAddress
 		this.toAddressInputDomRef.inputDomRef.current.value = currentSendCashState.toAddress
 		this.amountInputDomRef.inputDomRef.current.value = currentSendCashState.amount
+
+		// Setup destination address input debounce stream
+		this.destAddressValueChangeSubscription = this.destAddressValueChangeSubject
+			.asObservable()
+			.pipe(
+				debounceTime(300)
+			)
+			.subscribe(() => {
+				appStore.dispatch(SendCashActions.checkAddressBookByName())
+
+				// Just a workaround at this moment!!!
+				setTimeout(() => {
+					const latestAppState = appStore.getState()
+					this.toAddressInputDomRef.inputDomRef.current.value = latestAppState.sendCash.toAddress
+				}, 250);
+			})
 	}
 
 	/**
 	 * @memberof SendCash
 	 */
-	componentWillUnmount() { }
+	componentWillUnmount() {
+		if (this.destAddressValueChangeSubscription) {
+			this.destAddressValueChangeSubscription.unsubscribe();
+			this.destAddressValueChangeSubscription = null;
+		}
+	}
 
 	eventConfirm(event) {
 		event.preventDefault()
@@ -102,16 +130,7 @@ class SendCash extends Component<Props> {
 
 	onDestAddressInputChanged(value) {
 		appStore.dispatch(SendCashActions.updateToAddress(value))
-	}
-
-	onDestAddressEnterPressed() {
-		appStore.dispatch(SendCashActions.checkAddressBookByName())
-
-		// Just a workaround at this moment!!!
-		setTimeout(() => {
-			const currentAppState = appStore.getState()
-			this.toAddressInputDomRef.inputDomRef.current.value = currentAppState.sendCash.toAddress
-		}, 250);
+		this.destAddressValueChangeSubject.next()
 	}
 
 	onAmountAddressInputChanged(value) {
@@ -267,7 +286,6 @@ class SendCash extends Component<Props> {
 							enableTooltips="true"
 							tooltipsContent={this.props.sendCash.inputTooltips}
 							onInputChange={value => this.onDestAddressInputChanged(value)}
-							onEnterPressed={() => this.onDestAddressEnterPressed()}
 							ref={this.toAddressDomRef}
 						/>
 
