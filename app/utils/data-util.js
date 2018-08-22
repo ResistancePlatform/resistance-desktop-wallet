@@ -1,5 +1,5 @@
 /**
- * @param {*} date 
+ * @param {*} date
  */
 export const getFormattedDateString = (date: Date) => {
     const year = date.getFullYear().toString()
@@ -19,7 +19,7 @@ export const getFormattedDateString = (date: Date) => {
 }
 
 /**
- * @param {*} value 
+ * @param {*} value
  */
 export const getTransactionDirection = (value: string) => {
     if (value === 'receive') return 'In'
@@ -31,21 +31,12 @@ export const getTransactionDirection = (value: string) => {
 }
 
 /**
- * @param {*} value 
+ * @param {*} value
  */
 export const getTransactionConfirmed = (value: number) => (value !== 0 ? 'Yes' : 'No')
 
 /**
- * @param {*} value 
- * @param {*} digits 
- */
-export const getTransactionAmount = (value: number | string, digits?: number) => {
-    const tempFloat = typeof value === 'string' ? parseFloat(value).toFixed(digits ? digits : 2) : value.toFixed(digits ? digits : 2)
-    return tempFloat.startsWith('-') ? tempFloat.substring(1) : tempFloat
-}
-
-/**
- * @param {*} value 
+ * @param {*} value
  */
 export const getTransactionDate = (value: number) => {
     const tempDate = new Date(value * 1000)

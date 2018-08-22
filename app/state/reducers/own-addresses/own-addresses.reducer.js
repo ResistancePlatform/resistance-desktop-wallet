@@ -1,9 +1,10 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import { createActions, handleActions } from 'redux-actions'
 import { defaultAppState } from '../default-app-state'
 
 export type AddressRow = {
-	balance: number,
+	balance: Decimal | null,
 	confirmed: boolean,
 	address: string
 }

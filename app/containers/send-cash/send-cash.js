@@ -1,12 +1,16 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Subject, Subscription } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
+
+import { TRANSACTION_FEE } from '../../constants'
+import { appStore } from '../../state/store/configureStore'
 import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import AddressDropdownPopupMenu from '../../components/send-cash/address-drodown-popup-menu'
 import { SendCashActions, SendCashState } from '../../state/reducers/send-cash/send-cash.reducer'
-import { appStore } from '../../state/store/configureStore'
+
 import styles from './send-cash.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
@@ -47,12 +51,12 @@ class SendCash extends Component<Props> {
 		const currentSendCashState = currentAppState && currentAppState.sendCash ? currentAppState.sendCash : {
 			fromAddress: '',
 			toAddress: '',
-			amount: 0
+			amount: Decimal('0')
 		}
 
 		this.fromAddressInputDomRef.inputDomRef.current.value = currentSendCashState.fromAddress
 		this.toAddressInputDomRef.inputDomRef.current.value = currentSendCashState.toAddress
-		this.amountInputDomRef.inputDomRef.current.value = currentSendCashState.amount
+		this.amountInputDomRef.inputDomRef.current.value = currentSendCashState.amount.toString()
 
 		// Setup destination address input debounce stream
 		this.destAddressValueChangeSubscription = this.destAddressValueChangeSubject
@@ -134,7 +138,7 @@ class SendCash extends Component<Props> {
 	}
 
 	onAmountAddressInputChanged(value) {
-		appStore.dispatch(SendCashActions.updateAmount(parseFloat(value)))
+		appStore.dispatch(SendCashActions.updateAmount(Decimal(value)))
 	}
 
 	onSendButtonClicked(event) {
@@ -302,7 +306,7 @@ class SendCash extends Component<Props> {
 							/>
 							<div className={styles.transactionFeeContainer}>
 								<span className={styles.part1}>TRANSACTION FEE: </span>
-								<span className={styles.part2}>0.0001</span>
+								<span className={styles.part2}>{TRANSACTION_FEE.toString()}</span>
 								<span className={styles.part3}>RES</span>
 							</div>
 						</div>

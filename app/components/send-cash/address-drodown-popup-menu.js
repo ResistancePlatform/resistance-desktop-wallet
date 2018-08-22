@@ -1,6 +1,9 @@
 // @flow
 import React, { Component } from 'react'
+
+import { truncateAmount } from '../../constants'
 import { AddressDropdownItem } from '../../state/reducers/send-cash/send-cash.reducer'
+
 import styles from './address-drodown-popup-menu.scss'
 
 type Props = {
@@ -32,12 +35,6 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 		return isTheLastGroupItem ? styles.groupLastItem : ''
 	}
 
-	getBalanceDisplay(tempAddressItem: AddressDropdownItem) {
-		if (!tempAddressItem || tempAddressItem.balance === null || tempAddressItem.balance === undefined) return `0 RES`
-
-		return tempAddressItem.balance === -1 ? `ERROR` : `${tempAddressItem.balance.toFixed(2)} RES`
-	}
-
 	renderAddressItems() {
 		if (!this.props.addressList ||
 			!Array.isArray(this.props.addressList) ||
@@ -66,7 +63,7 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 			>
 				<div className={styles.itemRowAddress}>{addressItem.address}</div>
 				<div className={styles.itemRowBalance}>
-					{this.getBalanceDisplay(addressItem)}
+					{addressItem.balance === null ? 'ERROR' : `${truncateAmount(addressItem.balance)} RES`}
 				</div>
 			</div>
 		))

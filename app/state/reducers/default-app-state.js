@@ -1,3 +1,4 @@
+import { Decimal } from 'decimal.js'
 import { OSService } from '../../service/os-service'
 
 const config = require('electron-settings')
@@ -34,12 +35,12 @@ export const defaultAppState: AppState = {
 	},
 	overview: {
 		balances: {
-			transparentBalance: 0,
-			transparentUnconfirmedBalance: 0,
-			privateBalance: 0,
-			privateUnconfirmedBalance: 0,
-			totalBalance: 0,
-			totalUnconfirmedBalance: 0
+			transparentBalance: Decimal('0'),
+			transparentUnconfirmedBalance: Decimal('0'),
+			privateBalance: Decimal('0'),
+			privateUnconfirmedBalance: Decimal('0'),
+			totalBalance: Decimal('0'),
+			totalUnconfirmedBalance: Decimal('0')
 		},
 		transactions: [],
 		popupMenu: {
@@ -61,7 +62,7 @@ export const defaultAppState: AppState = {
 		fromAddress: '',
 		toAddress: '',
 		inputTooltips: '',
-		amount: 0,
+		amount: Decimal('0'),
 		currentOperation: null,
 		showDropdownMenu: false,
 		sendFromRadioButtonType: 'transparent',

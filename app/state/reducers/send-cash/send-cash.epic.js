@@ -4,6 +4,7 @@ import { merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
+import { TRANSACTION_FEE } from '../../../constants'
 import { AppAction } from '../appAction'
 import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { SendCashActions, SendCashState, checkPrivateTransactionRule } from './send-cash.reducer'
@@ -34,7 +35,7 @@ const allowToSend = (sendCashState: SendCashState) => {
 		sendCashState.fromAddress.trim() === sendCashState.toAddress.trim()
 	) {
 		return '"FROM ADDRESS" or "DESTINATION ADDRESS" cannot be the same.'
-	} else if (sendCashState.amount <= 0.0001) {
+	} else if (sendCashState.amount <= TRANSACTION_FEE) {
 		return '"AMOUNT" is required.'
 	}
 
