@@ -10,7 +10,8 @@ export type AddressBookRow = {
 export type AddressBookState = {
   addresses?: AddressBookRow[],
   showDropdownMenu?: boolean,
-  newAddressDialog: {
+  updatingAddress?: AddressBookRow | null,
+  addressDialog: {
     name: string,
     address: string
   } | null
@@ -24,8 +25,10 @@ export const AddressBookActions = createActions(
     GOT_ADDRESS_BOOK: (addresses: AddressBookRow[]) => addresses,
 
     ADD_ADDRESS: undefined,
-    REMOVE_ADDRESS: (addressToRemove: AddressRow) => addressToRemove,
+    UPDATE_ADDRESS: undefined,
+    EDIT_ADDRESS: (addressToUpdate: AddressRow) => addressToUpdate,
     COPY_ADDRESS: (addressToCopy: AddressRow) => addressToCopy,
+    REMOVE_ADDRESS: (addressToRemove: AddressRow) => addressToRemove,
 
     UPDATE_DROPDOWN_MENU_VISIBILITY: (show: boolean) => ({ show }),
 
@@ -39,6 +42,8 @@ export const AddressBookActions = createActions(
   }
 )
 
+const getAddressDialogState = (state: AddressBookState) => state.updatingAddress ? state.updatingAddress : ({ name: '', address: '' })
+
 export const AddressBookReducer = handleActions(
   {
     [AddressBookActions.gotAddressBook]: (state, action) => ({
@@ -48,16 +53,21 @@ export const AddressBookReducer = handleActions(
       ...state, showDropdownMenu: action.payload.show
     }),
     [AddressBookActions.updateNewAddressDialogVisibility]: (state, action) => ({
-      ...state, newAddressDialog: action.payload ? { name: '', address: '' } : null
+      ...state,
+      addressDialog: action.payload ? getAddressDialogState(state) : null,
+      updatingAddress : action.payload ? state.updatingAddress : null
     }),
     [AddressBookActions.updateNewAddressDialogName]: (state, action) => ({
       ...state,
-      newAddressDialog: state.newAddressDialog ?
-        { name: action.payload, address: state.newAddressDialog.address } : { name: action.payload, address: '' }
+      addressDialog: state.addressDialog ?
+        { name: action.payload, address: state.addressDialog.address } : { name: action.payload, address: '' }
     }),
     [AddressBookActions.updateNewAddressDialogAddress]: (state, action) => ({
       ...state,
-      newAddressDialog: state.newAddressDialog ?
-        { name: state.newAddressDialog.name, address: action.payload } : { name: '', address: action.payload }
-    })
+      addressDialog: state.addressDialog ?
+        { name: state.addressDialog.name, address: action.payload } : { name: '', address: action.payload }
+    }),
+    [AddressBookActions.editAddress]: (state, action) => ({
+      ...state, updatingAddress: action.payload
+    }),
   }, defaultAppState)

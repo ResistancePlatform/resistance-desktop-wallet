@@ -43,17 +43,22 @@ class AddressBook extends Component<Props> {
 	 */
 	componentDidMount() {
 		appStore.dispatch(AddressBookActions.loadAddressBook())
+		this.updateAddressDialogFromExistsState()
+	}
 
+	/**
+	 * @memberof AddressBook
+	 */
+	updateAddressDialogFromExistsState() {
 		const currentAppState = appStore.getState()
 		const dialogState = currentAppState &&
 			currentAppState.addressBook &&
-			currentAppState.addressBook.newAddressDialog ? currentAppState.addressBook.newAddressDialog : null
+			currentAppState.addressBook.addressDialog ? currentAppState.addressBook.addressDialog : null
 
 		if (dialogState) {
 			this.nameInputDomRef.inputDomRef.current.value = dialogState.name
 			this.addressInputDomRef.inputDomRef.current.value = dialogState.address
 		}
-
 	}
 
 	/**
@@ -118,7 +123,7 @@ class AddressBook extends Component<Props> {
 		// Just a workaround at this moment!!!
 		setTimeout(() => {
 			const currentAppState = appStore.getState()
-			this.addressInputDomRef.inputDomRef.current.value = currentAppState.addressBook.newAddressDialog.address
+			this.addressInputDomRef.inputDomRef.current.value = currentAppState.addressBook.addressDialog.address
 		}, 100);
 	}
 
@@ -140,11 +145,31 @@ class AddressBook extends Component<Props> {
 
 	/**
 	 * @param {*} event
+	 */
+	onUpdateButtonClicked(event) {
+		this.eventConfirm(event)
+		appStore.dispatch(AddressBookActions.updateAddress())
+	}
+
+	/**
+	 * @param {*} event
 	 * @param {AddressBookRow} addressBookRow
 	 * @memberof AddressBook
 	 */
 	onAddressRowClicked(event, addressBookRow: AddressBookRow) {
 		appStore.dispatch(PopupMenuActions.show(addressBookPopupMenuId, event.clientY, event.clientX, addressBookRow))
+	}
+
+	/**
+	 * @param {*} event
+	 * @param {AddressBookRow} addressBookRow
+	 * @memberof AddressBook
+	 */
+	updateAddressClicked(event, addressBookRow: AddressBookRow) {
+		appStore.dispatch(AddressBookActions.editAddress(addressBookRow))
+		appStore.dispatch(AddressBookActions.updateNewAddressDialogVisibility(true))
+
+		setTimeout(() => this.updateAddressDialogFromExistsState(), 200)
 	}
 
 	/**
@@ -169,7 +194,7 @@ class AddressBook extends Component<Props> {
 	/**
 	 */
 	renderNewAddressDialog() {
-		if (!this.props.addressBook.newAddressDialog) return null
+		if (!this.props.addressBook.addressDialog) return null
 
 		const nameAddon: RoundedInputAddon = {
 			enable: false,
@@ -183,6 +208,24 @@ class AddressBook extends Component<Props> {
 			type: 'PASTE',
 			onAddonClicked: () => this.onAddressPasteClicked()
 		}
+
+		const isInUpdateMode = this.props.addressBook.updatingAddress
+
+		const confirmButton = isInUpdateMode ? (
+			<button
+				className={styles.addButton}
+				onClick={(event) => this.onUpdateButtonClicked(event)}
+				onKeyDown={() => { }}
+			>UPDATE
+			</button>
+		) : (
+			<button
+					className={styles.addButton}
+					onClick={(event) => this.onAddButtonClicked(event)}
+					onKeyDown={() => { }}
+				>ADD
+			</button>
+			)
 
 		return (
 			<div className={styles.newAddressContainer}>
@@ -222,12 +265,7 @@ class AddressBook extends Component<Props> {
 						onKeyDown={() => { }}
 					>CANCEL
 					</button>
-					<button
-						className={styles.addButton}
-						onClick={(event) => this.onAddButtonClicked(event)}
-						onKeyDown={() => { }}
-					>ADD
-					</button>
+					{confirmButton}
 				</div>
 			</div>
 		)
@@ -263,6 +301,7 @@ class AddressBook extends Component<Props> {
 				<AddressBookList addresses={this.props.addressBook.addresses} onRowClicked={(e, addressBookRow) => this.onAddressRowClicked(e, addressBookRow)} />
 
 				<PopupMenu id={addressBookPopupMenuId}>
+					<PopupMenuItem onClick={(e, address) => this.updateAddressClicked(e, address)}>Update Address</PopupMenuItem>
 					<PopupMenuItem onClick={(e, address) => this.copyAddressClicked(e, address)}>Copy Address</PopupMenuItem>
 					<PopupMenuItem onClick={(e, address) => this.removeAddressClicked(e, address)}>Remove Address</PopupMenuItem>
 				</PopupMenu>

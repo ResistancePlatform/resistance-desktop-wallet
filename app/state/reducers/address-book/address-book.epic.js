@@ -24,9 +24,21 @@ const addAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe
 	ofType(AddressBookActions.addAddress),
 	switchMap(() => {
 		const addressBookState = state$.value.addressBook
-		const newAddressDialogState = addressBookState.newAddressDialog
+		const newAddressDialogState = addressBookState.addressDialog
 		const newAddress = { name: newAddressDialogState.name, address: newAddressDialogState.address }
 		return addressBookService.addAddress(addressBookState.addresses, newAddress)
+	}),
+	mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.updateNewAddressDialogVisibility(false)))
+)
+
+const updateAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+	ofType(AddressBookActions.updateAddress),
+	switchMap(() => {
+		const addressBookState = state$.value.addressBook
+		const newAddressDialogState = addressBookState.addressDialog
+		const udpatingAddress = addressBookState.updatingAddress
+		const newValueAddress = { name: newAddressDialogState.name, address: newAddressDialogState.address }
+		return addressBookService.updateAddress(addressBookState.addresses, udpatingAddress, newValueAddress)
 	}),
 	mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.updateNewAddressDialogVisibility(false)))
 )
@@ -53,4 +65,5 @@ export const AddressBookEpics = (action$, state$) => merge(
 	addAddressEpic(action$, state$),
 	copyAddressEpic(action$, state$),
 	removeAddressEpic(action$, state$),
+	updateAddressEpic(action$, state$)
 )
