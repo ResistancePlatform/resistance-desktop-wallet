@@ -1,14 +1,18 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { toastr } from 'react-redux-toastr'
 import { AddressBookActions, AddressBookState, AddressBookRow } from '../../state/reducers/address-book/address-book.reducer'
+import { PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.reducer'
 import { appStore } from '../../state/store/configureStore'
 import AddressBookList from '../../components/address-book/address-book-list'
 import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
+import { PopupMenu, PopupMenuItem } from '../../components/popup-menu'
 import styles from './address-book.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
+const addressBookPopupMenuId = 'address-book-row-popup-menu-id'
 
 type Props = {
 	addressBook: AddressBookState
@@ -92,27 +96,6 @@ class AddressBook extends Component<Props> {
 	}
 
 	/**
-	 * @param {*} event
-	 * @param {string} action
-	 * @param {AddressBookRow} addressRow
-	 */
-	onAddressHandler(event, action: string, addressRow: AddressBookRow) {
-		this.commonMenuItemEventHandler(event)
-		switch (action) {
-			case 'remove':
-				appStore.dispatch(AddressBookActions.removeAddress(addressRow))
-				break
-
-			case 'copy':
-				appStore.dispatch(AddressBookActions.copyAddress(addressRow))
-				break
-
-			default:
-				break
-		}
-	}
-
-	/**
 	 * @param {*} value
 	 */
 	onNameInputChanged(value) {
@@ -153,6 +136,34 @@ class AddressBook extends Component<Props> {
 	onAddButtonClicked(event) {
 		this.eventConfirm(event)
 		appStore.dispatch(AddressBookActions.addAddress())
+	}
+
+	/**
+	 * @param {*} event
+	 * @param {AddressBookRow} addressBookRow
+	 * @memberof AddressBook
+	 */
+	onAddressRowClicked(event, addressBookRow: AddressBookRow) {
+		appStore.dispatch(PopupMenuActions.show(addressBookPopupMenuId, event.clientY, event.clientX, addressBookRow))
+	}
+
+	/**
+	 * @param {*} event
+	 * @param {AddressBookRow} addressBookRow
+	 * @memberof AddressBook
+	 */
+	copyAddressClicked(event, addressBookRow: AddressBookRow) {
+		appStore.dispatch(AddressBookActions.copyAddress(addressBookRow))
+	}
+
+	/**
+	 * @param {*} event
+	 * @param {AddressBookRow} addressBookRow
+	 * @memberof AddressBook
+	 */
+	removeAddressClicked(event, addressBookRow: AddressBookRow) {
+		const confirmOptions = { onOk: () => appStore.dispatch(AddressBookActions.removeAddress(addressBookRow)) }
+		toastr.confirm(`Are you sure want to remove the address for "${addressBookRow.name}"?`, confirmOptions)
 	}
 
 	/**
@@ -249,7 +260,13 @@ class AddressBook extends Component<Props> {
 				{this.renderNewAddressDialog()}
 
 				{/* Address book list */}
-				<AddressBookList addresses={this.props.addressBook.addresses} />
+				<AddressBookList addresses={this.props.addressBook.addresses} onRowClicked={(e, addressBookRow) => this.onAddressRowClicked(e, addressBookRow)} />
+
+				<PopupMenu id={addressBookPopupMenuId}>
+					<PopupMenuItem onClick={(e, address) => this.copyAddressClicked(e, address)}>Copy Address</PopupMenuItem>
+					<PopupMenuItem onClick={(e, address) => this.removeAddressClicked(e, address)}>Remove Address</PopupMenuItem>
+				</PopupMenu>
+
 			</div >
 		)
 	}

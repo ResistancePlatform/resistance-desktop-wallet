@@ -1,5 +1,5 @@
 // @flow
-import { map, switchMap, mergeMap } from 'rxjs/operators'
+import { map, switchMap, mergeMap, tap } from 'rxjs/operators'
 import { merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { AddressBookActions } from './address-book.reducer'
@@ -29,11 +29,28 @@ const addAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe
 		return addressBookService.addAddress(addressBookState.addresses, newAddress)
 	}),
 	mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.updateNewAddressDialogVisibility(false)))
+)
 
+const copyAddressEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+	ofType(AddressBookActions.copyAddress),
+	tap(action => clipboardService.setContent(action.payload.address)),
+	map(() => AddressBookActions.empty())
+)
+
+const removeAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+	ofType(AddressBookActions.removeAddress),
+	switchMap((action) => {
+		const addressBookState = state$.value.addressBook
+		const addressToRemove = action.payload
+		return addressBookService.removeAddress(addressBookState.addresses, addressToRemove)
+	}),
+	mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.updateNewAddressDialogVisibility(false)))
 )
 
 export const AddressBookEpics = (action$, state$) => merge(
 	loadAddressBookEpic(action$, state$),
 	pasteAddressFromClipboardEpic(action$, state$),
-	addAddressEpic(action$, state$)
+	addAddressEpic(action$, state$),
+	copyAddressEpic(action$, state$),
+	removeAddressEpic(action$, state$),
 )

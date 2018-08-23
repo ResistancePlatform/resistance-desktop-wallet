@@ -86,7 +86,7 @@ export class AddressBookService {
 		const tempAddressRows = existsAddressRows ? existsAddressRows : config.get(addressBookKey, [])
 		// Remove specified address and remove the duplicate row
 		const addressRowsToSave = tempAddressRows
-			.filter(tempAddress => tempAddress.name !== addressToRemove.name && tempAddress.address === addressToRemove.address)
+			.filter(tempAddress => tempAddress.name !== addressToRemove.name && tempAddress.address !== addressToRemove.address)
 			.reduce(addressRowReduceFunc, [])
 			.sort(addressRowSortFunc)
 		config.set(addressBookKey, addressRowsToSave)

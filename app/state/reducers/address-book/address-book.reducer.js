@@ -24,7 +24,7 @@ export const AddressBookActions = createActions(
     GOT_ADDRESS_BOOK: (addresses: AddressBookRow[]) => addresses,
 
     ADD_ADDRESS: undefined,
-    REMOE_ADDRESS: (addressToRemove: AddressRow) => addressToRemove,
+    REMOVE_ADDRESS: (addressToRemove: AddressRow) => addressToRemove,
     COPY_ADDRESS: (addressToCopy: AddressRow) => addressToCopy,
 
     UPDATE_DROPDOWN_MENU_VISIBILITY: (show: boolean) => ({ show }),

@@ -6,7 +6,8 @@ import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
 type Props = {
-	addresses: AddressBookRow[]
+	addresses: AddressBookRow[],
+	onRowClicked: (event: any, address: string) => void
 }
 
 /**
@@ -16,6 +17,22 @@ type Props = {
  */
 export default class AddressBookList extends Component<Props> {
 	props: Props
+
+	/**
+	 * @param {*} event
+	 * @param {AddressBookRow} addressBookRow
+	 * @returns
+	 * @memberof AddressBookList
+	 */
+	onContextMenu(event: any, addressBookRow: AddressBookRow) {
+		event.preventDefault()
+		window.getSelection().removeAllRanges()
+
+		if (this.props.onRowClicked) {
+			this.props.onRowClicked(event, addressBookRow)
+		}
+		return false
+	}
 
 	/**
 	 * @returns
@@ -30,6 +47,7 @@ export default class AddressBookList extends Component<Props> {
 			<div
 				className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')}
 				key={index}
+				onContextMenu={e => this.onContextMenu(e, tempAddressRow)}
 			>
 				<div className={styles.tableBodyRowColumnName} >{tempAddressRow.name}</div>
 				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnValue].join(' ')}>{tempAddressRow.address}</div>
