@@ -66,7 +66,8 @@ export const defaultAppState: AppState = {
 		currentOperation: null,
 		showDropdownMenu: false,
 		sendFromRadioButtonType: 'transparent',
-		addressList: []
+    addressList: [],
+    isInputDisabled: false
 	},
 	settings: {
 		isTorEnabled: false,

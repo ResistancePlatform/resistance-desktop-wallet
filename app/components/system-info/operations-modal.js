@@ -8,7 +8,7 @@ import classNames from 'classnames'
 import 'react-tabs/style/react-tabs.scss'
 import { appStore } from '../../state/store/configureStore'
 import { SystemInfoActions } from '../../state/reducers/system-info/system-info.reducer'
-import humanizeOperationDescription from './humanize-operation'
+import humanizeOperationName from './humanize-operation'
 
 import styles from './operations-modal.scss'
 import HLayout from '../../theme/h-box-layout.scss'
@@ -41,18 +41,20 @@ class OperationsModal extends Component<Props> {
     const sortedOperations = this.props.systemInfo.operations.sort((first, second) => {
       const isPending = operation => Number(['queued', 'executing'].includes(operation.status))
       const priorityComparisonResult = isPending(first) - isPending(second)
-      return priorityComparisonResult !== 0 ? priorityComparisonResult : second.creation_time - first.creation_time
+      return priorityComparisonResult !== 0 ? -priorityComparisonResult : second.creation_time - first.creation_time
     })
 
     const rows = sortedOperations.map(operation => (
       <div
         className={classNames(HLayout.hBoxContainer, styles.tableBodyRow)}
       >
-        <div className={styles.tableColumnOperation} >{humanizeOperationDescription(operation)}</div>
+        <div className={styles.tableColumnOperation} >{humanizeOperationName(operation)}</div>
         <div className={styles.tableColumnTriggered} >{moment.unix(operation.creation_time).fromNow()}</div>
-        <div className={classNames(styles.tableColumnStatus)}><span className={classNames(styles.operationStatus, styles[operation.status])}>{operation.status}</span></div>
+        <div className={classNames(styles.tableColumnStatus)}>
+          <span className={classNames(styles.operationStatus, styles[operation.status])}>{operation.status}</span>
+        </div>
         <div className={styles.tableColumnError} >{operation.error && operation.error.message}</div>
-        <div className={styles.tableColumnAmount}>{operation.amounts && operation.amounts[0].amount}</div>
+        <div className={styles.tableColumnAmount}>{operation.params && operation.params.amounts && operation.params.amounts[0].amount}</div>
         <div className={styles.tableColumnFee}>{operation.params && operation.params.fee}</div>
       </div>
     ))

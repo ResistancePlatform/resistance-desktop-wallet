@@ -14,7 +14,7 @@ import { getTransactionConfirmed, getTransactionDate, getTransactionDirection } 
 import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions, Transaction } from '../state/reducers/overview/overview.reducer'
 import { OwnAddressesActions, AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
-import { SendCashActions, ProcessingOperation } from '../state/reducers/send-cash/send-cash.reducer'
+import { SendCashActions } from '../state/reducers/send-cash/send-cash.reducer'
 import { AddressBookRow } from '../state/reducers/address-book/address-book.reducer'
 
 /**
@@ -49,10 +49,6 @@ const getClientInstance = () => {
 	return clientInstance
 }
 
-const pollingIntervalValues = {
-	sendCash: 2 * 1000
-}
-
 /**
  * @export
  * @class RpcService
@@ -61,10 +57,6 @@ export class RpcService {
 	logger: LoggerService
   osService: OSService
 	addressBookService: AddressBookService
-
-	pollingIntervalIds = {
-		sendCash: -1
-	}
 
 	/**
 	 *Creates an instance of RpcService.
@@ -265,122 +257,29 @@ export class RpcService {
 	sendCash(fromAddress: string, toAddress: string, amountToSend: Decimal) {
 		const client = getClientInstance()
 
-		/**
-		 *
-		 */
-		const getSendCashPromise = (fAddress: string, tAddress: string, amountNeedToSend: Decimal): Promise<any> => {
-			const amountAfterDeductTheFransactionFee = amountNeedToSend.sub(TRANSACTION_FEE)
-			const sendCashParams = [
-				fAddress,
-				[{ address: tAddress, amount: amountAfterDeductTheFransactionFee }]
-			]
+    const commandParameters= [
+      fromAddress,
+      [{ address: toAddress, amount: amountToSend.sub(TRANSACTION_FEE) }]
+    ]
 
-      // Confirmations number, important!
-      if (fAddress.startsWith('r') && tAddress.startsWith('r')) {
-        sendCashParams.push(0)
+    // Confirmations number, important!
+    if (fromAddress.toLowerCase().startsWith('r') && toAddress.toLowerCase().startsWith('r')) {
+      commandParameters.push(0)
+    }
+
+    const command = client.command([{ method: `z_sendmany`, parameters: commandParameters }])
+
+    command.then(([result])=> {
+      if (typeof(result) === 'string') {
+        this.osService.dispatchAction(SendCashActions.sendCashOperationStarted(result))
+      } else {
+        this.osService.dispatchAction(SendCashActions.sendCashFailure(result.message))
       }
-
-			// sendmany "T address here" [{“address”:”t address”, “amount”:0.005}, {“address”:”z address”,”amount”:0.03, “memo”:”f508af…”}]
-			return client.command([{ method: `z_sendmany`, parameters: sendCashParams }])
-		}
-
-		getSendCashPromise(fromAddress, toAddress, amountToSend)
-			.then(result => {
-				const tempResult = result[0]
-
-				// Check error
-				if (tempResult.name && tempResult.name === 'RpcError') {
-					throw new Error(tempResult.message)
-				}
-
-				const operationId = result[0]
-				this.logger.debug(this, `sendCash`, `operationId: `, ConsoleTheme.error, operationId)
-
-				return operationId
-			})
-			.then(operationId => {
-				this.stopPollingOperationStatus()
-				this.starPollingOperationStatus(operationId)
-
-				return 'done'
-			})
-			.catch(error => {
-				this.logger.debug(this, `sendCash`, `Error happened: `, ConsoleTheme.error, error)
-
-				// Make sure pass "true" to "clearCurrentOperation" !!!
-				this.osService.dispatchAction(SendCashActions.sendCashFail(error.message, true))
-			})
-	}
-
-	/**
-	 * @memberof RpcService
-	 */
-	stopPollingOperationStatus() {
-		this.stopPolling('sendCash')
-	}
-
-	/**
-	 * @param {string} operationId
-	 * @returns {Observable<any>}
-	 * @memberof RpcService
-	 */
-	starPollingOperationStatus(operationId: string): Observable<any> {
-		let initProgressPercent = 0
-
-		const getAsyncOperationStatus = (operId: string) => {
-			const client = getClientInstance()
-			const params = [operId]
-			const promise = client.command([
-				{ method: `z_getoperationstatus`, parameters: [params] }
-			])
-
-			promise
-				.then(result => {
-					const tempStatus = result[0][0]
-
-          let failMessage
-          let newProgressPercent
-          let inProgressOperation: ProcessingOperation
-
-          switch(tempStatus && tempStatus.status) {
-            case 'success':
-              this.stopPollingOperationStatus()
-              this.osService.dispatchAction(SendCashActions.sendCashSuccess())
-              break
-            case 'failed':
-              this.stopPollingOperationStatus()
-              failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Unknown.`
-              this.osService.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
-              break
-            case 'cancelled':
-              this.stopPollingOperationStatus()
-              failMessage = tempStatus.error && tempStatus.error.message ? tempStatus.error.message : `Operation has been cancelled.`
-              this.osService.dispatchAction(SendCashActions.sendCashFail(failMessage, true))
-              break
-            default:
-              initProgressPercent += 1
-              newProgressPercent = initProgressPercent <= 100 ? initProgressPercent : 100
-              inProgressOperation = {
-                operationId: tempStatus.id,
-                status: tempStatus.status,
-                percent: newProgressPercent,
-                result: tempStatus.result
-              }
-              this.osService.dispatchAction(SendCashActions.updateSendOperationStatus(inProgressOperation))
-          }
-
-					return 'done'
-				})
-				.catch(error => {
-					this.logger.debug(this, `getAsyncOperationStatus`, `Error happened: `, ConsoleTheme.error, error)
-
-					// Make sure pass "true" to "clearCurrentOperation" !!!
-					this.osService.dispatchAction(SendCashActions.sendCashFail(error.message, true))
-					this.stopPollingOperationStatus()
-				})
-		}
-
-		this.pollingIntervalIds.sendCash = setInterval(() => getAsyncOperationStatus(operationId), pollingIntervalValues.sendCash)
+      return Promise.resolve()
+    })
+    .catch(err => (
+      this.osService.dispatchAction(SendCashActions.sendCashFailure(err.toString()))
+    ))
 	}
 
 	/**
@@ -564,36 +463,6 @@ export class RpcService {
     const command = getClientInstance().command('z_mergetoaddress', ['*'], zAddress)
     this::performMergeCoinsCommand(command)
   }
-
-	/**
-   * Start polling.
-   *
-	 * @memberof RpcService
-	 */
-	startPolling(entityName: string, handler) {
-		this.stopPolling(entityName)
-
-		// Trigger immediately at the first time
-		handler()
-
-		this.pollingIntervalIds[entityName] = setInterval(
-			handler,
-			pollingIntervalValues[entityName]
-		)
-	}
-
-	/**
-   * Stop polling.
-   *
-	 * @memberof RpcService
-	 */
-	stopPolling(entityName: string) {
-		if (this.pollingIntervalIds[entityName] !== -1) {
-			clearInterval(this.pollingIntervalIds[entityName])
-			this.pollingIntervalIds[entityName] = -1
-		}
-	}
-
 
 	/**
 	 * @param {string} transactionId
@@ -872,6 +741,6 @@ function performMergeCoinsCommand(commandPromise: Promise<any>) {
     commandPromise.then((result) => (
       this.osService.dispatchAction(OwnAddressesActions.mergeCoinsOperationStarted(result.opid))
     )).catch(err => (
-      this.osService.dispatchAction(OwnAddressesActions.mergeCoinsFailure(`Unable to start merge operation: ${err}`))
+      this.osService.dispatchAction(OwnAddressesActions.mergeCoinsFailure(err.toString()))
     ))
 }

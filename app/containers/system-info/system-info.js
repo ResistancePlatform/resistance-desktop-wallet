@@ -12,7 +12,7 @@ import { SystemInfoActions, SystemInfoState } from '../../state/reducers/system-
 import { appStore } from '../../state/store/configureStore'
 import { AppState } from '../../state/reducers/appState'
 import OperationsModal from '../../components/system-info/operations-modal'
-import humanizeOperationDescription from '../../components/system-info/humanize-operation'
+import humanizeOperationName from '../../components/system-info/humanize-operation'
 
 import styles from './system-info.scss'
 import HLayout from '../../theme/h-box-layout.scss'
@@ -54,17 +54,22 @@ class SystemInfo extends Component<Props> {
         return
       }
 
-      const description = humanizeOperationDescription(currentOperation)
+      let description
+      const humanizedName = humanizeOperationName(currentOperation)
 
       switch (currentOperation.status) {
         case 'cancelled':
-          toastr.info(`${description} operation cancelled successfully.`)
+          toastr.info(`${humanizedName} operation cancelled successfully.`)
           break
         case 'failed':
-          toastr.error(`${description} operation failed`, currentOperation.error && currentOperation.error.message)
+          toastr.error(`${humanizedName} operation failed`, currentOperation.error && currentOperation.error.message)
           break
         case 'success':
-          toastr.success(`${description} operation succeeded.`)
+          if (currentOperation.method === 'z_sendmany' && currentOperation.params && currentOperation.params.amounts) {
+            const amount = currentOperation.params.amounts[0]
+            description = `Sent ${amount.amount} RES from ${currentOperation.params.fromaddress} to ${amount.address}.`
+          }
+          toastr.success(`${humanizedName} operation succeeded${description ? '' : '.'}`, description)
           break
         default:
       }
