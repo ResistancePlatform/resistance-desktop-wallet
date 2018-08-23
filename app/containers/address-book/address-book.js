@@ -223,9 +223,11 @@ class AddressBook extends Component<Props> {
 					className={styles.addButton}
 					onClick={(event) => this.onAddButtonClicked(event)}
 					onKeyDown={() => { }}
-				>ADD
+			>ADD
 			</button>
 			)
+
+		const title = isInUpdateMode ? `Update Address` : `New Address`
 
 		return (
 			<div className={styles.newAddressContainer}>
@@ -237,7 +239,7 @@ class AddressBook extends Component<Props> {
 				/>
 
 				{ /* Title */}
-				<div className={styles.title}>New Address</div>
+				<div className={styles.title}>{title}</div>
 
 				{ /* Name */}
 				<RoundedInput
