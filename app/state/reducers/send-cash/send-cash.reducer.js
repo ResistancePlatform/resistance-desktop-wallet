@@ -1,4 +1,5 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import { createActions, handleActions } from 'redux-actions'
 import { defaultAppState } from '../default-app-state'
 
@@ -15,7 +16,7 @@ export type SendFromRadioButtonType = 'transparent' | 'private'
 
 export type AddressDropdownItem = {
 	address: string,
-	balance: number,
+	balance: Decimal | null,
 	disabled?: boolean
 }
 
@@ -33,7 +34,7 @@ export type SendCashState = {
 	fromAddress: string,
 	toAddress: string,
 	inputTooltips: string,
-	amount: number,
+	amount: Decimal,
 	currentOperation: ProcessingOperation | null,
 	showDropdownMenu: boolean,
 	sendFromRadioButtonType: SendFromRadioButtonType,
@@ -41,14 +42,14 @@ export type SendCashState = {
 }
 
 export const SendCashActions = createActions({
-	// Action define format: 
+	// Action define format:
 	// [Action type string/Object key]: payload creator function
 
 	EMPTY: undefined,
 	TOGGLE_PRIVATE_SEND: undefined,
 	UPDATE_FROM_ADDRESS: (address: string) => address,
 	UPDATE_TO_ADDRESS: (address: string) => address,
-	UPDATE_AMOUNT: (amount: number) => amount,
+	UPDATE_AMOUNT: (amount: Decimal) => amount,
 	SEND_CASH: undefined,
 	SEND_CASH_SUCCESS: undefined,
 	SEND_CASH_FAIL: (errorMessage: string, clearCurrentOperation: boolean) => ({ errorMessage, clearCurrentOperation }),
@@ -159,7 +160,7 @@ const handleTogglePrivateTransaction = (tempState: SendCashState) => {
 
 
 export const SendCashReducer = handleActions({
-	// Reducer define format: 
+	// Reducer define format:
 	// [Action type string/action function name (.toString)]: (state, action) => state
 
 	[SendCashActions.togglePrivateSend]: (state) => handleTogglePrivateTransaction(state),

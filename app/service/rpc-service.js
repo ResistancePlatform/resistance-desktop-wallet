@@ -1,15 +1,16 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import { remote } from 'electron'
 import Client from 'bitcoin-core'
 import { from, Observable, of } from 'rxjs'
 import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
+import { TRANSACTION_FEE } from '../constants'
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { OSService } from './os-service'
 import { AddressBookService } from './address-book-service'
-
-import { getTransactionAmount, getTransactionConfirmed, getTransactionDate, getTransactionDirection } from '../utils/data-util'
+import { getTransactionConfirmed, getTransactionDate, getTransactionDirection } from '../utils/data-util'
 import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions, Transaction } from '../state/reducers/overview/overview.reducer'
 import { OwnAddressesActions, AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
@@ -119,12 +120,12 @@ export class RpcService {
           this.logger.debug(this, `requestWalletInfo`, `result: `, ConsoleTheme.testing, result)
          ),
          map(result => ({
-           transparentBalance: parseFloat(result[0].transparent),
-           privateBalance: parseFloat(result[0].private),
-           totalBalance: parseFloat(result[0].total),
-           transparentUnconfirmedBalance: parseFloat(result[1].transparent),
-           privateUnconfirmedBalance: parseFloat(result[1].private),
-           totalUnconfirmedBalance: parseFloat(result[1].total)
+           transparentBalance: Decimal(result[0].transparent),
+           privateBalance: Decimal(result[0].private),
+           totalBalance: Decimal(result[0].total),
+           transparentUnconfirmedBalance: Decimal(result[1].transparent),
+           privateUnconfirmedBalance: Decimal(result[1].private),
+           totalUnconfirmedBalance: Decimal(result[1].total)
          }))
     )
     .subscribe(
@@ -257,18 +258,18 @@ export class RpcService {
 	/**
 	 * @param {string} fromAddress
 	 * @param {string} toAddress
-	 * @param {number} amountToSend
+	 * @param {Decimal} amountToSend
 	 * @returns {Observable<any>}
 	 * @memberof RpcService
 	 */
-	sendCash(fromAddress: string, toAddress: string, amountToSend: number) {
+	sendCash(fromAddress: string, toAddress: string, amountToSend: Decimal) {
 		const client = getClientInstance()
 
 		/**
 		 *
 		 */
-		const getSendCashPromise = (fAddress: string, tAddress: string, amountNeedToSend: number): Promise<any> => {
-			const amountAfterDeductTheFransactionFee = amountNeedToSend - 0.0001
+		const getSendCashPromise = (fAddress: string, tAddress: string, amountNeedToSend: Decimal): Promise<any> => {
+			const amountAfterDeductTheFransactionFee = amountNeedToSend.sub(TRANSACTION_FEE)
 			const sendCashParams = [
 				fAddress,
 				[{ address: tAddress, amount: amountAfterDeductTheFransactionFee }]
@@ -428,7 +429,7 @@ export class RpcService {
 
 				const combinedAddresses = [...Array.from(publicAddressResultSet), ...Array.from(privateAddressesResult)]
 					.map(addr => ({
-						balance: 0,
+						balance: Decimal('0'),
 						confirmed: false,
 						address: addr,
 						disabled: false
@@ -444,28 +445,28 @@ export class RpcService {
 
 				// Sort for each groups
 				if (sortByGroupBalance) {
-					const publicAddressesBeforeSort = []
-					const privateAddressesBeforeSort = []
+					const publicAddresses = []
+					const privateAddresses= []
 
 					for (let index = 0; index < addresses.length; index++) {
 						const tempAddressItem = addresses[index];
 						if (tempAddressItem.address.startsWith('z')) {
-							privateAddressesBeforeSort.push(tempAddressItem)
+							privateAddresses.push(tempAddressItem)
 						} else {
-							publicAddressesBeforeSort.push(tempAddressItem)
+							publicAddresses.push(tempAddressItem)
 						}
 					}
 
-					const publicAddressesAfterSort = publicAddressesBeforeSort.sort((item1, item2) => item2.balance - item1.balance)
-					const privateAddressesAfterSort = privateAddressesBeforeSort.sort((item1, item2) => item2.balance - item1.balance)
+					publicAddresses.sort((item1, item2) => item2.balance.sub(item1.balance))
+					privateAddresses.sort((item1, item2) => item2.balance.sub(item1.balance))
 
-					addressList = [...publicAddressesAfterSort, ...privateAddressesAfterSort]
+					addressList = [...publicAddresses, ...privateAddresses]
 				} else {
 					addressList = addresses
 				}
 
 				// Show the error to user
-				const errorAddressItems = addressList.filter(tempAddressItem => tempAddressItem.balance === -1 && tempAddressItem.errorMessage)
+				const errorAddressItems = addressList.filter(tempAddressItem => tempAddressItem.balance === null && tempAddressItem.errorMessage)
 
 				if (errorAddressItems && errorAddressItems.length > 0) {
           const errorMessages = errorAddressItems.map(tempAddressItem => `"${tempAddressItem.errorMessage}"`)
@@ -613,7 +614,7 @@ export class RpcService {
 				const tempObj = {}
 				Object.keys(result.details[0]).reduce((objToReturn, key) => {
 					if (key === 'amount') {
-						objToReturn[`details[0].${key}`] = getTransactionAmount(result.details[0][`${key}`], 4)
+						objToReturn[`details[0].${key}`] = Decimal(result.details[0][`${key}`])
 					} else {
 						objToReturn[`details[0].${key}`] = result.details[0][`${key}`]
 					}
@@ -621,7 +622,7 @@ export class RpcService {
 					return objToReturn
 				}, tempObj)
 
-				const detailResult = { ...result, amount: getTransactionAmount(result.amount, 4), ...tempObj }
+				const detailResult = { ...result, amount: Decimal(result.amount), ...tempObj }
 				delete detailResult.details
 				delete detailResult.vjoinsplit
 				delete detailResult.walletconflicts
@@ -688,7 +689,7 @@ async function getPublicTransactionsPromise(client: Client) {
             type: `\u2605 T (Public)`,
             direction: getTransactionDirection(originalTransaction.category),
             confirmed: getTransactionConfirmed(originalTransaction.confirmations),
-            amount: getTransactionAmount(originalTransaction.amount),
+            amount: Decimal(originalTransaction.amount),
             date: getTransactionDate(originalTransaction.time),
             originalTime: originalTransaction.time,
             destinationAddress: originalTransaction.address ? originalTransaction.address : `[ Z Address not listed in Wallet ]`,
@@ -739,7 +740,7 @@ async function getPrivateTransactionsPromise(client: Client) {
       type: `\u2605 T (Private)`,
       direction: getTransactionDirection(`receive`),
       confirmed: 0,
-      amount: getTransactionAmount(result.amount),
+      amount: Decimal(result.amount),
       date: null,
       originalTime: 0,
       destinationAddress: result.address,
@@ -827,7 +828,7 @@ function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise
         if (typeof(confirmedBalance) === 'object' || typeof(unconfirmedBalance) === 'object') {
           return {
             ...address,
-            balance: -1,
+            balance: null,
             confirmed: false,
             errorMessage: confirmedBalance.message || unconfirmedBalance.message
           }
@@ -838,7 +839,7 @@ function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise
 
         return {
           ...address,
-          balance: parseFloat(parseFloat(displayBalance).toFixed(4)),
+          balance: Decimal(displayBalance),
           confirmed: isConfirmed
         }
       })
@@ -850,7 +851,7 @@ function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise
 
       const addresses = addressRows.map(address => ({
         ...address,
-        balance: -1,
+        balance: null,
         confirmed: false,
         errorMessage: err.toString()
       }))

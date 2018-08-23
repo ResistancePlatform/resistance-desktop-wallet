@@ -1,6 +1,9 @@
 // @flow
 import React, { Component } from 'react'
+
+import { truncateAmount } from '../../constants'
 import { Transaction } from '../../state/reducers/overview/overview.reducer'
+
 import styles from './transaction-list.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
@@ -41,7 +44,7 @@ export default class TransactionList extends Component<Props> {
 				<div className={styles.tableBodyRowColumnType} >{transaction.type}</div>
 				<div className={styles.tableBodyRowColumnDirection}>{transaction.direction}</div>
 				<div className={styles.tableBodyRowColumnConfirmed}>{transaction.confirmed}</div>
-				<div className={styles.tableBodyRowColumnAmount}>{transaction.amount}</div>
+				<div className={styles.tableBodyRowColumnAmount}>{truncateAmount(transaction.amount)}</div>
 				<div className={styles.tableBodyRowColumnDate}>{transaction.date}</div>
 				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnAddress].join(' ')}>{transaction.destinationAddress}</div>
 			</div>

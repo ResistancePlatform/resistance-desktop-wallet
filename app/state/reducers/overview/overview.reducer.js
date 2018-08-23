@@ -1,4 +1,5 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import { createActions, handleActions } from 'redux-actions'
 import { defaultAppState } from '../default-app-state'
 
@@ -6,19 +7,19 @@ export type Transaction = {
 	type?: string,
 	direction?: string,
 	confirmed?: string,
-	amount?: string,
+	amount?: Decimal,
 	date?: string,
 	destinationAddress?: string,
 	transactionId?: string
 }
 
 export type Balances = {
-	transparentBalance: number,
-	transparentUnconfirmedBalance?: number,
-	privateBalance: number,
-	privateUnconfirmedBalance: number,
-	totalBalance: number,
-	totalUnconfirmedBalance: number
+	transparentBalance: Decimal,
+	transparentUnconfirmedBalance?: Decimal,
+	privateBalance: Decimal,
+	privateUnconfirmedBalance: Decimal,
+	totalBalance: Decimal,
+	totalUnconfirmedBalance: Decimal
 }
 
 export type OverviewState = {

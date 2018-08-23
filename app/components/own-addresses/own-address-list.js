@@ -1,6 +1,9 @@
 // @flow
 import React, { Component } from 'react'
+
+import { truncateAmount } from '../../constants'
 import { AddressRow } from '../../state/reducers/own-addresses/own-addresses.reducer'
+
 import styles from './own-address-list.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
@@ -24,14 +27,10 @@ export default class OwnAddressList extends Component<Props> {
     return false
 	}
 
-	getBalanceValue(tempAddressRow: AddressRow) {
-		if (!tempAddressRow || tempAddressRow.balance === null || tempAddressRow.balance === undefined) return `0`
-
-		return tempAddressRow.balance === -1 ? `ERROR` : tempAddressRow.balance.toFixed(2)
-	}
-
 	getConfirmValue(tempAddressRow: AddressRow) {
-		if (!tempAddressRow || tempAddressRow.balance === null || tempAddressRow.balance === undefined || tempAddressRow.balance === -1) return ``
+    if (!tempAddressRow || !tempAddressRow.balance) {
+      return ''
+    }
 
 		return tempAddressRow.confirmed ? 'YES' : 'NO'
 	}
@@ -49,7 +48,7 @@ export default class OwnAddressList extends Component<Props> {
         key={addressRow.address}
         onContextMenu={e => this.onContextMenu(e, addressRow.address)}
       >
-        <div className={styles.tableBodyRowColumnBalance} >{this.getBalanceValue(addressRow)}</div>
+        <div className={styles.tableBodyRowColumnBalance} >{addressRow.balance === null ? 'ERROR' : truncateAmount(addressRow.balance)}</div>
         <div className={styles.tableBodyRowColumnConfirmed}>{this.getConfirmValue(addressRow)}</div>
         <div className={[HLayout.hBoxChild, styles.tableBodyRowColumnAddress].join(' ')}>{addressRow.address}</div>
       </div>
