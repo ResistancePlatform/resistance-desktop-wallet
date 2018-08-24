@@ -147,7 +147,7 @@ class SendCash extends Component<Props> {
 							<RoundedInput
 								name="from-address"
                 defaultValue={this.props.sendCash.fromAddress}
-								title="FROM ADDRESS"
+								label="FROM ADDRESS"
 								addon={fromAddressAddon}
 								disabled={this.props.sendCash.isInputDisabled}
 								tooltip={this.props.sendCash.inputTooltips}
@@ -184,7 +184,7 @@ class SendCash extends Component<Props> {
 						<RoundedInput
 							name="destination-address"
               defaultValue={this.props.sendCash.toAddress}
-							title="DESTINATION ADDRESS"
+							label="DESTINATION ADDRESS"
 							addon={destAddressAddon}
               disabled={this.props.sendCash.isInputDisabled}
 							tooltip={this.props.sendCash.inputTooltips}
@@ -196,7 +196,7 @@ class SendCash extends Component<Props> {
 							<RoundedInput
 								name="amount"
                 defaultValue={this.props.sendCash.amount.toString()}
-								title="AMOUNT"
+								label="AMOUNT"
 								addon={amountAddressAddon}
                 disabled={this.props.sendCash.isInputDisabled}
 								onChange={value => this.onAmountAddressInputChanged(value)}

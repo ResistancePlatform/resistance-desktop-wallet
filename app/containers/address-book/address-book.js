@@ -158,7 +158,7 @@ class AddressBook extends Component<Props> {
 				<RoundedInput
 					name="new-address-name"
           defaultValue={this.props.addressBook.newAddressDialog.name}
-					title="NAME"
+					label="NAME"
 					addon={nameAddon}
 					onChange={value => this.onNameInputChanged(value)}
 				/>
@@ -167,7 +167,7 @@ class AddressBook extends Component<Props> {
 				<RoundedInput
 					name="new-address-address"
           defaultValue={this.props.addressBook.newAddressDialog.address}
-					title="ADDRESS"
+					label="ADDRESS"
 					addon={addressAddon}
 					onChange={value => this.onAddressInputChanged(value)}
 				/>

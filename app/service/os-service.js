@@ -155,15 +155,6 @@ export class OSService {
 	}
 
 	/**
-	 * @returns
-	 * @memberof OSService
-	 */
-	getAppSettingFile() {
-		const settingFileName = `wallet-settings.json`
-    return path.join(this.getAppDataPath(), settingFileName)
-	}
-
-	/**
    * Avoid circular dependency in appState.js
    *
 	 * @returns {SettingsActions}

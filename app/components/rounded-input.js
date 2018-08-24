@@ -15,7 +15,7 @@ type Props = {
   defaultValue?: string,
 	number?: boolean,
   password?: boolean,
-	title: string,
+	label: string,
 	onChange: value => void,
 	addon: RoundedInputAddon,
 	disabled?: boolean,
@@ -150,8 +150,8 @@ export default class RoundedInput extends Component<Props> {
 				disabled={this.props.disabled}
 				className={styles.roundedInputContainer}
 			>
-				<div className={styles.roundedInputTitle}>
-					{this.props.title ? this.props.title : ''}
+				<div className={styles.roundedInputLabel}>
+					{this.props.label || ''}
 				</div>
 
 				<div className={styles.roundedInputTextArea}>
