@@ -42,7 +42,7 @@ const getClientInstance = () => {
       port: nodeConfig.rpcport,
       username: nodeConfig.rpcuser,
       password: nodeConfig.rpcpassword,
-      timeout: 500
+      timeout: 1000
     })
   }
 
