@@ -15,7 +15,7 @@ import StatusModal from '../../components/settings/status-modal'
 
 const config = require('electron-settings')
 const generator = require('generate-password')
-const argon2 = require('argon2-browser')
+const argon2 = require('argon2')
 
 type Props = {
   systemInfo: SystemInfoState,
