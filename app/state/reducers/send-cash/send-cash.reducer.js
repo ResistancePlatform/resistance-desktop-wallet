@@ -4,27 +4,12 @@ import { createActions, handleActions } from 'redux-actions'
 import { defaultAppState } from '../default-app-state'
 
 
-export type ProcessingOperationStatus =
-	| ''
-	| 'queued'
-	| 'executing'
-	| 'cancelled'
-	| 'failed'
-	| 'success'
-
 export type SendFromRadioButtonType = 'transparent' | 'private'
 
 export type AddressDropdownItem = {
 	address: string,
 	balance: Decimal | null,
 	disabled?: boolean
-}
-
-export type ProcessingOperation = {
-	operationId: string,
-	status: ProcessingOperationStatus,
-	percent: number,
-	result: any
 }
 
 export type SendCashState = {
@@ -35,32 +20,33 @@ export type SendCashState = {
 	toAddress: string,
 	inputTooltips: string,
 	amount: Decimal,
-	currentOperation: ProcessingOperation | null,
 	showDropdownMenu: boolean,
 	sendFromRadioButtonType: SendFromRadioButtonType,
-	addressList: AddressDropdownItem[]
+  addressList: AddressDropdownItem[],
+  isInputDisabled: boolean
 }
 
-export const SendCashActions = createActions({
-	// Action define format:
-	// [Action type string/Object key]: payload creator function
-
-	EMPTY: undefined,
-	TOGGLE_PRIVATE_SEND: undefined,
-	UPDATE_FROM_ADDRESS: (address: string) => address,
-	UPDATE_TO_ADDRESS: (address: string) => address,
-	UPDATE_AMOUNT: (amount: Decimal) => amount,
-	SEND_CASH: undefined,
-	SEND_CASH_SUCCESS: undefined,
-	SEND_CASH_FAIL: (errorMessage: string, clearCurrentOperation: boolean) => ({ errorMessage, clearCurrentOperation }),
-	UPDATE_SEND_OPERATION_STATUS: (progressingTransaction: ProcessingOperation) => progressingTransaction,
-	UPDATE_DROPDOWN_MENU_VISIBILITY: (show: boolean) => show,
-	GET_ADDRESS_LIST: (isPrivate: boolean) => isPrivate,
-	GET_ADDRESS_LIST_SUCCESS: (addressList: AddressDropdownItem[]) => addressList,
-	GET_ADDRESS_LIST_FAIL: undefined,
-	PASTE_TO_ADDRESS_FROM_CLIPBOARD: undefined,
-	CHECK_ADDRESS_BOOK_BY_NAME: undefined
-}, { prefix: `APP/SEND_CASH` })
+export const SendCashActions = createActions(
+  {
+    EMPTY: undefined,
+    TOGGLE_PRIVATE_SEND: undefined,
+    UPDATE_FROM_ADDRESS: (address: string) => address,
+    UPDATE_TO_ADDRESS: (address: string) => address,
+    UPDATE_AMOUNT: (amount: Decimal) => amount,
+    SEND_CASH: undefined,
+    SEND_CASH_OPERATION_STARTED: (operationId: string) => ({ operationId }),
+    SEND_CASH_FAILURE: (errorMessage: string) => ({ errorMessage }),
+    UPDATE_DROPDOWN_MENU_VISIBILITY: (show: boolean) => show,
+    GET_ADDRESS_LIST: (isPrivate: boolean) => isPrivate,
+    GET_ADDRESS_LIST_SUCCESS: (addressList: AddressDropdownItem[]) => addressList,
+    GET_ADDRESS_LIST_FAIL: undefined,
+    PASTE_TO_ADDRESS_FROM_CLIPBOARD: undefined,
+    CHECK_ADDRESS_BOOK_BY_NAME: undefined
+  },
+  {
+    prefix: `APP/SEND_CASH`
+  }
+)
 
 
 const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')
@@ -87,7 +73,7 @@ export const checkPrivateTransactionRule = (tempState: SendCashState) => {
 	const transparentAddressDesc = `Transparent (R) address`
 	const privateAddressDesc = `Private (Z) address`
 	const prefixMessage = 'Sending cash '
-	const postFixMessage = ' is forbitten when "Private Transactions" is off.'
+	const postFixMessage = ' is forbidden when "Private Transactions" is off.'
 	if (isTransparentAddress(tempState.fromAddress) && isPrivateAddress(tempState.toAddress)) {
 		checkResult = `${prefixMessage}from a ${transparentAddressDesc} to a ${privateAddressDesc}${postFixMessage}`
 	}
@@ -114,15 +100,6 @@ const handleAddressUpdate = (tempState: SendCashState, newAddress: string, isUpd
 	const newInputTooltips = tempCheckResult === 'ok' ? '' : tempCheckResult
 
 	// The new `lockIcon` and `lockTips`
-	/**
-	 * t_addr --> z_addr -- Unlock. You are sending money from a Transparent (r) Address to a Private (Z) Address. This transaction will be partially shielded.
-	 *
-	 * z_addr --> z_addr -- Lock. You are sending money from a Private (Z) Address to a Private (Z) Address. This transaction will be fully shielded and invisible to all users.
-	 *
-	 * z_addr --> t_addr -- Unlock. You are sending money from a Private (Z) Address to a Transparent (r) Address. This transaction will be partially shielded.
-	 *
-	 * t_addr --> t_addr -- Unlock. You are sending money from a Transparent (r) Address to a Transparent (r) Address. This transaction will be fully transparent and visible to every user.
-	 */
 	const fromAddress = newState.fromAddress
 	const toAddress = newState.toAddress
 	let lockIcon = 'Unlock'
@@ -160,17 +137,17 @@ const handleTogglePrivateTransaction = (tempState: SendCashState) => {
 
 
 export const SendCashReducer = handleActions({
-	// Reducer define format:
-	// [Action type string/action function name (.toString)]: (state, action) => state
+	[SendCashActions.sendCash]: (state) => ({ ...state, isInputDisabled: true }),
+	[SendCashActions.sendCashOperationStarted]: (state) => ({ ...state, isInputDisabled: false }),
+	[SendCashActions.sendCashFailure]: (state) => ({ ...state, isInputDisabled: false }),
 
 	[SendCashActions.togglePrivateSend]: (state) => handleTogglePrivateTransaction(state),
+
 	[SendCashActions.updateFromAddress]: (state, action) => handleAddressUpdate(state, action.payload, true),
 	[SendCashActions.updateToAddress]: (state, action) => handleAddressUpdate(state, action.payload, false),
 	[SendCashActions.updateAmount]: (state, action) => ({ ...state, amount: action.payload }),
-	[SendCashActions.sendCashSuccess]: (state) => ({ ...state, currentOperation: null }),
-	[SendCashActions.sendCashFail]: (state, action) => action.payload.clearCurrentOperation ? { ...state, currentOperation: null } : state,
-	[SendCashActions.updateSendOperationStatus]: (state, action) => ({ ...state, currentOperation: action.payload }),
 	[SendCashActions.updateDropdownMenuVisibility]: (state, action) => ({ ...state, showDropdownMenu: action.payload }),
+
 	[SendCashActions.getAddressListSuccess]: (state, action) => ({ ...state, addressList: action.payload }),
 	[SendCashActions.getAddressListFail]: (state) => ({ ...state, addressList: null })
 }, defaultAppState.sendCash)

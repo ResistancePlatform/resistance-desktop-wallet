@@ -47,16 +47,9 @@ class SendCash extends Component<Props> {
 	 * @memberof SendCash
 	 */
 	componentDidMount() {
-		const currentAppState = appStore.getState()
-		const currentSendCashState = currentAppState && currentAppState.sendCash ? currentAppState.sendCash : {
-			fromAddress: '',
-			toAddress: '',
-			amount: Decimal('0')
-		}
-
-		this.fromAddressInputDomRef.inputDomRef.current.value = currentSendCashState.fromAddress
-		this.toAddressInputDomRef.inputDomRef.current.value = currentSendCashState.toAddress
-		this.amountInputDomRef.inputDomRef.current.value = currentSendCashState.amount.toString()
+		this.fromAddressInputDomRef.inputDomRef.current.value = this.props.sendCash.fromAddress
+		this.toAddressInputDomRef.inputDomRef.current.value = this.props.sendCash.toAddress
+		this.amountInputDomRef.inputDomRef.current.value = this.props.sendCash.amount.toString()
 
 		// Setup destination address input debounce stream
 		this.destAddressValueChangeSubscription = this.destAddressValueChangeSubject
@@ -106,11 +99,7 @@ class SendCash extends Component<Props> {
 
 	onPrivateSendToggleClicked(event) {
 		this.eventConfirm(event)
-		const shouldDisableInput = Boolean(this.props.sendCash.currentOperation && this.props.sendCash.currentOperation.operationId)
-
-		if (!shouldDisableInput) {
-			appStore.dispatch(SendCashActions.togglePrivateSend())
-		}
+    appStore.dispatch(SendCashActions.togglePrivateSend())
 	}
 
 	onFromAddressDropdownClicked() {
@@ -146,11 +135,6 @@ class SendCash extends Component<Props> {
 		appStore.dispatch(SendCashActions.sendCash())
 	}
 
-	getOperationProgressBarStyles() {
-		const flexValue = this.props.sendCash.currentOperation.percent / 100
-		return { flex: flexValue }
-	}
-
 	getDropdownMenuStyles() {
 		return this.props.sendCash && this.props.sendCash.showDropdownMenu ? 'block' : 'none'
 	}
@@ -173,33 +157,6 @@ class SendCash extends Component<Props> {
 		this.fromAddressInputDomRef.inputDomRef.current.value = selectedAddress
 
 		appStore.dispatch(SendCashActions.updateFromAddress(selectedAddress))
-	}
-
-
-	renderProgressRow() {
-		if (!this.props.sendCash || !this.props.sendCash.currentOperation) {
-			return null
-		}
-		return (
-			<div className={[styles.processRow, VLayout.vBoxContainer].join(' ')}>
-				<div className={[styles.row1, HLayout.hBoxContainer].join(' ')}>
-					<div className={styles.processRow1Title}>LAST OPERATION STATUS: </div>
-					<div className={styles.processRow1Status}>IN PROGRESS</div>
-					<div
-						className={[styles.processRow1Percent, HLayout.hBoxChild].join(' ')}
-					>
-						{this.props.sendCash.currentOperation.percent}%
-					</div>
-				</div>
-
-				<div className={[styles.row2, HLayout.hBoxContainer].join(' ')}>
-					<div
-						className={styles.progressBarPercent}
-						style={this.getOperationProgressBarStyles()}
-					/>
-				</div>
-			</div>
-		)
 	}
 
 	/**
@@ -226,8 +183,6 @@ class SendCash extends Component<Props> {
 			onAddonClicked: () => { }
 		}
 
-		const shouldDisableInput = Boolean(this.props.sendCash.currentOperation && this.props.sendCash.currentOperation.operationId)
-
 		return (
 			// Layout container
 			<div
@@ -248,7 +203,7 @@ class SendCash extends Component<Props> {
 								name="from-address"
 								title="FROM ADDRESS"
 								addon={fromAddressAddon}
-								disabled={shouldDisableInput}
+								disabled={this.props.sendCash.isInputDisabled}
 								enableTooltips="true"
 								tooltipsContent={this.props.sendCash.inputTooltips}
 								onInputChange={value => this.onFromAddressInputChanged(value)}
@@ -268,7 +223,7 @@ class SendCash extends Component<Props> {
 								<div className={styles.sendPrivateTitle}>Private Transactions</div>
 
 								<div
-									disabled={shouldDisableInput}
+                  disabled={this.props.sendCash.isInputDisabled}
 									className={this.getPrivatelyToggleButtonClasses()}
 									onClick={event => this.onPrivateSendToggleClicked(event)}
 									onKeyDown={event => this.onPrivateSendToggleClicked(event)}
@@ -286,7 +241,7 @@ class SendCash extends Component<Props> {
 							name="destination-address"
 							title="DESTINATION ADDRESS"
 							addon={destAddressAddon}
-							disabled={shouldDisableInput}
+              disabled={this.props.sendCash.isInputDisabled}
 							enableTooltips="true"
 							tooltipsContent={this.props.sendCash.inputTooltips}
 							onInputChange={value => this.onDestAddressInputChanged(value)}
@@ -300,7 +255,7 @@ class SendCash extends Component<Props> {
 								title="AMOUNT"
 								onlyNumberAllowed="true"
 								addon={amountAddressAddon}
-								disabled={shouldDisableInput}
+                disabled={this.props.sendCash.isInputDisabled}
 								onInputChange={value => this.onAmountAddressInputChanged(value)}
 								ref={this.amountAddressDomRef}
 							/>
@@ -315,7 +270,7 @@ class SendCash extends Component<Props> {
 						<div className={[styles.sendButtonContainer, HLayout.hBoxContainer].join(' ')}>
 							<button
 								name="send-cash"
-								disabled={this.props.sendCash.currentOperation && this.props.sendCash.currentOperation.operationId}
+								disabled={this.props.sendCash.isInputDisabled}
 								onClick={event => this.onSendButtonClicked(event)}
 								onKeyDown={event => this.onSendButtonClicked(event)}
 							>
@@ -328,9 +283,6 @@ class SendCash extends Component<Props> {
 								<div className={styles.descContent}>{this.props.sendCash.lockTips}</div>
 							</div>
 						</div>
-
-						{/* Process row */}
-						{this.renderProgressRow()}
 
 						{/* Memo */}
 						<div className={styles.memoConatiner}>

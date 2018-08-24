@@ -66,7 +66,7 @@ const mergeCoinsOperationStartedEpic = (action$: ActionsObservable<AppAction>) =
 const mergeCoinsFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
   ofType(OwnAddressesActions.mergeCoinsFailure),
   tap((action) => {
-    toastr.error(action.payload.errorMessage)
+    toastr.error(`Unable to start merge operation`, action.payload.errorMessage)
   }),
   mapTo(SystemInfoActions.empty())
 )

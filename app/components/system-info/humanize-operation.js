@@ -2,7 +2,7 @@
  * Returns human readable name for the given operation.
  *
  */
-export default function humanizeOperationDescription(operation) {
+export default function humanizeOperationName(operation) {
   switch (operation.method) {
     case 'z_sendmany':
         return `Send cash`

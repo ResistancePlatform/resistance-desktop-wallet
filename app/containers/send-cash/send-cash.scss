@@ -228,43 +228,6 @@ div[name="amount"] {
     }
 }
 
-.processRow {
-    width: 38.5rem;
-    margin-bottom: 2.5rem;
-
-    font-size: 0.7rem;
-    font-weight: 300;
-
-    .row1 {
-        margin-bottom: 0.5rem;
-
-        .processRow1Title {
-            margin-right: 0.5rem;
-            color: $BASE_COLOR_BUTTON_FONT_GRAY;
-        }
-
-        .processRow1Status {
-            font-weight: 400;
-        }
-
-        .processRow1Percent {
-            text-align: right;
-
-            font-size: 0.9rem;
-            font-weight: 400;
-        }
-    }
-
-    .row2 {
-        height: 0.3rem;
-        border-radius: 2rem;
-
-        .progressBarPercent {
-            background-image: $SEND_CASH_PROGRESS_BAR_BACKGROUND_IMAGE;
-        }
-    }
-}
-
 .memoConatiner {
     padding: 2rem 0;
 
@@ -281,7 +244,6 @@ div[name="amount"] {
         font-weight: 400;
         color: $BASE_COLOR_WHITE;
     }
-
 }
 
 
