@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { toastr } from 'react-redux-toastr'
 
 import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import styles from './settings.scss'
@@ -13,6 +14,8 @@ import { SettingsActions, SettingsState } from '../../state/reducers/settings/se
 import StatusModal from '../../components/settings/status-modal'
 
 const config = require('electron-settings')
+const generator = require('generate-password')
+const argon2 = require('argon2-browser')
 
 type Props = {
   systemInfo: SystemInfoState,
@@ -20,9 +23,9 @@ type Props = {
 }
 
 type State = {
-  currentPassword: string,
+  oldPassword: string,
   newPassword: string,
-  confirmPassword: string
+  repeatPassword: string
 }
 
 /**
@@ -101,7 +104,7 @@ class Settings extends Component<Props> {
 	 * @memberof Settings
 	 */
 	onOldPasswordInputChanged(value) {
-		console.log(`onOldPasswordInputChanged: ${value}`)
+    this.setState({ oldPassword: value })
 	}
 
 	/**
@@ -109,7 +112,7 @@ class Settings extends Component<Props> {
 	 * @memberof Settings
 	 */
 	onNewPasswordInputChanged(value) {
-		console.log(`onNewPasswordInputChanged: ${value}`)
+    this.setState({ newPassword: value })
 	}
 
 	/**
@@ -117,17 +120,80 @@ class Settings extends Component<Props> {
 	 * @memberof Settings
 	 */
 	onRepeatPasswordInputChanged(value) {
-		console.log(`onRepeatPasswordInputChanged: ${value}`)
+    this.setState({ repeatPassword: value })
 	}
 
 	/**
 	 * @param {*} event
 	 * @memberof Settings
 	 */
-	onSavePasswordClicked(event) {
-		this.eventConfirm(event)
-		console.log(`onSavePasswordClicked---->`)
+	async onSavePasswordClicked() {
+    const passwordHash = config.get('password.hash')
+
+    if (passwordHash) {
+      const oldPasswordHash = await this.generatePasswordHash(this.state.oldPassword, config.get('password.salt', ''))
+
+      if (!oldPasswordHash) {
+        return false
+      }
+
+      if (oldPasswordHash !== passwordHash) {
+        toastr.error(`Old password doesn't match.`)
+        return false
+      }
+    }
+
+    const newSalt = generator.generate({ length: 32, numbers: true })
+    const newPasswordHash = await this.generatePasswordHash(this.state.newPassword, newSalt)
+
+    if (!newPasswordHash) {
+      return false
+    }
+
+    config.set('password', {
+      hash: newPasswordHash,
+      salt: newSalt
+    })
+
+    this.setState({ oldPassword: null })
+    toastr.success(`Password saved successfully.`)
+
+    return false
 	}
+
+  async generatePasswordHash(password: string, salt: string) {
+    let hash
+
+    try {
+      hash = await argon2.hash({
+        pass: password,
+        salt
+      })
+    } catch (err) {
+      toastr.error(`Password hash generation failed`, err.toString())
+      return null
+    }
+
+    return hash.hashHex
+  }
+
+  getSavePasswordButtonDisabledAttribute() {
+    const passwordHash = config.get('passwordHash')
+
+    if (passwordHash && !this.state.oldPassword) {
+      return true
+    }
+
+    if (!this.state.newPassword) {
+      return true
+    }
+
+    if (this.state.newPassword !== this.state.repeatPassword) {
+      return true
+    }
+
+    return false
+  }
 
 	/**
 	 * @param {*} event
@@ -252,7 +318,7 @@ class Settings extends Component<Props> {
 							name="repeat-password"
 							label="Repeat New Password"
 							addon={passwordAddon}
-              value={this.state.confirmPassword}
+              value={this.state.repeatPassword}
 							onChange={value => this.onRepeatPasswordInputChanged(value)}
               password
 						/>
@@ -260,10 +326,11 @@ class Settings extends Component<Props> {
 						{/* Save password */}
 						<button
 							className={styles.savePasswordButton}
-							onClick={event => this.onSavePasswordClicked(event)}
-							onKeyDown={event => this.onSavePasswordClicked(event)}
+              onClick={async () => this.onSavePasswordClicked()}
+							onKeyDown={async () => this.onSavePasswordClicked()}
+              disabled={this.getSavePasswordButtonDisabledAttribute()}
 						>
-							SAVE PASSWORD
+							Save Password
 						</button>
 
 						{/* Manage daemon */}

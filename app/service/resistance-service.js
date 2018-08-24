@@ -7,7 +7,7 @@ import { app, remote } from 'electron'
 
 import { OSService } from './os-service'
 
-const generator = require('generate-password');
+const generator = require('generate-password')
 const PropertiesReader = require('properties-reader')
 
 /**

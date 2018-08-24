@@ -1,5 +1,7 @@
 // @flow
 import React, { Component } from 'react'
+import classNames from 'classnames'
+
 import styles from './rounded-input.scss'
 
 type RoundedInputAddon = {
@@ -21,6 +23,7 @@ type Props = {
 	disabled?: boolean,
 	tooltip?: string,
   onEnterPressed: func,
+  error?: string | null,
 	children: any
 }
 
@@ -154,7 +157,7 @@ export default class RoundedInput extends Component<Props> {
 					{this.props.label || ''}
 				</div>
 
-				<div className={styles.roundedInputTextArea}>
+				<div className={classNames(styles.roundedInputTextArea, {error: this.props.error})}>
 					<input
 						type={this.getInputType()}
             value={this.state.value}

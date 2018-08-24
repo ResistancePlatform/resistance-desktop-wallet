@@ -12,7 +12,7 @@
         color: $BASE_COLOR_WHITE;
     } @else {
         background-color: transparent;
-        border: 1.5px solid $BASE_COLOR_BODER_GRAY;
+        border: 1.5px solid $BASE_COLOR_BORDER_GRAY;
         color: $BASE_COLOR_BUTTON_FONT_GRAY;
     }
 
@@ -36,6 +36,6 @@
 // Generic rounded input
 // ------------------------------------------------------------------------------------------------------
 @mixin roundedInput() {
-    
+
 }
 
