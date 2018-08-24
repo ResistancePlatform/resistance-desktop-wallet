@@ -233,8 +233,10 @@ class Settings extends Component<Props> {
 							name="old-password"
 							title="OLD PASSWORD"
 							addon={passwordAddon}
-              value={this.state.currentPassword}
-							onInputChange={value => this.onOldPasswordInputChanged(value)}
+              defaultValue="aaaa"
+              tooltip="aaaaaaaaaaafdfsdf"
+							onChange={value => this.onOldPasswordInputChanged(value)}
+              password
 						/>
 
 						{/* New password */}
@@ -243,7 +245,7 @@ class Settings extends Component<Props> {
 							title="NEW PASSWORD"
 							addon={passwordAddon}
               value={this.state.newPassword}
-							onInputChange={value => this.onNewPasswordInputChanged(value)}
+							onChange={value => this.onNewPasswordInputChanged(value)}
 						/>
 
 						{/* Repeat password */}
@@ -252,7 +254,7 @@ class Settings extends Component<Props> {
 							title="REPEAT NEW PASSWORD"
 							addon={passwordAddon}
               value={this.state.confirmPassword}
-							onInputChange={value => this.onRepeatPasswordInputChanged(value)}
+							onChange={value => this.onRepeatPasswordInputChanged(value)}
 						/>
 
 						{/* Save password */}

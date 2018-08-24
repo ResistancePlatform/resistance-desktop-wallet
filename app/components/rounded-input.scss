@@ -18,26 +18,26 @@
         color: $BASE_COLOR_BUTTON_FONT_GRAY;
         width: 9rem;
     }
-    
+
     .roundedInputTextArea {
         input {
             padding: 0.5rem 1rem;
-    
+
             min-width: 12rem;
             max-width: 12rem;
             width: 12rem;
-    
+
             background-color: transparent;
             border: 0;
             border-left: 1.5px solid $BASE_COLOR_BODER_GRAY;
-    
+
             color: $BASE_COLOR_WHITE;
-    
+
             &:focus {
                 outline: none
             }
         }
-    
+
         span {
             cursor: pointer;
         }
@@ -58,7 +58,7 @@
             cursor: default;
         }
 
-        span.tooltips {
+        span.tooltip {
             // visibility: hidden; // Hidden by default
 
             position: absolute;
@@ -84,7 +84,7 @@
                 border-color: $BASE_COLOR_BODER_GRAY transparent transparent transparent;
             }
         }
-    }    
+    }
 }
 
 .roundedInputContainer[disabled] {

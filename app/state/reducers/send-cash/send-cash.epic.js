@@ -10,12 +10,10 @@ import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { SendCashActions, SendCashState, checkPrivateTransactionRule } from './send-cash.reducer'
 import { AddressBookRow } from '../address-book/address-book.reducer'
 import { RpcService } from '../../../service/rpc-service'
-import { ClipboardService } from '../../../service/clipboard-service'
 import { AddressBookService } from '../../../service/address-book-service'
 
 
 const resistanceCliService = new RpcService()
-const clipboardService = new ClipboardService()
 const addressBookService = new AddressBookService()
 
 const allowToSend = (sendCashState: SendCashState) => {
@@ -86,11 +84,6 @@ const getAddressListEpic = (action$: ActionsObservable<AppAction>, state$) => ac
 	map(result => SendCashActions.getAddressListSuccess(result))
 )
 
-const pasteToAddressFromClipboardEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-	ofType(SendCashActions.pasteToAddressFromClipboard),
-	map(() => SendCashActions.updateToAddress(clipboardService.getContent()))
-)
-
 const checkAddressBookByNameEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
 	ofType(SendCashActions.checkAddressBookByName),
 	switchMap(() => {
@@ -121,6 +114,5 @@ export const SendCashEpics = (action$, state$) => merge(
 	sendCashOperationStartedEpic(action$, state$),
 	sendCashFailureEpic(action$, state$),
 	getAddressListEpic(action$, state$),
-	pasteToAddressFromClipboardEpic(action$, state$),
 	checkAddressBookByNameEpic(action$, state$)
 )

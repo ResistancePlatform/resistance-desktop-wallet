@@ -2,8 +2,7 @@
 import { Decimal } from 'decimal.js'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Subject, Subscription } from 'rxjs'
-import { debounceTime } from 'rxjs/operators'
+import { clipboard } from 'electron'
 
 import { TRANSACTION_FEE } from '../../constants'
 import { appStore } from '../../state/store/configureStore'
@@ -25,57 +24,12 @@ type Props = {
  */
 class SendCash extends Component<Props> {
 	props: Props
-	fromAddressInputDomRef: any
-	toAddressInputDomRef: any
-	amountInputDomRef: any
-
-	destAddressValueChangeSubject: Subject<any>
-	destAddressValueChangeSubscription: Subscription
-
-	constructor(props) {
-		super(props)
-
-		// create a ref to specified <input> which inside <RoundedInput>
-		this.fromAddressDomRef = (element) => { this.fromAddressInputDomRef = element };
-		this.toAddressDomRef = (element) => { this.toAddressInputDomRef = element };
-		this.amountAddressDomRef = (element) => { this.amountInputDomRef = element };
-
-		this.destAddressValueChangeSubject = new Subject()
-	}
 
 	/**
 	 * @memberof SendCash
 	 */
 	componentDidMount() {
-		this.fromAddressInputDomRef.inputDomRef.current.value = this.props.sendCash.fromAddress
-		this.toAddressInputDomRef.inputDomRef.current.value = this.props.sendCash.toAddress
-		this.amountInputDomRef.inputDomRef.current.value = this.props.sendCash.amount.toString()
-
-		// Setup destination address input debounce stream
-		this.destAddressValueChangeSubscription = this.destAddressValueChangeSubject
-			.asObservable()
-			.pipe(
-				debounceTime(300)
-			)
-			.subscribe(() => {
-				appStore.dispatch(SendCashActions.checkAddressBookByName())
-
-				// Just a workaround at this moment!!!
-				setTimeout(() => {
-					const latestAppState = appStore.getState()
-					this.toAddressInputDomRef.inputDomRef.current.value = latestAppState.sendCash.toAddress
-				}, 250);
-			})
-	}
-
-	/**
-	 * @memberof SendCash
-	 */
-	componentWillUnmount() {
-		if (this.destAddressValueChangeSubscription) {
-			this.destAddressValueChangeSubscription.unsubscribe();
-			this.destAddressValueChangeSubscription = null;
-		}
+    appStore.dispatch(SendCashActions.checkAddressBookByName())
 	}
 
 	eventConfirm(event) {
@@ -112,18 +66,12 @@ class SendCash extends Component<Props> {
 	}
 
 	onDestAddressPasteClicked() {
-		appStore.dispatch(SendCashActions.pasteToAddressFromClipboard())
-
-		// Just a workaround at this moment!!!
-		setTimeout(() => {
-			const currentAppState = appStore.getState()
-			this.toAddressInputDomRef.inputDomRef.current.value = currentAppState.sendCash.toAddress
-		}, 100);
+		appStore.dispatch(SendCashActions.updateToAddress(clipboard.readText()))
 	}
 
 	onDestAddressInputChanged(value) {
+    appStore.dispatch(SendCashActions.checkAddressBookByName())
 		appStore.dispatch(SendCashActions.updateToAddress(value))
-		this.destAddressValueChangeSubject.next()
 	}
 
 	onAmountAddressInputChanged(value) {
@@ -152,9 +100,6 @@ class SendCash extends Component<Props> {
 		this.commonMenuItemEventHandler(event)
 
 		if (!selectedAddress || selectedAddress.trim() === '') return
-
-		// Update `<RoundedInput> --> <input>` value manually, seems don't have the better option at this moment!!!
-		this.fromAddressInputDomRef.inputDomRef.current.value = selectedAddress
 
 		appStore.dispatch(SendCashActions.updateFromAddress(selectedAddress))
 	}
@@ -201,13 +146,12 @@ class SendCash extends Component<Props> {
 						<div className={styles.fromAddressContainer}>
 							<RoundedInput
 								name="from-address"
+                defaultValue={this.props.sendCash.fromAddress}
 								title="FROM ADDRESS"
 								addon={fromAddressAddon}
 								disabled={this.props.sendCash.isInputDisabled}
-								enableTooltips="true"
-								tooltipsContent={this.props.sendCash.inputTooltips}
-								onInputChange={value => this.onFromAddressInputChanged(value)}
-								ref={this.fromAddressDomRef}
+								tooltip={this.props.sendCash.inputTooltips}
+								onChange={value => this.onFromAddressInputChanged(value)}
 							>
 								{/* Dropdown menu container */}
 								<div className={styles.dropdownMenu} style={{ display: this.getDropdownMenuStyles() }}>
@@ -239,25 +183,24 @@ class SendCash extends Component<Props> {
 						{/* Destination address */}
 						<RoundedInput
 							name="destination-address"
+              defaultValue={this.props.sendCash.toAddress}
 							title="DESTINATION ADDRESS"
 							addon={destAddressAddon}
               disabled={this.props.sendCash.isInputDisabled}
-							enableTooltips="true"
-							tooltipsContent={this.props.sendCash.inputTooltips}
-							onInputChange={value => this.onDestAddressInputChanged(value)}
-							ref={this.toAddressDomRef}
+							tooltip={this.props.sendCash.inputTooltips}
+							onChange={value => this.onDestAddressInputChanged(value)}
 						/>
 
 						{/* Amount */}
 						<div className={styles.amountContainer}>
 							<RoundedInput
 								name="amount"
+                defaultValue={this.props.sendCash.amount.toString()}
 								title="AMOUNT"
-								onlyNumberAllowed="true"
 								addon={amountAddressAddon}
                 disabled={this.props.sendCash.isInputDisabled}
-								onInputChange={value => this.onAmountAddressInputChanged(value)}
-								ref={this.amountAddressDomRef}
+								onChange={value => this.onAmountAddressInputChanged(value)}
+                number
 							/>
 							<div className={styles.transactionFeeContainer}>
 								<span className={styles.part1}>TRANSACTION FEE: </span>
