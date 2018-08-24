@@ -59,7 +59,7 @@ export default class TransactionList extends Component<Props> {
 				onKeyDown={() => { }}
 			>
 				<div className={styles.tableBodyRowColumnType} >{transaction.type}</div>
-				<div className={styles.tableBodyRowColumnDirection}>{transaction.direction}</div>
+				<div className={styles.tableBodyRowColumnDirection}>{this.getTransactionDirection(transaction)}</div>
 				<div className={styles.tableBodyRowColumnConfirmed}>{transaction.confirmations !== 0 ? 'Yes' : 'No'}</div>
 				<div className={styles.tableBodyRowColumnAmount}>{truncateAmount(transaction.amount)}</div>
 				<div className={styles.tableBodyRowColumnDate}>{moment.unix(transaction.timestamp).format('L kk:mm:ss')}</div>
