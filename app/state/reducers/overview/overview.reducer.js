@@ -5,10 +5,10 @@ import { defaultAppState } from '../default-app-state'
 
 export type Transaction = {
 	type?: string,
-	direction?: string,
-	confirmed?: string,
+	category?: string,
+	confirmations?: number,
 	amount?: Decimal,
-	date?: string,
+	timestamp?: number,
 	destinationAddress?: string,
 	transactionId?: string
 }

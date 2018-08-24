@@ -10,7 +10,6 @@ import { TRANSACTION_FEE } from '../constants'
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { OSService } from './os-service'
 import { AddressBookService } from './address-book-service'
-import { getTransactionConfirmed, getTransactionDate, getTransactionDirection } from '../utils/data-util'
 import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions, Transaction } from '../state/reducers/overview/overview.reducer'
 import { OwnAddressesActions, AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
@@ -148,7 +147,7 @@ export class RpcService {
       .then(result => {
         const combinedTransactionList = [...result[0], ...result[1]]
         const sortedByDateTransactions = combinedTransactionList.sort((trans1, trans2) => (
-          new Date(trans2.originalTime) - new Date(trans1.originalTime)
+          new Date(trans2.timestamp) - new Date(trans1.timestamp)
         ))
         return { transactions: sortedByDateTransactions }
       })
@@ -556,11 +555,10 @@ async function getPublicTransactionsPromise(client: Client) {
         return result.map(
           originalTransaction => ({
             type: `\u2605 T (Public)`,
-            direction: getTransactionDirection(originalTransaction.category),
-            confirmed: getTransactionConfirmed(originalTransaction.confirmations),
+            category: originalTransaction.category,
+            confirmations: originalTransaction.confirmations,
             amount: Decimal(originalTransaction.amount),
-            date: getTransactionDate(originalTransaction.time),
-            originalTime: originalTransaction.time,
+            timestamp: originalTransaction.time,
             destinationAddress: originalTransaction.address ? originalTransaction.address : `[ Z Address not listed in Wallet ]`,
             transactionId: originalTransaction.txid
           })
@@ -607,11 +605,10 @@ async function getPrivateTransactionsPromise(client: Client) {
 
     const tempTransactionList = queryResultWithAddressArr.map(result => ({
       type: `\u2605 T (Private)`,
-      direction: getTransactionDirection(`receive`),
-      confirmed: 0,
+      category: 'receive',
+      confirmations: 0,
       amount: Decimal(result.amount),
-      date: null,
-      originalTime: 0,
+      timestamp: 0,
       destinationAddress: result.address,
       transactionId: result.txid
     }))
@@ -622,9 +619,8 @@ async function getPrivateTransactionsPromise(client: Client) {
       const tempTransaction = tempTransactionList[index];
       /* eslint-disable-next-line no-await-in-loop */
       const transactionDetail = await client.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
-      tempTransaction.confirmed = getTransactionConfirmed(transactionDetail.confirmations)
-      tempTransaction.date = getTransactionDate(transactionDetail.time)
-      tempTransaction.originalTime = transactionDetail.time
+      tempTransaction.confirmations = transactionDetail.confirmations
+      tempTransaction.timestamp = transactionDetail.time
     }
 
     return tempTransactionList

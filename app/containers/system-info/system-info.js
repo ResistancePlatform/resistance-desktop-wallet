@@ -1,6 +1,7 @@
 // @flow
 import { EOL } from 'os'
 
+import moment from 'moment'
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import classNames from 'classnames'
@@ -115,19 +116,7 @@ class SystemInfo extends Component<Props> {
   }
 
 	displayLastBlockTime(tempDate: Date | null) {
-		if (tempDate === undefined || tempDate === null || tempDate === false) {
-			return 'N/A'
-		}
-
-		const nowDate = new Date()
-		let tempDateTimeStr = ''
-		if (tempDate.toLocaleDateString() === nowDate.toLocaleDateString()) {
-			tempDateTimeStr = `Today, ${tempDate.toLocaleTimeString()}`
-		} else {
-			tempDateTimeStr = tempDate.toLocaleString()
-		}
-
-		return tempDateTimeStr.substring(0, tempDateTimeStr.length - 3)
+    return tempDate ?   moment().calendar(tempDate) : 'N/A'
 	}
 
   getMinerStatusIconTitle() {

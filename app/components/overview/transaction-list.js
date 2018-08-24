@@ -1,4 +1,5 @@
 // @flow
+import moment from 'moment'
 import React, { Component } from 'react'
 
 import { truncateAmount } from '../../constants'
@@ -25,6 +26,22 @@ export default class TransactionList extends Component<Props> {
 		}
 	}
 
+  getTransactionDirection(transaction): string {
+    switch (transaction.category) {
+      case 'receive':
+        return 'In'
+      case 'send':
+        return 'Out'
+      case 'generate':
+        return 'Mined'
+      case 'immature':
+        return 'Immature'
+      default:
+    }
+
+    return transaction.category
+  }
+
 	getTransactionTable() {
 		if (!this.props.transactions || this.props.transactions.length <= 0) {
 			return (
@@ -42,10 +59,10 @@ export default class TransactionList extends Component<Props> {
 				onKeyDown={() => { }}
 			>
 				<div className={styles.tableBodyRowColumnType} >{transaction.type}</div>
-				<div className={styles.tableBodyRowColumnDirection}>{transaction.direction}</div>
-				<div className={styles.tableBodyRowColumnConfirmed}>{transaction.confirmed}</div>
+				<div className={styles.tableBodyRowColumnDirection}>{this.getTransactionDirection(transaction)}</div>
+				<div className={styles.tableBodyRowColumnConfirmed}>{transaction.confirmations !== 0 ? 'Yes' : 'No'}</div>
 				<div className={styles.tableBodyRowColumnAmount}>{truncateAmount(transaction.amount)}</div>
-				<div className={styles.tableBodyRowColumnDate}>{transaction.date}</div>
+				<div className={styles.tableBodyRowColumnDate}>{moment.unix(transaction.timestamp).format('L kk:mm:ss')}</div>
 				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnAddress].join(' ')}>{transaction.destinationAddress}</div>
 			</div>
 		))
