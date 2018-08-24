@@ -35,7 +35,7 @@ class SendCash extends Component<Props> {
 	constructor(props) {
 		super(props)
 
-		// create a ref to specified <input> which inside <RounedInput>
+		// create a ref to specified <input> which inside <RoundedInput>
 		this.fromAddressDomRef = (element) => { this.fromAddressInputDomRef = element };
 		this.toAddressDomRef = (element) => { this.toAddressInputDomRef = element };
 		this.amountAddressDomRef = (element) => { this.amountInputDomRef = element };
@@ -153,7 +153,7 @@ class SendCash extends Component<Props> {
 
 		if (!selectedAddress || selectedAddress.trim() === '') return
 
-		// Update `<RounedInput> --> <input>` value manually, seems don't have the better option at this moment!!!
+		// Update `<RoundedInput> --> <input>` value manually, seems don't have the better option at this moment!!!
 		this.fromAddressInputDomRef.inputDomRef.current.value = selectedAddress
 
 		appStore.dispatch(SendCashActions.updateFromAddress(selectedAddress))

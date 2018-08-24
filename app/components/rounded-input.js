@@ -12,6 +12,7 @@ type RoundedInputAddon = {
 
 type Props = {
 	name: string,
+  value: string,
 	title: string,
 	onlyNumberAllowed: boolean | undefined,
 	onInputChange: value => void,
@@ -19,6 +20,7 @@ type Props = {
 	disabled?: boolean,
 	enableTooltips?: boolean | undefined,
 	tooltipsContent?: string,
+  onEnterPressed: func,
 	children: any
 }
 

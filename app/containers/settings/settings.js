@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import RounedInput, { RoundedInputAddon } from '../../components/rounded-input'
+import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import styles from './settings.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
@@ -19,12 +19,27 @@ type Props = {
 	settings: SettingsState
 }
 
+type State = {
+  currentPassword: string,
+  newPassword: string,
+  confirmPassword: string
+}
+
 /**
  * @class Settings
  * @extends {Component<Props>}
  */
 class Settings extends Component<Props> {
 	props: Props
+  state: State
+
+	/**
+	 * @memberof Settings
+	 */
+  constructor(props) {
+    super(props)
+    this.state = {}
+  }
 
 	/**
 	 * @param {*} nextProps
@@ -214,26 +229,29 @@ class Settings extends Component<Props> {
 						<div className={styles.titleBar}>Settings</div>
 
 						{/* Old password */}
-						<RounedInput
+						<RoundedInput
 							name="old-password"
 							title="OLD PASSWORD"
 							addon={passwordAddon}
+              value={this.state.currentPassword}
 							onInputChange={value => this.onOldPasswordInputChanged(value)}
 						/>
 
 						{/* New password */}
-						<RounedInput
+						<RoundedInput
 							name="new-password"
 							title="NEW PASSWORD"
 							addon={passwordAddon}
+              value={this.state.newPassword}
 							onInputChange={value => this.onNewPasswordInputChanged(value)}
 						/>
 
 						{/* Repeat password */}
-						<RounedInput
+						<RoundedInput
 							name="repeat-password"
 							title="REPEAT NEW PASSWORD"
 							addon={passwordAddon}
+              value={this.state.confirmPassword}
 							onInputChange={value => this.onRepeatPasswordInputChanged(value)}
 						/>
 

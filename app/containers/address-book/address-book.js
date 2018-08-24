@@ -30,7 +30,7 @@ class AddressBook extends Component<Props> {
 	constructor(props) {
 		super(props)
 
-		// create a ref to specified <input> which inside <RounedInput>
+		// create a ref to specified <input> which inside <RoundedInput>
 		this.addressDomRef = (element) => { this.addressInputDomRef = element };
 		this.nameDomRef = (element) => { this.nameInputDomRef = element };
 	}
