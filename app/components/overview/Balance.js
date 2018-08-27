@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react'
+import classNames from 'classnames'
 
 import { truncateAmount } from '../../constants'
 import { Balances } from '../../state/reducers/overview/overview.reducer'
@@ -41,6 +42,16 @@ export default class Balance extends Component<Props> {
 		return hasUnconfirmed ? `${styles.balanceValue} ${styles.hasUnconfirmedTransactionBalance}` : `${styles.balanceValue}`
 	}
 
+	renderBalanceValue(balanceString: stirng) {
+		const strArr = balanceString.split('.')
+		return (
+			<span>
+				<span className={classNames(styles.balanceFrontPart)}>{strArr[0]}</span>
+				<span className={classNames(styles.balanceDecimalPart)}>.{strArr.length > 1 ? strArr[1] : ''}</span>
+			</span>
+		)
+	}
+
 	render() {
 		return (
 			<div className={[HLayout.hBoxContainer, styles.balanceContainer].join(' ')} data-tid="balance-container">
@@ -49,7 +60,7 @@ export default class Balance extends Component<Props> {
 					<div className={styles.balanceWraper}>
 						<div className={styles.balanceTitle}>TRANSPARENT BALANCE (T)</div>
 						<div className={this.getBalanceValueStyles('transparent')}>
-							{truncateAmount(this.props.balances.transparentUnconfirmedBalance)}
+							{this.renderBalanceValue(truncateAmount(this.props.balances.transparentUnconfirmedBalance))}
 							<span className={styles.balanceValueUnit}>RES</span>
 						</div>
 					</div>
@@ -59,7 +70,7 @@ export default class Balance extends Component<Props> {
 					<div className={styles.balanceWraper}>
 						<div className={styles.balanceTitle}>PRIVATE BALANCE (R)</div>
 						<div className={this.getBalanceValueStyles('private')}>
-							{truncateAmount(this.props.balances.privateUnconfirmedBalance)}
+							{this.renderBalanceValue(truncateAmount(this.props.balances.privateUnconfirmedBalance))}
 							<span className={styles.balanceValueUnit}>RES</span>
 						</div>
 					</div>
@@ -69,7 +80,7 @@ export default class Balance extends Component<Props> {
 					<div className={styles.balanceWraper}>
 						<div className={styles.balanceTitle}>TOTAL BALANCE (R + T)</div>
 						<div className={this.getBalanceValueStyles('total')}>
-							{truncateAmount(this.props.balances.totalUnconfirmedBalance)}
+							{this.renderBalanceValue(truncateAmount(this.props.balances.totalUnconfirmedBalance))}
 							<span className={styles.balanceValueUnit}>RES</span>
 						</div>
 					</div>
