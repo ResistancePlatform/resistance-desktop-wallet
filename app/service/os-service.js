@@ -1,7 +1,7 @@
 // @flow
+import * as fs from 'fs';
 import path from 'path'
 import { spawn } from 'child_process'
-import { createWriteStream } from 'fs'
 import { app, remote } from 'electron'
 
 /**
@@ -265,7 +265,7 @@ export class OSService {
       })
 
       const logFile = this.getLogFilePath(processName)
-      const logStream = createWriteStream(logFile, {flags: 'a'})
+      const logStream = fs.createWriteStream(logFile, {flags: 'a'})
 
       childProcess.stdout.pipe(logStream)
       childProcess.stderr.pipe(logStream)
@@ -362,4 +362,30 @@ export class OSService {
 			)
 		})
 	}
+
+	/**
+   * Moves a file from one path to another, supports cross partitions and virtual file systems.
+   *
+	 * @param {string} fromPath
+	 * @param {string} toPath
+	 * @memberof OSService
+	 * @returns {Promise<any>}
+	 */
+  moveFile(fromPath, toPath) {
+    const readStream = fs.createReadStream(fromPath)
+    const writeStream = fs.createWriteStream(toPath)
+
+    const promise = new Promise((resolve, reject) => {
+      readStream.on('error', err => reject(err))
+      writeStream.on('error', err => reject(err))
+
+      readStream.on('close', () => {
+        fs.unlink(fromPath, unlinkError => unlinkError ? reject(unlinkError) : resolve())
+      });
+
+      readStream.pipe(writeStream)
+    })
+
+    return promise
+  }
 }

@@ -2,6 +2,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { toastr } from 'react-redux-toastr'
+import { remote } from 'electron'
 
 import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import styles from './settings.scss'
@@ -15,7 +16,6 @@ import StatusModal from '../../components/settings/status-modal'
 
 const config = require('electron-settings')
 const generator = require('generate-password')
-const argon2 = require('argon2')
 
 type Props = {
   systemInfo: SystemInfoState,
@@ -162,19 +162,20 @@ class Settings extends Component<Props> {
 	}
 
   async generatePasswordHash(password: string, salt: string) {
-    let hash
-
-    try {
-      hash = await argon2.hash({
-        pass: password,
-        salt
-      })
-    } catch (err) {
-      toastr.error(`Password hash generation failed`, err.toString())
-      return null
-    }
-
-    return hash.hashHex
+    return ''
+    // let hash
+    //
+    // try {
+    //   hash = await argon2.hash({
+    //     pass: password,
+    //     salt
+    //   })
+    // } catch (err) {
+    //   toastr.error(`Password hash generation failed`, err.toString())
+    //   return null
+    // }
+    //
+    // return hash.hashHex
   }
 
   getSavePasswordButtonDisabledAttribute() {
@@ -266,9 +267,42 @@ class Settings extends Component<Props> {
 	 * @param {*} event
 	 * @memberof Settings
 	 */
-	onBackupWalletClicked(event) {
-		this.eventConfirm(event)
-		console.log(`onBackupWalletClicked---->`)
+	onBackupWalletClicked() {
+    const onSaveHandler = (filePath) => {
+      appStore.dispatch(SettingsActions.exportWallet(filePath))
+    }
+
+    const title = `Backup Resistance wallet to a file`
+
+    remote.dialog.showSaveDialog({
+      title,
+      defaultPath: remote.app.getPath('documents'),
+      message: title,
+      nameFieldLabel: `File name:`,
+      filters: [{ name: `Text files`,  extensions: ['wallet'] }]
+    }, onSaveHandler)
+
+    return false
+	}
+
+	/**
+	 * @param {*} event
+	 * @memberof Settings
+	 */
+	onRestoreWalletClicked() {
+    const onOpenHandler = (filePaths) => {
+      appStore.dispatch(SettingsActions.importWallet(filePaths.pop()))
+    }
+
+    const title = `Restore Resistance wallet from a file`
+    remote.dialog.showOpenDialog({
+      title,
+      defaultPath: remote.app.getPath('documents'),
+      message: title,
+      filters: [{ name: `Text files`,  extensions: ['wallet'] }]
+    }, onOpenHandler)
+
+    return false
 	}
 
 	/**
@@ -400,11 +434,21 @@ class Settings extends Component<Props> {
 							<div className={styles.manageWalletTitle}>MANAGE WALLET</div>
 
 							<button
-								className={styles.backupWalletNodeButton}
+								className={styles.walletNodeButton}
 								onClick={event => this.onBackupWalletClicked(event)}
 								onKeyDown={event => this.onBackupWalletClicked(event)}
+                disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
 							>
-								BACKUP WALLET
+								Backup Wallet
+							</button>
+
+							<button
+								className={styles.walletNodeButton}
+								onClick={event => this.onRestoreWalletClicked(event)}
+								onKeyDown={event => this.onRestoreWalletClicked(event)}
+                disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
+							>
+								Restore Wallet
 							</button>
 						</div>
 					</div>

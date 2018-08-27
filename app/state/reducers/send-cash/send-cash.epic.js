@@ -13,7 +13,7 @@ import { RpcService } from '../../../service/rpc-service'
 import { AddressBookService } from '../../../service/address-book-service'
 
 
-const resistanceCliService = new RpcService()
+const rpcService = new RpcService()
 const addressBookService = new AddressBookService()
 
 const allowToSend = (sendCashState: SendCashState) => {
@@ -54,7 +54,7 @@ const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.
 		// Only fire real send if no error above
 		if (action.type === SystemInfoActions.newOperationTriggered.toString()) {
 			const state = state$.value.sendCash
-			resistanceCliService.sendCash(state.fromAddress, state.toAddress, state.amount)
+			rpcService.sendCash(state.fromAddress, state.toAddress, state.amount)
 		}
 	})
 )
@@ -79,7 +79,7 @@ const getAddressListEpic = (action$: ActionsObservable<AppAction>, state$) => ac
 	ofType(SendCashActions.getAddressList),
 	switchMap(() => {
 		const sendCashState = state$.value.sendCash
-		return resistanceCliService.getWalletAddressAndBalance(true, !sendCashState.isPrivateTransactions)
+		return rpcService.getWalletAddressAndBalance(true, !sendCashState.isPrivateTransactions)
 	}),
 	map(result => SendCashActions.getAddressListSuccess(result))
 )

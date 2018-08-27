@@ -83,6 +83,7 @@ div[name="repeat-password"] {
     }
 }
 
-.backupWalletNodeButton {
+.walletNodeButton {
     @include settingButton();
+    margin-right: 1.5rem;
 }

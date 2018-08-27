@@ -1,5 +1,9 @@
 // @flow
+import path from 'path'
+import * as fs from 'fs'
+import { promisify } from 'util'
 import { Decimal } from 'decimal.js'
+import { v4 as uuid } from 'uuid'
 import { remote } from 'electron'
 import Client from 'bitcoin-core'
 import { from, Observable, of } from 'rxjs'
@@ -9,7 +13,9 @@ import { toastr } from 'react-redux-toastr'
 import { TRANSACTION_FEE } from '../constants'
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { OSService } from './os-service'
+import { ResistanceService } from './resistance-service'
 import { AddressBookService } from './address-book-service'
+import { SettingsActions } from '../state/reducers/settings/settings.reducer'
 import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions, Transaction } from '../state/reducers/overview/overview.reducer'
 import { OwnAddressesActions, AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
@@ -55,6 +61,7 @@ const getClientInstance = () => {
 export class RpcService {
 	logger: LoggerService
   osService: OSService
+  resistanceService: ResistanceService
 	addressBookService: AddressBookService
 
 	/**
@@ -68,6 +75,7 @@ export class RpcService {
 
 		this.logger = new LoggerService()
 		this.osService = new OSService()
+		this.resistanceService = new ResistanceService()
 		this.addressBookService = new AddressBookService()
 
 		return instance
@@ -505,6 +513,53 @@ export class RpcService {
 			})
 		)
 	}
+
+	/**
+   * Export wallet to a file.
+   *
+	 * @memberof RpcService
+	 */
+  exportWallet(filePath) {
+    const client = getClientInstance()
+
+    const exportFileName = uuid().replace(/-/g, '')
+    const exportFilePath = path.join(this.resistanceService.getExportDir(), exportFileName)
+
+    const commandPromise = client.command('z_exportwallet', exportFileName)
+
+    commandPromise.then((result) => {
+      if (typeof(result) === 'object' && result.name === 'RpcError') {
+        throw new Error(result.message)
+      }
+      return this.osService.moveFile(exportFilePath, filePath)
+    }).then(() => (
+      this.osService.dispatchAction(SettingsActions.exportWalletSuccess())
+    )).catch(err => (
+      this.osService.dispatchAction(SettingsActions.exportWalletFailure(err.toString()))
+    ))
+  }
+
+	/**
+   * Import wallet from a file.
+   *
+	 * @memberof RpcService
+	 */
+  importWallet(filePath) {
+    const client = getClientInstance()
+
+    const importFileName = uuid().replace(/-/g, '')
+    const importFilePath = path.join(process.cwd(), importFileName)
+
+    promisify(fs.copyFile)(filePath, importFilePath).then(() => (
+      client.command('z_importwallet', importFileName)
+    )).then(() => {
+      this.osService.dispatchAction(SettingsActions.importWalletSuccess())
+      return promisify(fs.unlink)(importFilePath)
+    }).catch(err => (
+      this.osService.dispatchAction(SettingsActions.importWalletFailure(err.toString()))
+    ))
+  }
+
 }
 
 /* RPC Service private methods */
