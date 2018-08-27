@@ -230,7 +230,7 @@
     "redux-actions": "^2.6.1",
     "redux-observable": "^1.0.0",
     "rxjs": "^6.2.1",
-    "scryptsy": "^2.0.0",
+    "scrypt-js": "^2.0.3",
     "source-map-support": "^0.5.6"
   },
   "devEngines": {

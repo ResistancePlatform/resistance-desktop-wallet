@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { toastr } from 'react-redux-toastr'
 import { remote } from 'electron'
+import scrypt from 'scrypt-js'
 
 import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import styles from './settings.scss'
@@ -25,7 +26,8 @@ type Props = {
 type State = {
   oldPassword: string,
   newPassword: string,
-  repeatPassword: string
+  repeatPassword: string,
+  isPasswordUpdating: boolean
 }
 
 /**
@@ -137,7 +139,7 @@ class Settings extends Component<Props> {
         return false
       }
 
-      if (oldPasswordHash !== passwordHash) {
+      if (oldPasswordHash.toString() !== passwordHash.toString()) {
         toastr.error(`Old password doesn't match.`)
         return false
       }
@@ -155,31 +157,35 @@ class Settings extends Component<Props> {
       salt: newSalt
     })
 
-    this.setState({ oldPassword: null })
+    this.setState({ oldPassword: '' })
     toastr.success(`Password saved successfully.`)
 
     return false
 	}
 
-  async generatePasswordHash(password: string, salt: string) {
-    return ''
-    // let hash
-    //
-    // try {
-    //   hash = await argon2.hash({
-    //     pass: password,
-    //     salt
-    //   })
-    // } catch (err) {
-    //   toastr.error(`Password hash generation failed`, err.toString())
-    //   return null
-    // }
-    //
-    // return hash.hashHex
+  generatePasswordHash(password: string, salt: string) {
+    this.setState({ isPasswordUpdating: true })
+
+    const promise = new Promise(resolve => {
+      scrypt(Buffer.from(password), Buffer.from(salt), 16384, 8, 1, 64, (error, progress, key) => {
+        if (error) {
+          toastr.error(`Password hash generation failed`, error.toString())
+          resolve(null)
+        } else if (key) {
+          resolve(key)
+        }
+      })
+    })
+
+    return promise
   }
 
   getSavePasswordButtonDisabledAttribute() {
-    const passwordHash = config.get('passwordHash')
+    const passwordHash = config.get('password.hash')
+
+    if (this.state.isPasswordUpdating) {
+      return true
+    }
 
     if (passwordHash && !this.state.oldPassword) {
       return true
@@ -335,6 +341,7 @@ class Settings extends Component<Props> {
 						{/* Old password */}
 						<RoundedInput
 							name="old-password"
+              defaultValue={this.state.oldPassword}
 							label="Old Password"
 							addon={passwordAddon}
 							onChange={value => this.onOldPasswordInputChanged(value)}
