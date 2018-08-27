@@ -299,7 +299,7 @@ class Settings extends Component<Props> {
 	 */
 	onRestoreWalletClicked() {
     const onOpenHandler = (filePaths) => {
-      if (filePaths.length) {
+      if (filePaths && filePaths.length) {
         appStore.dispatch(SettingsActions.importWallet(filePaths.pop()))
       }
     }
