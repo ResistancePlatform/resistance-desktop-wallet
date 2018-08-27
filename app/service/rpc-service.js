@@ -550,16 +550,24 @@ export class RpcService {
     const importFileName = uuid().replace(/-/g, '')
     const importFilePath = path.join(process.cwd(), importFileName)
 
-    promisify(fs.copyFile)(filePath, importFilePath).then(() => (
-      client.command('z_importwallet', importFileName)
-    )).then(() => {
-      this.osService.dispatchAction(SettingsActions.importWalletSuccess())
-      return promisify(fs.unlink)(importFilePath)
-    }).catch(err => (
+    const errorHandler = err => (
       this.osService.dispatchAction(SettingsActions.importWalletFailure(err.toString()))
-    ))
-  }
+    )
 
+    fs.copyFile(filePath, importFilePath, err => {
+      if (err) {
+        return errorHandler(err)
+      }
+
+      client.command('z_importwallet', importFileName).then(() => (
+        this.osService.dispatchAction(SettingsActions.importWalletSuccess())
+      )).catch(errorHandler).then(() => (
+        promisify(fs.unlink)(importFilePath)
+      )).catch(console.error)
+
+    })
+
+  }
 }
 
 /* RPC Service private methods */

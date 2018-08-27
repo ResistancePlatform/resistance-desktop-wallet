@@ -269,7 +269,9 @@ class Settings extends Component<Props> {
 	 */
 	onBackupWalletClicked() {
     const onSaveHandler = (filePath) => {
-      appStore.dispatch(SettingsActions.exportWallet(filePath))
+      if (filePath) {
+        appStore.dispatch(SettingsActions.exportWallet(filePath))
+      }
     }
 
     const title = `Backup Resistance wallet to a file`
@@ -291,7 +293,9 @@ class Settings extends Component<Props> {
 	 */
 	onRestoreWalletClicked() {
     const onOpenHandler = (filePaths) => {
-      appStore.dispatch(SettingsActions.importWallet(filePaths.pop()))
+      if (filePaths.length) {
+        appStore.dispatch(SettingsActions.importWallet(filePaths.pop()))
+      }
     }
 
     const title = `Restore Resistance wallet from a file`
