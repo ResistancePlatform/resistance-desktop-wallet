@@ -58,7 +58,7 @@ const mergeAllCoinsEpic = (action$: ActionsObservable<AppAction>) => action$.pip
 const mergeCoinsOperationStartedEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
   ofType(OwnAddressesActions.mergeCoinsOperationStarted),
   tap(() => {
-    toastr.info(`Merging operation started.`)
+    toastr.info(`Merging operation started, addresses will be frozen until done.`)
   }),
   mapTo(SystemInfoActions.getOperations())
 )

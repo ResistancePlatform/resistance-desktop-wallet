@@ -79,7 +79,7 @@ export const OwnAddressesReducer = handleActions(
       ...state, frozenAddresses: {}
     }),
     [SystemInfoActions.operationFinished]: (state, action) => (
-      ['z_mergetoaddress', 'z_shieldcoinbase'].includes(action.payload.operation)
+      ['z_mergetoaddress', 'z_shieldcoinbase'].includes(action.payload.operation.method)
         ? { ...state, frozenAddresses: {} }
         : state
     ),

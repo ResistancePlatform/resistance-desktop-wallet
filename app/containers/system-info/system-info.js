@@ -48,14 +48,18 @@ class SystemInfo extends Component<Props> {
       {...map, [operation.id]: operation}
     ), {})
 
+    const checkIfPending = (operation) => ['queued', 'executing'].includes(operation.status)
+
     this.props.systemInfo.operations.forEach(currentOperation => {
       const prevOperation = prevOperationsMap[currentOperation.id]
 
-      if (prevOperation && !['queued', 'executing'].includes(prevOperation.status)) {
+      if (prevOperation && !checkIfPending(prevOperation)) {
         return
       }
 
-      appStore.dispatch(SystemInfoActions.operationFinished(currentOperation))
+      if (!checkIfPending(currentOperation)) {
+        appStore.dispatch(SystemInfoActions.operationFinished(currentOperation))
+      }
 
       let description
       const humanizedName = humanizeOperationName(currentOperation)

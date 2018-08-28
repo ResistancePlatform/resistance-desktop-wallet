@@ -21,7 +21,7 @@ export default class OwnAddressList extends Component<Props> {
 	onContextMenu(event: any, address: string) {
     event.preventDefault()
 
-    if (this.props.frozenAddresses[address]) {
+    if (Object.keys(this.props.frozenAddresses).length) {
       return false
     }
 
