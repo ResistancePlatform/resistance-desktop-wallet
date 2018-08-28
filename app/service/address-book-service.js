@@ -81,13 +81,34 @@ export class AddressBookService {
 		const tempAddressRows = existsAddressRows ? existsAddressRows : config.get(addressBookKey, [])
 		// Remove specified address and remove the duplicate row
 		const addressRowsToSave = tempAddressRows
-			.filter(tempAddress => tempAddress.name !== addressToRemove.name && tempAddress.address === addressToRemove.address)
+			.filter(tempAddress => tempAddress.name !== addressToRemove.name && tempAddress.address !== addressToRemove.address)
 			.reduce(addressRowReduceFunc, [])
 			.sort(addressRowSortFunc)
 		config.set(addressBookKey, addressRowsToSave)
 
 		return of(addressRowsToSave).pipe(
 			tap(addressRowsAfterSave => this.logger.debug(this, 'removeAddress', 'addressRowsAfterSave: ', ConsoleTheme.testing, addressRowsAfterSave))
+		)
+	}
+
+	/**
+	 * @param {AddressBookRow[]} [existsAddressRows]
+	 * @param {AddressBookRow} updatingAddress
+	 * @param {AddressBookRow} newValueAddress
+	 * @returns {Observable<AddressBookRow[]>}
+	 * @memberof AddressBookService
+	 */
+	updateAddress(existsAddressRows?: AddressBookRow[], updatingAddress: AddressBookRow, newValueAddress: AddressBookRow): Observable<AddressBookRow[]> {
+		const tempAddressRows = existsAddressRows ? existsAddressRows : config.get(addressBookKey, [])
+		// Replace specified address and remove the duplicate row
+		const addressRowsToSave = tempAddressRows
+			.map(tempAddress => tempAddress.name === updatingAddress.name && tempAddress.address === updatingAddress.address ? newValueAddress : tempAddress)
+			.reduce(addressRowReduceFunc, [])
+			.sort(addressRowSortFunc)
+		config.set(addressBookKey, addressRowsToSave)
+
+		return of(addressRowsToSave).pipe(
+			tap(addressRowsAfterSave => this.logger.debug(this, 'updateAddress', 'addressRowsAfterSave: ', ConsoleTheme.testing, addressRowsAfterSave))
 		)
 	}
 }
