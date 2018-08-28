@@ -3,14 +3,19 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { clipboard } from 'electron'
 
+import { toastr } from 'react-redux-toastr'
 import { AddressBookActions, AddressBookState, AddressBookRow } from '../../state/reducers/address-book/address-book.reducer'
+import { PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.reducer'
 import { appStore } from '../../state/store/configureStore'
 import AddressBookList from '../../components/address-book/address-book-list'
 import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
+import { PopupMenu, PopupMenuItem } from '../../components/popup-menu'
 
 import styles from './address-book.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
+
+const addressBookPopupMenuId = 'address-book-row-popup-menu-id'
 
 type Props = {
 	addressBook: AddressBookState
@@ -67,27 +72,6 @@ class AddressBook extends Component<Props> {
 	}
 
 	/**
-	 * @param {*} event
-	 * @param {string} action
-	 * @param {AddressBookRow} addressRow
-	 */
-	onAddressHandler(event, action: string, addressRow: AddressBookRow) {
-		this.commonMenuItemEventHandler(event)
-		switch (action) {
-			case 'remove':
-				appStore.dispatch(AddressBookActions.removeAddress(addressRow))
-				break
-
-			case 'copy':
-				appStore.dispatch(AddressBookActions.copyAddress(addressRow))
-				break
-
-			default:
-				break
-		}
-	}
-
-	/**
 	 * @param {*} value
 	 */
 	onNameInputChanged(value) {
@@ -125,9 +109,57 @@ class AddressBook extends Component<Props> {
 	}
 
 	/**
+	 * @param {*} event
+	 */
+	onUpdateButtonClicked(event) {
+		this.eventConfirm(event)
+		appStore.dispatch(AddressBookActions.updateAddress())
+	}
+
+	/**
+	 * @param {*} event
+	 * @param {AddressBookRow} addressBookRow
+	 * @memberof AddressBook
+	 */
+	onAddressRowClicked(event, addressBookRow: AddressBookRow) {
+		appStore.dispatch(PopupMenuActions.show(addressBookPopupMenuId, event.clientY, event.clientX, addressBookRow))
+	}
+
+	/**
+	 * @param {*} event
+	 * @param {AddressBookRow} addressBookRow
+	 * @memberof AddressBook
+	 */
+	updateAddressClicked(event, addressBookRow: AddressBookRow) {
+		appStore.dispatch(AddressBookActions.editAddress(addressBookRow))
+		appStore.dispatch(AddressBookActions.updateNewAddressDialogVisibility(true))
+
+		setTimeout(() => this.updateAddressDialogFromExistsState(), 200)
+	}
+
+	/**
+	 * @param {*} event
+	 * @param {AddressBookRow} addressBookRow
+	 * @memberof AddressBook
+	 */
+	copyAddressClicked(event, addressBookRow: AddressBookRow) {
+		appStore.dispatch(AddressBookActions.copyAddress(addressBookRow))
+	}
+
+	/**
+	 * @param {*} event
+	 * @param {AddressBookRow} addressBookRow
+	 * @memberof AddressBook
+	 */
+	removeAddressClicked(event, addressBookRow: AddressBookRow) {
+		const confirmOptions = { onOk: () => appStore.dispatch(AddressBookActions.removeAddress(addressBookRow)) }
+		toastr.confirm(`Are you sure want to remove the address for "${addressBookRow.name}"?`, confirmOptions)
+	}
+
+	/**
 	 */
 	renderNewAddressDialog() {
-		if (!this.props.addressBook.newAddressDialog) return null
+		if (!this.props.addressBook.addressDialog) return null
 
 		const nameAddon: RoundedInputAddon = {
 			enable: false,
@@ -142,6 +174,26 @@ class AddressBook extends Component<Props> {
 			onAddonClicked: () => this.onAddressPasteClicked()
 		}
 
+		const isInUpdateMode = this.props.addressBook.updatingAddress
+
+		const confirmButton = isInUpdateMode ? (
+			<button
+				className={styles.addButton}
+				onClick={(event) => this.onUpdateButtonClicked(event)}
+				onKeyDown={() => { }}
+			>UPDATE
+			</button>
+		) : (
+			<button
+					className={styles.addButton}
+					onClick={(event) => this.onAddButtonClicked(event)}
+					onKeyDown={() => { }}
+			>ADD
+			</button>
+			)
+
+		const title = isInUpdateMode ? `Update Address` : `New Address`
+
 		return (
 			<div className={styles.newAddressContainer}>
 				{ /* Close button */}
@@ -152,7 +204,7 @@ class AddressBook extends Component<Props> {
 				/>
 
 				{ /* Title */}
-				<div className={styles.title}>New Address</div>
+				<div className={styles.title}>{title}</div>
 
 				{ /* Name */}
 				<RoundedInput
@@ -180,12 +232,7 @@ class AddressBook extends Component<Props> {
 						onKeyDown={() => { }}
 					>CANCEL
 					</button>
-					<button
-						className={styles.addButton}
-						onClick={(event) => this.onAddButtonClicked(event)}
-						onKeyDown={() => { }}
-					>ADD
-					</button>
+					{confirmButton}
 				</div>
 			</div>
 		)
@@ -218,7 +265,14 @@ class AddressBook extends Component<Props> {
 				{this.renderNewAddressDialog()}
 
 				{/* Address book list */}
-				<AddressBookList addresses={this.props.addressBook.addresses} />
+				<AddressBookList addresses={this.props.addressBook.addresses} onRowClicked={(e, addressBookRow) => this.onAddressRowClicked(e, addressBookRow)} />
+
+				<PopupMenu id={addressBookPopupMenuId}>
+					<PopupMenuItem onClick={(e, address) => this.updateAddressClicked(e, address)}>Update Address</PopupMenuItem>
+					<PopupMenuItem onClick={(e, address) => this.copyAddressClicked(e, address)}>Copy Address</PopupMenuItem>
+					<PopupMenuItem onClick={(e, address) => this.removeAddressClicked(e, address)}>Remove Address</PopupMenuItem>
+				</PopupMenu>
+
 			</div >
 		)
 	}

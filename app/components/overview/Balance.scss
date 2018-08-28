@@ -37,13 +37,26 @@
 }
 
 .balanceValue {
+    display: inline-block;
+    position: relative;
+
     text-align: left !important;
     font-size: 2rem;
     font-weight: 400;
+
+    .balanceDecimalPart {
+        position: absolute;
+        top: 0.25rem;
+
+        font-size: 1.4rem;
+        vertical-align: text-top;
+    }
 }
 
 .balanceValueUnit {
-    margin-left: 0.5rem;
+    display: inline-block;
+    margin-left: 4rem;
+
     font-size: 1.25rem;
 }
 
