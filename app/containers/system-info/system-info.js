@@ -55,6 +55,8 @@ class SystemInfo extends Component<Props> {
         return
       }
 
+      appStore.dispatch(SystemInfoActions.operationFinished(currentOperation))
+
       let description
       const humanizedName = humanizeOperationName(currentOperation)
 

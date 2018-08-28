@@ -49,22 +49,62 @@ $OWN_ADDRESS_LIST_COLUMN_ADDRESS_WIDTH: 60%;
 
 .tableBodyRow {
   cursor: default;
+  position: relative;
 
-    div {
-        padding: 0.8rem 0;
+  div {
+    padding: 0.8rem 0;
 
-        display: inline-block;
+    display: inline-block;
 
-        font-size: 0.7rem;
-        font-weight: 300;
+    font-size: 0.7rem;
+    font-weight: 300;
 
-        border-top: none;
-        border-left: none;
-        border-right: none;
-        border-bottom: 1px solid $TRANSACTION_LIST_BODY_SEPARATOR_COLOR;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid $TRANSACTION_LIST_BODY_SEPARATOR_COLOR;
 
-        overflow: scroll;
+    overflow: scroll;
+  }
+
+  .merging {
+    position: absolute;
+    width: 82%;
+    top: 0;
+
+    pointer-events: none;
+    cursor: default;
+
+    margin-bottom: 4px;
+
+    text-align: right;
+
+    span {
+      border-radius: 0.5rem;
+			border: 1px solid $BASE_COLOR_BORDER_GRAY;
+
+      padding: 2px 6px;
+      color: $BASE_COLOR_BORDER_GRAY;
+      z-index: 1000;
     }
+
+		background: linear-gradient(to left, rgba(29, 36, 64, 1) 10%, rgba(29, 36, 64, 0.3) 90%);
+  }
+}
+
+.tableBodyRow:hover {
+  div {
+    color: $BASE_COLOR_PURPLE;
+  }
+}
+
+.mergingContainer {
+}
+
+.mergingContainer:hover {
+  div {
+    color: inherit;
+  }
 }
 
 .tableBodyRowColumnBalance {

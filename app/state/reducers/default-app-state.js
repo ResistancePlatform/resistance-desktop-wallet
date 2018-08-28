@@ -47,7 +47,8 @@ export const defaultAppState: AppState = {
 	},
 	ownAddresses: {
 		addresses: [],
-		showDropdownMenu: false
+		showDropdownMenu: false,
+    frozenAddresses: {}
 	},
 	sendCash: {
 		isPrivateTransactions: false,

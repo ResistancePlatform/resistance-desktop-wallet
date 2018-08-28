@@ -2,16 +2,19 @@
 import { Decimal } from 'decimal.js'
 import { createActions, handleActions } from 'redux-actions'
 import { defaultAppState } from '../default-app-state'
+import { SystemInfoActions } from '../system-info/system-info.reducer'
 
 export type AddressRow = {
 	balance: Decimal | null,
 	confirmed: boolean,
-	address: string
+	address: string,
+  isUnspent: boolean
 }
 
 export type OwnAddressesState = {
 	addresses?: AddressRow[],
-	showDropdownMenu?: boolean
+  showDropdownMenu?: boolean,
+  frozenAddresses: { [string]: Decimal }
 }
 
 export const OwnAddressesActions = createActions(
@@ -39,6 +42,16 @@ export const OwnAddressesActions = createActions(
   }
 )
 
+function getFrozenAddresses(state, action, rule: (address: AddressRow) => boolean) {
+  return state.addresses.reduce((frozenAddresses, address) => {
+    if (rule(address) || address.address === action.payload.zAddress) {
+      // Save initial balance for it to stay during the 'merge' operation
+      frozenAddresses[address.address] = address.balance
+    }
+    return frozenAddresses
+  }, {})
+}
+
 export const OwnAddressesReducer = handleActions(
   {
     [OwnAddressesActions.gotOwnAddresses]: (state, action) => ({
@@ -47,6 +60,29 @@ export const OwnAddressesReducer = handleActions(
     [OwnAddressesActions.getOwnAddressesFailure]: state => ({
       ...state, addresses: []
     }),
+    [OwnAddressesActions.mergeAllMinedCoins]: (state, action) => ({
+      ...state,
+      frozenAddresses: getFrozenAddresses(state, action, (address) => address.isUnspent)
+    }),
+    [OwnAddressesActions.mergeAllRAddressCoins]: (state, action) => ({
+      ...state,
+      frozenAddresses: getFrozenAddresses(state, action, (address) => address.address.startsWith('r'))
+    }),
+    [OwnAddressesActions.mergeAllZAddressCoins]: (state, action) => ({
+      ...state,
+      frozenAddresses: getFrozenAddresses(state, action, (address) => address.address.startsWith('z'))
+    }),
+    [OwnAddressesActions.mergeAllCoins]: (state, action) => ({
+      ...state, frozenAddresses: getFrozenAddresses(state, action, () => true)
+    }),
+    [OwnAddressesActions.mergeCoinsFailure]: state => ({
+      ...state, frozenAddresses: {}
+    }),
+    [SystemInfoActions.operationFinished]: (state, action) => (
+      ['z_mergetoaddress', 'z_shieldcoinbase'].includes(action.payload.operation)
+        ? { ...state, frozenAddresses: {} }
+        : state
+    ),
     [OwnAddressesActions.updateDropdownMenuVisibility]: (state, action) => ({
       ...state, showDropdownMenu: action.payload.show
     })

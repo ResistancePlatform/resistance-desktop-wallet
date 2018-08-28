@@ -40,6 +40,7 @@ export const SystemInfoActions = createActions(
     GET_OPERATIONS: undefined,
     GOT_OPERATIONS: (operations: Operation[]) => ({ operations }),
     GET_OPERATIONS_FAILURE:  (errorMessage: string, code) => ({ errorMessage, code }),
+    OPERATION_FINISHED: (operation) => ({ operation }),
 
     OPEN_WALLET_IN_FILE_MANAGER: undefined,
     OPEN_INSTALLATION_FOLDER: undefined,

@@ -47,7 +47,7 @@ const getClientInstance = () => {
       port: nodeConfig.rpcport,
       username: nodeConfig.rpcuser,
       password: nodeConfig.rpcpassword,
-      timeout: 2000
+      timeout: 10000
     })
   }
 
@@ -306,10 +306,12 @@ export class RpcService {
 
 		const queryPromise = Promise.all(promiseArr)
 			.then(result => {
-				// console.log(`result: `, result)
+        let plainPublicUnspentAddresses: string[] = []
+
 				const PublicAddressesResult = result[0][0]
 				const PublicAddressesUnspendResult = result[1][0]
 				const privateAddressesResult = result[2][0]
+
 				const publicAddressResultSet = new Set()
 				const privateAddressResultSet = new Set()
 
@@ -321,9 +323,9 @@ export class RpcService {
 				}
 
 				if (Array.isArray(PublicAddressesUnspendResult)) {
-					const publicAddresses = PublicAddressesUnspendResult.map(tempValue => tempValue.address)
-					for (let index = 0; index < publicAddresses.length; index++) {
-						publicAddressResultSet.add(publicAddresses[index])
+					plainPublicUnspentAddresses = PublicAddressesUnspendResult.map(tempValue => tempValue.address)
+					for (let index = 0; index < plainPublicUnspentAddresses.length; index++) {
+						publicAddressResultSet.add(plainPublicUnspentAddresses[index])
 					}
 				}
 
@@ -338,6 +340,7 @@ export class RpcService {
 						balance: Decimal('0'),
 						confirmed: false,
 						address: addr,
+            isUnspent: plainPublicUnspentAddresses.includes(addr),
 						disabled: false
 					}))
 
@@ -383,7 +386,6 @@ export class RpcService {
 
 				if (disableThePrivateAddress) {
 					const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')
-					// return addressList.map(tempAddressItem => isPrivateAddress(tempAddressItem.address) ? { ...tempAddressItem, disabled: true } : tempAddressItem)
 					const processedAddressList = addressList.map(tempAddressItem => isPrivateAddress(tempAddressItem.address) ? { ...tempAddressItem, disabled: true } : tempAddressItem)
 					this.logger.debug(this, `getWalletAddressAndBalance`, `processedAddressList: `, ConsoleTheme.testing, processedAddressList)
 					return processedAddressList
