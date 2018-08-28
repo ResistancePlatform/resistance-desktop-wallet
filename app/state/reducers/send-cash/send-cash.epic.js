@@ -10,12 +10,10 @@ import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { SendCashActions, SendCashState, checkPrivateTransactionRule } from './send-cash.reducer'
 import { AddressBookRow } from '../address-book/address-book.reducer'
 import { RpcService } from '../../../service/rpc-service'
-import { ClipboardService } from '../../../service/clipboard-service'
 import { AddressBookService } from '../../../service/address-book-service'
 
 
-const resistanceCliService = new RpcService()
-const clipboardService = new ClipboardService()
+const rpcService = new RpcService()
 const addressBookService = new AddressBookService()
 
 const allowToSend = (sendCashState: SendCashState) => {
@@ -56,7 +54,7 @@ const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.
 		// Only fire real send if no error above
 		if (action.type === SystemInfoActions.newOperationTriggered.toString()) {
 			const state = state$.value.sendCash
-			resistanceCliService.sendCash(state.fromAddress, state.toAddress, state.amount)
+			rpcService.sendCash(state.fromAddress, state.toAddress, state.amount)
 		}
 	})
 )
@@ -81,14 +79,9 @@ const getAddressListEpic = (action$: ActionsObservable<AppAction>, state$) => ac
 	ofType(SendCashActions.getAddressList),
 	switchMap(() => {
 		const sendCashState = state$.value.sendCash
-		return resistanceCliService.getWalletAddressAndBalance(true, !sendCashState.isPrivateTransactions)
+		return rpcService.getWalletAddressAndBalance(true, !sendCashState.isPrivateTransactions)
 	}),
 	map(result => SendCashActions.getAddressListSuccess(result))
-)
-
-const pasteToAddressFromClipboardEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-	ofType(SendCashActions.pasteToAddressFromClipboard),
-	map(() => SendCashActions.updateToAddress(clipboardService.getContent()))
 )
 
 const checkAddressBookByNameEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
@@ -121,6 +114,5 @@ export const SendCashEpics = (action$, state$) => merge(
 	sendCashOperationStartedEpic(action$, state$),
 	sendCashFailureEpic(action$, state$),
 	getAddressListEpic(action$, state$),
-	pasteToAddressFromClipboardEpic(action$, state$),
 	checkAddressBookByNameEpic(action$, state$)
 )

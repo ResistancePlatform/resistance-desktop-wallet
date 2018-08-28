@@ -4,20 +4,13 @@ import { merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { AddressBookActions } from './address-book.reducer'
 import { AddressBookService } from '../../../service/address-book-service'
-import { ClipboardService } from '../../../service/clipboard-service'
 
 const addressBookService = new AddressBookService()
-const clipboardService = new ClipboardService()
 
 const loadAddressBookEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(AddressBookActions.loadAddressBook),
 	switchMap(() => addressBookService.loadAddressBook()),
 	map(result => AddressBookActions.gotAddressBook(result))
-)
-
-const pasteAddressFromClipboardEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
-	ofType(AddressBookActions.pasteAddressFromClipboard),
-	map(() => AddressBookActions.updateNewAddressDialogAddress(clipboardService.getContent()))
 )
 
 const addAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
@@ -34,6 +27,5 @@ const addAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe
 
 export const AddressBookEpics = (action$, state$) => merge(
 	loadAddressBookEpic(action$, state$),
-	pasteAddressFromClipboardEpic(action$, state$),
 	addAddressEpic(action$, state$)
 )

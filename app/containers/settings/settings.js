@@ -1,8 +1,11 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { toastr } from 'react-redux-toastr'
+import { remote } from 'electron'
+import scrypt from 'scrypt-js'
 
-import RounedInput, { RoundedInputAddon } from '../../components/rounded-input'
+import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import styles from './settings.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
@@ -13,10 +16,18 @@ import { SettingsActions, SettingsState } from '../../state/reducers/settings/se
 import StatusModal from '../../components/settings/status-modal'
 
 const config = require('electron-settings')
+const generator = require('generate-password')
 
 type Props = {
   systemInfo: SystemInfoState,
 	settings: SettingsState
+}
+
+type State = {
+  oldPassword: string,
+  newPassword: string,
+  repeatPassword: string,
+  isPasswordUpdating: boolean
 }
 
 /**
@@ -25,6 +36,15 @@ type Props = {
  */
 class Settings extends Component<Props> {
 	props: Props
+  state: State
+
+	/**
+	 * @memberof Settings
+	 */
+  constructor(props) {
+    super(props)
+    this.state = {}
+  }
 
 	/**
 	 * @param {*} nextProps
@@ -86,7 +106,7 @@ class Settings extends Component<Props> {
 	 * @memberof Settings
 	 */
 	onOldPasswordInputChanged(value) {
-		console.log(`onOldPasswordInputChanged: ${value}`)
+    this.setState({ oldPassword: value })
 	}
 
 	/**
@@ -94,7 +114,7 @@ class Settings extends Component<Props> {
 	 * @memberof Settings
 	 */
 	onNewPasswordInputChanged(value) {
-		console.log(`onNewPasswordInputChanged: ${value}`)
+    this.setState({ newPassword: value })
 	}
 
 	/**
@@ -102,17 +122,85 @@ class Settings extends Component<Props> {
 	 * @memberof Settings
 	 */
 	onRepeatPasswordInputChanged(value) {
-		console.log(`onRepeatPasswordInputChanged: ${value}`)
+    this.setState({ repeatPassword: value })
 	}
 
 	/**
 	 * @param {*} event
 	 * @memberof Settings
 	 */
-	onSavePasswordClicked(event) {
-		this.eventConfirm(event)
-		console.log(`onSavePasswordClicked---->`)
+	async onSavePasswordClicked() {
+    const passwordHash = config.get('password.hash')
+
+    if (passwordHash) {
+      const oldPasswordHash = await this.generatePasswordHash(this.state.oldPassword, config.get('password.salt', ''))
+
+      if (!oldPasswordHash) {
+        return false
+      }
+
+      if (oldPasswordHash.toString() !== passwordHash.toString()) {
+        toastr.error(`Old password doesn't match.`)
+        return false
+      }
+    }
+
+    const newSalt = generator.generate({ length: 32, numbers: true })
+    const newPasswordHash = await this.generatePasswordHash(this.state.newPassword, newSalt)
+
+    if (!newPasswordHash) {
+      return false
+    }
+
+    config.set('password', {
+      hash: newPasswordHash,
+      salt: newSalt
+    })
+
+    this.setState({ oldPassword: '' })
+    toastr.success(`Password saved successfully.`)
+
+    return false
 	}
+
+  generatePasswordHash(password: string, salt: string) {
+    this.setState({ isPasswordUpdating: true })
+
+    const promise = new Promise(resolve => {
+      scrypt(Buffer.from(password), Buffer.from(salt), 16384, 8, 1, 64, (error, progress, key) => {
+        if (error) {
+          toastr.error(`Password hash generation failed`, error.toString())
+          resolve(null)
+        } else if (key) {
+          resolve(key)
+        }
+      })
+    })
+
+    return promise
+  }
+
+  getSavePasswordButtonDisabledAttribute() {
+    const passwordHash = config.get('password.hash')
+
+    if (this.state.isPasswordUpdating) {
+      return true
+    }
+
+    if (passwordHash && !this.state.oldPassword) {
+      return true
+    }
+
+    if (!this.state.newPassword) {
+      return true
+    }
+
+    if (this.state.newPassword !== this.state.repeatPassword) {
+      return true
+    }
+
+    return false
+  }
 
 	/**
 	 * @param {*} event
@@ -185,9 +273,46 @@ class Settings extends Component<Props> {
 	 * @param {*} event
 	 * @memberof Settings
 	 */
-	onBackupWalletClicked(event) {
-		this.eventConfirm(event)
-		console.log(`onBackupWalletClicked---->`)
+	onBackupWalletClicked() {
+    const onSaveHandler = (filePath) => {
+      if (filePath) {
+        appStore.dispatch(SettingsActions.exportWallet(filePath))
+      }
+    }
+
+    const title = `Backup Resistance wallet to a file`
+
+    remote.dialog.showSaveDialog({
+      title,
+      defaultPath: remote.app.getPath('documents'),
+      message: title,
+      nameFieldLabel: `File name:`,
+      filters: [{ name: `Text files`,  extensions: ['wallet'] }]
+    }, onSaveHandler)
+
+    return false
+	}
+
+	/**
+	 * @param {*} event
+	 * @memberof Settings
+	 */
+	onRestoreWalletClicked() {
+    const onOpenHandler = (filePaths) => {
+      if (filePaths && filePaths.length) {
+        appStore.dispatch(SettingsActions.importWallet(filePaths.pop()))
+      }
+    }
+
+    const title = `Restore Resistance wallet from a file`
+    remote.dialog.showOpenDialog({
+      title,
+      defaultPath: remote.app.getPath('documents'),
+      message: title,
+      filters: [{ name: `Text files`,  extensions: ['wallet'] }]
+    }, onOpenHandler)
+
+    return false
 	}
 
 	/**
@@ -214,36 +339,43 @@ class Settings extends Component<Props> {
 						<div className={styles.titleBar}>Settings</div>
 
 						{/* Old password */}
-						<RounedInput
+						<RoundedInput
 							name="old-password"
-							title="OLD PASSWORD"
+              defaultValue={this.state.oldPassword}
+							label="Old Password"
 							addon={passwordAddon}
-							onInputChange={value => this.onOldPasswordInputChanged(value)}
+							onChange={value => this.onOldPasswordInputChanged(value)}
+              password
 						/>
 
 						{/* New password */}
-						<RounedInput
+						<RoundedInput
 							name="new-password"
-							title="NEW PASSWORD"
+							label="New Password"
 							addon={passwordAddon}
-							onInputChange={value => this.onNewPasswordInputChanged(value)}
+              value={this.state.newPassword}
+							onChange={value => this.onNewPasswordInputChanged(value)}
+              password
 						/>
 
 						{/* Repeat password */}
-						<RounedInput
+						<RoundedInput
 							name="repeat-password"
-							title="REPEAT NEW PASSWORD"
+							label="Repeat New Password"
 							addon={passwordAddon}
-							onInputChange={value => this.onRepeatPasswordInputChanged(value)}
+              value={this.state.repeatPassword}
+							onChange={value => this.onRepeatPasswordInputChanged(value)}
+              password
 						/>
 
 						{/* Save password */}
 						<button
 							className={styles.savePasswordButton}
-							onClick={event => this.onSavePasswordClicked(event)}
-							onKeyDown={event => this.onSavePasswordClicked(event)}
+              onClick={async () => this.onSavePasswordClicked()}
+							onKeyDown={async () => this.onSavePasswordClicked()}
+              disabled={this.getSavePasswordButtonDisabledAttribute()}
 						>
-							SAVE PASSWORD
+							Save Password
 						</button>
 
 						{/* Manage daemon */}
@@ -313,11 +445,21 @@ class Settings extends Component<Props> {
 							<div className={styles.manageWalletTitle}>MANAGE WALLET</div>
 
 							<button
-								className={styles.backupWalletNodeButton}
+								className={styles.walletNodeButton}
 								onClick={event => this.onBackupWalletClicked(event)}
 								onKeyDown={event => this.onBackupWalletClicked(event)}
+                disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
 							>
-								BACKUP WALLET
+								Backup Wallet
+							</button>
+
+							<button
+								className={styles.walletNodeButton}
+								onClick={event => this.onRestoreWalletClicked(event)}
+								onKeyDown={event => this.onRestoreWalletClicked(event)}
+                disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
+							>
+								Restore Wallet
 							</button>
 						</div>
 					</div>
