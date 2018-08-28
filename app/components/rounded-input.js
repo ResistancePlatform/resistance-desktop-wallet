@@ -1,5 +1,7 @@
 // @flow
 import React, { Component } from 'react'
+import classNames from 'classnames'
+
 import styles from './rounded-input.scss'
 
 type RoundedInputAddon = {
@@ -12,43 +14,63 @@ type RoundedInputAddon = {
 
 type Props = {
 	name: string,
-	title: string,
-	onlyNumberAllowed: boolean | undefined,
-	onInputChange: value => void,
+  defaultValue?: string,
+	number?: boolean,
+  password?: boolean,
+	label: string,
+	onChange: value => void,
 	addon: RoundedInputAddon,
 	disabled?: boolean,
-	enableTooltips?: boolean | undefined,
-	tooltipsContent?: string,
+	tooltip?: string,
+  onEnterPressed: func,
+  error?: string | null,
 	children: any
+}
+
+type State = {
+  value: string,
+  isFocused: boolean
 }
 
 export default class RoundedInput extends Component<Props> {
 	props: Props
-	inputDomRef: any
-	focusedOrTyping: boolean
+  state: State
 
 	constructor(props) {
 		super(props)
-		this.focusedOrTyping = false
-		this.inputDomRef = React.createRef()
+    this.state = {
+      value: props.defaultValue || '',
+      isFocused: false
+    }
 	}
 
-	inputOnchangeEventHandler(event) {
-		event.stopPropagation()
-		const newValue = event.target.value
-		this.focusedOrTyping = true
+	/**
+	 * @param {*} prevProps
+	 * @memberof RoundedInput
+	 */
+  componentDidUpdate(prevProps) {
+    if (prevProps.defaultValue !== this.props.defaultValue ) {
+        /* eslint-disable-next-line react/no-did-update-set-state */
+        this.setState({ value: this.props.defaultValue || '' })
+    }
+  }
 
-		if (this.props.onInputChange) {
-			this.props.onInputChange(newValue)
+	onChangeHandler(event) {
+		event.stopPropagation()
+
+    this.setState({ value: event.target.value })
+
+		if (this.props.onChange) {
+			this.props.onChange(event.target.value)
 		}
 	}
 
-	onInputFocusEventHandler() {
-		this.focusedOrTyping = true
+	onFocusHandler() {
+		this.setState({ isFocused: true })
 	}
 
-	onInputBlurEventHandler() {
-		this.focusedOrTyping = false
+	onBlurHandler() {
+		this.setState({ isFocused: false })
 	}
 
 	onMyAddonClick(event) {
@@ -102,20 +124,26 @@ export default class RoundedInput extends Component<Props> {
 		}
 	}
 
-	renderTooltips() {
-		/**
-		 * Only show the `tooltips` when:
-		 * - props.enableTooltips: true
-		 * - props.tooltipsContent: non-empty
-		 * - <input> is focused or typing
-		 */
-		const shouldHideShowTooltips = Boolean(!this.focusedOrTyping || !this.props.enableTooltips || !this.props.tooltipsContent || !this.props.tooltipsContent.trim() === '')
-		// console.log(`renderTooltips - shouldHideShowTooltips: ${shouldHideShowTooltips}`)
-		if (shouldHideShowTooltips) return null
+  getInputType() {
+    if (this.props.number) {
+      return 'number'
+    }
 
-		return (
-			<span className={styles.tooltips}>{this.props.tooltipsContent}</span>
-		)
+    if (this.props.password) {
+      return 'password'
+    }
+
+    return 'text'
+  }
+
+	renderTooltip() {
+    if (this.state.isFocused && this.props.tooltip) {
+      return (
+        <span className={styles.tooltip}>{this.props.tooltip}</span>
+      )
+    }
+
+    return null
 	}
 
 	render() {
@@ -125,22 +153,22 @@ export default class RoundedInput extends Component<Props> {
 				disabled={this.props.disabled}
 				className={styles.roundedInputContainer}
 			>
-				<div className={styles.roundedInputTitle}>
-					{this.props.title ? this.props.title : ''}
+				<div className={styles.roundedInputLabel}>
+					{this.props.label || ''}
 				</div>
 
-				<div className={styles.roundedInputTextArea}>
+				<div className={classNames(styles.roundedInputTextArea, {error: this.props.error})}>
 					<input
-						ref={this.inputDomRef}
-						type={this.props.onlyNumberAllowed ? 'number' : 'text'}
+						type={this.getInputType()}
+            value={this.state.value}
 						disabled={this.props.disabled}
-						onChange={event => this.inputOnchangeEventHandler(event)}
-						onFocus={(event) => this.onInputFocusEventHandler(event)}
-						onBlur={(event) => this.onInputBlurEventHandler(event)}
+						onChange={event => this.onChangeHandler(event)}
+						onFocus={(event) => this.onFocusHandler(event)}
+						onBlur={(event) => this.onBlurHandler(event)}
 						onKeyPress={(event) => this.onEnterPressedEventHandler(event)}
 					/>
 					{this.renderAddon()}
-					{this.renderTooltips()}
+					{this.renderTooltip()}
 				</div>
 				{this.props.children ? this.props.children : null}
 			</div>

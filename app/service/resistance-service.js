@@ -7,7 +7,7 @@ import { app, remote } from 'electron'
 
 import { OSService } from './os-service'
 
-const generator = require('generate-password');
+const generator = require('generate-password')
 const PropertiesReader = require('properties-reader')
 
 /**
@@ -96,7 +96,16 @@ export class ResistanceService {
 	 */
 	start(isTorEnabled: boolean) {
     const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs
-    osService.execProcess('NODE', args, this.handleStdout)
+
+    this::verifyExportDirExistence().then(exportDir => {
+      args.push(`-exportdir=${exportDir}`)
+      osService.execProcess('NODE', args, this::handleStdout)
+      return Promise.resolve()
+    }).catch(err => {
+      const actions = osService.getSettingsActions()
+      this.dispatchAction(actions.childProcessFailed('NODE', err.toString()))
+    })
+
 	}
 
 	/**
@@ -135,12 +144,44 @@ export class ResistanceService {
   }
 
 	/**
-   * Called on new data in stdout, returns true if Resistance node has been initialized.
+   * Returns Resistance export dir as provided with -exportdir command line argument to the node.
    *
-   * @param {string} configFilePath
 	 * @memberof ResistanceService
 	 */
-  handleStdout(data: Buffer) {
-    return data.toString().includes(`init message: Done loading`)
+  getExportDir() {
+    return path.join(osService.getAppDataPath(), 'ExportDir')
   }
+}
+
+/* Resistance Service private methods */
+
+/**
+ * Private method. Called on new data in stdout, returns true if Resistance node has been initialized.
+ *
+ * @param {string} configFilePath
+ * @memberof ResistanceService
+ */
+function handleStdout(data: Buffer) {
+  return data.toString().includes(`init message: Done loading`)
+}
+
+/**
+ * Privte method. Checks if local node export directory exists, otherwise creates one.
+ *
+ * @returns {Promise}
+ * @memberof ResistanceService
+ */
+function verifyExportDirExistence() {
+  const exportDir = this.getExportDir()
+
+  const promise = new Promise((resolve, reject) => {
+    fs.access(exportDir, err => {
+      if (err) {
+        fs.mkdir(exportDir, mkdirError => mkdirError ? reject(mkdirError) : resolve(exportDir))
+      }
+      resolve(exportDir)
+    })
+  })
+
+  return promise
 }

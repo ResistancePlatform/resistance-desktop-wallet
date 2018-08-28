@@ -23,7 +23,7 @@
     }
 
     tr {
-      border-bottom: 1.5px solid $BASE_COLOR_BODER_GRAY;
+      border-bottom: 1.5px solid $BASE_COLOR_BORDER_GRAY;
     }
 
     tr:last-child {
@@ -72,7 +72,7 @@
 
   .selectedTabPanel {
     display: block;
-    border: 1.1px solid $BASE_COLOR_BODER_GRAY;
+    border: 1.1px solid $BASE_COLOR_BORDER_GRAY;
     background-color: $BASE_COLOR_DARK_BLUE_2;
     padding: 6px;
     height: 100%;

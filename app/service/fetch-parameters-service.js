@@ -5,15 +5,9 @@ import path from 'path'
 import { app, dialog } from 'electron'
 import { download } from 'electron-dl'
 
-import { OSService } from './os-service'
-
 const crypto = require('crypto');
 const config = require('electron-settings')
 const ProgressBar = require('electron-progressbar');
-
-// Set the customized 'electron-settings' path
-const osService = new OSService()
-config.setPath(osService.getAppSettingFile())
 
 const quickHashesConfigKey = 'resistanceParameters.quickHashes'
 const paramsFolderName = 'ResistanceParams'

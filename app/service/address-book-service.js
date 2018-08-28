@@ -2,14 +2,9 @@
 import { Observable, of } from 'rxjs'
 import { map, tap, take, catchError } from 'rxjs/operators'
 import { LoggerService, ConsoleTheme } from './logger-service'
-import { OSService } from './os-service'
 import { AddressBookRow } from '../state/reducers/address-book/address-book.reducer'
 
 const config = require('electron-settings')
-
-// Set the customized 'electron-settings' path
-const osService = new OSService()
-config.setPath(osService.getAppSettingFile())
 
 const addressBookKey = 'addressbook'
 const addressRowSortFunc = (a1, a2) => a1.name.localeCompare(a2.name)

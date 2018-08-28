@@ -1,12 +1,6 @@
 import { Decimal } from 'decimal.js'
-import { OSService } from '../../service/os-service'
 
 const config = require('electron-settings')
-
-const osService = new OSService()
-
-// Set the customized 'electron-settings' path
-config.setPath(osService.getAppSettingFile())
 
 
 export const defaultAppState: AppState = {

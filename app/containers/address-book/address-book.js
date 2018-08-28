@@ -1,14 +1,16 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { clipboard } from 'electron'
+
 import { AddressBookActions, AddressBookState, AddressBookRow } from '../../state/reducers/address-book/address-book.reducer'
 import { appStore } from '../../state/store/configureStore'
 import AddressBookList from '../../components/address-book/address-book-list'
 import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
+
 import styles from './address-book.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
-
 
 type Props = {
 	addressBook: AddressBookState
@@ -20,36 +22,9 @@ type Props = {
  */
 class AddressBook extends Component<Props> {
 	props: Props
-	nameInputDomRef: any
-	addressInputDomRef: any
 
-	/**
-	 *Creates an instance of AddressBook.
-	 * @param {*} props
-	 */
-	constructor(props) {
-		super(props)
-
-		// create a ref to specified <input> which inside <RounedInput>
-		this.addressDomRef = (element) => { this.addressInputDomRef = element };
-		this.nameDomRef = (element) => { this.nameInputDomRef = element };
-	}
-
-	/**
-	 */
 	componentDidMount() {
 		appStore.dispatch(AddressBookActions.loadAddressBook())
-
-		const currentAppState = appStore.getState()
-		const dialogState = currentAppState &&
-			currentAppState.addressBook &&
-			currentAppState.addressBook.newAddressDialog ? currentAppState.addressBook.newAddressDialog : null
-
-		if (dialogState) {
-			this.nameInputDomRef.inputDomRef.current.value = dialogState.name
-			this.addressInputDomRef.inputDomRef.current.value = dialogState.address
-		}
-
 	}
 
 	/**
@@ -130,13 +105,7 @@ class AddressBook extends Component<Props> {
 	 * @memberof AddressBook
 	 */
 	onAddressPasteClicked() {
-		appStore.dispatch(AddressBookActions.pasteAddressFromClipboard())
-
-		// Just a workaround at this moment!!!
-		setTimeout(() => {
-			const currentAppState = appStore.getState()
-			this.addressInputDomRef.inputDomRef.current.value = currentAppState.addressBook.newAddressDialog.address
-		}, 100);
+		appStore.dispatch(AddressBookActions.updateNewAddressDialogAddress(clipboard.readText()))
 	}
 
 	/**
@@ -188,19 +157,19 @@ class AddressBook extends Component<Props> {
 				{ /* Name */}
 				<RoundedInput
 					name="new-address-name"
-					title="NAME"
+          defaultValue={this.props.addressBook.newAddressDialog.name}
+					label="NAME"
 					addon={nameAddon}
-					onInputChange={value => this.onNameInputChanged(value)}
-					ref={this.nameDomRef}
+					onChange={value => this.onNameInputChanged(value)}
 				/>
 
 				{ /* Address */}
 				<RoundedInput
 					name="new-address-address"
-					title="ADDRESS"
+          defaultValue={this.props.addressBook.newAddressDialog.address}
+					label="ADDRESS"
 					addon={addressAddon}
-					onInputChange={value => this.onAddressInputChanged(value)}
-					ref={this.addressDomRef}
+					onChange={value => this.onAddressInputChanged(value)}
 				/>
 
 				{ /* Buttons */}

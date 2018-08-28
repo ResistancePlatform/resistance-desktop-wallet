@@ -31,8 +31,7 @@ export const AddressBookActions = createActions(
 
     UPDATE_NEW_ADDRESS_DIALOG_VISIBILITY: (show: boolean) => show,
     UPDATE_NEW_ADDRESS_DIALOG_NAME: (name: string) => name,
-    UPDATE_NEW_ADDRESS_DIALOG_ADDRESS: (address: string) => address,
-    PASTE_ADDRESS_FROM_CLIPBOARD: undefined
+    UPDATE_NEW_ADDRESS_DIALOG_ADDRESS: (address: string) => address
   },
   {
     prefix: 'APP/ADDRESS_BOOK'
