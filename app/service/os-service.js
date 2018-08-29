@@ -348,12 +348,6 @@ export class OSService {
 
 					if (process) {
 						resolve(process.pid)
-						console.log(
-							'PID: %s, COMMAND: %s, ARGUMENTS: %s',
-							process.pid,
-							process.command,
-							process.arguments
-						)
 					} else {
 						resolve(0)
 						console.log('No such process found!')

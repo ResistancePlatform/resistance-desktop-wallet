@@ -5,9 +5,9 @@ import path from 'path'
 import { app, dialog } from 'electron'
 import { download } from 'electron-dl'
 
-const crypto = require('crypto');
+const crypto = require('crypto')
 const config = require('electron-settings')
-const ProgressBar = require('electron-progressbar');
+const ProgressBar = require('electron-progressbar')
 
 const quickHashesConfigKey = 'resistanceParameters.quickHashes'
 const paramsFolderName = 'ResistanceParams'
@@ -246,7 +246,7 @@ export class FetchParametersService {
 
     const calcFromStats = stats => {
       const data = `${fileName};${stats.size};${stats.ctime.toISOString()};${stats.mtime.toISOString()}`
-      return crypto.createHash('md5').update(data).digest("hex")
+      return crypto.createHash('sha512').update(data).digest("hex")
     }
 
     const promise = new Promise((resolve, reject) => {
