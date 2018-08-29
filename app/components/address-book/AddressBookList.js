@@ -1,7 +1,8 @@
 // @flow
 import React, { Component } from 'react'
 import { AddressBookRow } from '../../state/reducers/address-book/address-book.reducer'
-import styles from './address-book-list.scss'
+
+import styles from './AddressBookList.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 

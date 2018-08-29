@@ -76,9 +76,9 @@ export const defaultAppState: AppState = {
 	},
 	addressBook: {
 		addresses: [],
-		showDropdownMenu: false,
-		updatingAddress: null,
-		addressDialog: null
+    newAddressDialog: {
+      isVisible: false
+    }
 	}
 }
 
