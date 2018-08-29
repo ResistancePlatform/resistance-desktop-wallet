@@ -23,7 +23,7 @@ export const AddressBookActions = createActions(
     EMPTY: undefined,
 
     LOAD_ADDRESS_BOOK: undefined,
-    GOT_ADDRESS_BOOK: (addresses: AddressBookRecords) => ({ addresses }),
+    GOT_ADDRESS_BOOK: (addresses: AddressBookRecord[]) => ({ addresses }),
 
     EDIT_ADDRESS: (address: AddressRow) => ({ address }),
     COPY_ADDRESS: (address: AddressRow) => ({ address }),

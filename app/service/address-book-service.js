@@ -5,6 +5,7 @@ import { AddressBookRecord } from '../state/reducers/address-book/address-book.r
 const config = require('electron-settings')
 
 const addressBookConfigKey = 'addressBook'
+const addressNotFoundErrorMessage = `Address not found in the database.`
 
 /**
  * ES6 singleton
@@ -26,9 +27,8 @@ export class AddressBookService {
 	constructor() {
     if (!instance) {
       instance = this
+      instance.addressBook = []
     }
-
-    instance.addressBook = []
 
 		return instance
 	}
@@ -37,7 +37,8 @@ export class AddressBookService {
 	 * @memberof AddressBookService
 	 */
 	loadAddressBook() {
-		return of(config.get(addressBookConfigKey, []))
+    this.addressBook = config.get(addressBookConfigKey, [])
+		return of(this.addressBook)
 	}
 
 	/**
@@ -46,8 +47,11 @@ export class AddressBookService {
 	 */
 	addAddress(addressRecord: AddressBookRecord) {
     const validated = this::validateAddressRecord(addressRecord)
+    const match = record => (
+      record.name === validated.name || record.address === validated.address
+    )
 
-    if (this.addressBook.filter(this::matchAddressRecord(validated)).length) {
+    if (this.addressBook.filter(match).length) {
       return throwError(`Address already exists in the database.`)
     }
 
@@ -62,7 +66,13 @@ export class AddressBookService {
 	 * @memberof AddressBookService
 	 */
 	removeAddress(name: string) {
-    this.addressBook = this.addressBook.filter(record => record.name !== name)
+    const index = this.addressBook.findIndex(record => record.name === name)
+
+    if (index === -1) {
+      return throwError(addressNotFoundErrorMessage)
+    }
+
+    this.addressBook.splice(index, 1)
 		config.set(addressBookConfigKey, this.addressBook)
 
     return of(this.addressBook)
@@ -75,13 +85,14 @@ export class AddressBookService {
 	 */
 	updateAddress(originalName: string, newAddressRecord: AddressBookRecord) {
     const validated = this::validateAddressRecord(newAddressRecord)
-    const index = this.addressBook.findIndex(this::matchAddressRecord(validated))
+
+    const index = this.addressBook.findIndex(record => record.name === originalName)
 
     if (index === -1) {
-      return throwError(`Address not found in the database.`)
+      return throwError(addressNotFoundErrorMessage)
     }
 
-    this.addressBook.splice(index, 1)
+    this.addressBook[index] = validated
 		config.set(addressBookConfigKey, this.addressBook)
 
     return of(this.addressBook)
@@ -91,10 +102,4 @@ export class AddressBookService {
 function validateAddressRecord(addressRecord: AddressBookRecord) {
   // TODO: replace with proper form validation #116
   return addressRecord
-}
-
-function matchAddressRecord(validated) {
-  return record => (
-    record.name === validated.name || record.address === validated.address
-  )
 }

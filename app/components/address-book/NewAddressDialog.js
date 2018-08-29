@@ -51,7 +51,7 @@ class NewAddressDialog extends Component<Props> {
 
 				{/* Title */}
         <div className={styles.title}>
-          { this.props.newAddressDialog.isInUpdateMode ? `Update Address` : `New Address` }
+          { this.props.newAddressDialog.isInEditMode ? `Edit Address` : `New Address` }
         </div>
 
 				{/* Name */}
@@ -83,11 +83,11 @@ class NewAddressDialog extends Component<Props> {
 
           <button
             className={styles.addButton}
-            onClick={this.props.newAddressDialog.isInUpdateMode
+            onClick={this.props.newAddressDialog.isInEditMode
               ? this.props.actions.updateAddressRecord
               : this.props.actions.addAddressRecord}
             onKeyDown={() => {}}
-          >{ this.props.newAddressDialog.isInUpdateMode ? 'Update' : 'Add' }
+          >{ this.props.newAddressDialog.isInEditMode ? 'Edit' : 'Add' }
           </button>
 				</div>
 			</div>

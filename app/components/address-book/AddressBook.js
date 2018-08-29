@@ -67,7 +67,7 @@ export class AddressBook extends Component<Props> {
 					<div className={styles.topBarTitle}>Address Book</div>
 					<div className={classNames(styles.topBarButtonContainer, HLayout.hBoxChild)}>
 						<button
-              onClick={this.props.actions.openNewAddressDialog}
+              onClick={() => this.props.actions.openNewAddressDialog()}
 							onKeyDown={() => {}}
 						>
 							<span className={styles.addIcon}>&#43;</span><span>Add New Address</span>
@@ -83,13 +83,13 @@ export class AddressBook extends Component<Props> {
         />
 
 				<PopupMenu id={addressBookPopupMenuId}>
-          <PopupMenuItem onClick={(e, address) => this.props.actions.newAddressDialog(address)}>
-            Update Address
+          <PopupMenuItem onClick={(e, record) => this.props.actions.openNewAddressDialog(record)}>
+            Edit Address
           </PopupMenuItem>
-          <PopupMenuItem onClick={(e, address) => this.props.actions.copyAddress(address)}>
+          <PopupMenuItem onClick={(e, record) => this.props.actions.copyAddress(record)}>
             Copy Address
           </PopupMenuItem>
-          <PopupMenuItem onClick={(e, address) => this.props.actions.removeAddress(address)}>
+          <PopupMenuItem onClick={(e, record) => this.props.actions.removeAddress(record)}>
             Remove Address
           </PopupMenuItem>
 				</PopupMenu>

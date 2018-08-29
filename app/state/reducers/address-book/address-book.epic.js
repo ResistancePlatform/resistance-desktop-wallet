@@ -33,23 +33,30 @@ const addAddressRecordEpic = (action$: ActionsObservable<any>, state$) => action
 
 const updateAddressRecordEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(AddressBookActions.newAddressDialog.updateAddressRecord),
-  mergeMap(() => addressBookService.updateAddressRecord(state$.value.addressBook).pipe(
-    map(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.close())),
-    catchError(err => of(AddressBookActions.newAddressDialog.error(err)))
-  ))
+  mergeMap(() => {
+    const dialogState = state$.value.addressBook.newAddressDialog
+    const newAddressRecord = {
+      name: dialogState.name || '',
+      address: dialogState.address || ''
+    }
+    return addressBookService.updateAddress(dialogState.originalName, newAddressRecord).pipe(
+      mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.close())),
+      catchError(err => of(AddressBookActions.newAddressDialog.error(err.toString())))
+    )
+  })
 )
 
 const copyAddressEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
 	ofType(AddressBookActions.copyAddress),
-	tap(action => clipboard.writeText(action.payload.address)),
+	tap(action => clipboard.writeText(action.payload.address.address)),
 	mapTo(AddressBookActions.empty())
 )
 
 const removeAddressRecordEpic = (action$: ActionsObservable<any>) => action$.pipe(
-	ofType(AddressBookActions.newAddressDialog.removeAddressRecord),
-  mergeMap(action => addressBookService.updateAddressRecord(action.payload.name).pipe(
-    map(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.hide())),
-    catchError(err => of(AddressBookActions.newAddressDialog.error(err)))
+	ofType(AddressBookActions.removeAddress),
+  mergeMap(action => addressBookService.removeAddress(action.payload.address.name).pipe(
+    map(result => AddressBookActions.gotAddressBook(result)),
+    catchError(err => of(AddressBookActions.newAddressDialog.error(err.toString())))
   ))
 )
 
