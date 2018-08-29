@@ -144,9 +144,9 @@ class OwnAddresses extends Component<Props> {
 						<div className={[styles.topBar, HLayout.hBoxContainer].join(' ')}>
 							<div className={styles.topBarTitle}>Own Addresses</div>
 							<div className={[styles.topBarButtonContainer, HLayout.hBoxChild].join(' ')}>
-								<button onClick={(event) => this.onShowPrivteKeyClicked(event)} onKeyDown={(event) => this.onShowPrivteKeyClicked(event)} > SHOW PRIVATE KEY</button>
+								<button onClick={(event) => this.onShowPrivteKeyClicked(event)} onKeyDown={(event) => this.onShowPrivteKeyClicked(event)} > Show Private Key</button>
 								<div className={[styles.addAddressButtonContainer].join(' ')} onClick={(event) => this.onAddNewAddressClicked(event)} onKeyDown={(event) => this.onAddNewAddressClicked(event)} >
-									<button className={styles.addNewAddressButton} >+ ADD NEW ADDRESS
+									<button className={styles.addNewAddressButton} >+ Add New Address
 										<span className="icon-arrow-down" />
 									</button>
 
@@ -163,7 +163,11 @@ class OwnAddresses extends Component<Props> {
 							</div>
 						</div>
 
-            <OwnAddressList addresses={this.props.ownAddresses.addresses} onAddressRowClicked={(e, address) => this.onAddressRowClicked(e, address)} />
+            <OwnAddressList
+              addresses={this.props.ownAddresses.addresses}
+              frozenAddresses={this.props.ownAddresses.frozenAddresses}
+              onAddressRowClicked={(e, address) => this.onAddressRowClicked(e, address)}
+            />
 
             <PopupMenu id={addressRowPopupMenuId}>
               {this.state.isZAddressClicked &&

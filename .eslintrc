@@ -18,6 +18,7 @@
     "compat/compat": "error",
     "consistent-return": "off",
     "comma-dangle": "off",
+    "curly": "error",
     "generator-star-spacing": "off",
     "import/no-mutable-exports": "off",
     "import/no-unresolved": "error",

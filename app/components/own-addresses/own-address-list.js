@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react'
+import classNames from 'classnames'
 
 import { truncateAmount } from '../../constants'
 import { AddressRow } from '../../state/reducers/own-addresses/own-addresses.reducer'
@@ -10,6 +11,7 @@ import VLayout from '../../theme/v-box-layout.scss'
 
 type Props = {
 	addresses: AddressRow[],
+  frozenAddresses: { [string]: Decimal },
 	onAddressRowClicked: (event: any, address: string) => void
 }
 
@@ -19,6 +21,10 @@ export default class OwnAddressList extends Component<Props> {
 	onContextMenu(event: any, address: string) {
     event.preventDefault()
 
+    if (Object.keys(this.props.frozenAddresses).length) {
+      return false
+    }
+
     window.getSelection().removeAllRanges()
 
 		if (this.props.onAddressRowClicked) {
@@ -26,6 +32,12 @@ export default class OwnAddressList extends Component<Props> {
 		}
     return false
 	}
+
+  getAddressDisplayBalance(address: AddressRow) {
+    const frozenBalance = this.props.frozenAddresses[address.address]
+    const balance = frozenBalance === undefined ? address.balance : frozenBalance
+    return balance === null ? 'ERROR' : truncateAmount(balance)
+  }
 
 	getConfirmValue(tempAddressRow: AddressRow) {
     if (!tempAddressRow || !tempAddressRow.balance) {
@@ -44,11 +56,14 @@ export default class OwnAddressList extends Component<Props> {
 
 		const tableBody = this.props.addresses.map((addressRow) => (
       <div
-        className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')}
+        className={classNames(HLayout.hBoxContainer, styles.tableBodyRow, {[styles.mergingContainer]: this.props.frozenAddresses[addressRow.address] !== undefined})}
         key={addressRow.address}
         onContextMenu={e => this.onContextMenu(e, addressRow.address)}
       >
-        <div className={styles.tableBodyRowColumnBalance} >{addressRow.balance === null ? 'ERROR' : truncateAmount(addressRow.balance)}</div>
+        {Boolean(this.props.frozenAddresses[addressRow.address]) &&
+          <div className={styles.merging}><span>merging</span></div>
+        }
+        <div className={styles.tableBodyRowColumnBalance} >{this.getAddressDisplayBalance(addressRow)}</div>
         <div className={styles.tableBodyRowColumnConfirmed}>{this.getConfirmValue(addressRow)}</div>
         <div className={[HLayout.hBoxChild, styles.tableBodyRowColumnAddress].join(' ')}>{addressRow.address}</div>
       </div>
