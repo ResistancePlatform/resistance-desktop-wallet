@@ -1,13 +1,13 @@
 // @flow
 import React, { Component } from 'react'
-import { AddressBookRow } from '../../state/reducers/address-book/address-book.reducer'
+import { AddressBookRecords } from '../../state/reducers/address-book/address-book.reducer'
 
 import styles from './AddressBookList.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
 type Props = {
-	addresses: AddressBookRow[],
+	addresses: AddressBookRecords,
 	onRowClicked: (event: any, address: string) => void
 }
 
@@ -40,7 +40,7 @@ export default class AddressBookList extends Component<Props> {
 	 * @memberof AddressBookList
 	 */
 	renderList() {
-		if (!this.props.addresses || !Array.isArray(this.props.addresses) || this.props.addresses.length <= 0) {
+		if (!Object.keys(this.props.addresses).length) {
 			return (<div className={styles.hasNoDetail}>You don't have any contact address yet.</div>)
 		}
 

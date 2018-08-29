@@ -2,6 +2,7 @@
 import { clipboard } from 'electron'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux';
 
 import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import { AddressBookActions, AddressBookState } from '../../state/reducers/address-book/address-book.reducer'
@@ -9,11 +10,7 @@ import { AddressBookActions, AddressBookState } from '../../state/reducers/addre
 import styles from './NewAddressDialog.scss'
 
 type Props = {
-  hide: func,
-  updateName: func,
-  updateAddress: func,
-  addAddressRecord: func,
-  updateAddressRecord: func,
+  actions: Object,
   newAddressDialog: AddressBookState.newAddressDialog
 }
 
@@ -25,7 +22,9 @@ class NewAddressDialog extends Component<Props> {
 	props: Props
 
 	render() {
-		if (!this.props.newAddressDialog.isVisible) return null
+    if (!this.props.newAddressDialog.isVisible) {
+      return null
+    }
 
 		const nameAddon: RoundedInputAddon = {
 			enable: false,
@@ -37,7 +36,7 @@ class NewAddressDialog extends Component<Props> {
 		const addressAddon: RoundedInputAddon = {
 			enable: true,
 			type: 'PASTE',
-			onAddonClicked: () => this.props.updateAddress(clipboard.readText())
+			onAddonClicked: () => this.props.actions.updateAddress(clipboard.readText())
 		}
 
 		return (
@@ -46,7 +45,7 @@ class NewAddressDialog extends Component<Props> {
 				{/* Close button */}
 				<div
 					className={[styles.closeButton, 'icon-close'].join(' ')}
-					onClick={this.props.hide}
+					onClick={this.props.actions.close}
 					onKeyDown={() => {}}
 				/>
 
@@ -59,9 +58,9 @@ class NewAddressDialog extends Component<Props> {
 				<RoundedInput
 					name="new-address-name"
           defaultValue={this.props.newAddressDialog.name}
-					label="NAME"
+					label="Name"
 					addon={nameAddon}
-					onChange={value => this.props.updateName(value)}
+					onChange={value => this.props.actions.updateName(value)}
 				/>
 
 				{/* Address */}
@@ -70,21 +69,23 @@ class NewAddressDialog extends Component<Props> {
           defaultValue={this.props.newAddressDialog.address}
 					label="Address"
 					addon={addressAddon}
-					onChange={value => this.props.updateAddress(value)}
+					onChange={value => this.props.actions.updateAddress(value)}
 				/>
 
 				{ /* Buttons */}
 				<div className={styles.buttonContainer}>
 					<button
 						className={styles.cancelButton}
-						onClick={this.props.hide}
+						onClick={this.props.actions.close}
 						onKeyDown={() => {}}
 					>Cancel
 					</button>
 
           <button
             className={styles.addButton}
-            onClick={this.props.newAddressDialog.isInUpdateMode ? this.props.updateAddressRecord : this.props.addAddressRecord}
+            onClick={this.props.newAddressDialog.isInUpdateMode
+              ? this.props.actions.updateAddressRecord
+              : this.props.actions.addAddressRecord}
             onKeyDown={() => {}}
           >{ this.props.newAddressDialog.isInUpdateMode ? 'Update' : 'Add' }
           </button>
@@ -98,6 +99,6 @@ const mapStateToProps = (state) => ({
 	newAddressDialog: state.addressBook.newAddressDialog
 })
 
-const mapDispatchToProps = () => AddressBookActions.newAddressDialog
+const mapDispatchToProps = dispatch => ({ actions: bindActionCreators(AddressBookActions.newAddressDialog, dispatch) })
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewAddressDialog)

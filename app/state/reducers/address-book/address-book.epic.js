@@ -1,6 +1,6 @@
 // @flow
 import { clipboard } from 'electron'
-import { map, switchMap, mergeMap, tap } from 'rxjs/operators'
+import { map, switchMap, mergeMap, tap, mapTo, catchError } from 'rxjs/operators'
 import { merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { AddressBookActions } from './address-book.reducer'
@@ -14,49 +14,46 @@ const loadAddressBookEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	map(result => AddressBookActions.gotAddressBook(result))
 )
 
-const addAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
-	ofType(AddressBookActions.addAddress),
+const addAddressRecordEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+	ofType(AddressBookActions.newAddressDialog.addAddressRecord),
 	switchMap(() => {
-		const addressBookState = state$.value.addressBook
-		const newAddressDialogState = addressBookState.addressDialog
-		const newAddress = { name: newAddressDialogState.name, address: newAddressDialogState.address }
-		return addressBookService.addAddress(addressBookState.addresses, newAddress)
+    const dialogState = state$.value.addressBook.newAddressDialog
+    const newAddressRecord = {
+      name: dialogState.name,
+      address: dialogState.address
+    }
+		return addressBookService.addAddress(newAddressRecord)
 	}),
-	mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.updateNewAddressDialogVisibility(false)))
+  map(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.hide())),
+  catchError(err => of(AddressBookActions.newAddressDialog.error(err)))
 )
 
-const updateAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
-	ofType(AddressBookActions.updateAddress),
-	switchMap(() => {
-		const addressBookState = state$.value.addressBook
-		const newAddressDialogState = addressBookState.addressDialog
-		const udpatingAddress = addressBookState.updatingAddress
-		const newValueAddress = { name: newAddressDialogState.name, address: newAddressDialogState.address }
-		return addressBookService.updateAddress(addressBookState.addresses, udpatingAddress, newValueAddress)
-	}),
-	mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.updateNewAddressDialogVisibility(false)))
+const updateAddressRecordEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+	ofType(AddressBookActions.newAddressDialog.updateAddressRecord),
+  mergeMap(() => addressBookService.updateAddressRecord(state$.value.addressBook).pipe(
+    map(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.hide())),
+    catchError(err => of(AddressBookActions.newAddressDialog.error(err)))
+  ))
 )
 
 const copyAddressEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
 	ofType(AddressBookActions.copyAddress),
 	tap(action => clipboard.writeText(action.payload.address)),
-	map(() => AddressBookActions.empty())
+	mapTo(AddressBookActions.empty())
 )
 
-const removeAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
-	ofType(AddressBookActions.removeAddress),
-	switchMap((action) => {
-		const addressBookState = state$.value.addressBook
-		const addressToRemove = action.payload
-		return addressBookService.removeAddress(addressBookState.addresses, addressToRemove)
-	}),
-	mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.updateNewAddressDialogVisibility(false)))
+const removeAddressRecordEpic = (action$: ActionsObservable<any>) => action$.pipe(
+	ofType(AddressBookActions.newAddressDialog.removeAddressRecord),
+  mergeMap(action => addressBookService.updateAddressRecord(action.payload.name).pipe(
+    map(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.hide())),
+    catchError(err => of(AddressBookActions.newAddressDialog.error(err)))
+  ))
 )
 
 export const AddressBookEpics = (action$, state$) => merge(
-	loadAddressBookEpic(action$, state$),
-	addAddressEpic(action$, state$),
 	copyAddressEpic(action$, state$),
-	removeAddressEpic(action$, state$),
-	updateAddressEpic(action$, state$)
+	loadAddressBookEpic(action$, state$),
+	addAddressRecordEpic(action$, state$),
+	updateAddressRecordEpic(action$, state$),
+	removeAddressRecordEpic(action$, state$)
 )

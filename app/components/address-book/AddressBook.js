@@ -7,8 +7,8 @@ import { appStore } from '../../state/store/configureStore'
 import { AddressBookActions, AddressBookState, AddressBookRow } from '../../state/reducers/address-book/address-book.reducer'
 import { PopupMenu, PopupMenuItem } from '../../components/popup-menu'
 import { PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.reducer'
-import AddressBookList from './AddressBookList'
 import NewAddressDialog from './NewAddressDialog'
+import AddressBookList from './AddressBookList'
 
 import styles from './AddressBook.scss'
 import HLayout from '../../theme/h-box-layout.scss'
@@ -17,10 +17,7 @@ import VLayout from '../../theme/v-box-layout.scss'
 const addressBookPopupMenuId = 'address-book-row-popup-menu-id'
 
 type Props = {
-  loadAddressBook: func,
-  newAddressDialog: any,
-  copyAddress: func,
-  removeAddress: func,
+  actions: Object,
 	addressBook: AddressBookState
 }
 
@@ -32,7 +29,7 @@ export class AddressBook extends Component<Props> {
 	props: Props
 
 	componentDidMount() {
-    this.props.loadAddressBook()
+    this.props.actions.loadAddressBook()
 	}
 
 	/**
@@ -70,7 +67,7 @@ export class AddressBook extends Component<Props> {
 					<div className={styles.topBarTitle}>Address Book</div>
 					<div className={classNames(styles.topBarButtonContainer, HLayout.hBoxChild)}>
 						<button
-              onClick={this.props.newAddressDialog.show}
+              onClick={this.props.actions.openNewAddressDialog}
 							onKeyDown={() => {}}
 						>
 							<span className={styles.addIcon}>&#43;</span><span>Add New Address</span>
@@ -86,13 +83,13 @@ export class AddressBook extends Component<Props> {
         />
 
 				<PopupMenu id={addressBookPopupMenuId}>
-          <PopupMenuItem onClick={(e, address) => this.props.newAddressDialog(address)}>
+          <PopupMenuItem onClick={(e, address) => this.props.actions.newAddressDialog(address)}>
             Update Address
           </PopupMenuItem>
-          <PopupMenuItem onClick={(e, address) => this.props.copyAddress(address)}>
+          <PopupMenuItem onClick={(e, address) => this.props.actions.copyAddress(address)}>
             Copy Address
           </PopupMenuItem>
-          <PopupMenuItem onClick={(e, address) => this.props.removeAddress(address)}>
+          <PopupMenuItem onClick={(e, address) => this.props.actions.removeAddress(address)}>
             Remove Address
           </PopupMenuItem>
 				</PopupMenu>
