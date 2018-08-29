@@ -1,6 +1,6 @@
 // @flow
-import { of } from 'rxjs'
-import { AddressBookRecords, AddressBookRecord } from '../state/reducers/address-book/address-book.reducer'
+import { of, throwError } from 'rxjs'
+import { AddressBookRecord } from '../state/reducers/address-book/address-book.reducer'
 
 const config = require('electron-settings')
 
@@ -17,7 +17,7 @@ let instance = null
  * @class AddressBookService
  */
 export class AddressBookService {
-  addressBook: AddressBookRecords
+  addressBook: AddressBookRecord[]
 
 	/**
 	 * Creates an instance of AddressBookService.
@@ -28,7 +28,7 @@ export class AddressBookService {
       instance = this
     }
 
-    instance.addressBook = {}
+    instance.addressBook = []
 
 		return instance
 	}
@@ -37,7 +37,7 @@ export class AddressBookService {
 	 * @memberof AddressBookService
 	 */
 	loadAddressBook() {
-		return of(config.get(addressBookConfigKey, {}))
+		return of(config.get(addressBookConfigKey, []))
 	}
 
 	/**
@@ -45,15 +45,13 @@ export class AddressBookService {
 	 * @memberof AddressBookService
 	 */
 	addAddress(addressRecord: AddressBookRecord) {
-    const addresses = Object.values(this.addressBook)
-
     const validated = this::validateAddressRecord(addressRecord)
 
-    if (this.addressBook[validated.name] || addresses.includes(validated.address)) {
-      throw Error(`Address already exists in the database.`)
+    if (this.addressBook.filter(this::matchAddressRecord(validated)).length) {
+      return throwError(`Address already exists in the database.`)
     }
 
-    this.addressBook[validated.name] = validated
+    this.addressBook.push(validated)
 		config.set(addressBookConfigKey, this.addressBook)
 
     return of(this.addressBook)
@@ -64,7 +62,7 @@ export class AddressBookService {
 	 * @memberof AddressBookService
 	 */
 	removeAddress(name: string) {
-    delete this.addressBook[name]
+    this.addressBook = this.addressBook.filter(record => record.name !== name)
 		config.set(addressBookConfigKey, this.addressBook)
 
     return of(this.addressBook)
@@ -77,7 +75,13 @@ export class AddressBookService {
 	 */
 	updateAddress(originalName: string, newAddressRecord: AddressBookRecord) {
     const validated = this::validateAddressRecord(newAddressRecord)
-    this.addressBook[originalName] = validated
+    const index = this.addressBook.findIndex(this::matchAddressRecord(validated))
+
+    if (index === -1) {
+      return throwError(`Address not found in the database.`)
+    }
+
+    this.addressBook.splice(index, 1)
 		config.set(addressBookConfigKey, this.addressBook)
 
     return of(this.addressBook)
@@ -87,4 +91,10 @@ export class AddressBookService {
 function validateAddressRecord(addressRecord: AddressBookRecord) {
   // TODO: replace with proper form validation #116
   return addressRecord
+}
+
+function matchAddressRecord(validated) {
+  return record => (
+    record.name === validated.name || record.address === validated.address
+  )
 }

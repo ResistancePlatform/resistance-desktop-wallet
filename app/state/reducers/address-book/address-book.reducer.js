@@ -7,10 +7,8 @@ export type AddressBookRecord = {
   address: string
 }
 
-export type AddressBookRecords = { [string]: AddressBookRecord }
-
 export type AddressBookState = {
-  addresses: AddressBookRecords,
+  addresses: AddressBookRecord[],
   newAddressDialog: {
     isVisible: boolean,
     isInEditMode?: boolean,
@@ -25,7 +23,7 @@ export const AddressBookActions = createActions(
     EMPTY: undefined,
 
     LOAD_ADDRESS_BOOK: undefined,
-    GOT_ADDRESS_BOOK: (addresses: AddressBookRecords) => addresses,
+    GOT_ADDRESS_BOOK: (addresses: AddressBookRecords) => ({ addresses }),
 
     EDIT_ADDRESS: (address: AddressRow) => ({ address }),
     COPY_ADDRESS: (address: AddressRow) => ({ address }),
@@ -52,6 +50,10 @@ export const AddressBookActions = createActions(
 
 export const AddressBookReducer = handleActions(
   {
+    [AddressBookActions.gotAddressBook]: (state, action) => ({
+      ...state,
+      addresses: action.payload.addresses
+    }),
     [AddressBookActions.openNewAddressDialog]: (state, action) => ({
       ...state,
       newAddressDialog: {
