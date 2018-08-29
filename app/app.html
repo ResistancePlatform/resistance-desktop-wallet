@@ -36,11 +36,13 @@
             : './dist/renderer.prod.js'
         );
 
-        document.write(
-          scripts
-            .map(script => `<script defer src="${script}"><\/script>`)
-            .join('')
-        );
+        scripts.forEach(script => {
+          var newScriptEl = document.createElement("script");
+          newScriptEl.async = true;
+          newScriptEl.src = script;
+          var el = document.getElementsByTagName('script')[0];
+          el.parentNode.insertBefore(newScriptEl, el);
+        })
       }
     </script>
   </body>
