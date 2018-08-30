@@ -155,7 +155,7 @@ export class OSService {
 	}
 
 	/**
-   * Avoid circular dependency in appState.js
+   * Avoid circular dependency in types.js
    *
 	 * @returns {SettingsActions}
 	 * @memberof OSService

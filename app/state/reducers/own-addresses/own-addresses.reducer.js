@@ -1,7 +1,7 @@
 // @flow
 import { Decimal } from 'decimal.js'
 import { createActions, handleActions } from 'redux-actions'
-import { defaultAppState } from '../default-app-state'
+import { preloadedState } from '../preloaded.state'
 import { SystemInfoActions } from '../system-info/system-info.reducer'
 
 export type AddressRow = {
@@ -86,4 +86,4 @@ export const OwnAddressesReducer = handleActions(
     [OwnAddressesActions.updateDropdownMenuVisibility]: (state, action) => ({
       ...state, showDropdownMenu: action.payload.show
     })
-  }, defaultAppState)
+  }, preloadedState)

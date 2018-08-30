@@ -38,7 +38,7 @@ const updateAddressEpic = (action$: ActionsObservable<any>, state$) => action$.p
   })
 )
 
-const copyAddressEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const copyAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(AddressBookActions.copyAddress),
 	tap(action => clipboard.writeText(action.payload.record.address)),
 	mapTo(AddressBookActions.empty())

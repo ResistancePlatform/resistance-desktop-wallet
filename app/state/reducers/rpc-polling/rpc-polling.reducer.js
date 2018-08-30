@@ -1,6 +1,6 @@
 // @flow
 import { createActions } from 'redux-actions'
-import { defaultAppState } from '../default-app-state'
+import { preloadedState } from '../preloaded.state'
 
 type AppActionType = string
 
@@ -20,7 +20,7 @@ export const RpcPollingActions = createActions(
   }
 )
 
-export const RpcPollingReducer = (state: RpcPollingState = defaultAppState.rpcPolling, action: AppAction) => {
+export const RpcPollingReducer = (state: RpcPollingState = preloadedState.rpcPolling, action: Action) => {
   let actionRow
   const payload = action.payload
 

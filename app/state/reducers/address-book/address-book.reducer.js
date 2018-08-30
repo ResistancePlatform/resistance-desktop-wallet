@@ -1,6 +1,6 @@
 // @flow
 import { createActions, handleActions } from 'redux-actions'
-import { defaultAppState } from '../default-app-state'
+import { preloadedState } from '../preloaded.state'
 
 export type AddressBookRecord = {
   name: string,
@@ -81,4 +81,4 @@ export const AddressBookReducer = handleActions(
       newState.newAddressDialog.fields.address = action.payload
       return newState
     },
-  }, defaultAppState)
+  }, preloadedState)

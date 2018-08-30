@@ -1,6 +1,6 @@
 // @flow
 import { createActions, handleActions } from 'redux-actions'
-import { defaultAppState } from '../default-app-state'
+import { preloadedState } from '../preloaded.state'
 
 export type DaemonInfo = { [string]: any }
 
@@ -86,4 +86,4 @@ export const SystemInfoReducer = handleActions(
       ...state, isOperationsModalOpen: false
     })
 
-  }, defaultAppState)
+  }, preloadedState)

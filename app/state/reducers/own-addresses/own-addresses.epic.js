@@ -6,24 +6,24 @@ import { toastr } from 'react-redux-toastr'
 
 import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { OwnAddressesActions } from './own-addresses.reducer'
-import { AppAction } from '../appAction'
+import { Action } from '../types'
 import { RpcService } from '../../../service/rpc-service'
 
 const rpcService = new RpcService()
 
-const getOwnAddressesEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const getOwnAddressesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.getOwnAddresses),
   tap(() => { rpcService.requestOwnAddresses() }),
   mapTo(OwnAddressesActions.empty())
 )
 
-const createNewAddressesEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const createNewAddressesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.createNewAddress),
   switchMap((action) => rpcService.createNewAddress(action.payload.isPrivate)),
   map(result => result ? OwnAddressesActions.getOwnAddresses() : OwnAddressesActions.empty())
 )
 
-const mergeAllMinedCoinsEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const mergeAllMinedCoinsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeAllMinedCoins),
   tap(action => {
     rpcService.mergeAllMinedCoins(action.payload.zAddress)
@@ -31,7 +31,7 @@ const mergeAllMinedCoinsEpic = (action$: ActionsObservable<AppAction>) => action
   mapTo(SystemInfoActions.newOperationTriggered())
 )
 
-const mergeAllRAddressCoinsEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const mergeAllRAddressCoinsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeAllRAddressCoins),
   tap(action => {
     rpcService.mergeAllRAddressCoins(action.payload.zAddress)
@@ -39,7 +39,7 @@ const mergeAllRAddressCoinsEpic = (action$: ActionsObservable<AppAction>) => act
   mapTo(SystemInfoActions.newOperationTriggered())
 )
 
-const mergeAllZAddressCoinsEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const mergeAllZAddressCoinsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeAllZAddressCoins),
   tap(action => {
     rpcService.mergeAllZAddressCoins(action.payload.zAddress)
@@ -47,7 +47,7 @@ const mergeAllZAddressCoinsEpic = (action$: ActionsObservable<AppAction>) => act
   mapTo(SystemInfoActions.newOperationTriggered())
 )
 
-const mergeAllCoinsEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const mergeAllCoinsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeAllCoins),
   tap(action => {
     rpcService.mergeAllCoins(action.payload.zAddress)
@@ -55,7 +55,7 @@ const mergeAllCoinsEpic = (action$: ActionsObservable<AppAction>) => action$.pip
   mapTo(SystemInfoActions.newOperationTriggered())
 )
 
-const mergeCoinsOperationStartedEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const mergeCoinsOperationStartedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeCoinsOperationStarted),
   tap(() => {
     toastr.info(`Merging operation started, addresses will be frozen until done.`)
@@ -63,7 +63,7 @@ const mergeCoinsOperationStartedEpic = (action$: ActionsObservable<AppAction>) =
   mapTo(SystemInfoActions.getOperations())
 )
 
-const mergeCoinsFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const mergeCoinsFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeCoinsFailure),
   tap((action) => {
     toastr.error(`Unable to start merge operation`, action.payload.errorMessage)

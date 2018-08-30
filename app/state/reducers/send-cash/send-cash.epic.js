@@ -5,7 +5,7 @@ import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
 import { TRANSACTION_FEE } from '../../../constants'
-import { AppAction } from '../appAction'
+import { Action } from '../types'
 import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { SendCashActions, SendCashState, checkPrivateTransactionRule } from './send-cash.reducer'
 import { AddressBookRow } from '../address-book/address-book.reducer'
@@ -34,7 +34,7 @@ const allowToSend = (sendCashState: SendCashState) => {
 }
 
 
-const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+const sendCashEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SendCashActions.sendCash),
 	map(() => {
 		const isAllowedToSend = allowToSend(state$.value.sendCash)
@@ -50,7 +50,7 @@ const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.
     // Lock local Resistance node and Tor from toggling
 		return SystemInfoActions.newOperationTriggered()
 	}),
-	tap((action: AppAction) => {
+	tap((action: Action) => {
 		// Only fire real send if no error above
 		if (action.type === SystemInfoActions.newOperationTriggered.toString()) {
 			const state = state$.value.sendCash
@@ -59,7 +59,7 @@ const sendCashEpic = (action$: ActionsObservable<AppAction>, state$) => action$.
 	})
 )
 
-const sendCashOperationStartedEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const sendCashOperationStartedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SendCashActions.sendCashOperationStarted),
 	tap(() => {
 		toastr.info(`Send cash operation started.`)
@@ -67,15 +67,15 @@ const sendCashOperationStartedEpic = (action$: ActionsObservable<AppAction>) => 
 	mapTo(SendCashActions.empty())
 )
 
-const sendCashFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const sendCashFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SendCashActions.sendCashFailure),
-  tap((action: AppAction) => {
+  tap((action: Action) => {
     toastr.error(`Unable to start send cash operation`, action.payload.errorMessage)
   }),
 	mapTo(SendCashActions.empty())
 )
 
-const getAddressListEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+const getAddressListEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SendCashActions.getAddressList),
 	switchMap(() => {
 		const sendCashState = state$.value.sendCash
@@ -84,7 +84,7 @@ const getAddressListEpic = (action$: ActionsObservable<AppAction>, state$) => ac
 	map(result => SendCashActions.getAddressListSuccess(result))
 )
 
-const checkAddressBookByNameEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+const checkAddressBookByNameEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SendCashActions.checkAddressBookByName),
 	switchMap(() => {
 		const sendCashState = state$.value.sendCash
