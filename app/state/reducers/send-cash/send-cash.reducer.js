@@ -1,7 +1,7 @@
 // @flow
 import { Decimal } from 'decimal.js'
 import { createActions, handleActions } from 'redux-actions'
-import { defaultAppState } from '../default-app-state'
+import { preloadedState } from '../preloaded.state'
 
 
 export type SendFromRadioButtonType = 'transparent' | 'private'
@@ -150,4 +150,4 @@ export const SendCashReducer = handleActions({
 
 	[SendCashActions.getAddressListSuccess]: (state, action) => ({ ...state, addressList: action.payload }),
 	[SendCashActions.getAddressListFail]: (state) => ({ ...state, addressList: null })
-}, defaultAppState.sendCash)
+}, preloadedState.sendCash)

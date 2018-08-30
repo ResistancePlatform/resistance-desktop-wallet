@@ -9,7 +9,13 @@ import { SendCashState } from '../reducers/send-cash/send-cash.reducer'
 import { SettingsState } from '../reducers/settings/settings.reducer'
 import { AddressBookState } from '../reducers/address-book/address-book.reducer'
 
-export type AppState = {
+export type Action = {
+    +type: string,
+    payload?: any,
+    meta?: any
+}
+
+export type State = {
 	rpcPolling: RpcPollingState,
   popupMenu: PopupMenuState,
 	navi: NaviState,

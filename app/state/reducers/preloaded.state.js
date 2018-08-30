@@ -3,7 +3,7 @@ import { Decimal } from 'decimal.js'
 const config = require('electron-settings')
 
 
-export const defaultAppState: AppState = {
+export const preloadedState: State = {
   rpcPolling: {
     registeredActions: [],
     actionsResponseReceived: {}
@@ -75,15 +75,16 @@ export const defaultAppState: AppState = {
 		}
 	},
 	addressBook: {
-		addresses: [],
-		showDropdownMenu: false,
-		updatingAddress: null,
-		addressDialog: null
+		records: [],
+    newAddressDialog: {
+      fields: {},
+      isVisible: false
+    }
 	}
 }
 
 // Load serialized settings
-Object.assign(defaultAppState.settings, {
+Object.assign(preloadedState.settings, {
 	isMinerEnabled: config.get('manageDaemon.enableMiner', true),
 	isTorEnabled: config.get('manageDaemon.enableTor', false)
 })

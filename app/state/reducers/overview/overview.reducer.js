@@ -1,7 +1,7 @@
 // @flow
 import { Decimal } from 'decimal.js'
 import { createActions, handleActions } from 'redux-actions'
-import { defaultAppState } from '../default-app-state'
+import { preloadedState } from '../preloaded.state'
 
 export type Transaction = {
 	type?: string,
@@ -77,4 +77,4 @@ export const OverviewReducer = handleActions({
 	[OverviewActions.showTransactionDetailSuccess]: (state, action) => ({ ...state, transactionDetail: action.payload }),
 	[OverviewActions.showTransactionDetailFail]: (state, action) => ({ ...state, transactionDetail: action.payload }),
 	[OverviewActions.backToTransactionList]: (state) => ({ ...state, transactionDetail: null })
-}, defaultAppState)
+}, preloadedState)

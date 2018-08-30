@@ -4,7 +4,7 @@ import { map, tap } from 'rxjs/operators'
 import { merge } from 'rxjs'
 
 import { ActionsObservable, ofType } from 'redux-observable'
-import { AppAction } from '../appAction'
+import { Action } from '../types'
 import { NaviActions } from './navi.reducer'
 import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
 
@@ -12,14 +12,14 @@ const epicInstanceName = 'NaviEpics'
 const logger = new LoggerService()
 
 
-const naviPathChangedEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const naviPathChangedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     ofType('@@router/LOCATION_CHANGE'),
-    tap((action: AppAction) => logger.debug(epicInstanceName, `naviPathChangedEpic`, `pathname: `, ConsoleTheme.testing, action.payload.pathname)),
+    tap((action: Action) => logger.debug(epicInstanceName, `naviPathChangedEpic`, `pathname: `, ConsoleTheme.testing, action.payload.pathname)),
     map((action) => NaviActions.naviToPathSuccess(action.payload.pathname))
 )
 
 
-const mainWindowCloseEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const mainWindowCloseEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     ofType(NaviActions.MAIN_WINDOW_CLOSE),
     tap(() => setTimeout(() => {
         remote.getCurrentWindow().close()
@@ -27,7 +27,7 @@ const mainWindowCloseEpic = (action$: ActionsObservable<AppAction>) => action$.p
     map(() => NaviActions.empty())
 )
 
-const mainWindowMinimizeEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const mainWindowMinimizeEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     ofType(NaviActions.MAIN_WINDOW_MINIMIZE),
     tap(() => setTimeout(() => {
         remote.getCurrentWindow().minimize()
@@ -35,7 +35,7 @@ const mainWindowMinimizeEpic = (action$: ActionsObservable<AppAction>) => action
     map(() => NaviActions.empty())
 )
 
-const mainWindowMaximizeEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const mainWindowMaximizeEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     ofType(NaviActions.MAIN_WINDOW_MAXIMIZE),
     tap(() => setTimeout(() => {
         const win = remote.getCurrentWindow()

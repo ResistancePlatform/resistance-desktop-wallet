@@ -1,0 +1,37 @@
+@import "../../theme/vars.scss";
+@import "../../theme/generic-component.scss";
+
+$TOP_BAR_HEIGHT: 5rem;
+
+.AddressBookContainer {
+    padding: 2rem;
+    min-width: 30rem;
+}
+
+.topBar {
+    min-height: $TOP_BAR_HEIGHT;
+    height: $TOP_BAR_HEIGHT;
+
+    align-items: center;
+    overflow: visible;
+}
+
+.topBarTitle {
+    font-size: 1.2rem;
+}
+
+.topBarButtonContainer {
+  text-align: right;
+}
+
+button {
+    margin-left: 0.5rem;
+
+    @include roundedButton(true);
+    cursor: pointer;
+}
+
+.addIcon {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+}

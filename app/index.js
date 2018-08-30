@@ -3,10 +3,10 @@ import { render } from 'react-dom'
 import { AppContainer } from 'react-hot-loader'
 import Root from './containers/Root'
 import { configureStore, history } from './state/store/configureStore'
-import { defaultAppState } from './state/reducers/default-app-state'
+import { preloadedState } from './state/reducers/preloaded.state'
 import './app.global.scss'
 
-const store = configureStore(defaultAppState)
+const store = configureStore(preloadedState)
 
 render(
 	<AppContainer>
