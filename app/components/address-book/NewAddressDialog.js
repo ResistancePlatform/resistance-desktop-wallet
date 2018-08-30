@@ -57,19 +57,19 @@ class NewAddressDialog extends Component<Props> {
 				{/* Name */}
 				<RoundedInput
 					name="new-address-name"
-          defaultValue={this.props.newAddressDialog.name}
+          defaultValue={this.props.newAddressDialog.fields.name}
 					label="Name"
 					addon={nameAddon}
-					onChange={value => this.props.actions.updateName(value)}
+					onChange={value => this.props.actions.updateNameField(value)}
 				/>
 
 				{/* Address */}
 				<RoundedInput
 					name="new-address-address"
-          defaultValue={this.props.newAddressDialog.address}
+          defaultValue={this.props.newAddressDialog.fields.address}
 					label="Address"
 					addon={addressAddon}
-					onChange={value => this.props.actions.updateAddress(value)}
+					onChange={value => this.props.actions.updateAddressField(value)}
 				/>
 
 				{ /* Buttons */}
@@ -84,8 +84,8 @@ class NewAddressDialog extends Component<Props> {
           <button
             className={styles.addButton}
             onClick={this.props.newAddressDialog.isInEditMode
-              ? this.props.actions.updateAddressRecord
-              : this.props.actions.addAddressRecord}
+              ? this.props.actions.updateAddress
+              : this.props.actions.addAddress}
             onKeyDown={() => {}}
           >{ this.props.newAddressDialog.isInEditMode ? 'Edit' : 'Add' }
           </button>

@@ -75,8 +75,9 @@ export const defaultAppState: AppState = {
 		}
 	},
 	addressBook: {
-		addresses: [],
+		records: [],
     newAddressDialog: {
+      fields: {},
       isVisible: false
     }
 	}

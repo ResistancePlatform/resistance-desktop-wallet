@@ -21,7 +21,6 @@ export class AddressBookService {
   addressBook: AddressBookRecord[]
 
 	/**
-	 * Creates an instance of AddressBookService.
 	 * @memberof AddressBookService
 	 */
 	constructor() {
@@ -34,6 +33,9 @@ export class AddressBookService {
 	}
 
 	/**
+   * Returns all Address Book records.
+   *
+	 * @returns {Observable<AddressBookRecord[]>}
 	 * @memberof AddressBookService
 	 */
 	loadAddressBook() {
@@ -42,7 +44,10 @@ export class AddressBookService {
 	}
 
 	/**
+   * Adds an address record to the Address Book.
+   *
 	 * @param {AddressBookRecord} addressRecord
+	 * @returns {Observable<AddressBookRecord[]>}
 	 * @memberof AddressBookService
 	 */
 	addAddress(addressRecord: AddressBookRecord) {
@@ -62,7 +67,10 @@ export class AddressBookService {
 	}
 
 	/**
+   * Removes and address from the Address Book.
+   *
 	 * @param {string} name
+	 * @returns {Observable<AddressBookRecord[]>}
 	 * @memberof AddressBookService
 	 */
 	removeAddress(name: string) {
@@ -79,8 +87,11 @@ export class AddressBookService {
 	}
 
 	/**
+   * Updates an address record with new values.
+   *
 	 * @param {string]} originalName
 	 * @param {AddressBookRecord} newAddressRecord
+	 * @returns {Observable<AddressBookRecord[]>}
 	 * @memberof AddressBookService
 	 */
 	updateAddress(originalName: string, newAddressRecord: AddressBookRecord) {
@@ -99,6 +110,13 @@ export class AddressBookService {
 	}
 }
 
+/**
+ * Private method. Performs address record validation.
+ *
+ * @param {AddressBookRecord} addressRecord
+ * @returns {AddressBookRecord}
+ * @memberof AddressBookService
+ */
 function validateAddressRecord(addressRecord: AddressBookRecord) {
   // TODO: replace with proper form validation #116
   return addressRecord

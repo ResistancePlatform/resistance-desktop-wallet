@@ -8,13 +8,15 @@ export type AddressBookRecord = {
 }
 
 export type AddressBookState = {
-  addresses: AddressBookRecord[],
+  records: AddressBookRecord[],
   newAddressDialog: {
-    isVisible: boolean,
-    isInEditMode?: boolean,
     originalName?: string,
-    name?: string,
-    address?: string
+    fields: {
+      name?: string,
+      address?: string
+    },
+    isInEditMode?: boolean,
+    isVisible: boolean
   }
 }
 
@@ -23,22 +25,22 @@ export const AddressBookActions = createActions(
     EMPTY: undefined,
 
     LOAD_ADDRESS_BOOK: undefined,
-    GOT_ADDRESS_BOOK: (addresses: AddressBookRecord[]) => ({ addresses }),
+    GOT_ADDRESS_BOOK: (records: AddressBookRecord[]) => ({ records }),
 
-    EDIT_ADDRESS: (address: AddressRow) => ({ address }),
-    COPY_ADDRESS: (address: AddressRow) => ({ address }),
-    REMOVE_ADDRESS: (address: AddressRow) => ({ address }),
+    EDIT_ADDRESS: (record: AddressBookRecord) => ({ record }),
+    COPY_ADDRESS: (record: AddressBookRecord) => ({ record }),
+    REMOVE_ADDRESS: (record: AddressBookRecord) => ({ record }),
 
-    OPEN_NEW_ADDRESS_DIALOG: (addressRecord: AddressBookRecord | undefined) => ({ addressRecord }),
+    OPEN_NEW_ADDRESS_DIALOG: (record: AddressBookRecord | undefined) => ({ record }),
 
     NEW_ADDRESS_DIALOG: {
       ERROR: (errorMessage: string) => ({ errorMessage }),
 
-      UPDATE_NAME: (name: string) => ({ name }),
-      UPDATE_ADDRESS: (address: string) => ({ address }),
+      UPDATE_NAME_FIELD: (value: string) => value,
+      UPDATE_ADDRESS_FIELD: (value: string) => value,
 
-      ADD_ADDRESS_RECORD: undefined,
-      UPDATE_ADDRESS_RECORD: undefined,
+      ADD_ADDRESS: undefined,
+      UPDATE_ADDRESS: undefined,
 
       CLOSE: undefined
     },
@@ -52,28 +54,29 @@ export const AddressBookReducer = handleActions(
   {
     [AddressBookActions.gotAddressBook]: (state, action) => ({
       ...state,
-      addresses: action.payload.addresses
+      records: action.payload.records
     }),
     [AddressBookActions.openNewAddressDialog]: (state, action) => ({
       ...state,
       newAddressDialog: {
-        isVisible: true,
-        isInEditMode: action.payload.addressRecord !== undefined,
-        originalName: action.payload.addressRecord && action.payload.addressRecord.name,
-        name: action.payload.addressRecord && action.payload.addressRecord.name,
-        address: action.payload.addressRecord && action.payload.addressRecord.address
+        originalName: action.payload.record && action.payload.record.name,
+        fields: Object.assign({}, action.payload.record || {}),
+        isInEditMode: action.payload.record !== undefined,
+        isVisible: true
       }
     }),
     [AddressBookActions.newAddressDialog.close]: state => ({
       ...state,
-      newAddressDialog: { isVisible: false }
+      newAddressDialog: { fields: {}, isVisible: false }
     }),
-    [AddressBookActions.newAddressDialog.updateName]: (state, action) => ({
-      ...state,
-      newAddressDialog: { ...state.newAddressDialog, name: action.payload.name }
-    }),
-    [AddressBookActions.newAddressDialog.updateAddress]: (state, action) => ({
-      ...state,
-      newAddressDialog: { ...state.newAddressDialog, address: action.payload.address }
-    }),
+    [AddressBookActions.newAddressDialog.updateNameField]: (state, action) => {
+      const newState = Object.assign({}, state)
+      newState.newAddressDialog.fields.name = action.payload
+      return newState
+    },
+    [AddressBookActions.newAddressDialog.updateAddressField]: (state, action) => {
+      const newState = Object.assign({}, state)
+      newState.newAddressDialog.fields.address = action.payload
+      return newState
+    },
   }, defaultAppState)

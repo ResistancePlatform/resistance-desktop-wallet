@@ -8,38 +8,30 @@ import { toastr } from 'react-redux-toastr'
 import { AddressBookActions } from './address-book.reducer'
 import { AddressBookService } from '../../../service/address-book-service'
 
-const addressBookService = new AddressBookService()
+const addressBook = new AddressBookService()
 
 const loadAddressBookEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(AddressBookActions.loadAddressBook),
-	switchMap(() => addressBookService.loadAddressBook()),
+	switchMap(() => addressBook.loadAddressBook()),
 	map(result => AddressBookActions.gotAddressBook(result))
 )
 
-const addAddressRecordEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
-	ofType(AddressBookActions.newAddressDialog.addAddressRecord),
+const addAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+	ofType(AddressBookActions.newAddressDialog.addAddress),
   mergeMap(() => {
-    const dialogState = state$.value.addressBook.newAddressDialog
-    const newAddressRecord = {
-      name: dialogState.name || '',
-      address: dialogState.address || ''
-    }
-    return addressBookService.addAddress(newAddressRecord).pipe(
+    const newAddressRecord = state$.value.addressBook.newAddressDialog.fields
+    return addressBook.addAddress(newAddressRecord).pipe(
       mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.close())),
       catchError(err => of(AddressBookActions.newAddressDialog.error(err.toString())))
     )
   })
 )
 
-const updateAddressRecordEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
-	ofType(AddressBookActions.newAddressDialog.updateAddressRecord),
+const updateAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+	ofType(AddressBookActions.newAddressDialog.updateAddress),
   mergeMap(() => {
     const dialogState = state$.value.addressBook.newAddressDialog
-    const newAddressRecord = {
-      name: dialogState.name || '',
-      address: dialogState.address || ''
-    }
-    return addressBookService.updateAddress(dialogState.originalName, newAddressRecord).pipe(
+    return addressBook.updateAddress(dialogState.originalName, dialogState.fields).pipe(
       mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.close())),
       catchError(err => of(AddressBookActions.newAddressDialog.error(err.toString())))
     )
@@ -48,13 +40,13 @@ const updateAddressRecordEpic = (action$: ActionsObservable<any>, state$) => act
 
 const copyAddressEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
 	ofType(AddressBookActions.copyAddress),
-	tap(action => clipboard.writeText(action.payload.address.address)),
+	tap(action => clipboard.writeText(action.payload.record.address)),
 	mapTo(AddressBookActions.empty())
 )
 
-const removeAddressRecordEpic = (action$: ActionsObservable<any>) => action$.pipe(
+const removeAddressEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(AddressBookActions.removeAddress),
-  mergeMap(action => addressBookService.removeAddress(action.payload.address.name).pipe(
+  mergeMap(action => addressBook.removeAddress(action.payload.record.name).pipe(
     map(result => AddressBookActions.gotAddressBook(result)),
     catchError(err => of(AddressBookActions.newAddressDialog.error(err.toString())))
   ))
@@ -69,8 +61,8 @@ const errorEpic = (action$: ActionsObservable<any>) => action$.pipe(
 export const AddressBookEpics = (action$, state$) => merge(
 	copyAddressEpic(action$, state$),
 	loadAddressBookEpic(action$, state$),
-	addAddressRecordEpic(action$, state$),
-	updateAddressRecordEpic(action$, state$),
-	removeAddressRecordEpic(action$, state$),
+	addAddressEpic(action$, state$),
+	updateAddressEpic(action$, state$),
+	removeAddressEpic(action$, state$),
 	errorEpic(action$, state$),
 )

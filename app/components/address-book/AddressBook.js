@@ -78,7 +78,7 @@ export class AddressBook extends Component<Props> {
         <NewAddressDialog />
 
         <AddressBookList
-          addresses={this.props.addressBook.addresses}
+          addresses={this.props.addressBook.records}
           onRowClicked={(e, addressBookRow) => this.onAddressRowClicked(e, addressBookRow)}
         />
 
