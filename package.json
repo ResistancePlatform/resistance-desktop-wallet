@@ -210,6 +210,7 @@
     "font-awesome": "^4.7.0",
     "generate-password": "^1.4.0",
     "history": "^4.7.2",
+    "joi": "^13.6.0",
     "momentjs": "^2.0.0",
     "node-uuid": "^1.4.8",
     "prop-types": "^15.6.2",

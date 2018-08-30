@@ -16,6 +16,7 @@ export type AddressBookState = {
       address?: string
     },
     isInEditMode?: boolean,
+    validationErrors?: { [string]: string },
     isVisible: boolean
   }
 }

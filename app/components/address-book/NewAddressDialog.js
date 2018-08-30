@@ -2,7 +2,8 @@
 import { clipboard } from 'electron'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux';
+import { bindActionCreators } from 'redux'
+import * as Joi from 'joi'
 
 import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
 import { AddressBookActions, AddressBookState } from '../../state/reducers/address-book/address-book.reducer'
@@ -13,6 +14,11 @@ type Props = {
   actions: Object,
   newAddressDialog: AddressBookState.newAddressDialog
 }
+
+const validationSchema = Joi.object().keys({
+  name: Joi.string().required().label(`Address name`),
+  address: Joi.string().required().min(35).max(95)
+})
 
 /**
  * @class AddressDialog
@@ -54,9 +60,17 @@ class NewAddressDialog extends Component<Props> {
           { this.props.newAddressDialog.isInEditMode ? `Edit Address` : `New Address` }
         </div>
 
+        {/*
+        <RoundedForm
+          fields={this.props.newAddressDialog.fields}
+          schema={validationSchema}
+          onValidate={this.props.actions.validated}
+          >
+          */}
+
 				{/* Name */}
 				<RoundedInput
-					name="new-address-name"
+					name="name"
           defaultValue={this.props.newAddressDialog.fields.name}
 					label="Name"
 					addon={nameAddon}
@@ -65,7 +79,7 @@ class NewAddressDialog extends Component<Props> {
 
 				{/* Address */}
 				<RoundedInput
-					name="new-address-address"
+					name="address"
           defaultValue={this.props.newAddressDialog.fields.address}
 					label="Address"
 					addon={addressAddon}
@@ -90,6 +104,7 @@ class NewAddressDialog extends Component<Props> {
           >{ this.props.newAddressDialog.isInEditMode ? 'Edit' : 'Add' }
           </button>
 				</div>
+
 			</div>
 		)
 	}
