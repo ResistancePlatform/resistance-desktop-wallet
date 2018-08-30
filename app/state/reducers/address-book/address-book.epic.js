@@ -1,7 +1,7 @@
 // @flow
 import { clipboard } from 'electron'
-import { map, switchMap, mergeMap, tap, mapTo, catchError } from 'rxjs/operators'
-import { merge, of } from 'rxjs'
+import { tap, switchMap, mergeMap, mergeAll, map, mapTo, catchError } from 'rxjs/operators'
+import { Observable, merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
@@ -44,6 +44,26 @@ const copyAddressEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
 	mapTo(AddressBookActions.empty())
 )
 
+const confirmAddressRemovalEpic = (action$: ActionsObservable<any>) => action$.pipe(
+	ofType(AddressBookActions.confirmAddressRemoval),
+  mergeMap(action => (
+    Observable.create(observer => {
+      const confirmOptions = {
+        onOk: () => {
+          observer.next(of(AddressBookActions.removeAddress(action.payload.record)))
+          observer.complete()
+        },
+        onCancel: () => {
+          observer.next(of(AddressBookActions.empty()))
+          observer.complete()
+        }
+      }
+      toastr.confirm(`Are you sure want to remove the address for "${action.payload.record.name}"?`, confirmOptions)
+    })
+  )),
+  mergeAll()
+)
+
 const removeAddressEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(AddressBookActions.removeAddress),
   mergeMap(action => addressBook.removeAddress(action.payload.record.name).pipe(
@@ -63,6 +83,7 @@ export const AddressBookEpics = (action$, state$) => merge(
 	loadAddressBookEpic(action$, state$),
 	addAddressEpic(action$, state$),
 	updateAddressEpic(action$, state$),
+  confirmAddressRemovalEpic (action$, state$),
 	removeAddressEpic(action$, state$),
 	errorEpic(action$, state$),
 )

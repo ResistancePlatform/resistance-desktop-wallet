@@ -1,12 +1,9 @@
 // @flow
 import React, { Component } from 'react'
 import classNames from 'classnames'
-import { toastr } from 'react-redux-toastr'
 
-import { appStore } from '../../state/store/configureStore'
-import { AddressBookActions, AddressBookState, AddressBookRow } from '../../state/reducers/address-book/address-book.reducer'
+import { AddressBookState } from '../../state/reducers/address-book/address-book.reducer'
 import { PopupMenu, PopupMenuItem } from '../../components/popup-menu'
-import { PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.reducer'
 import NewAddressDialog from './NewAddressDialog'
 import AddressBookList from './AddressBookList'
 
@@ -18,6 +15,7 @@ const addressBookPopupMenuId = 'address-book-row-popup-menu-id'
 
 type Props = {
   actions: Object,
+  popupMenu: Object,
 	addressBook: AddressBookState
 }
 
@@ -30,25 +28,6 @@ export class AddressBook extends Component<Props> {
 
 	componentDidMount() {
     this.props.actions.loadAddressBook()
-	}
-
-	/**
-	 * @param {*} event
-	 * @param {AddressBookRow} addressBookRow
-	 * @memberof AddressBook
-	 */
-	onAddressRowClicked(event, addressBookRow: AddressBookRow) {
-		appStore.dispatch(PopupMenuActions.show(addressBookPopupMenuId, event.clientY, event.clientX, addressBookRow))
-	}
-
-	/**
-	 * @param {*} event
-	 * @param {AddressBookRow} addressBookRow
-	 * @memberof AddressBook
-	 */
-	removeAddressClicked(event, addressBookRow: AddressBookRow) {
-		const confirmOptions = { onOk: () => appStore.dispatch(AddressBookActions.removeAddress(addressBookRow)) }
-		toastr.confirm(`Are you sure want to remove the address for "${addressBookRow.name}"?`, confirmOptions)
 	}
 
 	/**
@@ -79,7 +58,7 @@ export class AddressBook extends Component<Props> {
 
         <AddressBookList
           records={this.props.addressBook.records}
-          onRowClicked={(e, addressBookRow) => this.onAddressRowClicked(e, addressBookRow)}
+          onRowClicked={(e, record) => this.props.popupMenu.show(addressBookPopupMenuId, e.clientY, e.clientX, record)}
         />
 
 				<PopupMenu id={addressBookPopupMenuId}>
@@ -89,7 +68,7 @@ export class AddressBook extends Component<Props> {
           <PopupMenuItem onClick={(e, record) => this.props.actions.copyAddress(record)}>
             Copy Address
           </PopupMenuItem>
-          <PopupMenuItem onClick={(e, record) => this.props.actions.removeAddress(record)}>
+          <PopupMenuItem onClick={(e, record) => this.props.actions.confirmAddressRemoval(record)}>
             Remove Address
           </PopupMenuItem>
 				</PopupMenu>

@@ -29,10 +29,12 @@ export const AddressBookActions = createActions(
 
     EDIT_ADDRESS: (record: AddressBookRecord) => ({ record }),
     COPY_ADDRESS: (record: AddressBookRecord) => ({ record }),
+    CONFIRM_ADDRESS_REMOVAL: (record: AddressBookRecord) => ({ record }),
     REMOVE_ADDRESS: (record: AddressBookRecord) => ({ record }),
 
     OPEN_NEW_ADDRESS_DIALOG: (record: AddressBookRecord | undefined) => ({ record }),
-
+//     SHOW_POPUP_MENU: (popupMenuId, top, left, record)
+// addressBookPopupMenuId, event.clientY, event.clientX, record
     NEW_ADDRESS_DIALOG: {
       ERROR: (errorMessage: string) => ({ errorMessage }),
 

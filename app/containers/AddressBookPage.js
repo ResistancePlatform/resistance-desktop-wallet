@@ -3,12 +3,16 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 
 import { AddressBookActions } from '../state/reducers/address-book/address-book.reducer'
+import { PopupMenuActions } from '../state/reducers/popup-menu/popup-menu.reducer'
 import { AddressBook } from '../components/address-book/AddressBook'
 
 const mapStateToProps = (state) => ({
 	addressBook: state.addressBook
 })
 
-const mapDispatchToProps = dispatch => ({ actions: bindActionCreators(AddressBookActions, dispatch) })
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(AddressBookActions, dispatch),
+  popupMenu: bindActionCreators(PopupMenuActions, dispatch)
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddressBook)
