@@ -40,7 +40,7 @@ export class AddressBookService {
 	 */
 	loadAddressBook() {
     this.addressBook = config.get(addressBookConfigKey, [])
-		return of(this.addressBook)
+		return of(this.addressBook.slice(0))
 	}
 
 	/**
@@ -63,7 +63,7 @@ export class AddressBookService {
     this.addressBook.push(validated)
 		config.set(addressBookConfigKey, this.addressBook)
 
-    return of(this.addressBook)
+    return of(this.addressBook.slice(0))
 	}
 
 	/**
@@ -83,7 +83,7 @@ export class AddressBookService {
     this.addressBook.splice(index, 1)
 		config.set(addressBookConfigKey, this.addressBook)
 
-    return of(this.addressBook)
+    return of(this.addressBook.slice(0))
 	}
 
 	/**
@@ -106,7 +106,7 @@ export class AddressBookService {
     this.addressBook[index] = validated
 		config.set(addressBookConfigKey, this.addressBook)
 
-    return of(this.addressBook)
+    return of(this.addressBook.slice(0))
 	}
 }
 

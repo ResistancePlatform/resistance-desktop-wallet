@@ -1,13 +1,13 @@
 // @flow
 import React, { Component } from 'react'
-import { AddressBookRecords } from '../../state/reducers/address-book/address-book.reducer'
+import { AddressBookRecord } from '../../state/reducers/address-book/address-book.reducer'
 
 import styles from './AddressBookList.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
 type Props = {
-	addresses: AddressBookRecords,
+	records: AddressBookRecord[],
 	onRowClicked: (event: any, address: string) => void
 }
 
@@ -40,18 +40,23 @@ export default class AddressBookList extends Component<Props> {
 	 * @memberof AddressBookList
 	 */
 	renderList() {
-		if (!Object.keys(this.props.addresses).length) {
-			return (<div className={styles.hasNoDetail}>You don't have any contact address yet.</div>)
+		if (!this.props.records.length) {
+			return (<div className={styles.hasNoDetail}>You don&#39;t have any contact address yet.</div>)
 		}
 
-		const tableBody = this.props.addresses.map((tempAddressRow, index) => (
+    // Sort by name
+    const sortedRecords = this.props.records.slice(0).sort(
+      (record1, record2) => record1.name.localeCompare(record2.name)
+    )
+
+		const tableBody = sortedRecords.map((record, index) => (
 			<div
 				className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')}
 				key={index}
-				onContextMenu={e => this.onContextMenu(e, tempAddressRow)}
+				onContextMenu={e => this.onContextMenu(e, record)}
 			>
-				<div className={styles.tableBodyRowColumnName} >{tempAddressRow.name}</div>
-				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnValue].join(' ')}>{tempAddressRow.address}</div>
+				<div className={styles.tableBodyRowColumnName} >{record.name}</div>
+				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnValue].join(' ')}>{record.address}</div>
 			</div>
 		))
 
