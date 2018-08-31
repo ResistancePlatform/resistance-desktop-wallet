@@ -4,16 +4,66 @@ import { tap, switchMap, mergeMap, mergeAll, map, mapTo, catchError } from 'rxjs
 import { Observable, merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
+import * as Joi from 'joi'
 
 import { AddressBookActions } from './address-book.reducer'
 import { AddressBookService } from '../../../service/address-book-service'
 
 const addressBook = new AddressBookService()
 
+const validationSchema = Joi.object().keys({
+  name: Joi.string().required().label(`Name`),
+  address: Joi.string().required().min(35).max(95).label(`Address`)
+})
+
 const loadAddressBookEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(AddressBookActions.loadAddressBook),
 	switchMap(() => addressBook.loadAddressBook()),
 	map(result => AddressBookActions.gotAddressBook(result))
+)
+
+const validateFormEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+	ofType(AddressBookActions.newAddressDialog.validateForm),
+  map(action => {
+    const fields = state$.value.addressBook.newAddressDialog.fields
+    const {error} = Joi.validate(fields, validationSchema, { abortEarly: false })
+
+    if (error === null) {
+      return action.payload.nextActionCreator()
+    }
+
+    const validationErrors = error.details.reduce((errors, item) => {
+      errors[item.path.pop()] = item.message
+      return errors
+    }, {})
+
+    return AddressBookActions.newAddressDialog.validateFormFailure(validationErrors)
+  })
+)
+
+const validateFieldEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+	ofType(AddressBookActions.newAddressDialog.validateField),
+  mergeMap(action => {
+    const dialogState = state$.value.addressBook.newAddressDialog
+    const fields = { ...dialogState.fields, [action.payload.field]: action.payload.value }
+    const {error} = Joi.validate(fields, validationSchema, { abortEarly: false })
+
+
+    let validationErrors = { ...dialogState.validationErrors }
+    delete validationErrors[action.payload.field]
+
+    if (error !== null) {
+      validationErrors = error.details.reduce((errors, item) => {
+        const field = item.path.pop()
+        if (field === action.payload.field) {
+          errors[field] = item.message
+        }
+        return errors
+      }, validationErrors)
+    }
+
+    return of(action.payload.nextActionCreator(), AddressBookActions.newAddressDialog.validateFormFailure(validationErrors))
+  })
 )
 
 const addAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
@@ -81,6 +131,8 @@ const errorEpic = (action$: ActionsObservable<any>) => action$.pipe(
 export const AddressBookEpics = (action$, state$) => merge(
 	copyAddressEpic(action$, state$),
 	loadAddressBookEpic(action$, state$),
+  validateFormEpic(action$, state$),
+  validateFieldEpic(action$, state$),
 	addAddressEpic(action$, state$),
 	updateAddressEpic(action$, state$),
   confirmAddressRemovalEpic (action$, state$),

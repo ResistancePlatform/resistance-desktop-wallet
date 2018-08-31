@@ -16,7 +16,8 @@ export type AddressBookState = {
       address?: string
     },
     isInEditMode?: boolean,
-    validationErrors?: { [string]: string },
+    isSubmitButtonDisabled?: boolean,
+    validationErrors: { [string]: string },
     isVisible: boolean
   }
 }
@@ -34,8 +35,7 @@ export const AddressBookActions = createActions(
     REMOVE_ADDRESS: (record: AddressBookRecord) => ({ record }),
 
     OPEN_NEW_ADDRESS_DIALOG: (record: AddressBookRecord | undefined) => ({ record }),
-//     SHOW_POPUP_MENU: (popupMenuId, top, left, record)
-// addressBookPopupMenuId, event.clientY, event.clientX, record
+
     NEW_ADDRESS_DIALOG: {
       ERROR: (errorMessage: string) => ({ errorMessage }),
 
@@ -44,6 +44,10 @@ export const AddressBookActions = createActions(
 
       ADD_ADDRESS: undefined,
       UPDATE_ADDRESS: undefined,
+
+      VALIDATE_FORM: (nextActionCreator: func) => ({ nextActionCreator }),
+      VALIDATE_FIELD: (field: string, value: string, nextActionCreator: func) => ({ field, value, nextActionCreator }),
+      VALIDATE_FORM_FAILURE: (errors) => ({ errors }),
 
       CLOSE: undefined
     },
@@ -65,12 +69,21 @@ export const AddressBookReducer = handleActions(
         originalName: action.payload.record && action.payload.record.name,
         fields: Object.assign({}, action.payload.record || {}),
         isInEditMode: action.payload.record !== undefined,
+        validationErrors: {},
         isVisible: true
+      }
+    }),
+    [AddressBookActions.newAddressDialog.validateFormFailure]: (state, action) => ({
+      ...state,
+      newAddressDialog: {
+        ...state.newAddressDialog,
+        validationErrors: action.payload.errors,
+        isSubmitButtonDisabled: Object.keys(action.payload.errors).length > 0
       }
     }),
     [AddressBookActions.newAddressDialog.close]: state => ({
       ...state,
-      newAddressDialog: { fields: {}, isVisible: false }
+      newAddressDialog: { fields: {}, validationErrors: {}, isVisible: false }
     }),
     [AddressBookActions.newAddressDialog.updateNameField]: (state, action) => {
       const newState = Object.assign({}, state)
