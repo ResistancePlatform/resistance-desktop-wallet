@@ -16,7 +16,6 @@ export type AddressBookState = {
       address?: string
     },
     isInEditMode?: boolean,
-    isSubmitButtonDisabled?: boolean,
     validationErrors: { [string]: string },
     isVisible: boolean
   }
@@ -39,15 +38,12 @@ export const AddressBookActions = createActions(
     NEW_ADDRESS_DIALOG: {
       ERROR: (errorMessage: string) => ({ errorMessage }),
 
-      UPDATE_NAME_FIELD: (value: string) => value,
-      UPDATE_ADDRESS_FIELD: (value: string) => value,
+      UPDATE_FIELD: (field: string, value: string) => ({ field, value }),
 
       ADD_ADDRESS: undefined,
       UPDATE_ADDRESS: undefined,
 
-      VALIDATE_FORM: (nextActionCreator: func) => ({ nextActionCreator }),
-      VALIDATE_FIELD: (field: string, value: string, nextActionCreator: func) => ({ field, value, nextActionCreator }),
-      VALIDATE_FORM_FAILURE: (errors) => ({ errors }),
+      UPDATE_VALIDATION_ERRORS: (errors) => ({ errors }),
 
       CLOSE: undefined
     },
@@ -73,26 +69,19 @@ export const AddressBookReducer = handleActions(
         isVisible: true
       }
     }),
-    [AddressBookActions.newAddressDialog.validateFormFailure]: (state, action) => ({
+    [AddressBookActions.newAddressDialog.updateValidationErrors]: (state, action) => ({
       ...state,
-      newAddressDialog: {
-        ...state.newAddressDialog,
-        validationErrors: action.payload.errors,
-        isSubmitButtonDisabled: Object.keys(action.payload.errors).length > 0
-      }
+      newAddressDialog: { ...state.newAddressDialog, validationErrors: action.payload.errors }
     }),
     [AddressBookActions.newAddressDialog.close]: state => ({
       ...state,
       newAddressDialog: { fields: {}, validationErrors: {}, isVisible: false }
     }),
-    [AddressBookActions.newAddressDialog.updateNameField]: (state, action) => {
-      const newState = Object.assign({}, state)
-      newState.newAddressDialog.fields.name = action.payload
-      return newState
-    },
-    [AddressBookActions.newAddressDialog.updateAddressField]: (state, action) => {
-      const newState = Object.assign({}, state)
-      newState.newAddressDialog.fields.address = action.payload
-      return newState
-    },
+    [AddressBookActions.newAddressDialog.updateField]: (state, action) => ({
+      ...state,
+      newAddressDialog: {
+        ...state.newAddressDialog,
+        fields: { ...state.newAddressDialog.fields, [action.payload.field]: action.payload.value }
+      }
+    }),
   }, preloadedState)

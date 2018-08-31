@@ -1,13 +1,20 @@
 // @flow
 import { clipboard } from 'electron'
+import * as Joi from 'joi'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
+import FormValidation from '../../components/form-validation/FormValidation'
 import { AddressBookActions, AddressBookState } from '../../state/reducers/address-book/address-book.reducer'
 
 import styles from './NewAddressDialog.scss'
+
+const validationSchema = Joi.object().keys({
+  name: Joi.string().required().label(`Name`),
+  address: Joi.string().required().min(35).max(95).label(`Address`)
+})
 
 type Props = {
   actions: Object,
@@ -39,12 +46,6 @@ class NewAddressDialog extends Component<Props> {
 			onAddonClicked: () => this.props.actions.updateAddress(clipboard.readText())
 		}
 
-    const submitAction = (
-      this.props.newAddressDialog.isInEditMode
-        ? this.props.actions.updateAddress
-        : this.props.actions.addAddress
-    )
-
 		return (
 			<div className={styles.newAddressContainer}>
 
@@ -60,6 +61,12 @@ class NewAddressDialog extends Component<Props> {
           { this.props.newAddressDialog.isInEditMode ? `Edit Address` : `New Address` }
         </div>
 
+        <FormValidation
+          schema={validationSchema}
+          fields={this.props.newAddressDialog.fields}
+          onValidate={this.props.actions.updateValidationErrors}
+        />
+
 				{/* Name */}
 				<RoundedInput
 					name="name"
@@ -67,9 +74,7 @@ class NewAddressDialog extends Component<Props> {
 					label="Name"
 					addon={nameAddon}
           error={this.props.newAddressDialog.validationErrors.name}
-          onChange={value => this.props.actions.validateField(
-            'name', value, () => this.props.actions.updateNameField(value)
-          )}
+          onChange={value => this.props.actions.updateField('name', value)}
 				/>
 
 				{/* Address */}
@@ -79,9 +84,7 @@ class NewAddressDialog extends Component<Props> {
 					label="Address"
 					addon={addressAddon}
           error={this.props.newAddressDialog.validationErrors.address}
-          onChange={value => this.props.actions.validateField(
-            'address', value, () => this.props.actions.updateAddressField(value)
-          )}
+          onChange={value => this.props.actions.updateField('address', value)}
 				/>
 
 				{ /* Buttons */}
@@ -95,9 +98,11 @@ class NewAddressDialog extends Component<Props> {
 
           <button
             className={styles.addButton}
-            onClick={() => this.props.actions.validateForm(submitAction)}
+            onClick={this.props.newAddressDialog.isInEditMode
+              ? this.props.actions.updateAddress
+              : this.props.actions.addAddress}
             onKeyDown={() => {}}
-            disabled={this.props.newAddressDialog.isSubmitButtonDisabled}
+            disabled={Object.keys(this.props.newAddressDialog.validationErrors).length}
           >{ this.props.newAddressDialog.isInEditMode ? 'Edit' : 'Add' }
           </button>
 				</div>

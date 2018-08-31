@@ -1,5 +1,6 @@
 // @flow
 import { Component } from 'react'
+import { connect } from 'react-redux'
 import * as Joi from 'joi'
 
 type Props = {
@@ -8,7 +9,7 @@ type Props = {
   onValidate: (errors: object) => void
 }
 
-export class FormValidation extends Component<Props> {
+class FormValidation extends Component<Props> {
 	props: Props
 
 	/**
@@ -19,7 +20,6 @@ export class FormValidation extends Component<Props> {
   }
 
 	/**
-	 * @param {*} prevProps
 	 * @memberof FormValidation
 	 */
   componentDidUpdate() {
@@ -37,7 +37,8 @@ export class FormValidation extends Component<Props> {
 
     if (error !== null) {
       validationErrors = error.details.reduce((errors, item) => {
-        errors[item.path.pop()] = item.message
+        const path = item.path.pop()
+        errors[path] = item.message
         return errors
       }, {})
     }
@@ -45,4 +46,13 @@ export class FormValidation extends Component<Props> {
     this.props.onValidate(validationErrors)
   }
 
+	/**
+	 * @memberof FormValidation
+	 */
+  render() {
+    return null
+  }
+
 }
+
+export default connect()(FormValidation)
