@@ -1,40 +1,4 @@
 @import "../../theme/vars.scss";
-@import "../../theme/generic-component.scss";
-
-$TOP_BAR_HEIGHT: 5rem;
-
-.AddressBookContainer {
-    padding: 2rem;
-    min-width: 30rem;
-}
-
-.topBar {
-    min-height: $TOP_BAR_HEIGHT;
-    height: $TOP_BAR_HEIGHT;
-
-    align-items: center;
-    overflow: visible;
-}
-
-.topBarTitle {
-    font-size: 1.2rem;
-}
-
-.topBarButtonContainer {
-  text-align: right;
-}
-
-button {
-    margin-left: 0.5rem;
-
-    @include roundedButton(true);
-    cursor: pointer;
-}
-
-.addIcon {
-    margin-right: 0.5rem;
-    font-size: 1rem;
-}
 
 .newAddressContainer {
     position: absolute;
@@ -67,21 +31,6 @@ button {
     margin-bottom: 1.5rem;
 }
 
-div[name="new-address-name"] {
-    margin-bottom: 0.5rem;
-
-    div[class*="roundedInputLabel"] {
-        width: 5rem;
-    }
-}
-
-div[name="new-address-address"] {
-    margin-bottom: 1.5rem;
-
-    div[class*="roundedInputLabel"] {
-        width: 5rem;
-    }
-}
 
 .buttonContainer {
     text-align: right;
@@ -97,4 +46,20 @@ div[name="new-address-address"] {
 
 .addButton {
     width: 6rem;
+}
+
+div[name="new-address-name"] {
+    margin-bottom: 0.5rem;
+
+    div[class*="roundedInputLabel"] {
+        width: 5rem;
+    }
+}
+
+div[name="new-address-address"] {
+    margin-bottom: 1.5rem;
+
+    div[class*="roundedInputLabel"] {
+        width: 5rem;
+    }
 }

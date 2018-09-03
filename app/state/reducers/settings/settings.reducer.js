@@ -1,7 +1,7 @@
 // @flow
 import { createActions, handleActions } from 'redux-actions'
 
-import { defaultAppState } from '../default-app-state'
+import { preloadedState } from '../preloaded.state'
 import { ChildProcessName, ChildProcessStatus } from '../../../service/os-service'
 
 export type SettingsState = {
@@ -131,4 +131,4 @@ export const SettingsReducer = handleActions(
       getChildProcessUpdateFailedState(state, action, 'MURDER FAILED', true)
     )
 
-  }, defaultAppState)
+  }, preloadedState)

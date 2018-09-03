@@ -4,37 +4,37 @@ import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
-import { AppAction } from '../appAction'
+import { Action } from '../types'
 import { OverviewActions } from './overview.reducer'
 import { RpcService } from '../../../service/rpc-service'
 
 const rpcService = new RpcService()
 
-const getWalletInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const getWalletInfoEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OverviewActions.getWalletInfo),
   tap(() => rpcService.requestWalletInfo()),
   map(() => OverviewActions.empty())
 )
 
-const getWalletInfoFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const getWalletInfoFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OverviewActions.getWalletInfoFailure),
   tap((action) => toastr.error(action.payload.errorMessage)),
   mapTo(OverviewActions.empty())
 )
 
-const getTransactionDataFromWalletEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const getTransactionDataFromWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OverviewActions.getTransactionDataFromWallet),
   tap(() => rpcService.requestTransactionsDataFromWallet()),
   mapTo(OverviewActions.empty())
 )
 
-const getTransactionDataDromWalletFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const getTransactionDataDromWalletFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OverviewActions.getTransactionDataFromWalletFailure),
   tap((action) => toastr.error(action.payload.errorMessage)),
   mapTo(OverviewActions.empty())
 )
 
-const showTransactionDetailEpic = (action$: ActionsObservable<AppAction>, state$) => action$.pipe(
+const showTransactionDetailEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
   ofType(OverviewActions.showTransactionDetail),
   switchMap(() => {
     const overviewState = state$.value.overview

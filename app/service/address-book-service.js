@@ -1,15 +1,11 @@
 // @flow
-import { Observable, of } from 'rxjs'
-import { map, tap, take, catchError } from 'rxjs/operators'
-import { LoggerService, ConsoleTheme } from './logger-service'
-import { AddressBookRow } from '../state/reducers/address-book/address-book.reducer'
+import { of, throwError } from 'rxjs'
+import { AddressBookRecord } from '../state/reducers/address-book/address-book.reducer'
 
 const config = require('electron-settings')
 
-const addressBookKey = 'addressbook'
-const addressRowSortFunc = (a1, a2) => a1.name.localeCompare(a2.name)
-const addressRowReduceFunc = (x, y) => x.findIndex(row => row.name === y.name && row.address === y.address) < 0 ? [...x, y] : x
-
+const addressBookConfigKey = 'addressBook'
+const addressNotFoundErrorMessage = `Address not found in the database.`
 
 /**
  * ES6 singleton
@@ -22,93 +18,106 @@ let instance = null
  * @class AddressBookService
  */
 export class AddressBookService {
-	logger: LoggerService
+  addressBook: AddressBookRecord[]
 
 	/**
-	 * Creates an instance of AddressBookService.
 	 * @memberof AddressBookService
 	 */
 	constructor() {
-		if (!instance) { instance = this }
+    if (!instance) {
+      instance = this
+      instance.addressBook = []
+    }
 
-		this.logger = new LoggerService()
 		return instance
 	}
 
 	/**
-	 * @returns {Observable<AddressBookRow[]>}
+   * Returns all Address Book records.
+   *
+	 * @returns {Observable<AddressBookRecord[]>}
 	 * @memberof AddressBookService
 	 */
-	loadAddressBook(): Observable<AddressBookRow[]> {
-		console.log(`config.get(addressBookKey, []): `, config.get(addressBookKey, []))
-		return of(config.get(addressBookKey, [])).pipe(
-			map((addresses) => addresses.sort(addressRowSortFunc)),
-			tap(addresses => this.logger.debug(this, 'loadAddressBook', 'addresses: ', ConsoleTheme.testing, addresses)),
-			take(1),
-			catchError(error => {
-				this.logger.error(this, 'loadAddressBook', 'Error happened: ', ConsoleTheme.error, error)
-				return of([])
-			})
-		)
+	loadAddressBook() {
+    this.addressBook = config.get(addressBookConfigKey, [])
+		return of(this.addressBook.slice(0))
 	}
 
 	/**
-	 * @param {(AddressBookRow[] | [])} [existsAddressRows]
-	 * @param {AddressBookRow} newAddress
-	 * @returns {Observable<AddressBookRow[]>}
+   * Adds an address record to the Address Book.
+   *
+	 * @param {AddressBookRecord} addressRecord
+	 * @returns {Observable<AddressBookRecord[]>}
 	 * @memberof AddressBookService
 	 */
-	addAddress(existsAddressRows?: AddressBookRow[] | [], newAddress: AddressBookRow): Observable<AddressBookRow[]> {
-		const tempAddressRows = existsAddressRows ? existsAddressRows : config.get(addressBookKey, [])
-		// Remove the duplicate row
-		const addressRowsToSave = [...tempAddressRows, newAddress]
-			.reduce(addressRowReduceFunc, [])
-			.sort(addressRowSortFunc)
-		config.set(addressBookKey, addressRowsToSave)
+	addAddress(addressRecord: AddressBookRecord) {
+    const validated = this::validateAddressRecord(addressRecord)
+    const match = record => (
+      record.name === validated.name || record.address === validated.address
+    )
 
-		return of(addressRowsToSave).pipe(
-			tap(addressRowsAfterSave => this.logger.debug(this, 'addAddress', 'addressRowsAfterSave: ', ConsoleTheme.testing, addressRowsAfterSave))
-		)
+    if (this.addressBook.filter(match).length) {
+      return throwError(`Address already exists in the database.`)
+    }
+
+    this.addressBook.push(validated)
+		config.set(addressBookConfigKey, this.addressBook)
+
+    return of(this.addressBook.slice(0))
 	}
 
 	/**
-	 * @param {AddressBookRow[]} [existsAddressRows]
-	 * @param {AddressBookRow} addressToRemove
-	 * @returns {Observable<AddressBookRow[]>}
+   * Removes and address from the Address Book.
+   *
+	 * @param {string} name
+	 * @returns {Observable<AddressBookRecord[]>}
 	 * @memberof AddressBookService
 	 */
-	removeAddress(existsAddressRows?: AddressBookRow[], addressToRemove: AddressBookRow): Observable<AddressBookRow[]> {
-		const tempAddressRows = existsAddressRows ? existsAddressRows : config.get(addressBookKey, [])
-		// Remove specified address and remove the duplicate row
-		const addressRowsToSave = tempAddressRows
-			.filter(tempAddress => tempAddress.name !== addressToRemove.name && tempAddress.address !== addressToRemove.address)
-			.reduce(addressRowReduceFunc, [])
-			.sort(addressRowSortFunc)
-		config.set(addressBookKey, addressRowsToSave)
+	removeAddress(name: string) {
+    const index = this.addressBook.findIndex(record => record.name === name)
 
-		return of(addressRowsToSave).pipe(
-			tap(addressRowsAfterSave => this.logger.debug(this, 'removeAddress', 'addressRowsAfterSave: ', ConsoleTheme.testing, addressRowsAfterSave))
-		)
+    if (index === -1) {
+      return throwError(addressNotFoundErrorMessage)
+    }
+
+    this.addressBook.splice(index, 1)
+		config.set(addressBookConfigKey, this.addressBook)
+
+    return of(this.addressBook.slice(0))
 	}
 
 	/**
-	 * @param {AddressBookRow[]} [existsAddressRows]
-	 * @param {AddressBookRow} updatingAddress
-	 * @param {AddressBookRow} newValueAddress
-	 * @returns {Observable<AddressBookRow[]>}
+   * Updates an address record with new values.
+   *
+	 * @param {string]} originalName
+	 * @param {AddressBookRecord} newAddressRecord
+	 * @returns {Observable<AddressBookRecord[]>}
 	 * @memberof AddressBookService
 	 */
-	updateAddress(existsAddressRows?: AddressBookRow[], updatingAddress: AddressBookRow, newValueAddress: AddressBookRow): Observable<AddressBookRow[]> {
-		const tempAddressRows = existsAddressRows ? existsAddressRows : config.get(addressBookKey, [])
-		// Replace specified address and remove the duplicate row
-		const addressRowsToSave = tempAddressRows
-			.map(tempAddress => tempAddress.name === updatingAddress.name && tempAddress.address === updatingAddress.address ? newValueAddress : tempAddress)
-			.reduce(addressRowReduceFunc, [])
-			.sort(addressRowSortFunc)
-		config.set(addressBookKey, addressRowsToSave)
+	updateAddress(originalName: string, newAddressRecord: AddressBookRecord) {
+    const validated = this::validateAddressRecord(newAddressRecord)
 
-		return of(addressRowsToSave).pipe(
-			tap(addressRowsAfterSave => this.logger.debug(this, 'updateAddress', 'addressRowsAfterSave: ', ConsoleTheme.testing, addressRowsAfterSave))
-		)
+    const index = this.addressBook.findIndex(record => record.name === originalName)
+
+    if (index === -1) {
+      return throwError(addressNotFoundErrorMessage)
+    }
+
+    this.addressBook[index] = validated
+		config.set(addressBookConfigKey, this.addressBook)
+
+    return of(this.addressBook.slice(0))
 	}
+}
+
+/**
+ * Private method. Performs address record validation.
+ *
+ * @param {AddressBookRecord} addressRecord
+ * @returns {AddressBookRecord}
+ * @memberof AddressBookService
+ */
+function validateAddressRecord(addressRecord: AddressBookRecord) {
+  // TODO: replace with proper form validation #116
+  return addressRecord
 }

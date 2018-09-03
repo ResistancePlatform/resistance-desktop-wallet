@@ -1,6 +1,6 @@
 // @flow
 import { createActions, handleActions } from 'redux-actions'
-import { defaultAppState } from '../default-app-state'
+import { preloadedState } from '../preloaded.state'
 
 export type PopupMenuState = { [string]: any }
 
@@ -21,4 +21,4 @@ export const PopupMenuReducer = handleActions({
   [PopupMenuActions.hide]: (state, action) => ({
     ...state, [action.payload.id]: { ...state[action.payload.id], isVisible: false }
   })
-}, defaultAppState)
+}, preloadedState)

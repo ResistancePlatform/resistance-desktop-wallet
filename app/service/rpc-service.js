@@ -20,7 +20,7 @@ import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers
 import { Balances, OverviewActions, Transaction } from '../state/reducers/overview/overview.reducer'
 import { OwnAddressesActions, AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
 import { SendCashActions } from '../state/reducers/send-cash/send-cash.reducer'
-import { AddressBookRow } from '../state/reducers/address-book/address-book.reducer'
+import { AddressBookRecord } from '../state/reducers/address-book/address-book.reducer'
 
 /**
  * ES6 singleton
@@ -710,14 +710,17 @@ function applyAddressBookNamesToTransactions(transactionsPromise) {
         }
 
         return this.addressBookService.loadAddressBook().pipe(
-          map((addressBookRows: AddressBookRow[] | []) => {
-            if (!addressBookRows || !addressBookRows.length) {
+          map((addressBookRecords: AddressBookRecord[]) => {
+            if (!addressBookRecords.length) {
               return result
             }
 
-            result.transactions = result.transactions.map((tempTransaction: Transaction) => {
-              const matchedAddressBookRow = addressBookRows.find(tempAddressRow => tempAddressRow.address === tempTransaction.destinationAddress)
-              return matchedAddressBookRow ? ({ ...tempTransaction, destinationAddress: matchedAddressBookRow.name }) : tempTransaction
+            result.transactions = result.transactions.map((transaction: Transaction) => {
+              const matchedRecord = (
+                addressBookRecords
+                .find(record => record.address === transaction.destinationAddress)
+              )
+              return matchedRecord ? ({ ...transaction, destinationAddress: matchedRecord.name }) : transaction
             })
 
             return result

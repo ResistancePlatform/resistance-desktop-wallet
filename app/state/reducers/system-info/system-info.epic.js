@@ -5,7 +5,7 @@ import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
-import { AppAction } from '../appAction'
+import { Action } from '../types'
 import { SystemInfoActions } from './system-info.reducer'
 import { RpcService } from '../../../service/rpc-service'
 import { ResistanceService } from '../../../service/resistance-service'
@@ -23,13 +23,13 @@ function suppressRpcWarmupError(action, callable) {
     }
 }
 
-const getDaemonInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const getDaemonInfoEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(SystemInfoActions.getDaemonInfo.toString()),
   tap(() => rpcService.requestDaemonInfo()),
   mapTo(SystemInfoActions.empty())
 )
 
-const getDaemonInfoFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const getDaemonInfoFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(SystemInfoActions.getDaemonInfoFailure.toString()),
   tap((action) => {
     suppressRpcWarmupError(action, () => toastr.error(action.payload.errorMessage))
@@ -37,13 +37,13 @@ const getDaemonInfoFailureEpic = (action$: ActionsObservable<AppAction>) => acti
   mapTo(SystemInfoActions.empty())
 )
 
-const getBlockchainInfoEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const getBlockchainInfoEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(SystemInfoActions.getBlockchainInfo.toString()),
   tap(() => rpcService.requestBlockchainInfo()),
   mapTo(SystemInfoActions.empty())
 )
 
-const getBlockchainInfoFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const getBlockchainInfoFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(SystemInfoActions.getBlockchainInfoFailure.toString()),
   tap((action) => {
     suppressRpcWarmupError(action, () => toastr.error(action.payload.errorMessage))
@@ -51,13 +51,13 @@ const getBlockchainInfoFailureEpic = (action$: ActionsObservable<AppAction>) => 
   mapTo(SystemInfoActions.empty())
 )
 
-const getOperationsEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const getOperationsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(SystemInfoActions.getOperations.toString()),
   tap(() => rpcService.requestOperations()),
   mapTo(SystemInfoActions.empty())
 )
 
-const getOperationsFailureEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const getOperationsFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(SystemInfoActions.getOperationsFailure.toString()),
   tap((action) => {
     suppressRpcWarmupError(action, () => toastr.error(action.payload.errorMessage))
@@ -65,7 +65,7 @@ const getOperationsFailureEpic = (action$: ActionsObservable<AppAction>) => acti
   mapTo(SystemInfoActions.empty())
 )
 
-const openWalletInFileManagerEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const openWalletInFileManagerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(SystemInfoActions.openWalletInFileManager.toString()),
   tap(() => {
     shell.openItem(resistanceService.getWalletPath())
@@ -73,7 +73,7 @@ const openWalletInFileManagerEpic = (action$: ActionsObservable<AppAction>) => a
   mapTo(SystemInfoActions.empty())
 )
 
-const openInstallationFolderEpic = (action$: ActionsObservable<AppAction>) => action$.pipe(
+const openInstallationFolderEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(SystemInfoActions.openInstallationFolder.toString()),
   tap(() => {
     shell.openItem(osService.getInstallationPath())

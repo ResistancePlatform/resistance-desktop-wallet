@@ -11,7 +11,7 @@ import RpcPolling from '../../components/rpc-polling/rpc-polling'
 import { OSService } from '../../service/os-service'
 import { SystemInfoActions, SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
 import { appStore } from '../../state/store/configureStore'
-import { AppState } from '../../state/reducers/appState'
+import { State } from '../../state/reducers/types'
 import OperationsModal from '../../components/system-info/operations-modal'
 import humanizeOperationName from '../../components/system-info/humanize-operation'
 
@@ -309,7 +309,7 @@ class SystemInfo extends Component<Props> {
 }
 
 
-const mapStateToProps = (state: AppState) => ({
+const mapStateToProps = (state: State) => ({
 	systemInfo: state.systemInfo,
 	sendCash: state.sendCash,
 	settings: state.settings

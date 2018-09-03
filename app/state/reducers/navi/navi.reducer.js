@@ -1,5 +1,5 @@
 // @flow
-import { AppAction } from '../appAction'
+import { Action } from '../types'
 
 export type NaviPath = '/' | '/overview' | '/own-addresses' | '/send-cash' | '/address-book' | '/settings'
 
@@ -18,20 +18,20 @@ export const NaviActions = {
 	MAIN_WINDOW_MINIMIZE: `${NaviActionTypePrefix}: MAIN_WINDOW_MINIMIZE`,
 	MAIN_WINDOW_MAXIMIZE: `${NaviActionTypePrefix}: MAIN_WINDOW_MAXIMIZE`,
 
-	naviToPathSuccess: (naviPath: NaviPath): AppAction => ({ type: NaviActions.NAVI_TO_PATH_SUCCESS, payload: naviPath }),
+	naviToPathSuccess: (naviPath: NaviPath): Action => ({ type: NaviActions.NAVI_TO_PATH_SUCCESS, payload: naviPath }),
 
-	mainWindowClose: (): AppAction => ({ type: NaviActions.MAIN_WINDOW_CLOSE }),
-	mainWindowMinimize: (): AppAction => ({ type: NaviActions.MAIN_WINDOW_MINIMIZE }),
-	mainWindowMaximize: (): AppAction => ({ type: NaviActions.MAIN_WINDOW_MAXIMIZE }),
+	mainWindowClose: (): Action => ({ type: NaviActions.MAIN_WINDOW_CLOSE }),
+	mainWindowMinimize: (): Action => ({ type: NaviActions.MAIN_WINDOW_MINIMIZE }),
+	mainWindowMaximize: (): Action => ({ type: NaviActions.MAIN_WINDOW_MAXIMIZE }),
 
-	empty: (): AppAction => ({ type: NaviActions.EMPTY })
+	empty: (): Action => ({ type: NaviActions.EMPTY })
 }
 
 const initState: NaviState = {
 	currentNaviPath: '/overview'
 }
 
-export const NaviReducer = (state: NaviState = initState, action: AppAction) => {
+export const NaviReducer = (state: NaviState = initState, action: Action) => {
 
 	switch (action.type) {
 		case NaviActions.NAVI_TO_PATH_SUCCESS:
