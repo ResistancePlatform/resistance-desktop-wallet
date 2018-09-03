@@ -4,6 +4,9 @@ const config = require('electron-settings')
 
 
 export const preloadedState: State = {
+  getStarted: {
+    isInProgress: true
+  },
   rpcPolling: {
     registeredActions: [],
     actionsResponseReceived: {}
@@ -85,6 +88,10 @@ export const preloadedState: State = {
 }
 
 // Load serialized settings
+Object.assign(preloadedState.getStarted, {
+	isInProgress: config.get('getStartedInProgress', true),
+})
+
 Object.assign(preloadedState.settings, {
 	isMinerEnabled: config.get('manageDaemon.enableMiner', true),
 	isTorEnabled: config.get('manageDaemon.enableTor', false)

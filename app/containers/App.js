@@ -1,9 +1,11 @@
 // @flow
 import React from 'react'
+import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
 
 import NaviBar from './navigation/navi-bar'
-import SytemInfo from './system-info/system-info'
+import TitleBarButtons from '../components/title-bar-buttons/TitleBarButtons'
+import SystemInfo from './system-info/system-info'
 import Overview from './overview/overview'
 import OwnAddress from './own-addresses/own-addresses'
 import SendCash from './send-cash/send-cash'
@@ -15,9 +17,12 @@ import HLayout from '../theme/h-box-layout.scss'
 import VLayout from '../theme/v-box-layout.scss'
 
 import { appStore } from '../state/store/configureStore'
+import { GetStartedState } from '../state/reducers/get-started/get-started.reducer'
 import { SettingsActions } from '../state/reducers/settings/settings.reducer'
 
-type Props = {};
+type Props = {
+  getStarted: GetStartedState
+}
 
 
 /**
@@ -25,7 +30,7 @@ type Props = {};
  * @class App
  * @extends {React.Component<Props>}
  */
-export default class App extends React.Component<Props> {
+class App extends React.Component<Props> {
 	props: Props;
 
   componentDidMount() {
@@ -52,10 +57,15 @@ export default class App extends React.Component<Props> {
   }
 
 	render() {
-		return (
-			<div id="App" className={[styles.appContainer, VLayout.vBoxContainer].join(' ')}>
+    const getStartedElement = (
+      <TitleBarButtons />
+    )
+
+    const mainElement = (
+      <div>
 				{ /* Content container */}
 				<div className={[styles.contentContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
+          <TitleBarButtons />
 					<NaviBar />
 
 					{ /* Route content container */}
@@ -72,8 +82,16 @@ export default class App extends React.Component<Props> {
 				</div>
 
 				{ /* System info bar */}
-				<SytemInfo />
+				<SystemInfo />
+      </div>
+    )
+
+		return (
+			<div id="App" className={[styles.appContainer, VLayout.vBoxContainer].join(' ')}>
+        {this.props.getStarted.isInProgress ? getStartedElement : mainElement }
 			</div>
 		)
 	}
 }
+
+export default connect(state => state, null)(App)

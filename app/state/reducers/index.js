@@ -7,6 +7,7 @@ import { reducer as toastrReducer } from 'react-redux-toastr'
 import { RpcPollingReducer } from '../reducers/rpc-polling/rpc-polling.reducer'
 import { PopupMenuReducer } from '../reducers/popup-menu/popup-menu.reducer'
 import { NaviReducer } from '../reducers/navi/navi.reducer'
+import { GetStartedReducer } from '../reducers/get-started/get-started.reducer'
 import { SystemInfoReducer } from '../reducers/system-info/system-info.reducer'
 import { OverviewReducer } from '../reducers/overview/overview.reducer'
 import { OwnAddressesReducer } from '../reducers/own-addresses/own-addresses.reducer'
@@ -25,6 +26,7 @@ import { AddressBookEpics } from '../reducers/address-book/address-book.epic'
 
 const rootReducer = combineReducers({
   toastr: toastrReducer,
+  getStarted: GetStartedReducer,
   rpcPolling: RpcPollingReducer,
   popupMenu: PopupMenuReducer,
 	navi: NaviReducer,

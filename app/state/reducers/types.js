@@ -1,4 +1,5 @@
 // @flow
+import { GetStartedState } from '../reducers/get-started/get-started.reducer'
 import { RpcPollingState } from '../reducers/rpc-polling/rpc-polling.reducer'
 import { PopupMenuState } from '../reducers/popup-menu/popup-menu.reducer'
 import { NaviState } from '../reducers/navi/navi.reducer'
@@ -16,6 +17,7 @@ export type Action = {
 }
 
 export type State = {
+  getStarted: GetStartedState,
 	rpcPolling: RpcPollingState,
   popupMenu: PopupMenuState,
 	navi: NaviState,

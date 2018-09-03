@@ -36,14 +36,6 @@ class NaviBar extends Component<Props> {
 	render() {
 		return (
 			<div className={[styles.navibarContainer].join(' ')} data-tid="navi-bar-container">
-
-				{/* Embedded toolbar */}
-				<div className={[styles.navibarToolbarContainer]}>
-					<div className={styles.closeButton} onClick={(event) => this.onCloseClicked(event)} onKeyDown={(event) => this.onCloseClicked(event)} />
-					<div className={styles.minimizeButton} onClick={(event) => this.onMinimizeClicked(event)} onKeyDown={(event) => this.onMinimizeClicked(event)} />
-					<div className={styles.fullScreenButton} onClick={(event) => this.onMaximizeClicked(event)} onKeyDown={(event) => this.onMaximizeClicked(event)} />
-				</div>
-
 				{/* Route items */}
 				<div className={[this.getNaviBarItemClasses('/overview'), HLayout.hBoxContainer].join(' ')}>
 					<span className="icon-overview" />
