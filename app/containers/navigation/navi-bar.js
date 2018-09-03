@@ -3,8 +3,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import styles from './navi-bar.scss'
-import { NaviActions, NaviState } from '../../state/reducers/navi/navi.reducer'
-import { appStore } from '../../state/store/configureStore'
+import { NaviState } from '../../state/reducers/navi/navi.reducer'
 import HLayout from '../../theme/h-box-layout.scss'
 
 type Props = {
@@ -14,21 +13,7 @@ type Props = {
 class NaviBar extends Component<Props> {
 	props: Props
 
-	onCloseClicked(event) {
-		event.preventDefault();
-		appStore.dispatch(NaviActions.mainWindowClose())
-	}
-
-	onMinimizeClicked(event) {
-		event.preventDefault();
-		appStore.dispatch(NaviActions.mainWindowMinimize())
-	}
-
-	onMaximizeClicked(event) {
-		event.preventDefault();
-		appStore.dispatch(NaviActions.mainWindowMaximize())
-	}
-
+  // TODO: Replace with classnames #114
 	getNaviBarItemClasses(itemPath: string) {
 		return this.props.navi.currentNaviPath === itemPath ? `${styles.naviVBarItem} ${styles.activeNaviVBarItem}` : `${styles.naviVBarItem}`
 	}

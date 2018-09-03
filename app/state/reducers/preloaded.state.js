@@ -13,7 +13,7 @@ export const preloadedState: State = {
   },
   popupMenu: {},
 	navi: {
-		currentNaviPath: '/overview'
+		currentNaviPath: '/'
 	},
 	systemInfo: {
 		daemonInfo: {},

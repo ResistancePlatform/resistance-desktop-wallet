@@ -9,7 +9,7 @@ export type GetStartedState = {
 export const GetStartedActions = createActions(
   {
     EMPTY: undefined,
-    COMPLETE_GET_STARTED: undefined
+    USE_RESISTANCE: undefined
   },
   {
     prefix: 'APP/GET_STARTED'
@@ -18,4 +18,5 @@ export const GetStartedActions = createActions(
 
 export const GetStartedReducer = handleActions(
   {
+    [GetStartedActions.useResistance]: state => ({ ...state, isInProgress: false }),
   }, preloadedState)

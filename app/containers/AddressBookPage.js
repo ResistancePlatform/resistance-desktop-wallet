@@ -6,7 +6,7 @@ import { AddressBookActions } from '../state/reducers/address-book/address-book.
 import { PopupMenuActions } from '../state/reducers/popup-menu/popup-menu.reducer'
 import { AddressBook } from '../components/address-book/AddressBook'
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
 	addressBook: state.addressBook
 })
 

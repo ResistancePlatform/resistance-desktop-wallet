@@ -3,11 +3,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
 
-import GetStartedPage from './get-started/GetStartedPage'
-import CreateNewWalletPage from './get-started/CreateNewWalletPage'
-import ChoosePasswordPage from './get-started/ChoosePasswordPage '
-import RestoreYourWalletPage from './get-started/RestoreYourWalletPage'
-import Welcome from './get-started/Welcome'
+import {
+  GetStartedPage,
+  CreateNewWalletPage,
+  ChoosePasswordPage,
+  RestoreYourWalletPage,
+  WelcomePage } from './GetStartedPage'
 
 import NaviBar from './navigation/navi-bar'
 import TitleBarButtons from '../components/title-bar-buttons/TitleBarButtons'
@@ -40,6 +41,10 @@ class App extends React.Component<Props> {
 	props: Props;
 
   componentDidMount() {
+    if (this.props.getStarted.isInProgress) {
+      return
+    }
+
     const settings = appStore.getState().settings
 
     const startNode = () => {
@@ -64,16 +69,18 @@ class App extends React.Component<Props> {
 
 	render() {
     const getStartedElement = (
-      <div>
+      <div className={[styles.contentContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
         <TitleBarButtons />
-        <Switch>
-          <Route exact path="/get-started" component={GetStartedPage} />
-          <Route exact path="/get-started/create-new-wallet" component={CreateNewWalletPage} />
-          <Route exact path="/get-started/choose-password" component={ChoosePasswordPage} />
-          <Route exact path="/get-started/restore-your-wallet" component={RestoreYourWalletPage} />
-          <Route exact path="/get-started/welcome" component={WelcomePage} />
-          <Route exact path="/" render={() => (<Redirect to="/get-started" />)} />
-        </Switch>
+        <div className={[styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer].join(' ')}>
+          <Switch>
+            <Route exact path="/get-started" component={GetStartedPage} />
+            <Route exact path="/get-started/create-new-wallet" component={CreateNewWalletPage} />
+            <Route exact path="/get-started/choose-password" component={ChoosePasswordPage} />
+            <Route exact path="/get-started/restore-your-wallet" component={RestoreYourWalletPage} />
+            <Route exact path="/get-started/welcome" component={WelcomePage} />
+            <Route exact path="/" render={() => (<Redirect to="/get-started" />)} />
+          </Switch>
+        </div>
       </div>
     )
 
