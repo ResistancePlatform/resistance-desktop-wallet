@@ -3,6 +3,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
 
+import GetStartedPage from './get-started/GetStartedPage'
+import CreateNewWalletPage from './get-started/CreateNewWalletPage'
+import ChoosePasswordPage from './get-started/ChoosePasswordPage '
+import RestoreYourWalletPage from './get-started/RestoreYourWalletPage'
+import Welcome from './get-started/Welcome'
+
 import NaviBar from './navigation/navi-bar'
 import TitleBarButtons from '../components/title-bar-buttons/TitleBarButtons'
 import SystemInfo from './system-info/system-info'
@@ -12,13 +18,13 @@ import SendCash from './send-cash/send-cash'
 import Settings from './settings/settings'
 import AddressBookPage from './AddressBookPage'
 
-import styles from './App.scss'
-import HLayout from '../theme/h-box-layout.scss'
-import VLayout from '../theme/v-box-layout.scss'
-
 import { appStore } from '../state/store/configureStore'
 import { GetStartedState } from '../state/reducers/get-started/get-started.reducer'
 import { SettingsActions } from '../state/reducers/settings/settings.reducer'
+
+import styles from './App.scss'
+import HLayout from '../theme/h-box-layout.scss'
+import VLayout from '../theme/v-box-layout.scss'
 
 type Props = {
   getStarted: GetStartedState
@@ -58,7 +64,17 @@ class App extends React.Component<Props> {
 
 	render() {
     const getStartedElement = (
-      <TitleBarButtons />
+      <div>
+        <TitleBarButtons />
+        <Switch>
+          <Route exact path="/get-started" component={GetStartedPage} />
+          <Route exact path="/get-started/create-new-wallet" component={CreateNewWalletPage} />
+          <Route exact path="/get-started/choose-password" component={ChoosePasswordPage} />
+          <Route exact path="/get-started/restore-your-wallet" component={RestoreYourWalletPage} />
+          <Route exact path="/get-started/welcome" component={WelcomePage} />
+          <Route exact path="/" render={() => (<Redirect to="/get-started" />)} />
+        </Switch>
+      </div>
     )
 
     const mainElement = (
