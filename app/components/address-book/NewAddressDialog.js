@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
-import FormValidation from '../../components/form-validation/FormValidation'
+import RoundedForm from '../../components/rounded-form/RoundedForm'
 import { AddressBookActions, AddressBookState } from '../../state/reducers/address-book/address-book.reducer'
 
 import styles from './NewAddressDialog.scss'
@@ -61,52 +61,51 @@ class NewAddressDialog extends Component<Props> {
           { this.props.newAddressDialog.isInEditMode ? `Edit Address` : `New Address` }
         </div>
 
-        <FormValidation
+        <RoundedForm
           schema={validationSchema}
           fields={this.props.newAddressDialog.fields}
           onValidate={this.props.actions.updateValidationErrors}
-        />
+        >
+          {/* Name */}
+          <RoundedInput
+            name="name"
+            defaultValue={this.props.newAddressDialog.fields.name}
+            label="Name"
+            addon={nameAddon}
+            error={this.props.newAddressDialog.validationErrors.name}
+            onChange={value => this.props.actions.updateField('name', value)}
+          />
 
-				{/* Name */}
-				<RoundedInput
-					name="name"
-          defaultValue={this.props.newAddressDialog.fields.name}
-					label="Name"
-					addon={nameAddon}
-          error={this.props.newAddressDialog.validationErrors.name}
-          onChange={value => this.props.actions.updateField('name', value)}
-				/>
+          {/* Address */}
+          <RoundedInput
+            name="address"
+            defaultValue={this.props.newAddressDialog.fields.address}
+            label="Address"
+            addon={addressAddon}
+            error={this.props.newAddressDialog.validationErrors.address}
+            onChange={value => this.props.actions.updateField('address', value)}
+          />
 
-				{/* Address */}
-				<RoundedInput
-					name="address"
-          defaultValue={this.props.newAddressDialog.fields.address}
-					label="Address"
-					addon={addressAddon}
-          error={this.props.newAddressDialog.validationErrors.address}
-          onChange={value => this.props.actions.updateField('address', value)}
-				/>
+          { /* Buttons */}
+          <div className={styles.buttonContainer}>
+            <button
+              className={styles.cancelButton}
+              onClick={this.props.actions.close}
+              onKeyDown={() => {}}
+            >Cancel
+            </button>
 
-				{ /* Buttons */}
-				<div className={styles.buttonContainer}>
-					<button
-						className={styles.cancelButton}
-						onClick={this.props.actions.close}
-						onKeyDown={() => {}}
-					>Cancel
-					</button>
-
-          <button
-            className={styles.addButton}
-            onClick={this.props.newAddressDialog.isInEditMode
-              ? this.props.actions.updateAddress
-              : this.props.actions.addAddress}
-            onKeyDown={() => {}}
-            disabled={Object.keys(this.props.newAddressDialog.validationErrors).length}
-          >{ this.props.newAddressDialog.isInEditMode ? 'Edit' : 'Add' }
-          </button>
-				</div>
-
+            <button
+              type="submit"
+              className={styles.addButton}
+              onClick={this.props.newAddressDialog.isInEditMode
+                ? this.props.actions.updateAddress
+                : this.props.actions.addAddress}
+              onKeyDown={() => {}}
+            >{ this.props.newAddressDialog.isInEditMode ? 'Edit' : 'Add' }
+            </button>
+          </div>
+        </RoundedForm>
 			</div>
 		)
 	}
