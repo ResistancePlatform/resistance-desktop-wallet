@@ -32,6 +32,8 @@ $OWN_ADDRESS_LIST_COLUMN_ADDRESS_WIDTH: 60%;
         display: inline-block;
         color: $TRANSACTION_LIST_HEADER_FONT_COLOR;
         font-size: 0.8rem;
+        user-select: none;
+        cursor: default;
     }
 }
 
@@ -53,7 +55,6 @@ $OWN_ADDRESS_LIST_COLUMN_ADDRESS_WIDTH: 60%;
 
   div {
     padding: 0.8rem 0;
-
     display: inline-block;
 
     font-size: 0.7rem;
@@ -64,25 +65,21 @@ $OWN_ADDRESS_LIST_COLUMN_ADDRESS_WIDTH: 60%;
     border-right: none;
     border-bottom: 1px solid $TRANSACTION_LIST_BODY_SEPARATOR_COLOR;
 
-    overflow: scroll;
+    overflow: hidden;
   }
 
   .merging {
     position: absolute;
     width: 82%;
     top: 0;
-
     pointer-events: none;
     cursor: default;
-
     margin-bottom: 4px;
-
     text-align: right;
 
     span {
       border-radius: 0.5rem;
 			border: 1px solid $BASE_COLOR_BORDER_GRAY;
-
       padding: 2px 6px;
       color: $BASE_COLOR_BORDER_GRAY;
     }
