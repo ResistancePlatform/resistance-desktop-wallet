@@ -1,11 +1,23 @@
 @import "../theme/vars.scss";
 
+.roundedInputErrorMessage {
+  padding: 2px 6px;
+  color: white;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  text-align: center;
+}
+
 .roundedInputContainer {
     position: relative;
     padding: 0 1.3rem;
 
     border: 1.5px solid $BASE_COLOR_BORDER_GRAY;
     border-radius: 5rem;
+
+    &.error {
+      border: 1.5px solid rgb(255, 97, 87);
+    }
 
     font-size: 0.7rem;
     font-weight: 300;
@@ -37,10 +49,6 @@
             &:focus {
                 outline: none
             }
-        }
-
-        &.error input {
-          border-left: 1.5px solid red;
         }
 
         span {

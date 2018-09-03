@@ -84,7 +84,6 @@ export default class RoundedInput extends Component<Props> {
 
 	onEnterPressedEventHandler(event) {
 		if (event.key === 'Enter' && this.props.onEnterPressed) {
-			// event.target.value
 			this.props.onEnterPressed()
 		}
 	}
@@ -148,30 +147,35 @@ export default class RoundedInput extends Component<Props> {
 
 	render() {
 		return (
-			<div
-				name={this.props.name}
-				disabled={this.props.disabled}
-				className={styles.roundedInputContainer}
-			>
-				<div className={styles.roundedInputLabel}>
-					{this.props.label || ''}
-				</div>
+      <div>
+        {this.props.error && !this.state.isFocused &&
+          <div className={styles.roundedInputErrorMessage}>{this.props.error}</div>
+        }
+        <div
+          name={this.props.name}
+          disabled={this.props.disabled}
+          className={classNames(styles.roundedInputContainer, {[styles.error]: Boolean(this.props.error)})}
+        >
+          <div className={styles.roundedInputLabel}>
+            {this.props.label || ''}
+          </div>
 
-				<div className={classNames(styles.roundedInputTextArea, {error: this.props.error})}>
-					<input
-						type={this.getInputType()}
-            value={this.state.value}
-						disabled={this.props.disabled}
-						onChange={event => this.onChangeHandler(event)}
-						onFocus={(event) => this.onFocusHandler(event)}
-						onBlur={(event) => this.onBlurHandler(event)}
-						onKeyPress={(event) => this.onEnterPressedEventHandler(event)}
-					/>
-					{this.renderAddon()}
-					{this.renderTooltip()}
-				</div>
-				{this.props.children ? this.props.children : null}
-			</div>
+          <div className={classNames(styles.roundedInputTextArea)}>
+            <input
+              type={this.getInputType()}
+              value={this.state.value}
+              disabled={this.props.disabled}
+              onChange={event => this.onChangeHandler(event)}
+              onFocus={(event) => this.onFocusHandler(event)}
+              onBlur={(event) => this.onBlurHandler(event)}
+              onKeyPress={(event) => this.onEnterPressedEventHandler(event)}
+            />
+            {this.renderAddon()}
+            {this.renderTooltip()}
+          </div>
+          {this.props.children ? this.props.children : null}
+        </div>
+      </div>
 		)
 	}
 }
