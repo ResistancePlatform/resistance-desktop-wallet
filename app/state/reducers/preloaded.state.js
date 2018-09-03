@@ -78,6 +78,7 @@ export const preloadedState: State = {
 		records: [],
     newAddressDialog: {
       fields: {},
+      validationErrors: {},
       isVisible: false
     }
 	}
