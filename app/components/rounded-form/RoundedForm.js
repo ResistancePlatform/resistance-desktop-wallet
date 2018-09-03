@@ -11,6 +11,9 @@ type Props = {
   children: any
 }
 
+/* Basic usage:
+ * https://github.com/ResistancePlatform/resistance-desktop-wallet/wiki/RoundedForm
+ */
 class RoundedForm extends Component<Props> {
 	props: Props
 
