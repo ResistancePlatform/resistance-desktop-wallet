@@ -1,6 +1,6 @@
 // @flow
-import { tap, filter, map, mapTo } from 'rxjs/operators'
-import { merge } from 'rxjs'
+import { tap, filter, map, mergeMap, mapTo } from 'rxjs/operators'
+import { of, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
@@ -14,6 +14,29 @@ const rpcService = new RpcService()
 const resistanceService = new ResistanceService()
 const minerService = new MinerService()
 const torService = new TorService()
+
+const kickOffChildProcessesEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+	ofType(SettingsActions.kickOffChildProcesses),
+  mergeMap(() => {
+		const settingsState = state$.value.settings
+    const observables = []
+
+    if (settingsState.isTorEnabled) {
+      observables.push(
+        of(SettingsActions.enableTor()),
+        of(SettingsActions.startLocalNode()).delay(200)
+      )
+    } else {
+      observables.push(of(SettingsActions.startLocalNode()))
+    }
+
+    if (settingsState.isMinerEnabled) {
+      observables.push(of(SettingsActions.enableMiner()).delay(1000))
+    }
+
+    return observables
+  })
+)
 
 const startLocalNodeEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(SettingsActions.startLocalNode),
@@ -144,6 +167,7 @@ const importWalletFailureEpic = (action$: ActionsObservable<any>) => action$.pip
 )
 
 export const SettingsEpics = (action$, state$) => merge(
+	kickOffChildProcessesEpic(action$, state$),
 	startLocalNodeEpic(action$, state$),
   restartLocalNodeEpic(action$, state$),
 	stopLocalNodeEpic(action$, state$),
