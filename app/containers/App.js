@@ -2,6 +2,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
+import classNames from 'classnames'
 
 import {
   GetStartedPage,
@@ -50,29 +51,6 @@ class App extends React.Component<Props> {
     if (!this.props.getStarted.isInProgress) {
       appStore.dispatch(SettingsActions.kickOffChildProcesses())
     }
-
-    /*
-    const settings = appStore.getState().settings
-
-    const startNode = () => {
-      appStore.dispatch(SettingsActions.startLocalNode())
-    }
-
-    const startMiner = () => {
-      appStore.dispatch(SettingsActions.enableMiner())
-    }
-
-    if (settings.isTorEnabled) {
-      appStore.dispatch(SettingsActions.enableTor())
-      setTimeout(startNode, 200);
-    } else {
-      startNode()
-    }
-
-    if (settings.isMinerEnabled) {
-      setTimeout(startMiner, 1000);
-    }
-    */
   }
 
 	/**
@@ -99,9 +77,9 @@ class App extends React.Component<Props> {
     )
 
     const mainElement = (
-      <div>
+      <div className={classNames(styles.contentContainer, VLayout.vBoxContainer)}>
 				{ /* Content container */}
-				<div className={[styles.contentContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
+				<div className={[VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
           <TitleBarButtons />
 					<NaviBar />
 
