@@ -149,7 +149,7 @@ export default class RoundedInput extends Component<Props> {
 		return (
       <div>
         {this.props.error && !this.state.isFocused &&
-          <div className={styles.roundedInputErrorMessage}>{this.props.error}</div>
+          <div className={styles.errorMessage}>{this.props.error}</div>
         }
         <div
           name={this.props.name}

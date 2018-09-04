@@ -11,8 +11,10 @@ import { RestoreYourWallet } from '../components/get-started/RestoreYourWallet'
 import { Welcome } from '../components/get-started/Welcome'
 
 const connectComponent = component => (
-  connect(
-    state => ({ getStarted: state.getStarted }),
+  connect(state => ({
+      getStarted: state.getStarted,
+      createNewWallet: state.getStarted.createNewWallet
+    }),
     dispatch => ({
       actions: bindActionCreators(GetStartedActions, dispatch),
       settingsActions: bindActionCreators(SettingsActions, dispatch),

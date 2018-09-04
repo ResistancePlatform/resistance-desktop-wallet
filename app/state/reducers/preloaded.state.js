@@ -5,6 +5,11 @@ const config = require('electron-settings')
 
 export const preloadedState: State = {
   getStarted: {
+    createNewWallet: {
+      fields: {},
+      mnemonicSeed: '',
+      validationErrors: {}
+    },
     isInProgress: true
   },
   rpcPolling: {

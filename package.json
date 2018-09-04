@@ -200,6 +200,7 @@
     "webpack-merge": "^4.1.2"
   },
   "dependencies": {
+    "bip39": "^2.5.0",
     "bs58check": "^2.1.2",
     "classnames": "^2.2.6",
     "decimal.js": "^10.0.1",
