@@ -1,6 +1,6 @@
 // @flow
-import { tap, filter, map, mergeMap, mapTo } from 'rxjs/operators'
-import { of, merge } from 'rxjs'
+import { tap, filter, delay, map, flatMap, mapTo } from 'rxjs/operators'
+import { of, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
@@ -17,21 +17,24 @@ const torService = new TorService()
 
 const kickOffChildProcessesEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(SettingsActions.kickOffChildProcesses),
-  mergeMap(() => {
+  flatMap(() => {
 		const settingsState = state$.value.settings
-    const observables = []
+    let observables
 
     if (settingsState.isTorEnabled) {
-      observables.push(
+      observables = concat(
         of(SettingsActions.enableTor()),
-        of(SettingsActions.startLocalNode()).delay(200)
+        of(SettingsActions.startLocalNode()).pipe(delay(200))
       )
     } else {
-      observables.push(of(SettingsActions.startLocalNode()))
+      observables = of(SettingsActions.startLocalNode())
     }
 
     if (settingsState.isMinerEnabled) {
-      observables.push(of(SettingsActions.enableMiner()).delay(1000))
+      observables = concat(
+        observables,
+        of(SettingsActions.enableMiner()).pipe(delay(1000))
+      )
     }
 
     return observables

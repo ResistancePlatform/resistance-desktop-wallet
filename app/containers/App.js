@@ -40,11 +40,18 @@ type Props = {
 class App extends React.Component<Props> {
 	props: Props;
 
+	/**
+   * Triggers child processes.
+   *
+	 * @returns
+   * @memberof App
+	 */
   componentDidMount() {
-    if (this.props.getStarted.isInProgress) {
-      return
+    if (!this.props.getStarted.isInProgress) {
+      appStore.dispatch(SettingsActions.kickOffChildProcesses())
     }
 
+    /*
     const settings = appStore.getState().settings
 
     const startNode = () => {
@@ -65,8 +72,15 @@ class App extends React.Component<Props> {
     if (settings.isMinerEnabled) {
       setTimeout(startMiner, 1000);
     }
+    */
   }
 
+	/**
+   * Renders routes.
+   *
+	 * @returns
+   * @memberof App
+	 */
 	render() {
     const getStartedElement = (
       <div className={[styles.contentContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>

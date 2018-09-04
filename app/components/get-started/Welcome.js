@@ -8,7 +8,7 @@ import styles from './GetStarted.scss'
 
 type Props = {
   actions: Object,
-	getStarted: GetStartedState
+  settingsActions: Object
 }
 
 
@@ -18,6 +18,16 @@ type Props = {
  */
 export class Welcome extends Component<Props> {
 	props: Props
+
+	/**
+   * Triggers child processes in advance.
+   *
+	 * @returns
+   * @memberof App
+	 */
+  componentDidMount() {
+    this.props.settingsActions.kickOffChildProcesses()
+  }
 
 	/**
 	 * @returns
