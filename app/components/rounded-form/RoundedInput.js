@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import classNames from 'classnames'
 
-import styles from './rounded-input.scss'
+import styles from './RoundedInput.scss'
 
 type RoundedInputAddon = {
 	enable: boolean,

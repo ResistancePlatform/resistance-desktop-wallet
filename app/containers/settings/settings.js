@@ -5,7 +5,7 @@ import { toastr } from 'react-redux-toastr'
 import { remote } from 'electron'
 import scrypt from 'scrypt-js'
 
-import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
+import RoundedInput, { RoundedInputAddon } from '../../components/rounded-form/RoundedInput'
 import styles from './settings.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'

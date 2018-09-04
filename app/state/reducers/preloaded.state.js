@@ -89,8 +89,7 @@ export const preloadedState: State = {
 
 // Load serialized settings
 Object.assign(preloadedState.getStarted, {
-	// isInProgress: config.get('getStartedInProgress', true),
-	isInProgress: false
+	isInProgress: config.get('getStartedInProgress', true)
 })
 
 Object.assign(preloadedState.settings, {

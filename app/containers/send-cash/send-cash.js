@@ -6,7 +6,7 @@ import { clipboard } from 'electron'
 
 import { TRANSACTION_FEE } from '../../constants'
 import { appStore } from '../../state/store/configureStore'
-import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
+import RoundedInput, { RoundedInputAddon } from '../../components/rounded-form/RoundedInput'
 import AddressDropdownPopupMenu from '../../components/send-cash/address-drodown-popup-menu'
 import { SendCashActions, SendCashState } from '../../state/reducers/send-cash/send-cash.reducer'
 

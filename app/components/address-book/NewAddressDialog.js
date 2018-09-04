@@ -5,7 +5,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
-import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
+import RoundedInput, { RoundedInputAddon } from '../../components/rounded-form/RoundedInput'
 import RoundedForm from '../../components/rounded-form/RoundedForm'
 import { AddressBookActions, AddressBookState } from '../../state/reducers/address-book/address-book.reducer'
 
