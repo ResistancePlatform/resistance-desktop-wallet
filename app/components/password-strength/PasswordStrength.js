@@ -7,7 +7,6 @@ import styles from './PasswordStrength.scss'
 type StrengthStatus = null | 'weak' | 'medium' | 'good' | 'excellent'
 
 const statusMessage: { [StrengthStatus]: string } = {
-  null: '',
   'weak': `Weak`,
   'medium': `Medium`,
   'good': `Good`,
@@ -15,7 +14,7 @@ const statusMessage: { [StrengthStatus]: string } = {
 }
 
 type Props = {
-  +password: string
+  +password: string | undefined
 }
 
 type State = {
@@ -44,7 +43,7 @@ export default class PasswordStrength extends Component<Props> {
 	 */
   componentDidUpdate(prevProps) {
     if (prevProps.password !== this.props.password) {
-      const result = test(this.props.password)
+      const result = test(this.props.password || '')
       const strengthRate = Math.Round(100 * result.passedtests.length / (result.passedtests.length + result.failedTests.length))
 
       let status = null
@@ -71,10 +70,10 @@ export default class PasswordStrength extends Component<Props> {
 	 */
 	render() {
 		return (
-			<div classNames={styles.container}>
+			<div className={styles.container}>
         Password strength: {this.state.strengthRate}
         <span className={this.state.status}>
-          Message: {statusMessage[this.state.status]}
+          Message: {statusMessage[this.state.status] || ''}
         </span>
 			</div>
 		)

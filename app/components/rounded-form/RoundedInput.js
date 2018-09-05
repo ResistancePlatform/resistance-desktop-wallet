@@ -19,7 +19,7 @@ type Props = {
   password?: boolean,
 	label: string,
 	onChange?: value => void,
-	addon: RoundedInputAddon,
+	addon?: RoundedInputAddon,
 	disabled?: boolean,
 	tooltip?: string,
   onEnterPressed: func,
@@ -90,7 +90,7 @@ export default class RoundedInput extends Component<Props> {
 	}
 
 	renderAddon() {
-		if (!this.props.addon.enable) {
+		if (!this.props.addon || !this.props.addon.enable) {
 			return null
 		}
 

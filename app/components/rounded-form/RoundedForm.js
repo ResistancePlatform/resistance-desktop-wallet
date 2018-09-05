@@ -3,8 +3,15 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as Joi from 'joi'
 
+export type RoundedFormRoot = {
+  fields: { [string]: any },
+  errors: { [string]: string },
+  isValid: boolean
+}
+
 type Props = {
   className?: string,
+  +root: RoundedFormRoot,
   schema: object,
   fields: { [string]: any },
   onValidate: (errors: object) => void,

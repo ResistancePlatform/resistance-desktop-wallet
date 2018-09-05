@@ -13,6 +13,10 @@ export const preloadedState: State = {
       wallet: null,
       validationErrors: {}
     },
+    choosePassword: {
+      fields: {},
+      validationErrors: {}
+    },
     isInProgress: true
   },
   rpcPolling: {

@@ -9,8 +9,8 @@ import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/Round
 import RoundedTextArea from '~/components/rounded-form/RoundedTextArea'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
-import HLayout from '../../theme/h-box-layout.scss'
-import VLayout from '../../theme/v-box-layout.scss'
+import HLayout from '~/theme/h-box-layout.scss'
+import VLayout from '~/theme/v-box-layout.scss'
 import styles from './GetStarted.scss'
 
 const resistance = new ResistanceService()

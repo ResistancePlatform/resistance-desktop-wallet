@@ -4,13 +4,10 @@ import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
 import classNames from 'classnames'
 
-import {
-  GetStartedPage,
-  ChoosePasswordPage,
-  RestoreYourWalletPage,
-  WelcomePage } from './GetStartedPage'
+import { GetStartedPage, RestoreYourWalletPage, WelcomePage } from './GetStartedPage'
 
 import CreateNewWalletPage from './get-started/CreateNewWalletPage'
+import ChoosePasswordPage from './get-started/ChoosePasswordPage'
 
 import NaviBar from './navigation/navi-bar'
 import TitleBarButtons from '../components/title-bar-buttons/TitleBarButtons'

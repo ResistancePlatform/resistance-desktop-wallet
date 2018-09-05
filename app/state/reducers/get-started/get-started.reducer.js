@@ -26,6 +26,11 @@ export const GetStartedActions = createActions(
       UPDATE_VALIDATION_ERRORS: errors => errors
     },
 
+    CHOOSE_PASSWORD: {
+      UPDATE_FIELD: (field: string, value: string) => ({ field, value }),
+      UPDATE_VALIDATION_ERRORS: errors => errors
+    },
+
     USE_RESISTANCE: undefined
   },
   {
