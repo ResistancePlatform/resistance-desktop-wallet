@@ -25,7 +25,7 @@ export const preloadedState: State = {
   },
   popupMenu: {},
 	navi: {
-		currentNaviPath: '/'
+		currentNaviPath: '/overview'
 	},
 	systemInfo: {
 		daemonInfo: {},

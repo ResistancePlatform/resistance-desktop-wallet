@@ -3,6 +3,7 @@ import { of, merge } from 'rxjs'
 import { switchMap,  map } from 'rxjs/operators'
 import { remote } from 'electron'
 import { ofType } from 'redux-observable'
+import { push } from 'react-router-redux'
 
 import { Bip39Service } from '~/service/bip39-service'
 import { GetStartedActions } from './get-started.reducer'
@@ -23,9 +24,9 @@ const generateWalletEpic = (action$: ActionsObservable<any>) => action$.pipe(
 
 const useResistanceEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(GetStartedActions.useResistance),
-  map(() => (
+  switchMap(() => (
     // TODO: Import the private key, encrypt the wallet, remove private information from the state
-    SettingsActions.kickOffChildProcesses()
+    of(SettingsActions.kickOffChildProcesses(), push('/overview'))
   ))
 )
 
