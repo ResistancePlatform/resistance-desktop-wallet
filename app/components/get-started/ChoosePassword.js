@@ -14,14 +14,18 @@ import styles from './GetStarted.scss'
 
 const validationSchema = Joi.object().keys({
   // #?!@$%^&*-'`;
-  password: Joi.string().required().regex(/^[a-zA-Z0-9]{8,30}$/),
-  confirmPassword: Joi.string().required().valid(Joi.ref('password')).options({
-    language: {
-      any: {
-        allowOnly: '!!Passwords do not match',
+  password: Joi.string().required().regex(/^[a-zA-Z0-9]{8,30}$/).label(`Password`),
+  confirmPassword: (
+    Joi.string().required().valid(Joi.ref('password'))
+    .label(`Confirm password`)
+    .options({
+      language: {
+        any: {
+          allowOnly: '!!Passwords do not match',
+        }
       }
-    }
-  })
+    })
+  )
 })
 
 type Props = {
@@ -55,7 +59,7 @@ export class ChoosePassword extends Component<Props> {
         >
           <RoundedInput
             name="password"
-            type="password"
+            password
             defaultValue={this.props.choosePassword.fields.password}
             label="Password"
             error={this.props.choosePassword.validationErrors.password}
@@ -64,7 +68,7 @@ export class ChoosePassword extends Component<Props> {
 
           <RoundedInput
             name="confirm-password"
-            type="password"
+            password
             defaultValue={this.props.choosePassword.fields.confirmPassword}
             label="Confirm password"
             error={this.props.choosePassword.validationErrors.confirmPassword}

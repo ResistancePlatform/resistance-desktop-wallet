@@ -11,7 +11,6 @@ export type RoundedFormRoot = {
 
 type Props = {
   className?: string,
-  +root: RoundedFormRoot,
   schema: object,
   fields: { [string]: any },
   onValidate: (errors: object) => void,
