@@ -5,9 +5,9 @@ import classNames from 'classnames'
 import * as Joi from 'joi'
 
 import { ResistanceService } from '~/service/resistance-service'
-import RoundedInput, { RoundedInputAddon } from '../../components/rounded-form/RoundedInput'
-import RoundedTextArea from '../../components/rounded-form/RoundedTextArea'
-import RoundedForm from '../../components/rounded-form/RoundedForm'
+import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
+import RoundedTextArea from '~/components/rounded-form/RoundedTextArea'
+import RoundedForm from '~/components/rounded-form/RoundedForm'
 
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
