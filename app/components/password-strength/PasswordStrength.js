@@ -44,7 +44,6 @@ export default class PasswordStrength extends Component<Props> {
   componentDidUpdate(prevProps) {
     if (prevProps.password !== this.props.password) {
       const result = owasp.test(this.props.password || '')
-      console.error("Res", result)
       const strengthRate = Math.round(100 * result.passedTests.length / (result.passedTests.length + result.failedTests.length))
 
       let status = null
