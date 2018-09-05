@@ -6,12 +6,9 @@ import { GetStartedActions } from '~/state/reducers/get-started/get-started.redu
 import { ChoosePassword } from '~/components/get-started/ChoosePassword'
 
 const mapStateToProps = state => ({
-	choosePassword: state.getStarted.choosePassword
+	choosePassword: state.getStarted.choosePassword,
+  form: state.roundedForm.getStartedChoosePassword
 })
 
-const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(GetStartedActions.choosePassword, dispatch)
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(ChoosePassword)
+export default connect(mapStateToProps, null)(ChoosePassword)
 

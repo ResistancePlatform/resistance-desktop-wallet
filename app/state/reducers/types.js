@@ -1,4 +1,6 @@
 // @flow
+
+import { RoundedFormState } from '../reducers/rounded-form/rounded-form.reducer'
 import { GetStartedState } from '../reducers/get-started/get-started.reducer'
 import { RpcPollingState } from '../reducers/rpc-polling/rpc-polling.reducer'
 import { PopupMenuState } from '../reducers/popup-menu/popup-menu.reducer'
@@ -17,6 +19,7 @@ export type Action = {
 }
 
 export type State = {
+  roundedForm: RoundedFormState,
   getStarted: GetStartedState,
 	rpcPolling: RpcPollingState,
   popupMenu: PopupMenuState,

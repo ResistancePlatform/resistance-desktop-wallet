@@ -1,19 +1,20 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux';
 import * as Joi from 'joi'
 
-export type RoundedFormRoot = {
-  fields: { [string]: any },
-  errors: { [string]: string },
-  isValid: boolean
-}
+import { RoundedFormState, RoundedFormActions } from '~/state/reducers/rounded-form/rounded-form.reducer'
+
+const inputChildComponentNames = ['RoundedInput', 'RoundedTextArea']
 
 type Props = {
+  actions: object,
+  roundedForm: RoundedFormState,
+  +id: string,
   className?: string,
   schema: object,
-  fields: { [string]: any },
-  onValidate: (errors: object) => void,
+  onValidate?: (errors: object) => void,
   children: any
 }
 
@@ -26,11 +27,18 @@ class RoundedForm extends Component<Props> {
 	/**
 	 * @memberof RoundedForm
 	 */
+  componentDidMount() {
+    this.props.actions.init(this.props.id)
+  }
+
+	/**
+	 * @memberof RoundedForm
+	 */
   componentDidUpdate(prevProps) {
-    const entries = Object.entries(this.props.fields)
+    const entries = Object.entries(this::getFormState().fields)
 
     const fields = entries.reduce((result, [key, value]) => {
-      if (value !== prevProps.fields[key]) {
+      if (value !== prevProps.roundedForm[this.props.id].fields[key]) {
         result.push(key)
       }
       return result
@@ -46,12 +54,13 @@ class RoundedForm extends Component<Props> {
 	 */
   validate(fields: string[] | null): boolean {
     let validationErrors = {}
+    const stateFields = this::getFormState().fields
 
-    if (!this.props.fields) {
+    if (!stateFields) {
       return
     }
 
-    const {error} = Joi.validate(this.props.fields, this.props.schema, { abortEarly: false })
+    const {error} = Joi.validate(stateFields, this.props.schema, { abortEarly: false })
 
     if (error !== null) {
       validationErrors = error.details.reduce((errors, item) => {
@@ -65,9 +74,14 @@ class RoundedForm extends Component<Props> {
       }, {})
     }
 
-    this.props.onValidate(validationErrors)
+    if (this.props.onValidate) {
+      this.props.onValidate(validationErrors)
+    }
 
-    return !error
+    const isValid = !error
+    this.props.actions.updateErrors(this.props.id, validationErrors, isValid)
+
+    return isValid
   }
 
 	/**
@@ -107,12 +121,33 @@ class RoundedForm extends Component<Props> {
 	 */
   renderChildren() {
     return this.mapChildrenRecursively(this.props.children, child => {
+
+      // Handle form submission
       if ((child.type === 'button' || child.props.role === 'button') && child.props.type === 'submit') {
         return React.cloneElement(child, {
           onClick: this.onSubmitHandler(child.props.onClick),
           onKeyDown: this.onSubmitHandler(child.props.onKeyDown)
         })
       }
+
+      // Handle child inputs change events
+      if (inputChildComponentNames.includes(child.type.displayName)) {
+        const formState = this::getFormState()
+
+        const onChange = (value) => (
+          this.props.actions.updateField(this.props.id, child.props.name, value)
+        )
+
+        const error = formState.errors[child.props.name]
+        const defaultValue = formState.fields[child.props.name]
+
+        return React.cloneElement(child, {
+          onChange: child.props.onChange ? child.props.onChange : onChange,
+          error: child.props.error ? child.props.error : error,
+          defaultValue: child.props.defaultValue ? child.props.defaultValue : defaultValue
+        })
+      }
+
       return child
     })
   }
@@ -132,4 +167,21 @@ class RoundedForm extends Component<Props> {
 
 }
 
-export default connect()(RoundedForm)
+/**
+ * Private method. Returns current form state.
+ *
+ * @memberof RoundedForm
+ */
+function getFormState() {
+    return this.props.roundedForm[this.props.id] || { fields: {}, errors: {} }
+}
+
+const mapStateToProps = state => ({
+	roundedForm: state.roundedForm
+})
+
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(RoundedFormActions, dispatch),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(RoundedForm)

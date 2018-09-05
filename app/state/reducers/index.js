@@ -4,6 +4,7 @@ import { combineEpics } from 'redux-observable'
 import { reducer as toastrReducer } from 'react-redux-toastr'
 
 // Reducers
+import { RoundedFormReducer } from '../reducers/rounded-form/rounded-form.reducer'
 import { RpcPollingReducer } from '../reducers/rpc-polling/rpc-polling.reducer'
 import { PopupMenuReducer } from '../reducers/popup-menu/popup-menu.reducer'
 import { NaviReducer } from '../reducers/navi/navi.reducer'
@@ -27,6 +28,7 @@ import { AddressBookEpics } from '../reducers/address-book/address-book.epic'
 
 const rootReducer = combineReducers({
   toastr: toastrReducer,
+  roundedForm: RoundedFormReducer,
   getStarted: GetStartedReducer,
   rpcPolling: RpcPollingReducer,
   popupMenu: PopupMenuReducer,

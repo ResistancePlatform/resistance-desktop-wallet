@@ -26,11 +26,6 @@ export const GetStartedActions = createActions(
       UPDATE_VALIDATION_ERRORS: errors => errors
     },
 
-    CHOOSE_PASSWORD: {
-      UPDATE_FIELD: (field: string, value: string) => ({ field, value }),
-      UPDATE_VALIDATION_ERRORS: errors => errors
-    },
-
     USE_RESISTANCE: undefined
   },
   {
@@ -54,17 +49,6 @@ export const GetStartedReducer = handleActions(
     [GetStartedActions.createNewWallet.updateValidationErrors]: (state, action) => ({
       ...state,
       createNewWallet: { ...state.createNewWallet, validationErrors: action.payload }
-    }),
-    [GetStartedActions.choosePassword.updateField]: (state, action) => ({
-      ...state,
-      choosePassword: {
-        ...state.choosePassword,
-        fields: { ...state.choosePassword.fields, [action.payload.field]: action.payload.value }
-      }
-    }),
-    [GetStartedActions.choosePassword.updateValidationErrors]: (state, action) => ({
-      ...state,
-      choosePassword: { ...state.choosePassword, validationErrors: action.payload }
     }),
     [GetStartedActions.useResistance]: state => ({ ...state, isInProgress: false }),
   }, preloadedState)

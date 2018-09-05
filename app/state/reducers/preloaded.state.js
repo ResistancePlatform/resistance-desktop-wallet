@@ -5,6 +5,7 @@ const config = require('electron-settings')
 
 
 export const preloadedState: State = {
+  roundedForm: {},
   getStarted: {
     createNewWallet: {
       fields: {
