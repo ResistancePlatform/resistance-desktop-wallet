@@ -7,7 +7,7 @@ export const preloadedState: State = {
   getStarted: {
     createNewWallet: {
       fields: {},
-      mnemonicSeed: '',
+      wallet: null,
       validationErrors: {}
     },
     isInProgress: true

@@ -6,10 +6,11 @@ import classNames from 'classnames'
 
 import {
   GetStartedPage,
-  CreateNewWalletPage,
   ChoosePasswordPage,
   RestoreYourWalletPage,
   WelcomePage } from './GetStartedPage'
+
+import CreateNewWalletPage from './get-started/CreateNewWalletPage'
 
 import NaviBar from './navigation/navi-bar'
 import TitleBarButtons from '../components/title-bar-buttons/TitleBarButtons'

@@ -18,7 +18,7 @@ const validationSchema = Joi.object().keys({
 
 type Props = {
   actions: Object,
-	createNewWallet: GetStartedState.createNewWallet
+	createNewWallet: Object
 }
 
 
@@ -36,7 +36,9 @@ export class CreateNewWallet extends Component<Props> {
    * @memberof App
 	 */
   componentDidMount() {
-    this.props.actions.generateWallet()
+    if (this.props.createNewWallet.wallet === null) {
+      this.props.actions.generateWallet()
+    }
   }
 
 	/**
@@ -67,26 +69,17 @@ export class CreateNewWallet extends Component<Props> {
             defaultValue={this.props.createNewWallet.fields.walletName}
             label="Wallet name"
             addon={nameAddon}
-            error={this.props.createNewWallet.validationErrors.name}
+            error={this.props.createNewWallet.validationErrors.walletName}
             onChange={value => this.props.actions.updateField('walletName', value)}
           />
 
           <RoundedTextArea
             name="mnemonic-seed"
-            defaultValue={this.props.createNewWallet.mnemonicSeed}
+            value={this.props.createNewWallet.wallet && this.props.createNewWallet.wallet.mnemonicSeed}
             readOnly
           />
 
-        <button
-          type="submit"
-          className={styles.nextButton}
-          onClick={this.props.actions.navigateToChoosePasswordPage}
-          onKeyDown={() => {}}
-        >Next
-        </button>
-
           <p><strong>Note:</strong> This seed is very important to write down and keep secret. It&#39;s all you need to backup &amp; restore your wallet. </p>
-
           <p>The <strong>seed phrase</strong> can only be used to recover R- (transparent) addresses. In order to also back up and recover Z- (private) addresses, you will need to backup the wallet in Settings each time you create a new Z-address</p>
 
           <RoundedInput
@@ -94,12 +87,12 @@ export class CreateNewWallet extends Component<Props> {
             defaultValue="/usr/local/"
             label="Your wallet stored in"
             addon={nameAddon}
+            readOnly
           />
-        </RoundedForm>
 
-        <div>
-          <NavLink to="/get-started/choose-password">Next</NavLink>
-        </div>
+          <NavLink to="/get-started">Prev</NavLink>
+          <NavLink type="submit" role="button" to="/get-started/choose-password">Next</NavLink>
+        </RoundedForm>
       </div>
     )
   }

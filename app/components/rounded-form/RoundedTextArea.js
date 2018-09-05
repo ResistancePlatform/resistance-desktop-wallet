@@ -6,10 +6,11 @@ import styles from './RoundedInput.scss'
 
 type Props = {
 	name?: string,
-  +value: string,
-	+onChange: value => void,
+  value?: string | null,
+	onChange?: value => void,
 	disabled?: boolean,
-  error?: string | null
+  error?: string | null,
+  readOnly?: boolean
 }
 
 export default class RoundedTextArea extends Component<Props> {
@@ -34,9 +35,9 @@ export default class RoundedTextArea extends Component<Props> {
           <textarea
             disabled={this.props.disabled}
             onChange={event => this.onChangeHandler(event)}
-          >
-            {this.props.value}
-          </textarea>
+            value={this.props.value || ''}
+            readOnly={this.props.readOnly}
+          />
         </div>
         {this.props.error &&
           <div className={styles.errorMessage}>{this.props.error}</div>

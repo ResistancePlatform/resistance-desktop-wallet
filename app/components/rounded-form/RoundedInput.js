@@ -18,12 +18,13 @@ type Props = {
 	number?: boolean,
   password?: boolean,
 	label: string,
-	onChange: value => void,
+	onChange?: value => void,
 	addon: RoundedInputAddon,
 	disabled?: boolean,
 	tooltip?: string,
   onEnterPressed: func,
   error?: string | null,
+  readOnly?: boolean,
 	children: any
 }
 
@@ -148,9 +149,6 @@ export default class RoundedInput extends Component<Props> {
 	render() {
 		return (
       <div>
-        {this.props.error && !this.state.isFocused &&
-          <div className={styles.errorMessage}>{this.props.error}</div>
-        }
         <div
           name={this.props.name}
           disabled={this.props.disabled}
@@ -160,7 +158,7 @@ export default class RoundedInput extends Component<Props> {
             {this.props.label || ''}
           </div>
 
-          <div className={classNames(styles.roundedInputTextArea)}>
+          <div className={classNames(styles.inputContainer)}>
             <input
               type={this.getInputType()}
               value={this.state.value}
@@ -169,12 +167,14 @@ export default class RoundedInput extends Component<Props> {
               onFocus={(event) => this.onFocusHandler(event)}
               onBlur={(event) => this.onBlurHandler(event)}
               onKeyPress={(event) => this.onEnterPressedEventHandler(event)}
+              readOnly={this.props.readOnly}
             />
             {this.renderAddon()}
             {this.renderTooltip()}
           </div>
           {this.props.children ? this.props.children : null}
         </div>
+        <div className={styles.errorMessage}>{this.props.error && !this.state.isFocused && this.props.error}</div>
       </div>
 		)
 	}

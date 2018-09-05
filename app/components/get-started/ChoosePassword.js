@@ -36,6 +36,7 @@ export class ChoosePassword extends Component<Props> {
         <p>Password strength</p>
 
         <div>
+          <NavLink to="/get-started/create-new-wallet">Prev</NavLink>
           <NavLink to="/get-started/welcome">Next</NavLink>
         </div>
       </div>

@@ -72,6 +72,7 @@ class RoundedForm extends Component<Props> {
       if (this.validate(null) && originalHandler) {
         return originalHandler(event)
       }
+      event.preventDefault()
       return false
     }
   }
@@ -100,7 +101,7 @@ class RoundedForm extends Component<Props> {
 	 */
   renderChildren() {
     return this.mapChildrenRecursively(this.props.children, child => {
-      if (child.type === 'button' && child.props.type === 'submit') {
+      if ((child.type === 'button' || child.props.role === 'button') && child.props.type === 'submit') {
         return React.cloneElement(child, {
           onClick: this.onSubmitHandler(child.props.onClick),
           onKeyDown: this.onSubmitHandler(child.props.onKeyDown)

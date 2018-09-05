@@ -16,6 +16,7 @@ import { SettingsReducer } from '../reducers/settings/settings.reducer'
 import { AddressBookReducer } from '../reducers/address-book/address-book.reducer'
 
 // Epics
+import { GetStartedEpic } from '../reducers/get-started/get-started.epic'
 import { OwnAddressesEpics } from '../reducers/own-addresses/own-addresses.epic'
 import { NaviEpics } from '../reducers/navi/navi.epic'
 import { OverviewEpics } from '../reducers/overview/overview.epic'
@@ -39,6 +40,7 @@ const rootReducer = combineReducers({
 })
 
 const rootEpic = combineEpics(
+  GetStartedEpic,
 	NaviEpics,
 	SystemInfoEpics,
 	OverviewEpics,

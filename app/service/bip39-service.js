@@ -1,4 +1,5 @@
 // @flow
+import * as bip39 from 'bip39'
 
 /**
  * ES6 singleton
@@ -12,13 +13,13 @@ export type Wallet = {
 
 /**
  * @export
- * @class ResistanceService
+ * @class Bip39Service
  */
-export class ResistanceService {
+export class Bip39Service {
 	/**
-	 * Creates an instance of ResistanceService.
+	 * Creates an instance of Bip39Service.
    *
-	 * @memberof ResistanceService
+	 * @memberof Bip39Service
 	 */
 	constructor() {
 		if (!instance) { instance = this }
@@ -29,7 +30,7 @@ export class ResistanceService {
 	/**
 	 * Returns Resistance service data path.
    *
-	 * @memberof ResistanceService
+	 * @memberof Bip39Service
 	 */
   generateWallet(isTestnet: boolean): Wallet {
     const seed = bip39.generateMnemonic(256)
