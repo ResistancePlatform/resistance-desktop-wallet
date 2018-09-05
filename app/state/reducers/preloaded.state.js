@@ -1,3 +1,4 @@
+import { userInfo } from 'os'
 import { Decimal } from 'decimal.js'
 
 const config = require('electron-settings')
@@ -6,7 +7,9 @@ const config = require('electron-settings')
 export const preloadedState: State = {
   getStarted: {
     createNewWallet: {
-      fields: {},
+      fields: {
+        walletName: userInfo().username
+      },
       wallet: null,
       validationErrors: {}
     },

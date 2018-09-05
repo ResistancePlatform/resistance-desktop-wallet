@@ -69,8 +69,8 @@ class RoundedForm extends Component<Props> {
 	 */
   onSubmitHandler(originalHandler: func) {
     return (event) => {
-      if (this.validate(null) && originalHandler) {
-        return originalHandler(event)
+      if (this.validate(null)) {
+        return originalHandler ? originalHandler(event) : undefined
       }
       event.preventDefault()
       return false
