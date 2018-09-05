@@ -49,13 +49,6 @@ export class CreateNewWallet extends Component<Props> {
    * @memberof CreateNewWallet
 	 */
 	render() {
-		const nameAddon: RoundedInputAddon = {
-			enable: false,
-			type: 'TEXT_PLACEHOLDER',
-			onAddonClicked: () => { },
-			value: ''
-		}
-
 		return (
       <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
         <h1>Create a new wallet</h1>
@@ -71,7 +64,6 @@ export class CreateNewWallet extends Component<Props> {
             name="wallet-name"
             defaultValue={this.props.createNewWallet.fields.walletName}
             label="Wallet name"
-            addon={nameAddon}
             error={this.props.createNewWallet.validationErrors.walletName}
             onChange={value => this.props.actions.updateField('walletName', value)}
           />
