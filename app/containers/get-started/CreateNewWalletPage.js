@@ -10,6 +10,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
+  getStartedActions: bindActionCreators(GetStartedActions, dispatch),
   actions: bindActionCreators(GetStartedActions.createNewWallet, dispatch)
 })
 

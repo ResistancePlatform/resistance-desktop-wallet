@@ -8,8 +8,6 @@ import VLayout from '../../theme/v-box-layout.scss'
 import styles from './GetStarted.scss'
 
 type Props = {
-  actions: Object,
-	getStarted: GetStartedState
 }
 
 

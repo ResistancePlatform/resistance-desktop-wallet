@@ -7,7 +7,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import * as Joi from 'joi'
 
 import { ResistanceService } from '~/service/resistance-service'
-import RoundedInput from '~/components/rounded-form/RoundedInput'
+import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
 import RoundedTextArea from '~/components/rounded-form/RoundedTextArea'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
@@ -19,13 +19,18 @@ const resistance = new ResistanceService()
 
 const validationSchema = Joi.object().keys({
   walletName: Joi.string().required().label(`Wallet name`),
-  mnemonicSeed: Joi.string().required().label(`Mnemonic seed`),
-  restoreHeight: Joi.number().integer().optional().allow('').label(`Restore height`)
-})
+  mnemonicSeed: Joi.string().label(`Mnemonic seed`),
+  backupFile: Joi.string().label(`Backup file`),
+  restoreHeight: Joi.number().integer().optional().allow('').label(`Restore height`),
+  walletPath: Joi.string().required().label(`Wallet path`)
+}).xor('mnemonicSeed', 'backupFile')
+
+type State = {
+  selectedTabIndex: number
+}
 
 type Props = {
-  // actions: object,
-	// getStarted: GetStartedState
+  actions: object
 }
 
 /**
@@ -34,12 +39,40 @@ type Props = {
  */
 export class RestoreYourWallet extends Component<Props> {
 	props: Props
+  state: State
+
+	/**
+   * @memberof RestoreYourWallet
+	 */
+	constructor(props) {
+		super(props)
+    this.state = {
+      selectedTabIndex: 0
+    }
+	}
+
+	/**
+	 * @returns
+   * @memberof RestoreYourWallet
+	 */
+  componentDidMount() {
+    this.props.actions.setCreatingNewWallet(false)
+  }
 
 	/**
 	 * @returns
    * @memberof RestoreYourWallet
 	 */
 	render() {
+		const backupFileAddon: RoundedInputAddon = {
+			enable: true,
+      type: 'CHOOSE_FILE',
+      data: {
+        title: `Restore Resistance wallet from a backup file`,
+        filters: [{ name: `Wallet keys files`,  extensions: ['wallet'] }]
+      }
+		}
+
 		return (
       <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
         <h1>Restore your wallet</h1>
@@ -56,11 +89,11 @@ export class RestoreYourWallet extends Component<Props> {
             className={styles.tabs}
             selectedTabClassName={styles.selectedTab}
             selectedTabPanelClassName={styles.selectedTabPanel}
+            onSelect={selectedTabIndex => this.setState({ selectedTabIndex })}
           >
             <TabList className={styles.tabList}>
               <Tab className={styles.tab}>Restore from seed</Tab>
-              <Tab className={styles.tab}>From keys</Tab>
-              <Tab className={styles.tab}>From backup</Tab>
+              <Tab className={styles.tab}>Restore from backup</Tab>
             </TabList>
 
             <TabPanel>
@@ -68,11 +101,7 @@ export class RestoreYourWallet extends Component<Props> {
             </TabPanel>
 
             <TabPanel>
-              Nope
-            </TabPanel>
-
-            <TabPanel>
-              Nope
+              <RoundedInput name="backupFile" label="Backup file" addon={backupFileAddon} readOnly />
             </TabPanel>
           </Tabs>
 

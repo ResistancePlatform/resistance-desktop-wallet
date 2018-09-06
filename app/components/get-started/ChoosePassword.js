@@ -29,6 +29,7 @@ const validationSchema = Joi.object().keys({
 })
 
 type Props = {
+  getStarted: object,
   form: object
 }
 
@@ -45,6 +46,8 @@ export class ChoosePassword extends Component<Props> {
    * @memberof ChoosePassword
 	 */
 	render() {
+    const prevPath = this.props.getStarted.isCreatingNewWallet ? 'create-new-wallet' : 'restore-your-wallet'
+
 		return (
       <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
         <h1>Choose password for your wallet</h1>
@@ -61,7 +64,7 @@ export class ChoosePassword extends Component<Props> {
 
           <PasswordStrength password={this.props.form && this.props.form.fields.password} />
 
-          <NavLink to="/get-started/create-new-wallet">Prev</NavLink>
+          <NavLink to={`/get-started/${prevPath}`}>Prev</NavLink>
           <NavLink type="submit" role="button" to="/get-started/welcome">Next</NavLink>
         </RoundedForm>
       </div>

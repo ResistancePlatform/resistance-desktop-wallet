@@ -11,8 +11,9 @@ import styles from './GetStarted.scss'
 const resistance = new ResistanceService()
 
 type Props = {
-  actions: object,
+  roundedForm: object,
   getStarted: object,
+  actions: object,
   settingsActions: object
 }
 
@@ -37,6 +38,24 @@ export class Welcome extends Component<Props> {
 	 */
   componentDidMount() {
     this.props.settingsActions.kickOffChildProcesses()
+  }
+
+	/**
+   * Gets wallet name.
+   *
+   * @returns string
+   * @memberof Welcome
+	 */
+  getWalletName(): string {
+    let form
+
+    if (this.props.getStarted.isCreatingNewWallet) {
+      form = this.props.roundedForm.getStartedCreateNewWallet
+    } else {
+      form = this.props.roundedForm.getStartedRestoreYourWallet
+    }
+
+    return form && form.fields.walletName || ''
   }
 
 	/**
@@ -82,7 +101,7 @@ export class Welcome extends Component<Props> {
 
         <ul>
           <li>Language: English</li>
-          <li>Wallet name: {this.props.getStarted.createNewWallet.fields.walletName}</li>
+          <li>Wallet name: {this.getWalletName()}</li>
           <li>Backup seed: *******</li>
           <li>Wallet path: {resistance.getWalletPath()}</li>
           <li>Daemon address: {this.getDaemonAddress()}</li>
@@ -90,6 +109,7 @@ export class Welcome extends Component<Props> {
         </ul>
 
         <button
+          type="button"
           onClick={this.props.actions.useResistance}
           onKeyDown={this.props.actions.useResistance}
         >

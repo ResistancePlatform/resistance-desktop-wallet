@@ -323,7 +323,7 @@ class Settings extends Component<Props> {
 		const passwordAddon: RoundedInputAddon = {
 			enable: false,
 			type: 'TEXT_PLACEHOLDER',
-			onAddonClicked: () => { },
+			onClick: () => { },
 			value: ''
 		}
 
@@ -370,6 +370,7 @@ class Settings extends Component<Props> {
 
 						{/* Save password */}
 						<button
+              type="button"
 							className={styles.savePasswordButton}
               onClick={async () => this.onSavePasswordClicked()}
 							onKeyDown={async () => this.onSavePasswordClicked()}
@@ -384,6 +385,7 @@ class Settings extends Component<Props> {
 
 							<div className={styles.manageDaemonBody}>
 								<button
+                  type="button"
 									className={styles.stopLocalNodeButton}
 									onClick={event => this.onStartStopLocalNodeClicked(event)}
 									onKeyDown={event => this.onStartStopLocalNodeClicked(event)}
@@ -393,6 +395,7 @@ class Settings extends Component<Props> {
 								</button>
 
 								<button
+                  type="button"
 									className={styles.showStatusButton}
 									onClick={event => this.onShowStatusClicked(event)}
 									onKeyDown={event => this.onShowStatusClicked(event)}
@@ -445,6 +448,7 @@ class Settings extends Component<Props> {
 							<div className={styles.manageWalletTitle}>MANAGE WALLET</div>
 
 							<button
+                type="button"
 								className={styles.walletNodeButton}
 								onClick={event => this.onBackupWalletClicked(event)}
 								onKeyDown={event => this.onBackupWalletClicked(event)}
@@ -454,6 +458,7 @@ class Settings extends Component<Props> {
 							</button>
 
 							<button
+                type="button"
 								className={styles.walletNodeButton}
 								onClick={event => this.onRestoreWalletClicked(event)}
 								onKeyDown={event => this.onRestoreWalletClicked(event)}

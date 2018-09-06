@@ -1,11 +1,12 @@
 // @flow
+import { userInfo } from 'os'
 import React, { Component } from 'react'
 import { NavLink } from 'react-router-dom'
 import classNames from 'classnames'
 import * as Joi from 'joi'
 
 import { ResistanceService } from '~/service/resistance-service'
-import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
+import RoundedInput from '~/components/rounded-form/RoundedInput'
 import RoundedTextArea from '~/components/rounded-form/RoundedTextArea'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
@@ -17,6 +18,8 @@ const resistance = new ResistanceService()
 
 const validationSchema = Joi.object().keys({
   walletName: Joi.string().required().label(`Wallet name`),
+  mnemonicSeed: Joi.string().required().label(`Mnemonic seed`),
+  walletPath: Joi.string().required().label(`Wallet path`)
 })
 
 type Props = {
@@ -33,12 +36,14 @@ export class CreateNewWallet extends Component<Props> {
 	props: Props
 
 	/**
-   * Triggers child processes.
+   * Triggers wallet generation.
    *
 	 * @returns
    * @memberof App
 	 */
   componentDidMount() {
+    this.props.getStartedActions.setCreatingNewWallet(true)
+
     if (this.props.createNewWallet.wallet === null) {
       this.props.actions.generateWallet()
     }
@@ -56,7 +61,7 @@ export class CreateNewWallet extends Component<Props> {
         <p>Choose a name for your wallet</p>
 
         <RoundedForm id="getStartedCreateNewWallet" schema={validationSchema}>
-          <RoundedInput name="walletName" label="Wallet name" />
+          <RoundedInput name="walletName" label="Wallet name" defaultValue={userInfo().username} />
 
           <RoundedTextArea
             name="mnemonicSeed"

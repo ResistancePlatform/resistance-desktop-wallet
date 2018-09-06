@@ -1,14 +1,16 @@
 // @flow
+import { remote } from 'electron'
 import React, { Component } from 'react'
 import classNames from 'classnames'
 
 import styles from './RoundedInput.scss'
 
-type RoundedInputAddon = {
+export type RoundedInputAddon = {
 	enable: boolean,
-	type: 'PASTE' | 'DROPDOWN' | 'TEXT_PLACEHOLDER',
+	type: 'PASTE' | 'DROPDOWN' | 'TEXT_PLACEHOLDER' | 'CHOOSE_FILE',
+  data: { [string]: any },
 	value: string | undefined,
-	onAddonClicked?: addonType => void,
+	onClick?: addonType => void,
 	onEnterPressed?: () => void
 }
 
@@ -37,6 +39,10 @@ export default class RoundedInput extends Component<Props> {
 	props: Props
   state: State
 
+	/**
+	 * @param {*} props
+	 * @memberof RoundedInput
+	 */
 	constructor(props) {
 		super(props)
     this.state = {
@@ -74,13 +80,35 @@ export default class RoundedInput extends Component<Props> {
 		this.setState({ isFocused: false })
 	}
 
-	onMyAddonClick(event) {
-		event.preventDefault()
-		event.stopPropagation()
-
-		if (this.props.addon.onAddonClicked && !this.props.disabled) {
-			this.props.addon.onAddonClicked(this.props.addon.type)
+	onAddonClick() {
+		if (this.props.addon.onClick && !this.props.disabled) {
+			this.props.addon.onClick(this.props.addon.type)
+      return false
 		}
+
+    if (this.props.addon.type === 'CHOOSE_FILE') {
+      const addonData = this.props.addon.data || {}
+      const title = addonData.title || `Choose a file`
+
+      const callback = filePaths => {
+        if (filePaths && filePaths.length) {
+          const value = filePaths.pop()
+          this.setState({ value })
+
+          if (this.props.onChange) {
+            this.props.onChange(value)
+          }
+        }
+      }
+      remote.dialog.showOpenDialog({
+        title,
+        defaultPath: addonData.defaultPath || remote.app.getPath('documents'),
+        message: addonData.message || title,
+        filters: addonData.filters
+      }, addonData.callback || callback )
+    }
+
+    return false
 	}
 
 	onEnterPressedEventHandler(event) {
@@ -94,34 +122,49 @@ export default class RoundedInput extends Component<Props> {
 			return null
 		}
 
-		if (this.props.addon.type === 'PASTE') {
-			return (
-				<span
-					className={styles.roundedInputAddonPaste}
-					onClick={event => this.onMyAddonClick(event)}
-					onKeyDown={event => this.onMyAddonClick(event)}
-				>
-					<i className="icon-paste" />
-					<span className={styles.addOnPaste}>PASTE</span>
-				</span>
-			)
-		} else if (this.props.addon.type === 'DROPDOWN') {
-			return (
-				<span
-					className={styles.roundedInputAddonDropdown}
-					onClick={event => this.onMyAddonClick(event)}
-					onKeyDown={event => this.onMyAddonClick(event)}
-				>
-					<i className="icon-arrow-down" />
-				</span>
-			)
-		} else if (this.props.addon.type === 'TEXT_PLACEHOLDER') {
+    if (this.props.addon.type === 'TEXT_PLACEHOLDER') {
 			return (
 				<span className={styles.roundedInputAddonTextPlaceholder}>
 					{this.props.addon.value}
 				</span>
 			)
 		}
+
+    let content
+
+    switch (this.props.addon.type) {
+      case 'PASTE':
+        content = (
+          <div>
+            <i className="icon-paste" />
+            <span className={styles.addOnPaste}>PASTE</span>
+          </div>
+        )
+        break
+      case 'DROPDOWN':
+        content = (
+					<i className="icon-arrow-down" />
+        )
+        break
+      case 'CHOOSE_FILE':
+        content = (
+					<i className="icon-folder-open" />
+        )
+        break
+      default:
+        content = null
+    }
+
+    return (
+				<span
+          role="none"
+					className={styles.roundedInputAddonPaste}
+					onClick={event => this.onAddonClick(event)}
+					onKeyDown={event => this.onAddonClick(event)}
+				>
+          {content}
+				</span>
+			)
 	}
 
   getInputType() {

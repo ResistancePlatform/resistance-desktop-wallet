@@ -9,6 +9,7 @@ export const preloadedState: State = {
     createNewWallet: {
       wallet: null
     },
+    isCreatingNewWallet: true,
     isInProgress: true
   },
   rpcPolling: {

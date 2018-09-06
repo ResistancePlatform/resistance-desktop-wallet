@@ -23,12 +23,21 @@ type Props = {
  */
 class RoundedForm extends Component<Props> {
 	props: Props
+  defaultValues: object
+
+	/**
+	 * @memberof RoundedForm
+	 */
+  constructor(props) {
+    super(props)
+    this.defaultValues = {}
+  }
 
 	/**
 	 * @memberof RoundedForm
 	 */
   componentDidMount() {
-    this.props.actions.init(this.props.id)
+    this.props.actions.init(this.props.id, this.defaultValues)
   }
 
 	/**
@@ -37,8 +46,13 @@ class RoundedForm extends Component<Props> {
   componentDidUpdate(prevProps) {
     const entries = Object.entries(this::getFormState().fields)
 
+    const prevForm = prevProps.roundedForm[this.props.id]
+    if (!prevForm) {
+      return
+    }
+
     const fields = entries.reduce((result, [key, value]) => {
-      if (value !== prevProps.roundedForm[this.props.id].fields[key]) {
+      if (value !== prevForm.fields[key]) {
         result.push(key)
       }
       return result
@@ -139,6 +153,12 @@ class RoundedForm extends Component<Props> {
         )
 
         const error = formState.errors[child.props.name]
+
+        // Collect children default values to initialize the fields
+        if (child.props.defaultValue) {
+          this.defaultValues[child.props.name] = child.props.defaultValue
+        }
+
         const defaultValue = formState.fields[child.props.name]
 
         return React.cloneElement(child, {
@@ -157,9 +177,7 @@ class RoundedForm extends Component<Props> {
 	 */
   render() {
     return (
-      <div
-        className={this.props.className}
-      >
+      <div className={this.props.className}>
         {this.renderChildren()}
       </div>
     )

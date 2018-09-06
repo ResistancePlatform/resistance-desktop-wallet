@@ -5,9 +5,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
-import RoundedInput, { RoundedInputAddon } from '../../components/rounded-form/RoundedInput'
-import RoundedForm from '../../components/rounded-form/RoundedForm'
-import { AddressBookActions, AddressBookState } from '../../state/reducers/address-book/address-book.reducer'
+import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
+import RoundedForm from '~/components/rounded-form/RoundedForm'
+import { AddressBookActions, AddressBookState } from '~/state/reducers/address-book/address-book.reducer'
 
 import styles from './NewAddressDialog.scss'
 
@@ -36,14 +36,14 @@ class NewAddressDialog extends Component<Props> {
 		const nameAddon: RoundedInputAddon = {
 			enable: false,
 			type: 'TEXT_PLACEHOLDER',
-			onAddonClicked: () => { },
+			onClick: () => { },
 			value: ''
 		}
 
 		const addressAddon: RoundedInputAddon = {
 			enable: true,
 			type: 'PASTE',
-			onAddonClicked: () => this.props.actions.updateAddress(clipboard.readText())
+			onClick: () => this.props.actions.updateAddress(clipboard.readText())
 		}
 
 		return (

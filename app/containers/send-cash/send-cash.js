@@ -112,20 +112,20 @@ class SendCash extends Component<Props> {
 		const fromAddressAddon: RoundedInputAddon = {
 			enable: true,
 			type: 'DROPDOWN',
-			onAddonClicked: this.onFromAddressDropdownClicked
+			onClick: this.onFromAddressDropdownClicked
 		}
 
 		const destAddressAddon: RoundedInputAddon = {
 			enable: true,
 			type: 'PASTE',
-			onAddonClicked: () => this.onDestAddressPasteClicked()
+			onClick: () => this.onDestAddressPasteClicked()
 		}
 
 		const amountAddressAddon: RoundedInputAddon = {
 			enable: true,
 			type: 'TEXT_PLACEHOLDER',
 			value: 'RES',
-			onAddonClicked: () => { }
+			onClick: () => { }
 		}
 
 		return (
