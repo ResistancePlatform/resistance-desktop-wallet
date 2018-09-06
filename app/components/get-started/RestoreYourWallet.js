@@ -28,7 +28,6 @@ type Props = {
 	// getStarted: GetStartedState
 }
 
-
 /**
  * @class RestoreYourWallet
  * @extends {Component<Props>}
