@@ -6,6 +6,7 @@ import { NavLink } from 'react-router-dom'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import * as Joi from 'joi'
 
+import { Bip39Service } from '~/service/bip39-service'
 import { ResistanceService } from '~/service/resistance-service'
 import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
 import RoundedTextArea from '~/components/rounded-form/RoundedTextArea'
@@ -16,6 +17,7 @@ import VLayout from '../../theme/v-box-layout.scss'
 import styles from './GetStarted.scss'
 
 const resistance = new ResistanceService()
+const bip39 = new Bip39Service()
 
 type Props = {
   actions: object
@@ -70,8 +72,10 @@ export class RestoreYourWallet extends Component<Props> {
       }))
     }
 
+    const seedJoi = bip39.getMnemonicValidationJoi()
+
     return baseSchema.concat(Joi.object().keys({
-      mnemonicSeed: Joi.string().required().label(`Mnemonic seed`),
+      mnemonicSeed: seedJoi.mnemonicSeed().wordCount().valid().required().label(`Mnemonic seed`),
     }))
   }
 

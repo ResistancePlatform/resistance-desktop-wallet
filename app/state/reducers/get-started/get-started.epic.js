@@ -12,7 +12,6 @@ import { SettingsActions } from '../settings/settings.reducer'
 
 const bip39 = new Bip39Service()
 
-
 const generateWalletEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(GetStartedActions.createNewWallet.generateWallet),
   switchMap(() => {

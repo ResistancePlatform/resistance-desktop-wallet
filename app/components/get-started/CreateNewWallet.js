@@ -17,14 +17,15 @@ import styles from './GetStarted.scss'
 const resistance = new ResistanceService()
 
 const validationSchema = Joi.object().keys({
-  walletName: Joi.string().required().label(`Wallet name`),
+  walletName: Joi.string().required().strip().label(`Wallet name`),
   mnemonicSeed: Joi.string().required().label(`Mnemonic seed`),
   walletPath: Joi.string().required().label(`Wallet path`)
 })
 
 type Props = {
-  actions: Object,
-	createNewWallet: Object
+  actions: object,
+  getStartedActions: object,
+	createNewWallet: object
 }
 
 
@@ -69,9 +70,12 @@ export class CreateNewWallet extends Component<Props> {
             readOnly
           />
 
-          <p><strong>Note:</strong> This seed is very important to write down and keep secret. It&#39;s all you need to backup &amp; restore your wallet. </p>
+          <p><strong>Note:</strong> This seed is very important to write down and keep secret.
+            It&#39;s all you need to backup &amp; restore your wallet. </p>
 
-          <p>The <strong>seed phrase</strong> can only be used to recover R- (transparent) addresses. In order to also back up and recover Z- (private) addresses, you will need to backup the wallet in Settings each time you create a new Z-address</p>
+          <p>The <strong>seed phrase</strong> can only be used to recover R- (transparent) addresses.
+            In order to also back up and recover Z- (private) addresses, you will need to backup the
+            wallet in Settings each time you create a new Z-address</p>
 
           <RoundedInput
             name="walletPath"
