@@ -55,35 +55,24 @@ export class CreateNewWallet extends Component<Props> {
 
         <p>Choose a name for your wallet</p>
 
-        <RoundedForm
-          schema={validationSchema}
-          fields={this.props.createNewWallet.fields}
-          onValidate={this.props.actions.updateValidationErrors}
-        >
-          <RoundedInput
-            name="wallet-name"
-            defaultValue={this.props.createNewWallet.fields.walletName}
-            label="Wallet name"
-            error={this.props.createNewWallet.validationErrors.walletName}
-            onChange={value => this.props.actions.updateField('walletName', value)}
-          />
+        <RoundedForm id="getStartedCreateNewWallet" schema={validationSchema}>
+          <RoundedInput name="walletName" label="Wallet name" />
 
           <RoundedTextArea
-            name="mnemonic-seed"
-            value={this.props.createNewWallet.wallet && this.props.createNewWallet.wallet.mnemonicSeed}
+            name="mnemonicSeed"
+            defaultValue={this.props.createNewWallet.wallet && this.props.createNewWallet.wallet.mnemonicSeed}
             readOnly
           />
 
           <p><strong>Note:</strong> This seed is very important to write down and keep secret. It&#39;s all you need to backup &amp; restore your wallet. </p>
+
           <p>The <strong>seed phrase</strong> can only be used to recover R- (transparent) addresses. In order to also back up and recover Z- (private) addresses, you will need to backup the wallet in Settings each time you create a new Z-address</p>
 
           <RoundedInput
-            name="wallet-path"
-            defaultValue={resistance.getWalletPath()}
+            name="walletPath"
             label="Your wallet stored in"
-            addon={nameAddon}
-            readOnly
-          />
+            defaultValue={resistance.getWalletPath()}
+            readOnly />
 
           <NavLink to="/get-started">Prev</NavLink>
           <NavLink type="submit" role="button" to="/get-started/choose-password">Next</NavLink>

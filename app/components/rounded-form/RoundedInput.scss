@@ -28,8 +28,10 @@
 
     .roundedInputLabel {
         color: $BASE_COLOR_BUTTON_FONT_GRAY;
-        width: 9rem;
+        min-width: 9rem;
+        padding-right: 0.5rem;
         text-transform: uppercase;
+        white-space: nowrap;
     }
 
 
