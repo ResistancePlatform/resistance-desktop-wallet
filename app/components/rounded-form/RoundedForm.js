@@ -14,6 +14,7 @@ type Props = {
   +id: string,
   className?: string,
   schema: object,
+  options?: object,
   onValidate?: (errors: object) => void,
   children: any
 }
@@ -37,7 +38,9 @@ class RoundedForm extends Component<Props> {
 	 * @memberof RoundedForm
 	 */
   componentDidMount() {
-    this.props.actions.init(this.props.id, this.defaultValues)
+    if (!this.props.roundedForm[this.props.id]) {
+      this.props.actions.updateFields(this.props.id, this.defaultValues, false)
+    }
   }
 
 	/**
@@ -74,11 +77,18 @@ class RoundedForm extends Component<Props> {
       return
     }
 
-    const {error} = Joi.validate(stateFields, this.props.schema, { abortEarly: false })
+    const options = Object.assign({ abortEarly: true }, this.props.options)
+    const {error, value} = Joi.validate(stateFields, this.props.schema, options)
 
-    if (error !== null) {
-      validationErrors = error.details.reduce((errors, item) => {
+    if (error === null) {
+      // Put cleaned up field values in the store
+      if (JSON.stringify(value) !== JSON.stringify(stateFields)) {
+        this.props.actions.updateFields(this.props.id, value)
+      }
+    } else {
+      validationErrors = error.details.reduce((stash, item) => {
         const path = item.path.pop()
+        const errors = { ...stash }
 
         if (fields === null || fields.includes(path)) {
           errors[path] = item.message
@@ -86,16 +96,15 @@ class RoundedForm extends Component<Props> {
 
         return errors
       }, {})
+
+      this.props.actions.updateErrors(this.props.id, validationErrors)
     }
 
     if (this.props.onValidate) {
       this.props.onValidate(validationErrors)
     }
 
-    const isValid = !error
-    this.props.actions.updateErrors(this.props.id, validationErrors, isValid)
-
-    return isValid
+    return !error
   }
 
 	/**
@@ -120,13 +129,15 @@ class RoundedForm extends Component<Props> {
         return child;
       }
 
+      let childToMap = child
+
       if (child.props.children) {
-        child = React.cloneElement(child, {
+        childToMap = React.cloneElement(child, {
           children: this.mapChildrenRecursively(child.props.children, fn)
         });
       }
 
-      return fn(child);
+      return fn(childToMap);
     });
   }
 
@@ -164,7 +175,7 @@ class RoundedForm extends Component<Props> {
         return React.cloneElement(child, {
           onChange: child.props.onChange ? child.props.onChange : onChange,
           error: child.props.error ? child.props.error : error,
-          defaultValue: child.props.defaultValue ? child.props.defaultValue : defaultValue
+          defaultValue: defaultValue || child.props.defaultValue
         })
       }
 

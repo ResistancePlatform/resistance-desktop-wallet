@@ -2,7 +2,7 @@
 import { createActions, handleActions } from 'redux-actions'
 import { preloadedState } from '../preloaded.state'
 
-type ValidationErrors = {
+export type ValidationErrors = {
   [string]: string
 }
 
@@ -16,9 +16,9 @@ export type RoundedFormState = { [string]: RoundedFormRoot }
 
 export const RoundedFormActions = createActions(
 	{
-    INIT: (formId: string, fields: object = {}) => ({ formId, fields }),
-    UPDATE_FIELD: (formId: string, field: string, value: string | undefined) => ({ formId, field, value }),
-    UPDATE_ERRORS: (formId: string, errors: ValidationErrors, isValid: boolean) => ({ formId, errors, isValid })
+    UPDATE_FIELDS: (formId: string, fields: object, isValid: boolean = true) => ({ formId, fields, isValid }),
+    UPDATE_FIELD: (formId: string, field: string, value: string) => ({ formId, field, value }),
+    UPDATE_ERRORS: (formId: string, errors: ValidationErrors) => ({ formId, errors })
   },
 	{
 		prefix: 'APP/ROUNDED_FORM'
@@ -26,20 +26,20 @@ export const RoundedFormActions = createActions(
 )
 
 export const RoundedFormReducer = handleActions({
-  [RoundedFormActions.init]: (state, action) => ({
+  [RoundedFormActions.updateFields]: (state, action) => ({
     ...state,
     [action.payload.formId]: {
       fields: action.payload.fields,
       errors: {},
-      isValid: false
+      isValid: action.payload.isValid
     }
   }),
   [RoundedFormActions.updateField]: (state, action) => ({
     ...state,
     [action.payload.formId]: {
-      ...state[action.payload.formId] || {},
+      ...state[action.payload.formId],
       fields: {
-        ...state[action.payload.formId].fields || {},
+        ...state[action.payload.formId].fields,
         [action.payload.field]: action.payload.value
       }
     }
@@ -47,9 +47,9 @@ export const RoundedFormReducer = handleActions({
   [RoundedFormActions.updateErrors]: (state, action) => ({
     ...state,
     [action.payload.formId]: {
-      ...state[action.payload.formId] || {},
+      ...state[action.payload.formId],
       errors: action.payload.errors,
-      isValid: action.payload.isValid
+      isValid: false
     }
   })
 }, preloadedState)

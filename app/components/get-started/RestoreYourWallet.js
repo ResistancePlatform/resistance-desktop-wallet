@@ -17,20 +17,31 @@ import styles from './GetStarted.scss'
 
 const resistance = new ResistanceService()
 
-const validationSchema = Joi.object().keys({
-  walletName: Joi.string().required().label(`Wallet name`),
-  mnemonicSeed: Joi.string().label(`Mnemonic seed`),
-  backupFile: Joi.string().label(`Backup file`),
-  restoreHeight: Joi.number().integer().optional().allow('').label(`Restore height`),
-  walletPath: Joi.string().required().label(`Wallet path`)
-}).xor('mnemonicSeed', 'backupFile')
+/* Joi's .xor() doesn't really work as expected, had to implement this // @iwuvjhdva */
+const getValidationSchema = (isRestoringFromBackup: boolean) => {
+  const baseSchema = Joi.object().keys({
+    walletName: Joi.string().required().label(`Wallet name`),
+    restoreHeight: Joi.number().integer().optional().allow('').label(`Restore height`),
+    walletPath: Joi.string().required().label(`Wallet path`)
+  })
 
-type State = {
-  selectedTabIndex: number
+  if (isRestoringFromBackup) {
+    return baseSchema.concat(Joi.object().keys({
+      backupFile: Joi.string().required().label(`Backup file`)
+    }))
+  }
+
+  return baseSchema.concat(Joi.object().keys({
+    mnemonicSeed: Joi.string().required().label(`Mnemonic seed`),
+  }))
 }
 
 type Props = {
   actions: object
+}
+
+type State = {
+  selectedTabIndex: number
 }
 
 /**
@@ -44,12 +55,12 @@ export class RestoreYourWallet extends Component<Props> {
 	/**
    * @memberof RestoreYourWallet
 	 */
-	constructor(props) {
-		super(props)
+  constructor(props) {
+    super(props)
     this.state = {
       selectedTabIndex: 0
     }
-	}
+  }
 
 	/**
 	 * @returns
@@ -79,7 +90,8 @@ export class RestoreYourWallet extends Component<Props> {
 
         <RoundedForm
           id="getStartedRestoreYourWalletForm"
-          schema={validationSchema}
+          options={{ stripUnknown: true }}
+          schema={getValidationSchema(this.state.selectedTabIndex === 1)}
         >
           <RoundedInput name="walletName" defaultValue={userInfo().username} label="Wallet name" />
 
@@ -89,7 +101,7 @@ export class RestoreYourWallet extends Component<Props> {
             className={styles.tabs}
             selectedTabClassName={styles.selectedTab}
             selectedTabPanelClassName={styles.selectedTabPanel}
-            onSelect={selectedTabIndex => this.setState({ selectedTabIndex })}
+            onSelect={(selectedTabIndex) => this.setState({ selectedTabIndex })}
           >
             <TabList className={styles.tabList}>
               <Tab className={styles.tab}>Restore from seed</Tab>
@@ -106,8 +118,6 @@ export class RestoreYourWallet extends Component<Props> {
           </Tabs>
 
           <RoundedInput name="restoreHeight" label="Restore height (optional)" number />
-
-          <p>Your wallet is stored in</p>
 
           <RoundedInput
             name="walletPath"
