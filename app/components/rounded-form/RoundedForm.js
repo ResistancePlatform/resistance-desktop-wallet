@@ -96,15 +96,16 @@ class RoundedForm extends Component<Props> {
 
         return errors
       }, {})
-
-      this.props.actions.updateErrors(this.props.id, validationErrors)
     }
 
     if (this.props.onValidate) {
       this.props.onValidate(validationErrors)
     }
 
-    return !error
+    const isValid = !error
+    this.props.actions.updateErrors(this.props.id, validationErrors, isValid)
+
+    return isValid
   }
 
 	/**

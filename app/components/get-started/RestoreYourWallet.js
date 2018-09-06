@@ -17,31 +17,12 @@ import styles from './GetStarted.scss'
 
 const resistance = new ResistanceService()
 
-/* Joi's .xor() doesn't really work as expected, had to implement this // @iwuvjhdva */
-const getValidationSchema = (isRestoringFromBackup: boolean) => {
-  const baseSchema = Joi.object().keys({
-    walletName: Joi.string().required().label(`Wallet name`),
-    restoreHeight: Joi.number().integer().optional().allow('').label(`Restore height`),
-    walletPath: Joi.string().required().label(`Wallet path`)
-  })
-
-  if (isRestoringFromBackup) {
-    return baseSchema.concat(Joi.object().keys({
-      backupFile: Joi.string().required().label(`Backup file`)
-    }))
-  }
-
-  return baseSchema.concat(Joi.object().keys({
-    mnemonicSeed: Joi.string().required().label(`Mnemonic seed`),
-  }))
-}
-
 type Props = {
   actions: object
 }
 
 type State = {
-  selectedTabIndex: number
+  isRestoringFromBackup: boolean
 }
 
 /**
@@ -58,7 +39,7 @@ export class RestoreYourWallet extends Component<Props> {
   constructor(props) {
     super(props)
     this.state = {
-      selectedTabIndex: 0
+      isRestoringFromBackup: false
     }
   }
 
@@ -68,6 +49,30 @@ export class RestoreYourWallet extends Component<Props> {
 	 */
   componentDidMount() {
     this.props.actions.setCreatingNewWallet(false)
+  }
+
+	/**
+   * Joi's .xor() doesn't really work as expected, had to implement this. // @iwuvjhdva
+   *
+	 * @returns
+   * @memberof RestoreYourWallet
+	 */
+  getValidationSchema() {
+    const baseSchema = Joi.object().keys({
+      walletName: Joi.string().required().label(`Wallet name`),
+      restoreHeight: Joi.number().integer().optional().allow('').label(`Restore height`),
+      walletPath: Joi.string().required().label(`Wallet path`)
+    })
+
+    if (this.state.isRestoringFromBackup) {
+      return baseSchema.concat(Joi.object().keys({
+        backupFile: Joi.string().required().label(`Backup file`)
+      }))
+    }
+
+    return baseSchema.concat(Joi.object().keys({
+      mnemonicSeed: Joi.string().required().label(`Mnemonic seed`),
+    }))
   }
 
 	/**
@@ -91,7 +96,7 @@ export class RestoreYourWallet extends Component<Props> {
         <RoundedForm
           id="getStartedRestoreYourWalletForm"
           options={{ stripUnknown: true }}
-          schema={getValidationSchema(this.state.selectedTabIndex === 1)}
+          schema={this.getValidationSchema()}
         >
           <RoundedInput name="walletName" defaultValue={userInfo().username} label="Wallet name" />
 
@@ -101,7 +106,7 @@ export class RestoreYourWallet extends Component<Props> {
             className={styles.tabs}
             selectedTabClassName={styles.selectedTab}
             selectedTabPanelClassName={styles.selectedTabPanel}
-            onSelect={(selectedTabIndex) => this.setState({ selectedTabIndex })}
+            onSelect={tabIndex => this.setState({ isRestoringFromBackup: tabIndex === 1 })}
           >
             <TabList className={styles.tabList}>
               <Tab className={styles.tab}>Restore from seed</Tab>
