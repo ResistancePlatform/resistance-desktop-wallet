@@ -1,4 +1,5 @@
 // @flow
+import config from 'electron-settings'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { toastr } from 'react-redux-toastr'
@@ -10,12 +11,11 @@ import styles from './settings.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
-import { appStore } from '../../state/store/configureStore'
-import { SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
-import { SettingsActions, SettingsState } from '../../state/reducers/settings/settings.reducer'
+import { appStore } from '~/state/store/configureStore'
+import { SystemInfoState } from '~/state/reducers/system-info/system-info.reducer'
+import { SettingsActions, SettingsState } from '~/state/reducers/settings/settings.reducer'
 import StatusModal from '../../components/settings/status-modal'
 
-const config = require('electron-settings')
 const generator = require('generate-password')
 
 type Props = {

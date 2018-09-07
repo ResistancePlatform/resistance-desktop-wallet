@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 
 import { GetStartedActions } from '../state/reducers/get-started/get-started.reducer'
-import { SettingsActions } from '../state/reducers/settings/settings.reducer'
 import { GetStarted } from '../components/get-started/GetStarted'
 import { ChoosePassword } from '../components/get-started/ChoosePassword'
 import { RestoreYourWallet } from '../components/get-started/RestoreYourWallet'
@@ -14,8 +13,7 @@ const connectComponent = component => (
       createNewWallet: state.getStarted.createNewWallet
     }),
     dispatch => ({
-      actions: bindActionCreators(GetStartedActions, dispatch),
-      settingsActions: bindActionCreators(SettingsActions, dispatch),
+      actions: bindActionCreators(GetStartedActions, dispatch)
     }))(component)
 )
 

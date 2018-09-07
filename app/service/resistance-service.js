@@ -2,7 +2,7 @@
 import { EOL } from 'os'
 import * as fs from 'fs';
 import path from 'path'
-
+import config from 'electron-settings'
 import { app, remote } from 'electron'
 
 import { OSService } from './os-service'
@@ -96,6 +96,12 @@ export class ResistanceService {
 	 */
 	start(isTorEnabled: boolean) {
     const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs
+
+    // TODO: support system wide wallet paths, stored in config.get('wallet.path')
+    // https://github.com/ResistancePlatform/resistance-core/issues/84
+
+    const walletName = config.get('wallet.name', 'wallet')
+    args.push(`-wallet=${walletName}.dat`)
 
     this::verifyExportDirExistence().then(exportDir => {
       args.push(`-exportdir=${exportDir}`)

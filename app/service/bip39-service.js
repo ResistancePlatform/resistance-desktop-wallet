@@ -67,7 +67,7 @@ export class Bip39Service {
         {
           name: 'wordCount',
           validate: (params, value, state, options) => {
-            const wordCount = value.split(' ').length
+            const wordCount = value.trim().split(' ').length
             if (wordCount !== 24) {
               return joi.createError('mnemonicSeed.wordCount', { w: wordCount }, state, options)
             }

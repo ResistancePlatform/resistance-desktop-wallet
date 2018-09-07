@@ -1,8 +1,7 @@
 // @flow
+import config from 'electron-settings'
 import { of, throwError } from 'rxjs'
 import { AddressBookRecord } from '../state/reducers/address-book/address-book.reducer'
-
-const config = require('electron-settings')
 
 const addressBookConfigKey = 'addressBook'
 const addressNotFoundErrorMessage = `Address not found in the database.`

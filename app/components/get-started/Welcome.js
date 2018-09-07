@@ -13,8 +13,7 @@ const resistance = new ResistanceService()
 type Props = {
   roundedForm: object,
   getStarted: object,
-  actions: object,
-  settingsActions: object
+  actions: object
 }
 
 
@@ -29,15 +28,6 @@ export class Welcome extends Component<Props> {
   constructor(props) {
     super(props)
     this.nodeConfig = remote.getGlobal('resistanceNodeConfig')
-  }
-
-	/**
-   * Triggers child processes in advance.
-   *
-   * @memberof Welcome
-	 */
-  componentDidMount() {
-    this.props.settingsActions.kickOffChildProcesses()
   }
 
 	/**

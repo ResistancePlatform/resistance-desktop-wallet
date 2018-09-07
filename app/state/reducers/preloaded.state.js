@@ -1,6 +1,5 @@
+import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
-
-const config = require('electron-settings')
 
 
 export const preloadedState: State = {

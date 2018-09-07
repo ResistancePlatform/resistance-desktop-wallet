@@ -17,7 +17,7 @@ import styles from './GetStarted.scss'
 const resistance = new ResistanceService()
 
 const validationSchema = Joi.object().keys({
-  walletName: Joi.string().required().strip().label(`Wallet name`),
+  walletName: Joi.string().required().label(`Wallet name`),
   mnemonicSeed: Joi.string().required().label(`Mnemonic seed`),
   walletPath: Joi.string().required().label(`Wallet path`)
 })
