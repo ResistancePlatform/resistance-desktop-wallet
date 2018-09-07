@@ -2,47 +2,41 @@
 
 .getStartedContainer {
   justify-content: start;
-  padding: 5rem;
+  display: inline;
+  position: relative;
+  padding: 5rem 13rem 5rem 13rem;
 }
 
-[class*="customIcon"] {
-  font-family: 'custom-icons' !important;
-  speak: none;
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  font-size: 1.4rem;
-  margin-right: 6px;
-}
-
-.customIconCreateNewWallet:before {
-  content: "a";
-}
-
-.customIconRestoreYourWallet:before {
-  content: "b";
-}
-
-.prevLink {
+.historyLink {
+  position: absolute;
+  top: 50%;
   font-family: 'icomoon' !important;
   background: $BASE_COLOR_PURPLE;
   border-radius: 50%;
-  width: 3rem;
+  width: 48px;
   position: absolute;
-  height: 3rem;
+  height: 48px;
   color: $BASE_COLOR_WHITE;
   font-size: 20px;
   text-decoration: none;
 }
 
-.prevLink:before {
-  content: "\e901";
+.historyLink:before {
   position: relative;
+  content: "\e901";
   left: 20px;
-  top: 100px;
+  top: 14px;
+}
+
+.prevLink {
+  @extend .historyLink;
+  left: 3rem;
+  transform: scale(-1, 1);
+}
+
+.nextLink {
+  @extend .historyLink;
+  right: 3rem;
 }
 
 .title {
@@ -56,17 +50,42 @@
   text-transform: uppercase;
   text-align: center;
   font-size: 0.9rem;
-  padding-bottom: 4.5rem;
+  padding-bottom: 3.2rem;
+
+  &.success {
+    color: $BASE_COLOR_SUCCESS;
+  }
+
+  &.success:before {
+    font-family: 'icomoon' !important;
+    content: "\e90d";
+    color: black;
+    position: relative;
+    top: 2px;
+    left: -0.8rem;
+  }
+}
+
+.note {
+  color: $BASE_COLOR_FONT_GRAY;
+  font-size: 0.8rem;
+
+  strong {
+    color: $BASE_COLOR_WHITE;
+  }
+
+  padding-bottom: 3.5rem;
 }
 
 .flowLinksContainer {
+  margin-top: 1.2rem;
   display: flex;
   flex-wrap: nowrap;
 }
 
 .chooseFlowLink {
   width: 50%;
-  height: 350px;
+  height: 270px;
   font-size: 1.4rem;
   border-radius: 6px;
   text-align: center;
@@ -74,9 +93,21 @@
   text-decoration: none;
 
   i {
-    margin-top: 80px;
+    font-family: 'custom-icons' !important;
+    -webkit-font-smoothing: antialiased;
+    font-style: normal;
+    font-weight: normal;
+    margin-top: 20px;
     display: block;
     font-size: 140px;
+  }
+
+  .createNewWalletIcon:before {
+    content: "a";
+  }
+
+  .restoreYourWalletIcon:before {
+    content: "b";
   }
 
 }
@@ -86,5 +117,33 @@
 
   i {
     color: black;
+  }
+}
+
+.welcomeContainer {
+  text-align: center;
+
+  .summaryTitle {
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.9rem;
+    border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+    padding-bottom: 1.2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .summary {
+    text-align: left;
+    margin-bottom: 6rem;
+
+    li {
+      white-space: nowrap;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    span {
+      color: $BASE_COLOR_FONT_GRAY;
+      width: 10rem;
+      display: inline-block;
+    }
   }
 }

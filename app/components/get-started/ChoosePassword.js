@@ -55,22 +55,22 @@ export class ChoosePassword extends Component<Props> {
 
 		return (
       <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
-        <h1>Choose password for your wallet</h1>
+        <div className={styles.title}>Choose password for your wallet</div>
 
-        <p>Enter a strong password (using letters, numbers and/or symbols)</p>
+        <div className={styles.hint}>Enter a strong password (using letters, numbers and/or symbols)</div>
 
-        <RoundedForm id="getStartedChoosePassword" schema={validationSchema}>
+        <RoundedForm id="getStartedChoosePassword" schema={validationSchema} important >
 
           <RoundedInput name="password" password label="Password" />
           <RoundedInput name="confirmPassword" password label="Confirm password" />
 
-          <p>Note: If you loose or forget this password, it cannot be recovered.
-            Your wallet can only be restored from it&#39;s 25 word mnemonic seed.</p>
+          <div className={styles.note}><strong>Note:</strong> If you loose or forget this password, it cannot be recovered.
+            Your wallet can only be restored from it&#39;s 25 word mnemonic seed.</div>
 
           <PasswordStrength password={this.props.form && this.props.form.fields.password} />
 
-          <NavLink to={`/get-started/${prevPath}`}>Prev</NavLink>
-          <NavLink type="submit" role="button" to="/get-started/welcome">Next</NavLink>
+          <NavLink className={styles.prevLink} to={`/get-started/${prevPath}`} />
+          <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/welcome" />
         </RoundedForm>
       </div>
     )

@@ -31,13 +31,14 @@ export class GetStarted extends Component<Props> {
 
         <div className={styles.flowLinksContainer}>
           <NavLink className={styles.chooseFlowLink} to="/get-started/create-new-wallet">
-            <i className={styles.customIconCreateNewWallet} />
+            <i className={styles.createNewWalletIcon } />
             Create a new wallet
           </NavLink>
 
           <NavLink className={styles.chooseFlowLink} to="/get-started/restore-your-wallet">
-            <i className={styles.customIconRestoreYourWallet} />
-            Restore wallet from keys or mnemonic seed
+            <i className={styles.restoreYourWalletIcon } />
+            Restore wallet from keys<br />
+            or mnemonic seed
           </NavLink>
         </div>
       </div>

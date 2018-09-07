@@ -61,21 +61,23 @@ export class CreateNewWallet extends Component<Props> {
 
         <div className={styles.hint}>Choose a name for your wallet</div>
 
-        <RoundedForm id="getStartedCreateNewWallet" schema={validationSchema}>
+        <RoundedForm id="getStartedCreateNewWallet" schema={validationSchema} important >
           <RoundedInput name="walletName" label="Wallet name" defaultValue={userInfo().username} />
 
           <RoundedTextArea
             name="mnemonicSeed"
+            rows="8"
             defaultValue={this.props.createNewWallet.wallet && this.props.createNewWallet.wallet.mnemonicSeed}
             readOnly
           />
 
-          <p><strong>Note:</strong> This seed is very important to write down and keep secret.
-            It&#39;s all you need to backup &amp; restore your wallet. </p>
-
-          <p>The <strong>seed phrase</strong> can only be used to recover R- (transparent) addresses.
+          <div className={styles.note}>
+            <strong>Note:</strong> This seed is very important to write down and keep secret.
+            It&#39;s all you need to backup &amp; restore your wallet.
+            The seed phrase can only be used to recover R- (transparent) addresses.
             In order to also back up and recover Z- (private) addresses, you will need to backup the
-            wallet in Settings each time you create a new Z-address</p>
+            wallet in Settings each time you create a new Z-address
+          </div>
 
           <RoundedInput
             name="walletPath"
@@ -84,7 +86,7 @@ export class CreateNewWallet extends Component<Props> {
             readOnly />
 
           <NavLink className={styles.prevLink} to="/get-started" />
-          <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/choose-password">Next</NavLink>
+          <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/choose-password" />
         </RoundedForm>
       </div>
     )

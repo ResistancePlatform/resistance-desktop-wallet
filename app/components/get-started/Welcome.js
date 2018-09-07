@@ -1,6 +1,7 @@
 // @flow
 import { remote } from 'electron'
 import React, { Component } from 'react'
+import { NavLink } from 'react-router-dom'
 import classNames from 'classnames'
 
 import { ResistanceService } from '~/service/resistance-service'
@@ -84,27 +85,48 @@ export class Welcome extends Component<Props> {
 	render() {
 		return (
       <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
-        <h1>Welcome to Resistance!</h1>
+        <div className={styles.title}>Welcome to Resistance!</div>
 
-        Success! Your wallet has been created
-        Here&#39;s a summary of your new wallet configuration:
+        <div className={classNames(styles.hint, styles.success)}>
+          Success! Your wallet has been created
+        </div>
 
-        <ul>
-          <li>Language: English</li>
-          <li>Wallet name: {this.getWalletName()}</li>
-          <li>Backup seed: *******</li>
-          <li>Wallet path: {resistance.getWalletPath()}</li>
-          <li>Daemon address: {this.getDaemonAddress()}</li>
-          <li>Network type: {this.getNetworkType()}</li>
-        </ul>
+        <div className={styles.welcomeContainer}>
+          <div className={styles.summaryTitle}>
+            Here&#39;s a summary of your new wallet configuration:
+          </div>
 
-        <button
-          type="button"
-          onClick={this.props.actions.useResistance}
-          onKeyDown={this.props.actions.useResistance}
-        >
-          Use Resistance
-        </button>
+          <ul className={styles.summary}>
+            <li>
+              <span>Language:</span> English
+            </li>
+            <li>
+              <span>Wallet name:</span> {this.getWalletName()}
+            </li>
+            <li>
+              <span>Backup seed:</span> * * * * * * *
+            </li>
+            <li>
+              <span>Wallet path:</span> {resistance.getWalletPath()}
+            </li>
+            <li>
+              <span>Daemon address:</span> {this.getDaemonAddress()}
+            </li>
+            <li>
+              <span>Network type:</span> {this.getNetworkType()}
+            </li>
+          </ul>
+
+          <button
+            type="button"
+            onClick={this.props.actions.useResistance}
+            onKeyDown={this.props.actions.useResistance}
+          >
+            Use Resistance
+          </button>
+        </div>
+
+        <NavLink className={styles.prevLink} to="/get-started/choose-password" />
       </div>
     )
   }

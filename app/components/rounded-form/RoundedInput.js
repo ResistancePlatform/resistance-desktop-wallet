@@ -27,6 +27,7 @@ type Props = {
   onEnterPressed: func,
   error?: string | null,
   readOnly?: boolean,
+  important?: boolean,
 	children: any
 }
 
@@ -195,7 +196,13 @@ export default class RoundedInput extends Component<Props> {
         <div
           name={this.props.name}
           disabled={this.props.disabled}
-          className={classNames(styles.roundedInputContainer, {[styles.error]: Boolean(this.props.error)})}
+          className={classNames(
+            styles.roundedInputContainer,
+            {
+              [styles.important]: this.props.important,
+              [styles.error]: Boolean(this.props.error)
+            }
+          )}
         >
           <div className={styles.roundedInputLabel}>
             {this.props.label || ''}
