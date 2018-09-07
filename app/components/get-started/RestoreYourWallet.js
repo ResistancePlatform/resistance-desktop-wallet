@@ -117,7 +117,7 @@ export class RestoreYourWallet extends Component<Props> {
             </TabList>
 
             <TabPanel>
-              <RoundedTextArea name="mnemonicSeed" rows="8" label="Add your 25 (or 24) word mnemonic seed" />
+              <RoundedTextArea name="mnemonicSeed" rows={8} label="Add your 25 (or 24) word mnemonic seed" />
             </TabPanel>
 
             <TabPanel>
@@ -135,6 +135,13 @@ export class RestoreYourWallet extends Component<Props> {
 
           <NavLink className={styles.prevLink} to="/get-started" />
           <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/choose-password" />
+
+          <div className={styles.paginationDots}>
+            <div className={styles.complete} />
+            <div className={styles.empty} />
+            <div className={styles.empty} />
+          </div>
+
         </RoundedForm>
       </div>
     )

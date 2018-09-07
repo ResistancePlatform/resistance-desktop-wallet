@@ -71,6 +71,13 @@ export class ChoosePassword extends Component<Props> {
 
           <NavLink className={styles.prevLink} to={`/get-started/${prevPath}`} />
           <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/welcome" />
+
+          <div className={styles.paginationDots}>
+            <div className={styles.complete} />
+            <div className={styles.complete} />
+            <div className={styles.empty} />
+          </div>
+
         </RoundedForm>
       </div>
     )

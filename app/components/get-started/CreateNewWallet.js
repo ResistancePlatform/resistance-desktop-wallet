@@ -66,7 +66,7 @@ export class CreateNewWallet extends Component<Props> {
 
           <RoundedTextArea
             name="mnemonicSeed"
-            rows="8"
+            rows={8}
             defaultValue={this.props.createNewWallet.wallet && this.props.createNewWallet.wallet.mnemonicSeed}
             readOnly
           />
@@ -87,6 +87,12 @@ export class CreateNewWallet extends Component<Props> {
 
           <NavLink className={styles.prevLink} to="/get-started" />
           <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/choose-password" />
+
+          <div className={styles.paginationDots}>
+            <div className={styles.complete} />
+            <div className={styles.empty} />
+            <div className={styles.empty} />
+          </div>
         </RoundedForm>
       </div>
     )
