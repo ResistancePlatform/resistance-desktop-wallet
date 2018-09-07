@@ -57,9 +57,9 @@ export class CreateNewWallet extends Component<Props> {
 	render() {
 		return (
       <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
-        <h1>Create a new wallet</h1>
+        <div className={styles.title}>Create a new wallet</div>
 
-        <p>Choose a name for your wallet</p>
+        <div className={styles.hint}>Choose a name for your wallet</div>
 
         <RoundedForm id="getStartedCreateNewWallet" schema={validationSchema}>
           <RoundedInput name="walletName" label="Wallet name" defaultValue={userInfo().username} />
@@ -83,8 +83,8 @@ export class CreateNewWallet extends Component<Props> {
             defaultValue={resistance.getWalletPath()}
             readOnly />
 
-          <NavLink to="/get-started">Prev</NavLink>
-          <NavLink type="submit" role="button" to="/get-started/choose-password">Next</NavLink>
+          <NavLink className={styles.prevLink} to="/get-started" />
+          <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/choose-password">Next</NavLink>
         </RoundedForm>
       </div>
     )

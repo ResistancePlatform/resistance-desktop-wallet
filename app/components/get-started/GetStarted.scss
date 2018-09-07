@@ -5,10 +5,50 @@
   padding: 5rem;
 }
 
+[class*="customIcon"] {
+  font-family: 'custom-icons' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  font-size: 1.4rem;
+  margin-right: 6px;
+}
+
+.customIconCreateNewWallet:before {
+  content: "a";
+}
+
+.customIconRestoreYourWallet:before {
+  content: "b";
+}
+
+.prevLink {
+  font-family: 'icomoon' !important;
+  background: $BASE_COLOR_PURPLE;
+  border-radius: 50%;
+  width: 3rem;
+  position: absolute;
+  height: 3rem;
+  color: $BASE_COLOR_WHITE;
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.prevLink:before {
+  content: "\e901";
+  position: relative;
+  left: 20px;
+  top: 100px;
+}
+
 .title {
   text-align: center;
-  font-size: 2.5rem;
-  padding-bottom: 1.4rem;
+  font-size: 2rem;
+  padding-bottom: 1.8rem;
 }
 
 .hint {
@@ -16,12 +56,17 @@
   text-transform: uppercase;
   text-align: center;
   font-size: 0.9rem;
-  padding-bottom: 3rem;
+  padding-bottom: 4.5rem;
+}
+
+.flowLinksContainer {
+  display: flex;
+  flex-wrap: nowrap;
 }
 
 .chooseFlowLink {
   width: 50%;
-  height: 250px;
+  height: 350px;
   font-size: 1.4rem;
   border-radius: 6px;
   text-align: center;
@@ -29,11 +74,17 @@
   text-decoration: none;
 
   i {
-    height: 140px;
+    margin-top: 80px;
     display: block;
+    font-size: 140px;
   }
+
 }
 
 .chooseFlowLink:hover {
   background: #009dd7;
+
+  i {
+    color: black;
+  }
 }

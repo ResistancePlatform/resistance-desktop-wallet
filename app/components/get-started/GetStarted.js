@@ -29,15 +29,17 @@ export class GetStarted extends Component<Props> {
 
         <div className={styles.hint}>Please select one of the following options:</div>
 
-        <NavLink className={styles.chooseFlowLink} to="/get-started/create-new-wallet">
-          <i />
-          Create a new wallet
-        </NavLink>
+        <div className={styles.flowLinksContainer}>
+          <NavLink className={styles.chooseFlowLink} to="/get-started/create-new-wallet">
+            <i className={styles.customIconCreateNewWallet} />
+            Create a new wallet
+          </NavLink>
 
-        <NavLink className={styles.chooseFlowLink} to="/get-started/restore-your-wallet">
-          <i />
-          Restore wallet from keys or mnemonic seed
-        </NavLink>
+          <NavLink className={styles.chooseFlowLink} to="/get-started/restore-your-wallet">
+            <i className={styles.customIconRestoreYourWallet} />
+            Restore wallet from keys or mnemonic seed
+          </NavLink>
+        </div>
       </div>
     )
   }
