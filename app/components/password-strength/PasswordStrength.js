@@ -50,14 +50,12 @@ export default class PasswordStrength extends Component<Props> {
 
       if (result.strong) {
         status = 'excellent'
+      } else if (strengthRate <= 50) {
+        status = 'weak'
+      } else if (strengthRate <= 70) {
+        status = 'medium'
       } else {
-        if (strengthRate <= 50) {
-          status = 'weak'
-        } else if (strengthRate <= 70) {
-          status = 'medium'
-        } else {
-          status = 'good'
-        }
+        status = 'good'
       }
 
       /* eslint-disable-next-line react/no-did-update-set-state */
@@ -71,9 +69,14 @@ export default class PasswordStrength extends Component<Props> {
 	render() {
 		return (
 			<div className={styles.container}>
-        Password strength: {this.state.strengthRate}
-        <div className={this.state.status}>
-          Message: {statusMessage[this.state.status] || ''}
+        <div className={styles.strength}>
+          Password strength
+          <div className={styles[this.state.status]}>
+            {statusMessage[this.state.status] || ''}
+          </div>
+        </div>
+        <div className={styles.progressBar}>
+          <div style={{ width: `${this.state.strengthRate}%` }} />
         </div>
 			</div>
 		)
