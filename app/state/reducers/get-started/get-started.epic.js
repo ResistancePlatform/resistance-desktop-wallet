@@ -1,7 +1,7 @@
 // @flow
 import config from 'electron-settings'
 import { of, merge } from 'rxjs'
-import { switchMap,  map } from 'rxjs/operators'
+import { filter, switchMap,  map, take, takeUntil } from 'rxjs/operators'
 import { remote } from 'electron'
 import { ofType } from 'redux-observable'
 import { push } from 'react-router-redux'
@@ -23,6 +23,15 @@ const generateWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	map(result => GetStartedActions.createNewWallet.gotGeneratedWallet(result))
 )
 
+/* TODO: Handle errors and completion actions
+ * https://github.com/ResistancePlatform/resistance-desktop-wallet/issues/136
+ *
+ * TODO: Add wallet creation / restoring with a mnemonic seed
+ * https://github.com/ResistancePlatform/resistance-desktop-wallet/issues/128
+ *
+ * TODO: Add wallet encryption
+ * https://github.com/ResistancePlatform/resistance-desktop-wallet/issues/129
+ */
 const useResistanceEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(GetStartedActions.useResistance),
   switchMap(() => {
@@ -39,11 +48,24 @@ const useResistanceEpic = (action$: ActionsObservable<Action>, state$) => action
       name: form.fields.walletName,
       path: form.fields.walletPath
     })
-    console.error("wallet", config.get('wallet'))
-
-    // TODO: Import the private key, encrypt the wallet, remove private information from the state
     return of(SettingsActions.kickOffChildProcesses(), push('/overview'))
-  })
+  }),
+  takeUntil(action$.pipe(
+    ofType(SettingsActions.childProcessStarted),
+    filter(action => action.payload.processName === 'NODE'),
+    switchMap(() => {
+      const state = state$.value.getStarted
+      const restoreForm = state$.value.roundedForm.getStartedRestoreYourWallet
+      config.set('getStartedInProgress', false)
+
+      if (!state.isCreatingNewWallet && restoreForm.fields.backupFile) {
+        const keysFilePath = restoreForm.fields.backupFile
+        return of(SettingsActions.importWallet(keysFilePath))
+      }
+      return of(GetStartedActions.empty())
+    }),
+    take(1)
+  ))
 )
 
 export const GetStartedEpic = (action$, state$) => merge(

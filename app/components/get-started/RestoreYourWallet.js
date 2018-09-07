@@ -98,7 +98,7 @@ export class RestoreYourWallet extends Component<Props> {
         <h1>Restore your wallet</h1>
 
         <RoundedForm
-          id="getStartedRestoreYourWalletForm"
+          id="getStartedRestoreYourWallet"
           options={{ stripUnknown: true }}
           schema={this.getValidationSchema()}
         >

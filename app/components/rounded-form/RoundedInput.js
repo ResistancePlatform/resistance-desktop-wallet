@@ -8,7 +8,7 @@ import styles from './RoundedInput.scss'
 export type RoundedInputAddon = {
 	enable: boolean,
 	type: 'PASTE' | 'DROPDOWN' | 'TEXT_PLACEHOLDER' | 'CHOOSE_FILE',
-  data: { [string]: any },
+  data?: { [string]: any },
 	value: string | undefined,
 	onClick?: addonType => void,
 	onEnterPressed?: () => void

@@ -14,7 +14,12 @@ import styles from './GetStarted.scss'
 
 const validationSchema = Joi.object().keys({
   // #?!@$%^&*-'`;
-  password: Joi.string().required().regex(/^[a-zA-Z0-9]{8,30}$/).label(`Password`),
+  password: (
+    Joi.string().required()
+    .regex(/^[a-zA-Z0-9]{8,30}$/)
+    .error(() => `should contain latin letters, numbers and special characters`)
+    .label(`Password`)
+  ),
   confirmPassword: (
     Joi.string().required().valid(Joi.ref('password'))
     .label(`Confirm password`)
