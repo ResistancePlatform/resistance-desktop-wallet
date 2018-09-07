@@ -16,8 +16,33 @@ type Props = {
   readOnly?: boolean
 }
 
+type State = {
+  isFocused: boolean
+}
+
+
 export default class RoundedTextArea extends Component<Props> {
 	props: Props
+  state: State
+
+	/**
+	 * @param {*} props
+	 * @memberof RoundedTextArea
+	 */
+	constructor(props) {
+		super(props)
+    this.state = {
+      isFocused: false
+    }
+	}
+
+	onFocusHandler() {
+		this.setState({ isFocused: true })
+	}
+
+	onBlurHandler() {
+		this.setState({ isFocused: false })
+	}
 
 	onChangeHandler(event) {
 		event.stopPropagation()
@@ -46,11 +71,13 @@ export default class RoundedTextArea extends Component<Props> {
             cols={this.props.cols}
             disabled={this.props.disabled}
             onChange={event => this.onChangeHandler(event)}
+            onFocus={(event) => this.onFocusHandler(event)}
+            onBlur={(event) => this.onBlurHandler(event)}
             value={this.props.defaultValue || ''}
             readOnly={this.props.readOnly}
           />
         </div>
-        <div className={styles.errorMessage}>{this.props.error && this.props.error}</div>
+        <div className={styles.errorMessage}>{this.props.error && !this.state.isFocused && this.props.error}</div>
       </div>
 		)
 	}

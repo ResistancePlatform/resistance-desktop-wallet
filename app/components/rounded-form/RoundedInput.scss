@@ -7,6 +7,12 @@
   height: 1rem;
 }
 
+.important {
+  .roundedInputAddonPaste {
+    color: $BASE_COLOR_GRAY !important;
+  }
+}
+
 .roundedInputContainer {
   position: relative;
   padding: 0 1.3rem;
@@ -60,7 +66,6 @@
 
     input {
       padding: 0.5rem 1rem;
-      width: 100%;
       min-width: 12rem;
       background-color: transparent;
       border: 0;

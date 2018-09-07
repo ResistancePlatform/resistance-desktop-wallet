@@ -95,16 +95,15 @@ export class RestoreYourWallet extends Component<Props> {
 
 		return (
       <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
-        <h1>Restore your wallet</h1>
+        <div className={styles.title}>Restore your wallet</div>
 
         <RoundedForm
           id="getStartedRestoreYourWallet"
           options={{ stripUnknown: true }}
           schema={this.getValidationSchema()}
+          important
         >
           <RoundedInput name="walletName" defaultValue={userInfo().username} label="Wallet name" />
-
-          <p>Wallet name</p>
 
           <Tabs
             className={styles.tabs}
@@ -118,7 +117,7 @@ export class RestoreYourWallet extends Component<Props> {
             </TabList>
 
             <TabPanel>
-              <RoundedTextArea name="mnemonicSeed" label="Add your 25 (or 24) word mnemonic seed" />
+              <RoundedTextArea name="mnemonicSeed" rows="8" label="Add your 25 (or 24) word mnemonic seed" />
             </TabPanel>
 
             <TabPanel>
@@ -134,8 +133,8 @@ export class RestoreYourWallet extends Component<Props> {
             defaultValue={resistance.getWalletPath()}
             readOnly />
 
-          <NavLink to="/get-started">Prev</NavLink>
-          <NavLink type="submit" role="button" to="/get-started/choose-password">Next</NavLink>
+          <NavLink className={styles.prevLink} to="/get-started" />
+          <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/choose-password" />
         </RoundedForm>
       </div>
     )
