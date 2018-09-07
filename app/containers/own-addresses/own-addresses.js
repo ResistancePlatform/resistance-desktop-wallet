@@ -146,7 +146,8 @@ class OwnAddresses extends Component<Props> {
 							<div className={[styles.topBarButtonContainer, HLayout.hBoxChild].join(' ')}>
 								<button onClick={(event) => this.onShowPrivteKeyClicked(event)} onKeyDown={(event) => this.onShowPrivteKeyClicked(event)} > Show Private Key</button>
 								<div className={[styles.addAddressButtonContainer].join(' ')} onClick={(event) => this.onAddNewAddressClicked(event)} onKeyDown={(event) => this.onAddNewAddressClicked(event)} >
-									<button className={styles.addNewAddressButton} >+ Add New Address
+                  <button type="button" className={styles.addNewAddressButton}>
+                    + Add New Address
 										<span className="icon-arrow-down" />
 									</button>
 

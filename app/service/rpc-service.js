@@ -343,6 +343,7 @@ export class RpcService {
             isUnspent: plainPublicUnspentAddresses.includes(addr),
 						disabled: false
 					}))
+          .filter(item => !(item.address.startsWith('rr') || item.address.startsWith('rs')))
 
 				this.logger.debug(this, `getWalletAddressAndBalance`, `combinedAddresses: `, ConsoleTheme.testing, combinedAddresses)
 				return this::getAddressesBalance(client, combinedAddresses)
