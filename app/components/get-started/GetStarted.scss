@@ -1,4 +1,39 @@
+@import "../../theme/vars.scss";
+
 .getStartedContainer {
   justify-content: start;
   padding: 5rem;
+}
+
+.title {
+  text-align: center;
+  font-size: 2.5rem;
+  padding-bottom: 1.4rem;
+}
+
+.hint {
+  color: $BASE_COLOR_PURPLE;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.9rem;
+  padding-bottom: 3rem;
+}
+
+.chooseFlowLink {
+  width: 50%;
+  height: 250px;
+  font-size: 1.4rem;
+  border-radius: 6px;
+  text-align: center;
+  color: $BASE_COLOR_WHITE;
+  text-decoration: none;
+
+  i {
+    height: 140px;
+    display: block;
+  }
+}
+
+.chooseFlowLink:hover {
+  background: #009dd7;
 }
