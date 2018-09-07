@@ -62,9 +62,8 @@ class NewAddressDialog extends Component<Props> {
         </div>
 
         <RoundedForm
+          id="addressBookNewAddressDialog"
           schema={validationSchema}
-          fields={this.props.newAddressDialog.fields}
-          onValidate={this.props.actions.updateValidationErrors}
         >
           {/* Name */}
           <RoundedInput
@@ -72,8 +71,6 @@ class NewAddressDialog extends Component<Props> {
             defaultValue={this.props.newAddressDialog.fields.name}
             label="Name"
             addon={nameAddon}
-            error={this.props.newAddressDialog.validationErrors.name}
-            onChange={value => this.props.actions.updateField('name', value)}
           />
 
           {/* Address */}
@@ -82,13 +79,12 @@ class NewAddressDialog extends Component<Props> {
             defaultValue={this.props.newAddressDialog.fields.address}
             label="Address"
             addon={addressAddon}
-            error={this.props.newAddressDialog.validationErrors.address}
-            onChange={value => this.props.actions.updateField('address', value)}
           />
 
           { /* Buttons */}
           <div className={styles.buttonContainer}>
             <button
+              type="button"
               className={styles.cancelButton}
               onClick={this.props.actions.close}
               onKeyDown={() => {}}
