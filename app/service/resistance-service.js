@@ -162,7 +162,7 @@ export class ResistanceService {
  * @memberof ResistanceService
  */
 function handleStdout(data: Buffer) {
-  return data.toString().includes(`init message: Done loading`)
+  return data.toString().includes(`READY for RPC calls`)
 }
 
 /**
