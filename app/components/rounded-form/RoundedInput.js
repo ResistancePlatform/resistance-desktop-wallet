@@ -88,7 +88,9 @@ export default class RoundedInput extends Component<Props> {
 		this.setState({ isFocused: false })
 	}
 
-	onAddonClick() {
+	onAddonClick(event) {
+    event.stopPropagation()
+
 		if (this.props.addon.onClick && !this.props.disabled) {
 			this.props.addon.onClick(this.props.addon.type)
       return false

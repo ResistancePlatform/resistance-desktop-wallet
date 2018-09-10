@@ -84,7 +84,7 @@ class SendCash extends Component<Props> {
 	}
 
 	getDropdownMenuStyles() {
-		return this.props.sendCash && this.props.sendCash.showDropdownMenu ? 'block' : 'none'
+		return this.props.sendCash.showDropdownMenu ? 'block' : 'none'
 	}
 
 	commonMenuItemEventHandler(event) {
