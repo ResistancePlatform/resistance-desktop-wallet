@@ -78,7 +78,7 @@ class RoundedForm extends Component<Props> {
       return
     }
 
-    const options = Object.assign({ abortEarly: true }, this.props.options)
+    const options = Object.assign({ abortEarly: false }, this.props.options)
     const {error, value} = Joi.validate(stateFields, this.props.schema, options)
 
     if (error === null) {
