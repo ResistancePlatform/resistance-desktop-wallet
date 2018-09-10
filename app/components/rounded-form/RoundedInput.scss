@@ -98,6 +98,13 @@
         color: $BASE_COLOR_BUTTON_FONT_GRAY;
         cursor: default;
       }
+
+      &.choose_file {
+        i {
+          position: absolute;
+          top: 7px;
+        }
+      }
     }
 
     span.tooltip {
