@@ -131,6 +131,7 @@ class SendCash extends Component<Props> {
 		return (
 			// Layout container
 			<div
+        role="none"
 				className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}
 				onClick={(event) => this.hideDropdownMenu(event)}
 				onKeyDown={() => { }}
@@ -167,6 +168,8 @@ class SendCash extends Component<Props> {
 								<div className={styles.sendPrivateTitle}>Private Transactions</div>
 
 								<div
+                  role="button"
+                  tabIndex={0}
                   disabled={this.props.sendCash.isInputDisabled}
 									className={this.getPrivatelyToggleButtonClasses()}
 									onClick={event => this.onPrivateSendToggleClicked(event)}
@@ -212,6 +215,7 @@ class SendCash extends Component<Props> {
 						{/* Send button row */}
 						<div className={[styles.sendButtonContainer, HLayout.hBoxContainer].join(' ')}>
 							<button
+                type="button"
 								name="send-cash"
 								disabled={this.props.sendCash.isInputDisabled}
 								onClick={event => this.onSendButtonClicked(event)}

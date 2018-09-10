@@ -8,7 +8,7 @@
 }
 
 .important {
-  .roundedInputAddonPaste {
+  .addon.paste {
     color: $BASE_COLOR_GRAY !important;
   }
 }
@@ -81,20 +81,23 @@
       cursor: pointer;
     }
 
-    .roundedInputAddonPaste {
-      position: relative;
-      color: $BASE_COLOR_PURPLE;
+    .addon {
 
-      .addOnPaste {
-        position: absolute;
-        top: -0.03rem;
-        left: 1.5rem;
+      &.paste {
+        position: relative;
+        color: $BASE_COLOR_PURPLE;
+
+        span {
+          position: absolute;
+          top: -0.03rem;
+          left: 1.5rem;
+        }
       }
-    }
 
-    .roundedInputAddonTextPlaceholder {
-      color: $BASE_COLOR_BUTTON_FONT_GRAY;
-      cursor: default;
+      &.text {
+        color: $BASE_COLOR_BUTTON_FONT_GRAY;
+        cursor: default;
+      }
     }
 
     span.tooltip {
@@ -129,17 +132,20 @@
 .roundedInputContainer[disabled] {
   .inputContainer {
 
-    .roundedInputAddonDropdown {
-      cursor: default;
-    }
-
-    .roundedInputAddonPaste {
-      opacity: 0.6;
-      cursor: default;
-
-      span {
+    .addon {
+      &.dropdown {
         cursor: default;
       }
+
+      &.paste {
+        opacity: 0.6;
+        cursor: default;
+
+        span {
+          cursor: default;
+        }
+      }
+
     }
   }
 }

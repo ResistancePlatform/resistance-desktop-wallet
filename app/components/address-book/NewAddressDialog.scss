@@ -3,17 +3,15 @@
 .newAddressContainer {
     position: absolute;
     top: 10rem;
-    left: calc(14.6rem + ((100% - 25rem - 20rem) / 2));
+    left: calc(14.6rem + ((100% - 30rem - 20rem) / 2));
 
-    width: 25rem;
+    width: 30rem;
 
     padding: 2rem;
 
     background-color: $ADDRESS_BOOK_LIST_POPUP_MENU_BACKGROUND_COLOR;
     border-radius: 0.35rem;
 
-    -webkit-box-shadow: 5px 5px 59px -2px $ADDRESS_BOOK_NEW_ADDRESS_DIALOG_SHADOW_COLOR;
-    -moz-box-shadow: 5px 5px 59px -2px $ADDRESS_BOOK_NEW_ADDRESS_DIALOG_SHADOW_COLOR;
     box-shadow: 5px 5px 59px -2px $ADDRESS_BOOK_NEW_ADDRESS_DIALOG_SHADOW_COLOR;
 
     z-index: 1;
@@ -22,15 +20,8 @@
 .closeButton {
     float: right;
     font-size: 0.7rem;
-
     cursor: pointer;
 }
-
-.title {
-    font-size: 1.2rem;
-    margin-bottom: 1.5rem;
-}
-
 
 .buttonContainer {
     text-align: right;
@@ -38,7 +29,6 @@
 
 .cancelButton {
     width: 6rem;
-
     background-color: transparent;
     border: 1.5px solid $BASE_COLOR_BORDER_GRAY;
     color: $BASE_COLOR_BUTTON_FONT_GRAY;
@@ -48,18 +38,7 @@
     width: 6rem;
 }
 
-div[name="name"] {
-    margin-bottom: 0.5rem;
-
-    div[class*="roundedInputLabel"] {
-        width: 5rem;
-    }
-}
-
-div[name="address"] {
+.title {
+    font-size: 1.2rem;
     margin-bottom: 1.5rem;
-
-    div[class*="roundedInputLabel"] {
-        width: 5rem;
-    }
 }

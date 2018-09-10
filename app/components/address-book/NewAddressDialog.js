@@ -1,5 +1,4 @@
 // @flow
-import { clipboard } from 'electron'
 import * as Joi from 'joi'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -40,17 +39,13 @@ class NewAddressDialog extends Component<Props> {
 			value: ''
 		}
 
-		const addressAddon: RoundedInputAddon = {
-			enable: true,
-			type: 'PASTE',
-			onClick: () => this.props.actions.updateAddress(clipboard.readText())
-		}
-
 		return (
 			<div className={styles.newAddressContainer}>
 
 				{/* Close button */}
 				<div
+          role="button"
+          tabIndex={0}
 					className={[styles.closeButton, 'icon-close'].join(' ')}
 					onClick={this.props.actions.close}
 					onKeyDown={() => {}}
@@ -68,7 +63,7 @@ class NewAddressDialog extends Component<Props> {
           {/* Name */}
           <RoundedInput
             name="name"
-            defaultValue={this.props.newAddressDialog.fields.name}
+            defaultValue={this.props.newAddressDialog.defaultValues.name}
             label="Name"
             addon={nameAddon}
           />
@@ -76,9 +71,9 @@ class NewAddressDialog extends Component<Props> {
           {/* Address */}
           <RoundedInput
             name="address"
-            defaultValue={this.props.newAddressDialog.fields.address}
+            defaultValue={this.props.newAddressDialog.defaultValues.address}
             label="Address"
-            addon={addressAddon}
+            addon={{ enable: true, type: 'PASTE' }}
           />
 
           { /* Buttons */}

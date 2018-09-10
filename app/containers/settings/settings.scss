@@ -37,7 +37,8 @@ div[name="repeat-password"] {
 
 .savePasswordButton {
     @include settingButton();
-
+    height: 3rem;
+    padding-bottom: 1.4rem;
     margin-bottom: 2rem;
 }
 

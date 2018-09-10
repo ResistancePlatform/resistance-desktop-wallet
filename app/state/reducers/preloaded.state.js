@@ -84,8 +84,7 @@ export const preloadedState: State = {
 	addressBook: {
 		records: [],
     newAddressDialog: {
-      fields: {},
-      validationErrors: {},
+      defaultValues: {},
       isVisible: false
     }
 	}

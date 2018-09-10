@@ -1,5 +1,5 @@
 // @flow
-import { remote } from 'electron'
+import { clipboard, remote } from 'electron'
 import React, { Component } from 'react'
 import classNames from 'classnames'
 
@@ -63,14 +63,21 @@ export default class RoundedInput extends Component<Props> {
     }
   }
 
-	onChangeHandler(event) {
-		event.stopPropagation()
-
-    this.setState({ value: event.target.value })
+	/**
+	 * @param {string} value
+	 * @memberof RoundedInput
+	 */
+  changeValue(value: string) {
+    this.setState({ value })
 
 		if (this.props.onChange) {
-			this.props.onChange(event.target.value)
+			this.props.onChange(value)
 		}
+  }
+
+	onChangeHandler(event) {
+		event.stopPropagation()
+    this.changeValue(event.target.value)
 	}
 
 	onFocusHandler() {
@@ -87,6 +94,10 @@ export default class RoundedInput extends Component<Props> {
       return false
 		}
 
+    if (this.props.addon.type === 'PASTE') {
+      this.changeValue(clipboard.readText())
+    }
+
     if (this.props.addon.type === 'CHOOSE_FILE') {
       const addonData = this.props.addon.data || {}
       const title = addonData.title || `Choose a file`
@@ -94,13 +105,10 @@ export default class RoundedInput extends Component<Props> {
       const callback = filePaths => {
         if (filePaths && filePaths.length) {
           const value = filePaths.pop()
-          this.setState({ value })
-
-          if (this.props.onChange) {
-            this.props.onChange(value)
-          }
+          this.changeValue(value)
         }
       }
+
       remote.dialog.showOpenDialog({
         title,
         defaultPath: addonData.defaultPath || remote.app.getPath('documents'),
@@ -125,7 +133,7 @@ export default class RoundedInput extends Component<Props> {
 
     if (this.props.addon.type === 'TEXT_PLACEHOLDER') {
 			return (
-				<span className={styles.roundedInputAddonTextPlaceholder}>
+				<span className={classNames(styles.addon, styles.text)}>
 					{this.props.addon.value}
 				</span>
 			)
@@ -138,7 +146,7 @@ export default class RoundedInput extends Component<Props> {
         content = (
           <div>
             <i className="icon-paste" />
-            <span className={styles.addOnPaste}>PASTE</span>
+            <span>PASTE</span>
           </div>
         )
         break
@@ -159,7 +167,7 @@ export default class RoundedInput extends Component<Props> {
     return (
 				<span
           role="none"
-					className={styles.roundedInputAddonPaste}
+					className={classNames(styles.addon, styles[this.props.addon.type.toLowerCase()])}
 					onClick={event => this.onAddonClick(event)}
 					onKeyDown={event => this.onAddonClick(event)}
 				>
