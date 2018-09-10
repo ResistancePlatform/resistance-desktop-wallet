@@ -2,51 +2,14 @@
 
 $NAVI_BAR_CONTAINER_WIDTH: 13rem;
 
-@mixin navibarToolbarButton {
-  -webkit-app-region: no-drag;
-  display: inline-block;
-  
-  width: 0.8rem;
-  height: 0.8rem;
-
-  margin-right: 1rem;
-  border-radius: 20rem;
-
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.8;
-  }
-}
-
 .navibarContainer {
+  padding-top: 3.6rem;
+  padding-left: 0.8rem;
   -webkit-app-region: drag;
   background-color: $NAVI_BAR_BACKGROUND_COLOR;
-  padding: 0.8rem;
 
   min-width: $NAVI_BAR_CONTAINER_WIDTH;
   width: $NAVI_BAR_CONTAINER_WIDTH;
-
-  .navibarToolbarContainer {
-    // -webkit-app-region: drag;
-    margin-bottom: 2rem;
-  }
-
-  .closeButton {
-    @include navibarToolbarButton();
-    background-color: $NAVI_BAR_TOOLBAR_BUTTON_CLOSE_COLOR;
-  }
-
-  .minimizeButton {
-    @include navibarToolbarButton();
-    background-color: $NAVI_BAR_TOOLBAR_BUTTON_MINIMIZE_COLOR;
-  }
-
-  .fullScreenButton {
-    @include navibarToolbarButton();
-    background-color: $NAVI_BAR_TOOLBAR_BUTTON_FULLSCREEN_COLOR;
-  }
-  
 }
 
 .naviVBarItem {
@@ -76,6 +39,6 @@ $NAVI_BAR_CONTAINER_WIDTH: 13rem;
   }
 }
 
-.icon-own-address:before { 
+.icon-own-address:before {
   font-size: 1.3rem !important;
 }

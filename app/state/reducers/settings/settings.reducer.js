@@ -28,6 +28,8 @@ export const SettingsActions = createActions(
     ENABLE_TOR: undefined,
     DISABLE_TOR: undefined,
 
+    KICK_OFF_CHILD_PROCESSES: undefined,
+
     CHILD_PROCESS_STARTED: processName => ({ processName }),
     CHILD_PROCESS_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
     CHILD_PROCESS_RESTART_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),

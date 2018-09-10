@@ -6,7 +6,7 @@ import { clipboard } from 'electron'
 
 import { TRANSACTION_FEE } from '../../constants'
 import { appStore } from '../../state/store/configureStore'
-import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
+import RoundedInput, { RoundedInputAddon } from '../../components/rounded-form/RoundedInput'
 import AddressDropdownPopupMenu from '../../components/send-cash/address-drodown-popup-menu'
 import { SendCashActions, SendCashState } from '../../state/reducers/send-cash/send-cash.reducer'
 
@@ -84,7 +84,7 @@ class SendCash extends Component<Props> {
 	}
 
 	getDropdownMenuStyles() {
-		return this.props.sendCash && this.props.sendCash.showDropdownMenu ? 'block' : 'none'
+		return this.props.sendCash.showDropdownMenu ? 'block' : 'none'
 	}
 
 	commonMenuItemEventHandler(event) {
@@ -112,25 +112,26 @@ class SendCash extends Component<Props> {
 		const fromAddressAddon: RoundedInputAddon = {
 			enable: true,
 			type: 'DROPDOWN',
-			onAddonClicked: this.onFromAddressDropdownClicked
+			onClick: this.onFromAddressDropdownClicked
 		}
 
 		const destAddressAddon: RoundedInputAddon = {
 			enable: true,
 			type: 'PASTE',
-			onAddonClicked: () => this.onDestAddressPasteClicked()
+			onClick: () => this.onDestAddressPasteClicked()
 		}
 
 		const amountAddressAddon: RoundedInputAddon = {
 			enable: true,
 			type: 'TEXT_PLACEHOLDER',
 			value: 'RES',
-			onAddonClicked: () => { }
+			onClick: () => { }
 		}
 
 		return (
 			// Layout container
 			<div
+        role="none"
 				className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}
 				onClick={(event) => this.hideDropdownMenu(event)}
 				onKeyDown={() => { }}
@@ -167,6 +168,8 @@ class SendCash extends Component<Props> {
 								<div className={styles.sendPrivateTitle}>Private Transactions</div>
 
 								<div
+                  role="button"
+                  tabIndex={0}
                   disabled={this.props.sendCash.isInputDisabled}
 									className={this.getPrivatelyToggleButtonClasses()}
 									onClick={event => this.onPrivateSendToggleClicked(event)}
@@ -212,6 +215,7 @@ class SendCash extends Component<Props> {
 						{/* Send button row */}
 						<div className={[styles.sendButtonContainer, HLayout.hBoxContainer].join(' ')}>
 							<button
+                type="button"
 								name="send-cash"
 								disabled={this.props.sendCash.isInputDisabled}
 								onClick={event => this.onSendButtonClicked(event)}

@@ -1,0 +1,173 @@
+@import "../../theme/vars.scss";
+@import "../../theme/tabs.scss";
+
+.getStartedContainer {
+  justify-content: start;
+  display: inline;
+  position: relative;
+  padding: 5rem 13rem 5rem 13rem;
+}
+
+.historyLink {
+  position: absolute;
+  top: 50%;
+  font-family: 'icomoon' !important;
+  background: $BASE_COLOR_PURPLE;
+  border-radius: 50%;
+  width: 48px;
+  position: absolute;
+  height: 48px;
+  color: $BASE_COLOR_WHITE;
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.historyLink:before {
+  position: relative;
+  content: "\e901";
+  left: 20px;
+  top: 14px;
+}
+
+.prevLink {
+  @extend .historyLink;
+  left: 3rem;
+  transform: scale(-1, 1);
+}
+
+.nextLink {
+  @extend .historyLink;
+  right: 3rem;
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  padding-bottom: 1.8rem;
+}
+
+.hint {
+  color: $BASE_COLOR_PURPLE;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.9rem;
+  padding-bottom: 3.2rem;
+
+  &.success {
+    color: $BASE_COLOR_SUCCESS;
+  }
+
+  &.success:before {
+    font-family: 'icomoon' !important;
+    content: "\e90d";
+    color: black;
+    position: relative;
+    top: 2px;
+    left: -0.8rem;
+  }
+}
+
+.note {
+  color: $BASE_COLOR_FONT_GRAY;
+  font-size: 0.8rem;
+
+  strong {
+    color: $BASE_COLOR_WHITE;
+  }
+
+  padding-bottom: 3.5rem;
+}
+
+.paginationDots {
+  position: absolute;
+  left: calc(50% - 2.1rem);
+  bottom: 2.2rem;
+
+  div {
+    float: left;
+    border-radius: 50%;
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.4rem;
+  }
+
+  div.complete {
+    background: $BASE_COLOR_PURPLE;
+  }
+
+  div.empty {
+    background: $BASE_COLOR_DARK_BLUE_2;
+  }
+}
+
+.flowLinksContainer {
+  margin-top: 1.2rem;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.chooseFlowLink {
+  width: 50%;
+  height: 270px;
+  font-size: 1.4rem;
+  border-radius: 6px;
+  text-align: center;
+  color: $BASE_COLOR_WHITE;
+  text-decoration: none;
+
+  i {
+    font-family: 'custom-icons' !important;
+    -webkit-font-smoothing: antialiased;
+    font-style: normal;
+    font-weight: normal;
+    margin-top: 20px;
+    display: block;
+    font-size: 140px;
+  }
+
+  .createNewWalletIcon:before {
+    content: "a";
+  }
+
+  .restoreYourWalletIcon:before {
+    content: "b";
+  }
+
+}
+
+.chooseFlowLink:hover {
+  background: #009dd7;
+
+  i {
+    color: black;
+  }
+}
+
+.welcomeContainer {
+  text-align: center;
+
+  .summaryTitle {
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.9rem;
+    border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+    padding-bottom: 1.2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .summary {
+    text-align: left;
+    margin-bottom: 6rem;
+    list-style: none;
+
+    li {
+      white-space: nowrap;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    span {
+      color: $BASE_COLOR_FONT_GRAY;
+      width: 10rem;
+      display: inline-block;
+    }
+  }
+}

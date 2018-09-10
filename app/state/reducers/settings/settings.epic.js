@@ -1,13 +1,14 @@
 // @flow
-import { tap, filter, map, mapTo } from 'rxjs/operators'
-import { merge } from 'rxjs'
+import { tap, filter, delay, map, flatMap, mapTo } from 'rxjs/operators'
+import { of, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
-import { RpcService } from '../../../service/rpc-service'
-import { ResistanceService } from '../../../service/resistance-service'
-import { MinerService } from '../../../service/miner-service'
-import { TorService } from '../../../service/tor-service'
+import { Action } from '../types'
+import { RpcService } from '~/service/rpc-service'
+import { ResistanceService } from '~/service/resistance-service'
+import { MinerService } from '~/service/miner-service'
+import { TorService } from '~/service/tor-service'
 import { SettingsActions } from './settings.reducer'
 
 const rpcService = new RpcService()
@@ -15,7 +16,33 @@ const resistanceService = new ResistanceService()
 const minerService = new MinerService()
 const torService = new TorService()
 
-const startLocalNodeEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+const kickOffChildProcessesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(SettingsActions.kickOffChildProcesses),
+  flatMap(() => {
+		const settingsState = state$.value.settings
+    let observables
+
+    if (settingsState.isTorEnabled) {
+      observables = concat(
+        of(SettingsActions.enableTor()),
+        of(SettingsActions.startLocalNode()).pipe(delay(200))
+      )
+    } else {
+      observables = of(SettingsActions.startLocalNode())
+    }
+
+    if (settingsState.isMinerEnabled) {
+      observables = concat(
+        observables,
+        of(SettingsActions.enableMiner()).pipe(delay(1000))
+      )
+    }
+
+    return observables
+  })
+)
+
+const startLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.startLocalNode),
 	tap(() => {
 		const settingsState = state$.value.settings
@@ -24,7 +51,7 @@ const startLocalNodeEpic = (action$: ActionsObservable<any>, state$) => action$.
   mapTo(SettingsActions.empty())
 )
 
-const restartLocalNodeEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+const restartLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.restartLocalNode),
 	tap(() => {
 		const settingsState = state$.value.settings
@@ -33,26 +60,26 @@ const restartLocalNodeEpic = (action$: ActionsObservable<any>, state$) => action
   mapTo(SettingsActions.empty())
 )
 
-const stopLocalNodeEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+const stopLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.stopLocalNode),
 	tap(() => { resistanceService.stop() }),
   filter(() => state$.value.settings.isMinerEnabled),
   mapTo(SettingsActions.disableMiner())
 )
 
-const enableMinerEpic = (action$: ActionsObservable<any>) => action$.pipe(
+const enableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.enableMiner),
 	tap(() => { minerService.start() }),
   mapTo(SettingsActions.empty())
 )
 
-const disableMinerEpic = (action$: ActionsObservable<any>) => action$.pipe(
+const disableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.disableMiner),
 	tap(() => { minerService.stop() }),
   mapTo(SettingsActions.empty())
 )
 
-const enableTorEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+const enableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.enableTor),
 	tap(() => { torService.start() }),
   tap(() => { toastr.info(`Restarting the local node due to Tor activation.`) }),
@@ -60,7 +87,7 @@ const enableTorEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
   mapTo(SettingsActions.restartLocalNode())
 )
 
-const disableTorEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+const disableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.disableTor),
 	tap(() => { torService.stop() }),
   tap(() => { toastr.info(`Restarting the local node due to Tor shutdown.`) }),
@@ -68,7 +95,7 @@ const disableTorEpic = (action$: ActionsObservable<any>, state$) => action$.pipe
   mapTo(SettingsActions.restartLocalNode())
 )
 
-const childProcessFailedEpic = (action$: ActionsObservable<any>) => action$.pipe(
+const childProcessFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.childProcessFailed),
 	tap((action) => {
     const errorMessage =`Process ${action.payload.processName} has failed.\n${action.payload.errorMessage}`
@@ -87,7 +114,7 @@ const childProcessFailedEpic = (action$: ActionsObservable<any>) => action$.pipe
   })
 )
 
-const childProcessMurderFailedEpic = (action$: ActionsObservable<any>) => action$.pipe(
+const childProcessMurderFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.childProcessMurderFailed),
 	tap((action) => {
     const errorMessage = `Failed to stop ${action.payload.processName}.\n${action.payload.errorMessage}`
@@ -96,13 +123,13 @@ const childProcessMurderFailedEpic = (action$: ActionsObservable<any>) => action
   mapTo(SettingsActions.empty())
 )
 
-const exportWalletEpic = (action$: ActionsObservable<any>) => action$.pipe(
+const exportWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.exportWallet),
 	tap((action) => { rpcService.exportWallet(action.payload.filePath) }),
   mapTo(SettingsActions.empty())
 )
 
-const exportWalletSuccessEpic = (action$: ActionsObservable<any>) => action$.pipe(
+const exportWalletSuccessEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.exportWalletSuccess),
 	tap(() => {
     toastr.info(`Wallet backup succeeded.`)
@@ -110,7 +137,7 @@ const exportWalletSuccessEpic = (action$: ActionsObservable<any>) => action$.pip
   mapTo(SettingsActions.empty())
 )
 
-const exportWalletFailureEpic = (action$: ActionsObservable<any>) => action$.pipe(
+const exportWalletFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.exportWalletFailure),
 	tap((action) => {
     toastr.error(`Unable to backup the wallet`, action.payload.errorMessage)
@@ -118,7 +145,7 @@ const exportWalletFailureEpic = (action$: ActionsObservable<any>) => action$.pip
   mapTo(SettingsActions.empty())
 )
 
-const importWalletEpic = (action$: ActionsObservable<any>) => action$.pipe(
+const importWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.importWallet),
 	tap((action) => {
     rpcService.importWallet(action.payload.filePath)
@@ -126,7 +153,7 @@ const importWalletEpic = (action$: ActionsObservable<any>) => action$.pipe(
   mapTo(SettingsActions.empty())
 )
 
-const importWalletSuccessEpic = (action$: ActionsObservable<any>) => action$.pipe(
+const importWalletSuccessEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.importWalletSuccess),
 	tap(() => {
     toastr.info(`Wallet restored successfully`,
@@ -135,7 +162,7 @@ const importWalletSuccessEpic = (action$: ActionsObservable<any>) => action$.pip
   mapTo(SettingsActions.empty())
 )
 
-const importWalletFailureEpic = (action$: ActionsObservable<any>) => action$.pipe(
+const importWalletFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.importWalletFailure),
 	tap((action) => {
     toastr.error(`Unable to restore wallet`, action.payload.errorMessage)
@@ -144,6 +171,7 @@ const importWalletFailureEpic = (action$: ActionsObservable<any>) => action$.pip
 )
 
 export const SettingsEpics = (action$, state$) => merge(
+	kickOffChildProcessesEpic(action$, state$),
 	startLocalNodeEpic(action$, state$),
   restartLocalNodeEpic(action$, state$),
 	stopLocalNodeEpic(action$, state$),

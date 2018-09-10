@@ -1,0 +1,159 @@
+@import "../../theme/vars.scss";
+
+.errorMessage {
+  padding: 2px 6px;
+  color: #e20063;
+  font-size: 0.6rem;
+  height: 1rem;
+}
+
+.important {
+  .addon.paste {
+    color: $BASE_COLOR_GRAY !important;
+  }
+}
+
+.roundedInputContainer {
+  position: relative;
+  padding: 0 1.3rem;
+
+  border: 1.5px solid $BASE_COLOR_BORDER_GRAY;
+  border-radius: 1rem;
+
+  &.important {
+    background: $BASE_COLOR_PURPLE;
+    border: 1.5px solid $BASE_COLOR_PURPLE;
+  }
+
+  &.error {
+    border: 1.5px solid #e20063;
+    box-shadow: 0 0 0.4rem #e20063;
+  }
+
+  font-size: 0.7rem;
+  font-weight: 300;
+
+  div {
+    display: inline-block;
+  }
+
+  .roundedInputLabel {
+    color: $BASE_COLOR_BUTTON_FONT_GRAY;
+    min-width: 9rem;
+    padding-right: 0.5rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+
+  textarea {
+    padding: 1rem 0rem;
+    width: 100%;
+    height: 100%;
+    resize: none;
+
+    background-color: transparent;
+    border: 0;
+
+    color: $BASE_COLOR_WHITE;
+
+    &:focus {
+      outline: none
+    }
+  }
+
+  .inputContainer {
+
+    input {
+      padding: 0.5rem 1rem;
+      min-width: 12rem;
+      background-color: transparent;
+      border: 0;
+      border-left: 1.5px solid $BASE_COLOR_BORDER_GRAY;
+      color: $BASE_COLOR_WHITE;
+
+      &:focus {
+        outline: none
+      }
+    }
+
+    span {
+      cursor: pointer;
+    }
+
+    .addon {
+
+      &.paste {
+        position: relative;
+        color: $BASE_COLOR_PURPLE;
+
+        span {
+          position: absolute;
+          top: -0.03rem;
+          left: 1.5rem;
+        }
+      }
+
+      &.text {
+        color: $BASE_COLOR_BUTTON_FONT_GRAY;
+        cursor: default;
+      }
+
+      &.choose_file {
+        i {
+          position: absolute;
+          top: 7px;
+        }
+      }
+    }
+
+    span.tooltip {
+      // visibility: hidden; // Hidden by default
+
+      position: absolute;
+      bottom: 125%;
+      left: 40%;
+      width: 22rem;
+
+      padding: 0.5rem 1.5rem;
+
+      background-color: $BASE_COLOR_BORDER_GRAY;
+      border-radius: 5rem;
+      font-size: 0.7rem;
+      font-style: italic;
+
+      &:after  {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: $BASE_COLOR_BORDER_GRAY transparent transparent transparent;
+      }
+    }
+  }
+}
+
+.roundedInputContainer[disabled] {
+  .inputContainer {
+
+    .addon {
+      &.dropdown {
+        cursor: default;
+      }
+
+      &.paste {
+        opacity: 0.6;
+        cursor: default;
+
+        span {
+          cursor: default;
+        }
+      }
+
+    }
+  }
+}
+

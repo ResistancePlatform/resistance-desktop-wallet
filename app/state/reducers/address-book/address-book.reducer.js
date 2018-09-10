@@ -11,12 +11,11 @@ export type AddressBookState = {
   records: AddressBookRecord[],
   newAddressDialog: {
     originalName?: string,
-    fields: {
+    defaultValues: {
       name?: string,
       address?: string
     },
     isInEditMode?: boolean,
-    validationErrors: { [string]: string },
     isVisible: boolean
   }
 }
@@ -38,12 +37,8 @@ export const AddressBookActions = createActions(
     NEW_ADDRESS_DIALOG: {
       ERROR: (errorMessage: string) => ({ errorMessage }),
 
-      UPDATE_FIELD: (field: string, value: string) => ({ field, value }),
-
       ADD_ADDRESS: undefined,
       UPDATE_ADDRESS: undefined,
-
-      UPDATE_VALIDATION_ERRORS: (errors) => ({ errors }),
 
       CLOSE: undefined
     },
@@ -63,25 +58,13 @@ export const AddressBookReducer = handleActions(
       ...state,
       newAddressDialog: {
         originalName: action.payload.record && action.payload.record.name,
-        fields: Object.assign({}, action.payload.record || {}),
+        defaultValues: Object.assign({}, action.payload.record || {}),
         isInEditMode: action.payload.record !== undefined,
-        validationErrors: {},
         isVisible: true
       }
     }),
-    [AddressBookActions.newAddressDialog.updateValidationErrors]: (state, action) => ({
-      ...state,
-      newAddressDialog: { ...state.newAddressDialog, validationErrors: action.payload.errors }
-    }),
     [AddressBookActions.newAddressDialog.close]: state => ({
       ...state,
-      newAddressDialog: { fields: {}, validationErrors: {}, isVisible: false }
-    }),
-    [AddressBookActions.newAddressDialog.updateField]: (state, action) => ({
-      ...state,
-      newAddressDialog: {
-        ...state.newAddressDialog,
-        fields: { ...state.newAddressDialog.fields, [action.payload.field]: action.payload.value }
-      }
+      newAddressDialog: { defaultValues: {}, isVisible: false }
     }),
   }, preloadedState)

@@ -1,9 +1,16 @@
+import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
-
-const config = require('electron-settings')
 
 
 export const preloadedState: State = {
+  roundedForm: {},
+  getStarted: {
+    createNewWallet: {
+      wallet: null
+    },
+    isCreatingNewWallet: true,
+    isInProgress: true
+  },
   rpcPolling: {
     registeredActions: [],
     actionsResponseReceived: {}
@@ -77,14 +84,17 @@ export const preloadedState: State = {
 	addressBook: {
 		records: [],
     newAddressDialog: {
-      fields: {},
-      validationErrors: {},
+      defaultValues: {},
       isVisible: false
     }
 	}
 }
 
 // Load serialized settings
+Object.assign(preloadedState.getStarted, {
+	isInProgress: config.get('getStartedInProgress', true)
+})
+
 Object.assign(preloadedState.settings, {
 	isMinerEnabled: config.get('manageDaemon.enableMiner', true),
 	isTorEnabled: config.get('manageDaemon.enableTor', false)

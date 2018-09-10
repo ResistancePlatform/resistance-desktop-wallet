@@ -1,21 +1,21 @@
 // @flow
+import config from 'electron-settings'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { toastr } from 'react-redux-toastr'
 import { remote } from 'electron'
 import scrypt from 'scrypt-js'
 
-import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
+import RoundedInput, { RoundedInputAddon } from '../../components/rounded-form/RoundedInput'
 import styles from './settings.scss'
 import HLayout from '../../theme/h-box-layout.scss'
 import VLayout from '../../theme/v-box-layout.scss'
 
-import { appStore } from '../../state/store/configureStore'
-import { SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
-import { SettingsActions, SettingsState } from '../../state/reducers/settings/settings.reducer'
+import { appStore } from '~/state/store/configureStore'
+import { SystemInfoState } from '~/state/reducers/system-info/system-info.reducer'
+import { SettingsActions, SettingsState } from '~/state/reducers/settings/settings.reducer'
 import StatusModal from '../../components/settings/status-modal'
 
-const config = require('electron-settings')
 const generator = require('generate-password')
 
 type Props = {
@@ -323,7 +323,7 @@ class Settings extends Component<Props> {
 		const passwordAddon: RoundedInputAddon = {
 			enable: false,
 			type: 'TEXT_PLACEHOLDER',
-			onAddonClicked: () => { },
+			onClick: () => { },
 			value: ''
 		}
 
@@ -370,6 +370,7 @@ class Settings extends Component<Props> {
 
 						{/* Save password */}
 						<button
+              type="button"
 							className={styles.savePasswordButton}
               onClick={async () => this.onSavePasswordClicked()}
 							onKeyDown={async () => this.onSavePasswordClicked()}
@@ -384,6 +385,7 @@ class Settings extends Component<Props> {
 
 							<div className={styles.manageDaemonBody}>
 								<button
+                  type="button"
 									className={styles.stopLocalNodeButton}
 									onClick={event => this.onStartStopLocalNodeClicked(event)}
 									onKeyDown={event => this.onStartStopLocalNodeClicked(event)}
@@ -393,6 +395,7 @@ class Settings extends Component<Props> {
 								</button>
 
 								<button
+                  type="button"
 									className={styles.showStatusButton}
 									onClick={event => this.onShowStatusClicked(event)}
 									onKeyDown={event => this.onShowStatusClicked(event)}
@@ -445,6 +448,7 @@ class Settings extends Component<Props> {
 							<div className={styles.manageWalletTitle}>MANAGE WALLET</div>
 
 							<button
+                type="button"
 								className={styles.walletNodeButton}
 								onClick={event => this.onBackupWalletClicked(event)}
 								onKeyDown={event => this.onBackupWalletClicked(event)}
@@ -454,6 +458,7 @@ class Settings extends Component<Props> {
 							</button>
 
 							<button
+                type="button"
 								className={styles.walletNodeButton}
 								onClick={event => this.onRestoreWalletClicked(event)}
 								onKeyDown={event => this.onRestoreWalletClicked(event)}
