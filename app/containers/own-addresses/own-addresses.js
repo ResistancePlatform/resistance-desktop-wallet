@@ -3,17 +3,18 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { toastr } from 'react-redux-toastr'
 
-import RpcPolling from '../../components/rpc-polling/rpc-polling'
-import { PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.reducer'
-import { OwnAddressesActions, OwnAddressesState } from '../../state/reducers/own-addresses/own-addresses.reducer'
-import { appStore } from '../../state/store/configureStore'
-import OwnAddressList from '../../components/own-addresses/own-address-list'
-import { PopupMenu, PopupMenuItem } from '../../components/popup-menu'
-import AddAddressPopupMenu from '../../components/own-addresses/add-address-popup-menu'
+import { truncateAmount } from '~/constants'
+import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
+import RpcPolling from '~/components/rpc-polling/rpc-polling'
+import { PopupMenuActions } from '~/state/reducers/popup-menu/popup-menu.reducer'
+import { OwnAddressesActions, OwnAddressesState } from '~/state/reducers/own-addresses/own-addresses.reducer'
+import { appStore } from '~/state/store/configureStore'
+import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
+import AddAddressPopupMenu from '~/components/own-addresses/add-address-popup-menu'
 
 import styles from './own-addresses.scss'
-import HLayout from '../../theme/h-box-layout.scss'
-import VLayout from '../../theme/v-box-layout.scss'
+import HLayout from '~/theme/h-box-layout.scss'
+import VLayout from '~/theme/v-box-layout.scss'
 
 const pollingInterval = 5.0
 const addressRowPopupMenuId = 'own-addresses-address-row-popup-menu-id'
@@ -114,6 +115,33 @@ class OwnAddresses extends Component<Props> {
     toastr.confirm(`Are you sure want to merge all the coins?`, confirmOptions)
   }
 
+  getListHeaderRenderer() {
+    return (
+      <UniformListHeader>
+        <UniformListColumn width="22%">Balance</UniformListColumn>
+        <UniformListColumn width="18%">Confirmed</UniformListColumn>
+        <UniformListColumn width="60%">Address</UniformListColumn>
+      </UniformListHeader>
+    )
+  }
+
+  getListRowRenderer(address: AddressRow) {
+    const frozenBalance = this.props.ownAddresses.frozenAddresses[address.address]
+    const balance = frozenBalance === undefined ? address.balance : frozenBalance
+    const displayBalance = balance === null ? 'ERROR' : truncateAmount(balance)
+
+    return (
+      <UniformListRow key={address.address} className={frozenBalance ? styles.mergingContainer : ''} onContextMenu={e => this.onAddressRowClicked(e, address.address)}>
+        {Boolean(frozenBalance) &&
+          <div className={styles.merging}><span>merging</span></div>
+        }
+        <UniformListColumn>{displayBalance}</UniformListColumn>
+        <UniformListColumn>{address.confirmed ? 'YES' : address.balance && 'NO' || ''}</UniformListColumn>
+        <UniformListColumn>{address.address}</UniformListColumn>
+      </UniformListRow>
+    )
+  }
+
 	/**
 	 * @returns
 	 * @memberof OwnAddresses
@@ -122,6 +150,7 @@ class OwnAddresses extends Component<Props> {
 		return (
 			// Layout container
 			<div
+        role="none"
 				className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}
 				onClick={(event) => this.hideDropdownMenu(event)}
 				onKeyDown={(event) => this.hideDropdownMenu(event)}
@@ -142,10 +171,23 @@ class OwnAddresses extends Component<Props> {
 
 						{ /* Top bar */}
 						<div className={[styles.topBar, HLayout.hBoxContainer].join(' ')}>
+
 							<div className={styles.topBarTitle}>Own Addresses</div>
+
 							<div className={[styles.topBarButtonContainer, HLayout.hBoxChild].join(' ')}>
-								<button onClick={(event) => this.onShowPrivteKeyClicked(event)} onKeyDown={(event) => this.onShowPrivteKeyClicked(event)} > Show Private Key</button>
-								<div className={[styles.addAddressButtonContainer].join(' ')} onClick={(event) => this.onAddNewAddressClicked(event)} onKeyDown={(event) => this.onAddNewAddressClicked(event)} >
+                <button
+                  type="button"
+                  onClick={(event) => this.onShowPrivteKeyClicked(event)}
+                  onKeyDown={(event) => this.onShowPrivteKeyClicked(event)}>
+                  Show Private Key
+                </button>
+
+                <div
+                  role="none"
+                  className={[styles.addAddressButtonContainer].join(' ')}
+                  onClick={(event) => this.onAddNewAddressClicked(event)}
+                  onKeyDown={(event) => this.onAddNewAddressClicked(event)}
+                >
                   <button type="button" className={styles.addNewAddressButton}>
                     + Add New Address
 										<span className="icon-arrow-down" />
@@ -164,10 +206,10 @@ class OwnAddresses extends Component<Props> {
 							</div>
 						</div>
 
-            <OwnAddressList
-              addresses={this.props.ownAddresses.addresses}
-              frozenAddresses={this.props.ownAddresses.frozenAddresses}
-              onAddressRowClicked={(e, address) => this.onAddressRowClicked(e, address)}
+            <UniformList
+              items={this.props.ownAddresses.addresses}
+              headerRenderer={address => this.getListHeaderRenderer(address)}
+              rowRenderer={address => this.getListRowRenderer(address)}
             />
 
             <PopupMenu id={addressRowPopupMenuId}>

@@ -3,11 +3,11 @@ import React, { Component } from 'react'
 import classNames from 'classnames'
 
 import { truncateAmount } from '../../constants'
-import { AddressRow } from '../../state/reducers/own-addresses/own-addresses.reducer'
+import { AddressRow } from '~/state/reducers/own-addresses/own-addresses.reducer'
 
 import styles from './own-address-list.scss'
-import HLayout from '../../theme/h-box-layout.scss'
-import VLayout from '../../theme/v-box-layout.scss'
+import HLayout from '~/theme/h-box-layout.scss'
+import VLayout from '~/theme/v-box-layout.scss'
 
 type Props = {
 	addresses: AddressRow[],

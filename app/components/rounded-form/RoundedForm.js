@@ -128,7 +128,7 @@ class RoundedForm extends Component<Props> {
   mapChildrenRecursively(children, fn) {
     return React.Children.map(children, child => {
       if (!React.isValidElement(child)) {
-        return child;
+        return child
       }
 
       let childToMap = child
@@ -139,7 +139,7 @@ class RoundedForm extends Component<Props> {
         });
       }
 
-      return fn(childToMap);
+      return fn(childToMap)
     });
   }
 
