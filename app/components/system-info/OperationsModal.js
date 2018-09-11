@@ -6,12 +6,12 @@ import moment from 'moment'
 import classNames from 'classnames'
 
 import 'react-tabs/style/react-tabs.scss'
-import { appStore } from '../../state/store/configureStore'
-import { SystemInfoActions } from '../../state/reducers/system-info/system-info.reducer'
+import { appStore } from '~/state/store/configureStore'
+import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
+import { SystemInfoActions } from '~/state/reducers/system-info/system-info.reducer'
 import humanizeOperationName from './humanize-operation'
 
-import styles from './operations-modal.scss'
-import HLayout from '../../theme/h-box-layout.scss'
+import styles from './OperationsModal.scss'
 
 
 type Props = {
@@ -37,45 +37,51 @@ class OperationsModal extends Component<Props> {
     return false
   }
 
-  getOperationRows() {
+  getSortedOperations() {
     const sortedOperations = this.props.systemInfo.operations.sort((first, second) => {
       const isPending = operation => Number(['queued', 'executing'].includes(operation.status))
       const priorityComparisonResult = isPending(first) - isPending(second)
       return priorityComparisonResult !== 0 ? -priorityComparisonResult : second.creation_time - first.creation_time
     })
 
-    const rows = sortedOperations.map(operation => (
-      <div
-        className={classNames(HLayout.hBoxContainer, styles.tableBodyRow)}
-      >
-        <div className={styles.tableColumnOperation} >{humanizeOperationName(operation)}</div>
-        <div className={styles.tableColumnTriggered} >{moment.unix(operation.creation_time).fromNow()}</div>
-        <div className={classNames(styles.tableColumnStatus)}>
-          <span className={classNames(styles.operationStatus, styles[operation.status])}>{operation.status}</span>
-        </div>
-        <div className={styles.tableColumnError} >{operation.error && operation.error.message}</div>
-        <div className={styles.tableColumnAmount}>{operation.params && operation.params.amounts && operation.params.amounts[0].amount}</div>
-        <div className={styles.tableColumnFee}>{operation.params && operation.params.fee}</div>
-      </div>
-    ))
-    return rows
+    return sortedOperations
   }
 
-  getOperationsTable() {
+  getListRowRenderer(operation) {
     return (
-      <div className={styles.tableContainer}>
-        <div className={classNames(HLayout.hBoxContainer, styles.tableHeader)}>
-          <div className={styles.tableColumnOperation}>Operation</div>
-          <div className={styles.tableColumnTriggered}>Triggered</div>
-          <div className={styles.tableColumnStatus}>Status</div>
-          <div className={styles.tableColumnError}>Error</div>
-          <div className={styles.tableColumnAmount}>Amount</div>
-          <div className={styles.tableColumnFee}>Fee</div>
-        </div>
-        <div className={styles.tableRowsContainer}>
-          {this.getOperationRows()}
-        </div>
-      </div>
+      <UniformListRow key={operation.id}>
+        <UniformListColumn>
+          {humanizeOperationName(operation)}
+        </UniformListColumn>
+        <UniformListColumn>
+          {moment.unix(operation.creation_time).fromNow()}
+        </UniformListColumn>
+        <UniformListColumn>
+          <span className={classNames(styles.operationStatus, styles[operation.status])}>{operation.status}</span>
+        </UniformListColumn>
+        <UniformListColumn>
+          {operation.error && operation.error.message}
+        </UniformListColumn>
+        <UniformListColumn>
+          {operation.params && operation.params.amounts && operation.params.amounts[0].amount}
+        </UniformListColumn>
+        <UniformListColumn>
+          {operation.params && operation.params.fee}
+        </UniformListColumn>
+      </UniformListRow>
+    )
+  }
+
+  getListHeaderRenderer() {
+    return (
+      <UniformListHeader>
+        <UniformListColumn width="15%">Operation</UniformListColumn>
+        <UniformListColumn width="15%">Triggered</UniformListColumn>
+        <UniformListColumn width="10%">Status</UniformListColumn>
+        <UniformListColumn width="30%">Error</UniformListColumn>
+        <UniformListColumn width="10%">Amount</UniformListColumn>
+        <UniformListColumn width="10%">Fee</UniformListColumn>
+      </UniformListHeader>
     )
   }
 
@@ -89,6 +95,8 @@ class OperationsModal extends Component<Props> {
       >
         <div className={classNames(styles.modalTitle)}>
           <div
+            role="button"
+            tabIndex={0}
             className={styles.closeButton}
             onClick={event => this.onCloseClicked(event)}
             onKeyDown={event => this.onCloseClicked(event)}
@@ -99,7 +107,12 @@ class OperationsModal extends Component<Props> {
         </div>
 
         <div className={styles.operationsModalBody}>
-          {this.props.systemInfo.operations.length ? this.getOperationsTable() : `No operations to display.`}
+          <UniformList
+            items={this.props.systemInfo.operations}
+            headerRenderer={() => this.getListHeaderRenderer()}
+            rowRenderer={operation => this.getListRowRenderer(operation)}
+            emptyMessage="No operations to display."
+          />
         </div>
 
         <div className={styles.modalFooter}>
@@ -114,6 +127,7 @@ class OperationsModal extends Component<Props> {
           */}
 
           <button
+            type="button"
             className={styles.closeButton}
             onClick={event => this.onCloseClicked(event)}
             onKeyDown={event => this.onCloseClicked(event)}

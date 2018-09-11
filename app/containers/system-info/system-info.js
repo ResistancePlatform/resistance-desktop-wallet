@@ -7,16 +7,16 @@ import { connect } from 'react-redux';
 import classNames from 'classnames'
 import { toastr } from 'react-redux-toastr'
 
-import RpcPolling from '../../components/rpc-polling/rpc-polling'
-import { OSService } from '../../service/os-service'
-import { SystemInfoActions, SystemInfoState } from '../../state/reducers/system-info/system-info.reducer'
-import { appStore } from '../../state/store/configureStore'
-import { State } from '../../state/reducers/types'
-import OperationsModal from '../../components/system-info/operations-modal'
-import humanizeOperationName from '../../components/system-info/humanize-operation'
+import RpcPolling from '~/components/rpc-polling/rpc-polling'
+import { OSService } from '~/service/os-service'
+import { SystemInfoActions, SystemInfoState } from '~/state/reducers/system-info/system-info.reducer'
+import { appStore } from '~/state/store/configureStore'
+import { State } from '~/state/reducers/types'
+import OperationsModal from '~/components/system-info/OperationsModal'
+import humanizeOperationName from '~/components/system-info/humanize-operation'
 
 import styles from './system-info.scss'
-import HLayout from '../../theme/h-box-layout.scss'
+import HLayout from '~/theme/h-box-layout.scss'
 
 const osService = new OSService()
 
@@ -157,6 +157,7 @@ class SystemInfo extends Component<Props> {
     if (pendingNumber) {
       iconHint = (
         <span
+          role="none"
           className={styles.operationsIconHint}
           title={this.getOperationsIconTitle()}
           onClick={e => this.onOperationsIconClicked(e)}
@@ -263,6 +264,7 @@ class SystemInfo extends Component<Props> {
         <div className={styles.statusButtonsContainer}>
           {/* Buttons - don't add onKeyDown() handler, otherwise Finder will become active on Cmd-commands (like Cmd-Q) */}
           <button
+            type="button"
             className={styles.walletInFileManagerButton}
             onClick={event => this.onWalletInFileManagerClicked(event)}
           >
@@ -270,6 +272,7 @@ class SystemInfo extends Component<Props> {
           </button>
 
           <button
+            type="button"
             className={styles.installationFolderButton}
             onClick={event => this.onInstallationFolderClicked(event)}
           >
@@ -280,6 +283,7 @@ class SystemInfo extends Component<Props> {
 
         <div className={styles.statusCustomIconsContainer}>
           <i
+            role="none"
             className={classNames(styles.customIconOperations, styles.statusIcon, { [styles.active]: this.props.systemInfo.operations.length })}
             title={this.getOperationsIconTitle()}
             onClick={e => this.onOperationsIconClicked(e)}
