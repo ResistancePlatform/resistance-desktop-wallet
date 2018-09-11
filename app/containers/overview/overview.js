@@ -1,12 +1,13 @@
 // @flow
 import React, { Component } from 'react'
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'
+import cn from 'classnames'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { OverviewActions } from '~/state/reducers/overview/overview.reducer'
 import { appStore } from '~/state/store/configureStore'
 import Balance from '~/components/overview/Balance'
-import TransactionList from '~/components/overview/transaction-list'
+import TransactionList from '~/components/overview/TransactionList'
 import TransactionPopupMenu from '~/components/overview/transaction-popup-menu'
 import TransactionDetailList from '~/components/overview/transaction-detail'
 
@@ -93,17 +94,19 @@ class Overview extends Component<Props> {
 				onBackToTransactionListClick={this.onBackToTransactionListClickHandler}
 			/>
 		) : (
-				<div className={[HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
+				<div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer)}>
 
 					<Balance balances={this.props.overview.balances} />
 
-          <div className={styles.title}>Transactions</div>
+          <div className={cn(styles.transactionsContainer)}>
+            <div className={styles.title}>Transactions</div>
 
-					<TransactionList
-						items={this.props.overview.transactions}
-						onRowClick={this.onTransactionRowClickHandler}
-						onRowContextMenu={this.onTransactionRowContextMenuHandler}
-					/>
+            <TransactionList
+              items={this.props.overview.transactions}
+              onRowClick={this.onTransactionRowClickHandler}
+              onRowContextMenu={this.onTransactionRowContextMenuHandler}
+            />
+          </div>
 
 					<TransactionPopupMenu
 						show={this.props.overview.popupMenu.show}
@@ -116,7 +119,7 @@ class Overview extends Component<Props> {
 
 		return (
 			// Layout container
-			<div className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
+			<div className={cn(styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer)}>
 
         <RpcPolling
           interval={walletInfoPollingInterval}
@@ -137,7 +140,7 @@ class Overview extends Component<Props> {
         />
 
 				{ /* Route content */}
-				<div className={[styles.overviewContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
+				<div className={cn(styles.overviewContainer, VLayout.vBoxChild, HLayout.hBoxContainer)}>
 					{renderContent}
 				</div>
 
@@ -151,4 +154,4 @@ const mapStateToProps = (state) => ({
 	overview: state.overview
 })
 
-export default connect(mapStateToProps, null)(Overview);
+export default connect(mapStateToProps, null)(Overview)

@@ -2,6 +2,14 @@
 }
 
 .overviewContainer {
+}
+
+.transactionsContainer {
+  padding: 2rem;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+
   .title {
     margin-bottom: 1.6rem;
     text-align: left;
