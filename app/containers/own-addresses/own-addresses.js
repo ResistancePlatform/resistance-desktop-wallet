@@ -3,9 +3,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { toastr } from 'react-redux-toastr'
 
-import { truncateAmount } from '~/constants'
-import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
+import OwnAddressList from '~/components/own-addresses/own-address-list'
 import { PopupMenuActions } from '~/state/reducers/popup-menu/popup-menu.reducer'
 import { OwnAddressesActions, OwnAddressesState } from '~/state/reducers/own-addresses/own-addresses.reducer'
 import { appStore } from '~/state/store/configureStore'
@@ -115,33 +114,6 @@ class OwnAddresses extends Component<Props> {
     toastr.confirm(`Are you sure want to merge all the coins?`, confirmOptions)
   }
 
-  getListHeaderRenderer() {
-    return (
-      <UniformListHeader>
-        <UniformListColumn width="22%">Balance</UniformListColumn>
-        <UniformListColumn width="18%">Confirmed</UniformListColumn>
-        <UniformListColumn width="60%">Address</UniformListColumn>
-      </UniformListHeader>
-    )
-  }
-
-  getListRowRenderer(address: AddressRow) {
-    const frozenBalance = this.props.ownAddresses.frozenAddresses[address.address]
-    const balance = frozenBalance === undefined ? address.balance : frozenBalance
-    const displayBalance = balance === null ? 'ERROR' : truncateAmount(balance)
-
-    return (
-      <UniformListRow key={address.address} className={frozenBalance ? styles.mergingContainer : ''} onContextMenu={e => this.onAddressRowClicked(e, address.address)}>
-        {Boolean(frozenBalance) &&
-          <div className={styles.merging}><span>merging</span></div>
-        }
-        <UniformListColumn>{displayBalance}</UniformListColumn>
-        <UniformListColumn>{address.confirmed ? 'YES' : address.balance && 'NO' || ''}</UniformListColumn>
-        <UniformListColumn>{address.address}</UniformListColumn>
-      </UniformListRow>
-    )
-  }
-
 	/**
 	 * @returns
 	 * @memberof OwnAddresses
@@ -206,10 +178,10 @@ class OwnAddresses extends Component<Props> {
 							</div>
 						</div>
 
-            <UniformList
+            <OwnAddressList
               items={this.props.ownAddresses.addresses}
-              headerRenderer={address => this.getListHeaderRenderer(address)}
-              rowRenderer={address => this.getListRowRenderer(address)}
+              frozenAddresses={this.props.ownAddresses.frozenAddresses}
+              onRowClick={(e, address) => this.onAddressRowClicked(e, address)}
             />
 
             <PopupMenu id={addressRowPopupMenuId}>

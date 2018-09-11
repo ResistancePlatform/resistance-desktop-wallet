@@ -2,93 +2,64 @@
 import moment from 'moment'
 import React, { Component } from 'react'
 
-import { truncateAmount } from '../../constants'
-import { Transaction } from '../../state/reducers/overview/overview.reducer'
+import { truncateAmount } from '~/constants'
+import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
+import { Transaction } from '~/state/reducers/overview/overview.reducer'
 
-import styles from './transaction-list.scss'
-import HLayout from '../../theme/h-box-layout.scss'
-import VLayout from '../../theme/v-box-layout.scss'
+const transactionDirectionMap = {
+  receive: `In`,
+  send: `Out`,
+  generate: `Mined`,
+  immature: `Immature`
+}
 
 type Props = {
-	transactions: Array<Transaction>,
-	onTransactionRowClick: (event: any, transactionId: string) => void
+	items: Transaction[],
+	onRowClick: () => void,
+	onRowContextMenu: (event: SyntheticEvent<any>, transactionId: string) => void
 }
 
 export default class TransactionList extends Component<Props> {
 	props: Props
 
-	rowClicked(event: any, transactionId: string) {
-		event.preventDefault()
-		event.stopPropagation()
-
-		if (this.props.onTransactionRowClick) {
-			this.props.onTransactionRowClick(event, transactionId)
-		}
-	}
-
-  getTransactionDirection(transaction): string {
-    switch (transaction.category) {
-      case 'receive':
-        return 'In'
-      case 'send':
-        return 'Out'
-      case 'generate':
-        return 'Mined'
-      case 'immature':
-        return 'Immature'
-      default:
-    }
-
-    return transaction.category
+  getListHeaderRenderer() {
+    return (
+      <UniformListHeader>
+        <UniformListColumn width="6rem">Type</UniformListColumn>
+        <UniformListColumn width="5rem">Direction</UniformListColumn>
+        <UniformListColumn width="5rem">Confirmed</UniformListColumn>
+        <UniformListColumn width="6rem">Amount</UniformListColumn>
+        <UniformListColumn width="9rem">Date</UniformListColumn>
+        <UniformListColumn>Destination address</UniformListColumn>
+      </UniformListHeader>
+    )
   }
 
-	getTransactionTable() {
-		if (!this.props.transactions || this.props.transactions.length <= 0) {
-			return (
-				<div>No Transaction.</div>
-			)
-		}
-
-		// const tableContent = `<table></table>`
-		const tableBody = this.props.transactions.map((transaction, index) => (
-			<div
-				className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')}
-				key={index}
-				onClick={(event) => this.rowClicked(event, transaction.transactionId)}
-				onContextMenu={(event) => this.rowClicked(event, transaction.transactionId)}
-				onKeyDown={() => { }}
-			>
-				<div className={styles.tableBodyRowColumnType} >{transaction.type}</div>
-				<div className={styles.tableBodyRowColumnDirection}>{this.getTransactionDirection(transaction)}</div>
-				<div className={styles.tableBodyRowColumnConfirmed}>{transaction.confirmations !== 0 ? 'Yes' : 'No'}</div>
-				<div className={styles.tableBodyRowColumnAmount}>{truncateAmount(transaction.amount)}</div>
-				<div className={styles.tableBodyRowColumnDate}>{moment.unix(transaction.timestamp).format('L kk:mm:ss')}</div>
-				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnAddress].join(' ')}>{transaction.destinationAddress}</div>
-			</div>
-		))
-
-		return (
-			<div className={[styles.tableContainer].join(' ')}>
-				<div className={[HLayout.hBoxContainer, styles.tableHeader].join(' ')}>
-					<div className={styles.tableHeaderColumnType}>Type</div>
-					<div className={styles.tableHeaderColumnDirection}>Direction</div>
-					<div className={styles.tableHeaderColumnConfirmed}>Confirmed</div>
-					<div className={styles.tableHeaderColumnAmount}>Amount</div>
-					<div className={styles.tableHeaderColumnDate}>Date</div>
-					<div className={[HLayout.hBoxChild, styles.tableHeaderColumnAddress].join(' ')}>Destination address</div>
-				</div>
-
-				{tableBody}
-			</div>
-		)
-	}
+  getListRowRenderer(transaction: Transaction) {
+    return (
+      <UniformListRow
+        key={transaction.transactionId}
+        onClick={e => this.props.onRowClick(e)}
+        onContextMenu={e => this.props.onRowContextMenu(e, transaction.transactionId)}
+      >
+        <UniformListColumn>{transaction.type}</UniformListColumn>
+        <UniformListColumn>{transactionDirectionMap[transaction.category] || transaction.category}</UniformListColumn>
+        <UniformListColumn>{transaction.confirmations !== 0 ? 'Yes' : 'No'}</UniformListColumn>
+        <UniformListColumn>{truncateAmount(transaction.amount)}</UniformListColumn>
+        <UniformListColumn>{moment.unix(transaction.timestamp).format('L kk:mm:ss')}</UniformListColumn>
+        <UniformListColumn>{transaction.destinationAddress}</UniformListColumn>
+      </UniformListRow>
+    )
+  }
 
 	render() {
 		return (
-			<div className={[VLayout.vBoxChild, styles.transactionListContainer].join(' ')}>
-				<div className={styles.title}>Transactions</div>
-				{this.getTransactionTable()}
-			</div>
+      <UniformList
+        items={this.props.items}
+        headerRenderer={transaction => this.getListHeaderRenderer(transaction)}
+        rowRenderer={transaction => this.getListRowRenderer(transaction)}
+        emptyMessage="No transactions to display."
+      />
 		)
 	}
 }

@@ -2,16 +2,17 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
-import RpcPolling from '../../components/rpc-polling/rpc-polling'
-import { OverviewActions } from '../../state/reducers/overview/overview.reducer'
-import { appStore } from '../../state/store/configureStore'
-import Balance from '../../components/overview/Balance'
-import TransactionList from '../../components/overview/transaction-list'
-import TransactionPopupMenu from '../../components/overview/transaction-popup-menu'
-import TransactionDetailList from '../../components/overview/transaction-detail'
+import RpcPolling from '~/components/rpc-polling/rpc-polling'
+import { OverviewActions } from '~/state/reducers/overview/overview.reducer'
+import { appStore } from '~/state/store/configureStore'
+import Balance from '~/components/overview/Balance'
+import TransactionList from '~/components/overview/transaction-list'
+import TransactionPopupMenu from '~/components/overview/transaction-popup-menu'
+import TransactionDetailList from '~/components/overview/transaction-detail'
+
 import styles from './overview.scss'
-import HLayout from '../../theme/h-box-layout.scss'
-import VLayout from '../../theme/v-box-layout.scss'
+import HLayout from '~/theme/h-box-layout.scss'
+import VLayout from '~/theme/v-box-layout.scss'
 
 const walletInfoPollingInterval = 2.0
 const transactionsPollingInterval = 5.0
@@ -28,16 +29,19 @@ class Overview extends Component<Props> {
 	props: Props
 
 	/**
-	 * @param {*} event
+	 * @memberof Overview
+	 */
+	onTransactionRowClickHandler() {
+    appStore.dispatch(OverviewActions.updatePopupMenuVisibility(false, -1, -1, ''))
+	}
+
+	/**
+	 * @param {SyntheticEvent<any>} event
 	 * @param {string} transactionId
 	 * @memberof Overview
 	 */
-	onTransactionRowClickHandler(event: any, transactionId: string) {
-		if (event.type === 'contextmenu') {
-			appStore.dispatch(OverviewActions.updatePopupMenuVisibility(true, event.clientX, event.clientY, transactionId))
-		} else {
-			appStore.dispatch(OverviewActions.updatePopupMenuVisibility(false, -1, -1, ''))
-		}
+	onTransactionRowContextMenuHandler(event: SyntheticEvent<any>, transactionId: string) {
+    appStore.dispatch(OverviewActions.updatePopupMenuVisibility(true, event.clientX, event.clientY, transactionId))
 	}
 
 	/**
@@ -92,10 +96,15 @@ class Overview extends Component<Props> {
 				<div className={[HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
 
 					<Balance balances={this.props.overview.balances} />
+
+          <div className={styles.title}>Transactions</div>
+
 					<TransactionList
-						transactions={this.props.overview.transactions}
-						onTransactionRowClick={this.onTransactionRowClickHandler}
+						items={this.props.overview.transactions}
+						onRowClick={this.onTransactionRowClickHandler}
+						onRowContextMenu={this.onTransactionRowContextMenuHandler}
 					/>
+
 					<TransactionPopupMenu
 						show={this.props.overview.popupMenu.show}
 						posX={this.props.overview.popupMenu.posX ? this.props.overview.popupMenu.posX : -1}
