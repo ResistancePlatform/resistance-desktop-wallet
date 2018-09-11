@@ -1,23 +1,35 @@
 // @flow
 import React from 'react'
+import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
+import classNames from 'classnames'
+
+import { GetStartedPage, RestoreYourWalletPage } from './GetStartedPage'
+
+import CreateNewWalletPage from './get-started/CreateNewWalletPage'
+import ChoosePasswordPage from './get-started/ChoosePasswordPage'
+import WelcomePage from './get-started/WelcomePage'
 
 import NaviBar from './navigation/navi-bar'
-import SytemInfo from './system-info/system-info'
+import TitleBarButtons from '../components/title-bar-buttons/TitleBarButtons'
+import SystemInfo from './system-info/system-info'
 import Overview from './overview/overview'
 import OwnAddress from './own-addresses/own-addresses'
 import SendCash from './send-cash/send-cash'
 import Settings from './settings/settings'
 import AddressBookPage from './AddressBookPage'
 
+import { appStore } from '../state/store/configureStore'
+import { GetStartedState } from '../state/reducers/get-started/get-started.reducer'
+import { SettingsActions } from '../state/reducers/settings/settings.reducer'
+
 import styles from './App.scss'
 import HLayout from '../theme/h-box-layout.scss'
 import VLayout from '../theme/v-box-layout.scss'
 
-import { appStore } from '../state/store/configureStore'
-import { SettingsActions } from '../state/reducers/settings/settings.reducer'
-
-type Props = {};
+type Props = {
+  getStarted: GetStartedState
+}
 
 
 /**
@@ -25,37 +37,49 @@ type Props = {};
  * @class App
  * @extends {React.Component<Props>}
  */
-export default class App extends React.Component<Props> {
+class App extends React.Component<Props> {
 	props: Props;
 
+	/**
+   * Triggers child processes.
+   *
+	 * @returns
+   * @memberof App
+	 */
   componentDidMount() {
-    const settings = appStore.getState().settings
-
-    const startNode = () => {
-      appStore.dispatch(SettingsActions.startLocalNode())
-    }
-
-    const startMiner = () => {
-      appStore.dispatch(SettingsActions.enableMiner())
-    }
-
-    if (settings.isTorEnabled) {
-      appStore.dispatch(SettingsActions.enableTor())
-      setTimeout(startNode, 200);
-    } else {
-      startNode()
-    }
-
-    if (settings.isMinerEnabled) {
-      setTimeout(startMiner, 1000);
+    if (!this.props.getStarted.isInProgress) {
+      appStore.dispatch(SettingsActions.kickOffChildProcesses())
     }
   }
 
+	/**
+   * Renders routes.
+   *
+	 * @returns
+   * @memberof App
+	 */
 	render() {
-		return (
-			<div id="App" className={[styles.appContainer, VLayout.vBoxContainer].join(' ')}>
+    const getStartedElement = (
+      <div className={[styles.contentContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
+        <TitleBarButtons />
+        <div className={[styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer].join(' ')}>
+          <Switch>
+            <Route exact path="/get-started" component={GetStartedPage} />
+            <Route exact path="/get-started/create-new-wallet" component={CreateNewWalletPage} />
+            <Route exact path="/get-started/choose-password" component={ChoosePasswordPage} />
+            <Route exact path="/get-started/restore-your-wallet" component={RestoreYourWalletPage} />
+            <Route exact path="/get-started/welcome" component={WelcomePage} />
+            <Route exact path="/" render={() => (<Redirect to="/get-started" />)} />
+          </Switch>
+        </div>
+      </div>
+    )
+
+    const mainElement = (
+      <div className={classNames(styles.contentContainer, VLayout.vBoxContainer)}>
 				{ /* Content container */}
-				<div className={[styles.contentContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
+				<div className={[VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
+          <TitleBarButtons />
 					<NaviBar />
 
 					{ /* Route content container */}
@@ -72,8 +96,16 @@ export default class App extends React.Component<Props> {
 				</div>
 
 				{ /* System info bar */}
-				<SytemInfo />
+				<SystemInfo />
+      </div>
+    )
+
+		return (
+			<div id="App" className={[styles.appContainer, VLayout.vBoxContainer].join(' ')}>
+        {this.props.getStarted.isInProgress ? getStartedElement : mainElement }
 			</div>
 		)
 	}
 }
+
+export default connect(state => state, null)(App)

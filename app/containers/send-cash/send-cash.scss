@@ -166,8 +166,6 @@ div[name="from-address"] {
 
 // Overwrite the CSS for the <input> width, and the <RoundedInput> --> <input> --> <span> left
 div[name="destination-address"] {
-    margin-bottom: 1rem;
-
     width: 35.5rem;
 
     input {
@@ -183,7 +181,6 @@ div[name="destination-address"] {
 
 div[name="amount"] {
     display: inline-block;
-    margin-bottom: 1rem;
     margin-right: 1.5rem;
 
     input {

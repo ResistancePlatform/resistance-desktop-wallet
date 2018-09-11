@@ -3,8 +3,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import styles from './navi-bar.scss'
-import { NaviActions, NaviState } from '../../state/reducers/navi/navi.reducer'
-import { appStore } from '../../state/store/configureStore'
+import { NaviState } from '../../state/reducers/navi/navi.reducer'
 import HLayout from '../../theme/h-box-layout.scss'
 
 type Props = {
@@ -14,21 +13,7 @@ type Props = {
 class NaviBar extends Component<Props> {
 	props: Props
 
-	onCloseClicked(event) {
-		event.preventDefault();
-		appStore.dispatch(NaviActions.mainWindowClose())
-	}
-
-	onMinimizeClicked(event) {
-		event.preventDefault();
-		appStore.dispatch(NaviActions.mainWindowMinimize())
-	}
-
-	onMaximizeClicked(event) {
-		event.preventDefault();
-		appStore.dispatch(NaviActions.mainWindowMaximize())
-	}
-
+  // TODO: Replace with classnames #114
 	getNaviBarItemClasses(itemPath: string) {
 		return this.props.navi.currentNaviPath === itemPath ? `${styles.naviVBarItem} ${styles.activeNaviVBarItem}` : `${styles.naviVBarItem}`
 	}
@@ -36,14 +21,6 @@ class NaviBar extends Component<Props> {
 	render() {
 		return (
 			<div className={[styles.navibarContainer].join(' ')} data-tid="navi-bar-container">
-
-				{/* Embedded toolbar */}
-				<div className={[styles.navibarToolbarContainer]}>
-					<div className={styles.closeButton} onClick={(event) => this.onCloseClicked(event)} onKeyDown={(event) => this.onCloseClicked(event)} />
-					<div className={styles.minimizeButton} onClick={(event) => this.onMinimizeClicked(event)} onKeyDown={(event) => this.onMinimizeClicked(event)} />
-					<div className={styles.fullScreenButton} onClick={(event) => this.onMaximizeClicked(event)} onKeyDown={(event) => this.onMaximizeClicked(event)} />
-				</div>
-
 				{/* Route items */}
 				<div className={[this.getNaviBarItemClasses('/overview'), HLayout.hBoxContainer].join(' ')}>
 					<span className="icon-overview" />

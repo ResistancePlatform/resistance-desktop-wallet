@@ -1,13 +1,12 @@
 // @flow
-import { clipboard } from 'electron'
 import * as Joi from 'joi'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
-import RoundedInput, { RoundedInputAddon } from '../../components/rounded-input'
-import RoundedForm from '../../components/rounded-form/RoundedForm'
-import { AddressBookActions, AddressBookState } from '../../state/reducers/address-book/address-book.reducer'
+import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
+import RoundedForm from '~/components/rounded-form/RoundedForm'
+import { AddressBookActions, AddressBookState } from '~/state/reducers/address-book/address-book.reducer'
 
 import styles from './NewAddressDialog.scss'
 
@@ -36,14 +35,8 @@ class NewAddressDialog extends Component<Props> {
 		const nameAddon: RoundedInputAddon = {
 			enable: false,
 			type: 'TEXT_PLACEHOLDER',
-			onAddonClicked: () => { },
+			onClick: () => { },
 			value: ''
-		}
-
-		const addressAddon: RoundedInputAddon = {
-			enable: true,
-			type: 'PASTE',
-			onAddonClicked: () => this.props.actions.updateAddress(clipboard.readText())
 		}
 
 		return (
@@ -51,6 +44,8 @@ class NewAddressDialog extends Component<Props> {
 
 				{/* Close button */}
 				<div
+          role="button"
+          tabIndex={0}
 					className={[styles.closeButton, 'icon-close'].join(' ')}
 					onClick={this.props.actions.close}
 					onKeyDown={() => {}}
@@ -62,33 +57,29 @@ class NewAddressDialog extends Component<Props> {
         </div>
 
         <RoundedForm
+          id="addressBookNewAddressDialog"
           schema={validationSchema}
-          fields={this.props.newAddressDialog.fields}
-          onValidate={this.props.actions.updateValidationErrors}
         >
           {/* Name */}
           <RoundedInput
             name="name"
-            defaultValue={this.props.newAddressDialog.fields.name}
+            defaultValue={this.props.newAddressDialog.defaultValues.name}
             label="Name"
             addon={nameAddon}
-            error={this.props.newAddressDialog.validationErrors.name}
-            onChange={value => this.props.actions.updateField('name', value)}
           />
 
           {/* Address */}
           <RoundedInput
             name="address"
-            defaultValue={this.props.newAddressDialog.fields.address}
+            defaultValue={this.props.newAddressDialog.defaultValues.address}
             label="Address"
-            addon={addressAddon}
-            error={this.props.newAddressDialog.validationErrors.address}
-            onChange={value => this.props.actions.updateField('address', value)}
+            addon={{ enable: true, type: 'PASTE' }}
           />
 
           { /* Buttons */}
           <div className={styles.buttonContainer}>
             <button
+              type="button"
               className={styles.cancelButton}
               onClick={this.props.actions.close}
               onKeyDown={() => {}}

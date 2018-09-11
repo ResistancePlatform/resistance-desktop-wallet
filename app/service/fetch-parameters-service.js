@@ -1,12 +1,12 @@
 // @flow
 import * as fs from 'fs';
 import path from 'path'
+import config from 'electron-settings'
 
 import { app, dialog } from 'electron'
 import { download } from 'electron-dl'
 
 const crypto = require('crypto')
-const config = require('electron-settings')
 const ProgressBar = require('electron-progressbar')
 
 const quickHashesConfigKey = 'resistanceParameters.quickHashes'

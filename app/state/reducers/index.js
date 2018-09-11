@@ -4,9 +4,11 @@ import { combineEpics } from 'redux-observable'
 import { reducer as toastrReducer } from 'react-redux-toastr'
 
 // Reducers
+import { RoundedFormReducer } from '../reducers/rounded-form/rounded-form.reducer'
 import { RpcPollingReducer } from '../reducers/rpc-polling/rpc-polling.reducer'
 import { PopupMenuReducer } from '../reducers/popup-menu/popup-menu.reducer'
 import { NaviReducer } from '../reducers/navi/navi.reducer'
+import { GetStartedReducer } from '../reducers/get-started/get-started.reducer'
 import { SystemInfoReducer } from '../reducers/system-info/system-info.reducer'
 import { OverviewReducer } from '../reducers/overview/overview.reducer'
 import { OwnAddressesReducer } from '../reducers/own-addresses/own-addresses.reducer'
@@ -15,6 +17,7 @@ import { SettingsReducer } from '../reducers/settings/settings.reducer'
 import { AddressBookReducer } from '../reducers/address-book/address-book.reducer'
 
 // Epics
+import { GetStartedEpic } from '../reducers/get-started/get-started.epic'
 import { OwnAddressesEpics } from '../reducers/own-addresses/own-addresses.epic'
 import { NaviEpics } from '../reducers/navi/navi.epic'
 import { OverviewEpics } from '../reducers/overview/overview.epic'
@@ -25,6 +28,8 @@ import { AddressBookEpics } from '../reducers/address-book/address-book.epic'
 
 const rootReducer = combineReducers({
   toastr: toastrReducer,
+  roundedForm: RoundedFormReducer,
+  getStarted: GetStartedReducer,
   rpcPolling: RpcPollingReducer,
   popupMenu: PopupMenuReducer,
 	navi: NaviReducer,
@@ -37,6 +42,7 @@ const rootReducer = combineReducers({
 })
 
 const rootEpic = combineEpics(
+  GetStartedEpic,
 	NaviEpics,
 	SystemInfoEpics,
 	OverviewEpics,

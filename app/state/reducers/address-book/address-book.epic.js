@@ -19,7 +19,7 @@ const loadAddressBookEpic = (action$: ActionsObservable<any>) => action$.pipe(
 const addAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(AddressBookActions.newAddressDialog.addAddress),
   mergeMap(() => {
-    const newAddressRecord = state$.value.addressBook.newAddressDialog.fields
+    const newAddressRecord = state$.value.roundedForm.addressBookNewAddressDialog.fields
     return addressBook.addAddress(newAddressRecord).pipe(
       mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.close())),
       catchError(err => of(AddressBookActions.newAddressDialog.error(err.toString())))
@@ -31,7 +31,8 @@ const updateAddressEpic = (action$: ActionsObservable<any>, state$) => action$.p
 	ofType(AddressBookActions.newAddressDialog.updateAddress),
   mergeMap(() => {
     const dialogState = state$.value.addressBook.newAddressDialog
-    return addressBook.updateAddress(dialogState.originalName, dialogState.fields).pipe(
+    const addressRecord = state$.value.roundedForm.addressBookNewAddressDialog.fields
+    return addressBook.updateAddress(dialogState.originalName, addressRecord).pipe(
       mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.close())),
       catchError(err => of(AddressBookActions.newAddressDialog.error(err.toString())))
     )
