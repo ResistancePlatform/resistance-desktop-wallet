@@ -6,7 +6,8 @@ import * as Joi from 'joi'
 import cn from 'classnames'
 
 import { RoundedFormRoot } from '~/state/reducers/rounded-form/rounded-form.reducer'
-import { AuthState, AuthActions } from '~/state/reducers/auth/auth.reducer'
+import { SettingsState } from '~/state/reducers/settings/settings.reducer'
+import { AuthActions } from '~/state/reducers/auth/auth.reducer'
 import RoundedInput from '~/components/rounded-form/RoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 import HLayout from '~/theme/h-box-layout.scss'
@@ -25,7 +26,7 @@ const validationSchema = Joi.object().keys({
 })
 
 type Props = {
-  auth: AuthState,
+  settings: SettingsState,
   form: RoundedFormRoot | undefined,
   actions: object
 }
@@ -42,6 +43,8 @@ class Login extends Component<Props> {
    * @memberof Login
 	 */
 	render() {
+    const isNodeRunning = this.props.settings.childProcessesStatus.NODE === 'RUNNING'
+
     return (
       <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
         <div className={cn(styles.title, { [styles.ready]: this.props.form && this.props.form.isValid })}>Enter Resistance</div>
@@ -54,8 +57,9 @@ class Login extends Component<Props> {
             className={styles.loginButton}
             onClick={this.props.actions.submitPassword}
             onKeyDown={this.props.actions.submitPassword}
+            disabled={!isNodeRunning}
           >
-            Submit
+            { isNodeRunning ? `Submit` : `Waiting for the daemon...` }
           </button>
         </RoundedForm>
       </div>
@@ -64,7 +68,7 @@ class Login extends Component<Props> {
 }
 
 const mapStateToProps = state => ({
-  auth: state.auth,
+  settings: state.settings,
   form: state.roundedForm.authLogin
 })
 
