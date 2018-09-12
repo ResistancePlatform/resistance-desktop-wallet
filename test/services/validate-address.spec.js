@@ -1,4 +1,4 @@
-import { ValidateAddressService } from '../../app/service/validate-address-service'
+import ValidateAddressService from '../../app/service/validate-address-service'
 
 const validateAddress = new ValidateAddressService()
 
