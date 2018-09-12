@@ -59,7 +59,7 @@ export class ChoosePassword extends Component<Props> {
 
         <div className={styles.hint}>Enter a strong password (using letters, numbers and/or symbols)</div>
 
-        <RoundedForm id="getStartedChoosePassword" schema={validationSchema} important >
+        <RoundedForm id="getStartedChoosePassword" schema={validationSchema}>
 
           <RoundedInput name="password" password label="Password" />
           <RoundedInput name="confirmPassword" password label="Confirm password" />

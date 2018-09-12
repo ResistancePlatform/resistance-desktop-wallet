@@ -4,30 +4,33 @@ import { combineEpics } from 'redux-observable'
 import { reducer as toastrReducer } from 'react-redux-toastr'
 
 // Reducers
-import { RoundedFormReducer } from '../reducers/rounded-form/rounded-form.reducer'
-import { RpcPollingReducer } from '../reducers/rpc-polling/rpc-polling.reducer'
-import { PopupMenuReducer } from '../reducers/popup-menu/popup-menu.reducer'
-import { NaviReducer } from '../reducers/navi/navi.reducer'
-import { GetStartedReducer } from '../reducers/get-started/get-started.reducer'
-import { SystemInfoReducer } from '../reducers/system-info/system-info.reducer'
-import { OverviewReducer } from '../reducers/overview/overview.reducer'
-import { OwnAddressesReducer } from '../reducers/own-addresses/own-addresses.reducer'
-import { SendCashReducer } from '../reducers/send-cash/send-cash.reducer'
-import { SettingsReducer } from '../reducers/settings/settings.reducer'
-import { AddressBookReducer } from '../reducers/address-book/address-book.reducer'
+import { AuthReducer } from './auth/auth.reducer'
+import { RoundedFormReducer } from './rounded-form/rounded-form.reducer'
+import { RpcPollingReducer } from './rpc-polling/rpc-polling.reducer'
+import { PopupMenuReducer } from './popup-menu/popup-menu.reducer'
+import { NaviReducer } from './navi/navi.reducer'
+import { GetStartedReducer } from './get-started/get-started.reducer'
+import { SystemInfoReducer } from './system-info/system-info.reducer'
+import { OverviewReducer } from './overview/overview.reducer'
+import { OwnAddressesReducer } from './own-addresses/own-addresses.reducer'
+import { SendCashReducer } from './send-cash/send-cash.reducer'
+import { SettingsReducer } from './settings/settings.reducer'
+import { AddressBookReducer } from './address-book/address-book.reducer'
 
 // Epics
-import { GetStartedEpic } from '../reducers/get-started/get-started.epic'
-import { OwnAddressesEpics } from '../reducers/own-addresses/own-addresses.epic'
-import { NaviEpics } from '../reducers/navi/navi.epic'
-import { OverviewEpics } from '../reducers/overview/overview.epic'
-import { SystemInfoEpics } from '../reducers/system-info/system-info.epic'
-import { SendCashEpics } from '../reducers/send-cash/send-cash.epic'
-import { SettingsEpics } from '../reducers/settings/settings.epic'
-import { AddressBookEpics } from '../reducers/address-book/address-book.epic'
+import { AuthEpic } from './auth/auth.epic'
+import { GetStartedEpic } from './get-started/get-started.epic'
+import { OwnAddressesEpics } from './own-addresses/own-addresses.epic'
+import { NaviEpics } from './navi/navi.epic'
+import { OverviewEpics } from './overview/overview.epic'
+import { SystemInfoEpics } from './system-info/system-info.epic'
+import { SendCashEpics } from './send-cash/send-cash.epic'
+import { SettingsEpics } from './settings/settings.epic'
+import { AddressBookEpics } from './address-book/address-book.epic'
 
 const rootReducer = combineReducers({
   toastr: toastrReducer,
+  auth: AuthReducer,
   roundedForm: RoundedFormReducer,
   getStarted: GetStartedReducer,
   rpcPolling: RpcPollingReducer,
@@ -42,6 +45,7 @@ const rootReducer = combineReducers({
 })
 
 const rootEpic = combineEpics(
+  AuthEpic,
   GetStartedEpic,
 	NaviEpics,
 	SystemInfoEpics,

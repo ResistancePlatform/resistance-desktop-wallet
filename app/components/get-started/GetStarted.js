@@ -37,8 +37,7 @@ export class GetStarted extends Component<Props> {
 
           <NavLink className={styles.chooseFlowLink} to="/get-started/restore-your-wallet">
             <i className={styles.restoreYourWalletIcon } />
-            Restore wallet from keys<br />
-            or mnemonic seed
+            Restore wallet from keys
           </NavLink>
         </div>
       </div>

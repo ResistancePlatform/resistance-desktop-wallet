@@ -1,0 +1,27 @@
+@import "../../theme/vars.scss";
+
+.container {
+  height: 100%;
+  justify-content: center;
+  display: inline;
+  position: relative;
+  padding: 16rem 16rem 5rem 16rem;
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  padding-bottom: 1.8rem;
+
+  &.ready {
+    text-shadow: 0 0 0.8rem $BASE_COLOR_WHITE;
+  }
+}
+
+.form {
+  text-align: center;
+
+  .passwordInput {
+    max-width: 24rem;
+  }
+}

@@ -18,7 +18,6 @@ const resistance = new ResistanceService()
 
 const validationSchema = Joi.object().keys({
   walletName: Joi.string().required().label(`Wallet name`),
-  mnemonicSeed: Joi.string().required().label(`Mnemonic seed`),
   walletPath: Joi.string().required().label(`Wallet path`)
 })
 
@@ -61,23 +60,8 @@ export class CreateNewWallet extends Component<Props> {
 
         <div className={styles.hint}>Choose a name for your wallet</div>
 
-        <RoundedForm id="getStartedCreateNewWallet" schema={validationSchema} important >
+        <RoundedForm id="getStartedCreateNewWallet" schema={validationSchema}>
           <RoundedInput name="walletName" label="Wallet name" defaultValue={userInfo().username} />
-
-          <RoundedTextArea
-            name="mnemonicSeed"
-            rows={8}
-            defaultValue={this.props.createNewWallet.wallet && this.props.createNewWallet.wallet.mnemonicSeed}
-            readOnly
-          />
-
-          <div className={styles.note}>
-            <strong>Note:</strong> This seed is very important to write down and keep secret.
-            It&#39;s all you need to backup &amp; restore your wallet.
-            The seed phrase can only be used to recover R- (transparent) addresses.
-            In order to also back up and recover Z- (private) addresses, you will need to backup the
-            wallet in Settings each time you create a new Z-address
-          </div>
 
           <RoundedInput
             name="walletPath"

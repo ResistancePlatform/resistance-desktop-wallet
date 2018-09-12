@@ -65,7 +65,8 @@ export class RpcService {
 	addressBookService: AddressBookService
 
 	/**
-	 *Creates an instance of RpcService.
+	 * Creates an instance of RpcService.
+   *
 	 * @memberof RpcService
 	 */
 	constructor() {
@@ -82,7 +83,30 @@ export class RpcService {
 	}
 
 	/**
-	 * Reques Resistance node running status and memory usage.
+	 * Encrypts the wallet with a passphrase.
+   *
+	 * @memberof RpcService
+	 */
+  encryptWallet(password: string) {
+    const client = getClientInstance()
+
+    return from(client.command('encryptwallet', password))
+  }
+
+	/**
+	 * Encrypts the wallet with a passphrase.
+   *
+	 * @memberof RpcService
+	 */
+  sendWalletPassword(password: string, timeoutSec: number) {
+    const client = getClientInstance()
+
+    return from(client.command('walletpassphrase', password, timeoutSec))
+  }
+
+
+	/**
+	 * Requests Resistance node running status and memory usage.
 	 *
 	 * @memberof RpcService
 	 */
@@ -317,20 +341,20 @@ export class RpcService {
 
 				if (Array.isArray(PublicAddressesResult)) {
 					const publicAddresses = PublicAddressesResult.map(tempValue => tempValue.address)
-					for (let index = 0; index < publicAddresses.length; index++) {
+					for (let index = 0; index < publicAddresses.length; index += 1) {
 						publicAddressResultSet.add(publicAddresses[index])
 					}
 				}
 
 				if (Array.isArray(PublicAddressesUnspendResult)) {
 					plainPublicUnspentAddresses = PublicAddressesUnspendResult.map(tempValue => tempValue.address)
-					for (let index = 0; index < plainPublicUnspentAddresses.length; index++) {
+					for (let index = 0; index < plainPublicUnspentAddresses.length; index += 1) {
 						publicAddressResultSet.add(plainPublicUnspentAddresses[index])
 					}
 				}
 
 				if (Array.isArray(privateAddressesResult)) {
-					for (let index = 0; index < privateAddressesResult.length; index++) {
+					for (let index = 0; index < privateAddressesResult.length; index += 1) {
 						privateAddressResultSet.add(privateAddressesResult[index])
 					}
 				}
@@ -358,7 +382,7 @@ export class RpcService {
 					const publicAddresses = []
 					const privateAddresses= []
 
-					for (let index = 0; index < addresses.length; index++) {
+					for (let index = 0; index < addresses.length; index += 1) {
 						const tempAddressItem = addresses[index];
 						if (tempAddressItem.address.startsWith('z')) {
 							privateAddresses.push(tempAddressItem)
@@ -491,14 +515,16 @@ export class RpcService {
 				}
 
 				const tempObj = {}
-				Object.keys(result.details[0]).reduce((objToReturn, key) => {
+				Object.keys(result.details[0]).reduce((accumulator, key) => {
+          const modified = { ...accumulator }
+
 					if (key === 'amount') {
-						objToReturn[`details[0].${key}`] = Decimal(result.details[0][`${key}`])
+						modified[`details[0].${key}`] = Decimal(result.details[0][`${key}`])
 					} else {
-						objToReturn[`details[0].${key}`] = result.details[0][`${key}`]
+						modified[`details[0].${key}`] = result.details[0][`${key}`]
 					}
 
-					return objToReturn
+					return modified
 				}, tempObj)
 
 				const detailResult = { ...result, amount: Decimal(result.amount), ...tempObj }
@@ -657,7 +683,7 @@ async function getPrivateTransactionsPromise(client: Client) {
 
   if (Array.isArray(privateAddresses) && privateAddresses.length > 0) {
     let queryResultWithAddressArr = []
-    for (let index = 0; index < privateAddresses.length; index++) {
+    for (let index = 0; index < privateAddresses.length; index += 1) {
       const tempAddress = privateAddresses[index];
 
       /* eslint-disable-next-line no-await-in-loop */
@@ -681,7 +707,7 @@ async function getPrivateTransactionsPromise(client: Client) {
 
     // At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`,
     // we need to get that info by viewing the detail of the transaction, and then put it back !
-    for (let index = 0; index < tempTransactionList.length; index++) {
+    for (let index = 0; index < tempTransactionList.length; index += 1) {
       const tempTransaction = tempTransactionList[index];
       /* eslint-disable-next-line no-await-in-loop */
       const transactionDetail = await client.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
@@ -716,7 +742,9 @@ function applyAddressBookNamesToTransactions(transactionsPromise) {
               return result
             }
 
-            result.transactions = result.transactions.map((transaction: Transaction) => {
+            const modified = { ...result }
+
+            modified.transactions = result.transactions.map((transaction: Transaction) => {
               const matchedRecord = (
                 addressBookRecords
                 .find(record => record.address === transaction.destinationAddress)
@@ -724,7 +752,7 @@ function applyAddressBookNamesToTransactions(transactionsPromise) {
               return matchedRecord ? ({ ...transaction, destinationAddress: matchedRecord.name }) : transaction
             })
 
-            return result
+            return modified
           })
         )
       }),

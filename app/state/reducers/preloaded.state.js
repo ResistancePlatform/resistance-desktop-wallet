@@ -3,7 +3,28 @@ import { Decimal } from 'decimal.js'
 
 
 export const preloadedState: State = {
-  roundedForm: {},
+  auth: {
+    isLoginRequired: true
+  },
+  roundedForm: {
+    getStartedChoosePassword: {
+      errors: {},
+      fields: {
+        password: '111111111',
+        confirmPassword: '111111111'
+      },
+      isValid: true
+    },
+    getStartedRestoreYourWallet: {
+      errors: {},
+      fields: {
+        backupFile: '/Users/negus/Documents/Untitled.wallet',
+        walletName: `wallet${Math.floor(Math.random() * 1000)}`,
+        walletPath: 'test'
+      },
+      isValid: true
+    }
+  },
   getStarted: {
     createNewWallet: {
       wallet: null
