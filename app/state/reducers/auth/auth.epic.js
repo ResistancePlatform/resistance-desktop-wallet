@@ -4,7 +4,7 @@ import { catchError, map, switchMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
-import { AUTH } from '~/constants'
+import { AUTH } from '~/constants/auth'
 import { RpcService } from '~/service/rpc-service'
 import { AuthActions } from './auth.reducer'
 import { RoundedFormActions } from '../rounded-form/rounded-form.reducer'
