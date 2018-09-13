@@ -15,12 +15,14 @@ const rpcService = new RpcService()
 const resistanceService = new ResistanceService()
 const osService = new OSService()
 
+// TODO: Get rid of the behaviour after the issue is fixed:
+// https://github.com/ResistancePlatform/resistance-core/issues/94
 function suppressRpcWarmupError(action, callable) {
-    if (action.payload.code !== -28) {
-      callable()
-    } else {
-      console.log(`Suppressing RPC initialization error display:`, action.payload)
-    }
+  if (action.payload.code !== -28 && action.payload.code !== 'ECONNREFUSED') {
+    callable()
+  } else {
+    console.log(`Suppressing RPC initialization error display:`, action.payload)
+  }
 }
 
 const getDaemonInfoEpic = (action$: ActionsObservable<Action>) => action$.pipe(
