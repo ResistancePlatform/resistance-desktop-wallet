@@ -4,15 +4,24 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
+import ValidateAddressService from '~/service/validate-address-service'
 import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 import { AddressBookActions, AddressBookState } from '~/state/reducers/address-book/address-book.reducer'
 
 import styles from './NewAddressDialog.scss'
 
+
+const validateAddress = new ValidateAddressService()
+
 const validationSchema = Joi.object().keys({
   name: Joi.string().required().label(`Name`),
-  address: Joi.string().required().min(35).max(95).label(`Address`)
+  address: (
+    validateAddress.getJoi()
+    .resistanceAddress()
+    .rZ().rLength().zLength().valid()
+    .required().label(`Address`)
+  )
 })
 
 type Props = {
