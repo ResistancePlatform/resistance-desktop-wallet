@@ -1,6 +1,6 @@
 // @flow
-import { of, merge } from 'rxjs'
-import { catchError, map, switchMap } from 'rxjs/operators'
+import { of, concat, merge } from 'rxjs'
+import { catchError, delay, map, switchMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
@@ -15,8 +15,19 @@ const submitPasswordEpic = (action$: ActionsObservable<Action>, state$) => actio
 	ofType(AuthActions.submitPassword),
   switchMap(() => {
     const loginForm = state$.value.roundedForm.authLogin
+
     const observable = rpc.sendWalletPassword(loginForm.fields.password, AUTH.sessionTimeoutSeconds).pipe(
-      switchMap(() => of(RoundedFormActions.clear('authLogin'), AuthActions.loginSucceeded())),
+      switchMap(() => {
+        const loginAfterTimeout = of(AuthActions.ensureLogin()).pipe(
+          delay((AUTH.sessionTimeoutSeconds - 2) * 1000)
+        )
+
+        return concat(
+          of(AuthActions.loginSucceeded()),
+          of(RoundedFormActions.clear('authLogin')),
+          loginAfterTimeout,
+        )
+      }),
       catchError(err => of(AuthActions.loginFailed(err.message)))
     )
     return observable
