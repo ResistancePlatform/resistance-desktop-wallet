@@ -203,13 +203,7 @@ export class OSService {
 
     const command = ChildProcessCommands[processName]
 
-    this.getPid(command).then(pid => {
-      if (pid) {
-        console.log(`Process ${processName} is already running, PID ${pid}`)
-        return this.killPid(pid)
-      }
-      return Promise.resolve()
-    }).then(() => {
+    this.killProcess(processName, () => {}).then(() => {
       let options
       let isUpdateFinished = false
       const commandPath = path.join(this.getBinariesPath(), command)
@@ -283,12 +277,13 @@ export class OSService {
    *
 	 * @param {string} processName
 	 * @param {function} customSuccessHandler
+   * @returns {Promise}
 	 * @memberof OSService
 	 */
   killProcess(processName: ChildProcessName, customSuccessHandler) {
     const actions = this.getSettingsActions()
 
-    this.getPid(ChildProcessCommands[processName]).then(pid => {
+    const promise = this.getPid(ChildProcessCommands[processName]).then(pid => {
       if (pid) {
         const childProcessInfo = remote.getGlobal('childProcesses')[processName]
         childProcessInfo.isGettingKilled = true
@@ -307,6 +302,7 @@ export class OSService {
       this.dispatchAction(actions.childProcessMurderFailed(processName, err.toString()))
     })
 
+    return promise
   }
 
 	/**

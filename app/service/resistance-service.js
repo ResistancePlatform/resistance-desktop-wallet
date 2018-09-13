@@ -95,7 +95,7 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
 	start(isTorEnabled: boolean) {
-    const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs
+    const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
 
     // TODO: support system wide wallet paths, stored in config.get('wallet.path')
     // https://github.com/ResistancePlatform/resistance-core/issues/84
@@ -109,7 +109,7 @@ export class ResistanceService {
       return Promise.resolve()
     }).catch(err => {
       const actions = osService.getSettingsActions()
-      this.dispatchAction(actions.childProcessFailed('NODE', err.toString()))
+      osService.dispatchAction(actions.childProcessFailed('NODE', err.toString()))
     })
 
 	}
@@ -120,7 +120,7 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
 	restart(isTorEnabled: boolean) {
-    const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs
+    const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
     osService.restartProcess('NODE', args)
 	}
 

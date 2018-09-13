@@ -29,14 +29,17 @@ export const GetStartedActions = createActions(
       GOT_GENERATED_WALLET: (wallet: Wallet) => wallet,
     },
 
-    ENCRYPT_WALLET: undefined,
-    AUTHENTICATE_AND_RESTORE_WALLET: undefined,
-    DISPLAY_HINT: (message: string) => ({ message }),
-    WALLET_BOOTSTRAPPING_SUCCEEDED: undefined,
-    WALLET_BOOTSTRAPPING_FAILED: (errorMessage: string) => ({ errorMessage }),
+    WELCOME: {
+      ENCRYPT_WALLET: undefined,
+      AUTHENTICATE_AND_RESTORE_WALLET: undefined,
 
-    APPLY_CONFIGURATION: undefined,
-    USE_RESISTANCE: undefined
+      DISPLAY_HINT: (message: string) => ({ message }),
+      WALLET_BOOTSTRAPPING_SUCCEEDED: undefined,
+      WALLET_BOOTSTRAPPING_FAILED: (errorMessage: string) => ({ errorMessage }),
+
+      APPLY_CONFIGURATION: undefined,
+      USE_RESISTANCE: undefined
+    }
   },
   {
     prefix: 'APP/GET_STARTED'
@@ -53,15 +56,15 @@ export const GetStartedReducer = handleActions(
       ...state,
       createNewWallet: { ...state.createNewWallet, wallet: action.payload }
     }),
-    [GetStartedActions.applyConfiguration]: state => ({
+    [GetStartedActions.welcome.applyConfiguration]: state => ({
       ...state,
       welcome: {
         ...state.welcome,
         isBootstrapping: true
       }
     }),
-    [GetStartedActions.useResistance]: state => ({ ...state, isInProgress: false }),
-    [GetStartedActions.displayHint]: (state, action) => ({
+    [GetStartedActions.welcome.useResistance]: state => ({ ...state, isInProgress: false }),
+    [GetStartedActions.welcome.displayHint]: (state, action) => ({
       ...state,
       welcome: {
         ...state.welcome,
@@ -69,7 +72,7 @@ export const GetStartedReducer = handleActions(
         status: 'info'
       }
     }),
-    [GetStartedActions.walletBootstrappingFailed]: (state, action) => ({
+    [GetStartedActions.welcome.walletBootstrappingFailed]: (state, action) => ({
       ...state,
       welcome: {
         ...state.welcome,
@@ -79,7 +82,7 @@ export const GetStartedReducer = handleActions(
         isReadyToUse: false
       }
     }),
-    [GetStartedActions.walletBootstrappingSucceeded]: state => ({
+    [GetStartedActions.welcome.walletBootstrappingSucceeded]: state => ({
       ...state,
       welcome: {
         ...state.welcome,

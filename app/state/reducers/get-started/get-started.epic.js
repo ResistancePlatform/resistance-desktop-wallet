@@ -19,7 +19,9 @@ import { SettingsActions } from '../settings/settings.reducer'
 const bip39 = new Bip39Service()
 const rpc = new RpcService()
 
-function getNodeStartObservable(emitActionOnStart: Action, action$: ActionsObservable<Action>): ActionsObservable<Action> {
+const WelcomeActions = GetStartedActions.welcome
+
+function getNodeStartedObservable(emitActionOnStart: Action, action$: ActionsObservable<Action>): ActionsObservable<Action> {
   const observable = race(
     action$.pipe(
       ofType(SettingsActions.childProcessStarted),
@@ -31,7 +33,7 @@ function getNodeStartObservable(emitActionOnStart: Action, action$: ActionsObser
       ofType(SettingsActions.childProcessFailed),
       filter(action => action.payload.processName === 'NODE'),
       take(1),
-      mapTo(GetStartedActions.walletBootstrappingFailed(`Unable to start Resistance local node, please try again or contact the support.`)),
+      mapTo(WelcomeActions.walletBootstrappingFailed(`Unable to start Resistance local node, please try again or contact the support.`)),
     )
   )
 
@@ -48,7 +50,7 @@ const generateWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 )
 
 const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(GetStartedActions.applyConfiguration),
+	ofType(WelcomeActions.applyConfiguration),
   switchMap(() => {
     const state = state$.value
 
@@ -64,9 +66,10 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
       path: form.fields.walletPath
     })
 
-    const nodeStartedObservable = getNodeStartObservable(GetStartedActions.encryptWallet(), action$)
+    const nodeStartedObservable = getNodeStartedObservable(WelcomeActions.encryptWallet(), action$)
+
     return concat(
-      of(GetStartedActions.displayHint(`Starting local Resistance node...`)),
+       of(WelcomeActions.displayHint(`Starting local Resistance node...`)),
       of(SettingsActions.startLocalNode()),
       nodeStartedObservable
     )
@@ -74,19 +77,19 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
 )
 
 const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(GetStartedActions.encryptWallet),
+	ofType(WelcomeActions.encryptWallet),
   switchMap(() => {
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
 
     // Wallet encryption shuts the node down, let's start it back up and trigger the next action
-    const nodeStartedObservable = getNodeStartObservable(GetStartedActions.authenticateAndRestoreWallet(), action$)
+    const nodeStartedObservable = getNodeStartedObservable(WelcomeActions.authenticateAndRestoreWallet(), action$)
 
     const nodeShutDownObservable = action$.pipe(
       ofType(SettingsActions.childProcessFailed),
       filter(action => action.payload.processName === 'NODE'),
       take(1),
       switchMap(() => concat(
-        of(GetStartedActions.displayHint(`Starting the local node and the miner...`)),
+        of(WelcomeActions.displayHint(`Starting the local node and the miner...`)),
         of(SettingsActions.kickOffChildProcesses()),
         nodeStartedObservable
       ))
@@ -94,15 +97,15 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
 
     const observable = rpc.encryptWallet(choosePasswordForm.fields.password).pipe(
       switchMap(() => nodeShutDownObservable),
-      catchError(err => of(GetStartedActions.walletBootstrappingFailed(err.toString())))
+      catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.toString())))
     )
 
-    return concat(of(GetStartedActions.displayHint(`Encrypting the wallet...`)), observable)
+    return concat(of(WelcomeActions.displayHint(`Encrypting the wallet...`)), observable)
   })
 )
 
 const authenticateAndRestoreWalletEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(GetStartedActions.authenticateAndRestoreWallet),
+	ofType(WelcomeActions.authenticateAndRestoreWallet),
   switchMap(() => {
     const state = state$.value.getStarted
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
@@ -111,12 +114,12 @@ const authenticateAndRestoreWalletEpic = (action$: ActionsObservable<Action>, st
       action$.pipe(
         ofType(SettingsActions.importWalletSuccess),
         take(1),
-        mapTo(GetStartedActions.walletBootstrappingSucceeded())
+        mapTo(WelcomeActions.walletBootstrappingSucceeded())
       ),
       action$.pipe(
         ofType(SettingsActions.importWalletFailure),
         take(1),
-        map(action => GetStartedActions.walletBootstrappingFailed(action.payload.errorMessage))
+        map(action => WelcomeActions.walletBootstrappingFailed(action.payload.errorMessage))
       )
     )
 
@@ -126,28 +129,28 @@ const authenticateAndRestoreWalletEpic = (action$: ActionsObservable<Action>, st
       const restoreForm = state$.value.roundedForm.getStartedRestoreYourWallet
       const keysFilePath = restoreForm.fields.backupFile
       nextObservables.push(
-        of(GetStartedActions.displayHint(`Restoring the wallet from the backup file...`)),
+        of(WelcomeActions.displayHint(`Restoring the wallet from the backup file...`)),
         of(SettingsActions.importWallet(keysFilePath)),
         importWalletObservable
       )
     } else {
-      nextObservables.push(of(GetStartedActions.walletBootstrappingSucceeded()))
+      nextObservables.push(of(WelcomeActions.walletBootstrappingSucceeded()))
     }
 
     const sendWalletObservable = rpc.sendWalletPassword(choosePasswordForm.fields.password, AUTH.sessionTimeoutSeconds).pipe(
       mergeMap(() => concat(...nextObservables)),
-      catchError(err => of(GetStartedActions.walletBootstrappingFailed(err.toString())))
+      catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.toString())))
     )
 
     return concat(
-      of(GetStartedActions.displayHint(`Sending the wallet password to the node...`)),
+      of(WelcomeActions.displayHint(`Sending the wallet password to the node...`)),
       sendWalletObservable
     )
   })
 )
 
 const walletBootstrappingSucceededEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-  ofType(GetStartedActions.walletBootstrappingSucceeded),
+  ofType(WelcomeActions.walletBootstrappingSucceeded),
   map(() => {
     config.set('getStartedInProgress', false)
     // Don't store the password in the state
@@ -156,7 +159,7 @@ const walletBootstrappingSucceededEpic = (action$: ActionsObservable<Action>) =>
 )
 
 const useResistanceEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(GetStartedActions.useResistance),
+	ofType(WelcomeActions.useResistance),
   mapTo(push('/overview'))
 )
 
