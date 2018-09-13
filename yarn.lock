@@ -5289,6 +5289,10 @@ hoist-non-react-statics@^2.3.0, hoist-non-react-statics@^2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.5.0.tgz#d2ca2dfc19c5a91c5a6615ce8e564ef0347e2a40"
 
+hoist-non-react-statics@^2.3.1:
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.5.5.tgz#c5903cf409c0dfd908f388e619d86b9c1174cb47"
+
 home-or-tmp@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/home-or-tmp/-/home-or-tmp-2.0.0.tgz#e36c3f2d2cae7d746a857e38d18d5f32a7882db8"
@@ -5332,6 +5336,12 @@ html-encoding-sniffer@^1.0.2:
 html-entities@^1.2.0:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-1.2.1.tgz#0df29351f0721163515dfb9e5543e5f6eed5162f"
+
+html-parse-stringify2@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/html-parse-stringify2/-/html-parse-stringify2-2.0.1.tgz#dc5670b7292ca158b7bc916c9a6735ac8872834a"
+  dependencies:
+    void-elements "^2.0.1"
 
 html-tags@^2.0.0:
   version "2.0.0"
@@ -5426,6 +5436,17 @@ husky@^0.14.3:
     is-ci "^1.0.10"
     normalize-path "^1.0.0"
     strip-indent "^2.0.0"
+
+i18next-node-fs-backend@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/i18next-node-fs-backend/-/i18next-node-fs-backend-2.1.0.tgz#b0ad55eb8671b4dedbd21fe434fb50e964a4ece2"
+  dependencies:
+    js-yaml "3.12.0"
+    json5 "2.0.0"
+
+i18next@^11.9.0:
+  version "11.9.0"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-11.9.0.tgz#c30c0a5e0a857124923a8dd1ce8f1df603e30c70"
 
 iconv-lite@0.4.19:
   version "0.4.19"
@@ -6409,16 +6430,16 @@ js-tokens@^3.0.0, js-tokens@^3.0.2:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
 
-js-yaml@^3.11.0, js-yaml@^3.4.3, js-yaml@^3.7.0, js-yaml@^3.9.0:
-  version "3.11.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.11.0.tgz#597c1a8bd57152f26d622ce4117851a51f5ebaef"
+js-yaml@3.12.0, js-yaml@^3.12.0:
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.12.0.tgz#eaed656ec8344f10f527c6bfa1b6e2244de167d1"
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
 
-js-yaml@^3.12.0:
-  version "3.12.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.12.0.tgz#eaed656ec8344f10f527c6bfa1b6e2244de167d1"
+js-yaml@^3.11.0, js-yaml@^3.4.3, js-yaml@^3.7.0, js-yaml@^3.9.0:
+  version "3.11.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.11.0.tgz#597c1a8bd57152f26d622ce4117851a51f5ebaef"
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
@@ -6554,6 +6575,12 @@ json-stringify-safe@~5.0.1:
 json3@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/json3/-/json3-3.3.2.tgz#3c0434743df93e2f5c42aee7b19bcb483575f4e1"
+
+json5@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/json5/-/json5-2.0.0.tgz#b61abf97aa178c4b5853a66cc8eecafd03045d78"
+  dependencies:
+    minimist "^1.2.0"
 
 json5@^0.5.0, json5@^0.5.1:
   version "0.5.1"
@@ -8870,6 +8897,14 @@ react-hot-loader@^4.2.0:
     prop-types "^15.6.1"
     react-lifecycles-compat "^3.0.4"
     shallowequal "^1.0.2"
+
+react-i18next@^7.12.0:
+  version "7.12.0"
+  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-7.12.0.tgz#edaed1593fdfb34ddb47e4faf409cb36c8220d80"
+  dependencies:
+    hoist-non-react-statics "^2.3.1"
+    html-parse-stringify2 "2.0.1"
+    prop-types "^15.6.0"
 
 react-is@^16.4.0:
   version "16.4.0"
@@ -11274,6 +11309,10 @@ vm-browserify@0.0.4:
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-0.0.4.tgz#5d7ea45bbef9e4a6ff65f95438e0a87c357d5a73"
   dependencies:
     indexof "0.0.1"
+
+void-elements@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-2.0.1.tgz#c066afb582bb1cb4128d60ea92392e94d5e9dbec"
 
 w3c-hr-time@^1.0.1:
   version "1.0.1"

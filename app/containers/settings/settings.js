@@ -3,22 +3,24 @@ import config from 'electron-settings'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { toastr } from 'react-redux-toastr'
+import { I18n, translate } from 'react-i18next'
 import { remote } from 'electron'
 import scrypt from 'scrypt-js'
 
-import RoundedInput, { RoundedInputAddon } from '../../components/rounded-form/RoundedInput'
+import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
 import styles from './settings.scss'
-import HLayout from '../../theme/h-box-layout.scss'
-import VLayout from '../../theme/v-box-layout.scss'
+import HLayout from '~/theme/h-box-layout.scss'
+import VLayout from '~/theme/v-box-layout.scss'
 
 import { appStore } from '~/state/store/configureStore'
 import { SystemInfoState } from '~/state/reducers/system-info/system-info.reducer'
 import { SettingsActions, SettingsState } from '~/state/reducers/settings/settings.reducer'
-import StatusModal from '../../components/settings/status-modal'
+import StatusModal from '~/components/settings/status-modal'
 
 const generator = require('generate-password')
 
 type Props = {
+  t: I18n,
   systemInfo: SystemInfoState,
 	settings: SettingsState
 }
@@ -320,6 +322,8 @@ class Settings extends Component<Props> {
 	 * @memberof Settings
 	 */
 	render() {
+    const { t } = this.props.t
+
 		const passwordAddon: RoundedInputAddon = {
 			enable: false,
 			type: 'TEXT_PLACEHOLDER',
@@ -336,13 +340,13 @@ class Settings extends Component<Props> {
             <StatusModal />
 
 						{/* Title bar */}
-						<div className={styles.titleBar}>Settings</div>
+						<div className={styles.titleBar}>{t(`Settings`)}</div>
 
 						{/* Old password */}
 						<RoundedInput
 							name="old-password"
               defaultValue={this.state.oldPassword}
-							label="Old Password"
+							label={t(`Old password`)}
 							addon={passwordAddon}
 							onChange={value => this.onOldPasswordInputChanged(value)}
               password
@@ -351,7 +355,7 @@ class Settings extends Component<Props> {
 						{/* New password */}
 						<RoundedInput
 							name="new-password"
-							label="New Password"
+							label={t(`New password`)}
 							addon={passwordAddon}
               value={this.state.newPassword}
 							onChange={value => this.onNewPasswordInputChanged(value)}
@@ -361,7 +365,7 @@ class Settings extends Component<Props> {
 						{/* Repeat password */}
 						<RoundedInput
 							name="repeat-password"
-							label="Repeat New Password"
+							label={t(`Repeat New Password`)}
 							addon={passwordAddon}
               value={this.state.repeatPassword}
 							onChange={value => this.onRepeatPasswordInputChanged(value)}
@@ -376,7 +380,7 @@ class Settings extends Component<Props> {
 							onKeyDown={async () => this.onSavePasswordClicked()}
               disabled={this.getSavePasswordButtonDisabledAttribute()}
 						>
-							Save Password
+              {t(`Save Password`)}
 						</button>
 
 						{/* Manage daemon */}
@@ -410,6 +414,7 @@ class Settings extends Component<Props> {
 									</div>
 
 									<div
+                    role="button"
 										className={this.getEnableMiningToggleButtonClasses()}
 										onClick={event => this.onEnableMiningToggleClicked(event)}
 										onKeyDown={event => this.onEnableMiningToggleClicked(event)}
@@ -428,6 +433,7 @@ class Settings extends Component<Props> {
 										Enable Tor
 									</div>
 									<div
+                    role="button"
 										title="Local node restart is required"
 										className={this.getEnableTorToggleButtonClasses()}
 										onClick={event => this.onEnableTorToggleClicked(event)}
@@ -479,4 +485,4 @@ const mapStateToProps = state => ({
 	settings: state.settings
 })
 
-export default connect(mapStateToProps, null)(Settings)
+export default connect(mapStateToProps, null)(translate()(Settings))

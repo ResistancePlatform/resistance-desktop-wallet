@@ -17,7 +17,6 @@ let instance = null
  * @class AddressBookService
  */
 export class AddressBookService {
-  addressBook: AddressBookRecord[]
 
 	/**
 	 * @memberof AddressBookService
