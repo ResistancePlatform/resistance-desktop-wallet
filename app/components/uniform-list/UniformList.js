@@ -9,6 +9,7 @@ import VLayout from '~/theme/v-box-layout.scss'
 type Props = {
   className?: string,
   emptyMessage?: string,
+  sortKeys?: string[],
   +items: object[],
   +headerRenderer: item => void,
   +rowRenderer: item => void
@@ -63,6 +64,25 @@ class UniformList extends Component<Props> {
 	/**
 	 * @memberof UniformList
 	 */
+  getSortedItems() {
+    if (!this.props.sortKeys || !this.props.sortKeys.length) {
+      return this.props.items
+    }
+
+    const key = this.props.sortKeys[0]
+
+    // TODO: implement properly #134
+    const sortedItems = this.props.items.slice(0).sort(
+      (record1, record2) => record1[key].toString().localeCompare(record2[key].toString())
+    )
+
+    return sortedItems
+  }
+
+
+	/**
+	 * @memberof UniformList
+	 */
   render() {
     return (
       <div className={classNames(styles.container, VLayout.vBoxChild, this.props.className)}>
@@ -70,7 +90,7 @@ class UniformList extends Component<Props> {
         {this.props.items.length > 0 && this.getHeader()}
 
         {this.props.items.length
-          ? this.props.items.map(item => this.applyColumnWidths(this.props.rowRenderer(item)))
+          ? this.getSortedItems().map(item => this.applyColumnWidths(this.props.rowRenderer(item)))
           : this.props.emptyMessage || `No data to display.`
         }
       </div>

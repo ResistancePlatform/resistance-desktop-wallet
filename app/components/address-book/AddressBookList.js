@@ -1,14 +1,13 @@
 // @flow
 import React, { Component } from 'react'
-import { AddressBookRecord } from '../../state/reducers/address-book/address-book.reducer'
+import { AddressBookRecord } from '~/state/reducers/address-book/address-book.reducer'
 
-import styles from './AddressBookList.scss'
-import HLayout from '../../theme/h-box-layout.scss'
-import VLayout from '../../theme/v-box-layout.scss'
+import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 
 type Props = {
-	records: AddressBookRecord[],
-	onRowClicked: (event: any, address: string) => void
+	items: AddressBookRecord[],
+	onRowClick?: () => void,
+	onRowContextMenu: (event: SyntheticEvent<any>, transactionId: string) => void
 }
 
 /**
@@ -19,59 +18,27 @@ type Props = {
 export default class AddressBookList extends Component<Props> {
 	props: Props
 
-	/**
-	 * @param {*} event
-	 * @param {AddressBookRow} addressBookRow
-	 * @returns
-	 * @memberof AddressBookList
-	 */
-	onContextMenu(event: any, addressBookRow: AddressBookRow) {
-		event.preventDefault()
-		window.getSelection().removeAllRanges()
-
-		if (this.props.onRowClicked) {
-			this.props.onRowClicked(event, addressBookRow)
-		}
-		return false
-	}
-
-	/**
-	 * @returns
-	 * @memberof AddressBookList
-	 */
-	renderList() {
-		if (!this.props.records.length) {
-			return (<div className={styles.hasNoDetail}>You don&#39;t have any contact address yet.</div>)
-		}
-
-    // Sort by name
-    const sortedRecords = this.props.records.slice(0).sort(
-      (record1, record2) => record1.name.localeCompare(record2.name)
+  getListHeaderRenderer() {
+    return(
+      <UniformListHeader>
+        <UniformListColumn width="10rem">Name</UniformListColumn>
+        <UniformListColumn>Address</UniformListColumn>
+      </UniformListHeader>
     )
+  }
 
-		const tableBody = sortedRecords.map((record, index) => (
-			<div
-				className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')}
-				key={index}
-				onContextMenu={e => this.onContextMenu(e, record)}
-			>
-				<div className={styles.tableBodyRowColumnName} >{record.name}</div>
-				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnValue].join(' ')}>{record.address}</div>
-			</div>
-		))
-
-		return (
-			<div className={[styles.tableContainer].join(' ')}>
-
-				<div className={[HLayout.hBoxContainer, styles.tableHeader].join(' ')}>
-					<div className={styles.tableHeaderColumnName}>Name</div>
-					<div className={[HLayout.hBoxChild, styles.tableHeaderColumnValue].join(' ')}>Address</div>
-				</div>
-
-				{tableBody}
-			</div>
-		)
-	}
+  getListRowRenderer(record: AddressBookRecord) {
+    return (
+      <UniformListRow
+        key={record.address}
+        onClick={e => this.props.onRowClick(e)}
+        onContextMenu={e => this.props.onRowContextMenu(e, record)}
+      >
+        <UniformListColumn>{record.name}</UniformListColumn>
+        <UniformListColumn>{record.address}</UniformListColumn>
+      </UniformListRow>
+    )
+  }
 
 	/**
 	 * @returns
@@ -79,9 +46,13 @@ export default class AddressBookList extends Component<Props> {
 	 */
 	render() {
 		return (
-			<div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.AddressBookListContainer].join(' ')}>
-				{this.renderList()}
-			</div>
+      <UniformList
+        items={this.props.items}
+        sortKeys={['name']}
+        headerRenderer={() => this.getListHeaderRenderer()}
+        rowRenderer={record => this.getListRowRenderer(record)}
+        emptyMessage="You don't have any address records yet."
+      />
 		)
 	}
 }
