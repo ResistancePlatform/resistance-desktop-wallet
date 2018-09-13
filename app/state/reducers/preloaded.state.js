@@ -11,8 +11,8 @@ export const preloadedState: State = {
     getStartedChoosePassword: {
       errors: {},
       fields: {
-        password: '111111111',
-        confirmPassword: '111111111'
+        password: '11111111',
+        confirmPassword: '11111111'
       },
       isValid: true
     },
@@ -33,6 +33,7 @@ export const preloadedState: State = {
     welcome: {
       hint: null,
       status: null,
+      isBootstrapping: false,
       isReadyToUse: false
     },
     isCreatingNewWallet: true,

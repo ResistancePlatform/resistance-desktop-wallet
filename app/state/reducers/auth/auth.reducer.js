@@ -29,5 +29,5 @@ export const AuthReducer = handleActions(
     }),
     [AuthActions.loginSucceeded]: state => ({
       ...state, isLoginRequired: false
-    }),
+    })
   }, preloadedState)

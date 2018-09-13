@@ -11,6 +11,7 @@ export type GetStartedState = {
   welcome: {
     hint: string | null,
     status: 'info' | 'success' | 'error' | null,
+    isBootstrapping: boolean,
     isReadyToUse: boolean
   },
   isCreatingNewWallet: boolean,
@@ -52,14 +53,20 @@ export const GetStartedReducer = handleActions(
       ...state,
       createNewWallet: { ...state.createNewWallet, wallet: action.payload }
     }),
+    [GetStartedActions.applyConfiguration]: state => ({
+      ...state,
+      welcome: {
+        ...state.welcome,
+        isBootstrapping: true
+      }
+    }),
     [GetStartedActions.useResistance]: state => ({ ...state, isInProgress: false }),
     [GetStartedActions.displayHint]: (state, action) => ({
       ...state,
       welcome: {
         ...state.welcome,
         hint: action.payload.message,
-        status: 'info',
-        isReadyToUse: false
+        status: 'info'
       }
     }),
     [GetStartedActions.walletBootstrappingFailed]: (state, action) => ({
@@ -68,6 +75,7 @@ export const GetStartedReducer = handleActions(
         ...state.welcome,
         hint: `Wallet bootstrapping has failed: ${action.payload.errorMessage}`,
         status: 'error',
+        isBootstrapping: false,
         isReadyToUse: false
       }
     }),
@@ -77,6 +85,7 @@ export const GetStartedReducer = handleActions(
         ...state.welcome,
         hint: `Success! Your wallet has been created`,
         status: 'success',
+        isBootstrapping: false,
         isReadyToUse: true
       }
     }),

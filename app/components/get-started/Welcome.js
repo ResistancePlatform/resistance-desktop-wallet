@@ -123,6 +123,7 @@ export class Welcome extends Component<Props> {
               type="button"
               onClick={this.props.actions.applyConfiguration}
               onKeyDown={this.props.actions.applyConfiguration}
+              disabled={this.props.welcome.isBootstrapping}
             >
               Apply configuration
             </button>
@@ -139,7 +140,7 @@ export class Welcome extends Component<Props> {
           }
         </div>
 
-        {!this.props.welcome.isReadyToUse &&
+        {!this.props.welcome.isReadyToUse && !this.props.welcome.isBootstrapping &&
         <NavLink className={styles.prevLink} to="/get-started/choose-password" />
         }
       </div>
