@@ -2,7 +2,7 @@
 import { remote } from 'electron'
 import React, { Component } from 'react'
 import { NavLink } from 'react-router-dom'
-import classNames from 'classnames'
+import cn from 'classnames'
 
 import { ResistanceService } from '~/service/resistance-service'
 import HLayout from '~/theme/h-box-layout.scss'
@@ -14,6 +14,7 @@ const resistance = new ResistanceService()
 type Props = {
   roundedForm: object,
   getStarted: object,
+  welcome: object,
   actions: object
 }
 
@@ -84,11 +85,11 @@ export class Welcome extends Component<Props> {
 	 */
 	render() {
 		return (
-      <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
+      <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
         <div className={styles.title}>Welcome to Resistance!</div>
 
-        <div className={classNames(styles.hint, styles.success)}>
-          Success! Your wallet has been created
+        <div className={cn(styles.hint, styles[this.props.welcome.status])}>
+          {this.props.welcome.hint || `Check the wallet configuration before applying`}
         </div>
 
         <div className={styles.welcomeContainer}>
@@ -117,16 +118,30 @@ export class Welcome extends Component<Props> {
             </li>
           </ul>
 
-          <button
-            type="button"
-            onClick={this.props.actions.useResistance}
-            onKeyDown={this.props.actions.useResistance}
-          >
-            Use Resistance
-          </button>
+          {!this.props.welcome.isReadyToUse &&
+            <button
+              type="button"
+              onClick={this.props.actions.applyConfiguration}
+              onKeyDown={this.props.actions.applyConfiguration}
+            >
+              Apply configuration
+            </button>
+          }
+
+          {this.props.welcome.isReadyToUse &&
+            <button
+              type="button"
+              onClick={this.props.actions.useResistance}
+              onKeyDown={this.props.actions.useResistance}
+            >
+              Use Resistance
+            </button>
+          }
         </div>
 
+        {!this.props.welcome.isReadyToUse &&
         <NavLink className={styles.prevLink} to="/get-started/choose-password" />
+        }
       </div>
     )
   }

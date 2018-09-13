@@ -8,6 +8,7 @@ import { push } from 'react-router-redux'
 import { toastr } from 'react-redux-toastr'
 
 import { Action } from '../types'
+import { AUTH } from '~/constants/auth'
 import { RpcService } from '~/service/rpc-service'
 import { Bip39Service } from '~/service/bip39-service'
 import { GetStartedActions } from './get-started.reducer'
@@ -46,15 +47,8 @@ const generateWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	map(result => GetStartedActions.createNewWallet.gotGeneratedWallet(result))
 )
 
-/* TODO: Handle errors and completion actions
- * https://github.com/ResistancePlatform/resistance-desktop-wallet/issues/136
- *
- * TODO: Add wallet creation / restoring with a mnemonic seed
- * https://github.com/ResistancePlatform/resistance-desktop-wallet/issues/128
- *
- */
-const useResistanceEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(GetStartedActions.useResistance),
+const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(GetStartedActions.applyConfiguration),
   switchMap(() => {
     const state = state$.value
 
@@ -71,7 +65,11 @@ const useResistanceEpic = (action$: ActionsObservable<Action>, state$) => action
     })
 
     const nodeStartedObservable = getNodeStartObservable(GetStartedActions.encryptWallet(), action$)
-    return concat(of(SettingsActions.startLocalNode()), of(push('/overview')), nodeStartedObservable)
+    return concat(
+      of(GetStartedActions.displayHint(`Starting local Resistance node...`)),
+      of(SettingsActions.startLocalNode()),
+      nodeStartedObservable
+    )
   })
 )
 
@@ -87,7 +85,11 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       ofType(SettingsActions.childProcessFailed),
       filter(action => action.payload.processName === 'NODE'),
       take(1),
-      switchMap(() => concat(of(SettingsActions.kickOffChildProcesses()), nodeStartedObservable))
+      switchMap(() => concat(
+        of(GetStartedActions.displayHint(`Starting the local node and the miner...`)),
+        of(SettingsActions.kickOffChildProcesses()),
+        nodeStartedObservable
+      ))
     )
 
     const observable = rpc.encryptWallet(choosePasswordForm.fields.password).pipe(
@@ -95,8 +97,7 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       catchError(err => of(GetStartedActions.walletBootstrappingFailed(err.toString())))
     )
 
-    return observable
-
+    return concat(of(GetStartedActions.displayHint(`Encrypting the wallet...`)), observable)
   })
 )
 
@@ -124,16 +125,24 @@ const authenticateAndRestoreWalletEpic = (action$: ActionsObservable<Action>, st
     if (!state.isCreatingNewWallet) {
       const restoreForm = state$.value.roundedForm.getStartedRestoreYourWallet
       const keysFilePath = restoreForm.fields.backupFile
-      nextObservable = concat(of(SettingsActions.importWallet(keysFilePath)), importWalletObservable)
+      nextObservable = concat(
+        of(GetStartedActions.displayHint(`Restoring the wallet from the backup file...`)),
+        of(SettingsActions.importWallet(keysFilePath)),
+        importWalletObservable
+      )
     } else {
       nextObservable = of(GetStartedActions.walletBootstrappingSucceeded())
     }
 
-    return rpc.sendWalletPassword(choosePasswordForm.fields.password, 1800).pipe(
+    const sendWalletObservable = rpc.sendWalletPassword(choosePasswordForm.fields.password, AUTH.sessionTimeoutSeconds).pipe(
       mergeMap(() => nextObservable),
       catchError(err => of(GetStartedActions.walletBootstrappingFailed(err.toString())))
     )
 
+    return concat(
+      of(GetStartedActions.displayHint(`Sending the wallet password to the node...`)),
+      sendWalletObservable
+    )
   })
 )
 
@@ -155,8 +164,14 @@ const walletBootstrappingFailedEpic = (action$: ActionsObservable<Action>) => ac
   })
 )
 
+const useResistanceEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(GetStartedActions.useResistance),
+  mapTo(push('/overview'))
+)
+
 export const GetStartedEpic = (action$, state$) => merge(
 	generateWalletEpic(action$, state$),
+	applyConfigurationEpic(action$, state$),
   encryptWalletEpic(action$, state$),
   authenticateAndRestoreWalletEpic(action$, state$),
   walletBootstrappingSucceededEpic(action$, state$),

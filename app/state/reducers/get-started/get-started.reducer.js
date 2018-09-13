@@ -8,8 +8,10 @@ export type GetStartedState = {
   createNewWallet: {
     wallet: Wallet | null
   },
-  welcome?: {
-    statusMessage: string
+  welcome: {
+    hint: string | null,
+    status: 'info' | 'success' | 'error' | null,
+    isReadyToUse: boolean
   },
   isCreatingNewWallet: boolean,
   isInProgress: boolean
@@ -26,13 +28,13 @@ export const GetStartedActions = createActions(
       GOT_GENERATED_WALLET: (wallet: Wallet) => wallet,
     },
 
-    WELCOME: {},
-
     ENCRYPT_WALLET: undefined,
     AUTHENTICATE_AND_RESTORE_WALLET: undefined,
+    DISPLAY_HINT: (message: string) => ({ message }),
     WALLET_BOOTSTRAPPING_SUCCEEDED: undefined,
     WALLET_BOOTSTRAPPING_FAILED: (errorMessage: string) => ({ errorMessage }),
 
+    APPLY_CONFIGURATION: undefined,
     USE_RESISTANCE: undefined
   },
   {
@@ -51,4 +53,31 @@ export const GetStartedReducer = handleActions(
       createNewWallet: { ...state.createNewWallet, wallet: action.payload }
     }),
     [GetStartedActions.useResistance]: state => ({ ...state, isInProgress: false }),
+    [GetStartedActions.displayHint]: (state, action) => ({
+      ...state,
+      welcome: {
+        ...state.welcome,
+        hint: action.payload.message,
+        status: 'info',
+        isReadyToUse: false
+      }
+    }),
+    [GetStartedActions.walletBootstrappingFailed]: (state, action) => ({
+      ...state,
+      welcome: {
+        ...state.welcome,
+        hint: `Wallet bootstrapping has failed: ${action.payload.errorMessage}`,
+        status: 'error',
+        isReadyToUse: false
+      }
+    }),
+    [GetStartedActions.walletBootstrappingSucceeded]: state => ({
+      ...state,
+      welcome: {
+        ...state.welcome,
+        hint: `Success! Your wallet has been created`,
+        status: 'success',
+        isReadyToUse: true
+      }
+    }),
   }, preloadedState)
