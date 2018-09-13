@@ -1,0 +1,20 @@
+{
+  "Settings": "Settings",
+  "Old password": "Old password",
+  "New password": "New password",
+  "Repeat new password": "Repeat new password",
+  "Save password": "Save password",
+  "MANAGE DAEMON": "MANAGE DAEMON",
+  "Stop local node": "Stop local node",
+  "On": "On",
+  "Manage wallet": "Manage wallet",
+  "Backup wallet": "Backup wallet",
+  "Restore wallet": "Restore wallet",
+  "Start local node": "Start local node",
+  "Manage daemon": "Manage daemon",
+  "Show status": "Show status",
+  "Enable Mining": "Enable Mining",
+  "Enable Tor": "Enable Tor",
+  "Local node restart is required": "Local node restart is required",
+  "Enable mining": "Enable mining"
+}

@@ -4,6 +4,7 @@ import { EOL } from 'os'
 import moment from 'moment'
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
+import { translate } from 'react-i18next'
 import classNames from 'classnames'
 import { toastr } from 'react-redux-toastr'
 
@@ -25,6 +26,7 @@ const blockchainInfoPollingInterval = 4.0
 const operationsPollingInterval = 3.0
 
 type Props = {
+  t: any,
 	systemInfo: SystemInfoState,
 	sendCash: SendCashState,
 	settings: SettingsState
@@ -108,7 +110,8 @@ class SystemInfo extends Component<Props> {
   }
 
   getWalletInFileManagerLabel() {
-    return osService.getOS() === 'windows' ? 'Wallet in Explorer' : 'Wallet in Finder';
+    const { t } = this.props
+    return osService.getOS() === 'windows' ? t(`Wallet in Explorer`) : t(`Wallet in Finder`)
   }
 
   onWalletInFileManagerClicked() {
@@ -122,7 +125,8 @@ class SystemInfo extends Component<Props> {
   }
 
 	displayLastBlockTime(tempDate: Date | null) {
-    return tempDate ?   moment().calendar(tempDate) : 'N/A'
+    const { t } = this.props
+    return tempDate ? moment().locale('eo').calendar(tempDate) : t(`N/A`)
 	}
 
   getMinerStatusIconTitle() {
@@ -195,6 +199,8 @@ class SystemInfo extends Component<Props> {
 	 * @memberof SystemInfo
 	 */
 	render() {
+    const { t } = this.props
+
 		return (
 			<div className={[styles.systemInfoContainer, HLayout.hBoxContainer].join(' ')}>
         <RpcPolling
@@ -229,21 +235,21 @@ class SystemInfo extends Component<Props> {
 
 					{ /* Resistance status coloumn */}
 					<div className={styles.statusColumnWrapper}>
-						<div className={styles.statusColoumnTitle}>RESISTANCE STATUS</div>
+						<div className={styles.statusColoumnTitle}>{t(`Resistance status`)}</div>
 						<div className={styles.statusColoumnValue}>
-              <span className={styles.nodeStatusContainer}><i className={this.getLocalNodeStatusClassNames()} /><span>{this.props.settings.childProcessesStatus.NODE}</span></span>
+              <span className={styles.nodeStatusContainer}><i className={this.getLocalNodeStatusClassNames()} /><span>{t(this.props.settings.childProcessesStatus.NODE)}</span></span>
 						</div>
 					</div>
 
 					{ /* Resistance status coloumn */}
 					<div className={styles.statusColumnWrapper}>
-						<div className={styles.statusColoumnTitle}>SYNCHRONIZED</div>
+						<div className={styles.statusColoumnTitle}>{t(`Synchronized`)}</div>
 						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockchainInfo.blockchainSynchronizedPercentage}%</div>
 					</div>
 
 					{ /* Resistance status coloumn */}
 					<div className={styles.statusColumnWrapper}>
-						<div className={styles.statusColoumnTitle}>UP TO</div>
+						<div className={styles.statusColoumnTitle}>{t(`Up to`)}</div>
 						<div className={styles.statusColoumnValue}>{this.displayLastBlockTime(this.props.systemInfo.blockchainInfo.lastBlockDate)}</div>
 					</div>
 
@@ -255,7 +261,7 @@ class SystemInfo extends Component<Props> {
 
 					{ /* Resistance status coloumn */}
 					<div className={styles.statusColumnWrapper}>
-						<div className={styles.statusColoumnTitle}>CONNECTIONS</div>
+						<div className={styles.statusColoumnTitle}>{t(`Connections`)}</div>
 						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockchainInfo.connectionCount}</div>
 					</div>
 
@@ -276,7 +282,7 @@ class SystemInfo extends Component<Props> {
             className={styles.installationFolderButton}
             onClick={event => this.onInstallationFolderClicked(event)}
           >
-            Installation Folder
+            {t(`Installation folder`)}
           </button>
         </div>
 
@@ -319,4 +325,4 @@ const mapStateToProps = (state: State) => ({
 	settings: state.settings
 })
 
-export default connect(mapStateToProps, null)(SystemInfo);
+export default connect(mapStateToProps, null)(translate('system-info')(SystemInfo))

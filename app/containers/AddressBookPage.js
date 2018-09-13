@@ -16,4 +16,4 @@ const mapDispatchToProps = dispatch => ({
   popupMenu: bindActionCreators(PopupMenuActions, dispatch)
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate()(AddressBook))
+export default connect(mapStateToProps, mapDispatchToProps)(translate('address-book')(AddressBook))

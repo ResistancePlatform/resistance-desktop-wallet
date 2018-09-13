@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react'
 import cn from 'classnames'
-import I18n from 'react-i18next'
 
 import { AddressBookState } from '~/state/reducers/address-book/address-book.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
@@ -15,7 +14,7 @@ import VLayout from '~/theme/v-box-layout.scss'
 const addressBookPopupMenuId = 'address-book-row-popup-menu-id'
 
 type Props = {
-  t: I18n,
+  t: any,
   actions: object,
   popupMenu: object,
 	addressBook: AddressBookState
@@ -36,7 +35,7 @@ export class AddressBook extends Component<Props> {
 	 * @returns
 	 */
 	render() {
-    const { t } = this.props.t
+    const { t } = this.props
 
 		return (
       /* Layout container */

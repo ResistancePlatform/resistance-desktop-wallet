@@ -10,10 +10,10 @@
  *
  * @flow
  */
-import * as fs from 'fs';
+import * as fs from 'fs'
 import path from 'path'
-
 import { app, BrowserWindow } from 'electron'
+import i18n from './i18n/i18next.config'
 
 import { OSService } from './service/os-service'
 import { ResistanceService } from './service/resistance-service'
@@ -90,6 +90,16 @@ app.on('ready', async () => {
   ) {
     await installExtensions()
   }
+
+  i18n.on('loaded', () => {
+    i18n.changeLanguage('eo')
+    i18n.off('loaded')
+  });
+
+  i18n.on('languageChanged', () => {
+    // menuFactoryService.buildMenu(app, win, i18n);
+    console.log('Not implemented')
+  })
 
   mainWindow = new BrowserWindow({
     minHeight: 728,

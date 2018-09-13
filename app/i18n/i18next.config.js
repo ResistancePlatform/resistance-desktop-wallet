@@ -1,6 +1,6 @@
 import i18n from 'i18next'
 import { reactI18nextModule } from 'react-i18next'
-import { i18nextBackend } from 'i18next-node-fs-backend'
+import i18nextBackend from 'i18next-node-fs-backend'
 
 const i18nextOptions = {
   backend:{
@@ -11,14 +11,15 @@ const i18nextOptions = {
   interpolation: {
     escapeValue: false
   },
+  debug: true,
   saveMissing: true,
   fallbackLng: 'en',
   whitelist: ['en', 'ko', 'eo'],
+  ns: ['settings', 'system-info', 'validation'],
   react: {
     wait: true,
     bindI18n: 'languageChanged loaded',
     bindStore: 'added removed',
-    nsMode: 'default'
   }
 };
 

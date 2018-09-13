@@ -1,0 +1,16 @@
+{
+  "Settings": "Agordoj",
+  "Old password": "Malnova pasvorto",
+  "New password": "Nova pasvorto",
+  "Repeat new password": "Ripetu la pasvorton",
+  "Save password": "Konservi la pasvorton",
+  "Manage daemon": "Administri demonon",
+  "Show status": "Montri staton",
+  "Enable mining": "Ŝalti minadon",
+  "On": "Jes",
+  "Off": "Ne",
+  "Enable Tor": "Ŝalti Toron",
+  "Manage wallet": "Administri monujon",
+  "Backup wallet": "Rezervi monujon",
+  "Restore wallet": "Restaŭri monujon"
+}

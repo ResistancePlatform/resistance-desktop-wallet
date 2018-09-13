@@ -3,7 +3,7 @@ import config from 'electron-settings'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { toastr } from 'react-redux-toastr'
-import { I18n, translate } from 'react-i18next'
+import { translate } from 'react-i18next'
 import { remote } from 'electron'
 import scrypt from 'scrypt-js'
 
@@ -20,7 +20,7 @@ import StatusModal from '~/components/settings/status-modal'
 const generator = require('generate-password')
 
 type Props = {
-  t: I18n,
+  t: any,
   systemInfo: SystemInfoState,
 	settings: SettingsState
 }
@@ -46,6 +46,8 @@ class Settings extends Component<Props> {
   constructor(props) {
     super(props)
     this.state = {}
+    console.log(this.props.i18n)
+    this.props.i18n.changeLanguage('eo')
   }
 
 	/**
@@ -86,9 +88,10 @@ class Settings extends Component<Props> {
   }
 
   getStartStopLocalNodeButtonLabel() {
+    const { t } = this.props
     const nodeStatus = this.props.settings.childProcessesStatus.NODE
     const startStatuses = ['NOT RUNNING', 'STARTING', 'FAILED']
-    return startStatuses.indexOf(nodeStatus) !== -1 ? 'Start Local Node' : 'Stop Local Node'
+    return startStatuses.indexOf(nodeStatus) !== -1 ? t(`Start local node`) : t(`Stop local node`)
   }
 
 	getToggleButtonClasses(on) {
@@ -132,6 +135,7 @@ class Settings extends Component<Props> {
 	 * @memberof Settings
 	 */
 	async onSavePasswordClicked() {
+    const { t } = this.props
     const passwordHash = config.get('password.hash')
 
     if (passwordHash) {
@@ -142,7 +146,7 @@ class Settings extends Component<Props> {
       }
 
       if (oldPasswordHash.toString() !== passwordHash.toString()) {
-        toastr.error(`Old password doesn't match.`)
+        toastr.error(t(`Old password doesn't match.`))
         return false
       }
     }
@@ -160,7 +164,7 @@ class Settings extends Component<Props> {
     })
 
     this.setState({ oldPassword: '' })
-    toastr.success(`Password saved successfully.`)
+    toastr.success(t(`Password saved successfully.`))
 
     return false
 	}
@@ -171,7 +175,7 @@ class Settings extends Component<Props> {
     const promise = new Promise(resolve => {
       scrypt(Buffer.from(password), Buffer.from(salt), 16384, 8, 1, 64, (error, progress, key) => {
         if (error) {
-          toastr.error(`Password hash generation failed`, error.toString())
+          toastr.error(t(`Password hash generation failed`), error.toString())
           resolve(null)
         } else if (key) {
           resolve(key)
@@ -276,20 +280,22 @@ class Settings extends Component<Props> {
 	 * @memberof Settings
 	 */
 	onBackupWalletClicked() {
+    const { t } = this.props
+
     const onSaveHandler = (filePath) => {
       if (filePath) {
         appStore.dispatch(SettingsActions.exportWallet(filePath))
       }
     }
 
-    const title = `Backup Resistance wallet to a file`
+    const title = t(`Backup Resistance wallet to a file`)
 
     remote.dialog.showSaveDialog({
       title,
       defaultPath: remote.app.getPath('documents'),
       message: title,
-      nameFieldLabel: `File name:`,
-      filters: [{ name: `Text files`,  extensions: ['wallet'] }]
+      nameFieldLabel: t(`File name:`),
+      filters: [{ name: t(`Text files`),  extensions: ['wallet'] }]
     }, onSaveHandler)
 
     return false
@@ -306,12 +312,12 @@ class Settings extends Component<Props> {
       }
     }
 
-    const title = `Restore Resistance wallet from a file`
+    const title = t(`Restore Resistance wallet from a file`)
     remote.dialog.showOpenDialog({
       title,
       defaultPath: remote.app.getPath('documents'),
       message: title,
-      filters: [{ name: `Text files`,  extensions: ['wallet'] }]
+      filters: [{ name: t(`Text files`),  extensions: ['wallet'] }]
     }, onOpenHandler)
 
     return false
@@ -322,7 +328,7 @@ class Settings extends Component<Props> {
 	 * @memberof Settings
 	 */
 	render() {
-    const { t } = this.props.t
+    const { t } = this.props
 
 		const passwordAddon: RoundedInputAddon = {
 			enable: false,
@@ -365,7 +371,7 @@ class Settings extends Component<Props> {
 						{/* Repeat password */}
 						<RoundedInput
 							name="repeat-password"
-							label={t(`Repeat New Password`)}
+							label={t(`Repeat new password`)}
 							addon={passwordAddon}
               value={this.state.repeatPassword}
 							onChange={value => this.onRepeatPasswordInputChanged(value)}
@@ -380,12 +386,12 @@ class Settings extends Component<Props> {
 							onKeyDown={async () => this.onSavePasswordClicked()}
               disabled={this.getSavePasswordButtonDisabledAttribute()}
 						>
-              {t(`Save Password`)}
+              {t(`Save password`)}
 						</button>
 
 						{/* Manage daemon */}
 						<div className={styles.manageDaemonContainer}>
-							<div className={styles.manageDaemonTitle}>MANAGE DAEMON</div>
+							<div className={styles.manageDaemonTitle}>{t(`Manage daemon`)}</div>
 
 							<div className={styles.manageDaemonBody}>
 								<button
@@ -404,13 +410,13 @@ class Settings extends Component<Props> {
 									onClick={event => this.onShowStatusClicked(event)}
 									onKeyDown={event => this.onShowStatusClicked(event)}
 								>
-									SHOW STATUS
+                  {t(`Show status`)}
 								</button>
 
 								{/* Enable Mining toggle */}
 								<div className={styles.toggleButtonContainer}>
 									<div className={styles.toggleButtonContainerTitle}>
-										Enable Mining
+                    {t(`Enable mining`)}
 									</div>
 
 									<div
@@ -422,7 +428,7 @@ class Settings extends Component<Props> {
 									>
 										<div className={styles.toggleButtonSwitcher} />
 										<div className={styles.toggleButtonText}>
-											{this.props.settings.isMinerEnabled ? 'On' : 'Off'}
+											{this.props.settings.isMinerEnabled ? t(`On`) : t(`Off`)}
 										</div>
 									</div>
 								</div>
@@ -430,11 +436,11 @@ class Settings extends Component<Props> {
 								{/* Enable Tor toggle */}
 								<div className={styles.toggleButtonContainer} style={{ paddingLeft: '5rem' }}>
 									<div className={styles.toggleButtonContainerTitle}>
-										Enable Tor
+                    {t(`Enable Tor`)}
 									</div>
 									<div
                     role="button"
-										title="Local node restart is required"
+										title={t(`Local node restart is required`)}
 										className={this.getEnableTorToggleButtonClasses()}
 										onClick={event => this.onEnableTorToggleClicked(event)}
 										onKeyDown={event => this.onEnableTorToggleClicked(event)}
@@ -442,7 +448,7 @@ class Settings extends Component<Props> {
 									>
 										<div className={styles.toggleButtonSwitcher} />
 										<div className={styles.toggleButtonText}>
-											{this.props.settings.isTorEnabled ? 'On' : 'Off'}
+											{this.props.settings.isTorEnabled ? t(`On`) : t(`Off`)}
 										</div>
 									</div>
 								</div>
@@ -451,7 +457,7 @@ class Settings extends Component<Props> {
 
 						{/* Manage wallet */}
 						<div className={styles.manageWalletContainer}>
-							<div className={styles.manageWalletTitle}>MANAGE WALLET</div>
+							<div className={styles.manageWalletTitle}>{t(`Manage wallet`)}</div>
 
 							<button
                 type="button"
@@ -460,7 +466,7 @@ class Settings extends Component<Props> {
 								onKeyDown={event => this.onBackupWalletClicked(event)}
                 disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
 							>
-								Backup Wallet
+                {t(`Backup wallet`)}
 							</button>
 
 							<button
@@ -470,7 +476,7 @@ class Settings extends Component<Props> {
 								onKeyDown={event => this.onRestoreWalletClicked(event)}
                 disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
 							>
-								Restore Wallet
+                {t(`Restore wallet`)}
 							</button>
 						</div>
 					</div>
@@ -485,4 +491,4 @@ const mapStateToProps = state => ({
 	settings: state.settings
 })
 
-export default connect(mapStateToProps, null)(translate()(Settings))
+export default connect(mapStateToProps, null)(translate('settings')(Settings))
