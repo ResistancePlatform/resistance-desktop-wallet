@@ -1,5 +1,5 @@
 // @flow
-import * as fs from 'fs';
+import * as fs from 'fs'
 import path from 'path'
 import config from 'electron-settings'
 
@@ -79,7 +79,7 @@ export class FetchParametersService {
       return true
     }
 
-    for (let index = 0; index < sproutFiles.length; index++) {
+    for (let index = 0; index < sproutFiles.length; index += 1) {
       const fileName = sproutFiles[index].name
       let isVerified = false
 
@@ -113,7 +113,7 @@ export class FetchParametersService {
       fs.mkdirSync(resistanceParamsFolder)
     }
 
-    for (let index = 0; index < sproutFiles.length; index++) {
+    for (let index = 0; index < sproutFiles.length; index += 1) {
       this.progressBar = this.createProgressBar()
 
       const fileName = sproutFiles[index].name

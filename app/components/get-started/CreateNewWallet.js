@@ -5,9 +5,9 @@ import { NavLink } from 'react-router-dom'
 import classNames from 'classnames'
 import * as Joi from 'joi'
 
+import { getWalletNameJoi } from '~/utils/get-started'
 import { ResistanceService } from '~/service/resistance-service'
 import RoundedInput from '~/components/rounded-form/RoundedInput'
-import RoundedTextArea from '~/components/rounded-form/RoundedTextArea'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
 import HLayout from '~/theme/h-box-layout.scss'
@@ -17,7 +17,7 @@ import styles from './GetStarted.scss'
 const resistance = new ResistanceService()
 
 const validationSchema = Joi.object().keys({
-  walletName: Joi.string().required().label(`Wallet name`),
+  walletName: getWalletNameJoi().walletName().fileDoesntExist(Joi.ref('walletPath')).required().label(`Wallet name`),
   walletPath: Joi.string().required().label(`Wallet path`)
 })
 

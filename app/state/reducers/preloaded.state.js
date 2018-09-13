@@ -7,25 +7,7 @@ export const preloadedState: State = {
     reason: null,
     isLoginRequired: true
   },
-  roundedForm: {
-    getStartedChoosePassword: {
-      errors: {},
-      fields: {
-        password: '11111111',
-        confirmPassword: '11111111'
-      },
-      isValid: true
-    },
-    getStartedRestoreYourWallet: {
-      errors: {},
-      fields: {
-        backupFile: '/Users/negus/Documents/Untitled.wallet',
-        walletName: `wallet${Math.floor(Math.random() * 1000)}`,
-        walletPath: 'test'
-      },
-      isValid: true
-    }
-  },
+  roundedForm: {},
   getStarted: {
     createNewWallet: {
       wallet: null
