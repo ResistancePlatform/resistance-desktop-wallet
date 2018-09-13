@@ -67,7 +67,7 @@ class UniformList extends Component<Props> {
     return (
       <div className={classNames(styles.container, VLayout.vBoxChild, this.props.className)}>
 
-        {this.getHeader()}
+        {this.props.items.length > 0 && this.getHeader()}
 
         {this.props.items.length
           ? this.props.items.map(item => this.applyColumnWidths(this.props.rowRenderer(item)))
