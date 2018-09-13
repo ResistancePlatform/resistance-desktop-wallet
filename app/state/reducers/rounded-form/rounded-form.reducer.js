@@ -16,6 +16,7 @@ export type RoundedFormState = { [string]: RoundedFormRoot }
 
 export const RoundedFormActions = createActions(
 	{
+    CLEAR: (formId: string) => ({ formId }),
     UPDATE_FIELDS: (formId: string, fields: object, isValid: boolean = true) => ({ formId, fields, isValid }),
     UPDATE_FIELD: (formId: string, field: string, value: string) => ({ formId, field, value }),
     UPDATE_ERRORS: (formId: string, errors: ValidationErrors, isValid: boolean) => ({ formId, errors, isValid })
@@ -26,6 +27,14 @@ export const RoundedFormActions = createActions(
 )
 
 export const RoundedFormReducer = handleActions({
+  [RoundedFormActions.clear]: (state, action) => ({
+    ...state,
+    [action.payload.formId]: {
+      fields: {},
+      errors: {},
+      isValid: false
+    }
+  }),
   [RoundedFormActions.updateFields]: (state, action) => ({
     ...state,
     [action.payload.formId]: {

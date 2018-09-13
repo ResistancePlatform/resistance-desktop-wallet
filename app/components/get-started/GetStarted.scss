@@ -53,6 +53,10 @@
   font-size: 0.9rem;
   padding-bottom: 3.2rem;
 
+  &.info {
+    color: $BASE_COLOR_INFO;
+  }
+
   &.success {
     color: $BASE_COLOR_SUCCESS;
   }
@@ -64,6 +68,10 @@
     position: relative;
     top: 2px;
     left: -0.8rem;
+  }
+
+  &.error {
+    color: $BASE_COLOR_ERROR;
   }
 }
 

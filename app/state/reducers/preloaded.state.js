@@ -3,10 +3,20 @@ import { Decimal } from 'decimal.js'
 
 
 export const preloadedState: State = {
+  auth: {
+    reason: null,
+    isLoginRequired: true
+  },
   roundedForm: {},
   getStarted: {
     createNewWallet: {
       wallet: null
+    },
+    welcome: {
+      hint: null,
+      status: null,
+      isBootstrapping: false,
+      isReadyToUse: false
     },
     isCreatingNewWallet: true,
     isInProgress: true

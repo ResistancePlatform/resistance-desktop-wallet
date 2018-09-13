@@ -2,16 +2,16 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
-import classNames from 'classnames'
+import cn from 'classnames'
 
 import { GetStartedPage, RestoreYourWalletPage } from './GetStartedPage'
-
 import CreateNewWalletPage from './get-started/CreateNewWalletPage'
 import ChoosePasswordPage from './get-started/ChoosePasswordPage'
 import WelcomePage from './get-started/WelcomePage'
 
+import Login from '~/components/auth/Login'
+import TitleBarButtons from '~/components/title-bar-buttons/TitleBarButtons'
 import NaviBar from './navigation/navi-bar'
-import TitleBarButtons from '../components/title-bar-buttons/TitleBarButtons'
 import SystemInfo from './system-info/system-info'
 import Overview from './overview/overview'
 import OwnAddress from './own-addresses/own-addresses'
@@ -20,14 +20,16 @@ import Settings from './settings/settings'
 import AddressBookPage from './AddressBookPage'
 
 import { appStore } from '../state/store/configureStore'
-import { GetStartedState } from '../state/reducers/get-started/get-started.reducer'
-import { SettingsActions } from '../state/reducers/settings/settings.reducer'
+import { AuthState } from '~/state/reducers/auth/auth.reducer'
+import { GetStartedState } from '~/state/reducers/get-started/get-started.reducer'
+import { SettingsActions } from '~/state/reducers/settings/settings.reducer'
 
 import styles from './App.scss'
 import HLayout from '../theme/h-box-layout.scss'
 import VLayout from '../theme/v-box-layout.scss'
 
 type Props = {
+  auth: AuthState,
   getStarted: GetStartedState
 }
 
@@ -52,14 +54,8 @@ class App extends React.Component<Props> {
     }
   }
 
-	/**
-   * Renders routes.
-   *
-	 * @returns
-   * @memberof App
-	 */
-	render() {
-    const getStartedElement = (
+  getGetStartedContent() {
+    return (
       <div className={[styles.contentContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
         <TitleBarButtons />
         <div className={[styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer].join(' ')}>
@@ -74,16 +70,18 @@ class App extends React.Component<Props> {
         </div>
       </div>
     )
+  }
 
-    const mainElement = (
-      <div className={classNames(styles.contentContainer, VLayout.vBoxContainer)}>
+  getMainContent() {
+    return (
+      <div className={cn(styles.contentContainer, VLayout.vBoxContainer)}>
 				{ /* Content container */}
 				<div className={[VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
           <TitleBarButtons />
 					<NaviBar />
 
 					{ /* Route content container */}
-					<div className={[styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer].join(' ')}>
+					<div className={cn(styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer)}>
 						<Switch>
 							<Route exact path="/overview" component={Overview} />
 							<Route exact path="/own-addresses" component={OwnAddress} />
@@ -95,14 +93,31 @@ class App extends React.Component<Props> {
 					</div>
 				</div>
 
-				{ /* System info bar */}
 				<SystemInfo />
       </div>
     )
+  }
+
+	/**
+   * Renders routes.
+   *
+	 * @returns
+   * @memberof App
+	 */
+	render() {
+    let content
+
+    if (this.props.getStarted.isInProgress) {
+      content = this.getGetStartedContent()
+    } else {
+      content = this.props.auth.isLoginRequired ? (
+        <Login />
+      ) : this.getMainContent()
+    }
 
 		return (
 			<div id="App" className={[styles.appContainer, VLayout.vBoxContainer].join(' ')}>
-        {this.props.getStarted.isInProgress ? getStartedElement : mainElement }
+        {content}
 			</div>
 		)
 	}
