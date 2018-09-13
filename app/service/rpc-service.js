@@ -6,7 +6,7 @@ import { Decimal } from 'decimal.js'
 import { v4 as uuid } from 'uuid'
 import { remote } from 'electron'
 import Client from 'bitcoin-core'
-import { from, Observable, of } from 'rxjs'
+import { from, of, Observable } from 'rxjs'
 import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 

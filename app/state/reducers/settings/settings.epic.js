@@ -95,9 +95,13 @@ const disableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.p
   mapTo(SettingsActions.restartLocalNode())
 )
 
-const childProcessFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const childProcessFailedEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.childProcessFailed),
 	tap((action) => {
+    // At Get Started stage the message is suppressed or displayed within a hint at Welcome page
+    if (state$.value.getStarted.isInProgress && action.payload.processName === 'NODE') {
+      return
+    }
     const errorMessage =`Process ${action.payload.processName} has failed.\n${action.payload.errorMessage}`
     toastr.error(`Child process failure`, errorMessage)
   }),
@@ -153,19 +157,27 @@ const importWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   mapTo(SettingsActions.empty())
 )
 
-const importWalletSuccessEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const importWalletSuccessEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.importWalletSuccess),
 	tap(() => {
-    toastr.info(`Wallet restored successfully`,
-                `It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`)
+    // TODO: Replace actions dispatching with observables in the RPC service #114
+    if (!state$.value.getStarted.isInProgress) {
+      toastr.info(
+        `Wallet restored successfully`,
+        `It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`
+      )
+    }
   }),
   mapTo(SettingsActions.empty())
 )
 
-const importWalletFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const importWalletFailureEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.importWalletFailure),
 	tap((action) => {
-    toastr.error(`Unable to restore wallet`, action.payload.errorMessage)
+  // TODO: Replace actions dispatching with observables in the RPC service #114
+    if (!state$.value.getStarted.isInProgress) {
+      toastr.error(`Unable to restore wallet`, action.payload.errorMessage)
+    }
   }),
   mapTo(SettingsActions.empty())
 )
