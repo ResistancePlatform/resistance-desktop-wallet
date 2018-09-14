@@ -577,7 +577,7 @@ export class RpcService {
     const client = getClientInstance()
 
     const importFileName = uuid().replace(/-/g, '')
-    const importFilePath = path.join(process.cwd(), importFileName)
+    const importFilePath = path.join(this.resistanceService.getExportDir(), importFileName)
 
     const errorHandler = err => (
       this.osService.dispatchAction(SettingsActions.importWalletFailure(err.toString()))
