@@ -553,7 +553,6 @@ export class RpcService {
 
     const exportFileName = uuid().replace(/-/g, '')
     const exportFilePath = path.join(this.resistanceService.getExportDir(), exportFileName)
-
     const commandPromise = client.command('z_exportwallet', exportFileName)
 
     commandPromise.then((result) => {
@@ -588,7 +587,7 @@ export class RpcService {
         return errorHandler(err)
       }
 
-      client.command('z_importwallet', importFileName).then(() => (
+      client.command('z_importwallet', importFilePath).then(() => (
         this.osService.dispatchAction(SettingsActions.importWalletSuccess())
       )).catch(errorHandler).then(() => (
         promisify(fs.unlink)(importFilePath)
