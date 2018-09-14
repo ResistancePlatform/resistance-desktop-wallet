@@ -41,12 +41,15 @@ export default class RoundedInput extends Component<Props> {
 	props: Props
   state: State
 
+  static get displayName() { return 'RoundedInput' }
+
 	/**
 	 * @param {*} props
 	 * @memberof RoundedInput
 	 */
 	constructor(props) {
 		super(props)
+
     this.state = {
       value: props.defaultValue || '',
       isFocused: false

@@ -1,5 +1,5 @@
 {
-  "name": "electron-react-boilerplate",
+  "name": "resistance-desktop-wallet",
   "productName": "ResistanceWallet",
   "version": "0.13.3",
   "description": "Resistance cross-platform desktop wallet",
@@ -85,7 +85,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chentsulin/electron-react-boilerplate.git"
+    "url": "git+https://github.com/ResistancePlatform/resistance-desktop-wallet.git"
   },
   "author": {
     "name": "C. T. Lin",
@@ -94,18 +94,13 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chentsulin/electron-react-boilerplate/issues"
+    "url": "https://github.com/ResistancePlatform/resistance-desktop-wallet/issues"
   },
   "keywords": [
-    "electron",
-    "boilerplate",
-    "react",
-    "redux",
-    "flow",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
+    "resistance",
+    "wallet",
+    "cryptocurrency",
+    "boinc"
   ],
   "homepage": "https://github.com/chentsulin/electron-react-boilerplate#readme",
   "jest": {
