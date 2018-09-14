@@ -140,7 +140,7 @@ export class OSService {
 		if (/[\\/](Electron\.app|Electron|Electron\.exe)[\\/]/i.test(process.execPath)) {
 			resourcesPath = process.cwd()
 		} else {
-			[resourcesPath] = process.resourcesPath
+      ({ resourcesPath } = process)
 		}
 
 		return path.join(resourcesPath, 'bin', this.getOS())

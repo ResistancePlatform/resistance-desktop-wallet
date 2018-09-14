@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react'
-import classNames from 'classnames'
+import cn from 'classnames'
 
 import styles from './UniformList.scss'
 
@@ -13,12 +13,14 @@ type Props = {
 export default class UniformListColumn extends Component<Props> {
 	props: Props
 
+  static get displayName() { return 'UniformListColumn' }
+
 	/**
 	 * @memberof UniformListColumn
 	 */
   render() {
     return (
-      <div className={classNames(styles.column, this.props.className)} style={{ width: this.props.width }}>
+      <div className={cn(styles.column, this.props.className)} style={{ width: this.props.width }}>
         {this.props.children}
       </div>
     )

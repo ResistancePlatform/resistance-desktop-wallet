@@ -16,6 +16,8 @@ type Props = {
 export default class UniformListRow extends Component<Props> {
 	props: Props
 
+  static get displayName() { return 'UniformListRow' }
+
 	/**
 	 * @memberof UniformListRow
 	 */

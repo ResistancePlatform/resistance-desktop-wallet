@@ -124,21 +124,22 @@
   text-decoration: none;
 
   i {
-    font-family: 'custom-icons' !important;
+    font-family: 'icomoon' !important;
     -webkit-font-smoothing: antialiased;
     font-style: normal;
     font-weight: normal;
-    margin-top: 20px;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
     display: block;
     font-size: 140px;
   }
 
   .createNewWalletIcon:before {
-    content: "a";
+    content: "\e90f";
   }
 
   .restoreYourWalletIcon:before {
-    content: "b";
+    content: "\e910";
   }
 
 }

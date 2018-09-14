@@ -20,10 +20,11 @@ type State = {
   isFocused: boolean
 }
 
-
 export default class RoundedTextArea extends Component<Props> {
 	props: Props
   state: State
+
+  static get displayName() { return 'RoundedTextArea' }
 
 	/**
 	 * @param {*} props
