@@ -12,7 +12,7 @@ const ProgressBar = require('electron-progressbar')
 const quickHashesConfigKey = 'resistanceParameters.quickHashes'
 const paramsFolderName = 'ResistanceParams'
 
-const sproutUrl = `https://s3.amazonaws.com/res-params`
+const sproutUrl = `https://d3idekp8vvpxdr.cloudfront.net`
 const sproutFiles = [
   { name: 'sprout-proving.key', checksum: "8bc20a7f013b2b58970cddd2e7ea028975c88ae7ceb9259a5344a16bc2c0eef7" },
   { name: 'sprout-verifying.key', checksum: "4bd498dae0aacfd8e98dc306338d017d9c08dd0918ead18172bd0aec2fc5df82" }
