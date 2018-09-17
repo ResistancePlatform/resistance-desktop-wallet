@@ -1,5 +1,5 @@
-import * as fs from 'fs'
-import * as chalk from 'chalk'
+const fs = require('fs')
+const chalk = require('chalk')
 
 module.exports = {
     options: {
@@ -14,10 +14,17 @@ module.exports = {
         },
         lngs: ['en','eo', 'ko'],
         ns: [
-            'locale',
-            'resource'
+          'get-started',
+          'overview',
+          'own-addresses',
+          'send-cash',
+          'settings',
+          'services',
+          'validation',
+          'menu',
+          'other'
         ],
-        defaultNs: 'resource',
+        defaultNs: 'other',
         defaultValue: '__STRING_NOT_TRANSLATED__',
         resource: {
             loadPath: 'i18n/{{lng}}/{{ns}}.json',

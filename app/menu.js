@@ -2,7 +2,7 @@
 import { app, Menu, shell, BrowserWindow } from 'electron'
 import i18n from './i18n/i18next.config'
 
-const t = i18n.getFixedT(null, 'get-started')
+const t = i18n.getFixedT(null, 'menu')
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow
