@@ -15,6 +15,8 @@ type Props = {
 
 export default class Root extends Component<Props> {
 	render() {
+    i18n.changeLanguage('eo')
+
 		return (
       <Provider store={this.props.store}>
         <I18nextProvider i18n={ i18n }>
