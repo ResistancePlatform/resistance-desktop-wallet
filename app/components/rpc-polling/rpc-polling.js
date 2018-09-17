@@ -4,9 +4,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { appStore } from '../../state/store/configureStore'
-import { SettingsState } from '../../state/reducers/settings/settings.reducer'
-import { RpcPollingActions, RpcPollingState } from '../../state/reducers/rpc-polling/rpc-polling.reducer'
+import { appStore } from '~/state/store/configureStore'
+import { SettingsState } from '~/state/reducers/settings/settings.reducer'
+import { RpcPollingActions, RpcPollingState } from '~/state/reducers/rpc-polling/rpc-polling.reducer'
 
 type ActionKind = 'polling' | 'success' | 'failure'
 
@@ -38,7 +38,7 @@ class RpcPolling extends Component<Props> {
 	 * @memberof RpcPolling
 	 */
 	componentDidMount() {
-    const actions = this.props.actions
+    const { actions } = this.props
     this.isActive = false
     appStore.dispatch(RpcPollingActions.registerActions(
       actions.polling.toString(), actions.success.toString(), actions.failure.toString()

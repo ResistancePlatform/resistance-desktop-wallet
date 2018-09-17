@@ -1,19 +1,21 @@
 // @flow
 import React, { Component } from 'react'
 import * as owasp from 'owasp-password-strength-test'
+import { translate } from 'react-i18next'
 
 import styles from './PasswordStrength.scss'
 
 type StrengthStatus = null | 'weak' | 'medium' | 'good' | 'excellent'
 
-const statusMessage: { [StrengthStatus]: string } = {
-  'weak': `Weak`,
-  'medium': `Medium`,
-  'good': `Good`,
-  'excellent': `Excellent`
-}
+const getStatusMessage = (t, status: StrengthStatus) => ({
+  'weak': t(`Weak`),
+  'medium': t(`Medium`),
+  'good': t(`Good`),
+  'excellent': t(`Excellent`)
+}[status])
 
 type Props = {
+  t: any,
   +password: string | undefined
 }
 
@@ -22,7 +24,7 @@ type State = {
   status: StrengthStatus
 }
 
-export default class PasswordStrength extends Component<Props> {
+class PasswordStrength extends Component<Props> {
 	props: Props
   state: State
 
@@ -67,12 +69,14 @@ export default class PasswordStrength extends Component<Props> {
 	 * @memberof PasswordStrength
 	 */
 	render() {
+    const { t } = this.props
+
 		return (
 			<div className={styles.container}>
         <div className={styles.strength}>
           Password strength
           <div className={styles[this.state.status]}>
-            {statusMessage[this.state.status] || ''}
+            {getStatusMessage(t, this.state.status) || ''}
           </div>
         </div>
         <div className={styles.progressBar}>
@@ -82,3 +86,5 @@ export default class PasswordStrength extends Component<Props> {
 		)
 	}
 }
+
+export default translate('get-started')(PasswordStrength)

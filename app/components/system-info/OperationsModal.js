@@ -2,8 +2,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Modal from 'react-modal'
+import { translate } from 'react-i18next'
 import moment from 'moment'
-import classNames from 'classnames'
+import cn from 'classnames'
 
 import 'react-tabs/style/react-tabs.scss'
 import { appStore } from '~/state/store/configureStore'
@@ -14,7 +15,16 @@ import humanizeOperationName from './humanize-operation'
 import styles from './OperationsModal.scss'
 
 
+const getStatusName = (t, status) => ({
+  'queued': t(`Queued`),
+  'executing': t(`Executing`),
+  'cancelled': t(`Cancelled`),
+  'failed': t(`Failed`),
+  'success': t(`Success`)
+}[status] || t(`Unknown`))
+
 type Props = {
+  t: any,
   systemInfo: SystemInfoState
 }
 
@@ -48,16 +58,18 @@ class OperationsModal extends Component<Props> {
   }
 
   getListRowRenderer(operation) {
+    const { t } = this.props
+
     return (
       <UniformListRow key={operation.id}>
         <UniformListColumn>
-          {humanizeOperationName(operation)}
+          {humanizeOperationName(t, operation)}
         </UniformListColumn>
         <UniformListColumn>
           {moment.unix(operation.creation_time).fromNow()}
         </UniformListColumn>
         <UniformListColumn>
-          <span className={classNames(styles.operationStatus, styles[operation.status])}>{operation.status}</span>
+          <span className={cn(styles.operationStatus, styles[operation.status])}>{getStatusName(t, operation.status)}</span>
         </UniformListColumn>
         <UniformListColumn>
           {operation.error && operation.error.message}
@@ -73,27 +85,31 @@ class OperationsModal extends Component<Props> {
   }
 
   getListHeaderRenderer() {
+    const { t } = this.props
+
     return (
       <UniformListHeader>
-        <UniformListColumn width="15%">Operation</UniformListColumn>
-        <UniformListColumn width="15%">Triggered</UniformListColumn>
-        <UniformListColumn width="10%">Status</UniformListColumn>
-        <UniformListColumn width="30%">Error</UniformListColumn>
-        <UniformListColumn width="10%">Amount</UniformListColumn>
-        <UniformListColumn width="10%">Fee</UniformListColumn>
+        <UniformListColumn width="15%">{t(`Operation`)}</UniformListColumn>
+        <UniformListColumn width="15%">{t(`Triggered`)}</UniformListColumn>
+        <UniformListColumn width="10%">{t(`Status`)}</UniformListColumn>
+        <UniformListColumn width="30%">{t(`Error`)}</UniformListColumn>
+        <UniformListColumn width="10%">{t(`Amount`)}</UniformListColumn>
+        <UniformListColumn width="10%">{t(`Fee`)}</UniformListColumn>
       </UniformListHeader>
     )
   }
 
   render() {
+    const { t } = this.props
+
     return (
       <Modal
         isOpen={this.props.systemInfo.isOperationsModalOpen}
         className={styles.operationsModal}
         overlayClassName={styles.modalOverlay}
-        contentLabel="Operations"
+        contentLabel={t(`Operations`)}
       >
-        <div className={classNames(styles.modalTitle)}>
+        <div className={cn(styles.modalTitle)}>
           <div
             role="button"
             tabIndex={0}
@@ -102,7 +118,8 @@ class OperationsModal extends Component<Props> {
             onKeyDown={event => this.onCloseClicked(event)}
           />
           <div className={styles.titleText}>
-            Operations {this.props.systemInfo.operations.length ? `(${this.props.systemInfo.operations.length})`: ``}
+            {t(`Operations`)}
+            {this.props.systemInfo.operations.length ? `(${this.props.systemInfo.operations.length})`: ``}
           </div>
         </div>
 
@@ -111,7 +128,7 @@ class OperationsModal extends Component<Props> {
             items={this.props.systemInfo.operations}
             headerRenderer={() => this.getListHeaderRenderer()}
             rowRenderer={operation => this.getListRowRenderer(operation)}
-            emptyMessage="No operations to display."
+            emptyMessage={t(`No operations to display.`)}
           />
         </div>
 
@@ -122,7 +139,7 @@ class OperationsModal extends Component<Props> {
             onClick={event => this.onClearCompletedClicked(event)}
             onKeyDown={event => this.onClearCompletedClicked(event)}
           >
-            Clear completed
+            {t(`Clear completed`)}
           </button>
           */}
 
@@ -132,7 +149,7 @@ class OperationsModal extends Component<Props> {
             onClick={event => this.onCloseClicked(event)}
             onKeyDown={event => this.onCloseClicked(event)}
           >
-            Close
+            {t(`Close`)}
           </button>
         </div>
 
@@ -145,4 +162,4 @@ const mapStateToProps = state => ({
   systemInfo: state.systemInfo
 })
 
-export default connect(mapStateToProps, null)(OperationsModal)
+export default connect(mapStateToProps, null)(translate('system-info')(OperationsModal))

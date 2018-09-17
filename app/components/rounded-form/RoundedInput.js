@@ -2,6 +2,7 @@
 import { clipboard, remote } from 'electron'
 import React, { Component } from 'react'
 import classNames from 'classnames'
+import { translate } from 'react-i18next'
 
 import styles from './RoundedInput.scss'
 
@@ -15,6 +16,7 @@ export type RoundedInputAddon = {
 }
 
 type Props = {
+  t: any,
 	name: string,
   className?: string,
   defaultValue?: string,
@@ -37,7 +39,7 @@ type State = {
   isFocused: boolean
 }
 
-export default class RoundedInput extends Component<Props> {
+class RoundedInput extends Component<Props> {
 	props: Props
   state: State
 
@@ -106,7 +108,7 @@ export default class RoundedInput extends Component<Props> {
 
     if (this.props.addon.type === 'CHOOSE_FILE') {
       const addonData = this.props.addon.data || {}
-      const title = addonData.title || `Choose a file`
+      const title = addonData.title || this.props.t(`Choose a file`)
 
       const callback = filePaths => {
         if (filePaths && filePaths.length) {
@@ -244,3 +246,5 @@ export default class RoundedInput extends Component<Props> {
 		)
 	}
 }
+
+export default translate('other')(RoundedInput)

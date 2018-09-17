@@ -6,7 +6,7 @@ import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
 import { AddressBookActions } from './address-book.reducer'
-import { AddressBookService } from '../../../service/address-book-service'
+import { AddressBookService } from '~/service/address-book-service'
 
 const addressBook = new AddressBookService()
 

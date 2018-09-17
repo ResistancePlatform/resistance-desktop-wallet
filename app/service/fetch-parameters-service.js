@@ -3,7 +3,7 @@ import * as fs from 'fs'
 import path from 'path'
 import config from 'electron-settings'
 
-import i18n from '~/i18n/i18next.config'
+import i18n from '../i18n/i18next.config'
 import { app, dialog } from 'electron'
 import { download } from 'electron-dl'
 
@@ -133,7 +133,7 @@ export class FetchParametersService {
         /* eslint-disable no-await-in-loop */
 
         await this.downloadSproutKey(fileName, index)
-        this.progressBar.detail = this.t(`Calculating checksum for ${fileName}...`)
+        this.progressBar.detail = this.t(`Calculating checksum for {{fileName}}...`, { fileName })
         await this.verifyChecksum(fileName, sproutFiles[index].checksum)
         await this.saveQuickFileHash(fileName)
 
@@ -177,14 +177,17 @@ export class FetchParametersService {
       this.progressBar.value = rate
 
       const detailMessageKey = `Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...`
-      this.progressBar.detail = this.t(detailMessageKey, fileName, receivedMb, totalMb, roundedRate)
+      this.progressBar.detail = this.t(detailMessageKey, { fileName, receivedMb, totalMb, roundedRate })
     }
 
     const onStarted = item => {
       totalBytes = item.getTotalBytes()
       this.progressBar.value = 0
-      const textKey = `Fetching Resistance parameters (file {{fileIndex}} of {filesNumber})...`
-      this.progressBar.text = this.t(textKey, index + 1, sproutFiles.length)
+      const textKey = `Fetching Resistance parameters (file {{fileIndex}} of {{filesNumber}})...`
+      this.progressBar.text = this.t(textKey, {
+        index: index + 1,
+        filesNumber: sproutFiles.length
+      })
     }
 
     const downloadPromise = download(this.parentWindow, `${sproutUrl}/${fileName}`, {

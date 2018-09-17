@@ -103,7 +103,7 @@ const childProcessFailedEpic = (action$: ActionsObservable<Action>, state$) => a
     if (state$.value.getStarted.isInProgress && action.payload.processName === 'NODE') {
       return
     }
-    const errorMessage = i18n.t(`Process {{processName}} has failed.`, action.payload.processName)
+    const errorMessage = i18n.t(`Process {{processName}} has failed.`, { processName: action.payload.processName })
     toastr.error(i18n.t(`Child process failure`), `${errorMessage}\n${action.payload.errorMessage}`)
   }),
 	map((action) => {
@@ -122,7 +122,7 @@ const childProcessFailedEpic = (action$: ActionsObservable<Action>, state$) => a
 const childProcessMurderFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.childProcessMurderFailed),
 	tap((action) => {
-    const errorMessage = i18n.t(`Failed to stop {{processName}}.`, action.payload.processName)
+    const errorMessage = i18n.t(`Failed to stop {{processName}}.`, {processName: action.payload.processName})
     toastr.error(i18n.t(`Stop child process error`), `${errorMessage}\n${action.payload.errorMessage}`)
   }),
   mapTo(SettingsActions.empty())

@@ -73,9 +73,9 @@ export default class ValidateAddressService {
       name: 'resistanceAddress',
       language: {
         rZ: this.t(`has to begin with R- for a transparent address or Z- for a private one`),
-        rLength: this.t(`R-addresses are 35 characters long, not {{l}}`),
-        zLength: this.t(`Z-addresses are 95 characters long, not {{l}}`),
-        valid: this.it(`is not a valid Resistance address`)
+        rLength: this.t(`R-addresses are 35 characters long, not {{length}}`, { length: `{{l}}` }),
+        zLength: this.t(`Z-addresses are 95 characters long, not {{length}}`, { length: `{{l}}` }),
+        valid: this.t(`is not a valid Resistance address`)
       },
       /* eslint-disable-next-line no-unused-vars */
       pre: (value, state, options) => value.replace(/\s+/g, ''),

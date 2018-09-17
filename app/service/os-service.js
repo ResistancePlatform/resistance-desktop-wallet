@@ -4,7 +4,7 @@ import path from 'path'
 import { spawn } from 'child_process'
 import { app, remote } from 'electron'
 
-import i18n from '~/i18n/i18next.config'
+import i18n from '../i18n/i18next.config'
 
 /**
  * ES6 singleton

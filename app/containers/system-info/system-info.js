@@ -46,6 +46,8 @@ class SystemInfo extends Component<Props> {
 	 * @memberof SystemInfo
 	 */
   componentDidUpdate(prevProps) {
+    const { t } = this.props
+
     const prevOperationsMap = prevProps.systemInfo.operations.reduce((map, operation) => (
       {...map, [operation.id]: operation}
     ), {})
@@ -64,26 +66,43 @@ class SystemInfo extends Component<Props> {
       }
 
       let description
-      const humanizedName = humanizeOperationName(currentOperation)
+      const operationName = humanizeOperationName(t, currentOperation)
+      const successTitle = t(`{{operationName}} operation succeeded`, { operationName })
 
       switch (currentOperation.status) {
         case 'cancelled':
-          toastr.info(`${humanizedName} operation cancelled successfully.`)
+          toastr.info(t(`{{operationName}} operation cancelled successfully.`, { operationName }))
           break
         case 'failed':
-          toastr.error(`${humanizedName} operation failed`, currentOperation.error && currentOperation.error.message)
+          toastr.error(t(`{{operationName}} operation failed`, { operationName }), currentOperation.error && currentOperation.error.message)
           break
         case 'success':
           if (currentOperation.method === 'z_sendmany' && currentOperation.params && currentOperation.params.amounts) {
             const amount = currentOperation.params.amounts[0]
-            description = `Sent ${amount.amount} RES from ${currentOperation.params.fromaddress} to ${amount.address}.`
+            description = t(
+              `Sent {{amount}} RES from {{from}} to {{to}}.`,
+              amount.amount, currentOperation.params.fromaddress, amount.address
+            )
           }
-          toastr.success(`${humanizedName} operation succeeded${description ? '' : '.'}`, description)
+          toastr.success(`${successTitle}${description ? '' : '.'}`, description)
           break
         default:
       }
 
     })
+  }
+
+  getChildProcessStatusName(t, processName) {
+    const nameMap = {
+      'RUNNING' : t(`Running`),
+      'STARTING' : t(`Starting`),
+      'RESTARTING' : t(`Restarting`),
+      'FAILED' : t(`Failed`),
+      'STOPPING' : t(`Stopping`),
+      'MURDER FAILED' : t(`Murder failed`),
+      'NOT RUNNING' : t(`Not running`)
+    }
+    return nameMap[processName] || t(`Unknown`)
   }
 
 	/**
@@ -130,18 +149,19 @@ class SystemInfo extends Component<Props> {
 	}
 
   getMinerStatusIconTitle() {
+    const { t } = this.props
     const minerStatus = this.props.settings.childProcessesStatus.MINER
 
     if (minerStatus !== 'RUNNING') {
-      return `Miner status: ${minerStatus}`
+      return `${t('Miner status:')} ${minerStatus}`
     }
 
     const minerInfo = this.props.systemInfo.miner
 
     const tooltip = [
-      `Mining in progress...`,
-      `Hashing power: ${minerInfo.hashingPower} khash/s`,
-      `Mined blocks number: ${minerInfo.minedBlocksNumber}`
+      t(`Mining in progress...`),
+      t(`Hashing power: {{hashingPower}} khash/s`, minerInfo.hashingPower),
+      `${t('Mined blocks number:')} ${minerInfo.minedBlocksNumber}`
     ].join(EOL)
 
     return tooltip
@@ -175,18 +195,20 @@ class SystemInfo extends Component<Props> {
   }
 
   getOperationsIconTitle() {
+    const { t } = this.props
+
     if (!this.props.systemInfo.operations.length) {
-      return 'No pending operations.'
+      return t(`No pending operations.`)
     }
 
-    let failed = ''
-    const failedNumber = this.getOperationsCount('failed')
+    const titleKey = `{{pendingCoun}} pending, {{successCount}} complete, {{failed}} failed operations.`
 
-    if (failedNumber) {
-      failed = `, ${failedNumber}`
-    }
-
-    return `${this.getOperationsCount('queued', 'executing')} pending, ${this.getOperationsCount('success')} complete${failed} operations.`
+    return t(
+      titleKey,
+      this.getOperationsCount('queued', 'executing'),
+      this.getOperationsCount('success'),
+      this.getOperationsCount('failed')
+    )
   }
 
   onOperationsIconClicked() {
@@ -237,7 +259,7 @@ class SystemInfo extends Component<Props> {
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>{t(`Resistance status`)}</div>
 						<div className={styles.statusColoumnValue}>
-              <span className={styles.nodeStatusContainer}><i className={this.getLocalNodeStatusClassNames()} /><span>{t(this.props.settings.childProcessesStatus.NODE)}</span></span>
+              <span className={styles.nodeStatusContainer}><i className={this.getLocalNodeStatusClassNames()} /><span>{t(this.getChildProcessStatusName('NODE'))}</span></span>
 						</div>
 					</div>
 
@@ -255,7 +277,7 @@ class SystemInfo extends Component<Props> {
 
 					{ /* Resistance status coloumn */}
 					{/* <div className={styles.statusColumnWrapper}>
-						<div className={styles.statusColoumnTitle}>RESIDENT</div>
+						<div className={styles.statusColoumnTitle}>{t(`Resident`)}</div>
 						<div className={styles.statusColoumnValue}>{this.props.resident}</div>
 					</div> */}
 
@@ -303,11 +325,15 @@ class SystemInfo extends Component<Props> {
           />
           <i
             className={classNames(styles.customIconPrivacy, styles.statusIcon, { [styles.active]: this.props.sendCash.isPrivateTransactions })}
-            title={`Private transactions are ${this.props.sendCash.isPrivateTransactions ? 'enabled' : 'disabled'}.`}
+            title={
+              this.props.sendCash.isPrivateTransactions
+                ? t(`Private transactions are enabled`)
+                : t(`Private transactions are disabled`)
+            }
           />
           <i
             className={classNames(styles.customIconTor, styles.statusIcon, { [styles.active]: this.props.settings.childProcessesStatus.TOR === 'RUNNING' })}
-            title={`Tor status: ${this.props.settings.childProcessesStatus.TOR}`}
+            title={t(`Tor status: {{status}}`, this.props.settings.childProcessesStatus.TOR)}
           />
 
           <OperationsModal />

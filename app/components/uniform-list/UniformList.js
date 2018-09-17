@@ -95,7 +95,7 @@ class UniformList extends Component<Props> {
 
         {this.props.items.length
           ? this.getSortedItems().map(item => this.applyColumnWidths(this.props.rowRenderer(item)))
-          : this.props.emptyMessage || t( `No data to display.`)
+          : this.props.emptyMessage || t(`No data to display.`)
         }
       </div>
     )
