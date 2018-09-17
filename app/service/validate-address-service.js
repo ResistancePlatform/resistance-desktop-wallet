@@ -2,6 +2,8 @@
 import bs58check from 'bs58check'
 import * as Joi from 'joi'
 
+import i18n from '~/i18n/i18next.config'
+
 /**
  * ES6 singleton
  */
@@ -23,7 +25,11 @@ export default class ValidateAddressService {
 	 * @memberof ValidateAddressService
 	 */
 	constructor() {
-		if (!instance) { instance = this }
+    if (!instance) {
+      instance = this
+    }
+
+    instance.t = i18n.getFixedT(null, 'services')
 
 		return instance
 	}
@@ -66,10 +72,10 @@ export default class ValidateAddressService {
       base: joi.string(),
       name: 'resistanceAddress',
       language: {
-        rZ: `has to begin with R- for a transparent address or Z- for a private one`,
-        rLength: `R-addresses are 35 characters long, not {{l}}`,
-        zLength: `Z-addresses are 95 characters long, not {{l}}`,
-        valid: `is not a valid Resistance address`
+        rZ: this.t(`has to begin with R- for a transparent address or Z- for a private one`),
+        rLength: this.t(`R-addresses are 35 characters long, not {{l}}`),
+        zLength: this.t(`Z-addresses are 95 characters long, not {{l}}`),
+        valid: this.it(`is not a valid Resistance address`)
       },
       /* eslint-disable-next-line no-unused-vars */
       pre: (value, state, options) => value.replace(/\s+/g, ''),

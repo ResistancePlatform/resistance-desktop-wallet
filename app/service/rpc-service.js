@@ -10,17 +10,18 @@ import { from, of, Observable } from 'rxjs'
 import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
-import { TRANSACTION_FEE } from '../constants'
+import i18n from '~/i18n/i18next.config'
+import { TRANSACTION_FEE } from '~/constants'
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { OSService } from './os-service'
 import { ResistanceService } from './resistance-service'
 import { AddressBookService } from './address-book-service'
-import { SettingsActions } from '../state/reducers/settings/settings.reducer'
+import { SettingsActions } from '~/state/reducers/settings/settings.reducer'
 import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions, Transaction } from '../state/reducers/overview/overview.reducer'
 import { OwnAddressesActions, AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
-import { SendCashActions } from '../state/reducers/send-cash/send-cash.reducer'
-import { AddressBookRecord } from '../state/reducers/address-book/address-book.reducer'
+import { SendCashActions } from '~/state/reducers/send-cash/send-cash.reducer'
+import { AddressBookRecord } from '~/state/reducers/address-book/address-book.reducer'
 
 /**
  * ES6 singleton
@@ -74,6 +75,8 @@ export class RpcService {
 			instance = this
 		}
 
+    instance.t = i18n.getFixedT(null, 'services')
+
 		this.logger = new LoggerService()
 		this.osService = new OSService()
 		this.resistanceService = new ResistanceService()
@@ -119,8 +122,9 @@ export class RpcService {
         return Promise.resolve()
       })
       .catch(err => {
-        const errorMessage = `Unable to get Resistance local node info: ${err}`
-        this.osService.dispatchAction(SystemInfoActions.getDaemonInfoFailure(errorMessage, err.code))
+        // TODO: move the prefix to toastr error title in the epic #114
+        const errorPrefix = this.t(`Unable to get Resistance local node info`)
+        this.osService.dispatchAction(SystemInfoActions.getDaemonInfoFailure(`${errorPrefix}: ${err}`, err.code))
       })
   }
 
@@ -157,7 +161,9 @@ export class RpcService {
       },
       error => {
         this.logger.debug(this, `startPollingWalletInfo`, `subscribe error: `, ConsoleTheme.error, error)
-        this.osService.dispatchAction(OverviewActions.getWalletInfoFailure(`Unable to get wallet info: ${error}`))
+        // TODO: move the prefix to toastr error title in the epic #114
+        const errorPrefix = this.t(`Unable to get Resistance local node info`)
+        this.osService.dispatchAction(OverviewActions.getWalletInfoFailure(`${errorPrefix}: ${error}`))
       }
     )
   }
@@ -192,7 +198,9 @@ export class RpcService {
         },
         error => {
           this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
-          this.osService.dispatchAction(OverviewActions.getTransactionDataFromWalletFailure(`Unable to get transactions from the wallet: ${error}`))
+          // TODO: move the prefix to toastr error title in the epic #114
+          const errorPrefix = this.t(`Unable to get transactions from the wallet`)
+          this.osService.dispatchAction(OverviewActions.getTransactionDataFromWalletFailure(`${errorPrefix}: ${error}`))
         }
       )
   }
@@ -227,7 +235,9 @@ export class RpcService {
       })
       .catch(err => {
         this.logger.debug(this, `requestBlockchainInfo`, `getBlockchainInfoFailure`, ConsoleTheme.error, err)
-        this.osService.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`Unable to get blockchain info: ${err}`, err.code))
+        // TODO: move the prefix to toastr error title in the epic #114
+        const errorPrefix = this.t(`Unable to get blockchain info`)
+        this.osService.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`${errorPrefix}: ${err}`, err.code))
       })
   }
 
@@ -405,8 +415,8 @@ export class RpcService {
 				if (errorAddressItems && errorAddressItems.length > 0) {
           const errorMessages = errorAddressItems.map(tempAddressItem => `"${tempAddressItem.errorMessage}"`)
 					const uniqueErrorMessages = Array.from(new Set(errorMessages)).join(', ')
-					const displayMessage = `Error fetching balances for ${errorAddressItems.length} out of ${addressList.length} addresses. Error messages included: ${uniqueErrorMessages}.`
-          toastr.error(`Address balance error`, displayMessage)
+          const errorKey = `Error fetching balances for {{errorCount}} out of {{addressCount}} addresses. Error messages included: {{errorMessages}}.`
+          toastr.error(this.t(`Address balance error`), this.t(errorKey, errorAddressItems.length, addressList.length, uniqueErrorMessages.toString()))
 				}
 
 				if (disableThePrivateAddress) {
@@ -453,9 +463,11 @@ export class RpcService {
     )).then(operations => {
       this.osService.dispatchAction(SystemInfoActions.gotOperations(operations))
       return Promise.resolve()
-    }).catch(err => (
-      this.osService.dispatchAction(SystemInfoActions.getOperationsFailure(`Unable to get operations: ${err}`, err.code))
-    ))
+    }).catch(err => {
+      // TODO: move the prefix to toastr error title in the epic #114
+      const errorPrefix = this.t(`Unable to get operations`)
+      return this.osService.dispatchAction(SystemInfoActions.getOperationsFailure(`${errorPrefix}: ${err}`, err.code))
+    })
   }
 
 	/**
@@ -640,18 +652,21 @@ async function getPublicTransactionsPromise(client: Client) {
     { method: 'listtransactions', parameters: ['', 200] }
   ]
 
+  const noAddressMessage = this.t('Z address is not listed in the wallet')
+  const publicAddressMessage = this.t(`R (public)`)
+
   return client.command(command)
     .then(result => result[0])
     .then(result => {
       if (Array.isArray(result)) {
         return result.map(
           originalTransaction => ({
-            type: `\u2605 T (Public)`,
+            type: `\u2605 ${publicAddressMessage}`,
             category: originalTransaction.category,
             confirmations: originalTransaction.confirmations,
             amount: Decimal(originalTransaction.amount),
             timestamp: originalTransaction.time,
-            destinationAddress: originalTransaction.address ? originalTransaction.address : `[ Z Address not listed in Wallet ]`,
+            destinationAddress: originalTransaction.address ? originalTransaction.address : `[ ${noAddressMessage} ]`,
             transactionId: originalTransaction.txid
           })
         )
