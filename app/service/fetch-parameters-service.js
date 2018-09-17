@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import path from 'path'
 import config from 'electron-settings'
 
+import i18n from '~/i18n/i18next.config'
 import { app, dialog } from 'electron'
 import { download } from 'electron-dl'
 
@@ -43,7 +44,12 @@ export class FetchParametersService {
 	 * @memberof FetchParametersService
 	 */
 	constructor() {
-		if (!instance) { instance = this }
+    if (!instance) {
+      instance = this
+    }
+
+    instance.t = i18n.getFixedT(null, 'services')
+
 		return instance
 	}
 
@@ -127,13 +133,13 @@ export class FetchParametersService {
         /* eslint-disable no-await-in-loop */
 
         await this.downloadSproutKey(fileName, index)
-        this.progressBar.detail = `Calculating checksum for ${fileName}...`
+        this.progressBar.detail = this.t(`Calculating checksum for ${fileName}...`)
         await this.verifyChecksum(fileName, sproutFiles[index].checksum)
         await this.saveQuickFileHash(fileName)
 
         /* eslint-enable no-await-in-loop */
       } catch(err) {
-        dialog.showErrorBox(`Unable to fetch Resistance parameters`, err.toString())
+        dialog.showErrorBox(this.t(`Unable to fetch Resistance parameters`), err.toString())
         app.quit()
         break
       }
@@ -151,8 +157,8 @@ export class FetchParametersService {
     const progressBar = new ProgressBar({
       indeterminate: false,
       closeOnComplete: false,
-      text: `Fetching Resistance parameters...`,
-      detail: `This will take awhile, but it's just a one time operation :)`,
+      text: this.t(`Fetching Resistance parameters...`),
+      detail: this.t(`This will take awhile, but it's just a one time operation :)`),
       browserWindow: {
         parent: this.parentWindow
       }
@@ -169,13 +175,16 @@ export class FetchParametersService {
       const totalMb = (totalBytes / 1024 / 1024).toFixed(2)
       const receivedMb = (progress  * totalMb).toFixed(2)
       this.progressBar.value = rate
-      this.progressBar.detail = `Downloading ${fileName}, received ${receivedMb}MB out of ${totalMb}MB (${roundedRate}%)...`
+
+      const detailMessageKey = `Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...`
+      this.progressBar.detail = this.t(detailMessageKey, fileName, receivedMb, totalMb, roundedRate)
     }
 
     const onStarted = item => {
       totalBytes = item.getTotalBytes()
       this.progressBar.value = 0
-      this.progressBar.text = `Fetching Resistance parameters (file ${index + 1} of ${sproutFiles.length})...`
+      const textKey = `Fetching Resistance parameters (file {{fileIndex}} of {filesNumber})...`
+      this.progressBar.text = this.t(textKey, index + 1, sproutFiles.length)
     }
 
     const downloadPromise = download(this.parentWindow, `${sproutUrl}/${fileName}`, {

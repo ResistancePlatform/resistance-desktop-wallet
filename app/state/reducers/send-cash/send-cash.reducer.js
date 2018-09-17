@@ -1,6 +1,8 @@
 // @flow
 import { Decimal } from 'decimal.js'
 import { createActions, handleActions } from 'redux-actions'
+
+import i18n from '~/i18n/i18next.config'
 import { preloadedState } from '../preloaded.state'
 
 
@@ -58,30 +60,18 @@ const isTransparentAddress = (tempAddress: string) => tempAddress.startsWith('r'
 export const checkPrivateTransactionRule = (tempState: SendCashState) => {
 	let checkResult = 'ok'
 
-	// [Enabled] rules:
-	// t_addr-- > z_addr SUCCESS
-	// z_addr-- > z_addr SUCCESS
-	// z_addr-- > t_addr SUCCESS
-	// t_addr-- > t_addr SUCCESS
-	if (tempState.isPrivateTransactions) return checkResult
+  if (tempState.isPrivateTransactions) {
+    return checkResult
+  }
 
-	// [Disabled] rules:
-	// t_addr --> z_addr ERROR
-	// z_addr --> z_addr ERROR
-	// z_addr --> t_addr ERROR
-	// t_addr --> t_addr SUCCESS
-	const transparentAddressDesc = `Transparent (R) address`
-	const privateAddressDesc = `Private (Z) address`
-	const prefixMessage = 'Sending cash '
-	const postFixMessage = ' is forbidden when "Private Transactions" is off.'
 	if (isTransparentAddress(tempState.fromAddress) && isPrivateAddress(tempState.toAddress)) {
-		checkResult = `${prefixMessage}from a ${transparentAddressDesc} to a ${privateAddressDesc}${postFixMessage}`
+    checkResult = i18n.t(`Sending cash from a transparent (R) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
 	}
 	else if (isPrivateAddress(tempState.fromAddress) && isPrivateAddress(tempState.toAddress)) {
-		checkResult = `${prefixMessage}from a ${privateAddressDesc} to a ${privateAddressDesc}${postFixMessage}`
+    checkResult = i18n.t(`Sending cash from a private (Z) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
 	}
 	else if (isPrivateAddress(tempState.fromAddress) && isTransparentAddress(tempState.toAddress)) {
-		checkResult = `${prefixMessage}from a ${privateAddressDesc} to a ${transparentAddressDesc}${postFixMessage}`
+    checkResult = i18n.t(`Sending cash from a private (Z) address to a transparent (R) address is forbidden when "Private Transactions" are disabled.`)
 	}
 
 	return checkResult
@@ -100,23 +90,23 @@ const handleAddressUpdate = (tempState: SendCashState, newAddress: string, isUpd
 	const newInputTooltips = tempCheckResult === 'ok' ? '' : tempCheckResult
 
 	// The new `lockIcon` and `lockTips`
-	const fromAddress = newState.fromAddress
-	const toAddress = newState.toAddress
+	const { fromAddress, toAddress } = newState
+
 	let lockIcon = 'Unlock'
-	let lockTips = `You are sending money from a Transparent (R) Address to a Transparent (R) Address. This transaction will be fully transparent and visible to every user.`
+	let lockTips = i18n.t(`You are sending money from a Transparent (R) Address to a Transparent (R) Address. This transaction will be fully transparent and visible to every user.`)
 
 	if (isTransparentAddress(fromAddress) && isPrivateAddress(toAddress)) {
 		lockIcon = `Unlock`
-		lockTips = `You are sending money from a Transparent (R) Address to a Private (Z) Address. This transaction will be partially shielded.`
+		lockTips = i18n.t(`You are sending money from a Transparent (R) Address to a Private (Z) Address. This transaction will be partially shielded.`)
 	} else if (isPrivateAddress(fromAddress) && isPrivateAddress(toAddress)) {
 		lockIcon = `Lock`
-		lockTips = `You are sending money from a Private (Z) Address to a Private (Z) Address. This transaction will be fully shielded and invisible to all users.`
+		lockTips = i18n.t(`You are sending money from a Private (Z) Address to a Private (Z) Address. This transaction will be fully shielded and invisible to all users.`)
 	} else if (isPrivateAddress(fromAddress) && isTransparentAddress(toAddress)) {
 		lockIcon = `Unlock`
-		lockTips = `You are sending money from a Private (Z) Address to a Transparent (R) Address. This transaction will be partially shielded.`
+		lockTips = i18n.t(`You are sending money from a Private (Z) Address to a Transparent (R) Address. This transaction will be partially shielded.`)
 	} else if (isTransparentAddress(fromAddress) && isTransparentAddress(toAddress)) {
 		lockIcon = `Unlock`
-		lockTips = `You are sending money from a Transparent (R) Address to a Transparent (R) Address. This transaction will be fully transparent and visible to every user.`
+		lockTips = i18n.t(`You are sending money from a Transparent (R) Address to a Transparent (R) Address. This transaction will be fully transparent and visible to every user.`)
 	}
 
 	return ({ ...newState, inputTooltips: newInputTooltips, lockIcon, lockTips })

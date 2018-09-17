@@ -1,17 +1,19 @@
 // @flow
 import React, { Component } from 'react'
+import { translate } from 'react-i18next'
 
-import { truncateAmount } from '../../constants'
-import { AddressDropdownItem } from '../../state/reducers/send-cash/send-cash.reducer'
+import { truncateAmount } from '~/constants'
+import { AddressDropdownItem } from '~/state/reducers/send-cash/send-cash.reducer'
 
 import styles from './address-drodown-popup-menu.scss'
 
 type Props = {
+  t: any,
 	addressList?: AddressDropdownItem[],
 	onPickupAddress: (address: string) => void
 }
 
-export default class AddressDropdownPopupMenu extends Component<Props> {
+class AddressDropdownPopupMenu extends Component<Props> {
 	props: Props
 
 	eventConfirm(event) {
@@ -27,7 +29,7 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 	}
 
 	checkAndApplyLastGroupItemClass(tempIndex) {
-		const addressList = this.props.addressList
+		const { addressList } = this.props
 		const currentItem = addressList[tempIndex]
 		const nextItem = tempIndex < addressList.length ? addressList[tempIndex + 1] : null
 		const isTheLastGroupItem = currentItem && currentItem.address.startsWith('r') && nextItem && nextItem.address.startsWith('z')
@@ -36,22 +38,26 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 	}
 
 	renderAddressItems() {
+    const { t } = this.props
+
 		if (!this.props.addressList ||
 			!Array.isArray(this.props.addressList) ||
 			this.props.addressList.length <= 0) {
 			return (
 				<div
+          role="none"
 					className={styles.lastMenuItem}
 					onClick={event => this.onAddressItemClicked(event, '')}
 					onKeyDown={() => { }}
 				>
-					Have no any available address
+          {t(`Have no any available address`)}
 				</div>
 			)
 		}
 
 		return this.props.addressList.map((addressItem, index) => (
 			<div
+        role="none"
 				className={[
 					index === this.props.addressList.length - 1 ? styles.lastMenuItem : styles.menuItem,
 					addressItem.disabled ? styles.disabledMenItem : '',
@@ -63,7 +69,7 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 			>
 				<div className={styles.itemRowAddress}>{addressItem.address}</div>
 				<div className={styles.itemRowBalance}>
-					{addressItem.balance === null ? 'ERROR' : `${truncateAmount(addressItem.balance)} RES`}
+					{addressItem.balance === null ? t('Error') : `${truncateAmount(addressItem.balance)} RES`}
 				</div>
 			</div>
 		))
@@ -77,3 +83,5 @@ export default class AddressDropdownPopupMenu extends Component<Props> {
 		)
 	}
 }
+
+export default translate('send-cash')(AddressDropdownPopupMenu)

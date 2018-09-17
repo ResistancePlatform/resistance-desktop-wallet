@@ -1,5 +1,6 @@
 // @flow
 import { createActions, handleActions } from 'redux-actions'
+import i18n from '~/i18n/i18next.config'
 
 import { preloadedState } from '../preloaded.state'
 import Wallet from '~/service/bip39-service'
@@ -76,7 +77,7 @@ export const GetStartedReducer = handleActions(
       ...state,
       welcome: {
         ...state.welcome,
-        hint: `Wallet bootstrapping has failed: ${action.payload.errorMessage}`,
+        hint: `${i18n.t('Wallet bootstrapping has failed:')} ${action.payload.errorMessage}`,
         status: 'error',
         isBootstrapping: false,
         isReadyToUse: false
@@ -86,7 +87,7 @@ export const GetStartedReducer = handleActions(
       ...state,
       welcome: {
         ...state.welcome,
-        hint: `Success! Your wallet has been created`,
+        hint: i18n.t(`Success! Your wallet has been created`),
         status: 'success',
         isBootstrapping: false,
         isReadyToUse: true

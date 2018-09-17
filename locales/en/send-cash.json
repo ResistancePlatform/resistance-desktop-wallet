@@ -1,0 +1,3 @@
+{
+  "send-cash.memo": "When sending cash from a Transparent (R) address, the remaining balance is sent to another out-generated r address. When sending from a Private (Z) address, the remaining unsent balance remains with the Z address. In both cases the original sending address cannot be used for sending again until the transaction is confirmed. The address is temporarily removed from the list. Freshly mined coins may only be sent to a Private (Z) address."
+}

@@ -2,7 +2,7 @@
 import { createActions, handleActions } from 'redux-actions'
 
 import { preloadedState } from '../preloaded.state'
-import { ChildProcessName, ChildProcessStatus } from '../../../service/os-service'
+import { ChildProcessName, ChildProcessStatus } from '~/service/os-service'
 
 export type SettingsState = {
 	isTorEnabled: boolean,

@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react'
+import { translate } from 'react-i18next'
 
 import { truncateAmount } from '~/constants'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
@@ -8,28 +9,29 @@ import { AddressRow } from '~/state/reducers/own-addresses/own-addresses.reducer
 import styles from './own-address-list.scss'
 
 type Props = {
+  t: any,
 	items: AddressRow[],
   frozenAddresses: { [string]: Decimal },
 	onRowClick: (event: any, address: string) => void
 }
 
-export default class OwnAddressList extends Component<Props> {
+class OwnAddressList extends Component<Props> {
 	props: Props
 
-  getListHeaderRenderer() {
+  getListHeaderRenderer(t) {
     return (
       <UniformListHeader>
-        <UniformListColumn width="22%">Balance</UniformListColumn>
-        <UniformListColumn width="18%">Confirmed</UniformListColumn>
-        <UniformListColumn width="60%">Address</UniformListColumn>
+        <UniformListColumn width="22%">{t(`Balance`)}</UniformListColumn>
+        <UniformListColumn width="18%">{t(`Confirmed`)}</UniformListColumn>
+        <UniformListColumn width="60%">{t(`Address`)}</UniformListColumn>
       </UniformListHeader>
     )
   }
 
-  getListRowRenderer(address: AddressRow) {
+  getListRowRenderer(t, address: AddressRow) {
     const frozenBalance = this.props.frozenAddresses[address.address]
     const balance = frozenBalance === undefined ? address.balance : frozenBalance
-    const displayBalance = balance === null ? 'ERROR' : truncateAmount(balance)
+    const displayBalance = balance === null ? t('ERROR') : truncateAmount(balance)
 
     return (
       <UniformListRow
@@ -38,22 +40,26 @@ export default class OwnAddressList extends Component<Props> {
         onContextMenu={e => this.props.onRowClick(e, address.address)}
       >
         {Boolean(frozenBalance) &&
-          <div className={styles.merging}><span>merging</span></div>
+          <div className={styles.merging}><span>{t(`merging`)}</span></div>
         }
         <UniformListColumn>{displayBalance}</UniformListColumn>
-        <UniformListColumn>{address.confirmed ? 'YES' : address.balance && 'NO' || ''}</UniformListColumn>
+        <UniformListColumn>{address.confirmed ? t('Yes') : address.balance && t('No') || ''}</UniformListColumn>
         <UniformListColumn>{address.address}</UniformListColumn>
       </UniformListRow>
     )
   }
 
 	render() {
+    const { t } = this.props
+
 		return (
       <UniformList
         items={this.props.items}
-        headerRenderer={address => this.getListHeaderRenderer(address)}
-        rowRenderer={address => this.getListRowRenderer(address)}
+        headerRenderer={() => this.getListHeaderRenderer(t)}
+        rowRenderer={address => this.getListRowRenderer(t, address)}
       />
 		)
 	}
 }
+
+export default translate('own-addresses')(OwnAddressList)

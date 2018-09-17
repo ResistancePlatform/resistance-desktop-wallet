@@ -46,8 +46,6 @@ class Settings extends Component<Props> {
   constructor(props) {
     super(props)
     this.state = {}
-    console.log(this.props.i18n)
-    this.props.i18n.changeLanguage('eo')
   }
 
 	/**
@@ -134,12 +132,11 @@ class Settings extends Component<Props> {
 	 * @param {*} event
 	 * @memberof Settings
 	 */
-	async onSavePasswordClicked() {
-    const { t } = this.props
+	async onSavePasswordClicked(t) {
     const passwordHash = config.get('password.hash')
 
     if (passwordHash) {
-      const oldPasswordHash = await this.generatePasswordHash(this.state.oldPassword, config.get('password.salt', ''))
+      const oldPasswordHash = await this.generatePasswordHash(t, this.state.oldPassword, config.get('password.salt', ''))
 
       if (!oldPasswordHash) {
         return false
@@ -152,7 +149,7 @@ class Settings extends Component<Props> {
     }
 
     const newSalt = generator.generate({ length: 32, numbers: true })
-    const newPasswordHash = await this.generatePasswordHash(this.state.newPassword, newSalt)
+    const newPasswordHash = await this.generatePasswordHash(t, this.state.newPassword, newSalt)
 
     if (!newPasswordHash) {
       return false
@@ -169,7 +166,7 @@ class Settings extends Component<Props> {
     return false
 	}
 
-  generatePasswordHash(password: string, salt: string) {
+  generatePasswordHash(t, password: string, salt: string) {
     this.setState({ isPasswordUpdating: true })
 
     const promise = new Promise(resolve => {
@@ -305,7 +302,7 @@ class Settings extends Component<Props> {
 	 * @param {*} event
 	 * @memberof Settings
 	 */
-	onRestoreWalletClicked() {
+	onRestoreWalletClicked(t) {
     const onOpenHandler = (filePaths) => {
       if (filePaths && filePaths.length) {
         appStore.dispatch(SettingsActions.importWallet(filePaths.pop()))
@@ -382,8 +379,8 @@ class Settings extends Component<Props> {
 						<button
               type="button"
 							className={styles.savePasswordButton}
-              onClick={async () => this.onSavePasswordClicked()}
-							onKeyDown={async () => this.onSavePasswordClicked()}
+              onClick={async () => this.onSavePasswordClicked(t)}
+							onKeyDown={async () => this.onSavePasswordClicked(t)}
               disabled={this.getSavePasswordButtonDisabledAttribute()}
 						>
               {t(`Save password`)}
@@ -472,8 +469,8 @@ class Settings extends Component<Props> {
 							<button
                 type="button"
 								className={styles.walletNodeButton}
-								onClick={event => this.onRestoreWalletClicked(event)}
-								onKeyDown={event => this.onRestoreWalletClicked(event)}
+								onClick={() => this.onRestoreWalletClicked(t)}
+								onKeyDown={() => this.onRestoreWalletClicked(t)}
                 disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
 							>
                 {t(`Restore wallet`)}

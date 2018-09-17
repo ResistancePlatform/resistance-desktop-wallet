@@ -4,13 +4,14 @@ import { merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
-import { TRANSACTION_FEE } from '../../../constants'
+import { TRANSACTION_FEE } from '~/constants'
+import i18n from '~/i18n/i18next.config'
 import { Action } from '../types'
 import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { SendCashActions, SendCashState, checkPrivateTransactionRule } from './send-cash.reducer'
 import { AddressBookRow } from '../address-book/address-book.reducer'
-import { RpcService } from '../../../service/rpc-service'
-import { AddressBookService } from '../../../service/address-book-service'
+import { RpcService } from '~/service/rpc-service'
+import { AddressBookService } from '~/service/address-book-service'
 
 
 const rpcService = new RpcService()
@@ -21,13 +22,17 @@ const allowToSend = (sendCashState: SendCashState) => {
 		sendCashState.fromAddress.trim() === '' ||
 		sendCashState.toAddress.trim() === ''
 	) {
-		return '"FROM ADDRESS" or "DESTINATION ADDRESS" is required.'
-	} else if (
+		return i18n.t('"FROM ADDRESS" or "DESTINATION ADDRESS" is required.')
+  }
+
+  if (
 		sendCashState.fromAddress.trim() === sendCashState.toAddress.trim()
 	) {
-		return '"FROM ADDRESS" or "DESTINATION ADDRESS" cannot be the same.'
-	} else if (sendCashState.amount.lessThanOrEqualTo(TRANSACTION_FEE)) {
-		return '"AMOUNT" is required.'
+		return i18n.t(`"FROM ADDRESS" or "DESTINATION ADDRESS" cannot be the same.`)
+  }
+
+  if (sendCashState.amount.lessThanOrEqualTo(TRANSACTION_FEE)) {
+		return i18n.t(`"AMOUNT" is required.`)
 	}
 
 	return 'ok'
@@ -62,7 +67,7 @@ const sendCashEpic = (action$: ActionsObservable<Action>, state$) => action$.pip
 const sendCashOperationStartedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SendCashActions.sendCashOperationStarted),
 	tap(() => {
-		toastr.info(`Send cash operation started.`)
+		toastr.info(i18n.t(`Send cash operation started.`))
 	}),
 	mapTo(SendCashActions.empty())
 )
@@ -70,7 +75,7 @@ const sendCashOperationStartedEpic = (action$: ActionsObservable<Action>) => act
 const sendCashFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SendCashActions.sendCashFailure),
   tap((action: Action) => {
-    toastr.error(`Unable to start send cash operation`, action.payload.errorMessage)
+    toastr.error(i18n.t(`Unable to start send cash operation`), action.payload.errorMessage)
   }),
 	mapTo(SendCashActions.empty())
 )

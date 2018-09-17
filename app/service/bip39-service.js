@@ -2,6 +2,8 @@
 import * as bip39 from 'bip39'
 import * as Joi from 'joi'
 
+import i18n from '~/i18n/i18next.config'
+
 /**
  * ES6 singleton
  */
@@ -24,6 +26,8 @@ export class Bip39Service {
 	 */
 	constructor() {
 		if (!instance) { instance = this }
+
+    instance.t = i18n.getFixedT(null, 'services')
 
 		return instance
 	}
@@ -58,8 +62,8 @@ export class Bip39Service {
       base: joi.string(),
       name: 'mnemonicSeed',
       language: {
-        wordCount: `needs to consist of 24 words, not {{w}}`,
-        valid: `is not a valid Bitcoin BIP39 mnemonic seed`
+        wordCount: this.t(`needs to consist of 24 words, not {{w}}`),
+        valid: this.t(`is not a valid Bitcoin BIP39 mnemonic seed`)
       },
       /* eslint-disable-next-line no-unused-vars */
       pre: (value, state, options) => value.replace(/\s\s+/g, ' ').toLowerCase(),

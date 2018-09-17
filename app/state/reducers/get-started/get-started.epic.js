@@ -5,6 +5,7 @@ import { filter, switchMap, take, map, mergeMap, mapTo, catchError } from 'rxjs/
 import { remote } from 'electron'
 import { ofType } from 'redux-observable'
 import { push } from 'react-router-redux'
+import i18n from '~/i18n/i18next.config'
 
 import { Action } from '../types'
 import { AUTH } from '~/constants/auth'
@@ -33,7 +34,9 @@ function getNodeStartedObservable(emitActionOnStart: Action, action$: ActionsObs
       ofType(SettingsActions.childProcessFailed),
       filter(action => action.payload.processName === 'NODE'),
       take(1),
-      mapTo(WelcomeActions.walletBootstrappingFailed(`Unable to start Resistance local node, please try again or contact the support.`)),
+      mapTo(WelcomeActions.walletBootstrappingFailed(
+        i18n.t(`Unable to start Resistance local node, please try again or contact the support.`)
+      )),
     )
   )
 
@@ -69,7 +72,7 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
     const nodeStartedObservable = getNodeStartedObservable(WelcomeActions.encryptWallet(), action$)
 
     return concat(
-       of(WelcomeActions.displayHint(`Starting local Resistance node...`)),
+      of(WelcomeActions.displayHint(i18n.t(`Starting local Resistance node...`))),
       of(SettingsActions.startLocalNode()),
       nodeStartedObservable
     )
@@ -89,7 +92,7 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       filter(action => action.payload.processName === 'NODE'),
       take(1),
       switchMap(() => concat(
-        of(WelcomeActions.displayHint(`Starting the local node and the miner...`)),
+        of(WelcomeActions.displayHint(i18n.t(`Starting the local node and the miner...`))),
         of(SettingsActions.kickOffChildProcesses()),
         nodeStartedObservable
       ))
@@ -100,7 +103,7 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.toString())))
     )
 
-    return concat(of(WelcomeActions.displayHint(`Encrypting the wallet...`)), observable)
+    return concat(of(WelcomeActions.displayHint(i18n.t(`Encrypting the wallet...`))), observable)
   })
 )
 
@@ -129,7 +132,7 @@ const authenticateAndRestoreWalletEpic = (action$: ActionsObservable<Action>, st
       const restoreForm = state$.value.roundedForm.getStartedRestoreYourWallet
       const keysFilePath = restoreForm.fields.backupFile
       nextObservables.push(
-        of(WelcomeActions.displayHint(`Restoring the wallet from the backup file...`)),
+        of(WelcomeActions.displayHint(i18n.t(`Restoring the wallet from the backup file...`))),
         of(SettingsActions.importWallet(keysFilePath)),
         importWalletObservable
       )
@@ -143,7 +146,7 @@ const authenticateAndRestoreWalletEpic = (action$: ActionsObservable<Action>, st
     )
 
     return concat(
-      of(WelcomeActions.displayHint(`Sending the wallet password to the node...`)),
+      of(WelcomeActions.displayHint(i18n.t(`Sending the wallet password to the node...`))),
       sendWalletObservable
     )
   })
