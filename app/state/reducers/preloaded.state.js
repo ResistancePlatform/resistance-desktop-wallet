@@ -71,7 +71,7 @@ export const preloadedState: State = {
 	sendCash: {
 		isPrivateTransactions: false,
 		lockIcon: 'Unlock',
-		lockTips: i18n.t(`You are sending money from a Transparent (R) Address to a Transparent (R) Address. This transaction will be fully transparent and visible to every user.`),
+		lockTips: i18n.t('send-cash.tip.r-to-r'),
 		fromAddress: '',
 		toAddress: '',
 		inputTooltips: '',

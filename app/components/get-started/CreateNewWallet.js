@@ -64,7 +64,7 @@ export class CreateNewWallet extends Component<Props> {
         <div className={styles.hint}>{t(`Choose a name for your wallet`)}</div>
 
         <RoundedForm id="getStartedCreateNewWallet" schema={validationSchema}>
-          <RoundedInput name="walletName" label="Wallet name" defaultValue={userInfo().username} />
+          <RoundedInput name="walletName" label={t(`Wallet name`)} defaultValue={userInfo().username} />
 
           <RoundedInput
             name="walletPath"

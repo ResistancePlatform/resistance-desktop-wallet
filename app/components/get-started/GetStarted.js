@@ -30,7 +30,7 @@ export class GetStarted extends Component<Props> {
       <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
         <div className={styles.title}>{t(`Get started with Resistance`)}</div>
 
-        <div className={styles.hint}>{t(`Please select one of the following options:`)}</div>
+        <div className={styles.hint}>{t(`Please select one of the following options`)}:</div>
 
         <div className={styles.flowLinksContainer}>
           <NavLink className={styles.chooseFlowLink} to="/get-started/create-new-wallet">

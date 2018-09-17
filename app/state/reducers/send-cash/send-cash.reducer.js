@@ -93,20 +93,20 @@ const handleAddressUpdate = (tempState: SendCashState, newAddress: string, isUpd
 	const { fromAddress, toAddress } = newState
 
 	let lockIcon = 'Unlock'
-	let lockTips = i18n.t(`You are sending money from a Transparent (R) Address to a Transparent (R) Address. This transaction will be fully transparent and visible to every user.`)
+	let lockTips = i18n.t('send-cash.tip.r-to-r')
 
 	if (isTransparentAddress(fromAddress) && isPrivateAddress(toAddress)) {
 		lockIcon = `Unlock`
-		lockTips = i18n.t(`You are sending money from a Transparent (R) Address to a Private (Z) Address. This transaction will be partially shielded.`)
+		lockTips = i18n.t('send-cash.tip.r-to-z')
 	} else if (isPrivateAddress(fromAddress) && isPrivateAddress(toAddress)) {
 		lockIcon = `Lock`
-		lockTips = i18n.t(`You are sending money from a Private (Z) Address to a Private (Z) Address. This transaction will be fully shielded and invisible to all users.`)
+		lockTips = i18n.t('send-cash.tip.z-to-z')
 	} else if (isPrivateAddress(fromAddress) && isTransparentAddress(toAddress)) {
 		lockIcon = `Unlock`
-		lockTips = i18n.t(`You are sending money from a Private (Z) Address to a Transparent (R) Address. This transaction will be partially shielded.`)
+		lockTips = i18n.t('send-cash.tip.z-to-r')
 	} else if (isTransparentAddress(fromAddress) && isTransparentAddress(toAddress)) {
 		lockIcon = `Unlock`
-		lockTips = i18n.t(`You are sending money from a Transparent (R) Address to a Transparent (R) Address. This transaction will be fully transparent and visible to every user.`)
+		lockTips = i18n.t('send-cash.tip.r-to-r')
 	}
 
 	return ({ ...newState, inputTooltips: newInputTooltips, lockIcon, lockTips })
