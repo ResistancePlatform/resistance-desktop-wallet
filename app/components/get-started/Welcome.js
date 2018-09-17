@@ -12,6 +12,7 @@ import styles from './GetStarted.scss'
 const resistance = new ResistanceService()
 
 type Props = {
+  t: any,
   roundedForm: object,
   getStarted: object,
   welcome: object,
@@ -84,37 +85,39 @@ export class Welcome extends Component<Props> {
    * @memberof Welcome
 	 */
 	render() {
+    const { t } = this.props
+
 		return (
       <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
-        <div className={styles.title}>Welcome to Resistance!</div>
+        <div className={styles.title}>{t(`Welcome to Resistance!`)}</div>
 
         <div className={cn(styles.hint, styles[this.props.welcome.status])}>
-          {this.props.welcome.hint || `Check the wallet configuration before applying`}
+          {this.props.welcome.hint || t(`Check the wallet configuration before applying`)}
         </div>
 
         <div className={styles.welcomeContainer}>
           <div className={styles.summaryTitle}>
-            Here&#39;s a summary of your new wallet configuration:
+            {t(`Here's a summary of your new wallet configuration:`)}
           </div>
 
           <ul className={styles.summary}>
             <li>
-              <span>Language:</span> English
+              <span>{t(`Language:`)}</span> English
             </li>
             <li>
-              <span>Wallet name:</span> {this.getWalletName()}
+              <span>{t(`Wallet name:`)}</span> {this.getWalletName()}
             </li>
             <li>
-              <span>Backup seed:</span> * * * * * * *
+              <span>{t(`Backup seed:`)}</span> * * * * * * *
             </li>
             <li>
-              <span>Wallet path:</span> {resistance.getWalletPath()}
+              <span>{t(`Wallet path:`)}</span> {resistance.getWalletPath()}
             </li>
             <li>
-              <span>Daemon address:</span> {this.getDaemonAddress()}
+              <span>{t(`Daemon address:`)}</span> {this.getDaemonAddress()}
             </li>
             <li>
-              <span>Network type:</span> {this.getNetworkType()}
+              <span>{t(`Network type:`)}</span> {this.getNetworkType()}
             </li>
           </ul>
 
@@ -125,7 +128,7 @@ export class Welcome extends Component<Props> {
               onKeyDown={this.props.actions.applyConfiguration}
               disabled={this.props.welcome.isBootstrapping}
             >
-              Apply configuration
+              {t(`Apply configuration`)}
             </button>
           }
 
@@ -135,7 +138,7 @@ export class Welcome extends Component<Props> {
               onClick={this.props.actions.useResistance}
               onKeyDown={this.props.actions.useResistance}
             >
-              Use Resistance
+              {t(`Use Resistance`)}
             </button>
           }
         </div>

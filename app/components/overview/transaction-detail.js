@@ -1,11 +1,15 @@
 // @flow
 import React, { Component } from 'react'
-import { TransactionDetail } from '../../state/reducers/overview/overview.reducer'
+import { translate } from 'react-i18next'
+
+import { TransactionDetail } from '~/state/reducers/overview/overview.reducer'
+
 import styles from './transaction-detail.scss'
-import HLayout from '../../theme/h-box-layout.scss'
-import VLayout from '../../theme/v-box-layout.scss'
+import HLayout from '~/theme/h-box-layout.scss'
+import VLayout from '~/theme/v-box-layout.scss'
 
 type Props = {
+  t: any,
 	transactionDetail: TransactionDetail,
 	onBackToTransactionListClick: () => void
 }
@@ -15,7 +19,7 @@ type Props = {
  * @class TransactionDetailList
  * @extends {Component<Props>}
  */
-export default class TransactionDetailList extends Component<Props> {
+class TransactionDetailList extends Component<Props> {
 	props: Props
 
 	/**
@@ -36,10 +40,14 @@ export default class TransactionDetailList extends Component<Props> {
 	 * @memberof TransactionDetailList
 	 */
 	getDetailTable() {
+    const { t } = this.props
+
 		if (!this.props.transactionDetail) {
-			return (<div className={styles.hasNoDetail}>No Transaction Detail.</div>)
-		} else if (typeof this.props.transactionDetail === 'string') {
-			return (<div className={styles.error}>Error happend: {this.props.transactionDetail}</div>)
+			return (<div className={styles.hasNoDetail}>{t(`No Transaction Detail.`)}</div>)
+    }
+
+    if (typeof this.props.transactionDetail === 'string') {
+			return (<div className={styles.error}>{t(`Error occurred:`)} {this.props.transactionDetail}</div>)
 		}
 
 		const sortedKeys = Object.keys(this.props.transactionDetail).sort()
@@ -57,8 +65,8 @@ export default class TransactionDetailList extends Component<Props> {
 			<div className={[styles.tableContainer].join(' ')}>
 
 				<div className={[HLayout.hBoxContainer, styles.tableHeader].join(' ')}>
-					<div className={styles.tableHeaderColumnName}>Name</div>
-					<div className={[HLayout.hBoxChild, styles.tableHeaderColumnValue].join(' ')}>Value</div>
+					<div className={styles.tableHeaderColumnName}>{t(`Name`)}</div>
+					<div className={[HLayout.hBoxChild, styles.tableHeaderColumnValue].join(' ')}>{t(`Value`)}</div>
 				</div>
 
 				{tableBody}
@@ -71,18 +79,24 @@ export default class TransactionDetailList extends Component<Props> {
 	 * @memberof TransactionDetailList
 	 */
 	render() {
+    const { t } = this.props
+
 		return (
 			<div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.transactionDetailListContainer].join(' ')}>
 				<div
+          role="button"
+          tabIndex={0}
 					className={styles.backToTransactionList}
 					onClick={(event) => this.backToTransactionList(event)}
 					onKeyDown={() => { }}
 				>
-					<span className={styles.arrow}>←</span><span className={styles.text}>BACK TO TRANSACTION LIST</span>
+					<span className={styles.arrow}>←</span><span className={styles.text}>{t(`Back to transaction list`)}</span>
 				</div>
-				<div className={styles.title}>Transaction Details</div>
+				<div className={styles.title}>{t(`Transaction Details`)}</div>
 				{this.getDetailTable()}
 			</div>
 		)
 	}
 }
+
+export default translate('overview')(TransactionDetailList)

@@ -4,8 +4,9 @@ import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
 import cn from 'classnames'
 
-import { GetStartedPage, RestoreYourWalletPage } from './GetStartedPage'
+import GetStartedPage from './GetStartedPage'
 import CreateNewWalletPage from './get-started/CreateNewWalletPage'
+import RestoreYourWalletPage from './get-started/RestoreYourWalletPage'
 import ChoosePasswordPage from './get-started/ChoosePasswordPage'
 import WelcomePage from './get-started/WelcomePage'
 

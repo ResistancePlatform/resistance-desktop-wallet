@@ -15,11 +15,20 @@ const i18nextOptions = {
   saveMissing: true,
   fallbackLng: 'en',
   whitelist: ['en', 'ko', 'eo'],
-  ns: ['settings', 'system-info', 'validation'],
+  ns: [
+    'get-started',
+    'overview',
+    'own-addresses',
+    'send-cash',
+    'settings',
+    'services',
+    'validation',
+    'menu',
+    'other'
+  ],
   react: {
     wait: true,
     bindI18n: 'languageChanged loaded',
-    bindStore: 'added removed',
   }
 };
 

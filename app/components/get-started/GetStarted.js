@@ -3,11 +3,12 @@ import React, { Component } from 'react'
 import { NavLink } from 'react-router-dom'
 import classNames from 'classnames'
 
-import HLayout from '../../theme/h-box-layout.scss'
-import VLayout from '../../theme/v-box-layout.scss'
+import HLayout from '~/theme/h-box-layout.scss'
+import VLayout from '~/theme/v-box-layout.scss'
 import styles from './GetStarted.scss'
 
 type Props = {
+  t: any
 }
 
 
@@ -23,21 +24,23 @@ export class GetStarted extends Component<Props> {
    * @memberof GetStarted
 	 */
 	render() {
+    const { t } = this.props
+
 		return (
       <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
-        <div className={styles.title}>Get started with Resistance</div>
+        <div className={styles.title}>{t(`Get started with Resistance`)}</div>
 
-        <div className={styles.hint}>Please select one of the following options:</div>
+        <div className={styles.hint}>{t(`Please select one of the following options:`)}</div>
 
         <div className={styles.flowLinksContainer}>
           <NavLink className={styles.chooseFlowLink} to="/get-started/create-new-wallet">
             <i className={styles.createNewWalletIcon } />
-            Create a new wallet
+            {t(`Create a new wallet`)}
           </NavLink>
 
           <NavLink className={styles.chooseFlowLink} to="/get-started/restore-your-wallet">
             <i className={styles.restoreYourWalletIcon } />
-            Restore wallet from keys
+            {t(`Restore wallet from keys`)}
           </NavLink>
         </div>
       </div>

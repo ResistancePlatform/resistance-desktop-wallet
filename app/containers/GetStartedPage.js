@@ -1,24 +1,17 @@
 // @flow
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
+import { translate } from 'react-i18next'
 
-import { GetStartedActions } from '../state/reducers/get-started/get-started.reducer'
-import { GetStarted } from '../components/get-started/GetStarted'
-import { ChoosePassword } from '../components/get-started/ChoosePassword'
-import { RestoreYourWallet } from '../components/get-started/RestoreYourWallet'
+import { GetStartedActions } from '~/state/reducers/get-started/get-started.reducer'
+import { GetStarted } from '~/components/get-started/GetStarted'
 
-const connectComponent = component => (
-  connect(state => ({
-      getStarted: state.getStarted,
-      createNewWallet: state.getStarted.createNewWallet
-    }),
-    dispatch => ({
-      actions: bindActionCreators(GetStartedActions, dispatch)
-    }))(component)
-)
+const mapStateToProps = state => ({
+	getStarted: state.getStarted
+})
 
-export default {
-  GetStartedPage: connectComponent(GetStarted),
-  ChoosePasswordPage: connectComponent(ChoosePassword),
-  RestoreYourWalletPage: connectComponent(RestoreYourWallet),
-}
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(GetStartedActions, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(translate('get-started')(GetStarted))

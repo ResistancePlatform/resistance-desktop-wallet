@@ -22,6 +22,7 @@ const validationSchema = Joi.object().keys({
 })
 
 type Props = {
+  t: any,
   actions: object,
   getStartedActions: object,
 	createNewWallet: object
@@ -54,18 +55,20 @@ export class CreateNewWallet extends Component<Props> {
    * @memberof CreateNewWallet
 	 */
 	render() {
+    const { t } = this.props
+
 		return (
       <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
-        <div className={styles.title}>Create a new wallet</div>
+        <div className={styles.title}>{t(`Create a new wallet`)}</div>
 
-        <div className={styles.hint}>Choose a name for your wallet</div>
+        <div className={styles.hint}>{t(`Choose a name for your wallet`)}</div>
 
         <RoundedForm id="getStartedCreateNewWallet" schema={validationSchema}>
           <RoundedInput name="walletName" label="Wallet name" defaultValue={userInfo().username} />
 
           <RoundedInput
             name="walletPath"
-            label="Your wallet stored in"
+            label={t(`Your wallet stored in`)}
             defaultValue={resistance.getWalletPath()}
             readOnly />
 

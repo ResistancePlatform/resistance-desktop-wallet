@@ -12,28 +12,8 @@ import HLayout from '~/theme/h-box-layout.scss'
 import VLayout from '~/theme/v-box-layout.scss'
 import styles from './GetStarted.scss'
 
-const validationSchema = Joi.object().keys({
-  // #?!@$%^&*-'`;
-  password: (
-    Joi.string().required()
-    .regex(/^[a-zA-Z0-9]{8,30}$/)
-    .error(() => `should contain latin letters, numbers and special characters`)
-    .label(`Password`)
-  ),
-  confirmPassword: (
-    Joi.string().required().valid(Joi.ref('password'))
-    .label(`Confirm password`)
-    .options({
-      language: {
-        any: {
-          allowOnly: '!!Passwords do not match',
-        }
-      }
-    })
-  )
-})
-
 type Props = {
+  t: any,
   getStarted: object,
   form: object
 }
@@ -46,26 +26,56 @@ type Props = {
 export class ChoosePassword extends Component<Props> {
 	props: Props
 
+  getValidationSchema() {
+    const { t } = this.props
+
+    const schema = Joi.object().keys({
+      // #?!@$%^&*-'`;
+      password: (
+        Joi.string().required()
+        .regex(/^[a-zA-Z0-9]{8,30}$/)
+        .error(() => t(`should contain latin letters, numbers and special characters`))
+        .label(t(`Password`))
+      ),
+      confirmPassword: (
+        Joi.string().required().valid(Joi.ref('password'))
+        .label(t(`Confirm password`))
+        .options({
+          language: {
+            any: {
+              allowOnly: `!!${t('Passwords do not match')}`,
+            }
+          }
+        })
+      )
+    })
+
+    return schema
+  }
+
 	/**
 	 * @returns
    * @memberof ChoosePassword
 	 */
 	render() {
+    const { t } = this.props
     const prevPath = this.props.getStarted.isCreatingNewWallet ? 'create-new-wallet' : 'restore-your-wallet'
 
 		return (
       <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
-        <div className={styles.title}>Choose password for your wallet</div>
+        <div className={styles.title}>{t(`Choose password for your wallet`)}</div>
 
-        <div className={styles.hint}>Enter a strong password (using letters, numbers and/or symbols)</div>
+        <div className={styles.hint}>{t(`Enter a strong password (using letters, numbers and/or symbols)`)}</div>
 
-        <RoundedForm id="getStartedChoosePassword" schema={validationSchema}>
+        <RoundedForm id="getStartedChoosePassword" schema={this.getValidationSchema()}>
 
-          <RoundedInput name="password" password label="Password" />
-          <RoundedInput name="confirmPassword" password label="Confirm password" />
+          <RoundedInput name="password" password label={t(`Password`)} />
+          <RoundedInput name="confirmPassword" password label={t(`Confirm password`)} />
 
-          <div className={styles.note}><strong>Note:</strong> If you loose or forget this password, it cannot be recovered.
-            Your wallet can only be restored from it&#39;s 25 word mnemonic seed.</div>
+          <div className={styles.note}>
+            <strong>{t('Note:')}</strong>
+            {t(`If you loose or forget this password, it cannot be recovered. Your wallet can only be restored from it's 25 word mnemonic seed.`)}
+          </div>
 
           <PasswordStrength password={this.props.form && this.props.form.fields.password} />
 

@@ -1,6 +1,7 @@
 // @flow
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
+import { translate } from 'react-i18next'
 
 import { GetStartedActions } from '~/state/reducers/get-started/get-started.reducer'
 import { CreateNewWallet } from '~/components/get-started/CreateNewWallet'
@@ -14,4 +15,4 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(GetStartedActions.createNewWallet, dispatch)
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateNewWallet)
+export default connect(mapStateToProps, mapDispatchToProps)(translate('get-started')(CreateNewWallet))
