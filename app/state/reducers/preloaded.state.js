@@ -1,8 +1,6 @@
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
 
-import i18n from '~/i18n/i18next.config'
-
 export const preloadedState: State = {
   auth: {
     reason: null,
@@ -71,7 +69,7 @@ export const preloadedState: State = {
 	sendCash: {
 		isPrivateTransactions: false,
 		lockIcon: 'Unlock',
-		lockTips: i18n.t('send-cash.tip.r-to-r'),
+		lockTips: null,
 		fromAddress: '',
 		toAddress: '',
 		inputTooltips: '',

@@ -12,5 +12,9 @@
   "Up to": "Ekde",
   "Connections": "Konektoj",
   "Installation folder": "Instala dosierujo",
-  "RUNNING": "RULAS"
+  "Running": "Rulas",
+  "Enter Resistance": "Eniri Rezistancon",
+  "Password": "Pasvorto",
+  "Waiting for the daemon...": "Atendas la demonon...",
+  "Submit": "Sendi"
 }

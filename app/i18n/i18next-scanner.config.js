@@ -1,5 +1,5 @@
-var fs = require('fs');
-var chalk = require('chalk');
+import * as fs from 'fs'
+import * as chalk from 'chalk'
 
 module.exports = {
     options: {
@@ -10,9 +10,7 @@ module.exports = {
         },
         trans: {
             extensions: ['.js', '.jsx'],
-            fallbackKey: (ns, value) => {
-                return value;
-            }
+            fallbackKey: (ns, value) => value
         },
         lngs: ['en','eo', 'ko'],
         ns: [
@@ -25,31 +23,30 @@ module.exports = {
             loadPath: 'i18n/{{lng}}/{{ns}}.json',
             savePath: 'i18n/{{lng}}/{{ns}}.json'
         },
-        nsSeparator: false, // namespace separator
-        keySeparator: false, // key separator
+        nsSeparator: false,
+        keySeparator: false,
         interpolation: {
             prefix: '{{',
             suffix: '}}'
         }
     },
     transform: function customTransform(file, enc, done) {
-        "use strict";
-        const parser = this.parser;
-        const content = fs.readFileSync(file.path, enc);
-        let count = 0;
+        const { parser } = this
+        const content = fs.readFileSync(file.path, enc)
+        let count = 0
 
         parser.parseFuncFromString(content, { list: ['i18next._', 'i18next.__'] }, (key, options) => {
             parser.set(key, Object.assign({}, options, {
                 nsSeparator: false,
                 keySeparator: false
-            }));
-            ++count;
-        });
+            }))
+            count += 1
+        })
 
         if (count > 0) {
-            console.log(`i18next-scanner: count=${chalk.cyan(count)}, file=${chalk.yellow(JSON.stringify(file.relative))}`);
+            console.log(`i18next-scanner: count=${chalk.cyan(count)}, file=${chalk.yellow(JSON.stringify(file.relative))}`)
         }
 
-        done();
+        done()
     }
-};
+}

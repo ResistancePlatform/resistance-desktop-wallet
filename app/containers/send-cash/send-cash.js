@@ -117,7 +117,7 @@ class SendCash extends Component<Props> {
 
 		const destAddressAddon: RoundedInputAddon = {
 			enable: true,
-			type: t('Paste'),
+			type: 'PASTE',
 			onClick: () => this.onDestAddressPasteClicked()
 		}
 
@@ -177,7 +177,7 @@ class SendCash extends Component<Props> {
 								>
 									<div className={styles.toggleButtonSwitcher} />
 									<div className={styles.toggleButtonText}>
-										{this.props.sendCash.isPrivateTransactions ? t(`On` ): t(`Off`)}
+										{this.props.sendCash.isPrivateTransactions ? t(`On`): t(`Off`)}
 									</div>
 								</div>
 							</div>
@@ -221,20 +221,20 @@ class SendCash extends Component<Props> {
 								onClick={event => this.onSendButtonClicked(event)}
 								onKeyDown={event => this.onSendButtonClicked(event)}
 							>
-								SEND
+                {t(`Send`)}
 							</button>
 							<div className={[styles.desc, HLayout.hBoxContainer].join(' ')}>
 								<div className={styles.descIcon}>
 									<i className={this.getSendLockClasses()} />
 								</div>
-								<div className={styles.descContent}>{this.props.sendCash.lockTips}</div>
+								<div className={styles.descContent}>{this.props.sendCash.lockTips || t('tip-r-to-r') }</div>
 							</div>
 						</div>
 
 						{/* Memo */}
 						<div className={styles.memoConatiner}>
 							<span className={styles.memoTitle}>{t(`Memo:`)}</span>
-              {t(`send-cash.memo`)}
+              {t(`memo`)}
 						</div>
 
 					</div>

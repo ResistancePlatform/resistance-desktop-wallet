@@ -73,8 +73,8 @@ export class ChoosePassword extends Component<Props> {
           <RoundedInput name="confirmPassword" password label={t(`Confirm password`)} />
 
           <div className={styles.note}>
-            <strong>{t('Note:')}</strong>
-            {t(`If you loose or forget this password, it cannot be recovered. Your wallet can only be restored from it's 25 word mnemonic seed.`)}
+            <strong>{t('Note')}: </strong>
+            {t('choose-password-note')}
           </div>
 
           <PasswordStrength password={this.props.form && this.props.form.fields.password} />

@@ -57,4 +57,4 @@ const mapStateToProps = (state) => ({
 	navi: state.navi
 })
 
-export default connect(mapStateToProps, null)(translate('general')(NaviBar))
+export default connect(mapStateToProps, null)(translate('other')(NaviBar))

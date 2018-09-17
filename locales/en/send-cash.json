@@ -1,7 +1,7 @@
 {
-  "send-cash.tip-r-to-r": "You are sending money from a Transparent (R) Address to a Transparent (R) Address. This transaction will be fully transparent and visible to every user.",
-  "send-cash.tip-r-to-z": "You are sending money from a Transparent (R) Address to a Private (Z) Address. This transaction will be partially shielded.",
-  "send-cash.tip-z-to-z": "You are sending money from a Private (Z) Address to a Private (Z) Address. This transaction will be fully shielded and invisible to all users.",
-  "send-cash.tip-z-to-r": "You are sending money from a Private (Z) Address to a Transparent (R) Address. This transaction will be partially shielded.",
-  "send-cash.memo": "When sending cash from a Transparent (R) address, the remaining balance is sent to another out-generated r address. When sending from a Private (Z) address, the remaining unsent balance remains with the Z address. In both cases the original sending address cannot be used for sending again until the transaction is confirmed. The address is temporarily removed from the list. Freshly mined coins may only be sent to a Private (Z) address."
+  "tip-r-to-r": "You are sending money from a Transparent (R) Address to a Transparent (R) Address. This transaction will be fully transparent and visible to every user.",
+  "tip-r-to-z": "You are sending money from a Transparent (R) Address to a Private (Z) Address. This transaction will be partially shielded.",
+  "tip-z-to-z": "You are sending money from a Private (Z) Address to a Private (Z) Address. This transaction will be fully shielded and invisible to all users.",
+  "tip-z-to-r": "You are sending money from a Private (Z) Address to a Transparent (R) Address. This transaction will be partially shielded.",
+  "memo": "When sending cash from a Transparent (R) address, the remaining balance is sent to another out-generated r address. When sending from a Private (Z) address, the remaining unsent balance remains with the Z address. In both cases the original sending address cannot be used for sending again until the transaction is confirmed. The address is temporarily removed from the list. Freshly mined coins may only be sent to a Private (Z) address."
 }

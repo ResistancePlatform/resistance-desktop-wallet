@@ -6,6 +6,8 @@ import i18n from '~/i18n/i18next.config'
 import { preloadedState } from '../preloaded.state'
 
 
+const t = i18n.getFixedT(null, 'send-cash')
+
 export type SendFromRadioButtonType = 'transparent' | 'private'
 
 export type AddressDropdownItem = {
@@ -17,7 +19,7 @@ export type AddressDropdownItem = {
 export type SendCashState = {
 	isPrivateTransactions: boolean,
 	lockIcon: 'Lock' | 'Unlock',
-	lockTips: string,
+	lockTips: string | null,
 	fromAddress: string,
 	toAddress: string,
 	inputTooltips: string,
@@ -65,13 +67,13 @@ export const checkPrivateTransactionRule = (tempState: SendCashState) => {
   }
 
 	if (isTransparentAddress(tempState.fromAddress) && isPrivateAddress(tempState.toAddress)) {
-    checkResult = i18n.t(`Sending cash from a transparent (R) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
+    checkResult = t(`Sending cash from a transparent (R) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
 	}
 	else if (isPrivateAddress(tempState.fromAddress) && isPrivateAddress(tempState.toAddress)) {
-    checkResult = i18n.t(`Sending cash from a private (Z) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
+    checkResult = t(`Sending cash from a private (Z) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
 	}
 	else if (isPrivateAddress(tempState.fromAddress) && isTransparentAddress(tempState.toAddress)) {
-    checkResult = i18n.t(`Sending cash from a private (Z) address to a transparent (R) address is forbidden when "Private Transactions" are disabled.`)
+    checkResult = t(`Sending cash from a private (Z) address to a transparent (R) address is forbidden when "Private Transactions" are disabled.`)
 	}
 
 	return checkResult
@@ -93,20 +95,20 @@ const handleAddressUpdate = (tempState: SendCashState, newAddress: string, isUpd
 	const { fromAddress, toAddress } = newState
 
 	let lockIcon = 'Unlock'
-	let lockTips = i18n.t('send-cash.tip.r-to-r')
+	let lockTips = t('tip-r-to-r')
 
 	if (isTransparentAddress(fromAddress) && isPrivateAddress(toAddress)) {
 		lockIcon = `Unlock`
-		lockTips = i18n.t('send-cash.tip.r-to-z')
+		lockTips = t('tip-r-to-z')
 	} else if (isPrivateAddress(fromAddress) && isPrivateAddress(toAddress)) {
 		lockIcon = `Lock`
-		lockTips = i18n.t('send-cash.tip.z-to-z')
+		lockTips = t('tip-z-to-z')
 	} else if (isPrivateAddress(fromAddress) && isTransparentAddress(toAddress)) {
 		lockIcon = `Unlock`
-		lockTips = i18n.t('send-cash.tip.z-to-r')
+		lockTips = t('tip-z-to-r')
 	} else if (isTransparentAddress(fromAddress) && isTransparentAddress(toAddress)) {
 		lockIcon = `Unlock`
-		lockTips = i18n.t('send-cash.tip.r-to-r')
+		lockTips = t('tip-r-to-r')
 	}
 
 	return ({ ...newState, inputTooltips: newInputTooltips, lockIcon, lockTips })

@@ -102,7 +102,8 @@ class SystemInfo extends Component<Props> {
       'MURDER FAILED' : t(`Murder failed`),
       'NOT RUNNING' : t(`Not running`)
     }
-    return nameMap[processName] || t(`Unknown`)
+    const status = this.props.settings.childProcessesStatus[processName]
+    return nameMap[status] || t(`Unknown`)
   }
 
 	/**
@@ -259,7 +260,7 @@ class SystemInfo extends Component<Props> {
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>{t(`Resistance status`)}</div>
 						<div className={styles.statusColoumnValue}>
-              <span className={styles.nodeStatusContainer}><i className={this.getLocalNodeStatusClassNames()} /><span>{t(this.getChildProcessStatusName('NODE'))}</span></span>
+              <span className={styles.nodeStatusContainer}><i className={this.getLocalNodeStatusClassNames()} /><span>{t(this.getChildProcessStatusName(t, 'NODE'))}</span></span>
 						</div>
 					</div>
 
@@ -351,4 +352,4 @@ const mapStateToProps = (state: State) => ({
 	settings: state.settings
 })
 
-export default connect(mapStateToProps, null)(translate('system-info')(SystemInfo))
+export default connect(mapStateToProps, null)(translate('other')(SystemInfo))

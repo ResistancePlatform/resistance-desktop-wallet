@@ -47,7 +47,7 @@ export class AddressBook extends Component<Props> {
 
 				{/* Top bar */}
 				<div className={cn(styles.topBar, HLayout.hBoxContainer)}>
-					<div className={styles.topBarTitle}>Address Book</div>
+					<div className={styles.topBarTitle}>{t(`Address Book`)}</div>
 					<div className={cn(styles.topBarButtonContainer, HLayout.hBoxChild)}>
 						<button
               type="button"

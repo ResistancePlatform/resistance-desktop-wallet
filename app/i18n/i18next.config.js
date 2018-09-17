@@ -15,6 +15,8 @@ const i18nextOptions = {
   saveMissing: true,
   fallbackLng: 'en',
   whitelist: ['en', 'ko', 'eo'],
+  keySeparator: false,
+  nsSeparator: false,
   ns: [
     'get-started',
     'overview',

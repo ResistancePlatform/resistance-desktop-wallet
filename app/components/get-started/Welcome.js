@@ -97,27 +97,27 @@ export class Welcome extends Component<Props> {
 
         <div className={styles.welcomeContainer}>
           <div className={styles.summaryTitle}>
-            {t(`Here's a summary of your new wallet configuration:`)}
+            {t(`Here's a summary of your new wallet configuration`)}:
           </div>
 
           <ul className={styles.summary}>
             <li>
-              <span>{t(`Language:`)}</span> English
+              <span>{t(`Language`)}:</span> English
             </li>
             <li>
-              <span>{t(`Wallet name:`)}</span> {this.getWalletName()}
+              <span>{t(`Wallet name`)}:</span> {this.getWalletName()}
             </li>
             <li>
-              <span>{t(`Backup seed:`)}</span> * * * * * * *
+              <span>{t(`Backup seed`)}:</span> * * * * * * *
             </li>
             <li>
-              <span>{t(`Wallet path:`)}</span> {resistance.getWalletPath()}
+              <span>{t(`Wallet path`)}:</span> {resistance.getWalletPath()}
             </li>
             <li>
-              <span>{t(`Daemon address:`)}</span> {this.getDaemonAddress()}
+              <span>{t(`Daemon address`)}:</span> {this.getDaemonAddress()}
             </li>
             <li>
-              <span>{t(`Network type:`)}</span> {this.getNetworkType()}
+              <span>{t(`Network type`)}:</span> {this.getNetworkType()}
             </li>
           </ul>
 
