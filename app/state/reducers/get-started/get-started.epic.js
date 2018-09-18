@@ -44,6 +44,14 @@ function getNodeStartedObservable(emitActionOnStart: Action, action$: ActionsObs
   return observable
 }
 
+const chooseLanguageEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(GetStartedActions.chooseLanguage),
+  mergeMap(action => of(
+    SettingsActions.updateLanguage(action.payload.code),
+    push('/get-started/get-started')
+  ))
+)
+
 const generateWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(GetStartedActions.createNewWallet.generateWallet),
   switchMap(() => {
@@ -168,6 +176,7 @@ const useResistanceEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 )
 
 export const GetStartedEpic = (action$, state$) => merge(
+	chooseLanguageEpic(action$, state$),
 	generateWalletEpic(action$, state$),
 	applyConfigurationEpic(action$, state$),
   encryptWalletEpic(action$, state$),

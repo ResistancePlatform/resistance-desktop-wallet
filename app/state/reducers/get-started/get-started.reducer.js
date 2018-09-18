@@ -29,6 +29,8 @@ export const GetStartedActions = createActions(
 
     SET_CREATING_NEW_WALLET: (isCreatingNewWallet: boolean) => isCreatingNewWallet,
 
+    CHOOSE_LANGUAGE: (code: string) => ({ code }),
+
     CREATE_NEW_WALLET: {
       GENERATE_WALLET: undefined,
       GOT_GENERATED_WALLET: (wallet: Wallet) => wallet,

@@ -43,6 +43,8 @@ export class GetStarted extends Component<Props> {
             {t(`Restore wallet from keys`)}
           </NavLink>
         </div>
+
+        <NavLink className={styles.prevLink} to="/get-started/choose-language" />
       </div>
     )
   }

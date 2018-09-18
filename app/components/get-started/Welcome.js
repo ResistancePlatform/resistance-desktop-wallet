@@ -108,9 +108,6 @@ export class Welcome extends Component<Props> {
               <span>{t(`Wallet name`)}:</span> {this.getWalletName()}
             </li>
             <li>
-              <span>{t(`Backup seed`)}:</span> * * * * * * *
-            </li>
-            <li>
               <span>{t(`Wallet path`)}:</span> {resistance.getWalletPath()}
             </li>
             <li>

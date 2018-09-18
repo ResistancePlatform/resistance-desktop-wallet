@@ -80,7 +80,7 @@ export class RestoreYourWallet extends Component<Props> {
             defaultValue={resistance.getWalletPath()}
             readOnly />
 
-          <NavLink className={styles.prevLink} to="/get-started" />
+          <NavLink className={styles.prevLink} to="/get-started/get-started" />
           <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/choose-password" />
 
           <div className={styles.paginationDots}>
