@@ -37,7 +37,7 @@ const scannerOptions = {
   defaultValue: (language, namespace, key) => key,
   resource: {
     loadPath: './locales/{{lng}}/{{ns}}.json',
-    savePath: 'i18n/{{lng}}/{{ns}}.json'
+    savePath: './{{lng}}/{{ns}}.json'
   },
   nsSeparator: false,
   keySeparator: false,
