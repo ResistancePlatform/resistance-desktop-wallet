@@ -30,7 +30,12 @@ const submitPasswordEpic = (action$: ActionsObservable<Action>, state$) => actio
           loginAfterTimeout,
         )
       }),
-      catchError(err => of(AuthActions.loginFailed(err.message)))
+      catchError(err => {
+        const errorMessage = err.code === -14
+          ? t(`The wallet password entered was incorrect.`)
+          : err.message
+        return of(AuthActions.loginFailed(errorMessage))
+      })
     )
     return observable
   })

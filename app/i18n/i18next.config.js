@@ -13,7 +13,7 @@ const i18nextOptions = {
   interpolation: {
     escapeValue: false
   },
-  debug: true,
+  debug: process.env.NODE_ENV === 'development',
   saveMissing: true,
   fallbackLng: 'en',
   whitelist: availableLanguages,
