@@ -4,6 +4,19 @@ import i18nextBackend from 'i18next-node-fs-backend'
 
 const availableLanguages = ['en', 'eo', 'ko']
 
+const availableNamespaces = [
+  'get-started',
+  'overview',
+  'own-addresses',
+  'address-book',
+  'send-cash',
+  'settings',
+  'service',
+  'validation',
+  'menu',
+  'other'
+]
+
 const i18nextOptions = {
   backend:{
     loadPath: './locales/{{lng}}/{{ns}}.json',
@@ -19,17 +32,7 @@ const i18nextOptions = {
   whitelist: availableLanguages,
   keySeparator: false,
   nsSeparator: false,
-  ns: [
-    'get-started',
-    'overview',
-    'own-addresses',
-    'send-cash',
-    'settings',
-    'services',
-    'validation',
-    'menu',
-    'other'
-  ],
+  ns: availableNamespaces,
   react: {
     wait: true,
     bindI18n: 'languageChanged loaded'
@@ -46,5 +49,6 @@ if (!i18n.isInitialized) {
 
 module.exports = {
   i18n,
-  availableLanguages
+  availableLanguages,
+  availableNamespaces
 }

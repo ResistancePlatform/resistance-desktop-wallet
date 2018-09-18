@@ -87,4 +87,4 @@ class PasswordStrength extends Component<Props> {
 	}
 }
 
-export default translate('get-started')(PasswordStrength)
+export default translate('other')(PasswordStrength)

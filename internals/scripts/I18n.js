@@ -1,37 +1,42 @@
 // @flow
+import path from 'path'
 import vfs from 'vinyl-fs'
 import scanner from 'i18next-scanner'
-import filter from 'gulp-filter'
 import * as fs from 'fs'
-import { availableLanguages } from '../../app/i18n/i18next.config'
+import { availableLanguages, availableNamespaces } from '../../app/i18n/i18next.config'
 
-const optionsTemplate = {
-  debug: true,
+function convertPathToNamespace(filePath) {
+  if (filePath === '/menu.js') {
+    return 'menu'
+  }
+
+  const namespace = availableNamespaces.filter(
+    ns => filePath.split(path.sep).includes(ns)
+  ).pop() || 'other'
+
+  return namespace
+}
+
+const scannerOptions = {
+  debug: false,
+  attr: {
+    // Disable attribute parsing
+    extensions: [],
+  },
   func: {
-    list: ['i18next.t', 'i18n.t', 't'],
-    extensions: ['.js', '.jsx']
+    // Disable function parsing, we will do that ourselves from transform()
+    extensions: []
   },
   trans: {
     // Disable Trans component parsing
     extensions: [],
-    fallbackKey: (ns, value) => value
   },
   lngs: availableLanguages,
-  ns: [
-    'get-started',
-    'overview',
-    'own-addresses',
-    'send-cash',
-    'settings',
-    'services',
-    'validation',
-    'menu',
-    'other'
-  ],
+  ns: availableNamespaces,
   defaultNs: 'other',
   defaultValue: (language, namespace, key) => key,
   resource: {
-    loadPath: './localesa/{{lng}}/{{ns}}.json',
+    loadPath: './locales/{{lng}}/{{ns}}.json',
     savePath: 'i18n/{{lng}}/{{ns}}.json'
   },
   nsSeparator: false,
@@ -42,47 +47,34 @@ const optionsTemplate = {
   }
 }
 
-function getScanner(namespace: string) {
-  const options = {
-    ...optionsTemplate,
-    defaultNs: namespace
-  }
-  return scanner(options)
-}
-
 function transform(file, enc, done) {
-  const parser = this.parser;
+  const { parser } = this
   const content = fs.readFileSync(file.path, enc);
-  let count = 0;
 
-  parser.parseFuncFromString(content, { list: ['i18next._', 'i18next.__'] }, (key, options) => {
-    parser.set(key, Object.assign({}, options, {
-      nsSeparator: false,
-      keySeparator: false
-    }));
-    ++count;
-  });
-
-  if (count > 0) {
-    console.log(`i18next-scanner: count=${chalk.cyan(count)}, file=${chalk.yellow(JSON.stringify(file.relative))}`);
+  const funcOptions = {
+    list: ['i18next.t', 'i18n.t', 't'],
+    extensions: ['.js', '.jsx']
   }
 
-  done();
-}
+  const appPath = path.join(__dirname, '../../app')
+  const relativePath = file.path.slice(appPath.length)
+  const namespace = convertPathToNamespace(relativePath)
+  let hasKeys = false
 
-const filters = {
-  getStarted: filter('**/get-started/*.js', { restore: true }),
-  overview: filter('**/overview/*.js', { restore: true }),
+  parser.parseFuncFromString(content, funcOptions, (key, options) => {
+    hasKeys = true
+    parser.set(key, Object.assign({}, options, {
+      ns: namespace
+    }))
+  })
+
+  if (hasKeys) {
+    console.log(`[${namespace}] ${relativePath}...`)
+  }
+
+  done()
 }
 
 vfs.src(['./app/**/*.js', '!./app/node_modules/**/*', '!./app/dist/**/*.js', '!./app/i18n/**/*.js'])
-
-  .pipe(filters.getStarted)
-  .pipe(getScanner('get-started'))
+  .pipe(scanner(scannerOptions, transform))
   .pipe(vfs.dest('./locales/'))
-  .pipe(filters.getStarted.restore)
-
-  .pipe(filters.overview)
-  .pipe(getScanner('overview'))
-  .pipe(vfs.dest('./locales/'))
-  .pipe(filters.overview.restore)

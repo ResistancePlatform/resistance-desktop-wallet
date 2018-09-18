@@ -163,4 +163,4 @@ const mapStateToProps = state => ({
   systemInfo: state.systemInfo
 })
 
-export default connect(mapStateToProps, null)(translate('system-info')(OperationsModal))
+export default connect(mapStateToProps, null)(translate('other')(OperationsModal))
