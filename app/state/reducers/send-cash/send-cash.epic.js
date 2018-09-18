@@ -14,6 +14,7 @@ import { RpcService } from '~/service/rpc-service'
 import { AddressBookService } from '~/service/address-book-service'
 
 
+const t = i18n.getFixedT(null, 'send-cash')
 const rpcService = new RpcService()
 const addressBookService = new AddressBookService()
 
@@ -22,17 +23,17 @@ const allowToSend = (sendCashState: SendCashState) => {
 		sendCashState.fromAddress.trim() === '' ||
 		sendCashState.toAddress.trim() === ''
 	) {
-		return i18n.t('"FROM ADDRESS" or "DESTINATION ADDRESS" is required.')
+		return t('"FROM ADDRESS" or "DESTINATION ADDRESS" is required.')
   }
 
   if (
 		sendCashState.fromAddress.trim() === sendCashState.toAddress.trim()
 	) {
-		return i18n.t(`"FROM ADDRESS" or "DESTINATION ADDRESS" cannot be the same.`)
+		return t(`"FROM ADDRESS" or "DESTINATION ADDRESS" cannot be the same.`)
   }
 
   if (sendCashState.amount.lessThanOrEqualTo(TRANSACTION_FEE)) {
-		return i18n.t(`"AMOUNT" is required.`)
+		return t(`"AMOUNT" is required.`)
 	}
 
 	return 'ok'
@@ -67,7 +68,7 @@ const sendCashEpic = (action$: ActionsObservable<Action>, state$) => action$.pip
 const sendCashOperationStartedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SendCashActions.sendCashOperationStarted),
 	tap(() => {
-		toastr.info(i18n.t(`Send cash operation started.`))
+		toastr.info(t(`Send cash operation started.`))
 	}),
 	mapTo(SendCashActions.empty())
 )
@@ -75,7 +76,7 @@ const sendCashOperationStartedEpic = (action$: ActionsObservable<Action>) => act
 const sendCashFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SendCashActions.sendCashFailure),
   tap((action: Action) => {
-    toastr.error(i18n.t(`Unable to start send cash operation`), action.payload.errorMessage)
+    toastr.error(t(`Unable to start send cash operation`), action.payload.errorMessage)
   }),
 	mapTo(SendCashActions.empty())
 )

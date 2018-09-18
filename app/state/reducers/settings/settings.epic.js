@@ -12,6 +12,7 @@ import { MinerService } from '~/service/miner-service'
 import { TorService } from '~/service/tor-service'
 import { SettingsActions } from './settings.reducer'
 
+const t = i18n.getFixedT(null, 'settings')
 const rpcService = new RpcService()
 const resistanceService = new ResistanceService()
 const minerService = new MinerService()
@@ -92,7 +93,7 @@ const disableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 const enableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.enableTor),
 	tap(() => { torService.start() }),
-  tap(() => { toastr.info(i18n.t(`Restarting the local node due to Tor activation.`)) }),
+  tap(() => { toastr.info(t(`Restarting the local node due to Tor activation.`)) }),
   filter(() => state$.value.settings.childProcessesStatus.NODE === 'RUNNING'),
   mapTo(SettingsActions.restartLocalNode())
 )
@@ -100,7 +101,7 @@ const enableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pi
 const disableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.disableTor),
 	tap(() => { torService.stop() }),
-  tap(() => { toastr.info(i18n.t(`Restarting the local node due to Tor shutdown.`)) }),
+  tap(() => { toastr.info(t(`Restarting the local node due to Tor shutdown.`)) }),
   filter(() => state$.value.settings.childProcessesStatus.NODE === 'RUNNING'),
   mapTo(SettingsActions.restartLocalNode())
 )
@@ -112,8 +113,8 @@ const childProcessFailedEpic = (action$: ActionsObservable<Action>, state$) => a
     if (state$.value.getStarted.isInProgress && action.payload.processName === 'NODE') {
       return
     }
-    const errorMessage = i18n.t(`Process {{processName}} has failed.`, { processName: action.payload.processName })
-    toastr.error(i18n.t(`Child process failure`), `${errorMessage}\n${action.payload.errorMessage}`)
+    const errorMessage = t(`Process {{processName}} has failed.`, { processName: action.payload.processName })
+    toastr.error(t(`Child process failure`), `${errorMessage}\n${action.payload.errorMessage}`)
   }),
 	map((action) => {
     if (action.payload.processName === 'NODE') {
@@ -131,8 +132,8 @@ const childProcessFailedEpic = (action$: ActionsObservable<Action>, state$) => a
 const childProcessMurderFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.childProcessMurderFailed),
 	tap((action) => {
-    const errorMessage = i18n.t(`Failed to stop {{processName}}.`, {processName: action.payload.processName})
-    toastr.error(i18n.t(`Stop child process error`), `${errorMessage}\n${action.payload.errorMessage}`)
+    const errorMessage = t(`Failed to stop {{processName}}.`, {processName: action.payload.processName})
+    toastr.error(t(`Stop child process error`), `${errorMessage}\n${action.payload.errorMessage}`)
   }),
   mapTo(SettingsActions.empty())
 )
@@ -146,7 +147,7 @@ const exportWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 const exportWalletSuccessEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.exportWalletSuccess),
 	tap(() => {
-    toastr.info(i18n.t(`Wallet backup succeeded.`))
+    toastr.info(t(`Wallet backup succeeded.`))
   }),
   mapTo(SettingsActions.empty())
 )
@@ -154,7 +155,7 @@ const exportWalletSuccessEpic = (action$: ActionsObservable<Action>) => action$.
 const exportWalletFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.exportWalletFailure),
 	tap((action) => {
-    toastr.error(i18n.t(`Unable to backup the wallet`), action.payload.errorMessage)
+    toastr.error(t(`Unable to backup the wallet`), action.payload.errorMessage)
   }),
   mapTo(SettingsActions.empty())
 )
@@ -173,8 +174,8 @@ const importWalletSuccessEpic = (action$: ActionsObservable<Action>, state$) => 
     // TODO: Replace actions dispatching with observables in the RPC service #114
     if (!state$.value.getStarted.isInProgress) {
       toastr.info(
-        i18n.t(`Wallet restored successfully`),
-        i18n.t(`It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`)
+        t(`Wallet restored successfully`),
+        t(`It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`)
       )
     }
   }),
@@ -186,7 +187,7 @@ const importWalletFailureEpic = (action$: ActionsObservable<Action>, state$) => 
 	tap((action) => {
   // TODO: Replace actions dispatching with observables in the RPC service #114
     if (!state$.value.getStarted.isInProgress) {
-      toastr.error(i18n.t(`Unable to restore wallet`), action.payload.errorMessage)
+      toastr.error(t(`Unable to restore wallet`), action.payload.errorMessage)
     }
   }),
   mapTo(SettingsActions.empty())
