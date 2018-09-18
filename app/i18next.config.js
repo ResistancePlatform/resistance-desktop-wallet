@@ -17,6 +17,8 @@ const availableNamespaces = [
   'other'
 ]
 
+const isDev = process.env.NODE_ENV === 'development'
+
 const i18nextOptions = {
   backend:{
     loadPath: './locales/{{lng}}/{{ns}}.json',
@@ -26,8 +28,8 @@ const i18nextOptions = {
   interpolation: {
     escapeValue: false
   },
-  debug: process.env.NODE_ENV === 'development',
-  saveMissing: true,
+  debug: isDev,
+  saveMissing: isDev,
   fallbackLng: 'en',
   whitelist: availableLanguages,
   keySeparator: false,

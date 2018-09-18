@@ -5,7 +5,7 @@ import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
 import { TRANSACTION_FEE } from '~/constants'
-import { i18n } from '~/i18n/i18next.config'
+import { i18n } from '~/i18next.config'
 import { Action } from '../types'
 import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { SendCashActions, SendCashState, checkPrivateTransactionRule } from './send-cash.reducer'

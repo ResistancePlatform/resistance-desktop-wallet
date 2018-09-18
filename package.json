@@ -171,7 +171,6 @@
     "flow-bin": "^0.72.0",
     "flow-runtime": "^0.17.0",
     "flow-typed": "^2.4.0",
-    "gulp-filter": "^5.1.0",
     "husky": "^0.14.3",
     "i18next-scanner": "^2.6.5",
     "identity-obj-proxy": "^3.0.0",

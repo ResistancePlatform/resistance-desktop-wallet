@@ -5,7 +5,7 @@ import { filter, switchMap, take, map, mergeMap, mapTo, catchError } from 'rxjs/
 import { remote } from 'electron'
 import { ofType } from 'redux-observable'
 import { push } from 'react-router-redux'
-import { i18n } from '~/i18n/i18next.config'
+import { i18n } from '~/i18next.config'
 
 import { Action } from '../types'
 import { AUTH } from '~/constants/auth'

@@ -10,7 +10,7 @@ import { from, of, Observable } from 'rxjs'
 import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
-import { i18n } from '~/i18n/i18next.config'
+import { i18n } from '~/i18next.config'
 import { TRANSACTION_FEE } from '~/constants'
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { OSService } from './os-service'
@@ -75,7 +75,7 @@ export class RpcService {
 			instance = this
 		}
 
-    instance.t = i18n.getFixedT(null, 'services')
+    instance.t = i18n.getFixedT(null, 'service')
 
 		this.logger = new LoggerService()
 		this.osService = new OSService()

@@ -4,7 +4,7 @@ import path from 'path'
 import { spawn } from 'child_process'
 import { app, remote } from 'electron'
 
-import { i18n } from '../i18n/i18next.config'
+import { i18n } from '../i18next.config'
 
 /**
  * ES6 singleton
@@ -36,7 +36,7 @@ export class OSService {
       instance = this
     }
 
-    instance.t = i18n.getFixedT(null, 'services')
+    instance.t = i18n.getFixedT(null, 'service')
 
     // Create a global var to store child processes information for the cleanup
     if (process.type === 'browser' && global.childProcesses === undefined) {

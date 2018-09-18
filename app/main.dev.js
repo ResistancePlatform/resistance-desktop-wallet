@@ -13,7 +13,7 @@
 import * as fs from 'fs'
 import path from 'path'
 import { app, BrowserWindow } from 'electron'
-import { i18n } from './i18n/i18next.config'
+import { i18n } from './i18next.config'
 import config from 'electron-settings'
 
 import { OSService } from './service/os-service'

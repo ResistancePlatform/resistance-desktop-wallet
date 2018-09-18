@@ -1,10 +1,11 @@
 // @flow
+import config from 'electron-settings'
 import { tap, filter, delay, map, flatMap, mapTo } from 'rxjs/operators'
 import { of, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
-import { i18n } from '~/i18n/i18next.config'
+import { i18n } from '~/i18next.config'
 import { Action } from '../types'
 import { RpcService } from '~/service/rpc-service'
 import { ResistanceService } from '~/service/resistance-service'
@@ -21,8 +22,8 @@ const torService = new TorService()
 const updateLanguageEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.updateLanguage),
   map(action => {
-    console.log(`Action changed to`, action.payload.code)
     i18n.changeLanguage(action.payload.code)
+    config.set('language', action.payload.code)
     return SettingsActions.empty()
   })
 )

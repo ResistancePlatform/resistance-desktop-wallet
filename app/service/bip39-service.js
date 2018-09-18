@@ -2,7 +2,7 @@
 import * as bip39 from 'bip39'
 import * as Joi from 'joi'
 
-import { i18n } from '~/i18n/i18next.config'
+import { i18n } from '~/i18next.config'
 
 /**
  * ES6 singleton
@@ -27,7 +27,7 @@ export class Bip39Service {
 	constructor() {
 		if (!instance) { instance = this }
 
-    instance.t = i18n.getFixedT(null, 'services')
+    instance.t = i18n.getFixedT(null, 'service')
 
 		return instance
 	}

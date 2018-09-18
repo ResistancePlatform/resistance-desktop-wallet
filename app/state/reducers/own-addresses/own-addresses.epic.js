@@ -4,7 +4,7 @@ import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
-import { i18n } from '~/i18n/i18next.config'
+import { i18n } from '~/i18next.config'
 import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { OwnAddressesActions } from './own-addresses.reducer'
 import { Action } from '../types'

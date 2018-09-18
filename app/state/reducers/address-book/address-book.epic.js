@@ -5,7 +5,7 @@ import { Observable, merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
-import { i18n } from '~/i18n/i18next.config'
+import { i18n } from '~/i18next.config'
 import { AddressBookActions } from './address-book.reducer'
 import { AddressBookService } from '~/service/address-book-service'
 

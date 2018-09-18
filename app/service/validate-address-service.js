@@ -2,7 +2,7 @@
 import bs58check from 'bs58check'
 import * as Joi from 'joi'
 
-import { i18n } from '~/i18n/i18next.config'
+import { i18n } from '~/i18next.config'
 
 /**
  * ES6 singleton
@@ -29,7 +29,7 @@ export default class ValidateAddressService {
       instance = this
     }
 
-    instance.t = i18n.getFixedT(null, 'services')
+    instance.t = i18n.getFixedT(null, 'service')
 
 		return instance
 	}

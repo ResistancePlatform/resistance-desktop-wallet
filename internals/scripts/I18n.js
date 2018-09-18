@@ -3,7 +3,7 @@ import path from 'path'
 import vfs from 'vinyl-fs'
 import scanner from 'i18next-scanner'
 import * as fs from 'fs'
-import { availableLanguages, availableNamespaces } from '../../app/i18n/i18next.config'
+import { availableLanguages, availableNamespaces } from '../../app/i18next.config'
 
 function convertPathToNamespace(filePath) {
   if (filePath === '/menu.js') {

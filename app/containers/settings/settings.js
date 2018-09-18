@@ -10,7 +10,7 @@ import cn from 'classnames'
 import scrypt from 'scrypt-js'
 import Iso6391 from 'iso-639-1'
 
-import { availableLanguages } from '~/i18n/i18next.config'
+import { availableLanguages } from '~/i18next.config'
 import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import styles from './settings.scss'
@@ -69,10 +69,6 @@ class Settings extends Component<Props> {
 
     if (nextProps.settings.isTorEnabled !== this.props.settings.isTorEnabled) {
       config.set('manageDaemon.enableTor', nextProps.settings.isTorEnabled)
-    }
-
-    if (nextProps.settings.language !== this.props.settings.language) {
-      config.set('language', nextProps.settings.language)
     }
   }
 

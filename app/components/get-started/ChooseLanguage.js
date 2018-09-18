@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import cn from 'classnames'
 import Iso6391 from 'iso-639-1'
 
-import { availableLanguages } from '~/i18n/i18next.config'
+import { availableLanguages } from '~/i18next.config'
 
 import HLayout from '~/theme/h-box-layout.scss'
 import VLayout from '~/theme/v-box-layout.scss'

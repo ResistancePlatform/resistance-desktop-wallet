@@ -2,7 +2,7 @@
 import { Decimal } from 'decimal.js'
 import { createActions, handleActions } from 'redux-actions'
 
-import { i18n } from '~/i18n/i18next.config'
+import { i18n } from '~/i18next.config'
 import { preloadedState } from '../preloaded.state'
 
 

@@ -3,7 +3,7 @@ import config from 'electron-settings'
 import { of, throwError } from 'rxjs'
 import { AddressBookRecord } from '../state/reducers/address-book/address-book.reducer'
 
-import { i18n } from '~/i18n/i18next.config'
+import { i18n } from '~/i18next.config'
 
 const addressBookConfigKey = 'addressBook'
 const addressNotFoundErrorMessageKey = `Address not found in the database.`
@@ -30,7 +30,7 @@ export class AddressBookService {
       instance.addressBook = []
     }
 
-    instance.t = i18n.getFixedT(null, 'services')
+    instance.t = i18n.getFixedT(null, 'service')
 
 		return instance
 	}
