@@ -27,6 +27,7 @@ const operationsPollingInterval = 3.0
 
 type Props = {
   t: any,
+  i18n: any,
 	systemInfo: SystemInfoState,
 	sendCash: SendCashState,
 	settings: SettingsState
@@ -145,8 +146,8 @@ class SystemInfo extends Component<Props> {
   }
 
 	displayLastBlockTime(tempDate: Date | null) {
-    const { t } = this.props
-    return tempDate ? moment().locale('eo').calendar(tempDate) : t(`N/A`)
+    const { t, i18n } = this.props
+    return tempDate ? moment().locale(i18n.language).calendar(tempDate) : t(`N/A`)
 	}
 
   getMinerStatusIconTitle() {

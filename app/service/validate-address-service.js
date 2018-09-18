@@ -2,7 +2,7 @@
 import bs58check from 'bs58check'
 import * as Joi from 'joi'
 
-import i18n from '~/i18n/i18next.config'
+import { i18n } from '~/i18n/i18next.config'
 
 /**
  * ES6 singleton

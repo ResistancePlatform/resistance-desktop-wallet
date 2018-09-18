@@ -2,7 +2,7 @@
 import * as bip39 from 'bip39'
 import * as Joi from 'joi'
 
-import i18n from '~/i18n/i18next.config'
+import { i18n } from '~/i18n/i18next.config'
 
 /**
  * ES6 singleton

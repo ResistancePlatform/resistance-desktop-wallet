@@ -4,7 +4,7 @@ import { catchError, delay, map, switchMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
-import i18n from '~/i18n/i18next.config'
+import { i18n } from '~/i18n/i18next.config'
 import { AUTH } from '~/constants/auth'
 import { RpcService } from '~/service/rpc-service'
 import { AuthActions } from './auth.reducer'

@@ -25,6 +25,7 @@ const getStatusName = (t, status) => ({
 
 type Props = {
   t: any,
+  i18n: any,
   systemInfo: SystemInfoState
 }
 
@@ -58,7 +59,7 @@ class OperationsModal extends Component<Props> {
   }
 
   getListRowRenderer(operation) {
-    const { t } = this.props
+    const { t, i18n } = this.props
 
     return (
       <UniformListRow key={operation.id}>
@@ -66,7 +67,7 @@ class OperationsModal extends Component<Props> {
           {humanizeOperationName(t, operation)}
         </UniformListColumn>
         <UniformListColumn>
-          {moment.unix(operation.creation_time).fromNow()}
+          {moment.unix(operation.creation_time).locale(i18n.language).fromNow()}
         </UniformListColumn>
         <UniformListColumn>
           <span className={cn(styles.operationStatus, styles[operation.status])}>{getStatusName(t, operation.status)}</span>

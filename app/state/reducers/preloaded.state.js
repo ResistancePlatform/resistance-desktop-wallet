@@ -88,7 +88,8 @@ export const preloadedState: State = {
 			NODE: 'NOT RUNNING',
 			MINER: 'NOT RUNNING',
 			TOR: 'NOT RUNNING'
-		}
+    },
+    language: 'en'
 	},
 	addressBook: {
 		records: [],
@@ -106,5 +107,6 @@ Object.assign(preloadedState.getStarted, {
 
 Object.assign(preloadedState.settings, {
 	isMinerEnabled: config.get('manageDaemon.enableMiner', true),
-	isTorEnabled: config.get('manageDaemon.enableTor', false)
+	isTorEnabled: config.get('manageDaemon.enableTor', false),
+	language: config.get('language', 'en')
 })

@@ -13,5 +13,6 @@
   "Manage wallet": "Administri monujon",
   "Backup wallet": "Rezervi monujon",
   "Restore wallet": "Restaŭri monujon",
-  "Services Status": "Statuso de la servoj"
+  "Services Status": "Statuso de la servoj",
+  "Stop local node": "Malŝalti la lokan nodon"
 }

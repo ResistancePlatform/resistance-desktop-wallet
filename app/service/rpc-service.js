@@ -10,7 +10,7 @@ import { from, of, Observable } from 'rxjs'
 import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
-import i18n from '~/i18n/i18next.config'
+import { i18n } from '~/i18n/i18next.config'
 import { TRANSACTION_FEE } from '~/constants'
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { OSService } from './os-service'
@@ -652,7 +652,7 @@ async function getPublicTransactionsPromise(client: Client) {
     { method: 'listtransactions', parameters: ['', 200] }
   ]
 
-  const noAddressMessage = this.t('Z address is not listed in the wallet')
+  const noAddressMessage = this.t(`Z address is not listed in the wallet`)
   const publicAddressMessage = this.t(`R (public)`)
 
   return client.command(command)

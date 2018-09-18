@@ -3,7 +3,7 @@ import * as fs from 'fs'
 import path from 'path'
 import config from 'electron-settings'
 
-import i18n from '../i18n/i18next.config'
+import { i18n } from '../i18n/i18next.config'
 import { app, dialog } from 'electron'
 import { download } from 'electron-dl'
 

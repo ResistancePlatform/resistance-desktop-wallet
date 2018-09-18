@@ -16,6 +16,7 @@ const transactionDirectionMap = t => ({
 
 type Props = {
   t: any,
+  i18n: any,
 	items: Transaction[],
 	onRowClick: () => void,
 	onRowContextMenu: (event: SyntheticEvent<any>, transactionId: string) => void
@@ -40,7 +41,7 @@ class TransactionList extends Component<Props> {
   }
 
   getListRowRenderer(transaction: Transaction) {
-    const { t } = this.props
+    const { t, i18n } = this.props
 
     return (
       <UniformListRow
@@ -52,7 +53,7 @@ class TransactionList extends Component<Props> {
         <UniformListColumn>{transactionDirectionMap(t)[transaction.category] || transaction.category}</UniformListColumn>
         <UniformListColumn>{transaction.confirmations !== 0 ? t('Yes') : t('No')}</UniformListColumn>
         <UniformListColumn>{truncateAmount(transaction.amount)}</UniformListColumn>
-        <UniformListColumn>{moment.unix(transaction.timestamp).format('L kk:mm:ss')}</UniformListColumn>
+        <UniformListColumn>{moment.unix(transaction.timestamp).locale(i18n.language).format('L kk:mm:ss')}</UniformListColumn>
         <UniformListColumn>{transaction.destinationAddress}</UniformListColumn>
       </UniformListRow>
     )

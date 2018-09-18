@@ -4,7 +4,7 @@ import { of, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
-import i18n from '~/i18n/i18next.config'
+import { i18n } from '~/i18n/i18next.config'
 import { Action } from '../types'
 import { RpcService } from '~/service/rpc-service'
 import { ResistanceService } from '~/service/resistance-service'
@@ -16,6 +16,15 @@ const rpcService = new RpcService()
 const resistanceService = new ResistanceService()
 const minerService = new MinerService()
 const torService = new TorService()
+
+const updateLanguageEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.updateLanguage),
+  map(action => {
+    console.log(`Action changed to`, action.payload.code)
+    i18n.changeLanguage(action.payload.code)
+    return SettingsActions.empty()
+  })
+)
 
 const kickOffChildProcessesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.kickOffChildProcesses),
@@ -184,6 +193,7 @@ const importWalletFailureEpic = (action$: ActionsObservable<Action>, state$) => 
 )
 
 export const SettingsEpics = (action$, state$) => merge(
+  updateLanguageEpic(action$, state$),
 	kickOffChildProcessesEpic(action$, state$),
 	startLocalNodeEpic(action$, state$),
   restartLocalNodeEpic(action$, state$),

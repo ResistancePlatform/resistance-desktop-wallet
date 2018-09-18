@@ -5,17 +5,18 @@ import { I18nextProvider } from 'react-i18next'
 import { ConnectedRouter } from 'react-router-redux'
 import ReduxToastr from 'react-redux-toastr'
 
-import i18n from '~/i18n/i18next.config'
+import { i18n } from '~/i18n/i18next.config'
 import App from './App'
 
 type Props = {
-	store: {},
-	history: {}
+	store: object,
+	history: object
 }
 
 export default class Root extends Component<Props> {
 	render() {
-    i18n.changeLanguage('eo')
+    const state = this.props.store.getState()
+    i18n.changeLanguage(state.settings.language)
 
 		return (
       <Provider store={this.props.store}>

@@ -2,6 +2,8 @@ import i18n from 'i18next'
 import { reactI18nextModule } from 'react-i18next'
 import i18nextBackend from 'i18next-node-fs-backend'
 
+const availableLanguages = ['en', 'eo', 'ko']
+
 const i18nextOptions = {
   backend:{
     loadPath: './locales/{{lng}}/{{ns}}.json',
@@ -14,7 +16,7 @@ const i18nextOptions = {
   debug: true,
   saveMissing: true,
   fallbackLng: 'en',
-  whitelist: ['en', 'ko', 'eo'],
+  whitelist: availableLanguages,
   keySeparator: false,
   nsSeparator: false,
   ns: [
@@ -30,7 +32,7 @@ const i18nextOptions = {
   ],
   react: {
     wait: true,
-    bindI18n: 'languageChanged loaded',
+    bindI18n: 'languageChanged loaded'
   }
 };
 
@@ -42,4 +44,7 @@ if (!i18n.isInitialized) {
   i18n.init(i18nextOptions)
 }
 
-module.exports = i18n
+module.exports = {
+  i18n,
+  availableLanguages
+}

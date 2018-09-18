@@ -13,7 +13,8 @@
 import * as fs from 'fs'
 import path from 'path'
 import { app, BrowserWindow } from 'electron'
-import i18n from './i18n/i18next.config'
+import { i18n } from './i18n/i18next.config'
+import config from 'electron-settings'
 
 import { OSService } from './service/os-service'
 import { ResistanceService } from './service/resistance-service'
@@ -92,7 +93,7 @@ app.on('ready', async () => {
   }
 
   i18n.on('loaded', () => {
-    i18n.changeLanguage('eo')
+    i18n.changeLanguage(config.get('language', 'en'))
     i18n.off('loaded')
   });
 
