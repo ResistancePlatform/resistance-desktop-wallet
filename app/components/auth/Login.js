@@ -21,7 +21,7 @@ const getValidationSchema = t => Joi.object().keys({
   password: (
     Joi.string().required()
     .regex(/^[a-zA-Z0-9]{8,30}$/)
-    .error(() => t(`should contain latin letters, numbers and special characters`))
+    .error(() => t(`should contain Latin letters, numbers and special characters`))
     .label(t(`Password`))
   )
 })
