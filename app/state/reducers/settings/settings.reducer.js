@@ -37,13 +37,7 @@ export const SettingsActions = createActions(
     CHILD_PROCESS_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
     CHILD_PROCESS_RESTART_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
     CHILD_PROCESS_MURDERED: processName => ({ processName }),
-    CHILD_PROCESS_MURDER_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
-
-    INITIATE_PRIVATE_KEYS_EXPORT: undefined,
-    EXPORT_PRIVATE_KEYS: filePath => ({filePath}),
-
-    INITIATE_PRIVATE_KEYS_IMPORT: undefined,
-    IMPORT_PRIVATE_KEYS: filePath => ({filePath})
+    CHILD_PROCESS_MURDER_FAILED: (processName, errorMessage) => ({ processName, errorMessage })
   },
   {
     prefix: 'APP/SETTINGS'

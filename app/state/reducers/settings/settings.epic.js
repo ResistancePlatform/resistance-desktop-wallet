@@ -1,22 +1,18 @@
 // @flow
 import config from 'electron-settings'
-import { remote } from 'electron'
-import { tap, filter, delay, take, map, flatMap, mergeMap, mapTo, catchError } from 'rxjs/operators'
-import { of, bindCallback, concat, merge } from 'rxjs'
+import { tap, filter, delay, flatMap, map, mapTo } from 'rxjs/operators'
+import { of, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
 import { i18n } from '~/i18next.config'
 import { Action } from '../types'
-import { RpcService } from '~/service/rpc-service'
 import { ResistanceService } from '~/service/resistance-service'
 import { MinerService } from '~/service/miner-service'
 import { TorService } from '~/service/tor-service'
-import { AuthActions } from '~/state/reducers/auth/auth.reducer'
 import { SettingsActions } from './settings.reducer'
 
 const t = i18n.getFixedT(null, 'settings')
-const rpcService = new RpcService()
 const resistanceService = new ResistanceService()
 const minerService = new MinerService()
 const torService = new TorService()
@@ -141,100 +137,6 @@ const childProcessMurderFailedEpic = (action$: ActionsObservable<Action>) => act
   mapTo(SettingsActions.empty())
 )
 
-function getEnsureLoginObservable(reason: string, next: Observable, action$: ActionsObservable<Action>) {
-  const loginSucceeded: Observable = action$.pipe(
-    ofType(AuthActions.loginSucceeded),
-    take(1),
-    mergeMap(() => next)
-  )
-
-  return concat(of(AuthActions.ensureLogin(reason)), loginSucceeded)
-}
-
-const initiatePrivateKeysExportEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(SettingsActions.initiatePrivateKeysExport),
-  mergeMap(() => {
-    const showSaveDialogObservable = bindCallback(remote.dialog.showSaveDialog.bind(remote.dialog))
-
-    const title = t(`Export Resistance addresses private keys to a file`)
-    const params = {
-      title,
-      defaultPath: remote.app.getPath('documents'),
-      message: title,
-      nameFieldLabel: t(`File name:`),
-      filters: [{ name: t(`Keys files`),  extensions: ['keys'] }]
-    }
-
-    const observable = showSaveDialogObservable(params).pipe(
-      map(([ filePath ]) => (
-        filePath
-          ? SettingsActions.exportPrivateKeys(filePath)
-          : SettingsActions.empty()
-      )))
-
-    const reason = t(`Enter your wallet password before exporting the private keys`)
-    return getEnsureLoginObservable(reason, observable, action$)
-  })
-)
-
-const exportPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(SettingsActions.exportPrivateKeys),
-  mergeMap(action => (
-    rpcService.exportPrivateKeys(action.payload.filePath).pipe(
-      map(() => {
-        toastr.info(t(`Private keys exported successfully`))
-        return SettingsActions.empty()
-      }),
-      catchError(err => {
-        toastr.error(t(`Unable to export private keys`), err.message)
-        return of(SettingsActions.empty())
-      })
-  )))
-)
-
-const initiatePrivateKeysImportEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(SettingsActions.initiatePrivateKeysImport),
-  mergeMap(() => {
-    const showOpenDialogObservable = bindCallback(remote.dialog.showOpenDialog.bind(remote.dialog))
-
-    const title = t(`Import Resistance addresses from private keys file`)
-    const params = {
-      title,
-      defaultPath: remote.app.getPath('documents'),
-      message: title,
-      filters: [{ name: t(`Keys files`),  extensions: ['keys'] }]
-    }
-
-    const observable = showOpenDialogObservable(params).pipe(
-      map(([ filePaths ]) => (
-        filePaths && filePaths.length
-          ? SettingsActions.importPrivateKeys(filePaths.pop())
-          : SettingsActions.empty()
-      )))
-
-    const reason = t(`Enter your wallet password before importing the private keys`)
-    return getEnsureLoginObservable(reason, observable, action$)
-  })
-)
-
-const importPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(SettingsActions.importPrivateKeys),
-  mergeMap(action => (
-    rpcService.importPrivateKeys(action.payload.filePath).pipe(
-      map(() => {
-        toastr.info(
-          t(`Private keys imported successfully`),
-          t(`It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`)
-        )
-        return SettingsActions.empty()
-      }),
-      catchError(err => {
-        toastr.error(t(`Unable to import private keys`), err.message)
-        return of(SettingsActions.empty())
-      })
-  )))
-)
-
 export const SettingsEpics = (action$, state$) => merge(
   updateLanguageEpic(action$, state$),
 	kickOffChildProcessesEpic(action$, state$),
@@ -246,9 +148,5 @@ export const SettingsEpics = (action$, state$) => merge(
 	enableTorEpic(action$, state$),
 	disableTorEpic(action$, state$),
 	childProcessFailedEpic(action$, state$),
-	childProcessMurderFailedEpic(action$, state$),
-	initiatePrivateKeysExportEpic(action$, state$),
-	exportPrivateKeysEpic(action$, state$),
-  initiatePrivateKeysImportEpic(action$, state$),
-	importPrivateKeysEpic(action$, state$),
+	childProcessMurderFailedEpic(action$, state$)
 )

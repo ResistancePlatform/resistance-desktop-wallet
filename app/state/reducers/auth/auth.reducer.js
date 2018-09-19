@@ -11,7 +11,7 @@ export const AuthActions = createActions(
   {
     EMPTY: undefined,
 
-    ENSURE_LOGIN: (reason: string) => ({ reason }),
+    ENSURE_LOGIN: (reason: string | null) => ({ reason }),
     SUBMIT_PASSWORD: undefined,
 
     LOGIN_SUCCEEDED: undefined,

@@ -12,10 +12,10 @@
  */
 import * as fs from 'fs'
 import path from 'path'
-import { app, BrowserWindow } from 'electron'
-import { i18n } from './i18next.config'
 import config from 'electron-settings'
+import { app, BrowserWindow } from 'electron'
 
+import { i18n } from './i18next.config'
 import { OSService } from './service/os-service'
 import { ResistanceService } from './service/resistance-service'
 import { FetchParametersService } from './service/fetch-parameters-service'

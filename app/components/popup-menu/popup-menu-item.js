@@ -2,6 +2,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
+import cn from 'classnames'
 
 import { appStore } from '../../state/store/configureStore'
 import { PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.reducer'
@@ -11,6 +12,7 @@ import styles from './popup-menu.scss'
 type Props = {
   id: string,
   data: any,
+  disabled?: boolean,
   onClick: func
 }
 
@@ -31,7 +33,8 @@ class PopupMenuItem extends Component<Props> {
 	render() {
 		return (
       <div
-        className={styles.menuItem}
+        role="none"
+        className={cn(styles.menuItem, { [styles.disabled]: this.props.disabled })}
         onClick={(e) => this.handleClick(e)}
         onKeyDown={(e) => this.handleClick(e)}
       >

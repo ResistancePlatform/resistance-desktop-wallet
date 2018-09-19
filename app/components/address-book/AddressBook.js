@@ -63,7 +63,7 @@ export class AddressBook extends Component<Props> {
 
         <AddressBookList
           items={this.props.addressBook.records}
-          onRowContextMenu={(e, record) => this.props.popupMenu.show(addressBookPopupMenuId, e.clientY, e.clientX, record)}
+          onRowContextMenu={(e, record) => this.props.popupMenu.show(addressBookPopupMenuId, record, e.clientY, e.clientX)}
         />
 
 				<PopupMenu id={addressBookPopupMenuId}>

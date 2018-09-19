@@ -1,17 +1,23 @@
 @import "../../theme/vars.scss";
 
-.popupMenuContainer {
+.container {
+  position: absolute;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  z-index: 1000;
+  top: 0.2rem;
+  left: calc(100% - 13.2rem);
+}
+
+.menu {
+  position: absolute;
+
   padding: 0.3rem 1.3rem;
   min-width: $POPUP_MENU_CONTAINER_WIDTH;
-
-  position: absolute;
   background-color: $POPUP_MENU_BACKGROUND_COLOR;
 
-  text-align: left;
   border-radius: 0.35rem;
-
-  z-index: 1;
-  cursor: pointer;
 
   -webkit-box-shadow: 5px 5px 59px -2px $POPUP_MENU_SHADOW_COLOR;
   -moz-box-shadow: 5px 5px 59px -2px $POPUP_MENU_SHADOW_COLOR;
@@ -29,6 +35,16 @@
   &:hover {
     color: $BASE_COLOR_PURPLE;
   }
+
+  &.disabled {
+    color: $BASE_COLOR_FONT_GRAY;
+    pointer-events: none;
+  }
+
+  &.disabled:hover {
+    color: $BASE_COLOR_FONT_GRAY;
+  }
+
 
   text-transform: uppercase;
 }

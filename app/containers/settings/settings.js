@@ -305,7 +305,7 @@ class Settings extends Component<Props> {
     const languageDropdownAddon: RoundedInputAddon = {
       enable: true,
       type: 'DROPDOWN',
-      onClick: () => this.props.popupMenu.show(languagePopupMenuId, '2rem', 'calc(100% - 14.5rem)')
+      onClick: () => this.props.popupMenu.show(languagePopupMenuId)
     }
 
 		const passwordAddon: RoundedInputAddon = {
@@ -336,7 +336,7 @@ class Settings extends Component<Props> {
                 readOnly
               >
                 {/* Dropdown menu container */}
-                <PopupMenu id={languagePopupMenuId} className={styles.languageDropdown}>
+                <PopupMenu id={languagePopupMenuId} relative>
                   {this.getLanguageMenuItems()}
                 </PopupMenu>
               </RoundedInput>
@@ -462,21 +462,21 @@ class Settings extends Component<Props> {
                 <button
                   type="button"
                   className={styles.walletNodeButton}
-                  onClick={this.props.actions.initiatePrivateKeysExport}
+                  onClick={this.props.actions.initiateWalletBackup}
                   onKeyDown={() => undefined}
                   disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
                 >
-                  {t(`Export private keys`)}
+                  {t(`Backup`)}
                 </button>
 
                 <button
                   type="button"
                   className={styles.walletNodeButton}
-                  onClick={this.props.actions.initiatePrivateKeysImport}
+                  onClick={this.props.actions.initiateWalletRestore}
                   onKeyDown={() => undefined}
                   disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
                 >
-                  {t(`Import private keys`)}
+                  {t(`Restore`)}
                 </button>
               </div>
 						</div>
