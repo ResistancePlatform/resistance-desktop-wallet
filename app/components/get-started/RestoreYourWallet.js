@@ -10,8 +10,8 @@ import { ResistanceService } from '~/service/resistance-service'
 import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
-import HLayout from '../../theme/h-box-layout.scss'
-import VLayout from '../../theme/v-box-layout.scss'
+import HLayout from '~/theme/h-box-layout.scss'
+import VLayout from '~/theme/v-box-layout.scss'
 import styles from './GetStarted.scss'
 
 const resistance = new ResistanceService()
@@ -54,8 +54,8 @@ export class RestoreYourWallet extends Component<Props> {
 			enable: true,
       type: 'CHOOSE_FILE',
       data: {
-        title: t(`Restore Resistance wallet from a backup file`),
-        filters: [{ name: t(`Wallet keys files`),  extensions: ['wallet'] }]
+        title: t(`Restore Resistance wallet from a private keys file`),
+        filters: [{ name: t(`Keys files`),  extensions: ['keys'] }]
       }
 		}
 

@@ -122,6 +122,7 @@ const authenticateAndRestoreWalletEpic = (action$: ActionsObservable<Action>, st
     const state = state$.value.getStarted
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
 
+    /*
     const importWalletObservable = race(
       action$.pipe(
         ofType(SettingsActions.importWalletSuccess),
@@ -134,16 +135,22 @@ const authenticateAndRestoreWalletEpic = (action$: ActionsObservable<Action>, st
         map(action => WelcomeActions.walletBootstrappingFailed(action.payload.errorMessage))
       )
     )
+    */
 
     const nextObservables = [of(AuthActions.loginSucceeded())]
 
     if (!state.isCreatingNewWallet) {
       const restoreForm = state$.value.roundedForm.getStartedRestoreYourWallet
       const keysFilePath = restoreForm.fields.backupFile
+
+      const importPrivateKeysObservable = rpc.importPrivateKeys(keysFilePath).pipe(
+        mapTo(WelcomeActions.walletBootstrappingSucceeded()),
+        catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.message)))
+      )
+
       nextObservables.push(
         of(WelcomeActions.displayHint(t(`Restoring the wallet from the backup file...`))),
-        of(SettingsActions.importWallet(keysFilePath)),
-        importWalletObservable
+        importPrivateKeysObservable
       )
     } else {
       nextObservables.push(of(WelcomeActions.walletBootstrappingSucceeded()))

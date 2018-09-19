@@ -169,14 +169,14 @@ const exportPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pi
 	ofType(SettingsActions.exportPrivateKeys),
   mergeMap(action => (
     rpcService.exportPrivateKeys(action.payload.filePath).pipe(
-    map(() => {
-      toastr.info(t(`Private keys exported successfully`))
-      return SettingsActions.empty()
-    }),
-    catchError(err => {
-      toastr.error(t(`Unable to export private keys`), err.message)
-      return of(SettingsActions.empty())
-    })
+      map(() => {
+        toastr.info(t(`Private keys exported successfully`))
+        return SettingsActions.empty()
+      }),
+      catchError(err => {
+        toastr.error(t(`Unable to export private keys`), err.message)
+        return of(SettingsActions.empty())
+      })
   )))
 )
 
@@ -208,17 +208,17 @@ const importPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pi
 	ofType(SettingsActions.importPrivateKeys),
   mergeMap(action => (
     rpcService.importPrivateKeys(action.payload.filePath).pipe(
-    map(() => {
-      toastr.info(
-        t(`Private keys imported successfully`),
-        t(`It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`)
-      )
-      return SettingsActions.empty()
-    }),
-    catchError(err => {
-      toastr.error(t(`Unable to import private keys`), err.message)
-      return of(SettingsActions.empty())
-    })
+      map(() => {
+        toastr.info(
+          t(`Private keys imported successfully`),
+          t(`It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`)
+        )
+        return SettingsActions.empty()
+      }),
+      catchError(err => {
+        toastr.error(t(`Unable to import private keys`), err.message)
+        return of(SettingsActions.empty())
+      })
   )))
 )
 

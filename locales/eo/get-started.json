@@ -29,7 +29,7 @@
   "Passwords do not match": "Passwords do not match",
   "Choose password for your wallet": "Choose password for your wallet",
   "Enter a strong password (using letters, numbers and/or symbols)": "Enter a strong password (using letters, numbers and/or symbols)",
-  "choose-password-note": "choose-password-note",
+  "choose-password-note": "If you lose or forget this password, it cannot be recovered. Your wallet can only be restored from private keys in that case.",
   "Restore Resistance wallet from a backup file": "Restore Resistance wallet from a backup file",
   "Wallet keys files": "Wallet keys files",
   "Restore your wallet": "Restore your wallet",
@@ -38,5 +38,7 @@
   "Restoring the wallet from the backup file...": "Restoring the wallet from the backup file...",
   "Wallet bootstrapping has failed:": "Wallet bootstrapping has failed:",
   "should contain Latin letters, numbers and special characters": "should contain Latin letters, numbers and special characters",
-  "Starting the local node again...": "Starting the local node again..."
+  "Starting the local node again...": "Starting the local node again...",
+  "Restore Resistance wallet from a private keys file": "Restore Resistance wallet from a private keys file",
+  "Keys files": "Keys files"
 }
