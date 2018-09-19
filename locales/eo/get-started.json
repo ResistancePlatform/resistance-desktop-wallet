@@ -37,5 +37,6 @@
   "Restore height (optional)": "Restore height (optional)",
   "Restoring the wallet from the backup file...": "Restoring the wallet from the backup file...",
   "Wallet bootstrapping has failed:": "Wallet bootstrapping has failed:",
-  "should contain Latin letters, numbers and special characters": "should contain Latin letters, numbers and special characters"
+  "should contain Latin letters, numbers and special characters": "should contain Latin letters, numbers and special characters",
+  "Starting the local node again...": "Starting the local node again..."
 }

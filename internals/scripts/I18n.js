@@ -64,6 +64,7 @@ function transform(file, enc, done) {
   parser.parseFuncFromString(content, funcOptions, (key, options) => {
     hasKeys = true
     parser.set(key, Object.assign({}, options, {
+      removeUnusedKeys: namespace !== 'validation',
       ns: namespace
     }))
   })

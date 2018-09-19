@@ -36,5 +36,6 @@
   "Sending the wallet password to the node...": "Sending the wallet password to the node...",
   "Wallet bootstrapping has failed:": "Wallet bootstrapping has failed:",
   "Success! Your wallet has been created": "Success! Your wallet has been created",
-  "should contain Latin letters, numbers and special characters": "should contain Latin letters, numbers and special characters"
+  "should contain Latin letters, numbers and special characters": "should contain Latin letters, numbers and special characters",
+  "Starting the local node again...": "Starting the local node again..."
 }
