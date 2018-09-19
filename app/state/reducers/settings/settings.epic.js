@@ -1,18 +1,22 @@
 // @flow
 import config from 'electron-settings'
-import { tap, filter, delay, flatMap, map, mapTo } from 'rxjs/operators'
-import { of, concat, merge } from 'rxjs'
+import { remote } from 'electron'
+import { tap, filter, delay, mergeMap, flatMap, map, mapTo, catchError } from 'rxjs/operators'
+import { of, bindCallback, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
 import { i18n } from '~/i18next.config'
+import { getEnsureLoginObservable } from '~/utils/auth'
 import { Action } from '../types'
+import { RpcService } from '~/service/rpc-service'
 import { ResistanceService } from '~/service/resistance-service'
 import { MinerService } from '~/service/miner-service'
 import { TorService } from '~/service/tor-service'
 import { SettingsActions } from './settings.reducer'
 
 const t = i18n.getFixedT(null, 'settings')
+const rpc = new RpcService()
 const resistanceService = new ResistanceService()
 const minerService = new MinerService()
 const torService = new TorService()
@@ -105,6 +109,88 @@ const disableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.p
   mapTo(SettingsActions.restartLocalNode())
 )
 
+const initiateWalletBackupEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.initiateWalletBackup),
+  mergeMap(() => {
+    const showSaveDialogObservable = bindCallback(remote.dialog.showSaveDialog.bind(remote.dialog))
+
+    const title = t(`Backup resistance wallet to a file`)
+    const params = {
+      title,
+      defaultPath: remote.app.getPath('documents'),
+      message: title,
+      nameFieldLabel: t(`File name:`),
+      filters: [{ name: t(`Wallet files`),  extensions: ['dat'] }]
+    }
+
+    const observable = showSaveDialogObservable(params).pipe(
+      map(([ filePath ]) => (
+        filePath
+          ? SettingsActions.backupWallet(filePath)
+          : SettingsActions.empty()
+      )))
+
+    return getEnsureLoginObservable(null, observable, action$)
+  })
+)
+
+const backupWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.backupWallet),
+  mergeMap(action => (
+    rpc.backupWallet(action.payload.filePath).pipe(
+      map(() => {
+        toastr.info(t(`Wallet backup succeeded.`))
+        return SettingsActions.empty()
+      }),
+      catchError(err => {
+        toastr.error(t(`Unable to backup the wallet`), err.message)
+        return of(SettingsActions.empty())
+      })
+  )))
+)
+
+const initiateWalletRestoreEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.initiateWalletRestore),
+  mergeMap(() => {
+    const showOpenDialogObservable = bindCallback(remote.dialog.showOpenDialog.bind(remote.dialog))
+
+    const title = t(`Import Resistance addresses from private keys file`)
+    const params = {
+      title,
+      defaultPath: remote.app.getPath('documents'),
+      message: title,
+      filters: [{ name: t(`Keys files`),  extensions: ['keys'] }]
+    }
+
+    const observable = showOpenDialogObservable(params).pipe(
+      map(([ filePaths ]) => (
+        filePaths && filePaths.length
+          ? SettingsActions.restoreWallet(filePaths.pop())
+          : SettingsActions.empty()
+      )))
+
+    return getEnsureLoginObservable(null, observable, action$)
+  })
+)
+
+const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.restoreWallet),
+  mergeMap(action => (
+    rpc.restoreWallet(action.payload.filePath).pipe(
+      map(() => {
+        toastr.info(
+          t(`Private keys imported successfully`),
+          t(`It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`)
+        )
+        return SettingsActions.empty()
+      }),
+      catchError(err => {
+        toastr.error(t(`Unable to import private keys`), err.message)
+        return of(SettingsActions.empty())
+      })
+  )))
+)
+
 const childProcessFailedEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.childProcessFailed),
 	tap((action) => {
@@ -147,6 +233,10 @@ export const SettingsEpics = (action$, state$) => merge(
 	disableMinerEpic(action$, state$),
 	enableTorEpic(action$, state$),
 	disableTorEpic(action$, state$),
+  initiateWalletBackupEpic(action$, state$),
+  initiateWalletRestoreEpic(action$, state$),
+  backupWalletEpic(action$, state$),
+  restoreWalletEpic(action$, state$),
 	childProcessFailedEpic(action$, state$),
 	childProcessMurderFailedEpic(action$, state$)
 )

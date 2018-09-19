@@ -1,12 +1,12 @@
 // @flow
 import { remote } from 'electron'
-import { take, tap, map, mapTo, mergeMap, switchMap, catchError } from 'rxjs/operators'
-import { of, bindCallback, concat, merge } from 'rxjs'
+import { tap, map, mapTo, mergeMap, switchMap, catchError } from 'rxjs/operators'
+import { of, bindCallback, merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
 import { i18n } from '~/i18next.config'
-import { AuthActions } from '~/state/reducers/auth/auth.reducer'
+import { getEnsureLoginObservable } from '~/utils/auth'
 import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { OwnAddressesActions } from './own-addresses.reducer'
 import { Action } from '../types'
@@ -14,16 +14,6 @@ import { RpcService } from '~/service/rpc-service'
 
 const t = i18n.getFixedT(null, 'own-addresses')
 const rpc = new RpcService()
-
-function getEnsureLoginObservable(reason: string | null, next: Observable, action$: ActionsObservable<Action>) {
-  const loginSucceeded: Observable = action$.pipe(
-    ofType(AuthActions.loginSucceeded),
-    take(1),
-    mergeMap(() => next)
-  )
-
-  return concat(of(AuthActions.ensureLogin(reason)), loginSucceeded)
-}
 
 const getOwnAddressesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.getOwnAddresses),

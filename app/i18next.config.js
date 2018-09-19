@@ -29,7 +29,7 @@ const i18nextOptions = {
     escapeValue: false
   },
   debug: isDev,
-  saveMissing: isDev,
+  saveMissing: false,
   fallbackLng: 'en',
   whitelist: availableLanguages,
   keySeparator: false,

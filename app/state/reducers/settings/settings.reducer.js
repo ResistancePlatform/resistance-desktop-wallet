@@ -31,6 +31,11 @@ export const SettingsActions = createActions(
     ENABLE_TOR: undefined,
     DISABLE_TOR: undefined,
 
+    INITIATE_WALLET_BACKUP: undefined,
+    BACKUP_WALLET: filePath => ({filePath}),
+    INITIATE_WALLET_RESTORE: undefined,
+    RESTORE_WALLET: filePath => ({filePath}),
+
     KICK_OFF_CHILD_PROCESSES: undefined,
 
     CHILD_PROCESS_STARTED: processName => ({ processName }),
