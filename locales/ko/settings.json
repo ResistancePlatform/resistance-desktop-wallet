@@ -55,5 +55,14 @@
   "Unable to backup the wallet": "Unable to backup the wallet",
   "Wallet restored successfully": "Wallet restored successfully",
   "It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.": "It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.",
-  "Unable to restore wallet": "Unable to restore wallet"
+  "Unable to restore wallet": "Unable to restore wallet",
+  "Export private keys": "Export private keys",
+  "Import private keys": "Import private keys",
+  "Export Resistance addresses private keys to a file": "Export Resistance addresses private keys to a file",
+  "Keys files": "Keys files",
+  "Private keys exported successfully": "Private keys exported successfully",
+  "Unable to export private keys": "Unable to export private keys",
+  "Import Resistance addresses from private keys file": "Import Resistance addresses from private keys file",
+  "Private keys imported successfully": "Private keys imported successfully",
+  "Unable to import private keys": "Unable to import private keys"
 }

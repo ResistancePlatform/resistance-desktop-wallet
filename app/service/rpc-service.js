@@ -16,7 +16,6 @@ import { LoggerService, ConsoleTheme } from './logger-service'
 import { OSService } from './os-service'
 import { ResistanceService } from './resistance-service'
 import { AddressBookService } from './address-book-service'
-import { SettingsActions } from '~/state/reducers/settings/settings.reducer'
 import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions, Transaction } from '../state/reducers/overview/overview.reducer'
 import { OwnAddressesActions, AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
@@ -560,53 +559,44 @@ export class RpcService {
    *
 	 * @memberof RpcService
 	 */
-  exportWallet(filePath) {
+  exportPrivateKeys(filePath) {
     const client = getClientInstance()
 
     const exportFileName = uuid().replace(/-/g, '')
     const exportFilePath = path.join(this.resistanceService.getExportDir(), exportFileName)
-    const commandPromise = client.command('z_exportwallet', exportFileName)
 
-    commandPromise.then((result) => {
-      if (typeof(result) === 'object' && result.name === 'RpcError') {
-        throw new Error(result.message)
-      }
-      return this.osService.moveFile(exportFilePath, filePath)
-    }).then(() => (
-      this.osService.dispatchAction(SettingsActions.exportWalletSuccess())
-    )).catch(err => (
-      this.osService.dispatchAction(SettingsActions.exportWalletFailure(err.toString()))
-    ))
+    return from(
+      client.command('z_exportwallet', exportFileName)
+        .then((result) => {
+          if (typeof(result) === 'object' && result.name === 'RpcError') {
+            throw new Error(result.message)
+          }
+          return this.osService.moveFile(exportFilePath, filePath)
+        })
+    )
   }
 
 	/**
    * Import wallet from a file.
    *
 	 * @memberof RpcService
+   * @returns {Observable}
 	 */
-  importWallet(filePath) {
+  importPrivateKeys(filePath) {
     const client = getClientInstance()
 
     const importFileName = uuid().replace(/-/g, '')
     const importFilePath = path.join(this.resistanceService.getExportDir(), importFileName)
 
-    const errorHandler = err => (
-      this.osService.dispatchAction(SettingsActions.importWalletFailure(err.toString()))
+    const observable = from(
+      promisify(fs.copyFile)(filePath, importFilePath)
+        .then(() => (
+          client.command('z_importwallet', importFilePath)
+            .finally(() => promisify(fs.unlink)(importFilePath))
+        ))
     )
 
-    fs.copyFile(filePath, importFilePath, err => {
-      if (err) {
-        return errorHandler(err)
-      }
-
-      client.command('z_importwallet', importFilePath).then(() => (
-        this.osService.dispatchAction(SettingsActions.importWalletSuccess())
-      )).catch(errorHandler).then(() => (
-        promisify(fs.unlink)(importFilePath)
-      )).catch(console.error)
-
-    })
-
+    return observable
   }
 }
 

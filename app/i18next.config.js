@@ -49,7 +49,7 @@ if (!i18n.isInitialized) {
   i18n.init(i18nextOptions)
 }
 
-module.exports = {
+export {
   i18n,
   availableLanguages,
   availableNamespaces

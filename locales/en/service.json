@@ -15,5 +15,7 @@
   "has to begin with R- for a transparent address or Z- for a private one": "has to begin with R- for a transparent address or Z- for a private one",
   "R-addresses are 35 characters long, not {{length}}": "R-addresses are 35 characters long, not {{length}}",
   "Z-addresses are 95 characters long, not {{length}}": "Z-addresses are 95 characters long, not {{length}}",
-  "is not a valid Resistance address": "is not a valid Resistance address"
+  "is not a valid Resistance address": "is not a valid Resistance address",
+  "Address already exists in the database.": "Address already exists in the database.",
+  "Address not found in the database.": "Address not found in the database."
 }

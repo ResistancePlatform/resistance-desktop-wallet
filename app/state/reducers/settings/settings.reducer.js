@@ -39,13 +39,11 @@ export const SettingsActions = createActions(
     CHILD_PROCESS_MURDERED: processName => ({ processName }),
     CHILD_PROCESS_MURDER_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
 
-    EXPORT_WALLET: filePath => ({filePath}),
-    EXPORT_WALLET_SUCCESS: undefined,
-    EXPORT_WALLET_FAILURE: errorMessage => ({ errorMessage }),
+    INITIATE_PRIVATE_KEYS_EXPORT: undefined,
+    EXPORT_PRIVATE_KEYS: filePath => ({filePath}),
 
-    IMPORT_WALLET: filePath => ({filePath}),
-    IMPORT_WALLET_SUCCESS: undefined,
-    IMPORT_WALLET_FAILURE: errorMessage => ({ errorMessage })
+    INITIATE_PRIVATE_KEYS_IMPORT: undefined,
+    IMPORT_PRIVATE_KEYS: filePath => ({filePath})
   },
   {
     prefix: 'APP/SETTINGS'

@@ -1,7 +1,8 @@
 // @flow
 import config from 'electron-settings'
-import { tap, filter, delay, map, flatMap, mapTo } from 'rxjs/operators'
-import { of, concat, merge } from 'rxjs'
+import { remote } from 'electron'
+import { tap, filter, delay, map, flatMap, mergeMap, mapTo, catchError } from 'rxjs/operators'
+import { of, bindCallback, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
@@ -139,59 +140,86 @@ const childProcessMurderFailedEpic = (action$: ActionsObservable<Action>) => act
   mapTo(SettingsActions.empty())
 )
 
-const exportWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(SettingsActions.exportWallet),
-	tap((action) => { rpcService.exportWallet(action.payload.filePath) }),
-  mapTo(SettingsActions.empty())
+const initiatePrivateKeysExportEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.initiatePrivateKeysExport),
+  mergeMap(() => {
+    const showSaveDialogObservable = bindCallback(remote.dialog.showSaveDialog.bind(remote.dialog))
+
+    const title = t(`Export Resistance addresses private keys to a file`)
+    const params = {
+      title,
+      defaultPath: remote.app.getPath('documents'),
+      message: title,
+      nameFieldLabel: t(`File name:`),
+      filters: [{ name: t(`Keys files`),  extensions: ['keys'] }]
+    }
+
+    const observable = showSaveDialogObservable(params).pipe(
+      map(([ filePath ]) => (
+        filePath
+          ? SettingsActions.exportPrivateKeys(filePath)
+          : SettingsActions.empty()
+      )))
+
+    return observable
+  })
 )
 
-const exportWalletSuccessEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(SettingsActions.exportWalletSuccess),
-	tap(() => {
-    toastr.info(t(`Wallet backup succeeded.`))
-  }),
-  mapTo(SettingsActions.empty())
+const exportPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.exportPrivateKeys),
+  mergeMap(action => (
+    rpcService.exportPrivateKeys(action.payload.filePath).pipe(
+    map(() => {
+      toastr.info(t(`Private keys exported successfully`))
+      return SettingsActions.empty()
+    }),
+    catchError(err => {
+      toastr.error(t(`Unable to export private keys`), err.message)
+      return of(SettingsActions.empty())
+    })
+  )))
 )
 
-const exportWalletFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(SettingsActions.exportWalletFailure),
-	tap((action) => {
-    toastr.error(t(`Unable to backup the wallet`), action.payload.errorMessage)
-  }),
-  mapTo(SettingsActions.empty())
+const initiatePrivateKeysImportEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.initiatePrivateKeysImport),
+  mergeMap(() => {
+    const showOpenDialogObservable = bindCallback(remote.dialog.showOpenDialog.bind(remote.dialog))
+
+    const title = t(`Import Resistance addresses from private keys file`)
+    const params = {
+      title,
+      defaultPath: remote.app.getPath('documents'),
+      message: title,
+      filters: [{ name: t(`Keys files`),  extensions: ['keys'] }]
+    }
+
+    const observable = showOpenDialogObservable(params).pipe(
+      map(([ filePaths ]) => (
+        filePaths && filePaths.length
+          ? SettingsActions.importPrivateKeys(filePaths.pop())
+          : SettingsActions.empty()
+      )))
+
+    return observable
+  })
 )
 
-const importWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(SettingsActions.importWallet),
-	tap((action) => {
-    rpcService.importWallet(action.payload.filePath)
-	}),
-  mapTo(SettingsActions.empty())
-)
-
-const importWalletSuccessEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(SettingsActions.importWalletSuccess),
-	tap(() => {
-    // TODO: Replace actions dispatching with observables in the RPC service #114
-    if (!state$.value.getStarted.isInProgress) {
+const importPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.importPrivateKeys),
+  mergeMap(action => (
+    rpcService.importPrivateKeys(action.payload.filePath).pipe(
+    map(() => {
       toastr.info(
-        t(`Wallet restored successfully`),
+        t(`Private keys imported successfully`),
         t(`It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`)
       )
-    }
-  }),
-  mapTo(SettingsActions.empty())
-)
-
-const importWalletFailureEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(SettingsActions.importWalletFailure),
-	tap((action) => {
-  // TODO: Replace actions dispatching with observables in the RPC service #114
-    if (!state$.value.getStarted.isInProgress) {
-      toastr.error(t(`Unable to restore wallet`), action.payload.errorMessage)
-    }
-  }),
-  mapTo(SettingsActions.empty())
+      return SettingsActions.empty()
+    }),
+    catchError(err => {
+      toastr.error(t(`Unable to import private keys`), err.message)
+      return of(SettingsActions.empty())
+    })
+  )))
 )
 
 export const SettingsEpics = (action$, state$) => merge(
@@ -206,10 +234,8 @@ export const SettingsEpics = (action$, state$) => merge(
 	disableTorEpic(action$, state$),
 	childProcessFailedEpic(action$, state$),
 	childProcessMurderFailedEpic(action$, state$),
-	exportWalletEpic(action$, state$),
-	exportWalletSuccessEpic(action$, state$),
-	exportWalletFailureEpic(action$, state$),
-	importWalletEpic(action$, state$),
-	importWalletSuccessEpic(action$, state$),
-	importWalletFailureEpic(action$, state$),
+	initiatePrivateKeysExportEpic(action$, state$),
+	exportPrivateKeysEpic(action$, state$),
+  initiatePrivateKeysImportEpic(action$, state$),
+	importPrivateKeysEpic(action$, state$),
 )
