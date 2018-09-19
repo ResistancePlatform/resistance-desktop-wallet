@@ -4,6 +4,8 @@ import path from 'path'
 import { spawn } from 'child_process'
 import { app, remote } from 'electron'
 
+import { i18n } from '../i18next.config'
+
 /**
  * ES6 singleton
  */
@@ -30,7 +32,11 @@ export class OSService {
 	 * @memberof OSService
 	 */
 	constructor() {
-		if (!instance) { instance = this }
+    if (!instance) {
+      instance = this
+    }
+
+    instance.t = i18n.getFixedT(null, 'service')
 
     // Create a global var to store child processes information for the cleanup
     if (process.type === 'browser' && global.childProcesses === undefined) {
@@ -62,7 +68,7 @@ export class OSService {
 	 * @memberof RpcService
 	 */
 	dispatchAction(action) {
-		const storeModule = require('../state/store/configureStore')
+		const storeModule = require('~/state/store/configureStore')
 		if (storeModule && storeModule.appStore) {
 			storeModule.appStore.dispatch(action)
 		}
@@ -161,7 +167,7 @@ export class OSService {
 	 * @memberof OSService
 	 */
   getSettingsActions() {
-    const settingsReducerModule = require('../state/reducers/settings/settings.reducer')
+    const settingsReducerModule = require('~/state/reducers/settings/settings.reducer')
     return settingsReducerModule.SettingsActions
   }
 
@@ -252,7 +258,8 @@ export class OSService {
 
       childProcess.on('close', (code) => {
         if (!childProcessInfo.isGettingKilled) {
-          this.dispatchAction(actions.childProcessFailed(processName, `Process ${processName} unexpectedly exited with code ${code}.`))
+          const errorKey =  `Process {{processName}} unexpectedly exited with code {{code}}.`
+          this.dispatchAction(actions.childProcessFailed(processName, this.t(errorKey, processName, code)))
         }
 
         childProcessInfo.isGettingKilled = false

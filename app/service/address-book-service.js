@@ -3,8 +3,10 @@ import config from 'electron-settings'
 import { of, throwError } from 'rxjs'
 import { AddressBookRecord } from '../state/reducers/address-book/address-book.reducer'
 
+import { i18n } from '~/i18next.config'
+
 const addressBookConfigKey = 'addressBook'
-const addressNotFoundErrorMessage = `Address not found in the database.`
+const addressNotFoundErrorMessageKey = `Address not found in the database.`
 
 /**
  * ES6 singleton
@@ -17,7 +19,7 @@ let instance = null
  * @class AddressBookService
  */
 export class AddressBookService {
-  addressBook: AddressBookRecord[]
+  t: any
 
 	/**
 	 * @memberof AddressBookService
@@ -27,6 +29,8 @@ export class AddressBookService {
       instance = this
       instance.addressBook = []
     }
+
+    instance.t = i18n.getFixedT(null, 'service')
 
 		return instance
 	}
@@ -76,7 +80,7 @@ export class AddressBookService {
     const index = this.addressBook.findIndex(record => record.name === name)
 
     if (index === -1) {
-      return throwError(addressNotFoundErrorMessage)
+      return throwError(this.t(addressNotFoundErrorMessageKey))
     }
 
     this.addressBook.splice(index, 1)
@@ -99,7 +103,7 @@ export class AddressBookService {
     const index = this.addressBook.findIndex(record => record.name === originalName)
 
     if (index === -1) {
-      return throwError(addressNotFoundErrorMessage)
+      return throwError(this.t(addressNotFoundErrorMessageKey))
     }
 
     this.addressBook[index] = validated

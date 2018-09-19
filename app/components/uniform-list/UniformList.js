@@ -2,11 +2,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import classNames from 'classnames'
+import { translate } from 'react-i18next'
 
 import styles from './UniformList.scss'
 import VLayout from '~/theme/v-box-layout.scss'
 
 type Props = {
+  t: any,
   className?: string,
   emptyMessage?: string,
   sortKeys?: string[],
@@ -84,6 +86,8 @@ class UniformList extends Component<Props> {
 	 * @memberof UniformList
 	 */
   render() {
+    const { t } = this.props
+
     return (
       <div className={classNames(styles.container, VLayout.vBoxChild, this.props.className)}>
 
@@ -91,7 +95,7 @@ class UniformList extends Component<Props> {
 
         {this.props.items.length
           ? this.getSortedItems().map(item => this.applyColumnWidths(this.props.rowRenderer(item)))
-          : this.props.emptyMessage || `No data to display.`
+          : this.props.emptyMessage || t(`No data to display.`)
         }
       </div>
     )
@@ -99,4 +103,4 @@ class UniformList extends Component<Props> {
 
 }
 
-export default connect(null, null)(UniformList)
+export default connect(null, null)(translate('other')(UniformList))

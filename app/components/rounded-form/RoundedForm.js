@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import * as Joi from 'joi'
 
+import { i18n } from '~/i18next.config'
 import { RoundedFormState, RoundedFormActions } from '~/state/reducers/rounded-form/rounded-form.reducer'
 
 const inputChildComponentNames = ['RoundedInput', 'RoundedTextArea']
@@ -78,7 +79,9 @@ class RoundedForm extends Component<Props> {
       return
     }
 
-    const options = Object.assign({ abortEarly: false }, this.props.options)
+    const language = i18n.getResourceBundle(i18n.language, 'validation')
+
+    const options = Object.assign({ abortEarly: false, language }, this.props.options)
     const {error, value} = Joi.validate(stateFields, this.props.schema, options)
 
     if (error === null) {

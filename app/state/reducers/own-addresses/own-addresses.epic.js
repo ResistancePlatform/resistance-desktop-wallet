@@ -4,11 +4,13 @@ import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
+import { i18n } from '~/i18next.config'
 import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { OwnAddressesActions } from './own-addresses.reducer'
 import { Action } from '../types'
-import { RpcService } from '../../../service/rpc-service'
+import { RpcService } from '~/service/rpc-service'
 
+const t = i18n.getFixedT(null, 'own-addresses')
 const rpcService = new RpcService()
 
 const getOwnAddressesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
@@ -58,7 +60,7 @@ const mergeAllCoinsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 const mergeCoinsOperationStartedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeCoinsOperationStarted),
   tap(() => {
-    toastr.info(`Merging operation started, addresses will be frozen until done.`)
+    toastr.info(t(`Merging operation started, addresses will be frozen until done.`))
   }),
   mapTo(SystemInfoActions.getOperations())
 )
@@ -66,7 +68,7 @@ const mergeCoinsOperationStartedEpic = (action$: ActionsObservable<Action>) => a
 const mergeCoinsFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeCoinsFailure),
   tap((action) => {
-    toastr.error(`Unable to start merge operation`, action.payload.errorMessage)
+    toastr.error(t(`Unable to start merge operation`), action.payload.errorMessage)
   }),
   mapTo(SystemInfoActions.empty())
 )

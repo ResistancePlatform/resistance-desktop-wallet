@@ -4,8 +4,10 @@ import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
 import cn from 'classnames'
 
-import { GetStartedPage, RestoreYourWalletPage } from './GetStartedPage'
+import ChooseLanguagePage from './get-started/ChooseLanguagePage'
+import GetStartedPage from './get-started/GetStartedPage'
 import CreateNewWalletPage from './get-started/CreateNewWalletPage'
+import RestoreYourWalletPage from './get-started/RestoreYourWalletPage'
 import ChoosePasswordPage from './get-started/ChoosePasswordPage'
 import WelcomePage from './get-started/WelcomePage'
 
@@ -60,12 +62,13 @@ class App extends React.Component<Props> {
         <TitleBarButtons />
         <div className={[styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer].join(' ')}>
           <Switch>
-            <Route exact path="/get-started" component={GetStartedPage} />
+            <Route exact path="/get-started/choose-language" component={ChooseLanguagePage} />
+            <Route exact path="/get-started/get-started" component={GetStartedPage} />
             <Route exact path="/get-started/create-new-wallet" component={CreateNewWalletPage} />
             <Route exact path="/get-started/choose-password" component={ChoosePasswordPage} />
             <Route exact path="/get-started/restore-your-wallet" component={RestoreYourWalletPage} />
             <Route exact path="/get-started/welcome" component={WelcomePage} />
-            <Route exact path="/" render={() => (<Redirect to="/get-started" />)} />
+            <Route exact path="/" render={() => (<Redirect to="/get-started/choose-language" />)} />
           </Switch>
         </div>
       </div>

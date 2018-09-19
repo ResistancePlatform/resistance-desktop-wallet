@@ -2,6 +2,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
+import { translate } from 'react-i18next'
 import * as Joi from 'joi'
 import cn from 'classnames'
 
@@ -15,17 +16,18 @@ import VLayout from '~/theme/v-box-layout.scss'
 
 import styles from './Login.scss'
 
-const validationSchema = Joi.object().keys({
+const getValidationSchema = t => Joi.object().keys({
   // #?!@$%^&*-'`;
   password: (
     Joi.string().required()
     .regex(/^[a-zA-Z0-9]{8,30}$/)
-    .error(() => `should contain latin letters, numbers and special characters`)
-    .label(`Password`)
+    .error(() => t(`should contain latin letters, numbers and special characters`))
+    .label(t(`Password`))
   )
 })
 
 type Props = {
+  t: any,
   settings: SettingsState,
   form: RoundedFormRoot | undefined,
   actions: object
@@ -43,14 +45,15 @@ class Login extends Component<Props> {
    * @memberof Login
 	 */
 	render() {
+    const { t } = this.props
     const isNodeRunning = this.props.settings.childProcessesStatus.NODE === 'RUNNING'
 
     return (
       <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
-        <div className={cn(styles.title, { [styles.ready]: this.props.form && this.props.form.isValid })}>Enter Resistance</div>
+        <div className={cn(styles.title, { [styles.ready]: this.props.form && this.props.form.isValid })}>{t(`Enter Resistance`)}</div>
 
-        <RoundedForm id="authLogin" schema={validationSchema} className={styles.form}>
-          <RoundedInput name="password" password label="Password" />
+        <RoundedForm id="authLogin" schema={getValidationSchema(t)} className={styles.form}>
+          <RoundedInput name="password" password label={t(`Password`)} />
 
           <button
             type="submit"
@@ -59,7 +62,7 @@ class Login extends Component<Props> {
             onKeyDown={this.props.actions.submitPassword}
             disabled={!isNodeRunning}
           >
-            { isNodeRunning ? `Submit` : `Waiting for the daemon...` }
+            { isNodeRunning ? t(`Submit`) : t(`Waiting for the daemon...`) }
           </button>
         </RoundedForm>
       </div>
@@ -76,4 +79,4 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(AuthActions, dispatch)
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login)
+export default connect(mapStateToProps, mapDispatchToProps)(translate('other')(Login))

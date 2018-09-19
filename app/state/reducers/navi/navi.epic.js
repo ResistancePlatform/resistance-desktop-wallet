@@ -6,7 +6,7 @@ import { merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { Action } from '../types'
 import { NaviActions } from './navi.reducer'
-import { LoggerService, ConsoleTheme } from '../../../service/logger-service'
+import { LoggerService, ConsoleTheme } from '~/service/logger-service'
 
 const epicInstanceName = 'NaviEpics'
 const logger = new LoggerService()

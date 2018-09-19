@@ -5,6 +5,7 @@ import { filter, switchMap, take, map, mergeMap, mapTo, catchError } from 'rxjs/
 import { remote } from 'electron'
 import { ofType } from 'redux-observable'
 import { push } from 'react-router-redux'
+import { i18n } from '~/i18next.config'
 
 import { Action } from '../types'
 import { AUTH } from '~/constants/auth'
@@ -16,6 +17,7 @@ import { RoundedFormActions } from '../rounded-form/rounded-form.reducer'
 import { SettingsActions } from '../settings/settings.reducer'
 
 
+const t = i18n.getFixedT(null, 'get-started')
 const bip39 = new Bip39Service()
 const rpc = new RpcService()
 
@@ -33,12 +35,22 @@ function getNodeStartedObservable(emitActionOnStart: Action, action$: ActionsObs
       ofType(SettingsActions.childProcessFailed),
       filter(action => action.payload.processName === 'NODE'),
       take(1),
-      mapTo(WelcomeActions.walletBootstrappingFailed(`Unable to start Resistance local node, please try again or contact the support.`)),
+      mapTo(WelcomeActions.walletBootstrappingFailed(
+        t(`Unable to start Resistance local node, please try again or contact the support.`)
+      )),
     )
   )
 
   return observable
 }
+
+const chooseLanguageEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(GetStartedActions.chooseLanguage),
+  mergeMap(action => of(
+    SettingsActions.updateLanguage(action.payload.code),
+    push('/get-started/get-started')
+  ))
+)
 
 const generateWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(GetStartedActions.createNewWallet.generateWallet),
@@ -69,7 +81,7 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
     const nodeStartedObservable = getNodeStartedObservable(WelcomeActions.encryptWallet(), action$)
 
     return concat(
-       of(WelcomeActions.displayHint(`Starting local Resistance node...`)),
+      of(WelcomeActions.displayHint(t(`Starting local Resistance node...`))),
       of(SettingsActions.startLocalNode()),
       nodeStartedObservable
     )
@@ -89,7 +101,7 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       filter(action => action.payload.processName === 'NODE'),
       take(1),
       switchMap(() => concat(
-        of(WelcomeActions.displayHint(`Starting the local node and the miner...`)),
+        of(WelcomeActions.displayHint(t(`Starting the local node and the miner...`))),
         of(SettingsActions.kickOffChildProcesses()),
         nodeStartedObservable
       ))
@@ -100,7 +112,7 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.toString())))
     )
 
-    return concat(of(WelcomeActions.displayHint(`Encrypting the wallet...`)), observable)
+    return concat(of(WelcomeActions.displayHint(t(`Encrypting the wallet...`))), observable)
   })
 )
 
@@ -129,7 +141,7 @@ const authenticateAndRestoreWalletEpic = (action$: ActionsObservable<Action>, st
       const restoreForm = state$.value.roundedForm.getStartedRestoreYourWallet
       const keysFilePath = restoreForm.fields.backupFile
       nextObservables.push(
-        of(WelcomeActions.displayHint(`Restoring the wallet from the backup file...`)),
+        of(WelcomeActions.displayHint(t(`Restoring the wallet from the backup file...`))),
         of(SettingsActions.importWallet(keysFilePath)),
         importWalletObservable
       )
@@ -143,7 +155,7 @@ const authenticateAndRestoreWalletEpic = (action$: ActionsObservable<Action>, st
     )
 
     return concat(
-      of(WelcomeActions.displayHint(`Sending the wallet password to the node...`)),
+      of(WelcomeActions.displayHint(t(`Sending the wallet password to the node...`))),
       sendWalletObservable
     )
   })
@@ -164,6 +176,7 @@ const useResistanceEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 )
 
 export const GetStartedEpic = (action$, state$) => merge(
+	chooseLanguageEpic(action$, state$),
 	generateWalletEpic(action$, state$),
 	applyConfigurationEpic(action$, state$),
   encryptWalletEpic(action$, state$),

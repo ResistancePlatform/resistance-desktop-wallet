@@ -4,12 +4,14 @@ import { catchError, delay, map, switchMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
+import { i18n } from '~/i18next.config'
 import { AUTH } from '~/constants/auth'
 import { RpcService } from '~/service/rpc-service'
 import { AuthActions } from './auth.reducer'
 import { RoundedFormActions } from '../rounded-form/rounded-form.reducer'
 
-const rpc= new RpcService()
+const t = i18n.getFixedT(null, 'other')
+const rpc = new RpcService()
 
 const submitPasswordEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(AuthActions.submitPassword),
@@ -18,7 +20,7 @@ const submitPasswordEpic = (action$: ActionsObservable<Action>, state$) => actio
 
     const observable = rpc.sendWalletPassword(loginForm.fields.password, AUTH.sessionTimeoutSeconds).pipe(
       switchMap(() => {
-        const loginAfterTimeout = of(AuthActions.ensureLogin(`Your session has expired.`)).pipe(
+        const loginAfterTimeout = of(AuthActions.ensureLogin(t(`Your session has expired.`))).pipe(
           delay((AUTH.sessionTimeoutSeconds - 2) * 1000)
         )
 
@@ -28,7 +30,12 @@ const submitPasswordEpic = (action$: ActionsObservable<Action>, state$) => actio
           loginAfterTimeout,
         )
       }),
-      catchError(err => of(AuthActions.loginFailed(err.message)))
+      catchError(err => {
+        const errorMessage = err.code === -14
+          ? t(`The wallet password entered was incorrect.`)
+          : err.message
+        return of(AuthActions.loginFailed(errorMessage))
+      })
     )
     return observable
   })
@@ -37,7 +44,7 @@ const submitPasswordEpic = (action$: ActionsObservable<Action>, state$) => actio
 const loginFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(AuthActions.loginFailed),
   map(action => {
-    toastr.error(`Login failed`, action.payload.errorMessage)
+    toastr.error(t(`Login failed`), action.payload.errorMessage)
     return AuthActions.empty()
   })
 )

@@ -2,25 +2,37 @@
 import config from 'electron-settings'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { toastr } from 'react-redux-toastr'
+import { translate } from 'react-i18next'
 import { remote } from 'electron'
+import cn from 'classnames'
 import scrypt from 'scrypt-js'
+import Iso6391 from 'iso-639-1'
 
-import RoundedInput, { RoundedInputAddon } from '../../components/rounded-form/RoundedInput'
+import { availableLanguages } from '~/i18next.config'
+import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
+import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import styles from './settings.scss'
-import HLayout from '../../theme/h-box-layout.scss'
-import VLayout from '../../theme/v-box-layout.scss'
+import HLayout from '~/theme/h-box-layout.scss'
+import VLayout from '~/theme/v-box-layout.scss'
 
 import { appStore } from '~/state/store/configureStore'
+import { PopupMenuActions } from '~/state/reducers/popup-menu/popup-menu.reducer'
 import { SystemInfoState } from '~/state/reducers/system-info/system-info.reducer'
 import { SettingsActions, SettingsState } from '~/state/reducers/settings/settings.reducer'
-import StatusModal from '../../components/settings/status-modal'
+import StatusModal from '~/components/settings/status-modal'
 
 const generator = require('generate-password')
 
+const languagePopupMenuId = 'settings-language-dropdown-id'
+
 type Props = {
+  t: any,
   systemInfo: SystemInfoState,
-	settings: SettingsState
+  settings: SettingsState,
+  actions: SettingsActions,
+  popupMenu: PopupMenuActions
 }
 
 type State = {
@@ -54,6 +66,7 @@ class Settings extends Component<Props> {
     if (nextProps.settings.isMinerEnabled !== this.props.settings.isMinerEnabled) {
       config.set('manageDaemon.enableMiner', nextProps.settings.isMinerEnabled)
     }
+
     if (nextProps.settings.isTorEnabled !== this.props.settings.isTorEnabled) {
       config.set('manageDaemon.enableTor', nextProps.settings.isTorEnabled)
     }
@@ -67,6 +80,19 @@ class Settings extends Component<Props> {
 		event.preventDefault()
 		event.stopPropagation()
 	}
+
+	/**
+	 * @memberof Settings
+	 */
+  getLanguageMenuItems() {
+    const languages = Iso6391.getLanguages(availableLanguages)
+
+    return languages.map(language => (
+      <PopupMenuItem onClick={() => this.props.actions.updateLanguage(language.code)}>
+        {language.nativeName}
+      </PopupMenuItem>
+    ))
+  }
 
   getIsChildProcessUpdating(processName) {
     const processStatus = this.props.settings.childProcessesStatus[processName]
@@ -84,9 +110,10 @@ class Settings extends Component<Props> {
   }
 
   getStartStopLocalNodeButtonLabel() {
+    const { t } = this.props
     const nodeStatus = this.props.settings.childProcessesStatus.NODE
     const startStatuses = ['NOT RUNNING', 'STARTING', 'FAILED']
-    return startStatuses.indexOf(nodeStatus) !== -1 ? 'Start Local Node' : 'Stop Local Node'
+    return startStatuses.indexOf(nodeStatus) !== -1 ? t(`Start local node`) : t(`Stop local node`)
   }
 
 	getToggleButtonClasses(on) {
@@ -129,24 +156,24 @@ class Settings extends Component<Props> {
 	 * @param {*} event
 	 * @memberof Settings
 	 */
-	async onSavePasswordClicked() {
+	async onSavePasswordClicked(t) {
     const passwordHash = config.get('password.hash')
 
     if (passwordHash) {
-      const oldPasswordHash = await this.generatePasswordHash(this.state.oldPassword, config.get('password.salt', ''))
+      const oldPasswordHash = await this.generatePasswordHash(t, this.state.oldPassword, config.get('password.salt', ''))
 
       if (!oldPasswordHash) {
         return false
       }
 
       if (oldPasswordHash.toString() !== passwordHash.toString()) {
-        toastr.error(`Old password doesn't match.`)
+        toastr.error(t(`Old password doesn't match.`))
         return false
       }
     }
 
     const newSalt = generator.generate({ length: 32, numbers: true })
-    const newPasswordHash = await this.generatePasswordHash(this.state.newPassword, newSalt)
+    const newPasswordHash = await this.generatePasswordHash(t, this.state.newPassword, newSalt)
 
     if (!newPasswordHash) {
       return false
@@ -158,18 +185,18 @@ class Settings extends Component<Props> {
     })
 
     this.setState({ oldPassword: '' })
-    toastr.success(`Password saved successfully.`)
+    toastr.success(t(`Password saved successfully.`))
 
     return false
 	}
 
-  generatePasswordHash(password: string, salt: string) {
+  generatePasswordHash(t, password: string, salt: string) {
     this.setState({ isPasswordUpdating: true })
 
     const promise = new Promise(resolve => {
       scrypt(Buffer.from(password), Buffer.from(salt), 16384, 8, 1, 64, (error, progress, key) => {
         if (error) {
-          toastr.error(`Password hash generation failed`, error.toString())
+          toastr.error(t(`Password hash generation failed`), error.toString())
           resolve(null)
         } else if (key) {
           resolve(key)
@@ -274,20 +301,22 @@ class Settings extends Component<Props> {
 	 * @memberof Settings
 	 */
 	onBackupWalletClicked() {
+    const { t } = this.props
+
     const onSaveHandler = (filePath) => {
       if (filePath) {
         appStore.dispatch(SettingsActions.exportWallet(filePath))
       }
     }
 
-    const title = `Backup Resistance wallet to a file`
+    const title = t(`Backup Resistance wallet to a file`)
 
     remote.dialog.showSaveDialog({
       title,
       defaultPath: remote.app.getPath('documents'),
       message: title,
-      nameFieldLabel: `File name:`,
-      filters: [{ name: `Text files`,  extensions: ['wallet'] }]
+      nameFieldLabel: t(`File name:`),
+      filters: [{ name: t(`Text files`),  extensions: ['wallet'] }]
     }, onSaveHandler)
 
     return false
@@ -297,19 +326,19 @@ class Settings extends Component<Props> {
 	 * @param {*} event
 	 * @memberof Settings
 	 */
-	onRestoreWalletClicked() {
+	onRestoreWalletClicked(t) {
     const onOpenHandler = (filePaths) => {
       if (filePaths && filePaths.length) {
         appStore.dispatch(SettingsActions.importWallet(filePaths.pop()))
       }
     }
 
-    const title = `Restore Resistance wallet from a file`
+    const title = t(`Restore Resistance wallet from a file`)
     remote.dialog.showOpenDialog({
       title,
       defaultPath: remote.app.getPath('documents'),
       message: title,
-      filters: [{ name: `Text files`,  extensions: ['wallet'] }]
+      filters: [{ name: t(`Text files`),  extensions: ['wallet'] }]
     }, onOpenHandler)
 
     return false
@@ -320,6 +349,14 @@ class Settings extends Component<Props> {
 	 * @memberof Settings
 	 */
 	render() {
+    const { t } = this.props
+
+    const languageDropdownAddon: RoundedInputAddon = {
+      enable: true,
+      type: 'DROPDOWN',
+      onClick: () => this.props.popupMenu.show(languagePopupMenuId, '2rem', 'calc(100% - 14.5rem)')
+    }
+
 		const passwordAddon: RoundedInputAddon = {
 			enable: false,
 			type: 'TEXT_PLACEHOLDER',
@@ -336,54 +373,74 @@ class Settings extends Component<Props> {
             <StatusModal />
 
 						{/* Title bar */}
-						<div className={styles.titleBar}>Settings</div>
+            <div className={styles.titleBar}>{t(`Settings`)}</div>
 
-						{/* Old password */}
-						<RoundedInput
-							name="old-password"
-              defaultValue={this.state.oldPassword}
-							label="Old Password"
-							addon={passwordAddon}
-							onChange={value => this.onOldPasswordInputChanged(value)}
-              password
-						/>
+						{/* Language */}
+            <div className={styles.languageContainer}>
+              <RoundedInput
+                defaultValue={Iso6391.getNativeName(this.props.settings.language)}
+                label={t(`Language`)}
+                addon={languageDropdownAddon}
+                readOnly
+              >
+                {/* Dropdown menu container */}
+                <PopupMenu id={languagePopupMenuId} className={styles.languageDropdown}>
+                  {this.getLanguageMenuItems()}
+                </PopupMenu>
+              </RoundedInput>
+            </div>
 
-						{/* New password */}
-						<RoundedInput
-							name="new-password"
-							label="New Password"
-							addon={passwordAddon}
-              value={this.state.newPassword}
-							onChange={value => this.onNewPasswordInputChanged(value)}
-              password
-						/>
+            <div className={cn(styles.sectionContainer, styles.walletPassword)}>
+              <div className={styles.title}>{t(`Wallet password`)}</div>
+              <div className={cn(styles.body)}>
+              {/* Old password */}
+              <RoundedInput
+                name="old-password"
+                defaultValue={this.state.oldPassword}
+                label={t(`Old password`)}
+                addon={passwordAddon}
+                onChange={value => this.onOldPasswordInputChanged(value)}
+                password
+              />
 
-						{/* Repeat password */}
-						<RoundedInput
-							name="repeat-password"
-							label="Repeat New Password"
-							addon={passwordAddon}
-              value={this.state.repeatPassword}
-							onChange={value => this.onRepeatPasswordInputChanged(value)}
-              password
-						/>
+              {/* New password */}
+              <RoundedInput
+                name="new-password"
+                label={t(`New password`)}
+                addon={passwordAddon}
+                value={this.state.newPassword}
+                onChange={value => this.onNewPasswordInputChanged(value)}
+                password
+              />
 
-						{/* Save password */}
-						<button
-              type="button"
-							className={styles.savePasswordButton}
-              onClick={async () => this.onSavePasswordClicked()}
-							onKeyDown={async () => this.onSavePasswordClicked()}
-              disabled={this.getSavePasswordButtonDisabledAttribute()}
-						>
-							Save Password
-						</button>
+              {/* Repeat password */}
+              <RoundedInput
+                name="repeat-password"
+                label={t(`Repeat new password`)}
+                addon={passwordAddon}
+                value={this.state.repeatPassword}
+                onChange={value => this.onRepeatPasswordInputChanged(value)}
+                password
+              />
+
+              {/* Save password */}
+              <button
+                type="button"
+                className={styles.savePasswordButton}
+                onClick={async () => this.onSavePasswordClicked(t)}
+                onKeyDown={async () => this.onSavePasswordClicked(t)}
+                disabled={this.getSavePasswordButtonDisabledAttribute()}
+              >
+                {t(`Save password`)}
+              </button>
+              </div>
+            </div>
 
 						{/* Manage daemon */}
-						<div className={styles.manageDaemonContainer}>
-							<div className={styles.manageDaemonTitle}>MANAGE DAEMON</div>
+						<div className={styles.sectionContainer}>
+							<div className={styles.title}>{t(`Manage daemon`)}</div>
 
-							<div className={styles.manageDaemonBody}>
+							<div className={cn(styles.body, styles.buttonsRow)}>
 								<button
                   type="button"
 									className={styles.stopLocalNodeButton}
@@ -400,16 +457,17 @@ class Settings extends Component<Props> {
 									onClick={event => this.onShowStatusClicked(event)}
 									onKeyDown={event => this.onShowStatusClicked(event)}
 								>
-									SHOW STATUS
+                  {t(`Show status`)}
 								</button>
 
 								{/* Enable Mining toggle */}
 								<div className={styles.toggleButtonContainer}>
 									<div className={styles.toggleButtonContainerTitle}>
-										Enable Mining
+                    {t(`Enable mining`)}
 									</div>
 
 									<div
+                    role="button"
 										className={this.getEnableMiningToggleButtonClasses()}
 										onClick={event => this.onEnableMiningToggleClicked(event)}
 										onKeyDown={event => this.onEnableMiningToggleClicked(event)}
@@ -417,7 +475,7 @@ class Settings extends Component<Props> {
 									>
 										<div className={styles.toggleButtonSwitcher} />
 										<div className={styles.toggleButtonText}>
-											{this.props.settings.isMinerEnabled ? 'On' : 'Off'}
+											{this.props.settings.isMinerEnabled ? t(`On`) : t(`Off`)}
 										</div>
 									</div>
 								</div>
@@ -425,10 +483,11 @@ class Settings extends Component<Props> {
 								{/* Enable Tor toggle */}
 								<div className={styles.toggleButtonContainer} style={{ paddingLeft: '5rem' }}>
 									<div className={styles.toggleButtonContainerTitle}>
-										Enable Tor
+                    {t(`Enable Tor`)}
 									</div>
 									<div
-										title="Local node restart is required"
+                    role="button"
+										title={t(`Local node restart is required`)}
 										className={this.getEnableTorToggleButtonClasses()}
 										onClick={event => this.onEnableTorToggleClicked(event)}
 										onKeyDown={event => this.onEnableTorToggleClicked(event)}
@@ -436,7 +495,7 @@ class Settings extends Component<Props> {
 									>
 										<div className={styles.toggleButtonSwitcher} />
 										<div className={styles.toggleButtonText}>
-											{this.props.settings.isTorEnabled ? 'On' : 'Off'}
+											{this.props.settings.isTorEnabled ? t(`On`) : t(`Off`)}
 										</div>
 									</div>
 								</div>
@@ -444,28 +503,30 @@ class Settings extends Component<Props> {
 						</div>
 
 						{/* Manage wallet */}
-						<div className={styles.manageWalletContainer}>
-							<div className={styles.manageWalletTitle}>MANAGE WALLET</div>
+						<div className={styles.sectionContainer}>
+							<div className={styles.title}>{t(`Manage wallet`)}</div>
 
-							<button
-                type="button"
-								className={styles.walletNodeButton}
-								onClick={event => this.onBackupWalletClicked(event)}
-								onKeyDown={event => this.onBackupWalletClicked(event)}
-                disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
-							>
-								Backup Wallet
-							</button>
+              <div className={cn(styles.body, styles.buttonsRow)}>
+                <button
+                  type="button"
+                  className={styles.walletNodeButton}
+                  onClick={event => this.onBackupWalletClicked(event)}
+                  onKeyDown={event => this.onBackupWalletClicked(event)}
+                  disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
+                >
+                  {t(`Backup wallet`)}
+                </button>
 
-							<button
-                type="button"
-								className={styles.walletNodeButton}
-								onClick={event => this.onRestoreWalletClicked(event)}
-								onKeyDown={event => this.onRestoreWalletClicked(event)}
-                disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
-							>
-								Restore Wallet
-							</button>
+                <button
+                  type="button"
+                  className={styles.walletNodeButton}
+                  onClick={() => this.onRestoreWalletClicked(t)}
+                  onKeyDown={() => this.onRestoreWalletClicked(t)}
+                  disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
+                >
+                  {t(`Restore wallet`)}
+                </button>
+              </div>
 						</div>
 					</div>
 				</div>
@@ -479,4 +540,9 @@ const mapStateToProps = state => ({
 	settings: state.settings
 })
 
-export default connect(mapStateToProps, null)(Settings)
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(SettingsActions, dispatch),
+  popupMenu: bindActionCreators(PopupMenuActions, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(translate('settings')(Settings))

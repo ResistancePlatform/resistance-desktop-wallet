@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react'
-import classNames from 'classnames'
+import cn from 'classnames'
 
 import { AddressBookState } from '~/state/reducers/address-book/address-book.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
@@ -14,8 +14,9 @@ import VLayout from '~/theme/v-box-layout.scss'
 const addressBookPopupMenuId = 'address-book-row-popup-menu-id'
 
 type Props = {
-  actions: Object,
-  popupMenu: Object,
+  t: any,
+  actions: object,
+  popupMenu: object,
 	addressBook: AddressBookState
 }
 
@@ -34,24 +35,26 @@ export class AddressBook extends Component<Props> {
 	 * @returns
 	 */
 	render() {
+    const { t } = this.props
+
 		return (
       /* Layout container */
 			<div
         role="none"
-				className={classNames(styles.AddressBookContainer, HLayout.hBoxChild, VLayout.vBoxContainer)}
+				className={cn(styles.AddressBookContainer, HLayout.hBoxChild, VLayout.vBoxContainer)}
 				onKeyDown={() => {}}
 			>
 
 				{/* Top bar */}
-				<div className={classNames(styles.topBar, HLayout.hBoxContainer)}>
-					<div className={styles.topBarTitle}>Address Book</div>
-					<div className={classNames(styles.topBarButtonContainer, HLayout.hBoxChild)}>
+				<div className={cn(styles.topBar, HLayout.hBoxContainer)}>
+					<div className={styles.topBarTitle}>{t(`Address Book`)}</div>
+					<div className={cn(styles.topBarButtonContainer, HLayout.hBoxChild)}>
 						<button
               type="button"
               onClick={() => this.props.actions.openNewAddressDialog()}
 							onKeyDown={() => {}}
 						>
-							<span className={styles.addIcon}>&#43;</span><span>Add New Address</span>
+							<span className={styles.addIcon}>&#43;</span><span>{t(`Add new address`)}</span>
 						</button>
 					</div>
 				</div>
@@ -65,13 +68,13 @@ export class AddressBook extends Component<Props> {
 
 				<PopupMenu id={addressBookPopupMenuId}>
           <PopupMenuItem onClick={(e, record) => this.props.actions.openNewAddressDialog(record)}>
-            Edit Address
+            {t(`Edit address`)}
           </PopupMenuItem>
           <PopupMenuItem onClick={(e, record) => this.props.actions.copyAddress(record)}>
-            Copy Address
+            {t(`Copy Address`)}
           </PopupMenuItem>
           <PopupMenuItem onClick={(e, record) => this.props.actions.confirmAddressRemoval(record)}>
-            Remove Address
+            {t(`Remove Address`)}
           </PopupMenuItem>
 				</PopupMenu>
 

@@ -24,6 +24,7 @@ const validationSchema = Joi.object().keys({
 })
 
 type Props = {
+  t: any,
   actions: object
 }
 
@@ -47,37 +48,39 @@ export class RestoreYourWallet extends Component<Props> {
    * @memberof RestoreYourWallet
 	 */
 	render() {
+    const { t } = this.props
+
 		const backupFileAddon: RoundedInputAddon = {
 			enable: true,
       type: 'CHOOSE_FILE',
       data: {
-        title: `Restore Resistance wallet from a backup file`,
-        filters: [{ name: `Wallet keys files`,  extensions: ['wallet'] }]
+        title: t(`Restore Resistance wallet from a backup file`),
+        filters: [{ name: t(`Wallet keys files`),  extensions: ['wallet'] }]
       }
 		}
 
 		return (
       <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
-        <div className={styles.title}>Restore your wallet</div>
+        <div className={styles.title}>{t(`Restore your wallet`)}</div>
 
         <RoundedForm
           id="getStartedRestoreYourWallet"
           options={{ stripUnknown: true }}
           schema={validationSchema}
         >
-          <RoundedInput name="walletName" defaultValue={userInfo().username} label="Wallet name" />
+          <RoundedInput name="walletName" defaultValue={userInfo().username} label={t(`Wallet name`)} />
 
-          <RoundedInput name="backupFile" label="Backup file" addon={backupFileAddon} readOnly />
+          <RoundedInput name="backupFile" label={t(`Backup file`)} addon={backupFileAddon} readOnly />
 
-          <RoundedInput name="restoreHeight" label="Restore height (optional)" number />
+          <RoundedInput name="restoreHeight" label={t(`Restore height (optional)`)} number />
 
           <RoundedInput
             name="walletPath"
-            label="Your wallet stored in"
+            label={t(`Your wallet stored in`)}
             defaultValue={resistance.getWalletPath()}
             readOnly />
 
-          <NavLink className={styles.prevLink} to="/get-started" />
+          <NavLink className={styles.prevLink} to="/get-started/get-started" />
           <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/choose-password" />
 
           <div className={styles.paginationDots}>

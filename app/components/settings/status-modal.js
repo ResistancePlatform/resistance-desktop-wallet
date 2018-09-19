@@ -1,17 +1,17 @@
 // @flow
-import * as fs from 'fs';
-
+import * as fs from 'fs'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { translate } from 'react-i18next'
 import Modal from 'react-modal'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { LazyLog } from 'react-lazylog'
 import classNames from 'classnames'
 
 import 'react-tabs/style/react-tabs.scss'
-import { OSService, ChildProcessName } from '../../service/os-service'
-import { appStore } from '../../state/store/configureStore'
-import { SettingsActions, SettingsState } from '../../state/reducers/settings/settings.reducer'
+import { OSService, ChildProcessName } from '~/service/os-service'
+import { appStore } from '~/state/store/configureStore'
+import { SettingsActions, SettingsState } from '~/state/reducers/settings/settings.reducer'
 import styles from './status-modal.scss'
 
 const osService = new OSService()
@@ -19,6 +19,7 @@ const osService = new OSService()
 const processNames = ['NODE', 'MINER', 'TOR']
 
 type Props = {
+  t: any,
 	settings: SettingsState,
   systemInfo: SystemInfoState
 }
@@ -89,7 +90,9 @@ class StatusModal extends Component<Props> {
     }
 
     return (
-      <span>The log file for {processName} doesn&apos;t exist yet. Start the process in order to have something here.</span>
+      <span>
+        {this.props.t(`The log file for {{processName}} doesn't exist yet. Start the process in order to have something here.`, { processName })}
+      </span>
     )
   }
 
@@ -134,6 +137,7 @@ class StatusModal extends Component<Props> {
   }
 
   render() {
+    const { t } = this.props
     const nodeInfo = this.props.systemInfo.daemonInfo
 
     return (
@@ -141,16 +145,18 @@ class StatusModal extends Component<Props> {
         isOpen={this.props.settings.isStatusModalOpen}
         className={classNames(styles.statusModal)}
         overlayClassName={styles.modalOverlay}
-        contentLabel="Services Status"
+        contentLabel={t(`Services Status`)}
       >
         <div className={classNames(styles.modalTitle)}>
           <div
+            role="button"
+            tabIndex={0}
             className={styles.closeButton}
             onClick={event => this.onCloseClicked(event)}
             onKeyDown={event => this.onCloseClicked(event)}
           />
           <div className={styles.titleText}>
-            Services Status
+            {t(`Services Status`)}
           </div>
         </div>
 
@@ -168,42 +174,42 @@ class StatusModal extends Component<Props> {
                   className={this.getChildProcessStatusClassNames('NODE')}
                   title={this.props.settings.childProcessesStatus.NODE}
                 />
-                Node Log
+                {t(`Node Log`)}
               </Tab>
               <Tab className={styles.tab}>
                 <i
                   className={this.getChildProcessStatusClassNames('MINER')}
                   title={this.props.settings.childProcessesStatus.MINER}
                 />
-                Miner Log
+                {t(`Miner Log`)}
               </Tab>
               <Tab className={styles.tab}>
                 <i
                   className={this.getChildProcessStatusClassNames('TOR')}
                   title={this.props.settings.childProcessesStatus.TOR}
                 />
-                Tor Log
+                {t(`Tor Log`)}
               </Tab>
             </TabList>
 
             <TabPanel className={styles.tabPanel}>
               <table>
                 <tbody>
-                  <tr><td width="30%">Balance</td><td>{nodeInfo.balance}</td></tr>
-                  <tr><td>Blocks</td><td>{nodeInfo.blocks}</td></tr>
-                  <tr><td>Connections</td><td>{nodeInfo.connections}</td></tr>
-                  <tr><td>Difficulty</td><td>{nodeInfo.difficulty}</td></tr>
-                  <tr><td>Errors</td><td><div>{nodeInfo.errors}</div></td></tr>
-                  <tr><td>Key Pool Oldest</td><td>{nodeInfo.keypoololdest}</td></tr>
-                  <tr><td>Key Pool Size</td><td>{nodeInfo.keypoolsize}</td></tr>
-                  <tr><td>Pay TX Fee</td><td>{nodeInfo.paytxfee}</td></tr>
-                  <tr><td>Protocol Version</td><td>{nodeInfo.protocolversion}</td></tr>
-                  <tr><td>Proxy</td><td>{nodeInfo.proxy}</td></tr>
-                  <tr><td>Relay Fee</td><td>{nodeInfo.relayfee}</td></tr>
-                  <tr><td>Testnet</td><td>{nodeInfo.testnet}</td></tr>
-                  <tr><td>Time Offset</td><td>{nodeInfo.timeoffset}</td></tr>
-                  <tr><td>Version</td><td>{nodeInfo.version}</td></tr>
-                  <tr><td>Wallet Version</td><td>{nodeInfo.walletversion}</td></tr>
+                  <tr><td width="30%">{t(`Balance`)}</td><td>{nodeInfo.balance}</td></tr>
+                  <tr><td>{t(`Blocks`)}</td><td>{nodeInfo.blocks}</td></tr>
+                  <tr><td>{t(`Connections`)}</td><td>{nodeInfo.connections}</td></tr>
+                  <tr><td>{t(`Difficulty`)}</td><td>{nodeInfo.difficulty}</td></tr>
+                  <tr><td>{t(`Errors`)}</td><td><div>{nodeInfo.errors}</div></td></tr>
+                  <tr><td>{t(`Key Pool Oldest`)}</td><td>{nodeInfo.keypoololdest}</td></tr>
+                  <tr><td>{t(`Key Pool Size`)}</td><td>{nodeInfo.keypoolsize}</td></tr>
+                  <tr><td>{t(`Pay TX Fee`)}</td><td>{nodeInfo.paytxfee}</td></tr>
+                  <tr><td>{t(`Protocol Version`)}</td><td>{nodeInfo.protocolversion}</td></tr>
+                  <tr><td>{t(`Proxy`)}</td><td>{nodeInfo.proxy}</td></tr>
+                  <tr><td>{t(`Relay Fee`)}</td><td>{nodeInfo.relayfee}</td></tr>
+                  <tr><td>{t(`Testnet`)}</td><td>{nodeInfo.testnet}</td></tr>
+                  <tr><td>{t(`Time Offset`)}</td><td>{nodeInfo.timeoffset}</td></tr>
+                  <tr><td>{t(`Version`)}</td><td>{nodeInfo.version}</td></tr>
+                  <tr><td>{t(`Wallet Version`)}</td><td>{nodeInfo.walletversion}</td></tr>
                 </tbody>
               </table>
             </TabPanel>
@@ -224,6 +230,7 @@ class StatusModal extends Component<Props> {
 
         <div className={styles.statusModalFooter}>
           <button
+            type="button"
             className={styles.refreshButton}
             onClick={event => this.onRefreshClicked(event)}
             onKeyDown={event => this.onRefreshClicked(event)}
@@ -233,6 +240,7 @@ class StatusModal extends Component<Props> {
           </button>
 
           <button
+            type="button"
             className={styles.closeButton}
             onClick={event => this.onCloseClicked(event)}
             onKeyDown={event => this.onCloseClicked(event)}
@@ -251,4 +259,4 @@ const mapStateToProps = state => ({
   systemInfo: state.systemInfo,
 })
 
-export default connect(mapStateToProps, null)(StatusModal)
+export default connect(mapStateToProps, null)(translate('settings')(StatusModal))

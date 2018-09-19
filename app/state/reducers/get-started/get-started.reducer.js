@@ -1,8 +1,13 @@
 // @flow
 import { createActions, handleActions } from 'redux-actions'
+import { i18n } from '~/i18next.config'
 
 import { preloadedState } from '../preloaded.state'
 import Wallet from '~/service/bip39-service'
+
+
+const t = i18n.getFixedT(null, 'get-started')
+
 
 export type GetStartedState = {
   createNewWallet: {
@@ -23,6 +28,8 @@ export const GetStartedActions = createActions(
     EMPTY: undefined,
 
     SET_CREATING_NEW_WALLET: (isCreatingNewWallet: boolean) => isCreatingNewWallet,
+
+    CHOOSE_LANGUAGE: (code: string) => ({ code }),
 
     CREATE_NEW_WALLET: {
       GENERATE_WALLET: undefined,
@@ -76,7 +83,7 @@ export const GetStartedReducer = handleActions(
       ...state,
       welcome: {
         ...state.welcome,
-        hint: `Wallet bootstrapping has failed: ${action.payload.errorMessage}`,
+        hint: `${t('Wallet bootstrapping has failed:')} ${action.payload.errorMessage}`,
         status: 'error',
         isBootstrapping: false,
         isReadyToUse: false
@@ -86,7 +93,7 @@ export const GetStartedReducer = handleActions(
       ...state,
       welcome: {
         ...state.welcome,
-        hint: `Success! Your wallet has been created`,
+        hint: t(`Success! Your wallet has been created`),
         status: 'success',
         isBootstrapping: false,
         isReadyToUse: true

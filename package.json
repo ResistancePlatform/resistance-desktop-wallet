@@ -4,6 +4,7 @@
   "version": "0.13.3",
   "description": "Resistance cross-platform desktop wallet",
   "scripts": {
+    "i18n": "node -r babel-register internals/scripts/I18n.js",
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
     "build-dll": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.dev.dll.js --colors",
     "build-main": "cross-env NODE_ENV=production node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.main.prod.js --colors",
@@ -50,7 +51,8 @@
       "package.json"
     ],
     "extraResources": [
-      "bin"
+      "bin",
+      "locales"
     ],
     "dmg": {
       "contents": [
@@ -170,6 +172,7 @@
     "flow-runtime": "^0.17.0",
     "flow-typed": "^2.4.0",
     "husky": "^0.14.3",
+    "i18next-scanner": "^2.6.5",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^23.0.0",
     "minimist": "^1.2.0",
@@ -188,6 +191,7 @@
     "stylelint-config-standard": "^18.2.0",
     "uglifyjs-webpack-plugin": "1.2.5",
     "url-loader": "^1.0.1",
+    "vinyl-fs": "^3.0.3",
     "webpack": "^4.8.3",
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-cli": "^2.1.4",
@@ -207,6 +211,9 @@
     "font-awesome": "^4.7.0",
     "generate-password": "^1.4.0",
     "history": "^4.7.2",
+    "i18next": "^11.9.0",
+    "i18next-node-fs-backend": "^2.1.0",
+    "iso-639-1": "^2.0.3",
     "joi": "^13.6.0",
     "momentjs": "^2.0.0",
     "node-uuid": "^1.4.8",
@@ -217,6 +224,7 @@
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "react-hot-loader": "^4.2.0",
+    "react-i18next": "^7.12.0",
     "react-lazylog": "^3.1.4",
     "react-modal": "^3.5.1",
     "react-redux": "^5.0.7",

@@ -37,7 +37,7 @@ type State = {
   isFocused: boolean
 }
 
-export default class RoundedInput extends Component<Props> {
+class RoundedInput extends Component<Props> {
 	props: Props
   state: State
 
@@ -106,7 +106,7 @@ export default class RoundedInput extends Component<Props> {
 
     if (this.props.addon.type === 'CHOOSE_FILE') {
       const addonData = this.props.addon.data || {}
-      const title = addonData.title || `Choose a file`
+      const { title } = addonData
 
       const callback = filePaths => {
         if (filePaths && filePaths.length) {
@@ -244,3 +244,5 @@ export default class RoundedInput extends Component<Props> {
 		)
 	}
 }
+
+export default RoundedInput

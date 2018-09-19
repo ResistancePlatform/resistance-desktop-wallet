@@ -1,0 +1,7 @@
+{
+  "has to begin with R- for a transparent address or Z- for a private one": "devas komenci de R- por diafanaj adresoj kaj de Z- tiuj privataj",
+  "R-addresses are 35 characters long, not {{length}}": "R-adresoj estas 35 karaktrojn longaj, ne {{length}}",
+  "Z-addresses are 95 characters long, not {{length}}": "Z-adresoj estas 95 karaktrojn longaj, ne {{length}}",
+  "is not a valid Resistance address": "ne estas korekta Rezistanca adreso",
+  "Z address is not listed in the wallet": "Z address is not listed in the wallet"
+}

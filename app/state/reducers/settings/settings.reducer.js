@@ -2,18 +2,21 @@
 import { createActions, handleActions } from 'redux-actions'
 
 import { preloadedState } from '../preloaded.state'
-import { ChildProcessName, ChildProcessStatus } from '../../../service/os-service'
+import { ChildProcessName, ChildProcessStatus } from '~/service/os-service'
 
 export type SettingsState = {
 	isTorEnabled: boolean,
 	isMinerEnabled: boolean,
   isStatusModalOpen: boolean,
-  childProcessesStatus: { [ChildProcessName]: ChildProcessStatus }
+  childProcessesStatus: { [ChildProcessName]: ChildProcessStatus },
+  language: string
 }
 
 export const SettingsActions = createActions(
   {
     EMPTY: undefined,
+
+    UPDATE_LANGUAGE: (code: string) => ({ code }),
 
     OPEN_STATUS_MODAL: undefined,
     CLOSE_STATUS_MODAL: undefined,
@@ -73,6 +76,11 @@ const getChildProcessUpdateFailedState = (state, action, processStatus: ChildPro
 
 export const SettingsReducer = handleActions(
   {
+    // Language
+    [SettingsActions.updateLanguage]: (state, action) => ({
+      ...state, language: action.payload.code
+    }),
+
     // Status Modal
     [SettingsActions.openStatusModal]: state => ({
       ...state, isStatusModalOpen: true

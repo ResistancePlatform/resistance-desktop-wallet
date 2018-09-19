@@ -2,6 +2,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import cn from 'classnames'
+import { translate } from 'react-i18next'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { OverviewActions } from '~/state/reducers/overview/overview.reducer'
@@ -19,6 +20,7 @@ const walletInfoPollingInterval = 2.0
 const transactionsPollingInterval = 5.0
 
 type Props = {
+  t: any,
   overview: OverviewState
 }
 
@@ -87,6 +89,8 @@ class Overview extends Component<Props> {
 	 * @memberof Overview
 	 */
 	render() {
+    const { t } = this.props
+
 		const shouldShowTransactionDetail = this.props.overview.transactionDetail !== null
 		const renderContent = shouldShowTransactionDetail ? (
 			<TransactionDetailList
@@ -99,7 +103,7 @@ class Overview extends Component<Props> {
 					<Balance balances={this.props.overview.balances} />
 
           <div className={cn(styles.transactionsContainer)}>
-            <div className={styles.title}>Transactions</div>
+            <div className={styles.title}>{t(`Transactions`)}</div>
 
             <TransactionList
               items={this.props.overview.transactions}
@@ -154,4 +158,4 @@ const mapStateToProps = (state) => ({
 	overview: state.overview
 })
 
-export default connect(mapStateToProps, null)(Overview)
+export default connect(mapStateToProps, null)(translate('overview')(Overview))

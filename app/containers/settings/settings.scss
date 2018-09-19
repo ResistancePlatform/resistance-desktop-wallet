@@ -22,43 +22,37 @@
     margin-bottom: 2rem;
 }
 
-// Overwrite the CSS to change the width
-div[name="old-password"] {
-    margin-bottom: 1rem;
-}
-
-div[name="new-password"] {
-    margin-bottom: 1rem;
-}
-
-div[name="repeat-password"] {
-    margin-bottom: 1rem;
-}
-
 .savePasswordButton {
     @include settingButton();
-    height: 3rem;
-    padding-bottom: 1.4rem;
-    margin-bottom: 2rem;
 }
 
-.manageDaemonContainer {
-    padding: 1.5rem 0;
+.sectionContainer {
+  width: 100%;
+  display: block;
+  padding: 1.3rem 0;
+  font-size: 0.7rem;
+  font-weight: 300;
+  border-top: 1px solid $BASE_COLOR_BORDER_GRAY;
 
-    font-size: 0.7rem;
-    font-weight: 300;
+  .title {
+    margin-bottom: 1.2rem;
+    text-transform: uppercase;
+  }
 
-    border-top: 1px solid $BASE_COLOR_BORDER_GRAY;
-
-    .manageDaemonTitle {
-        margin-bottom: 1.5rem;
-    }
-
-    .manageDaemonBody {
+  .body {
+    display: inline-block;
+    &.buttonsRow {
       div, button {
         display: inline-block;
       }
     }
+  }
+
+  &.walletPassword {
+    // border-top: 0;
+    // padding-top: 0.5rem;
+  }
+
 }
 
 .stopLocalNodeButton {
@@ -69,19 +63,6 @@ div[name="repeat-password"] {
     @include settingButton();
 
     margin-left: 1.5rem;
-}
-
-.manageWalletContainer {
-    padding: 1.5rem 0;
-
-    font-size: 0.7rem;
-    font-weight: 300;
-
-    border-top: 1px solid $BASE_COLOR_BORDER_GRAY;
-
-    .manageWalletTitle {
-        margin-bottom: 1.5rem;
-    }
 }
 
 .walletNodeButton {

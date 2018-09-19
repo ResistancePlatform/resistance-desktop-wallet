@@ -22,7 +22,7 @@ export const RpcPollingActions = createActions(
 
 export const RpcPollingReducer = (state: RpcPollingState = preloadedState.rpcPolling, action: Action) => {
   let actionRow
-  const payload = action.payload
+  const { payload } = action
 
   switch(action.type) {
     case RpcPollingActions.registerActions.toString():
