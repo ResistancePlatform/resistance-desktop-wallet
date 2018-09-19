@@ -24,10 +24,14 @@ export const AuthActions = createActions(
 
 export const AuthReducer = handleActions(
   {
-    [AuthActions.ensureLogin]: state => ({
-      ...state, isLoginRequired: true
+    [AuthActions.ensureLogin]: (state, action) => ({
+      ...state,
+      reason: action.payload.reason,
+      isLoginRequired: true
     }),
     [AuthActions.loginSucceeded]: state => ({
-      ...state, isLoginRequired: false
+      ...state,
+      reason: null,
+      isLoginRequired: false
     })
   }, preloadedState)

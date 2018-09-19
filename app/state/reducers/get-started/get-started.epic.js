@@ -121,22 +121,6 @@ const authenticateAndRestoreWalletEpic = (action$: ActionsObservable<Action>, st
   switchMap(() => {
     const state = state$.value.getStarted
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
-
-    /*
-    const importWalletObservable = race(
-      action$.pipe(
-        ofType(SettingsActions.importWalletSuccess),
-        take(1),
-        mapTo(WelcomeActions.walletBootstrappingSucceeded())
-      ),
-      action$.pipe(
-        ofType(SettingsActions.importWalletFailure),
-        take(1),
-        map(action => WelcomeActions.walletBootstrappingFailed(action.payload.errorMessage))
-      )
-    )
-    */
-
     const nextObservables = [of(AuthActions.loginSucceeded())]
 
     if (!state.isCreatingNewWallet) {
@@ -149,7 +133,7 @@ const authenticateAndRestoreWalletEpic = (action$: ActionsObservable<Action>, st
       )
 
       nextObservables.push(
-        of(WelcomeActions.displayHint(t(`Restoring the wallet from the backup file...`))),
+        of(WelcomeActions.displayHint(t(`Restoring the wallet from the private keys...`))),
         importPrivateKeysObservable
       )
     } else {

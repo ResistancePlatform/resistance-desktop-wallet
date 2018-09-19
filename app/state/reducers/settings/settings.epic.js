@@ -1,7 +1,7 @@
 // @flow
 import config from 'electron-settings'
 import { remote } from 'electron'
-import { tap, filter, delay, map, flatMap, mergeMap, mapTo, catchError } from 'rxjs/operators'
+import { tap, filter, delay, take, map, flatMap, mergeMap, mapTo, catchError } from 'rxjs/operators'
 import { of, bindCallback, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
@@ -12,6 +12,7 @@ import { RpcService } from '~/service/rpc-service'
 import { ResistanceService } from '~/service/resistance-service'
 import { MinerService } from '~/service/miner-service'
 import { TorService } from '~/service/tor-service'
+import { AuthActions } from '~/state/reducers/auth/auth.reducer'
 import { SettingsActions } from './settings.reducer'
 
 const t = i18n.getFixedT(null, 'settings')
@@ -140,6 +141,16 @@ const childProcessMurderFailedEpic = (action$: ActionsObservable<Action>) => act
   mapTo(SettingsActions.empty())
 )
 
+function getEnsureLoginObservable(reason: string, next: Observable, action$: ActionsObservable<Action>) {
+  const loginSucceeded: Observable = action$.pipe(
+    ofType(AuthActions.loginSucceeded),
+    take(1),
+    mergeMap(() => next)
+  )
+
+  return concat(of(AuthActions.ensureLogin(reason)), loginSucceeded)
+}
+
 const initiatePrivateKeysExportEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.initiatePrivateKeysExport),
   mergeMap(() => {
@@ -161,7 +172,8 @@ const initiatePrivateKeysExportEpic = (action$: ActionsObservable<Action>) => ac
           : SettingsActions.empty()
       )))
 
-    return observable
+    const reason = t(`Enter your wallet password before exporting the private keys`)
+    return getEnsureLoginObservable(reason, observable, action$)
   })
 )
 
@@ -200,7 +212,8 @@ const initiatePrivateKeysImportEpic = (action$: ActionsObservable<Action>) => ac
           : SettingsActions.empty()
       )))
 
-    return observable
+    const reason = t(`Enter your wallet password before importing the private keys`)
+    return getEnsureLoginObservable(reason, observable, action$)
   })
 )
 
