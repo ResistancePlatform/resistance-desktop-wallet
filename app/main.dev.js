@@ -121,6 +121,13 @@ app.on('ready', async () => {
     await fetchParamsService.fetch(mainWindow)
   }
 
+  // Disabling eval for security reasons,
+  // https://github.com/ResistancePlatform/resistance-desktop-wallet/issues/155
+  // eslint-disable-next-line
+  mainWindow.eval = global.eval = function () {
+    throw new Error(`Sorry, this app does not support window.eval().`)
+  }
+
   mainWindow.loadURL(`file://${__dirname}/app.html`)
 
   // Uncomment for debugging in prod mode
