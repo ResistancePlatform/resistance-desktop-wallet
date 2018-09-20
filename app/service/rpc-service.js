@@ -555,29 +555,16 @@ export class RpcService {
 	}
 
 	/**
-   * Export wallet to a file.
+   * Export private keys to a file.
    *
 	 * @memberof RpcService
 	 */
   exportPrivateKeys(filePath) {
-    const client = getClientInstance()
-
-    const exportFileName = uuid().replace(/-/g, '')
-    const exportFilePath = path.join(this.resistanceService.getExportDir(), exportFileName)
-
-    return from(
-      client.command('z_exportwallet', exportFileName)
-        .then((result) => {
-          if (typeof(result) === 'object' && result.name === 'RpcError') {
-            throw new Error(result.message)
-          }
-          return this.osService.moveFile(exportFilePath, filePath)
-        })
-    )
+    return this::exportFileWithMethod('z_exportwallet', filePath)
   }
 
 	/**
-   * Import wallet from a file.
+   * Import private keys from a file.
    *
 	 * @memberof RpcService
    * @returns {Observable}
@@ -598,6 +585,17 @@ export class RpcService {
 
     return observable
   }
+
+	/**
+   * Backup wallet to a file.
+   *
+	 * @memberof RpcService
+   * @returns {Observable}
+	 */
+  backupWallet(filePath) {
+    return this::exportFileWithMethod('backupwallet', filePath)
+  }
+
 }
 
 /* RPC Service private methods */
@@ -840,4 +838,27 @@ function performMergeCoinsCommand(commandPromise: Promise<any>) {
     )).catch(err => (
       this.osService.dispatchAction(OwnAddressesActions.mergeCoinsFailure(err.toString()))
     ))
+}
+
+
+/**
+ * Private method. Used to export private keys or backup the wallet to a file.
+ *
+ * @memberof RpcService
+ */
+function exportFileWithMethod(method, filePath) {
+  const client = getClientInstance()
+
+  const exportFileName = uuid().replace(/-/g, '')
+  const exportFilePath = path.join(this.resistanceService.getExportDir(), exportFileName)
+
+  return from(
+    client.command(method, exportFileName)
+      .then((result) => {
+        if (typeof(result) === 'object' && result.name === 'RpcError') {
+          throw new Error(result.message)
+        }
+        return this.osService.moveFile(exportFilePath, filePath)
+      })
+  )
 }

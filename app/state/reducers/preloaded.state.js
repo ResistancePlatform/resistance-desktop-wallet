@@ -4,6 +4,7 @@ import { Decimal } from 'decimal.js'
 export const preloadedState: State = {
   auth: {
     reason: null,
+    enter: true,
     isLoginRequired: true
   },
   roundedForm: {},

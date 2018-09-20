@@ -1,18 +1,23 @@
 // @flow
 import config from 'electron-settings'
+import path from 'path'
+import * as fs from 'fs'
+import { promisify } from 'util'
 import { remote, ipcRenderer } from 'electron'
-import { tap, filter, delay, mergeMap, flatMap, map, mapTo, catchError } from 'rxjs/operators'
-import { of, bindCallback, concat, merge } from 'rxjs'
+import { tap, filter, delay, mergeMap, flatMap, switchMap, map, mapTo, catchError } from 'rxjs/operators'
+import { of, from, bindCallback, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
 import { i18n } from '~/i18next.config'
 import { getEnsureLoginObservable } from '~/utils/auth'
 import { Action } from '../types'
+import { getStartLocalNodeObservable } from '~/utils/child-process'
 import { RpcService } from '~/service/rpc-service'
 import { ResistanceService } from '~/service/resistance-service'
 import { MinerService } from '~/service/miner-service'
 import { TorService } from '~/service/tor-service'
+import { AuthActions } from '../auth/auth.reducer'
 import { SettingsActions } from './settings.reducer'
 
 const t = i18n.getFixedT(null, 'settings')
@@ -125,13 +130,14 @@ const initiateWalletBackupEpic = (action$: ActionsObservable<Action>) => action$
     }
 
     const observable = showSaveDialogObservable(params).pipe(
-      map(([ filePath ]) => (
+      switchMap(([ filePath ]) => (
         filePath
-          ? SettingsActions.backupWallet(filePath)
-          : SettingsActions.empty()
+          ? of(SettingsActions.backupWallet(filePath))
+          : of(SettingsActions.empty())
       )))
 
-    return getEnsureLoginObservable(null, observable, action$)
+    const reason = t(`We're going to backup the wallet`)
+    return getEnsureLoginObservable(reason, observable, action$)
   })
 )
 
@@ -139,9 +145,9 @@ const backupWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.backupWallet),
   mergeMap(action => (
     rpc.backupWallet(action.payload.filePath).pipe(
-      map(() => {
+      switchMap(() => {
         toastr.info(t(`Wallet backup succeeded.`))
-        return SettingsActions.empty()
+        return of(SettingsActions.empty())
       }),
       catchError(err => {
         toastr.error(t(`Unable to backup the wallet`), err.message)
@@ -155,41 +161,70 @@ const initiateWalletRestoreEpic = (action$: ActionsObservable<Action>) => action
   mergeMap(() => {
     const showOpenDialogObservable = bindCallback(remote.dialog.showOpenDialog.bind(remote.dialog))
 
-    const title = t(`Import Resistance addresses from private keys file`)
+    const title = t(`Restore the wallet from a backup file`)
     const params = {
       title,
       defaultPath: remote.app.getPath('documents'),
       message: title,
-      filters: [{ name: t(`Keys files`),  extensions: ['keys'] }]
+      filters: [{ name: t(`Wallet files`),  extensions: ['dat'] }]
     }
 
     const observable = showOpenDialogObservable(params).pipe(
-      map(([ filePaths ]) => (
+      switchMap(([ filePaths ]) => (
         filePaths && filePaths.length
-          ? SettingsActions.restoreWallet(filePaths.pop())
-          : SettingsActions.empty()
+          ? of(SettingsActions.restoreWallet(filePaths.pop()))
+          : of(SettingsActions.empty())
       )))
 
-    return getEnsureLoginObservable(null, observable, action$)
+    const reason = t(`We're going to restore the wallet`)
+    return getEnsureLoginObservable(reason, observable, action$)
   })
 )
 
 const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.restoreWallet),
-  mergeMap(action => (
-    rpc.restoreWallet(action.payload.filePath).pipe(
-      map(() => {
-        toastr.info(
-          t(`Private keys imported successfully`),
-          t(`It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`)
-        )
-        return SettingsActions.empty()
+  switchMap(action => {
+    const walletFileName = path.basename(action.payload.filePath)
+    const newWalletPath = path.join(resistanceService.getWalletPath(), walletFileName)
+
+    // Third, send the password for the new wallet
+    const startLocalNodeObservable = getStartLocalNodeObservable(
+      AuthActions.ensureLogin(t(`Your restored wallet password is required`), true),
+      SettingsActions.restoringWalletFailed(),
+      action$
+    )
+
+    const copyPromise = promisify(fs.copyFile)(action.payload.filePath, newWalletPath)
+
+    // Second, copy the backed up wallet to the export directory, update the config and restart the node
+    const copyObservable = from(copyPromise).pipe(
+      switchMap(() => {
+        const walletName = path.basename(walletFileName, path.extname(walletFileName))
+        config.set('wallet.name', walletName)
+        return concat(of(SettingsActions.restartLocalNode()), startLocalNodeObservable)
       }),
-      catchError(err => {
-        toastr.error(t(`Unable to import private keys`), err.message)
-        return of(SettingsActions.empty())
-      })
-  )))
+      catchError(err => SettingsActions.restoringWalletFailed(err.message))
+    )
+
+    // First, check if wallet file already exists
+    const result = from(promisify(fs.access)(newWalletPath)).pipe(
+      switchMap(() => {
+        const errorMessage = t(`Wallet file "{{walletFileName}}" already exists.`, { walletFileName })
+        return of(SettingsActions.restoringWalletFailed(errorMessage))
+      }),
+      catchError(() => copyObservable)
+    )
+
+    return result
+  })
+)
+
+const restoringWalletFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.restoringWalletFailed),
+  map(action => {
+    toastr.error(t(`Failed to restore the wallet`), action.payload.errorMessage)
+    return SettingsActions.empty()
+  })
 )
 
 const childProcessFailedEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
@@ -238,6 +273,7 @@ export const SettingsEpics = (action$, state$) => merge(
   initiateWalletRestoreEpic(action$, state$),
   backupWalletEpic(action$, state$),
   restoreWalletEpic(action$, state$),
+  restoringWalletFailedEpic(action$, state$),
 	childProcessFailedEpic(action$, state$),
 	childProcessMurderFailedEpic(action$, state$)
 )

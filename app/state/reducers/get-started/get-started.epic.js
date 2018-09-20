@@ -1,6 +1,6 @@
 // @flow
 import config from 'electron-settings'
-import { of, race, concat, merge } from 'rxjs'
+import { of, concat, merge } from 'rxjs'
 import { filter, switchMap, take, map, mergeMap, mapTo, catchError } from 'rxjs/operators'
 import { remote } from 'electron'
 import { ofType } from 'redux-observable'
@@ -8,6 +8,7 @@ import { push } from 'react-router-redux'
 import { i18n } from '~/i18next.config'
 
 import { Action } from '../types'
+import { getStartLocalNodeObservable } from '~/utils/child-process'
 import { AUTH } from '~/constants/auth'
 import { RpcService } from '~/service/rpc-service'
 import { Bip39Service } from '~/service/bip39-service'
@@ -21,28 +22,9 @@ const t = i18n.getFixedT(null, 'get-started')
 const bip39 = new Bip39Service()
 const rpc = new RpcService()
 
+
 const WelcomeActions = GetStartedActions.welcome
-
-function getNodeStartedObservable(emitActionOnStart: Action, action$: ActionsObservable<Action>): ActionsObservable<Action> {
-  const observable = race(
-    action$.pipe(
-      ofType(SettingsActions.childProcessStarted),
-      filter(action => action.payload.processName === 'NODE'),
-      take(1),
-      mapTo(emitActionOnStart)
-    ),
-    action$.pipe(
-      ofType(SettingsActions.childProcessFailed),
-      filter(action => action.payload.processName === 'NODE'),
-      take(1),
-      mapTo(WelcomeActions.walletBootstrappingFailed(
-        t(`Unable to start Resistance local node, please try again or contact the support.`)
-      )),
-    )
-  )
-
-  return observable
-}
+const unableToStartLocalNodeMessage = t(`Unable to start Resistance local node, please try again or contact the support.`)
 
 const chooseLanguageEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(GetStartedActions.chooseLanguage),
@@ -78,7 +60,11 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
       path: form.fields.walletPath
     })
 
-    const nodeStartedObservable = getNodeStartedObservable(WelcomeActions.encryptWallet(), action$)
+    const nodeStartedObservable = getStartLocalNodeObservable(
+      WelcomeActions.encryptWallet(),
+      WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage),
+      action$
+    )
 
     return concat(
       of(WelcomeActions.displayHint(t(`Starting local Resistance node...`))),
@@ -94,7 +80,11 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
 
     // Wallet encryption shuts the node down, let's start it back up and trigger the next action
-    const nodeStartedObservable = getNodeStartedObservable(WelcomeActions.authenticateAndRestoreWallet(), action$)
+    const nodeStartedObservable = getStartLocalNodeObservable(
+      WelcomeActions.authenticateAndRestoreWallet(),
+      WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage),
+      action$
+    )
 
     const nodeShutDownObservable = action$.pipe(
       ofType(SettingsActions.childProcessFailed),

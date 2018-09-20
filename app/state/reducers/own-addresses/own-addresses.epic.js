@@ -42,10 +42,10 @@ const initiatePrivateKeysExportEpic = (action$: ActionsObservable<Action>) => ac
     }
 
     const observable = showSaveDialogObservable(params).pipe(
-      map(([ filePath ]) => (
+      switchMap(([ filePath ]) => (
         filePath
-          ? OwnAddressesActions.exportPrivateKeys(filePath)
-          : OwnAddressesActions.empty()
+          ? of(OwnAddressesActions.exportPrivateKeys(filePath))
+          : of(OwnAddressesActions.empty())
       )))
 
     return getEnsureLoginObservable(null, observable, action$)
@@ -56,9 +56,9 @@ const exportPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pi
 	ofType(OwnAddressesActions.exportPrivateKeys),
   mergeMap(action => (
     rpc.exportPrivateKeys(action.payload.filePath).pipe(
-      map(() => {
+      switchMap(() => {
         toastr.info(t(`Private keys exported successfully`))
-        return OwnAddressesActions.empty()
+        return of(OwnAddressesActions.empty())
       }),
       catchError(err => {
         toastr.error(t(`Unable to export private keys`), err.message)
@@ -81,10 +81,10 @@ const initiatePrivateKeysImportEpic = (action$: ActionsObservable<Action>) => ac
     }
 
     const observable = showOpenDialogObservable(params).pipe(
-      map(([ filePaths ]) => (
+      switchMap(([ filePaths ]) => (
         filePaths && filePaths.length
-          ? OwnAddressesActions.importPrivateKeys(filePaths.pop())
-          : OwnAddressesActions.empty()
+          ? of(OwnAddressesActions.importPrivateKeys(filePaths.pop()))
+          : of(OwnAddressesActions.empty())
       )))
 
     return getEnsureLoginObservable(null, observable, action$)
@@ -95,12 +95,12 @@ const importPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pi
 	ofType(OwnAddressesActions.importPrivateKeys),
   mergeMap(action => (
     rpc.importPrivateKeys(action.payload.filePath).pipe(
-      map(() => {
+      switchMap(() => {
         toastr.info(
           t(`Private keys imported successfully`),
           t(`It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`)
         )
-        return OwnAddressesActions.empty()
+        return of(OwnAddressesActions.empty())
       }),
       catchError(err => {
         toastr.error(t(`Unable to import private keys`), err.message)

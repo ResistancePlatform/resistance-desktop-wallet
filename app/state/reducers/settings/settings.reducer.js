@@ -35,6 +35,7 @@ export const SettingsActions = createActions(
     BACKUP_WALLET: filePath => ({filePath}),
     INITIATE_WALLET_RESTORE: undefined,
     RESTORE_WALLET: filePath => ({filePath}),
+    RESTORING_WALLET_FAILED: (errorMessage: string = '') => ({ errorMessage }),
 
     KICK_OFF_CHILD_PROCESSES: undefined,
 
