@@ -22,5 +22,17 @@
   "Merge all private address coins here": "Merge all private address coins here",
   "Merge all coins here": "Merge all coins here",
   "Merging operation started, addresses will be frozen until done.": "Merging operation started, addresses will be frozen until done.",
-  "Unable to start merge operation": "Unable to start merge operation"
+  "Unable to start merge operation": "Unable to start merge operation",
+  "Show private key": "Show private key",
+  "Add new address": "Add new address",
+  "Import private keys form file": "Import private keys form file",
+  "Export Resistance addresses private keys to a file": "Export Resistance addresses private keys to a file",
+  "File name:": "File name:",
+  "Keys files": "Keys files",
+  "Private keys exported successfully": "Private keys exported successfully",
+  "Unable to export private keys": "Unable to export private keys",
+  "Import Resistance addresses from private keys file": "Import Resistance addresses from private keys file",
+  "Private keys imported successfully": "Private keys imported successfully",
+  "It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.": "It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.",
+  "Unable to import private keys": "Unable to import private keys"
 }

@@ -1,6 +1,6 @@
 // @flow
 import config from 'electron-settings'
-import { remote } from 'electron'
+import { remote, ipcRenderer } from 'electron'
 import { tap, filter, delay, mergeMap, flatMap, map, mapTo, catchError } from 'rxjs/operators'
 import { of, bindCallback, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
@@ -26,6 +26,7 @@ const updateLanguageEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   map(action => {
     i18n.changeLanguage(action.payload.code)
     config.set('language', action.payload.code)
+    ipcRenderer.send('change-language', action.payload.code)
     return SettingsActions.empty()
   })
 )

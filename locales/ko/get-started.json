@@ -39,5 +39,6 @@
   "should contain Latin letters, numbers and special characters": "should contain Latin letters, numbers and special characters",
   "Starting the local node again...": "Starting the local node again...",
   "Restore Resistance wallet from a private keys file": "Restore Resistance wallet from a private keys file",
-  "Keys files": "Keys files"
+  "Keys files": "Keys files",
+  "Restoring the wallet from the private keys...": "Restoring the wallet from the private keys..."
 }

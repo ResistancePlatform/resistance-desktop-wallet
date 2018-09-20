@@ -64,5 +64,9 @@
   "Unable to export private keys": "Unable to export private keys",
   "Import Resistance addresses from private keys file": "Import Resistance addresses from private keys file",
   "Private keys imported successfully": "Private keys imported successfully",
-  "Unable to import private keys": "Unable to import private keys"
+  "Unable to import private keys": "Unable to import private keys",
+  "Backup": "Backup",
+  "Restore": "Restore",
+  "Backup resistance wallet to a file": "Backup resistance wallet to a file",
+  "Wallet files": "Wallet files"
 }

@@ -13,7 +13,7 @@
 import * as fs from 'fs'
 import path from 'path'
 import config from 'electron-settings'
-import { app, BrowserWindow } from 'electron'
+import { app, ipcMain, BrowserWindow } from 'electron'
 
 import { i18n } from './i18next.config'
 import { OSService } from './service/os-service'
@@ -92,16 +92,6 @@ app.on('ready', async () => {
     await installExtensions()
   }
 
-  i18n.on('loaded', () => {
-    i18n.changeLanguage(config.get('language', 'en'))
-    i18n.off('loaded')
-  });
-
-  i18n.on('languageChanged', () => {
-    // menuFactoryService.buildMenu(app, win, i18n);
-    console.log('Not implemented')
-  })
-
   mainWindow = new BrowserWindow({
     minHeight: 728,
     height: 728,
@@ -111,6 +101,21 @@ app.on('ready', async () => {
     frame: false,
     backgroundColor: '#1d2440',
   });
+
+  const menuBuilder = new MenuBuilder(mainWindow)
+
+  i18n.on('loaded', () => {
+    i18n.changeLanguage(config.get('language', 'en'))
+    i18n.off('loaded')
+  });
+
+  i18n.on('languageChanged', () => {
+    menuBuilder.buildMenu()
+  })
+
+  ipcMain.on('change-language', (event, code) => {
+    i18n.changeLanguage(code)
+  })
 
   if (!await fetchParamsService.checkPresence()) {
     await fetchParamsService.fetch(mainWindow)
@@ -149,6 +154,4 @@ app.on('ready', async () => {
     mainWindow = null
   })
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
 });
