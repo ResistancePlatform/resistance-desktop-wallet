@@ -15,7 +15,7 @@ type Props = {
 
 
 /**
- * @class GetStarted
+ * @class ChooseLanguage
  * @extends {Component<Props>}
  */
 export class ChooseLanguage extends Component<Props> {
