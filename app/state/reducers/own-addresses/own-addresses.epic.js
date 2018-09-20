@@ -57,7 +57,7 @@ const exportPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pi
   mergeMap(action => (
     rpc.exportPrivateKeys(action.payload.filePath).pipe(
       switchMap(() => {
-        toastr.info(t(`Private keys exported successfully`))
+        toastr.success(t(`Private keys exported successfully`))
         return of(OwnAddressesActions.empty())
       }),
       catchError(err => {
@@ -96,7 +96,7 @@ const importPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pi
   mergeMap(action => (
     rpc.importPrivateKeys(action.payload.filePath).pipe(
       switchMap(() => {
-        toastr.info(
+        toastr.success(
           t(`Private keys imported successfully`),
           t(`It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`)
         )

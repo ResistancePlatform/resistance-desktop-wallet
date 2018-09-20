@@ -7,7 +7,7 @@ import { remote, ipcRenderer } from 'electron'
 import { tap, filter, delay, mergeMap, flatMap, switchMap, map, mapTo, catchError } from 'rxjs/operators'
 import { of, from, bindCallback, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
-import { toastr } from 'react-redux-toastr'
+import { toastr, actions as toastrActions } from 'react-redux-toastr'
 
 import { i18n } from '~/i18next.config'
 import { getEnsureLoginObservable } from '~/utils/auth'
@@ -146,7 +146,7 @@ const backupWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   mergeMap(action => (
     rpc.backupWallet(action.payload.filePath).pipe(
       switchMap(() => {
-        toastr.info(t(`Wallet backup succeeded.`))
+        toastr.success(t(`Wallet backup succeeded.`))
         return of(SettingsActions.empty())
       }),
       catchError(err => {
@@ -189,8 +189,14 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 
     // Third, send the password for the new wallet
     const startLocalNodeObservable = getStartLocalNodeObservable(
-      AuthActions.ensureLogin(t(`Your restored wallet password is required`), true),
-      SettingsActions.restoringWalletFailed(),
+      concat(
+        of(AuthActions.ensureLogin(t(`Your restored wallet password is required`), true)),
+        of(toastrActions.add({
+          type: 'success',
+          title: t(`Wallet restored successfully.`)
+        }))
+      ),
+      of(SettingsActions.restoringWalletFailed()),
       action$
     )
 
@@ -201,7 +207,14 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
       switchMap(() => {
         const walletName = path.basename(walletFileName, path.extname(walletFileName))
         config.set('wallet.name', walletName)
-        return concat(of(SettingsActions.restartLocalNode()), startLocalNodeObservable)
+        return concat(
+          of(toastrActions.add({
+            type: 'info',
+            title: t(`Restarting the local node with the new wallet...`)
+          })),
+          of(SettingsActions.restartLocalNode()),
+          startLocalNodeObservable
+        )
       }),
       catchError(err => SettingsActions.restoringWalletFailed(err.message))
     )

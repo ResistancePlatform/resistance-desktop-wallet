@@ -61,8 +61,8 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
     })
 
     const nodeStartedObservable = getStartLocalNodeObservable(
-      WelcomeActions.encryptWallet(),
-      WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage),
+      of(WelcomeActions.encryptWallet()),
+      of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
       action$
     )
 
@@ -81,8 +81,8 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
 
     // Wallet encryption shuts the node down, let's start it back up and trigger the next action
     const nodeStartedObservable = getStartLocalNodeObservable(
-      WelcomeActions.authenticateAndRestoreWallet(),
-      WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage),
+      of(WelcomeActions.authenticateAndRestoreWallet()),
+      of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
       action$
     )
 
