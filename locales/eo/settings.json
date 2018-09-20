@@ -68,5 +68,13 @@
   "Backup": "Backup",
   "Restore": "Restore",
   "Backup resistance wallet to a file": "Backup resistance wallet to a file",
-  "Wallet files": "Wallet files"
+  "Wallet files": "Wallet files",
+  "We're going to backup the wallet": "We're going to backup the wallet",
+  "Restore the wallet from a backup file": "Restore the wallet from a backup file",
+  "We're going to restore the wallet": "We're going to restore the wallet",
+  "Your restored wallet password is required": "Your restored wallet password is required",
+  "Wallet restored successfully.": "Wallet restored successfully.",
+  "Restarting the local node with the new wallet...": "Restarting the local node with the new wallet...",
+  "Wallet file \"{{walletFileName}}\" already exists.": "Wallet file \"{{walletFileName}}\" already exists.",
+  "Failed to restore the wallet": "Failed to restore the wallet"
 }
