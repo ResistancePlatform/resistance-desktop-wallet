@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import { translate } from 'react-i18next'
+import cn from 'classnames'
 
 import { NaviState } from '~/state/reducers/navi/navi.reducer'
 import HLayout from '~/theme/h-box-layout.scss'
@@ -16,36 +17,44 @@ type Props = {
 class NaviBar extends Component<Props> {
 	props: Props
 
-  // TODO: Replace with classnames #114
-	getNaviBarItemClasses(itemPath: string) {
-		return this.props.navi.currentNaviPath === itemPath ? `${styles.naviVBarItem} ${styles.activeNaviVBarItem}` : `${styles.naviVBarItem}`
-	}
-
 	render() {
     const { t } = this.props
 
+    const getItemClasses = path => ({
+      [HLayout.hBoxContainer]: true,
+      [styles.item]: true,
+      [styles.active]: this.props.navi.currentNaviPath.startsWith(path)
+    })
+
 		return (
-			<div className={[styles.navibarContainer].join(' ')} data-tid="navi-bar-container">
+			<div className={cn(styles.container)} data-tid="navi-bar-container">
 				{/* Route items */}
-				<div className={[this.getNaviBarItemClasses('/overview'), HLayout.hBoxContainer].join(' ')}>
-					<span className="icon-overview" />
+				<div className={cn(styles.overview, getItemClasses('/overview'))}>
+          <i />
 					<NavLink to="/">{t(`Overview`)}</NavLink>
 				</div>
-				<div className={[this.getNaviBarItemClasses('/own-addresses'), HLayout.hBoxContainer].join(' ')}>
-					<span className="icon-own-address" />
+				<div className={cn(styles.ownAddresses, getItemClasses('/own-addresses'))}>
+          <i />
 					<NavLink to="/own-addresses">{t(`Own Addresses`)}</NavLink>
 				</div>
-				<div className={[this.getNaviBarItemClasses('/send-cash'), HLayout.hBoxContainer].join(' ')}>
-					<span className="icon-send-cash" />
+				<div className={cn(styles.sendCash, getItemClasses('/send-cash'))}>
+          <i />
 					<NavLink to="/send-cash">{t(`Send Cash`)}</NavLink>
 				</div>
-				<div className={[this.getNaviBarItemClasses('/address-book'), HLayout.hBoxContainer].join(' ')}>
-					<span className="icon-address-book" />
+				<div className={cn(styles.addressBook, getItemClasses('/address-book'))}>
+          <i />
 					<NavLink to="/address-book">{t(`Address Book`)}</NavLink>
 				</div>
-				<div className={[this.getNaviBarItemClasses('/settings'), HLayout.hBoxContainer].join(' ')}>
-					<span className="icon-settings" />
+				<div className={cn(styles.settings, getItemClasses('/settings'))}>
+          <i />
 					<NavLink to="/settings">{t(`Settings`)}</NavLink>
+				</div>
+				<div className={cn(styles.resdex, getItemClasses('/resdex'))}>
+					<i />
+          <NavLink to="/resdex">
+            {t(`ResDEX`)}
+            <span>{t(`Coming soon`)}</span>
+          </NavLink>
 				</div>
 
 			</div>
