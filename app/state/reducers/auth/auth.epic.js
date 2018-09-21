@@ -20,7 +20,7 @@ const submitPasswordEpic = (action$: ActionsObservable<Action>, state$) => actio
 
     const observable = rpc.sendWalletPassword(loginForm.fields.password, AUTH.sessionTimeoutSeconds).pipe(
       switchMap(() => {
-        const loginAfterTimeout = of(AuthActions.ensureLogin(t(`Your session has expired.`))).pipe(
+        const loginAfterTimeout = of(AuthActions.ensureLogin(t(`The session has expired`), true)).pipe(
           delay((AUTH.sessionTimeoutSeconds - 2) * 1000)
         )
 

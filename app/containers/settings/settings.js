@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { toastr } from 'react-redux-toastr'
 import { translate } from 'react-i18next'
-import { remote } from 'electron'
 import cn from 'classnames'
 import scrypt from 'scrypt-js'
 import Iso6391 from 'iso-639-1'
@@ -88,7 +87,7 @@ class Settings extends Component<Props> {
     const languages = Iso6391.getLanguages(availableLanguages)
 
     return languages.map(language => (
-      <PopupMenuItem onClick={() => this.props.actions.updateLanguage(language.code)}>
+      <PopupMenuItem key={language.code} onClick={() => this.props.actions.updateLanguage(language.code)}>
         {language.nativeName}
       </PopupMenuItem>
     ))
@@ -297,54 +296,6 @@ class Settings extends Component<Props> {
 	}
 
 	/**
-	 * @param {*} event
-	 * @memberof Settings
-	 */
-	onBackupWalletClicked() {
-    const { t } = this.props
-
-    const onSaveHandler = (filePath) => {
-      if (filePath) {
-        appStore.dispatch(SettingsActions.exportWallet(filePath))
-      }
-    }
-
-    const title = t(`Backup Resistance wallet to a file`)
-
-    remote.dialog.showSaveDialog({
-      title,
-      defaultPath: remote.app.getPath('documents'),
-      message: title,
-      nameFieldLabel: t(`File name:`),
-      filters: [{ name: t(`Text files`),  extensions: ['wallet'] }]
-    }, onSaveHandler)
-
-    return false
-	}
-
-	/**
-	 * @param {*} event
-	 * @memberof Settings
-	 */
-	onRestoreWalletClicked(t) {
-    const onOpenHandler = (filePaths) => {
-      if (filePaths && filePaths.length) {
-        appStore.dispatch(SettingsActions.importWallet(filePaths.pop()))
-      }
-    }
-
-    const title = t(`Restore Resistance wallet from a file`)
-    remote.dialog.showOpenDialog({
-      title,
-      defaultPath: remote.app.getPath('documents'),
-      message: title,
-      filters: [{ name: t(`Text files`),  extensions: ['wallet'] }]
-    }, onOpenHandler)
-
-    return false
-	}
-
-	/**
 	 * @returns
 	 * @memberof Settings
 	 */
@@ -354,7 +305,7 @@ class Settings extends Component<Props> {
     const languageDropdownAddon: RoundedInputAddon = {
       enable: true,
       type: 'DROPDOWN',
-      onClick: () => this.props.popupMenu.show(languagePopupMenuId, '2rem', 'calc(100% - 14.5rem)')
+      onClick: () => this.props.popupMenu.show(languagePopupMenuId)
     }
 
 		const passwordAddon: RoundedInputAddon = {
@@ -378,13 +329,14 @@ class Settings extends Component<Props> {
 						{/* Language */}
             <div className={styles.languageContainer}>
               <RoundedInput
+                name="language"
                 defaultValue={Iso6391.getNativeName(this.props.settings.language)}
                 label={t(`Language`)}
                 addon={languageDropdownAddon}
                 readOnly
               >
                 {/* Dropdown menu container */}
-                <PopupMenu id={languagePopupMenuId} className={styles.languageDropdown}>
+                <PopupMenu id={languagePopupMenuId} relative>
                   {this.getLanguageMenuItems()}
                 </PopupMenu>
               </RoundedInput>
@@ -510,21 +462,21 @@ class Settings extends Component<Props> {
                 <button
                   type="button"
                   className={styles.walletNodeButton}
-                  onClick={event => this.onBackupWalletClicked(event)}
-                  onKeyDown={event => this.onBackupWalletClicked(event)}
+                  onClick={this.props.actions.initiateWalletBackup}
+                  onKeyDown={() => undefined}
                   disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
                 >
-                  {t(`Backup wallet`)}
+                  {t(`Backup`)}
                 </button>
 
                 <button
                   type="button"
                   className={styles.walletNodeButton}
-                  onClick={() => this.onRestoreWalletClicked(t)}
-                  onKeyDown={() => this.onRestoreWalletClicked(t)}
+                  onClick={this.props.actions.initiateWalletRestore}
+                  onKeyDown={() => undefined}
                   disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
                 >
-                  {t(`Restore wallet`)}
+                  {t(`Restore`)}
                 </button>
               </div>
 						</div>

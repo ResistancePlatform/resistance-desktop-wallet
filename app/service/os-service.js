@@ -181,12 +181,13 @@ export class OSService {
    *
 	 * @param {string} processName
 	 * @param {string[]} args
+	 * @param {function} stdoutHandler If returns true the process is considered started.
 	 * @memberof OSService
 	 */
-  restartProcess(processName: ChildProcessName, args = []) {
+  restartProcess(processName: ChildProcessName, args = [], stdoutHandler) {
     console.log(`Restarting ${processName} process.`)
     this.killProcess(processName, () => {
-      this.execProcess(processName, args)
+      this.execProcess(processName, args, stdoutHandler)
     })
   }
 
@@ -196,7 +197,6 @@ export class OSService {
 	 * @param {string} processName
 	 * @param {string[]} args
 	 * @param {function} stdoutHandler If returns true the process is considered started.
-	 * @param {function} stderrHandler
 	 * @memberof OSService
 	 */
   execProcess(processName: ChildProcessName, args = [], stdoutHandler) {

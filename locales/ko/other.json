@@ -62,5 +62,8 @@
   "Tor status: {{status}}": "Tor status: {{status}}",
   "Your session has expired.": "Your session has expired.",
   "The wallet password entered was incorrect.": "The wallet password entered was incorrect.",
-  "Login failed": "Login failed"
+  "Login failed": "Login failed",
+  "should contain Latin letters, numbers and special characters": "should contain Latin letters, numbers and special characters",
+  "Confirm your login": "Confirm your login",
+  "The session has expired": "The session has expired"
 }

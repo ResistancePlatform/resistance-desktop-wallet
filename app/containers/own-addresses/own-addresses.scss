@@ -22,7 +22,6 @@ $TOP_BAR_HEIGHT: 5rem;
 
 .topBarButtonContainer {
   text-align: right;
-  margin-right: 5rem;
 }
 
 .addAddressButtonContainer {
@@ -41,7 +40,6 @@ button {
 .addNewAddressButton {
     position: relative;
     @include roundedButton(true);
-
     padding-right: 2rem;
 }
 

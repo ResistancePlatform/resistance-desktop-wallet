@@ -29,7 +29,7 @@ const i18nextOptions = {
     escapeValue: false
   },
   debug: isDev,
-  saveMissing: isDev,
+  saveMissing: false,
   fallbackLng: 'en',
   whitelist: availableLanguages,
   keySeparator: false,
@@ -49,7 +49,7 @@ if (!i18n.isInitialized) {
   i18n.init(i18nextOptions)
 }
 
-module.exports = {
+export {
   i18n,
   availableLanguages,
   availableNamespaces

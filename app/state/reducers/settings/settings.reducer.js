@@ -31,21 +31,20 @@ export const SettingsActions = createActions(
     ENABLE_TOR: undefined,
     DISABLE_TOR: undefined,
 
+    INITIATE_WALLET_BACKUP: undefined,
+    BACKUP_WALLET: filePath => ({filePath}),
+    INITIATE_WALLET_RESTORE: undefined,
+    RESTORE_WALLET: filePath => ({filePath}),
+    RESTORING_WALLET_FAILED: (errorMessage: string = '') => ({ errorMessage }),
+    RESTORING_WALLET_SUCCEEDED: undefined,
+
     KICK_OFF_CHILD_PROCESSES: undefined,
 
     CHILD_PROCESS_STARTED: processName => ({ processName }),
     CHILD_PROCESS_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
     CHILD_PROCESS_RESTART_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
     CHILD_PROCESS_MURDERED: processName => ({ processName }),
-    CHILD_PROCESS_MURDER_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
-
-    EXPORT_WALLET: filePath => ({filePath}),
-    EXPORT_WALLET_SUCCESS: undefined,
-    EXPORT_WALLET_FAILURE: errorMessage => ({ errorMessage }),
-
-    IMPORT_WALLET: filePath => ({filePath}),
-    IMPORT_WALLET_SUCCESS: undefined,
-    IMPORT_WALLET_FAILURE: errorMessage => ({ errorMessage })
+    CHILD_PROCESS_MURDER_FAILED: (processName, errorMessage) => ({ processName, errorMessage })
   },
   {
     prefix: 'APP/SETTINGS'

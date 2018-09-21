@@ -92,36 +92,21 @@ export class ResistanceService {
 	/**
    * Starts resistanced
    *
+   * @param {boolean} isTorEnabled
 	 * @memberof ResistanceService
 	 */
 	start(isTorEnabled: boolean) {
-    const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
-
-    // TODO: support system wide wallet paths, stored in config.get('wallet.path')
-    // https://github.com/ResistancePlatform/resistance-core/issues/84
-
-    const walletName = config.get('wallet.name', 'wallet')
-    args.push(`-wallet=${walletName}.dat`)
-
-    this::verifyExportDirExistence().then(exportDir => {
-      args.push(`-exportdir=${exportDir}`)
-      osService.execProcess('NODE', args, this::handleStdout)
-      return Promise.resolve()
-    }).catch(err => {
-      const actions = osService.getSettingsActions()
-      osService.dispatchAction(actions.childProcessFailed('NODE', err.toString()))
-    })
-
+    this::startOrRestart(isTorEnabled, true)
 	}
 
 	/**
    * Restarts resistanced
    *
+   * @param {boolean} isTorEnabled
 	 * @memberof ResistanceService
 	 */
 	restart(isTorEnabled: boolean) {
-    const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
-    osService.restartProcess('NODE', args)
+    this::startOrRestart(isTorEnabled, false)
 	}
 
 	/**
@@ -160,6 +145,34 @@ export class ResistanceService {
 }
 
 /* Resistance Service private methods */
+
+/**
+ * Private method. Starts or restarts the local node process based on the start switch
+ *
+ * @param {boolean} isTorEnabled
+ * @param {boolean} start Starts if true, restarts otherwise
+ * @memberof ResistanceService
+ */
+function startOrRestart(isTorEnabled: boolean, start: boolean) {
+  const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
+
+  // TODO: support system wide wallet paths, stored in config.get('wallet.path')
+  // https://github.com/ResistancePlatform/resistance-core/issues/84
+
+  const walletName = config.get('wallet.name', 'wallet')
+  args.push(`-wallet=${walletName}.dat`)
+
+  const caller = start ? osService.execProcess : osService.restartProcess
+
+  this::verifyExportDirExistence().then(exportDir => {
+    args.push(`-exportdir=${exportDir}`)
+    caller.bind(osService)('NODE', args, this::handleStdout)
+    return Promise.resolve()
+  }).catch(err => {
+    const actions = osService.getSettingsActions()
+    osService.dispatchAction(actions.childProcessFailed('NODE', err.toString()))
+  })
+}
 
 /**
  * Private method. Called on new data in stdout, returns true if Resistance node has been initialized.

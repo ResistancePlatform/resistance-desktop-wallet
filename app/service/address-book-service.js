@@ -6,7 +6,6 @@ import { AddressBookRecord } from '../state/reducers/address-book/address-book.r
 import { i18n } from '~/i18next.config'
 
 const addressBookConfigKey = 'addressBook'
-const addressNotFoundErrorMessageKey = `Address not found in the database.`
 
 /**
  * ES6 singleton
@@ -60,7 +59,7 @@ export class AddressBookService {
     )
 
     if (this.addressBook.filter(match).length) {
-      return throwError(`Address already exists in the database.`)
+      return throwError(this.t(`Address already exists in the database.`))
     }
 
     this.addressBook.push(validated)
@@ -80,7 +79,7 @@ export class AddressBookService {
     const index = this.addressBook.findIndex(record => record.name === name)
 
     if (index === -1) {
-      return throwError(this.t(addressNotFoundErrorMessageKey))
+      return throwError(this.t(`Address not found in the database.`))
     }
 
     this.addressBook.splice(index, 1)
@@ -103,7 +102,7 @@ export class AddressBookService {
     const index = this.addressBook.findIndex(record => record.name === originalName)
 
     if (index === -1) {
-      return throwError(this.t(addressNotFoundErrorMessageKey))
+      return throwError(this.t(`Address not found in the database.`))
     }
 
     this.addressBook[index] = validated

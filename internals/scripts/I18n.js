@@ -52,7 +52,7 @@ function transform(file, enc, done) {
   const content = fs.readFileSync(file.path, enc);
 
   const funcOptions = {
-    list: ['i18next.t', 'i18n.t', 't'],
+    list: ['i18next.t', 'i18n.t', 'this.t', 't'],
     extensions: ['.js', '.jsx']
   }
 
@@ -64,6 +64,7 @@ function transform(file, enc, done) {
   parser.parseFuncFromString(content, funcOptions, (key, options) => {
     hasKeys = true
     parser.set(key, Object.assign({}, options, {
+      removeUnusedKeys: namespace !== 'validation',
       ns: namespace
     }))
   })

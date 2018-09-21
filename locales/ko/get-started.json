@@ -6,7 +6,7 @@
   "Choose password for your wallet": "Choose password for your wallet",
   "Enter a strong password (using letters, numbers and/or symbols)": "Enter a strong password (using letters, numbers and/or symbols)",
   "Note": "Note",
-  "choose-password-note": "choose-password-note",
+  "choose-password-note": "If you lose or forget this password, it cannot be recovered. Your wallet can only be restored from private keys in that case.",
   "Create a new wallet": "Create a new wallet",
   "Choose a name for your wallet": "Choose a name for your wallet",
   "Wallet name": "Wallet name",
@@ -35,5 +35,10 @@
   "Restoring the wallet from the backup file...": "Restoring the wallet from the backup file...",
   "Sending the wallet password to the node...": "Sending the wallet password to the node...",
   "Wallet bootstrapping has failed:": "Wallet bootstrapping has failed:",
-  "Success! Your wallet has been created": "Success! Your wallet has been created"
+  "Success! Your wallet has been created": "Success! Your wallet has been created",
+  "should contain Latin letters, numbers and special characters": "should contain Latin letters, numbers and special characters",
+  "Starting the local node again...": "Starting the local node again...",
+  "Restore Resistance wallet from a private keys file": "Restore Resistance wallet from a private keys file",
+  "Keys files": "Keys files",
+  "Restoring the wallet from the private keys...": "Restoring the wallet from the private keys..."
 }
