@@ -1,12 +1,18 @@
 @import "../../theme/vars.scss";
 @import "../../theme/tabs.scss";
 
+.dragBar {
+  -webkit-app-region: drag;
+  height: 3.5rem;
+  display: block;
+}
+
 .tabList {
   color: $BASE_COLOR_FONT_GRAY;
   font-weight: 200;
   font-size: 0.8rem;
   text-align: left;
-  margin-top: 4rem;
+  margin-top: 0.5rem;
   border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
 }
 

@@ -65,5 +65,7 @@
   "Login failed": "Login failed",
   "should contain Latin letters, numbers and special characters": "should contain Latin letters, numbers and special characters",
   "Confirm your login": "Confirm your login",
-  "The session has expired": "The session has expired"
+  "The session has expired": "The session has expired",
+  "ResDEX": "ResDEX",
+  "Coming soon": "Coming soon"
 }

@@ -1,30 +1,35 @@
 // @flow
 import React, { Component } from 'react'
 import cn from 'classnames'
+import { translate } from 'react-i18next'
 
 import styles from './ResDex.scss'
 
 type Props = {
+  t: any
 }
 
 
 /**
- * @class Assets
+ * @class ResDexAccounts
  * @extends {Component<Props>}
  */
-export class Assets extends Component<Props> {
+class ResDexAccounts extends Component<Props> {
 	props: Props
 
 	/**
 	 * @returns
-   * @memberof Assets
+   * @memberof ResDexAccounts
 	 */
 	render() {
+    const { t } = this.props
+
 		return (
       <div className={cn(styles.assetsContainer)}>
-        Assets
+        Accounts
       </div>
     )
   }
 }
 
+export default translate('resdex')(ResDexAccounts)

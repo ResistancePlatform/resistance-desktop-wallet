@@ -3,6 +3,11 @@ import React, { Component } from 'react'
 import cn from 'classnames'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
+import ResDexAssets from './Assets'
+import ResDexBuySell from './BuySell'
+import ResDexOrders from './Orders'
+import ResDexAccounts from './Accounts'
+
 import HLayout from '~/theme/h-box-layout.scss'
 import VLayout from '~/theme/v-box-layout.scss'
 import styles from './ResDex.scss'
@@ -23,37 +28,38 @@ export class ResDex extends Component<Props> {
    * @memberof ResDex
 	 */
 	render() {
-		return (
+    return (
       <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.resDexContainer)}>
-          <Tabs
-            className={styles.tabs}
-            selectedTabClassName={styles.selectedTab}
-            selectedTabPanelClassName={styles.selectedTabPanel}
-          >
-            <TabList className={styles.tabList}>
-              <Tab className={styles.tab}>Assets</Tab>
-              <Tab className={styles.tab}>Buy/Sell</Tab>
-              <Tab className={styles.tab}>Orders</Tab>
-              <Tab className={styles.tab}>Accounts</Tab>
-            </TabList>
+        <div className={styles.dragBar} />
+        <Tabs
+          className={styles.tabs}
+          selectedTabClassName={styles.selectedTab}
+          selectedTabPanelClassName={styles.selectedTabPanel}
+        >
+          <TabList className={styles.tabList}>
+            <Tab className={styles.tab}>Assets</Tab>
+            <Tab className={styles.tab}>Buy/Sell</Tab>
+            <Tab className={styles.tab}>Orders</Tab>
+            <Tab className={styles.tab}>Accounts</Tab>
+          </TabList>
 
-            <TabPanel>
-              Assets
-            </TabPanel>
+          <TabPanel>
+            <ResDexAssets />
+          </TabPanel>
 
-            <TabPanel>
-              Buy/Sell
-            </TabPanel>
+          <TabPanel>
+            <ResDexBuySell />
+          </TabPanel>
 
-            <TabPanel>
-              Orders
-            </TabPanel>
+          <TabPanel>
+            <ResDexOrders />
+          </TabPanel>
 
-            <TabPanel>
-              Accounts
-            </TabPanel>
+          <TabPanel>
+            <ResDexAccounts />
+          </TabPanel>
 
-          </Tabs>
+        </Tabs>
       </div>
     )
   }
