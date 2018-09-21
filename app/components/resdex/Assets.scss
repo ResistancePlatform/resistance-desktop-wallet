@@ -1,0 +1,31 @@
+@import "../../theme/vars.scss";
+
+.container {
+}
+
+.period {
+  $bulletDiameter: 1.5rem;
+
+  user-select: none;
+  float: right;
+
+  li {
+    cursor: default;
+    color: #9fabdc;
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 200;
+    list-style: none;
+    padding: 0;
+    width: $bulletDiameter;
+    height: $bulletDiameter;
+    text-align: center;
+    line-height: $bulletDiameter;
+
+    &.active {
+      color: $BASE_COLOR_WHITE;
+      background: $BASE_COLOR_PURPLE;
+      border-radius: 50%;
+    }
+  }
+}
