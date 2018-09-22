@@ -118,11 +118,19 @@ export class OSService {
   }
 
 	/**
+   * Returns a common name/alias for each OS family
+   *
 	 * @memberof OSService
 	 * @returns {string}
 	 */
 	getOS() {
-    return process.platform === 'darwin' ? 'macos' : 'windows'
+    let os = 'linux'
+    if (process.platform === 'darwin') {
+      os = 'macos'
+    } else if (process.platform === 'win32') {
+      os = 'windows'
+    }
+    return os
 	}
 
 	/**
@@ -258,7 +266,7 @@ export class OSService {
 
       childProcess.on('close', (code) => {
         if (!childProcessInfo.isGettingKilled) {
-          const errorKey =  `Process {{processName}} unexpectedly exited with code {{code}}.`
+          const errorKey =  `Process ${processName} unexpectedly exited with code ${code}.`
           this.dispatchAction(actions.childProcessFailed(processName, this.t(errorKey, processName, code)))
         }
 

@@ -206,6 +206,7 @@
     "devtron": "^1.4.0",
     "electron-debug": "^1.5.0",
     "electron-dl": "^1.12.0",
+    "electron-log": "^2.2.17",
     "electron-progressbar": "^1.1.0",
     "electron-settings": "^3.2.0",
     "font-awesome": "^4.7.0",

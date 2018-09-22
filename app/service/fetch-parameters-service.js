@@ -19,12 +19,12 @@ const sproutFiles = [
   { name: 'sprout-verifying.key', checksum: "4bd498dae0aacfd8e98dc306338d017d9c08dd0918ead18172bd0aec2fc5df82" }
 ]
 
-// Shorter files for testing purposes
-// const sproutUrl = 'https://www.sample-videos.com/video/mp4/480'
-// const sproutFiles = [
-//   { name: 'big_buck_bunny_480p_5mb.mp4', checksum: "287d49daf0fa4c0a12aa31404fd408b1156669084496c8031c0e1a4ce18c5247" },
-//   { name: 'big_buck_bunny_480p_1mb.mp4', checksum: "6b83d01a1bddbb6481001d8bb644bd4eb376922a4cf363fda9c14826534e17b3" }
-// ]
+/* Shorter files for testing purposes
+ const sproutUrl = 'https://www.sample-videos.com/video/mp4/480'
+ const sproutFiles = [
+   { name: 'big_buck_bunny_480p_5mb.mp4', checksum: "287d49daf0fa4c0a12aa31404fd408b1156669084496c8031c0e1a4ce18c5247" },
+   { name: 'big_buck_bunny_480p_1mb.mp4', checksum: "6b83d01a1bddbb6481001d8bb644bd4eb376922a4cf363fda9c14826534e17b3" }
+ ] */
 
 /**
  * ES6 singleton
@@ -71,6 +71,7 @@ export class FetchParametersService {
     const quickHashes = config.get(quickHashesConfigKey, {})
 
     const verifySproutFile = async (fileName, index) => {
+      console.log(`Sprout file ${fileName} verification . . .`)
       if (!quickHashes[fileName]) {
         console.log(`Quick hash not found for ${fileName}, calculating SHA256 checksum...`)
         await this.verifyChecksum(fileName, sproutFiles[index].checksum)
@@ -133,7 +134,7 @@ export class FetchParametersService {
         /* eslint-disable no-await-in-loop */
 
         await this.downloadSproutKey(fileName, index)
-        this.progressBar.detail = this.t(`Calculating checksum for {{fileName}}...`, { fileName })
+        this.progressBar.detail = this.t(`Calculating checksum for ${fileName}...`, { fileName })
         await this.verifyChecksum(fileName, sproutFiles[index].checksum)
         await this.saveQuickFileHash(fileName)
 
@@ -150,6 +151,7 @@ export class FetchParametersService {
   }
 
   getResistanceParamsFolder(): string {
+    const validApp = process.type === 'renderer' ? remote.app : app
     return path.join(app.getPath('appData'), paramsFolderName)
   }
 
@@ -171,19 +173,20 @@ export class FetchParametersService {
 
     const onProgress = progress => {
       const rate = progress * 100
-      const roundedRate = Math.round(rate)
+      const roundedRate = Math.round(rate)  
       const totalMb = (totalBytes / 1024 / 1024).toFixed(2)
       const receivedMb = (progress  * totalMb).toFixed(2)
       this.progressBar.value = rate
 
-      const detailMessageKey = `Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...`
+      const detailMessageKey = `Downloading ${fileName}, received ${receivedMb}MB out of ${totalMb}MB (${roundedRate}%)...`
       this.progressBar.detail = this.t(detailMessageKey, { fileName, receivedMb, totalMb, roundedRate })
     }
 
     const onStarted = item => {
       totalBytes = item.getTotalBytes()
       this.progressBar.value = 0
-      const textKey = `Fetching Resistance parameters (file {{fileIndex}} of {{filesNumber}})...`
+      //const textKey = `Fetching Resistance parameters (file ${fileIndex} of ${filesNumber})...`
+      const textKey = `Fetching Resistance parameters files ...`
       this.progressBar.text = this.t(textKey, {
         index: index + 1,
         filesNumber: sproutFiles.length

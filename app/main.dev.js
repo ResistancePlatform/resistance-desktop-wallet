@@ -14,6 +14,7 @@ import * as fs from 'fs'
 import path from 'path'
 import config from 'electron-settings'
 import { app, ipcMain, BrowserWindow } from 'electron'
+import log from 'electron-log'
 
 import { i18n } from './i18next.config'
 import { OSService } from './service/os-service'
@@ -29,6 +30,8 @@ const resistanceService = new ResistanceService()
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
+  log.transports.file.level = 'warn'; //Just to be explicit, warn is the default
+  log.transports.console.level = 'warn'; //Just to be explicit, warn is the default
   const sourceMapSupport = require('source-map-support')
   sourceMapSupport.install();
 }
@@ -37,6 +40,8 @@ if (
   process.env.NODE_ENV === 'development' ||
   process.env.DEBUG_PROD === 'true'
 ) {
+  log.transports.file.level = 'debug';
+  log.transports.console.level = 'debug';
   require('electron-debug')();
   const p = path.join(__dirname, '..', 'app', 'node_modules')
   require('module').globalPaths.push(p);
@@ -80,9 +85,9 @@ app.on('window-all-closed', () => {
 
 app.on('ready', async () => {
   app.on('before-quit', () => {
-    console.log(`Killing all child processes...`)
+    //log.info(`Killing all child processes...`)
     osService.stopChildProcesses()
-    console.log(`Done`)
+    //log.info(`Done`)
   })
 
   if (
@@ -90,6 +95,13 @@ app.on('ready', async () => {
     process.env.DEBUG_PROD === 'true'
   ) {
     await installExtensions()
+  }
+
+  let iconFileName = 'icon.png'
+  if (osService.getOS() === 'macos') {
+    iconFileName = 'icon.icns'
+  } else if (osService.getOS() === 'windows') {
+    iconFileName = 'icon.ico'
   }
 
   mainWindow = new BrowserWindow({
@@ -100,6 +112,7 @@ app.on('ready', async () => {
     show: false,
     frame: false,
     backgroundColor: '#1d2440',
+    icon: path.join(__dirname, '..', `/resources/${iconFileName}`)
   });
 
   const menuBuilder = new MenuBuilder(mainWindow)

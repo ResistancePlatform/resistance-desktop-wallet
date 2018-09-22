@@ -6,6 +6,7 @@ import config from 'electron-settings'
 import { app, remote } from 'electron'
 
 import { OSService } from './os-service'
+import { FetchParametersService } from './fetch-parameters-service'
 
 const generator = require('generate-password')
 const PropertiesReader = require('properties-reader')
@@ -19,6 +20,7 @@ const osService = new OSService()
 
 const walletFolderName = 'testnet3'
 const configFolderName = 'Resistance'
+const paramFolderName = 'ResistanceParams'
 const configFileName = 'resistance.conf'
 const configFileContents = [
   `testnet=1`,
@@ -28,10 +30,6 @@ const configFileContents = [
   `rpcpassword=%generatedPassword%`,
   ``
 ].join(EOL)
-
-
-const resistancedArgs = ['-printtoconsole', '-rpcthreads=8']
-const torSwitch = '-proxy=127.0.0.1:9050'
 
 /**
  * @export
@@ -55,12 +53,23 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
   getDataPath() {
+    let fetchParametersService = new FetchParametersService()
     const validApp = process.type === 'renderer' ? remote.app : app
     return path.join(validApp.getPath('appData'), configFolderName)
   }
 
   getWalletPath() {
     return path.join(this.getDataPath(), walletFolderName)
+  }
+
+  getParamsPath() {
+    const validApp = process.type === 'renderer' ? remote.app : app
+    return path.join(validApp.getPath('appData'), paramFolderName)
+  }
+
+  getConfigFile() {
+    const configFolder = this.getDataPath()
+    return path.join(configFolder, configFileName)
   }
 
 	/**
@@ -70,9 +79,8 @@ export class ResistanceService {
 	 * @returns {Object} Node configuration dictionary
 	 */
   checkAndCreateConfig(): Object {
-    const configFolder = this.getDataPath()
-    const configFile = path.join(configFolder, configFileName)
-
+    let configFile = this.getConfigFile()
+    let configFolder = this.getDataPath()
     if (!fs.existsSync(configFolder)) {
       fs.mkdirSync(configFolder)
     }
@@ -154,6 +162,11 @@ export class ResistanceService {
  * @memberof ResistanceService
  */
 function startOrRestart(isTorEnabled: boolean, start: boolean) {
+  let configFile = this.getConfigFile()
+  const resistancedArgs = ['-printtoconsole', '-rpcthreads=8',
+  `-zcparamsdir=${this.getParamsPath()}`, `-conf=${configFile}`]
+  const torSwitch = '-proxy=127.0.0.1:9050'
+
   const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
 
   // TODO: support system wide wallet paths, stored in config.get('wallet.path')
