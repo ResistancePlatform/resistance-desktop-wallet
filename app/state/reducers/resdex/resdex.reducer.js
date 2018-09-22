@@ -3,12 +3,16 @@ import { createActions, handleActions } from 'redux-actions'
 
 import { preloadedState } from '../preloaded.state'
 
+export type Order = {}
+
 export type ResDexState = {
   assets: {
   },
   buySell: {
   },
   orders: {
+    openOrders: Order[],
+    completedOrders: Order[]
   },
   accounts: {
   }
@@ -17,6 +21,9 @@ export type ResDexState = {
 export const ResDexActions = createActions(
   {
     EMPTY: undefined,
+    ORDERS: {
+      EMPTY: undefined
+    }
   },
   {
     prefix: 'APP/RESDEX'

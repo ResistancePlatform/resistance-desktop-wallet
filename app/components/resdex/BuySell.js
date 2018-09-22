@@ -60,10 +60,12 @@ class ResDexBuySell extends Component<Props> {
             {t(`Exchange rate`)}
             <RoundedInput name="exchangeRate" label="No"/>
 
-            <label htmlFor="maxPrivacyId">
-              <input id="maxPrivacyId" type="checkbox" name="maxPrivacy" />
-              {t(`Maximum privacy`)}
+            <label htmlFor="enhancedPrivacyInputId">
+              <input id="enhancedPrivacyInputId" type="checkbox" name="enhancedPrivacy" />
+              {t(`Enhanced privacy`)}
             </label>
+
+            {t(`enhancend-privacy`)}
 
             <button type="submit">{t(`Sell {{name}}`, { name: 'Bitcoin' })}</button>
           </RoundedForm>

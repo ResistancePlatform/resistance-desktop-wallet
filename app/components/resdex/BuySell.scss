@@ -1,0 +1,15 @@
+@import "../../theme/vars.scss";
+
+.container {
+  background: $BASE_COLOR_DARK_BLUE;
+  border: 1px solid red;
+}
+
+.actionContainer {
+  float: left;
+  width: 60%;
+}
+
+.summaryContainer {
+  margin-left: 2rem;
+}

@@ -44,7 +44,7 @@ const rootReducer = combineReducers({
 	sendCash: SendCashReducer,
 	addressBook: AddressBookReducer,
 	settings: SettingsReducer,
-  resdex: ResDexReducer
+  resDex: ResDexReducer
 })
 
 const rootEpic = combineEpics(
