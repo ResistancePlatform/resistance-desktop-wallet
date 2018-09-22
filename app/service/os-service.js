@@ -118,11 +118,19 @@ export class OSService {
   }
 
 	/**
+   * Returns a common name/alias for each OS family
+   *
 	 * @memberof OSService
 	 * @returns {string}
 	 */
 	getOS() {
-    return process.platform === 'darwin' ? 'macos' : 'windows'
+    let os = 'linux'
+    if (process.platform === 'darwin') {
+      os = 'macos'
+    } else if (process.platform === 'win32') {
+      os = 'windows'
+    }
+    return os
 	}
 
 	/**

@@ -92,6 +92,13 @@ app.on('ready', async () => {
     await installExtensions()
   }
 
+  let iconFileName = 'icon.png'
+  if (osService.getOS() === 'macos') {
+    iconFileName = 'icon.icns'
+  } else if (osService.getOS() === 'windows') {
+    iconFileName = 'icon.ico'
+  }
+
   mainWindow = new BrowserWindow({
     minHeight: 728,
     height: 728,
@@ -100,6 +107,7 @@ app.on('ready', async () => {
     show: false,
     frame: false,
     backgroundColor: '#1d2440',
+    icon: path.join(__dirname, '..', `/resources/${iconFileName}`)
   });
 
   const menuBuilder = new MenuBuilder(mainWindow)
