@@ -1,6 +1,6 @@
-@import "../../theme/vars.scss";
-@import "../../theme/generic-component.scss";
-@import "../../theme/toggle-button.scss";
+@import "../../assets/styles/vars.scss";
+@import "../../assets/styles/generic-component.scss";
+@import "../../assets/styles/toggle-button.scss";
 
 @mixin settingButton() {
     @include roundedButton(true);

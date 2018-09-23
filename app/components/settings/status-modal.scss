@@ -1,6 +1,6 @@
-@import "../../theme/generic-component.scss";
-@import "../../theme/vars.scss";
-@import "../../theme/modal-dialog.scss";
+@import "../../assets/styles/generic-component.scss";
+@import "../../assets/styles/vars.scss";
+@import "../../assets/styles/modal-dialog.scss";
 
 .statusModal {
   @extend .modalDialog;

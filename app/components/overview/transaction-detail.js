@@ -5,8 +5,8 @@ import { translate } from 'react-i18next'
 import { TransactionDetail } from '~/state/reducers/overview/overview.reducer'
 
 import styles from './transaction-detail.scss'
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 
 type Props = {
   t: any,

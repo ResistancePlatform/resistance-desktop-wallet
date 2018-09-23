@@ -13,8 +13,8 @@ import TransactionPopupMenu from '~/components/overview/transaction-popup-menu'
 import TransactionDetailList from '~/components/overview/transaction-detail'
 
 import styles from './overview.scss'
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 
 const walletInfoPollingInterval = 2.0
 const transactionsPollingInterval = 5.0

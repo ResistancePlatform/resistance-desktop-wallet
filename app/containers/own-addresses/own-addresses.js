@@ -13,8 +13,8 @@ import { OwnAddressesActions, OwnAddressesState } from '~/state/reducers/own-add
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 
 import styles from './own-addresses.scss'
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 
 const pollingInterval = 5.0
 const addressRowPopupMenuId = 'own-addresses-address-row-popup-menu-id'

@@ -12,8 +12,8 @@ import AddressDropdownPopupMenu from '~/components/send-cash/address-drodown-pop
 import { SendCashActions, SendCashState } from '~/state/reducers/send-cash/send-cash.reducer'
 
 import styles from './send-cash.scss'
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 
 type Props = {
   t: any,

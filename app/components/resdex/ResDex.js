@@ -8,8 +8,8 @@ import ResDexBuySell from './BuySell'
 import ResDexOrders from './Orders'
 import ResDexAccounts from './Accounts'
 
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 import styles from './ResDex.scss'
 
 type Props = {

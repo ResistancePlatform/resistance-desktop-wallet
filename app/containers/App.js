@@ -28,8 +28,8 @@ import { GetStartedState } from '~/state/reducers/get-started/get-started.reduce
 import { SettingsActions } from '~/state/reducers/settings/settings.reducer'
 
 import styles from './App.scss'
-import HLayout from '../theme/h-box-layout.scss'
-import VLayout from '../theme/v-box-layout.scss'
+import HLayout from '../assets/styles/h-box-layout.scss'
+import VLayout from '../assets/styles/v-box-layout.scss'
 
 type Props = {
   auth: AuthState,

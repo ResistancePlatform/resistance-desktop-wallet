@@ -17,7 +17,7 @@ import OperationsModal from '~/components/system-info/OperationsModal'
 import humanizeOperationName from '~/components/system-info/humanize-operation'
 
 import styles from './system-info.scss'
-import HLayout from '~/theme/h-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
 
 const osService = new OSService()
 

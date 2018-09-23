@@ -6,7 +6,7 @@ import { translate } from 'react-i18next'
 import cn from 'classnames'
 
 import { NaviState } from '~/state/reducers/navi/navi.reducer'
-import HLayout from '~/theme/h-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
 import styles from './navi-bar.scss'
 
 type Props = {

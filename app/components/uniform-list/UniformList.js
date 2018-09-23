@@ -5,7 +5,7 @@ import cn from 'classnames'
 import { translate } from 'react-i18next'
 
 import styles from './UniformList.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 
 type Props = {
   t: any,

@@ -1,9 +1,13 @@
 // @flow
 import React, { Component } from 'react'
-import cn from 'classnames'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
+import cn from 'classnames'
 
-import styles from './ResDex.scss'
+import { ResDexActions } from '~/state/reducers/resdex/resdex.reducer'
+
+import styles from './Accounts.scss'
 
 type Props = {
   t: any
@@ -25,11 +29,20 @@ class ResDexAccounts extends Component<Props> {
     const { t } = this.props
 
 		return (
-      <div className={cn(styles.assetsContainer)}>
+      <div className={cn(styles.container)}>
         Accounts
       </div>
     )
   }
 }
 
-export default translate('resdex')(ResDexAccounts)
+
+const mapStateToProps = state => ({
+  orders: state.resDex.orders
+})
+
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(ResDexActions.orders, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexAccounts))

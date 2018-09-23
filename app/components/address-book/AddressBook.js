@@ -8,8 +8,8 @@ import NewAddressDialog from './NewAddressDialog'
 import AddressBookList from './AddressBookList'
 
 import styles from './AddressBook.scss'
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 
 const addressBookPopupMenuId = 'address-book-row-popup-menu-id'
 

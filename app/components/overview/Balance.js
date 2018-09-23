@@ -7,7 +7,7 @@ import { truncateAmount } from '~/constants'
 import { Balances } from '~/state/reducers/overview/overview.reducer'
 
 import styles from './Balance.scss'
-import HLayout from '~/theme/h-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
 
 type Props = {
   t: any,
