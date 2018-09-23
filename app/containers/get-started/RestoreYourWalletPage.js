@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 
-import { GetStartedActions } from '~/state/reducers/get-started/get-started.reducer'
+import { GetStartedActions } from '~/reducers/get-started/get-started.reducer'
 import { RestoreYourWallet } from '~/components/get-started/RestoreYourWallet'
 
 const mapStateToProps = state => ({

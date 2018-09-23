@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import cn from 'classnames'
 
-import { AddressBookState } from '~/state/reducers/address-book/address-book.reducer'
+import { AddressBookState } from '~/reducers/address-book/address-book.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import NewAddressDialog from './NewAddressDialog'
 import AddressBookList from './AddressBookList'

@@ -7,9 +7,9 @@ import { translate } from 'react-i18next'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import OwnAddressList from '~/components/own-addresses/own-address-list'
-import { PopupMenuActions } from '~/state/reducers/popup-menu/popup-menu.reducer'
-import { SettingsState } from '~/state/reducers/settings/settings.reducer'
-import { OwnAddressesActions, OwnAddressesState } from '~/state/reducers/own-addresses/own-addresses.reducer'
+import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
+import { SettingsState } from '~/reducers/settings/settings.reducer'
+import { OwnAddressesActions, OwnAddressesState } from '~/reducers/own-addresses/own-addresses.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 
 import styles from './own-addresses.scss'

@@ -6,7 +6,7 @@ import React, { Component } from 'react'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
 
-import { ResDexActions } from '~/state/reducers/resdex/resdex.reducer'
+import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 
 import styles from './Orders.scss'

@@ -1,9 +1,9 @@
 import { take, filter, switchMap } from 'rxjs/operators'
 import { race } from 'rxjs'
-import { Action } from '~/state/reducers/types'
+import { Action } from '~/reducers/types'
 import { ActionsObservable, ofType } from 'redux-observable'
 
-import { SettingsActions } from '~/state/reducers/settings/settings.reducer'
+import { SettingsActions } from '~/reducers/settings/settings.reducer'
 
 function getStartLocalNodeObservable(onSuccess: Observable, onFailure: Observable, action$: ActionsObservable<Action>) {
   const processName: string = 'NODE'

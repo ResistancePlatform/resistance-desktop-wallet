@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import * as Joi from 'joi'
 
 import { i18n } from '~/i18next.config'
-import { RoundedFormState, RoundedFormActions } from '~/state/reducers/rounded-form/rounded-form.reducer'
+import { RoundedFormState, RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 
 const inputChildComponentNames = ['RoundedInput', 'RoundedTextArea']
 

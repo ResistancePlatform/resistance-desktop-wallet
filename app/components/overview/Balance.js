@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import { translate } from 'react-i18next'
 
 import { truncateAmount } from '~/constants'
-import { Balances } from '~/state/reducers/overview/overview.reducer'
+import { Balances } from '~/reducers/overview/overview.reducer'
 
 import styles from './Balance.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'

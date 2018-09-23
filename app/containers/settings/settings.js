@@ -16,10 +16,10 @@ import styles from './settings.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 
-import { appStore } from '~/state/store/configureStore'
-import { PopupMenuActions } from '~/state/reducers/popup-menu/popup-menu.reducer'
-import { SystemInfoState } from '~/state/reducers/system-info/system-info.reducer'
-import { SettingsActions, SettingsState } from '~/state/reducers/settings/settings.reducer'
+import { appStore } from '~/store/configureStore'
+import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
+import { SystemInfoState } from '~/reducers/system-info/system-info.reducer'
+import { SettingsActions, SettingsState } from '~/reducers/settings/settings.reducer'
 import StatusModal from '~/components/settings/status-modal'
 
 const generator = require('generate-password')

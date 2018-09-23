@@ -59,7 +59,7 @@ export class OSService {
 
 	/**
 	 * We CANNOT use:
-	 *   import { appStore } from '../state/store/configureStore'
+	 *   import { appStore } from '../store/configureStore'
 	 *
 	 * As that will import BEFORE the `appStore` be created !!!
 	 * We have to require the latest `appStore` to make sure it has been created !!!
@@ -68,7 +68,7 @@ export class OSService {
 	 * @memberof RpcService
 	 */
 	dispatchAction(action) {
-		const storeModule = require('~/state/store/configureStore')
+		const storeModule = require('~/store/configureStore')
 		if (storeModule && storeModule.appStore) {
 			storeModule.appStore.dispatch(action)
 		}
@@ -167,7 +167,7 @@ export class OSService {
 	 * @memberof OSService
 	 */
   getSettingsActions() {
-    const settingsReducerModule = require('~/state/reducers/settings/settings.reducer')
+    const settingsReducerModule = require('~/reducers/settings/settings.reducer')
     return settingsReducerModule.SettingsActions
   }
 

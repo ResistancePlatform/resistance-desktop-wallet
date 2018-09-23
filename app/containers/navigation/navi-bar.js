@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 
-import { NaviState } from '~/state/reducers/navi/navi.reducer'
+import { NaviState } from '~/reducers/navi/navi.reducer'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import styles from './navi-bar.scss'
 

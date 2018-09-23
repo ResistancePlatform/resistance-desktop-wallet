@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
 import cn from 'classnames'
 
-import { appStore } from '../../state/store/configureStore'
-import { PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.reducer'
+import { appStore } from '../../store/configureStore'
+import { PopupMenuActions } from '../../reducers/popup-menu/popup-menu.reducer'
 
 import styles from './popup-menu.scss'
 

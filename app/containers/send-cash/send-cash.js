@@ -6,10 +6,10 @@ import { clipboard } from 'electron'
 import { translate } from 'react-i18next'
 
 import { TRANSACTION_FEE } from '~/constants'
-import { appStore } from '~/state/store/configureStore'
+import { appStore } from '~/store/configureStore'
 import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
 import AddressDropdownPopupMenu from '~/components/send-cash/address-drodown-popup-menu'
-import { SendCashActions, SendCashState } from '~/state/reducers/send-cash/send-cash.reducer'
+import { SendCashActions, SendCashState } from '~/reducers/send-cash/send-cash.reducer'
 
 import styles from './send-cash.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'

@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import { translate } from 'react-i18next'
 
-import { TransactionDetail } from '~/state/reducers/overview/overview.reducer'
+import { TransactionDetail } from '~/reducers/overview/overview.reducer'
 
 import styles from './transaction-detail.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'

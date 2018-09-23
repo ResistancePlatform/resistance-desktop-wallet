@@ -2,7 +2,7 @@
 import { remote } from 'electron'
 
 import { OSService } from './os-service'
-import { SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
+import { SystemInfoActions } from '../reducers/system-info/system-info.reducer'
 
 /**
  * ES6 singleton

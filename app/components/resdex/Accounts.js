@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 
-import { ResDexActions } from '~/state/reducers/resdex/resdex.reducer'
+import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
 
 import styles from './Accounts.scss'
 

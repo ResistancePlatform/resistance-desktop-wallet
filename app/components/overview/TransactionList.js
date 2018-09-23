@@ -5,7 +5,7 @@ import { translate } from 'react-i18next'
 
 import { truncateAmount } from '~/constants'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
-import { Transaction } from '~/state/reducers/overview/overview.reducer'
+import { Transaction } from '~/reducers/overview/overview.reducer'
 
 const transactionDirectionMap = t => ({
   receive: t(`In`),

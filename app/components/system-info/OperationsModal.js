@@ -7,9 +7,9 @@ import moment from 'moment'
 import cn from 'classnames'
 
 import 'react-tabs/style/react-tabs.scss'
-import { appStore } from '~/state/store/configureStore'
+import { appStore } from '~/store/configureStore'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
-import { SystemInfoActions } from '~/state/reducers/system-info/system-info.reducer'
+import { SystemInfoActions } from '~/reducers/system-info/system-info.reducer'
 import humanizeOperationName from './humanize-operation'
 
 import styles from './OperationsModal.scss'
