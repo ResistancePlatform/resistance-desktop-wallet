@@ -1,10 +1,186 @@
-@import "../../assets/styles/vars.scss";
+@import "~/assets/styles/vars.scss";
+@import "./ResDex.scss";
 
-.coinsContainer {
-  float: left;
-  width: 40%;
+.container {
+  display: flex;
+}
+
+%discButton {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: $BASE_COLOR_GRAY_3;
+  color: $BASE_COLOR_FONT_GRAY;
+}
+
+%discButton:hover {
+  background: $BASE_COLOR_PURPLE;
+}
+
+%discButton:hover:before {
+  content: '';
+}
+
+.record {
+  border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+
+  %column {
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.8rem;
+    white-space: nowrap;
+
+    span {
+      color: $BASE_COLOR_WHITE;
+      font-size: 1rem;
+      display: block;
+    }
+  }
+}
+
+.record:last-child {
+  border-bottom: none;
+}
+
+.accountsContainer {
+  @extend %smallContainer;
+  width: 70%;
+
+  .record {
+    .columnsWrapper {
+      padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+      display: flex;
+    }
+
+    .account {
+      margin-right: 0.1rem;
+
+      img {
+        width: 2rem;
+        padding: 0.45rem;
+        background: $BASE_COLOR_WHITE;
+      }
+    }
+
+    .balance {
+      @extend %column;
+      width: 100%;
+    }
+
+    .equity {
+      text-align: right;
+      font-size: 1.2rem;
+      padding-top: 0.5rem;
+
+      i {
+        font-style: normal;
+        font-size: 0.8rem;
+      }
+    }
+
+    .more {
+      height: 100%;
+      padding-top: 0.4rem;
+      margin-left: 1rem;
+
+      .button {
+        @extend %discButton;
+      }
+
+      .button:before {
+        content: '. . .';
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin-left: 0.45rem;
+      }
+    }
+
+    .rateBar {
+      display: block;
+      position: relative;
+      width: 100%;
+      margin: 0 0.5rem 0.5rem 0.5rem;
+
+      div {
+        height: 0.2rem;
+        background: $BASE_COLOR_LIGHT_BLUE;
+        border-radius: 0.15rem;
+
+        &.btc {
+          background: #ffad04;
+        }
+
+        &.ltc {
+          background: #b5b5b5;
+        }
+
+        &.eth {
+          background: #6f7cba;
+        }
+
+        &.etc {
+          background: #59d4af;
+        }
+
+        &.bch {
+          background: #8dc451;
+        }
+      }
+    }
+  }
+
+  .addNewCoin {
+    color: $BASE_COLOR_FONT_GRAY;
+    padding: 1.5rem;
+
+    .button {
+      @extend %discButton;
+      margin-right: 0.8rem;
+    }
+
+    .button:before {
+      content: '\e900';
+      font-size: 2rem;
+      position: relative;
+      top: -0.1rem;
+      left: -0.1rem;
+    }
+  }
 }
 
 .historyContainer {
+  @extend %smallContainer;
+  width: 100%;
   margin-left: 2rem;
+
+  .record {
+    display: flex;
+    padding: 1.5rem;
+
+    .date {
+      width: 5rem;
+      font-size: 1.2rem;
+
+      span {
+        color: $BASE_COLOR_PURPLE;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        display: block;
+      }
+    }
+
+    .description {
+      @extend %column;
+      width: 100%;
+    }
+
+    .amount {
+      @extend %column;
+      text-align: right;
+      width: 50%;
+      overflow: hidden;
+    }
+
+  }
 }

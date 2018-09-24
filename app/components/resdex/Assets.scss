@@ -1,7 +1,8 @@
-@import "../../assets/styles/vars.scss";
+@import "~/assets/styles/vars.scss";
+@import "./ResDex.scss";
 
 .container {
-  background: $BASE_COLOR_DARK_BLUE_3;
+  @extend %largeContainer;
 }
 
 .period {

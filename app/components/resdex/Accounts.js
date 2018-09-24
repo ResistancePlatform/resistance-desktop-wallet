@@ -30,7 +30,59 @@ class ResDexAccounts extends Component<Props> {
 
 		return (
       <div className={cn(styles.container)}>
-        Accounts
+        <div className={styles.accountsContainer}>
+          <div className={styles.record}>
+            <div className={styles.columnsWrapper}>
+              <div className={styles.account}>
+                <img src="assets/images/resdex/BTC.svg" alt="Bitcoin"/>
+              </div>
+
+              <div className={styles.balance}>
+                <span>Bitcoin</span>
+                -0.09351917 BTC
+              </div>
+
+              <div className={styles.equity}>
+                <i>$</i>279.21
+              </div>
+
+              <div className={styles.more}>
+                <span className={styles.button} />
+              </div>
+
+            </div>
+
+            <div className={styles.rateBar}>
+              <div className={styles.btc} style={{ width: `77%` }} />
+            </div>
+
+          </div>
+
+          <div className={styles.addNewCoin}>
+            <span className={cn('icon', styles.button)} />{t(`Add new coin`)}
+          </div>
+
+        </div>
+
+        <div className={styles.historyContainer}>
+          <div className={styles.record}>
+            <div className={styles.date}>
+              <span>Aug</span>
+              27
+            </div>
+
+            <div className={styles.description}>
+              <span>{t(`Sent {{name}}`, { name: 'Bitcoin'})}</span>
+              {t(`To {{name}} address`, { name: 'Bitcoin' })}
+            </div>
+
+            <div className={styles.amount}>
+              <span>-0.09351917 BTC</span>
+              -$25.52
+            </div>
+
+          </div>
+        </div>
       </div>
     )
   }

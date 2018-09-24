@@ -1,4 +1,9 @@
-@import "../../assets/styles/vars.scss";
+@import '~/assets/styles/vars.scss';
+@import './ResDex.scss';
+
+.container {
+  @extend %largeContainer;
+}
 
 .header {
   font-size: 0.8rem;
@@ -52,7 +57,7 @@
 
   &.pending {
     color: $BASE_COLOR_WHITE;
-    background: $BASE_COLOR_GRAY_2;
+    background: $BASE_COLOR_GRAY_3;
   }
 
   &.matched {

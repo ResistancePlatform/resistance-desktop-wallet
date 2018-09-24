@@ -1,5 +1,5 @@
-@import "../../assets/styles/vars.scss";
-@import "../../assets/styles/tabs.scss";
+@import "~/assets/styles/vars.scss";
+@import "~/assets/styles/tabs.scss";
 
 .dragBar {
   -webkit-app-region: drag;
@@ -30,12 +30,24 @@
 
 .selectedTabPanel {
   margin: 1.5rem 1.5rem 0rem 1.5rem;
-  padding: 1.8rem;
-  background: $BASE_COLOR_DARK_BLUE_3;
+  padding: 0;
 }
 
 .resDexContainer {
   justify-content: start;
   display: inline;
   position: relative;
+}
+
+/* Base classes for all top level containers inside the tab panel */
+%largeContainer {
+  border-radius: 0.5rem;
+  background: red;
+  background: $BASE_COLOR_DARK_BLUE_3;
+  padding: 1.8rem;
+}
+
+%smallContainer {
+  @extend %largeContainer;
+  padding: 0;
 }

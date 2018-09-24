@@ -11,7 +11,7 @@ import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
 import { i18n } from '~/i18next.config'
-import { TRANSACTION_FEE } from '~/constants'
+import { DECIMAL } from '~/constants/decimal'
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { OSService } from './os-service'
 import { ResistanceService } from './resistance-service'
@@ -299,7 +299,7 @@ export class RpcService {
 
     const commandParameters= [
       fromAddress,
-      [{ address: toAddress, amount: amountToSend.sub(TRANSACTION_FEE) }]
+      [{ address: toAddress, amount: amountToSend.sub(DECIMAL.transactionFee) }]
     ]
 
     // Confirmations number, important!

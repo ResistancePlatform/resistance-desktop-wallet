@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import { translate } from 'react-i18next'
 
-import { truncateAmount } from '~/constants'
+import { truncateAmount } from '~/utils/decimal'
 import { AddressDropdownItem } from '~/reducers/send-cash/send-cash.reducer'
 
 import styles from './address-drodown-popup-menu.scss'

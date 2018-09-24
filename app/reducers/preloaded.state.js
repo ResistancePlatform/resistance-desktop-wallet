@@ -5,7 +5,7 @@ export const preloadedState: State = {
   auth: {
     reason: null,
     enter: true,
-    isLoginRequired: true
+    isLoginRequired: process.env.NODE_ENV !== 'development'
   },
   roundedForm: {},
   getStarted: {

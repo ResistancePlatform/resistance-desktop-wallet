@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import { translate } from 'react-i18next'
 
-import { truncateAmount } from '~/constants'
+import { truncateAmount } from '~/utils/decimal'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 import { AddressRow } from '~/reducers/own-addresses/own-addresses.reducer'
 

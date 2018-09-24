@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import classNames from 'classnames'
 import { translate } from 'react-i18next'
 
-import { truncateAmount } from '~/constants'
+import { truncateAmount } from '~/utils/decimal'
 import { Balances } from '~/reducers/overview/overview.reducer'
 
 import styles from './Balance.scss'

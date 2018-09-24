@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { clipboard } from 'electron'
 import { translate } from 'react-i18next'
 
-import { TRANSACTION_FEE } from '~/constants'
+import { DECIMAL } from '~/constants/decimal'
 import { appStore } from '~/store/configureStore'
 import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
 import AddressDropdownPopupMenu from '~/components/send-cash/address-drodown-popup-menu'
@@ -207,7 +207,7 @@ class SendCash extends Component<Props> {
 							/>
 							<div className={styles.transactionFeeContainer}>
 								<span className={styles.part1}>{t(`Transaction fee:`)} </span>
-								<span className={styles.part2}>{TRANSACTION_FEE.toString()}</span>
+								<span className={styles.part2}>{DECIMAL.transactionFee.toString()}</span>
 								<span className={styles.part3}>RES</span>
 							</div>
 						</div>

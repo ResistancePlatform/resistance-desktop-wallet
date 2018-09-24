@@ -1,15 +1,17 @@
-@import "../../assets/styles/vars.scss";
+@import "~/assets/styles/vars.scss";
+@import "./ResDex.scss";
 
 .container {
-  background: $BASE_COLOR_DARK_BLUE;
-  border: 1px solid red;
+  display: flex;
 }
 
 .actionContainer {
-  float: left;
-  width: 60%;
+  @extend %smallContainer;
+  width: 100%;
 }
 
 .summaryContainer {
+  @extend %smallContainer;
+  width: 80%;
   margin-left: 2rem;
 }
