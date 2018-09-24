@@ -1,4 +1,4 @@
-@import "../../assets/styles/vars.scss";
+@import "~/assets/styles/vars.scss";
 
 .errorMessage {
   padding: 2px 6px;
@@ -13,8 +13,49 @@
   }
 }
 
-.roundedInputContainer {
-    text-align: left;
+.newAddon {
+  width: 100%;
+
+  .arrowDown:before {
+    content: '\e90e';
+    font-size: 1.2rem;
+    position: relative;
+    left: 0.9rem;
+    top: 0.35rem;
+  }
+
+  &.chooseWallet {
+    display: flex;
+    font-size: 0.6rem;
+
+    img {
+      width: 1.2rem;
+      height: 1.2rem;
+      padding: 0.25rem;
+      background: $BASE_COLOR_WHITE;
+      float: left;
+      margin-right: 0.3rem;
+      margin-left: 0.15rem;
+    }
+
+    span {
+      white-space: nowrap;
+      line-height: 1.7rem;
+    }
+
+    span:nth-child(4) {
+      color: $BASE_COLOR_FONT_GRAY;
+    }
+
+    input {
+      text-align: right;
+    }
+  }
+}
+
+.container {
+  text-align: left;
+  display: flex !important;
 
   position: relative;
   padding: 0 1.3rem;
@@ -35,16 +76,13 @@
   font-size: 0.7rem;
   font-weight: 300;
 
-  div {
-    display: inline-block;
-  }
-
-  .roundedInputLabel {
+  .label {
     color: $BASE_COLOR_BUTTON_FONT_GRAY;
     min-width: 9rem;
-    padding-right: 0.5rem;
+    padding: 0.5rem 0.5rem 0 0;
     text-transform: uppercase;
     white-space: nowrap;
+    border-right: 1.5px solid $BASE_COLOR_BORDER_GRAY;
   }
 
 
@@ -65,13 +103,14 @@
   }
 
   .inputContainer {
+    width: 100%;
+    display: flex;
 
     input {
       padding: 0.5rem 1rem;
-      min-width: 12rem;
+      width: 100%;
       background-color: transparent;
       border: 0;
-      border-left: 1.5px solid $BASE_COLOR_BORDER_GRAY;
       color: $BASE_COLOR_WHITE;
 
       &:focus {
@@ -84,6 +123,7 @@
     }
 
     .addon {
+      margin-top: 0.5rem;
 
       &.paste {
         position: relative;
@@ -138,7 +178,7 @@
   }
 }
 
-.roundedInputContainer[disabled] {
+.container[disabled] {
   .inputContainer {
 
     .addon {
@@ -158,4 +198,3 @@
     }
   }
 }
-

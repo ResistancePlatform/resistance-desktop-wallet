@@ -159,7 +159,7 @@ class SendCash extends Component<Props> {
 									<AddressDropdownPopupMenu
 										addressList={this.props.sendCash.addressList}
 										onPickupAddress={(event, address) => this.onPickupAddressHandler(event, address)}
-									/>re
+									/>
 								</div>
 							</RoundedInput>
 

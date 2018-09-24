@@ -1,11 +1,12 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import * as Joi from 'joi'
 import React, { Component } from 'react'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
 
 import RoundedForm from '~/components/rounded-form/RoundedForm'
-import RoundedInput from '~/components/rounded-form/RoundedInput'
+import RoundedInput, { ChooseWalletAddon } from '~/components/rounded-form/RoundedInput'
 
 import styles from './BuySell.scss'
 
@@ -35,6 +36,11 @@ class ResDexBuySell extends Component<Props> {
 	render() {
     const { t } = this.props
 
+    const wallets = [{
+      currency: 'BTC',
+      balance: Decimal('2.12400181')
+    }]
+
 		return (
       <div className={cn(styles.container)}>
         <div className={styles.actionContainer}>
@@ -44,28 +50,41 @@ class ResDexBuySell extends Component<Props> {
           >
             <RoundedInput
               name="sellFrom"
+              labelClassName={styles.inputLabel}
               label={t(`Sell from`)}
+              newAddon={new ChooseWalletAddon(wallets)}
               number
             />
 
             <RoundedInput
               name="depositTo"
+              labelClassName={styles.inputLabel}
               label={t(`Deposit to`)}
+              newAddon={new ChooseWalletAddon(wallets)}
               number
             />
 
-            {t(`Max. amount`)}
-            <RoundedInput name="maxAmount" label="No" />
+            <div className={styles.inputsRow}>
+              <div>
+                <div className={styles.caption}>{t(`Max. amount`)}<i /></div>
+                <RoundedInput className={styles.maxAmount} name="maxAmount" number />
+              </div>
 
-            {t(`Exchange rate`)}
-            <RoundedInput name="exchangeRate" label="No"/>
+              <div>
+                <div className={styles.caption}>{t(`Exchange rate`)}<i /></div>
+                <RoundedInput name="exchangeRate" number />
+              </div>
 
-            <label htmlFor="enhancedPrivacyInputId">
-              <input id="enhancedPrivacyInputId" type="checkbox" name="enhancedPrivacy" />
-              {t(`Enhanced privacy`)}
-            </label>
+            </div>
 
-            {t(`enhancend-privacy`)}
+            <div className={styles.enhancedPrivacy}>
+              <label htmlFor="enhancedPrivacyInputId">
+                <input id="enhancedPrivacyInputId" type="checkbox" name="enhancedPrivacy" />
+                {t(`Enhanced privacy`)}
+              </label>
+
+              <strong>{t(`Read more:`)}</strong> {t(`enhanced-privacy`)}
+            </div>
 
             <button type="submit">{t(`Sell {{name}}`, { name: 'Bitcoin' })}</button>
           </RoundedForm>
