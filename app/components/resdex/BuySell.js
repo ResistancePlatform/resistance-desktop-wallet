@@ -72,11 +72,61 @@ class ResDexBuySell extends Component<Props> {
         </div>
 
         <div className={styles.summaryContainer}>
-          {t(`You are selling`)}
+          <div className={styles.briefContainer}>
+            <div className={styles.brief}>{t(`You are selling`)}</div>
 
-          {t(`DEX Fee`)}
-          {t(`RES Fee`)}
-          {t(`Max. Total Payout`)}
+            <div className={styles.amount}>
+              1.01679 <span>BTC</span>
+            </div>
+
+            <div className={styles.at}>
+              @ 24.69 ETH per BTC
+            </div>
+
+          </div>
+
+          <div className={styles.fromTo}>
+            <div className={styles.wallet}>
+              <img src="assets/images/resdex/BTC.svg" alt="Bitcoin"/>
+              <div>
+                <span>Sell from</span>
+                BTC Wallet
+              </div>
+            </div>
+
+            <div className={styles.wallet}>
+              <img src="assets/images/resdex/ETH.svg" alt="Ethereum"/>
+              <div>
+                <span>Deposit to</span>
+                ETH Wallet
+              </div>
+            </div>
+
+          </div>
+
+          <ul className={styles.list}>
+            <li className={styles.res}>
+              1.01679 BTC
+              <hr />
+              <span>24.69 ETH</span>
+            </li>
+            <li>
+              {t(`DEX Fee`)}
+              <hr />
+              <span>0.15%</span>
+            </li>
+            <li>
+              {t(`RES Fee`)}
+              <hr />
+              <span>0.10%</span>
+            </li>
+            <li>
+              {t(`Max. Total Payout`)}
+              <hr />
+              <span>25.26 ETH</span>
+            </li>
+          </ul>
+
         </div>
       </div>
     )

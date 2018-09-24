@@ -14,9 +14,9 @@ import { ResDexState } from './resdex/resdex.reducer'
 import { AddressBookState } from './address-book/address-book.reducer'
 
 export type Action = {
-    +type: string,
-    payload?: any,
-    meta?: any
+  +type: string,
+  payload?: any,
+  meta?: any
 }
 
 export type State = {
