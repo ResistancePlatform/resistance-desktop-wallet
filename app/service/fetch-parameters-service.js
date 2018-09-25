@@ -71,6 +71,7 @@ export class FetchParametersService {
     const quickHashes = config.get(quickHashesConfigKey, {})
 
     const verifySproutFile = async (fileName, index) => {
+      console.log(`Sprout file ${fileName} verification . . .`)
       if (!quickHashes[fileName]) {
         console.log(`Quick hash not found for ${fileName}, calculating SHA256 checksum...`)
         await this.verifyChecksum(fileName, sproutFiles[index].checksum)
@@ -133,7 +134,7 @@ export class FetchParametersService {
         /* eslint-disable no-await-in-loop */
 
         await this.downloadSproutKey(fileName, index)
-        this.progressBar.detail = this.t(`Calculating checksum for {{fileName}}...`, { fileName })
+        this.progressBar.detail = this.t(`Calculating checksum for ${fileName}...`, { fileName })
         await this.verifyChecksum(fileName, sproutFiles[index].checksum)
         await this.saveQuickFileHash(fileName)
 
@@ -171,19 +172,20 @@ export class FetchParametersService {
 
     const onProgress = progress => {
       const rate = progress * 100
-      const roundedRate = Math.round(rate)
+      const roundedRate = Math.round(rate)  
       const totalMb = (totalBytes / 1024 / 1024).toFixed(2)
       const receivedMb = (progress  * totalMb).toFixed(2)
       this.progressBar.value = rate
 
-      const detailMessageKey = `Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...`
+      const detailMessageKey = `Downloading ${fileName}, received ${receivedMb}MB out of ${totalMb}MB (${roundedRate}%)...`
       this.progressBar.detail = this.t(detailMessageKey, { fileName, receivedMb, totalMb, roundedRate })
     }
 
     const onStarted = item => {
       totalBytes = item.getTotalBytes()
       this.progressBar.value = 0
-      const textKey = `Fetching Resistance parameters (file {{fileIndex}} of {{filesNumber}})...`
+      //const textKey = `Fetching Resistance parameters (file ${fileIndex} of ${filesNumber})...`
+      const textKey = `Fetching Resistance parameters files ...`
       this.progressBar.text = this.t(textKey, {
         index: index + 1,
         filesNumber: sproutFiles.length
