@@ -160,6 +160,22 @@ class ResDexAssets extends Component<Props> {
               <button type="button">{t(`Deposit`)}</button>
             </div>
           </div>
+
+          <div className={styles.coin}>
+            <img src="assets/images/resdex/ETC.svg" alt="Ethereum"/>
+
+            Ethereum Classic
+            <div className={styles.amount}>21.478472 ETC</div>
+
+            <div className={styles.equity}>
+              <sub>$</sub>67.44342
+            </div>
+
+            <div className={styles.buttons}>
+              <button type="button">{t(`Withdraw`)}</button>
+              <button type="button">{t(`Deposit`)}</button>
+            </div>
+          </div>
         </div>
 
       </div>
