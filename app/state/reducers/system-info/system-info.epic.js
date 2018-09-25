@@ -7,9 +7,9 @@ import { toastr } from 'react-redux-toastr'
 
 import { Action } from '../types'
 import { SystemInfoActions } from './system-info.reducer'
-import { RpcService } from '../../../service/rpc-service'
-import { ResistanceService } from '../../../service/resistance-service'
-import { OSService } from '../../../service/os-service'
+import { RpcService } from '~/service/rpc-service'
+import { ResistanceService } from '~/service/resistance-service'
+import { OSService } from '~/service/os-service'
 
 const rpcService = new RpcService()
 const resistanceService = new ResistanceService()

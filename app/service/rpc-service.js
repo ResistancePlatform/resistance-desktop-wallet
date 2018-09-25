@@ -6,21 +6,21 @@ import { Decimal } from 'decimal.js'
 import { v4 as uuid } from 'uuid'
 import { remote } from 'electron'
 import Client from 'bitcoin-core'
-import { from, Observable, of } from 'rxjs'
+import { from, of, Observable } from 'rxjs'
 import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
-import { TRANSACTION_FEE } from '../constants'
+import { i18n } from '~/i18next.config'
+import { TRANSACTION_FEE } from '~/constants'
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { OSService } from './os-service'
 import { ResistanceService } from './resistance-service'
 import { AddressBookService } from './address-book-service'
-import { SettingsActions } from '../state/reducers/settings/settings.reducer'
 import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions, Transaction } from '../state/reducers/overview/overview.reducer'
 import { OwnAddressesActions, AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
-import { SendCashActions } from '../state/reducers/send-cash/send-cash.reducer'
-import { AddressBookRecord } from '../state/reducers/address-book/address-book.reducer'
+import { SendCashActions } from '~/state/reducers/send-cash/send-cash.reducer'
+import { AddressBookRecord } from '~/state/reducers/address-book/address-book.reducer'
 
 /**
  * ES6 singleton
@@ -65,13 +65,16 @@ export class RpcService {
 	addressBookService: AddressBookService
 
 	/**
-	 *Creates an instance of RpcService.
+	 * Creates an instance of RpcService.
+   *
 	 * @memberof RpcService
 	 */
 	constructor() {
 		if (!instance) {
 			instance = this
 		}
+
+    instance.t = i18n.getFixedT(null, 'service')
 
 		this.logger = new LoggerService()
 		this.osService = new OSService()
@@ -82,7 +85,30 @@ export class RpcService {
 	}
 
 	/**
-	 * Reques Resistance node running status and memory usage.
+	 * Encrypts the wallet with a passphrase.
+   *
+	 * @memberof RpcService
+	 */
+  encryptWallet(password: string) {
+    const client = getClientInstance()
+
+    return from(client.command('encryptwallet', password))
+  }
+
+	/**
+	 * Encrypts the wallet with a passphrase.
+   *
+	 * @memberof RpcService
+	 */
+  sendWalletPassword(password: string, timeoutSec: number) {
+    const client = getClientInstance()
+
+    return from(client.command('walletpassphrase', password, timeoutSec))
+  }
+
+
+	/**
+	 * Requests Resistance node running status and memory usage.
 	 *
 	 * @memberof RpcService
 	 */
@@ -95,8 +121,9 @@ export class RpcService {
         return Promise.resolve()
       })
       .catch(err => {
-        const errorMessage = `Unable to get Resistance local node info: ${err}`
-        this.osService.dispatchAction(SystemInfoActions.getDaemonInfoFailure(errorMessage, err.code))
+        // TODO: move the prefix to toastr error title in the epic #114
+        const errorPrefix = this.t(`Unable to get Resistance local node info`)
+        this.osService.dispatchAction(SystemInfoActions.getDaemonInfoFailure(`${errorPrefix}: ${err}`, err.code))
       })
   }
 
@@ -133,7 +160,9 @@ export class RpcService {
       },
       error => {
         this.logger.debug(this, `startPollingWalletInfo`, `subscribe error: `, ConsoleTheme.error, error)
-        this.osService.dispatchAction(OverviewActions.getWalletInfoFailure(`Unable to get wallet info: ${error}`))
+        // TODO: move the prefix to toastr error title in the epic #114
+        const errorPrefix = this.t(`Unable to get Resistance local node info`)
+        this.osService.dispatchAction(OverviewActions.getWalletInfoFailure(`${errorPrefix}: ${error}`))
       }
     )
   }
@@ -168,7 +197,9 @@ export class RpcService {
         },
         error => {
           this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
-          this.osService.dispatchAction(OverviewActions.getTransactionDataFromWalletFailure(`Unable to get transactions from the wallet: ${error}`))
+          // TODO: move the prefix to toastr error title in the epic #114
+          const errorPrefix = this.t(`Unable to get transactions from the wallet`)
+          this.osService.dispatchAction(OverviewActions.getTransactionDataFromWalletFailure(`${errorPrefix}: ${error}`))
         }
       )
   }
@@ -203,7 +234,9 @@ export class RpcService {
       })
       .catch(err => {
         this.logger.debug(this, `requestBlockchainInfo`, `getBlockchainInfoFailure`, ConsoleTheme.error, err)
-        this.osService.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`Unable to get blockchain info: ${err}`, err.code))
+        // TODO: move the prefix to toastr error title in the epic #114
+        const errorPrefix = this.t(`Unable to get blockchain info`)
+        this.osService.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`${errorPrefix}: ${err}`, err.code))
       })
   }
 
@@ -317,20 +350,20 @@ export class RpcService {
 
 				if (Array.isArray(PublicAddressesResult)) {
 					const publicAddresses = PublicAddressesResult.map(tempValue => tempValue.address)
-					for (let index = 0; index < publicAddresses.length; index++) {
+					for (let index = 0; index < publicAddresses.length; index += 1) {
 						publicAddressResultSet.add(publicAddresses[index])
 					}
 				}
 
 				if (Array.isArray(PublicAddressesUnspendResult)) {
 					plainPublicUnspentAddresses = PublicAddressesUnspendResult.map(tempValue => tempValue.address)
-					for (let index = 0; index < plainPublicUnspentAddresses.length; index++) {
+					for (let index = 0; index < plainPublicUnspentAddresses.length; index += 1) {
 						publicAddressResultSet.add(plainPublicUnspentAddresses[index])
 					}
 				}
 
 				if (Array.isArray(privateAddressesResult)) {
-					for (let index = 0; index < privateAddressesResult.length; index++) {
+					for (let index = 0; index < privateAddressesResult.length; index += 1) {
 						privateAddressResultSet.add(privateAddressesResult[index])
 					}
 				}
@@ -358,7 +391,7 @@ export class RpcService {
 					const publicAddresses = []
 					const privateAddresses= []
 
-					for (let index = 0; index < addresses.length; index++) {
+					for (let index = 0; index < addresses.length; index += 1) {
 						const tempAddressItem = addresses[index];
 						if (tempAddressItem.address.startsWith('z')) {
 							privateAddresses.push(tempAddressItem)
@@ -381,8 +414,8 @@ export class RpcService {
 				if (errorAddressItems && errorAddressItems.length > 0) {
           const errorMessages = errorAddressItems.map(tempAddressItem => `"${tempAddressItem.errorMessage}"`)
 					const uniqueErrorMessages = Array.from(new Set(errorMessages)).join(', ')
-					const displayMessage = `Error fetching balances for ${errorAddressItems.length} out of ${addressList.length} addresses. Error messages included: ${uniqueErrorMessages}.`
-          toastr.error(`Address balance error`, displayMessage)
+          const errorKey = `Error fetching balances for {{errorCount}} out of {{addressCount}} addresses. Error messages included: {{errorMessages}}.`
+          toastr.error(this.t(`Address balance error`), this.t(errorKey, errorAddressItems.length, addressList.length, uniqueErrorMessages.toString()))
 				}
 
 				if (disableThePrivateAddress) {
@@ -429,9 +462,11 @@ export class RpcService {
     )).then(operations => {
       this.osService.dispatchAction(SystemInfoActions.gotOperations(operations))
       return Promise.resolve()
-    }).catch(err => (
-      this.osService.dispatchAction(SystemInfoActions.getOperationsFailure(`Unable to get operations: ${err}`, err.code))
-    ))
+    }).catch(err => {
+      // TODO: move the prefix to toastr error title in the epic #114
+      const errorPrefix = this.t(`Unable to get operations`)
+      return this.osService.dispatchAction(SystemInfoActions.getOperationsFailure(`${errorPrefix}: ${err}`, err.code))
+    })
   }
 
 	/**
@@ -491,14 +526,16 @@ export class RpcService {
 				}
 
 				const tempObj = {}
-				Object.keys(result.details[0]).reduce((objToReturn, key) => {
+				Object.keys(result.details[0]).reduce((accumulator, key) => {
+          const modified = { ...accumulator }
+
 					if (key === 'amount') {
-						objToReturn[`details[0].${key}`] = Decimal(result.details[0][`${key}`])
+						modified[`details[0].${key}`] = Decimal(result.details[0][`${key}`])
 					} else {
-						objToReturn[`details[0].${key}`] = result.details[0][`${key}`]
+						modified[`details[0].${key}`] = result.details[0][`${key}`]
 					}
 
-					return objToReturn
+					return modified
 				}, tempObj)
 
 				const detailResult = { ...result, amount: Decimal(result.amount), ...tempObj }
@@ -518,59 +555,47 @@ export class RpcService {
 	}
 
 	/**
-   * Export wallet to a file.
+   * Export private keys to a file.
    *
 	 * @memberof RpcService
 	 */
-  exportWallet(filePath) {
-    const client = getClientInstance()
-
-    const exportFileName = uuid().replace(/-/g, '')
-    const exportFilePath = path.join(this.resistanceService.getExportDir(), exportFileName)
-
-    const commandPromise = client.command('z_exportwallet', exportFileName)
-
-    commandPromise.then((result) => {
-      if (typeof(result) === 'object' && result.name === 'RpcError') {
-        throw new Error(result.message)
-      }
-      return this.osService.moveFile(exportFilePath, filePath)
-    }).then(() => (
-      this.osService.dispatchAction(SettingsActions.exportWalletSuccess())
-    )).catch(err => (
-      this.osService.dispatchAction(SettingsActions.exportWalletFailure(err.toString()))
-    ))
+  exportPrivateKeys(filePath) {
+    return this::exportFileWithMethod('z_exportwallet', filePath)
   }
 
 	/**
-   * Import wallet from a file.
+   * Import private keys from a file.
    *
 	 * @memberof RpcService
+   * @returns {Observable}
 	 */
-  importWallet(filePath) {
+  importPrivateKeys(filePath) {
     const client = getClientInstance()
 
     const importFileName = uuid().replace(/-/g, '')
-    const importFilePath = path.join(process.cwd(), importFileName)
+    const importFilePath = path.join(this.resistanceService.getExportDir(), importFileName)
 
-    const errorHandler = err => (
-      this.osService.dispatchAction(SettingsActions.importWalletFailure(err.toString()))
+    const observable = from(
+      promisify(fs.copyFile)(filePath, importFilePath)
+        .then(() => (
+          client.command('z_importwallet', importFilePath)
+            .finally(() => promisify(fs.unlink)(importFilePath))
+        ))
     )
 
-    fs.copyFile(filePath, importFilePath, err => {
-      if (err) {
-        return errorHandler(err)
-      }
-
-      client.command('z_importwallet', importFileName).then(() => (
-        this.osService.dispatchAction(SettingsActions.importWalletSuccess())
-      )).catch(errorHandler).then(() => (
-        promisify(fs.unlink)(importFilePath)
-      )).catch(console.error)
-
-    })
-
+    return observable
   }
+
+	/**
+   * Backup wallet to a file.
+   *
+	 * @memberof RpcService
+   * @returns {Observable}
+	 */
+  backupWallet(filePath) {
+    return this::exportFileWithMethod('backupwallet', filePath)
+  }
+
 }
 
 /* RPC Service private methods */
@@ -614,18 +639,21 @@ async function getPublicTransactionsPromise(client: Client) {
     { method: 'listtransactions', parameters: ['', 200] }
   ]
 
+  const noAddressMessage = this.t(`Z address is not listed in the wallet`)
+  const publicAddressMessage = this.t(`R (public)`)
+
   return client.command(command)
     .then(result => result[0])
     .then(result => {
       if (Array.isArray(result)) {
         return result.map(
           originalTransaction => ({
-            type: `\u2605 T (Public)`,
+            type: `\u2605 ${publicAddressMessage}`,
             category: originalTransaction.category,
             confirmations: originalTransaction.confirmations,
             amount: Decimal(originalTransaction.amount),
             timestamp: originalTransaction.time,
-            destinationAddress: originalTransaction.address ? originalTransaction.address : `[ Z Address not listed in Wallet ]`,
+            destinationAddress: originalTransaction.address ? originalTransaction.address : `[ ${noAddressMessage} ]`,
             transactionId: originalTransaction.txid
           })
         )
@@ -657,7 +685,7 @@ async function getPrivateTransactionsPromise(client: Client) {
 
   if (Array.isArray(privateAddresses) && privateAddresses.length > 0) {
     let queryResultWithAddressArr = []
-    for (let index = 0; index < privateAddresses.length; index++) {
+    for (let index = 0; index < privateAddresses.length; index += 1) {
       const tempAddress = privateAddresses[index];
 
       /* eslint-disable-next-line no-await-in-loop */
@@ -681,7 +709,7 @@ async function getPrivateTransactionsPromise(client: Client) {
 
     // At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`,
     // we need to get that info by viewing the detail of the transaction, and then put it back !
-    for (let index = 0; index < tempTransactionList.length; index++) {
+    for (let index = 0; index < tempTransactionList.length; index += 1) {
       const tempTransaction = tempTransactionList[index];
       /* eslint-disable-next-line no-await-in-loop */
       const transactionDetail = await client.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
@@ -716,7 +744,9 @@ function applyAddressBookNamesToTransactions(transactionsPromise) {
               return result
             }
 
-            result.transactions = result.transactions.map((transaction: Transaction) => {
+            const modified = { ...result }
+
+            modified.transactions = result.transactions.map((transaction: Transaction) => {
               const matchedRecord = (
                 addressBookRecords
                 .find(record => record.address === transaction.destinationAddress)
@@ -724,7 +754,7 @@ function applyAddressBookNamesToTransactions(transactionsPromise) {
               return matchedRecord ? ({ ...transaction, destinationAddress: matchedRecord.name }) : transaction
             })
 
-            return result
+            return modified
           })
         )
       }),
@@ -808,4 +838,27 @@ function performMergeCoinsCommand(commandPromise: Promise<any>) {
     )).catch(err => (
       this.osService.dispatchAction(OwnAddressesActions.mergeCoinsFailure(err.toString()))
     ))
+}
+
+
+/**
+ * Private method. Used to export private keys or backup the wallet to a file.
+ *
+ * @memberof RpcService
+ */
+function exportFileWithMethod(method, filePath) {
+  const client = getClientInstance()
+
+  const exportFileName = uuid().replace(/-/g, '')
+  const exportFilePath = path.join(this.resistanceService.getExportDir(), exportFileName)
+
+  return from(
+    client.command(method, exportFileName)
+      .then((result) => {
+        if (typeof(result) === 'object' && result.name === 'RpcError') {
+          throw new Error(result.message)
+        }
+        return this.osService.moveFile(exportFilePath, filePath)
+      })
+  )
 }

@@ -16,40 +16,6 @@
   @include roundedButton(false);
 }
 
-.tableContainer {
-  height: 100%;
-}
-
-.tableRowsContainer {
-  overflow-x: hidden;
-  overflow-y: scroll;
-  height: 100%;
-}
-
-.tableColumnOperation {
-  width: 15%;
-}
-
-.tableColumnAmount {
-  width: 10%;
-}
-
-.tableColumnError {
-  width: 30%;
-}
-
-.tableColumnTriggered {
-  width: 15%;
-}
-
-.tableColumnStatus {
-  width: 10%;
-}
-
-.tableColumnFee{
-  width: 10%;
-}
-
 .operationStatus {
   border-radius: 0.5rem;
   padding: 2px 6px;

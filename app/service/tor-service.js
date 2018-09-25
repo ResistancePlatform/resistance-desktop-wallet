@@ -32,7 +32,7 @@ export class TorService {
 	 * @memberof TorService
 	 */
   start() {
-    osService.execProcess('TOR', torCommandArgs)
+    osService.execProcess('TOR', torCommandArgs.slice())
   }
 
 	/**

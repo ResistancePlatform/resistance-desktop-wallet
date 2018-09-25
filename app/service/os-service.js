@@ -4,6 +4,8 @@ import path from 'path'
 import { spawn } from 'child_process'
 import { app, remote } from 'electron'
 
+import { i18n } from '../i18next.config'
+
 /**
  * ES6 singleton
  */
@@ -30,7 +32,11 @@ export class OSService {
 	 * @memberof OSService
 	 */
 	constructor() {
-		if (!instance) { instance = this }
+    if (!instance) {
+      instance = this
+    }
+
+    instance.t = i18n.getFixedT(null, 'service')
 
     // Create a global var to store child processes information for the cleanup
     if (process.type === 'browser' && global.childProcesses === undefined) {
@@ -62,7 +68,7 @@ export class OSService {
 	 * @memberof RpcService
 	 */
 	dispatchAction(action) {
-		const storeModule = require('../state/store/configureStore')
+		const storeModule = require('~/state/store/configureStore')
 		if (storeModule && storeModule.appStore) {
 			storeModule.appStore.dispatch(action)
 		}
@@ -112,11 +118,19 @@ export class OSService {
   }
 
 	/**
+   * Returns a common name/alias for each OS family
+   *
 	 * @memberof OSService
 	 * @returns {string}
 	 */
 	getOS() {
-    return process.platform === 'darwin' ? 'macos' : 'windows'
+    let os = 'linux'
+    if (process.platform === 'darwin') {
+      os = 'macos'
+    } else if (process.platform === 'win32') {
+      os = 'windows'
+    }
+    return os
 	}
 
 	/**
@@ -140,7 +154,7 @@ export class OSService {
 		if (/[\\/](Electron\.app|Electron|Electron\.exe)[\\/]/i.test(process.execPath)) {
 			resourcesPath = process.cwd()
 		} else {
-			[resourcesPath] = process.resourcesPath
+      ({ resourcesPath } = process)
 		}
 
 		return path.join(resourcesPath, 'bin', this.getOS())
@@ -161,7 +175,7 @@ export class OSService {
 	 * @memberof OSService
 	 */
   getSettingsActions() {
-    const settingsReducerModule = require('../state/reducers/settings/settings.reducer')
+    const settingsReducerModule = require('~/state/reducers/settings/settings.reducer')
     return settingsReducerModule.SettingsActions
   }
 
@@ -175,12 +189,13 @@ export class OSService {
    *
 	 * @param {string} processName
 	 * @param {string[]} args
+	 * @param {function} stdoutHandler If returns true the process is considered started.
 	 * @memberof OSService
 	 */
-  restartProcess(processName: ChildProcessName, args = []) {
+  restartProcess(processName: ChildProcessName, args = [], stdoutHandler) {
     console.log(`Restarting ${processName} process.`)
     this.killProcess(processName, () => {
-      this.execProcess(processName, args)
+      this.execProcess(processName, args, stdoutHandler)
     })
   }
 
@@ -190,7 +205,6 @@ export class OSService {
 	 * @param {string} processName
 	 * @param {string[]} args
 	 * @param {function} stdoutHandler If returns true the process is considered started.
-	 * @param {function} stderrHandler
 	 * @memberof OSService
 	 */
   execProcess(processName: ChildProcessName, args = [], stdoutHandler) {
@@ -203,13 +217,7 @@ export class OSService {
 
     const command = ChildProcessCommands[processName]
 
-    this.getPid(command).then(pid => {
-      if (pid) {
-        console.log(`Process ${processName} is already running, PID ${pid}`)
-        return this.killPid(pid)
-      }
-      return Promise.resolve()
-    }).then(() => {
+    this.killProcess(processName, () => {}).then(() => {
       let options
       let isUpdateFinished = false
       const commandPath = path.join(this.getBinariesPath(), command)
@@ -258,7 +266,8 @@ export class OSService {
 
       childProcess.on('close', (code) => {
         if (!childProcessInfo.isGettingKilled) {
-          this.dispatchAction(actions.childProcessFailed(processName, `Process ${processName} unexpectedly exited with code ${code}.`))
+          const errorKey =  `Process {{processName}} unexpectedly exited with code {{code}}.`
+          this.dispatchAction(actions.childProcessFailed(processName, this.t(errorKey, processName, code)))
         }
 
         childProcessInfo.isGettingKilled = false
@@ -283,12 +292,13 @@ export class OSService {
    *
 	 * @param {string} processName
 	 * @param {function} customSuccessHandler
+   * @returns {Promise}
 	 * @memberof OSService
 	 */
   killProcess(processName: ChildProcessName, customSuccessHandler) {
     const actions = this.getSettingsActions()
 
-    this.getPid(ChildProcessCommands[processName]).then(pid => {
+    const promise = this.getPid(ChildProcessCommands[processName]).then(pid => {
       if (pid) {
         const childProcessInfo = remote.getGlobal('childProcesses')[processName]
         childProcessInfo.isGettingKilled = true
@@ -307,6 +317,7 @@ export class OSService {
       this.dispatchAction(actions.childProcessMurderFailed(processName, err.toString()))
     })
 
+    return promise
   }
 
 	/**

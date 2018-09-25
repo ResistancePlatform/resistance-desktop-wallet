@@ -1,10 +1,8 @@
 // @flow
 import { Action } from '../types'
 
-export type NaviPath = '/' | '/overview' | '/own-addresses' | '/send-cash' | '/address-book' | '/settings'
-
 export type NaviState = {
-	currentNaviPath: NaviPath
+	currentNaviPath: string
 }
 
 const NaviActionTypePrefix = 'NAVI_ACTION'
@@ -18,7 +16,7 @@ export const NaviActions = {
 	MAIN_WINDOW_MINIMIZE: `${NaviActionTypePrefix}: MAIN_WINDOW_MINIMIZE`,
 	MAIN_WINDOW_MAXIMIZE: `${NaviActionTypePrefix}: MAIN_WINDOW_MAXIMIZE`,
 
-	naviToPathSuccess: (naviPath: NaviPath): Action => ({ type: NaviActions.NAVI_TO_PATH_SUCCESS, payload: naviPath }),
+	naviToPathSuccess: (naviPath: string): Action => ({ type: NaviActions.NAVI_TO_PATH_SUCCESS, payload: naviPath }),
 
 	mainWindowClose: (): Action => ({ type: NaviActions.MAIN_WINDOW_CLOSE }),
 	mainWindowMinimize: (): Action => ({ type: NaviActions.MAIN_WINDOW_MINIMIZE }),

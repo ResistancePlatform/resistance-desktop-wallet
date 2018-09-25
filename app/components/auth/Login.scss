@@ -1,0 +1,35 @@
+@import "../../theme/vars.scss";
+
+.container {
+  height: 100%;
+  justify-content: center;
+  display: inline;
+  position: relative;
+  padding: 8rem 16rem 5rem 16rem;
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  padding-bottom: 1.8rem;
+
+  &.ready {
+    text-shadow: 0 0 0.8rem $BASE_COLOR_WHITE;
+  }
+}
+
+.reason {
+  color: $BASE_COLOR_PURPLE;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.9rem;
+  padding-bottom: 2rem;
+}
+
+.form {
+  text-align: center;
+
+  .passwordInput {
+    max-width: 24rem;
+  }
+}

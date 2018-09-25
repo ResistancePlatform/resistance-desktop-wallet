@@ -1,11 +1,11 @@
 // @flow
+import config from 'electron-settings'
 import { of, throwError } from 'rxjs'
 import { AddressBookRecord } from '../state/reducers/address-book/address-book.reducer'
 
-const config = require('electron-settings')
+import { i18n } from '~/i18next.config'
 
 const addressBookConfigKey = 'addressBook'
-const addressNotFoundErrorMessage = `Address not found in the database.`
 
 /**
  * ES6 singleton
@@ -18,7 +18,7 @@ let instance = null
  * @class AddressBookService
  */
 export class AddressBookService {
-  addressBook: AddressBookRecord[]
+  t: any
 
 	/**
 	 * @memberof AddressBookService
@@ -28,6 +28,8 @@ export class AddressBookService {
       instance = this
       instance.addressBook = []
     }
+
+    instance.t = i18n.getFixedT(null, 'service')
 
 		return instance
 	}
@@ -57,7 +59,7 @@ export class AddressBookService {
     )
 
     if (this.addressBook.filter(match).length) {
-      return throwError(`Address already exists in the database.`)
+      return throwError(this.t(`Address already exists in the database.`))
     }
 
     this.addressBook.push(validated)
@@ -77,7 +79,7 @@ export class AddressBookService {
     const index = this.addressBook.findIndex(record => record.name === name)
 
     if (index === -1) {
-      return throwError(addressNotFoundErrorMessage)
+      return throwError(this.t(`Address not found in the database.`))
     }
 
     this.addressBook.splice(index, 1)
@@ -100,7 +102,7 @@ export class AddressBookService {
     const index = this.addressBook.findIndex(record => record.name === originalName)
 
     if (index === -1) {
-      return throwError(addressNotFoundErrorMessage)
+      return throwError(this.t(`Address not found in the database.`))
     }
 
     this.addressBook[index] = validated

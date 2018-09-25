@@ -6,7 +6,7 @@ import { toastr } from 'react-redux-toastr'
 
 import { Action } from '../types'
 import { OverviewActions } from './overview.reducer'
-import { RpcService } from '../../../service/rpc-service'
+import { RpcService } from '~/service/rpc-service'
 
 const rpcService = new RpcService()
 

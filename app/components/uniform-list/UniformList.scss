@@ -1,0 +1,45 @@
+@import "../../theme/vars.scss";
+
+.container {
+  background-color: $BASE_COLOR_DARK_BLUE;
+  color: $BASE_COLOR_WHITE;
+  overflow: hidden;
+}
+
+.header {
+  div {
+    display: inline-block;
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.8rem;
+    user-select: none;
+    cursor: default;
+  }
+}
+
+.row {
+  cursor: default;
+  position: relative;
+
+  div {
+    padding: 0.8rem 0;
+    display: inline-block;
+
+    font-size: 0.7rem;
+    font-weight: 300;
+
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid $UNIFORM_LIST_SEPARATOR_COLOR;
+
+    overflow: hidden;
+  }
+
+}
+
+.row:hover {
+  div {
+    color: $BASE_COLOR_PURPLE;
+  }
+}
+

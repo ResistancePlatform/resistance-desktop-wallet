@@ -1,32 +1,119 @@
 // @flow
-import { tap, map, mapTo, switchMap } from 'rxjs/operators'
-import { merge } from 'rxjs'
+import { remote } from 'electron'
+import { tap, map, mapTo, mergeMap, switchMap, catchError } from 'rxjs/operators'
+import { of, bindCallback, merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
+import { i18n } from '~/i18next.config'
+import { getEnsureLoginObservable } from '~/utils/auth'
 import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { OwnAddressesActions } from './own-addresses.reducer'
 import { Action } from '../types'
-import { RpcService } from '../../../service/rpc-service'
+import { RpcService } from '~/service/rpc-service'
 
-const rpcService = new RpcService()
+const t = i18n.getFixedT(null, 'own-addresses')
+const rpc = new RpcService()
 
 const getOwnAddressesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.getOwnAddresses),
-  tap(() => { rpcService.requestOwnAddresses() }),
+  tap(() => { rpc.requestOwnAddresses() }),
   mapTo(OwnAddressesActions.empty())
 )
 
-const createNewAddressesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-  ofType(OwnAddressesActions.createNewAddress),
-  switchMap((action) => rpcService.createNewAddress(action.payload.isPrivate)),
+const createAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(OwnAddressesActions.createAddress),
+  switchMap(action => rpc.createNewAddress(action.payload.isPrivate)),
   map(result => result ? OwnAddressesActions.getOwnAddresses() : OwnAddressesActions.empty())
 )
+
+const initiatePrivateKeysExportEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(OwnAddressesActions.initiatePrivateKeysExport),
+  mergeMap(() => {
+    const showSaveDialogObservable = bindCallback(remote.dialog.showSaveDialog.bind(remote.dialog))
+
+    const title = t(`Export Resistance addresses private keys to a file`)
+    const params = {
+      title,
+      defaultPath: remote.app.getPath('documents'),
+      message: title,
+      nameFieldLabel: t(`File name:`),
+      filters: [{ name: t(`Keys files`),  extensions: ['keys'] }]
+    }
+
+    const observable = showSaveDialogObservable(params).pipe(
+      switchMap(([ filePath ]) => (
+        filePath
+          ? of(OwnAddressesActions.exportPrivateKeys(filePath))
+          : of(OwnAddressesActions.empty())
+      )))
+
+    return getEnsureLoginObservable(null, observable, action$)
+  })
+)
+
+const exportPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(OwnAddressesActions.exportPrivateKeys),
+  mergeMap(action => (
+    rpc.exportPrivateKeys(action.payload.filePath).pipe(
+      switchMap(() => {
+        toastr.success(t(`Private keys exported successfully`))
+        return of(OwnAddressesActions.empty())
+      }),
+      catchError(err => {
+        toastr.error(t(`Unable to export private keys`), err.message)
+        return of(OwnAddressesActions.empty())
+      })
+  )))
+)
+
+const initiatePrivateKeysImportEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(OwnAddressesActions.initiatePrivateKeysImport),
+  mergeMap(() => {
+    const showOpenDialogObservable = bindCallback(remote.dialog.showOpenDialog.bind(remote.dialog))
+
+    const title = t(`Import Resistance addresses from private keys file`)
+    const params = {
+      title,
+      defaultPath: remote.app.getPath('documents'),
+      message: title,
+      filters: [{ name: t(`Keys files`),  extensions: ['keys'] }]
+    }
+
+    const observable = showOpenDialogObservable(params).pipe(
+      switchMap(([ filePaths ]) => (
+        filePaths && filePaths.length
+          ? of(OwnAddressesActions.importPrivateKeys(filePaths.pop()))
+          : of(OwnAddressesActions.empty())
+      )))
+
+    return getEnsureLoginObservable(null, observable, action$)
+  })
+)
+
+const importPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(OwnAddressesActions.importPrivateKeys),
+  mergeMap(action => (
+    rpc.importPrivateKeys(action.payload.filePath).pipe(
+      switchMap(() => {
+        toastr.success(
+          t(`Private keys imported successfully`),
+          t(`It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`)
+        )
+        return of(OwnAddressesActions.empty())
+      }),
+      catchError(err => {
+        toastr.error(t(`Unable to import private keys`), err.message)
+        return of(OwnAddressesActions.empty())
+      })
+  )))
+)
+
 
 const mergeAllMinedCoinsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeAllMinedCoins),
   tap(action => {
-    rpcService.mergeAllMinedCoins(action.payload.zAddress)
+    rpc.mergeAllMinedCoins(action.payload.zAddress)
   }),
   mapTo(SystemInfoActions.newOperationTriggered())
 )
@@ -34,7 +121,7 @@ const mergeAllMinedCoinsEpic = (action$: ActionsObservable<Action>) => action$.p
 const mergeAllRAddressCoinsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeAllRAddressCoins),
   tap(action => {
-    rpcService.mergeAllRAddressCoins(action.payload.zAddress)
+    rpc.mergeAllRAddressCoins(action.payload.zAddress)
   }),
   mapTo(SystemInfoActions.newOperationTriggered())
 )
@@ -42,7 +129,7 @@ const mergeAllRAddressCoinsEpic = (action$: ActionsObservable<Action>) => action
 const mergeAllZAddressCoinsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeAllZAddressCoins),
   tap(action => {
-    rpcService.mergeAllZAddressCoins(action.payload.zAddress)
+    rpc.mergeAllZAddressCoins(action.payload.zAddress)
   }),
   mapTo(SystemInfoActions.newOperationTriggered())
 )
@@ -50,7 +137,7 @@ const mergeAllZAddressCoinsEpic = (action$: ActionsObservable<Action>) => action
 const mergeAllCoinsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeAllCoins),
   tap(action => {
-    rpcService.mergeAllCoins(action.payload.zAddress)
+    rpc.mergeAllCoins(action.payload.zAddress)
   }),
   mapTo(SystemInfoActions.newOperationTriggered())
 )
@@ -58,7 +145,7 @@ const mergeAllCoinsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 const mergeCoinsOperationStartedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeCoinsOperationStarted),
   tap(() => {
-    toastr.info(`Merging operation started, addresses will be frozen until done.`)
+    toastr.info(t(`Merging operation started, addresses will be frozen until done.`))
   }),
   mapTo(SystemInfoActions.getOperations())
 )
@@ -66,14 +153,18 @@ const mergeCoinsOperationStartedEpic = (action$: ActionsObservable<Action>) => a
 const mergeCoinsFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.mergeCoinsFailure),
   tap((action) => {
-    toastr.error(`Unable to start merge operation`, action.payload.errorMessage)
+    toastr.error(t(`Unable to start merge operation`), action.payload.errorMessage)
   }),
   mapTo(SystemInfoActions.empty())
 )
 
 export const OwnAddressesEpics = (action$, state$) => merge(
   getOwnAddressesEpic(action$, state$),
-  createNewAddressesEpic(action$, state$),
+  createAddressEpic(action$, state$),
+	initiatePrivateKeysExportEpic(action$, state$),
+	exportPrivateKeysEpic(action$, state$),
+  initiatePrivateKeysImportEpic(action$, state$),
+	importPrivateKeysEpic(action$, state$),
   mergeAllMinedCoinsEpic(action$, state$),
   mergeAllRAddressCoinsEpic(action$, state$),
   mergeAllZAddressCoinsEpic(action$, state$),

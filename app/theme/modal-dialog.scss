@@ -48,7 +48,7 @@
 
   .closeButton {
     @include modalToolbarButton();
-    background-color: $NAVI_BAR_TOOLBAR_BUTTON_CLOSE_COLOR;
+    background-color: $TITLE_BAR_BUTTONS_CLOSE_COLOR;
     float: left;
   }
 

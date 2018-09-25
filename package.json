@@ -1,9 +1,10 @@
 {
-  "name": "electron-react-boilerplate",
+  "name": "resistance-desktop-wallet",
   "productName": "ResistanceWallet",
   "version": "0.13.3",
   "description": "Resistance cross-platform desktop wallet",
   "scripts": {
+    "i18n": "node -r babel-register internals/scripts/I18n.js",
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
     "build-dll": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.dev.dll.js --colors",
     "build-main": "cross-env NODE_ENV=production node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.main.prod.js --colors",
@@ -50,7 +51,8 @@
       "package.json"
     ],
     "extraResources": [
-      "bin"
+      "bin",
+      "locales"
     ],
     "dmg": {
       "contents": [
@@ -85,7 +87,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chentsulin/electron-react-boilerplate.git"
+    "url": "git+https://github.com/ResistancePlatform/resistance-desktop-wallet.git"
   },
   "author": {
     "name": "C. T. Lin",
@@ -94,18 +96,13 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chentsulin/electron-react-boilerplate/issues"
+    "url": "https://github.com/ResistancePlatform/resistance-desktop-wallet/issues"
   },
   "keywords": [
-    "electron",
-    "boilerplate",
-    "react",
-    "redux",
-    "flow",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
+    "resistance",
+    "wallet",
+    "cryptocurrency",
+    "boinc"
   ],
   "homepage": "https://github.com/chentsulin/electron-react-boilerplate#readme",
   "jest": {
@@ -155,18 +152,18 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "enzyme-to-json": "^3.3.4",
-    "eslint": "^4.19.1",
-    "eslint-config-airbnb": "^16.1.0",
-    "eslint-config-prettier": "^2.9.0",
+    "eslint": "^5.5.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-prettier": "^3.0.1",
     "eslint-formatter-pretty": "^1.3.0",
-    "eslint-import-resolver-webpack": "^0.10.0",
-    "eslint-plugin-compat": "^2.2.0",
-    "eslint-plugin-flowtype": "^2.47.1",
-    "eslint-plugin-import": "^2.12.0",
-    "eslint-plugin-jest": "^21.15.2",
-    "eslint-plugin-jsx-a11y": "6.0.3",
-    "eslint-plugin-promise": "^3.7.0",
-    "eslint-plugin-react": "^7.8.2",
+    "eslint-import-resolver-webpack": "^0.10.1",
+    "eslint-plugin-compat": "^2.5.1",
+    "eslint-plugin-flowtype": "^2.50.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jest": "^21.22.0",
+    "eslint-plugin-jsx-a11y": "6.1.1",
+    "eslint-plugin-promise": "^4.0.0",
+    "eslint-plugin-react": "^7.11.1",
     "express": "^4.16.3",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "fbjs-scripts": "^0.8.3",
@@ -175,6 +172,7 @@
     "flow-runtime": "^0.17.0",
     "flow-typed": "^2.4.0",
     "husky": "^0.14.3",
+    "i18next-scanner": "^2.6.5",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^23.0.0",
     "minimist": "^1.2.0",
@@ -193,6 +191,7 @@
     "stylelint-config-standard": "^18.2.0",
     "uglifyjs-webpack-plugin": "1.2.5",
     "url-loader": "^1.0.1",
+    "vinyl-fs": "^3.0.3",
     "webpack": "^4.8.3",
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-cli": "^2.1.4",
@@ -200,6 +199,7 @@
     "webpack-merge": "^4.1.2"
   },
   "dependencies": {
+    "bip39": "^2.5.0",
     "bs58check": "^2.1.2",
     "classnames": "^2.2.6",
     "decimal.js": "^10.0.1",
@@ -211,15 +211,20 @@
     "font-awesome": "^4.7.0",
     "generate-password": "^1.4.0",
     "history": "^4.7.2",
+    "i18next": "^11.9.0",
+    "i18next-node-fs-backend": "^2.1.0",
+    "iso-639-1": "^2.0.3",
     "joi": "^13.6.0",
     "momentjs": "^2.0.0",
     "node-uuid": "^1.4.8",
+    "owasp-password-strength-test": "^1.3.0",
     "prop-types": "^15.6.2",
     "properties-reader": "^0.0.16",
     "ps-node": "^0.1.6",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "react-hot-loader": "^4.2.0",
+    "react-i18next": "^7.12.0",
     "react-lazylog": "^3.1.4",
     "react-modal": "^3.5.1",
     "react-redux": "^5.0.7",

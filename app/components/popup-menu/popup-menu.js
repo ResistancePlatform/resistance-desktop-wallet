@@ -2,14 +2,17 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
+import cn from 'classnames'
 
-import { appStore } from '../../state/store/configureStore'
-import { PopupMenuState, PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.reducer'
+import { appStore } from '~/state/store/configureStore'
+import { PopupMenuState, PopupMenuActions } from '~/state/reducers/popup-menu/popup-menu.reducer'
 
 import styles from './popup-menu.scss'
 
 type Props = {
   id: string,
+  className?: string,
+  relative?: boolean,
   popupMenu: PopupMenuState
 }
 
@@ -77,18 +80,29 @@ class PopupMenu extends Component<Props> {
     }
 
 		const containerStyles = {
-			display: props.isVisible ? 'block' : 'none',
-			top: props.top,
-			left: props.left
+			display: props.isVisible ? 'block' : 'none'
 		}
+
+    if (this.props.relative) {
+      containerStyles.position = 'relative'
+    } else {
+      Object.assign(containerStyles, {
+        position: 'absolute',
+        top: props.top,
+        left: props.left
+      })
+    }
+
 
 		return (
 			<div
-				className={styles.popupMenuContainer}
+				className={cn(styles.container, this.props.className)}
 				style={containerStyles}
         ref={el => this.elementRef(el)}
 			>
-        {this.renderChildren()}
+        <div className={styles.menu}>
+          {this.renderChildren()}
+        </div>
 			</div>
 		)
 	}

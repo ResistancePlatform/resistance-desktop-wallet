@@ -6,7 +6,7 @@ export type PopupMenuState = { [string]: any }
 
 export const PopupMenuActions = createActions(
 	{
-    SHOW: (id, top, left, data) => ({ id, top, left, data }),
+    SHOW: (id, data, top = null, left = null) => ({ id, top, left, data }),
     HIDE: id => ({ id })
   },
 	{

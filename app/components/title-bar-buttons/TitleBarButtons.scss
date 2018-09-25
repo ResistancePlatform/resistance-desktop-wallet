@@ -1,0 +1,41 @@
+@import "../../theme/vars.scss";
+
+@mixin titleBarButton {
+  -webkit-app-region: no-drag;
+  display: inline-block;
+
+  width: 0.8rem;
+  height: 0.8rem;
+
+  margin-right: 1rem;
+  border-radius: 20rem;
+
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.titleBarButtonsContainer {
+  -webkit-app-region: drag;
+  margin-bottom: 2rem;
+  position: absolute;
+  top: 0.8rem;
+  left: 0.8rem;
+
+  .closeButton {
+    @include titleBarButton();
+    background-color: $TITLE_BAR_BUTTONS_CLOSE_COLOR;
+  }
+
+  .minimizeButton {
+    @include titleBarButton();
+    background-color: $TITLE_BAR_BUTTONS_MINIMIZE_COLOR;
+  }
+
+  .maximizeButton {
+    @include titleBarButton();
+    background-color: $TITLE_BAR_BUTTONS_MAXIMIZE_COLOR;
+  }
+}

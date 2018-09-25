@@ -10,11 +10,12 @@
  *
  * @flow
  */
-import * as fs from 'fs';
+import * as fs from 'fs'
 import path from 'path'
+import config from 'electron-settings'
+import { app, ipcMain, BrowserWindow } from 'electron'
 
-import { app, BrowserWindow } from 'electron'
-
+import { i18n } from './i18next.config'
 import { OSService } from './service/os-service'
 import { ResistanceService } from './service/resistance-service'
 import { FetchParametersService } from './service/fetch-parameters-service'
@@ -91,6 +92,13 @@ app.on('ready', async () => {
     await installExtensions()
   }
 
+  let iconFileName = 'icon.png'
+  if (osService.getOS() === 'macos') {
+    iconFileName = 'icon.icns'
+  } else if (osService.getOS() === 'windows') {
+    iconFileName = 'icon.ico'
+  }
+
   mainWindow = new BrowserWindow({
     minHeight: 728,
     height: 728,
@@ -99,13 +107,38 @@ app.on('ready', async () => {
     show: false,
     frame: false,
     backgroundColor: '#1d2440',
+    icon: path.join(__dirname, '..', `/resources/${iconFileName}`)
   });
+
+  const menuBuilder = new MenuBuilder(mainWindow)
+
+  i18n.on('loaded', () => {
+    i18n.changeLanguage(config.get('language', 'en'))
+    i18n.off('loaded')
+  });
+
+  i18n.on('languageChanged', () => {
+    menuBuilder.buildMenu()
+  })
+
+  ipcMain.on('change-language', (event, code) => {
+    i18n.changeLanguage(code)
+  })
 
   if (!await fetchParamsService.checkPresence()) {
     await fetchParamsService.fetch(mainWindow)
   }
 
+  // Disabling eval for security reasons,
+  // https://github.com/ResistancePlatform/resistance-desktop-wallet/issues/155
+  // eslint-disable-next-line
+  mainWindow.eval = global.eval = function () {
+    throw new Error(`Sorry, this app does not support window.eval().`)
+  }
+
   mainWindow.loadURL(`file://${__dirname}/app.html`)
+
+  // Uncomment for debugging in prod mode
   // mainWindow.webContents.openDevTools()
 
   // Showing the window if DOM finished loading and the content has been rendered
@@ -136,6 +169,4 @@ app.on('ready', async () => {
     mainWindow = null
   })
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
 });

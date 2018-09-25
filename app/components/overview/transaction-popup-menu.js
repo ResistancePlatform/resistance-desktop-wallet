@@ -1,15 +1,18 @@
 // @flow
 import React, { Component } from 'react'
+import { translate } from 'react-i18next'
+
 import styles from './transaction-popup-menu.scss'
 
 type Props = {
+  t: any,
 	show: boolean,
 	posX: number,
 	posY: number,
 	onMenuItemClicked: (name: string) => void
 }
 
-export default class TransactionPopupMenu extends Component<Props> {
+class TransactionPopupMenu extends Component<Props> {
 	props: Props
 
 	eventConfirm(event) {
@@ -26,6 +29,8 @@ export default class TransactionPopupMenu extends Component<Props> {
 	}
 
 	render() {
+    const { t } = this.props
+
 		const containerStyles = {
 			display: this.props.show ? 'block' : 'none',
 			top: this.props.posY,
@@ -38,41 +43,48 @@ export default class TransactionPopupMenu extends Component<Props> {
 				style={containerStyles}
 			>
 				<div
+          role="none"
 					className={styles.menuItem}
 					onClick={event => this.onMenuItemClicked(event, 'COPY_VALUE')}
 					onKeyDown={() => { }}
 				>
-					COPY VALUE
+          {t(`Copy value`)}
 				</div>
 				<div
+          role="none"
 					className={styles.menuItem}
 					onClick={event => this.onMenuItemClicked(event, 'EXPORT_DATA_TO_.CSV')}
 					onKeyDown={() => { }}
 				>
-					EXPORT DATA TO .CSV
+          {t(`Export data to .CSV`)}
 				</div>
 				<div
+          role="none"
 					className={styles.menuItem}
 					onClick={event => this.onMenuItemClicked(event, 'SHOW_DETAILS')}
 					onKeyDown={() => { }}
 				>
-					SHOW DETAILS
+          {t(`Show details`)}
 				</div>
 				<div
+          role="none"
 					className={styles.menuItem}
 					onClick={event => this.onMenuItemClicked(event, 'SHOW_IN_BLOCK_EXPLORER')}
 					onKeyDown={() => { }}
 				>
-					SHOW IN BLOCK EXPLORER
+          {t(`Show in Block Explorer`)}
 				</div>
 				<div
+          role="none"
 					className={[styles.menuItem, styles.lastMenuItem].join(' ')}
 					onClick={event => this.onMenuItemClicked(event, 'SHOW_TRANSACTION_MEMO')}
 					onKeyDown={() => { }}
 				>
-					SHOW TRANSACTION MEMO
+					Show transaction memo
 				</div>
 			</div>
 		)
 	}
 }
+
+export default translate('overview')(TransactionPopupMenu)

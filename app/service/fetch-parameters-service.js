@@ -1,12 +1,13 @@
 // @flow
-import * as fs from 'fs';
+import * as fs from 'fs'
 import path from 'path'
+import config from 'electron-settings'
 
+import { i18n } from '../i18next.config'
 import { app, dialog } from 'electron'
 import { download } from 'electron-dl'
 
 const crypto = require('crypto')
-const config = require('electron-settings')
 const ProgressBar = require('electron-progressbar')
 
 const quickHashesConfigKey = 'resistanceParameters.quickHashes'
@@ -43,7 +44,12 @@ export class FetchParametersService {
 	 * @memberof FetchParametersService
 	 */
 	constructor() {
-		if (!instance) { instance = this }
+    if (!instance) {
+      instance = this
+    }
+
+    instance.t = i18n.getFixedT(null, 'service')
+
 		return instance
 	}
 
@@ -65,6 +71,7 @@ export class FetchParametersService {
     const quickHashes = config.get(quickHashesConfigKey, {})
 
     const verifySproutFile = async (fileName, index) => {
+      console.log(`Sprout file ${fileName} verification . . .`)
       if (!quickHashes[fileName]) {
         console.log(`Quick hash not found for ${fileName}, calculating SHA256 checksum...`)
         await this.verifyChecksum(fileName, sproutFiles[index].checksum)
@@ -79,7 +86,7 @@ export class FetchParametersService {
       return true
     }
 
-    for (let index = 0; index < sproutFiles.length; index++) {
+    for (let index = 0; index < sproutFiles.length; index += 1) {
       const fileName = sproutFiles[index].name
       let isVerified = false
 
@@ -113,7 +120,7 @@ export class FetchParametersService {
       fs.mkdirSync(resistanceParamsFolder)
     }
 
-    for (let index = 0; index < sproutFiles.length; index++) {
+    for (let index = 0; index < sproutFiles.length; index += 1) {
       this.progressBar = this.createProgressBar()
 
       const fileName = sproutFiles[index].name
@@ -127,13 +134,13 @@ export class FetchParametersService {
         /* eslint-disable no-await-in-loop */
 
         await this.downloadSproutKey(fileName, index)
-        this.progressBar.detail = `Calculating checksum for ${fileName}...`
+        this.progressBar.detail = this.t(`Calculating checksum for ${fileName}...`, { fileName })
         await this.verifyChecksum(fileName, sproutFiles[index].checksum)
         await this.saveQuickFileHash(fileName)
 
         /* eslint-enable no-await-in-loop */
       } catch(err) {
-        dialog.showErrorBox(`Unable to fetch Resistance parameters`, err.toString())
+        dialog.showErrorBox(this.t(`Unable to fetch Resistance parameters`), err.toString())
         app.quit()
         break
       }
@@ -151,8 +158,8 @@ export class FetchParametersService {
     const progressBar = new ProgressBar({
       indeterminate: false,
       closeOnComplete: false,
-      text: `Fetching Resistance parameters...`,
-      detail: `This will take awhile, but it's just a one time operation :)`,
+      text: this.t(`Fetching Resistance parameters...`),
+      detail: this.t(`This will take awhile, but it's just a one time operation :)`),
       browserWindow: {
         parent: this.parentWindow
       }
@@ -165,17 +172,24 @@ export class FetchParametersService {
 
     const onProgress = progress => {
       const rate = progress * 100
-      const roundedRate = Math.round(rate)
+      const roundedRate = Math.round(rate)  
       const totalMb = (totalBytes / 1024 / 1024).toFixed(2)
       const receivedMb = (progress  * totalMb).toFixed(2)
       this.progressBar.value = rate
-      this.progressBar.detail = `Downloading ${fileName}, received ${receivedMb}MB out of ${totalMb}MB (${roundedRate}%)...`
+
+      const detailMessageKey = `Downloading ${fileName}, received ${receivedMb}MB out of ${totalMb}MB (${roundedRate}%)...`
+      this.progressBar.detail = this.t(detailMessageKey, { fileName, receivedMb, totalMb, roundedRate })
     }
 
     const onStarted = item => {
       totalBytes = item.getTotalBytes()
       this.progressBar.value = 0
-      this.progressBar.text = `Fetching Resistance parameters (file ${index + 1} of ${sproutFiles.length})...`
+      //const textKey = `Fetching Resistance parameters (file ${fileIndex} of ${filesNumber})...`
+      const textKey = `Fetching Resistance parameters files ...`
+      this.progressBar.text = this.t(textKey, {
+        index: index + 1,
+        filesNumber: sproutFiles.length
+      })
     }
 
     const downloadPromise = download(this.parentWindow, `${sproutUrl}/${fileName}`, {

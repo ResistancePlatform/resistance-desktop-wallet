@@ -25,7 +25,11 @@ export const OwnAddressesActions = createActions(
     GOT_OWN_ADDRESSES: (addresses: AddressRow[]) => ({ addresses }),
     GET_OWN_ADDRESSES_FAILURE:  (errorMessage: string) => ({ errorMessage }),
 
-    CREATE_NEW_ADDRESS: (isPrivate: boolean) => ({ isPrivate }),
+    CREATE_ADDRESS: (isPrivate: boolean) => ({ isPrivate }),
+    INITIATE_PRIVATE_KEYS_EXPORT: undefined,
+    EXPORT_PRIVATE_KEYS: filePath => ({filePath}),
+    INITIATE_PRIVATE_KEYS_IMPORT: undefined,
+    IMPORT_PRIVATE_KEYS: filePath => ({filePath}),
 
     MERGE_ALL_MINED_COINS: (zAddress: string) => ({ zAddress }),
     MERGE_ALL_R_ADDRESS_COINS: (zAddress: string) => ({ zAddress }),
@@ -33,9 +37,7 @@ export const OwnAddressesActions = createActions(
     MERGE_ALL_COINS: (zAddress: string) => ({ zAddress }),
 
     MERGE_COINS_OPERATION_STARTED: (operationId: string) => ({ operationId }),
-    MERGE_COINS_FAILURE: errorMessage => ({ errorMessage }),
-
-    UPDATE_DROPDOWN_MENU_VISIBILITY: (show: boolean) => ({ show })
+    MERGE_COINS_FAILURE: errorMessage => ({ errorMessage })
   },
   {
     prefix: 'APP/OWN_ADDRESSES'
@@ -43,7 +45,9 @@ export const OwnAddressesActions = createActions(
 )
 
 function getFrozenAddresses(state, action, rule: (address: AddressRow) => boolean) {
-  return state.addresses.reduce((frozenAddresses, address) => {
+  return state.addresses.reduce((accumulator, address) => {
+    const frozenAddresses = {...accumulator}
+
     if (rule(address) || address.address === action.payload.zAddress) {
       // Save initial balance for it to stay during the 'merge' operation
       frozenAddresses[address.address] = address.balance
@@ -83,7 +87,4 @@ export const OwnAddressesReducer = handleActions(
         ? { ...state, frozenAddresses: {} }
         : state
     ),
-    [OwnAddressesActions.updateDropdownMenuVisibility]: (state, action) => ({
-      ...state, showDropdownMenu: action.payload.show
-    })
   }, preloadedState)

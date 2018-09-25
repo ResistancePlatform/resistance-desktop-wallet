@@ -5,9 +5,11 @@ import { Observable, merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
+import { i18n } from '~/i18next.config'
 import { AddressBookActions } from './address-book.reducer'
-import { AddressBookService } from '../../../service/address-book-service'
+import { AddressBookService } from '~/service/address-book-service'
 
+const t = i18n.getFixedT(null, 'address-book')
 const addressBook = new AddressBookService()
 
 const loadAddressBookEpic = (action$: ActionsObservable<any>) => action$.pipe(
@@ -19,7 +21,7 @@ const loadAddressBookEpic = (action$: ActionsObservable<any>) => action$.pipe(
 const addAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(AddressBookActions.newAddressDialog.addAddress),
   mergeMap(() => {
-    const newAddressRecord = state$.value.addressBook.newAddressDialog.fields
+    const newAddressRecord = state$.value.roundedForm.addressBookNewAddressDialog.fields
     return addressBook.addAddress(newAddressRecord).pipe(
       mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.close())),
       catchError(err => of(AddressBookActions.newAddressDialog.error(err.toString())))
@@ -31,7 +33,8 @@ const updateAddressEpic = (action$: ActionsObservable<any>, state$) => action$.p
 	ofType(AddressBookActions.newAddressDialog.updateAddress),
   mergeMap(() => {
     const dialogState = state$.value.addressBook.newAddressDialog
-    return addressBook.updateAddress(dialogState.originalName, dialogState.fields).pipe(
+    const addressRecord = state$.value.roundedForm.addressBookNewAddressDialog.fields
+    return addressBook.updateAddress(dialogState.originalName, addressRecord).pipe(
       mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.close())),
       catchError(err => of(AddressBookActions.newAddressDialog.error(err.toString())))
     )
@@ -58,7 +61,8 @@ const confirmAddressRemovalEpic = (action$: ActionsObservable<any>) => action$.p
           observer.complete()
         }
       }
-      toastr.confirm(`Are you sure want to remove the address for "${action.payload.record.name}"?`, confirmOptions)
+      const confirmKey = `Are you sure want to remove the address for "{{addressName}}"?`
+      toastr.confirm(t(confirmKey, { addressName: action.payload.record.name }), confirmOptions)
     })
   )),
   mergeAll()

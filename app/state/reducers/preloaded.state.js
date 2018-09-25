@@ -1,9 +1,26 @@
+import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
 
-const config = require('electron-settings')
-
-
 export const preloadedState: State = {
+  auth: {
+    reason: null,
+    enter: true,
+    isLoginRequired: true
+  },
+  roundedForm: {},
+  getStarted: {
+    createNewWallet: {
+      wallet: null
+    },
+    welcome: {
+      hint: null,
+      status: null,
+      isBootstrapping: false,
+      isReadyToUse: false
+    },
+    isCreatingNewWallet: true,
+    isInProgress: true
+  },
   rpcPolling: {
     registeredActions: [],
     actionsResponseReceived: {}
@@ -53,7 +70,7 @@ export const preloadedState: State = {
 	sendCash: {
 		isPrivateTransactions: false,
 		lockIcon: 'Unlock',
-		lockTips: 'You are sending money from a Transparent (R) Address to a Transparent (R) Address. This transaction will be fully transparent and visible to every user.',
+		lockTips: null,
 		fromAddress: '',
 		toAddress: '',
 		inputTooltips: '',
@@ -72,20 +89,25 @@ export const preloadedState: State = {
 			NODE: 'NOT RUNNING',
 			MINER: 'NOT RUNNING',
 			TOR: 'NOT RUNNING'
-		}
+    },
+    language: 'en'
 	},
 	addressBook: {
 		records: [],
     newAddressDialog: {
-      fields: {},
-      validationErrors: {},
+      defaultValues: {},
       isVisible: false
     }
 	}
 }
 
 // Load serialized settings
+Object.assign(preloadedState.getStarted, {
+	isInProgress: config.get('getStartedInProgress', true)
+})
+
 Object.assign(preloadedState.settings, {
 	isMinerEnabled: config.get('manageDaemon.enableMiner', true),
-	isTorEnabled: config.get('manageDaemon.enableTor', false)
+	isTorEnabled: config.get('manageDaemon.enableTor', false),
+	language: config.get('language', 'en')
 })

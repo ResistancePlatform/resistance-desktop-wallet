@@ -25,6 +25,18 @@ npm run dev
 ```
 <hr><br>
 
+## Internationalization
+Is done using [i18next](https://www.i18next.com/) package, the configuration is stored in `./app/i18next.config.js`.
+Every string displayed to the user should be wrapped with the translation function. Check [i18next documentation](https://www.i18next.com/) for
+more details.
+
+Generate locales with the following command:
+
+```bash
+$ yarn i18n
+```
+Locales are poured into the `./locales` directory.
+<hr><br>
 
 ## Packaging
 

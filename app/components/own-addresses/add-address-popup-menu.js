@@ -1,15 +1,17 @@
 // @flow
 import React, { Component } from 'react'
+import { translate } from 'react-i18next'
 import styles from './add-address-popup-menu.scss'
 
 type Props = {
+  t: any,
 	onAddNewTransparentAddressHandler: () => void,
 	onAddNewPrivateAddressHandler: () => void,
 	onImportPrivateKeyHandler: () => void,
 	onExportPrivateKeysHandler: () => void
 }
 
-export default class AddAddressPopupMenu extends Component<Props> {
+class AddAddressPopupMenu extends Component<Props> {
 	props: Props
 
 	eventConfirm(event) {
@@ -46,37 +48,44 @@ export default class AddAddressPopupMenu extends Component<Props> {
 	}
 
 	render() {
+    const { t } = this.props
+
 		return (
 			<div className={[styles.AddAddressPopupMenuContainer].join(' ')}>
 				<div
+          role="none"
 					className={styles.menuItem}
 					onClick={event => this.onAddNewTransparentAddressClicked(event)}
 					onKeyDown={event => this.onAddNewTransparentAddressClicked(event)}
 				>
-				NEW TRANSPARENT (R) ADDRESS
+          {t(`New transparent (R) address`)}
 				</div>
 				<div
+          role="none"
 					className={styles.menuItem}
 					onClick={event => this.onAddNewPrivateAddressClicked(event)}
 					onKeyDown={event => this.onAddNewPrivateAddressClicked(event)}
 				>
-				NEW PRIVATE (Z) ADDRESS
+          {t(`New private (Z) address`)}
 				</div>
 				<div
+          role="none"
 					className={styles.menuItem}
 					onClick={event => this.onImportPrivateKeyClicked(event)}
 					onKeyDown={event => this.onImportPrivateKeyClicked(event)}
 				>
-				IMPORT PRIVATE KEY
+          {t(`Import private key`)}
 				</div>
 				<div
+          role="none"
 					className={[styles.menuItem, styles.lastMenuItem].join(' ')}
 					onClick={event => this.onExportPrivateKeysClicked(event)}
 					onKeyDown={event => this.onExportPrivateKeysClicked(event)}
 				>
-				EXPORT PRIVATE KEYS
+          {t(`Export private keys`)}
 				</div>
 			</div>
 		)
 	}
 }
+export default translate('own-addresses')(AddAddressPopupMenu)

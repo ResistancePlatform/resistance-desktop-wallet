@@ -1,25 +1,31 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { toastr } from 'react-redux-toastr'
+import { translate } from 'react-i18next'
 
-import RpcPolling from '../../components/rpc-polling/rpc-polling'
-import { PopupMenuActions } from '../../state/reducers/popup-menu/popup-menu.reducer'
-import { OwnAddressesActions, OwnAddressesState } from '../../state/reducers/own-addresses/own-addresses.reducer'
-import { appStore } from '../../state/store/configureStore'
-import OwnAddressList from '../../components/own-addresses/own-address-list'
-import { PopupMenu, PopupMenuItem } from '../../components/popup-menu'
-import AddAddressPopupMenu from '../../components/own-addresses/add-address-popup-menu'
+import RpcPolling from '~/components/rpc-polling/rpc-polling'
+import OwnAddressList from '~/components/own-addresses/own-address-list'
+import { PopupMenuActions } from '~/state/reducers/popup-menu/popup-menu.reducer'
+import { SettingsState } from '~/state/reducers/settings/settings.reducer'
+import { OwnAddressesActions, OwnAddressesState } from '~/state/reducers/own-addresses/own-addresses.reducer'
+import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 
 import styles from './own-addresses.scss'
-import HLayout from '../../theme/h-box-layout.scss'
-import VLayout from '../../theme/v-box-layout.scss'
+import HLayout from '~/theme/h-box-layout.scss'
+import VLayout from '~/theme/v-box-layout.scss'
 
 const pollingInterval = 5.0
 const addressRowPopupMenuId = 'own-addresses-address-row-popup-menu-id'
+const createAddressPopupMenuId = 'own-addresses-create-address-popup-menu-id'
 
 type Props = {
-	ownAddresses: OwnAddressesState
+  t: any,
+  settings: SettingsState,
+	ownAddresses: OwnAddressesState,
+  actions: object,
+  popupMenu: object
 }
 
 type State = {
@@ -44,74 +50,29 @@ class OwnAddresses extends Component<Props> {
     }
   }
 
-	eventConfirm(event) {
-		event.preventDefault()
-		event.stopPropagation()
-	}
-
-	commonMenuItemEventHandler(event) {
-		this.eventConfirm(event)
-		appStore.dispatch(OwnAddressesActions.updateDropdownMenuVisibility(false))
-	}
-
-	onShowPrivteKeyClicked(event) {
-		this.eventConfirm(event)
-	}
-
-	onAddNewAddressClicked(event) {
-		this.eventConfirm(event)
-		appStore.dispatch(OwnAddressesActions.updateDropdownMenuVisibility(true))
-	}
-
-	hideDropdownMenu(event) {
-		this.commonMenuItemEventHandler(event)
-	}
-
-	getDropdownMenuStyles() {
-		return this.props.ownAddresses && this.props.ownAddresses.showDropdownMenu ? 'block' : 'none'
-	}
-
-	onAddNewTransparentAddressHandler(event) {
-		this.commonMenuItemEventHandler(event)
-		appStore.dispatch(OwnAddressesActions.createNewAddress(false))
-	}
-
-	onAddNewPrivateAddressHandler(event) {
-		this.commonMenuItemEventHandler(event)
-		appStore.dispatch(OwnAddressesActions.createNewAddress(true))
-	}
-
-	onImportPrivateKeyHandler(event) {
-		this.commonMenuItemEventHandler(event)
-	}
-
-	onExportPrivateKeysHandler(event) {
-		this.commonMenuItemEventHandler(event)
-	}
-
   onAddressRowClicked(event, address) {
     this.setState({ isZAddressClicked: address.toLowerCase().startsWith('z')})
-    appStore.dispatch(PopupMenuActions.show(addressRowPopupMenuId, event.clientY, event.clientX, address))
+    this.props.popupMenu.show(addressRowPopupMenuId, address, event.clientY, event.clientX)
   }
 
-  mergeAllMinedCoinsClicked(event, address) {
-    const confirmOptions = { onOk: () => appStore.dispatch(OwnAddressesActions.mergeAllMinedCoins(address)) }
-    toastr.confirm(`Are you sure want to merge all the mined coins?`, confirmOptions)
+  mergeAllMinedCoinsClicked(event, address, t) {
+    const confirmOptions = { onOk: () => this.props.actions.mergeAllMinedCoins(address) }
+    toastr.confirm(t(`Are you sure want to merge all the mined coins?`), confirmOptions)
   }
 
-  mergeAllTransparentAddressCoinsClicked(event, address) {
-    const confirmOptions = { onOk: () => appStore.dispatch(OwnAddressesActions.mergeAllRAddressCoins(address)) }
-    toastr.confirm(`Are you sure want to merge all the transparent address coins?`, confirmOptions)
+  mergeAllTransparentAddressCoinsClicked(event, address, t) {
+    const confirmOptions = { onOk: () => this.props.actions.mergeAllRAddressCoins(address) }
+    toastr.confirm(t(`Are you sure want to merge all the transparent address coins?`), confirmOptions)
   }
 
-  mergeAllPrivateAddressCoinsClicked(event, address) {
-    const confirmOptions = { onOk: () => appStore.dispatch(OwnAddressesActions.mergeAllZAddressCoins(address)) }
-    toastr.confirm(`Are you sure want to merge all the private address coins?`, confirmOptions)
+  mergeAllPrivateAddressCoinsClicked(event, address, t) {
+    const confirmOptions = { onOk: () => this.props.actions.mergeAllZAddressCoins(address) }
+    toastr.confirm(t(`Are you sure want to merge all the private address coins?`), confirmOptions)
   }
 
-  mergeAllCoinsClicked(event, address) {
-    const confirmOptions = { onOk: () => appStore.dispatch(OwnAddressesActions.mergeAllCoins(address)) }
-    toastr.confirm(`Are you sure want to merge all the coins?`, confirmOptions)
+  mergeAllCoinsClicked(event, address, t) {
+    const confirmOptions = { onOk: () => this.props.actions.mergeAllCoins(address) }
+    toastr.confirm(t(`Are you sure want to merge all the coins?`), confirmOptions)
   }
 
 	/**
@@ -119,12 +80,13 @@ class OwnAddresses extends Component<Props> {
 	 * @memberof OwnAddresses
 	 */
 	render() {
+    const { t } = this.props
+
 		return (
 			// Layout container
 			<div
+        role="none"
 				className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}
-				onClick={(event) => this.hideDropdownMenu(event)}
-				onKeyDown={(event) => this.hideDropdownMenu(event)}
 			>
         <RpcPolling
           interval={pollingInterval}
@@ -142,48 +104,71 @@ class OwnAddresses extends Component<Props> {
 
 						{ /* Top bar */}
 						<div className={[styles.topBar, HLayout.hBoxContainer].join(' ')}>
-							<div className={styles.topBarTitle}>Own Addresses</div>
+
+							<div className={styles.topBarTitle}>{t(`Own Addresses`)}</div>
+
 							<div className={[styles.topBarButtonContainer, HLayout.hBoxChild].join(' ')}>
-								<button onClick={(event) => this.onShowPrivteKeyClicked(event)} onKeyDown={(event) => this.onShowPrivteKeyClicked(event)} > Show Private Key</button>
-								<div className={[styles.addAddressButtonContainer].join(' ')} onClick={(event) => this.onAddNewAddressClicked(event)} onKeyDown={(event) => this.onAddNewAddressClicked(event)} >
-                  <button type="button" className={styles.addNewAddressButton}>
-                    + Add New Address
+                <button
+                  type="button"
+                  onClick={() => false}
+                  onKeyDown={() => false}>
+                  {t(`Show private key`)}
+                </button>
+
+                <div role="none" className={styles.addAddressButtonContainer}>
+                  <button
+                    type="button"
+                    className={styles.addNewAddressButton}
+                    onClick={() => this.props.popupMenu.show(createAddressPopupMenuId)}
+                    onKeyDown={() => this.props.popupMenu.show(createAddressPopupMenuId)}
+                    disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
+                  >
+                    + {t(`Add new address`)}
 										<span className="icon-arrow-down" />
 									</button>
 
-									{ /* Dropdown menu container */}
-									<div className={styles.dropdownMenu} style={{ display: this.getDropdownMenuStyles() }}>
-										<AddAddressPopupMenu
-											onAddNewTransparentAddressHandler={(event) => this.onAddNewTransparentAddressHandler(event)}
-											onAddNewPrivateAddressHandler={(event) => this.onAddNewPrivateAddressHandler(event)}
-											onImportPrivateKeyHandler={(event) => this.onImportPrivateKeyHandler(event)}
-											onExportPrivateKeysHandler={(event) => this.onExportPrivateKeysHandler(event)}
-										/>
-									</div>
+                  <PopupMenu id={createAddressPopupMenuId} relative>
+                    <PopupMenuItem onClick={() => this.props.actions.createAddress(false)}>
+                      {t(`New transparent (R) address`)}
+                    </PopupMenuItem>
+                    <PopupMenuItem onClick={() => this.props.actions.createAddress(true)}>
+                      {t(`New private (Z) address`)}
+                    </PopupMenuItem>
+                    <PopupMenuItem onClick={this.props.actions.importPrivateKey}>
+                      {t(`Import private key`)}
+                    </PopupMenuItem>
+                    <PopupMenuItem onClick={this.props.actions.initiatePrivateKeysImport}>
+                      {t(`Import private keys form file`)}
+                    </PopupMenuItem>
+                    <PopupMenuItem onClick={this.props.actions.initiatePrivateKeysExport}>
+                      {t(`Export private keys`)}
+                    </PopupMenuItem>
+                  </PopupMenu>
+
 								</div>
 							</div>
 						</div>
 
             <OwnAddressList
-              addresses={this.props.ownAddresses.addresses}
+              items={this.props.ownAddresses.addresses}
               frozenAddresses={this.props.ownAddresses.frozenAddresses}
-              onAddressRowClicked={(e, address) => this.onAddressRowClicked(e, address)}
+              onRowClick={(e, address) => this.onAddressRowClicked(e, address)}
             />
 
             <PopupMenu id={addressRowPopupMenuId}>
               {this.state.isZAddressClicked &&
-                <PopupMenuItem onClick={(e, address) => this.mergeAllMinedCoinsClicked(e, address)}>
-                  Merge all mined coins here
+                <PopupMenuItem onClick={(e, address) => this.mergeAllMinedCoinsClicked(e, address, t)}>
+                  {t(`Merge all mined coins here`)}
                 </PopupMenuItem>
               }
-              <PopupMenuItem onClick={(e, address) => this.mergeAllTransparentAddressCoinsClicked(e, address)}>
-                Merge all transparent address coins here
+              <PopupMenuItem onClick={(e, address) => this.mergeAllTransparentAddressCoinsClicked(e, address, t)}>
+                {t(`Merge all transparent address coins here`)}
               </PopupMenuItem>
-              <PopupMenuItem onClick={(e, address) => this.mergeAllPrivateAddressCoinsClicked(e, address)}>
-                Merge all private address coins here
+              <PopupMenuItem onClick={(e, address) => this.mergeAllPrivateAddressCoinsClicked(e, address, t)}>
+                {t(`Merge all private address coins here`)}
               </PopupMenuItem>
-              <PopupMenuItem onClick={(e, address) => this.mergeAllCoinsClicked(e, address)}>
-                Merge all coins here
+              <PopupMenuItem onClick={(e, address) => this.mergeAllCoinsClicked(e, address, t)}>
+                {t(`Merge all coins here`)}
               </PopupMenuItem>
             </PopupMenu>
 
@@ -197,7 +182,13 @@ class OwnAddresses extends Component<Props> {
 
 
 const mapStateToProps = (state) => ({
+  settings: state.settings,
 	ownAddresses: state.ownAddresses
 })
 
-export default connect(mapStateToProps, null)(OwnAddresses)
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(OwnAddressesActions, dispatch),
+  popupMenu: bindActionCreators(PopupMenuActions, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(translate('own-addresses')(OwnAddresses))
