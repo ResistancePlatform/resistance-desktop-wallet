@@ -1,11 +1,12 @@
-@import "../../assets/styles/vars.scss";
-@import "../../assets/styles/generic-component.scss";
+@import "~/assets/styles/vars.scss";
+@import "~/assets/styles/generic-component.scss";
 
 $TOP_BAR_HEIGHT: 5rem;
 
 .AddressBookContainer {
     padding: 2rem;
     min-width: 30rem;
+    position: relative;
 }
 
 .topBar {

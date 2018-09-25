@@ -328,18 +328,17 @@ class Settings extends Component<Props> {
 
 						{/* Language */}
             <div className={styles.languageContainer}>
+              <PopupMenu id={languagePopupMenuId} relative>
+                {this.getLanguageMenuItems()}
+              </PopupMenu>
+
               <RoundedInput
                 name="language"
                 defaultValue={Iso6391.getNativeName(this.props.settings.language)}
                 label={t(`Language`)}
                 addon={languageDropdownAddon}
                 readOnly
-              >
-                {/* Dropdown menu container */}
-                <PopupMenu id={languagePopupMenuId} relative>
-                  {this.getLanguageMenuItems()}
-                </PopupMenu>
-              </RoundedInput>
+              />
             </div>
 
             <div className={cn(styles.sectionContainer, styles.walletPassword)}>

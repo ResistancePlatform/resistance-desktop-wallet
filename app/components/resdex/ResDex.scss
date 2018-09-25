@@ -29,8 +29,8 @@
 }
 
 .selectedTabPanel {
-  margin: 1.5rem 1.5rem 0rem 1.5rem;
   padding: 0;
+  margin: 0;
 }
 
 .resDexContainer {
@@ -44,7 +44,7 @@
   border-radius: 0.5rem;
   background: red;
   background: $BASE_COLOR_DARK_BLUE_3;
-  padding: 1.8rem;
+  padding: 0;
 }
 
 %smallContainer {

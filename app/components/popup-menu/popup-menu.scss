@@ -1,4 +1,4 @@
-@import "../../assets/styles/vars.scss";
+@import "~/assets/styles/vars.scss";
 
 .container {
   position: absolute;
@@ -6,12 +6,13 @@
   text-align: left;
   white-space: nowrap;
   z-index: 1000;
-  top: 0.2rem;
-  left: calc(100% - 13.2rem);
+  left: 100%;
+  top: 2.2rem;
+  transform: translateX(-100%);
 }
 
 .menu {
-  position: absolute;
+  position: relative;
 
   padding: 0.3rem 1.3rem;
   min-width: $POPUP_MENU_CONTAINER_WIDTH;

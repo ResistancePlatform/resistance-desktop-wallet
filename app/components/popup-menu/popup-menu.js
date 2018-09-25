@@ -83,13 +83,11 @@ class PopupMenu extends Component<Props> {
 			display: props.isVisible ? 'block' : 'none'
 		}
 
-    if (this.props.relative) {
-      containerStyles.position = 'relative'
-    } else {
+    if (!this.props.relative) {
       Object.assign(containerStyles, {
-        position: 'absolute',
         top: props.top,
-        left: props.left
+        left: props.left,
+        transform: 'none'
       })
     }
 

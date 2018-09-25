@@ -116,17 +116,6 @@ class OwnAddresses extends Component<Props> {
                 </button>
 
                 <div role="none" className={styles.addAddressButtonContainer}>
-                  <button
-                    type="button"
-                    className={styles.addNewAddressButton}
-                    onClick={() => this.props.popupMenu.show(createAddressPopupMenuId)}
-                    onKeyDown={() => this.props.popupMenu.show(createAddressPopupMenuId)}
-                    disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
-                  >
-                    + {t(`Add new address`)}
-										<span className="icon-arrow-down" />
-									</button>
-
                   <PopupMenu id={createAddressPopupMenuId} relative>
                     <PopupMenuItem onClick={() => this.props.actions.createAddress(false)}>
                       {t(`New transparent (R) address`)}
@@ -144,6 +133,17 @@ class OwnAddresses extends Component<Props> {
                       {t(`Export private keys`)}
                     </PopupMenuItem>
                   </PopupMenu>
+
+                  <button
+                    type="button"
+                    className={styles.addNewAddressButton}
+                    onClick={() => this.props.popupMenu.show(createAddressPopupMenuId)}
+                    onKeyDown={() => this.props.popupMenu.show(createAddressPopupMenuId)}
+                    disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
+                  >
+                    + {t(`Add new address`)}
+										<span className="icon-arrow-down" />
+									</button>
 
 								</div>
 							</div>

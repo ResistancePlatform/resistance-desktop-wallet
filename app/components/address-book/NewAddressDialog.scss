@@ -1,9 +1,10 @@
-@import "../../assets/styles/vars.scss";
+@import "~/assets/styles/vars.scss";
 
 .newAddressContainer {
     position: absolute;
     top: 10rem;
-    left: calc(14.6rem + ((100% - 30rem - 20rem) / 2));
+    left: 50%;
+    transform: translateX(-50%);
 
     width: 30rem;
 

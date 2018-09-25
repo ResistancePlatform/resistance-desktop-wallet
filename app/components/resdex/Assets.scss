@@ -1,15 +1,72 @@
 @import "~/assets/styles/vars.scss";
 @import "./ResDex.scss";
 
+:global {
+  @import "./node_modules/react-vis/dist/style";
+}
+
 .container {
-  @extend %largeContainer;
+}
+
+.top {
+  margin: 1.8rem 2.8rem;
+  margin-right: 1.5rem;
+  position: relative;
+}
+
+.summary {
+  display: flex;
+
+  div {
+    color: $BASE_COLOR_FONT_GRAY;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    border-right: 1px solid $BASE_COLOR_BORDER_GRAY;
+    padding-right: 2rem;
+
+    span {
+      padding-top: 0.2rem;
+      display: block;
+      color: $BASE_COLOR_WHITE;
+      font-weight: 300;
+      font-size: 2rem;
+
+      sup {
+        font-size: 1.2rem;
+      }
+
+      sub {
+        vertical-align: baseline;
+        font-size: 1.2rem;
+      }
+
+      i {
+        display: inline-block;
+        position: relative;
+        color: $BASE_COLOR_LIGHT_GREEN;
+        font-style: normal;
+        font-size: 1.2rem;
+        top: -0.3rem;
+      }
+    }
+  }
+
+  div:last-child {
+    border: none;
+    margin-left: 1.8rem;
+  }
 }
 
 .period {
   $bulletDiameter: 1.5rem;
-
   user-select: none;
   float: right;
+  margin: 0;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  transform: translateX(-100%);
+  white-space: nowrap;
 
   li {
     cursor: default;
@@ -28,6 +85,71 @@
       color: $BASE_COLOR_WHITE;
       background: $BASE_COLOR_PURPLE;
       border-radius: 50%;
+    }
+  }
+}
+
+.chart {
+  max-width: 100% !important;
+  min-width: 100% !important;
+}
+
+.coins {
+  display: flex;
+  margin: 0 1.5rem;
+
+  .coin {
+    @extend %smallContainer;
+    text-align: center;
+    position: relative;
+    padding-top: 1rem;
+    font-size: 0.7rem;
+    margin-right: 1.25rem;
+
+    img {
+      position: absolute;
+      width: 1.6rem;
+      padding: 0.25rem;
+      background: $BASE_COLOR_WHITE;
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .amount {
+      color: $BASE_COLOR_FONT_GRAY;
+      font-size: 0.6rem;
+      padding: 0.2rem;
+    }
+
+    .equity {
+      font-size: 1.4rem;
+
+      sub {
+        font-size: 0.9rem;
+        vertical-align: baseline;
+      }
+
+      margin-bottom: 0.8rem;
+    }
+
+    .buttons {
+      display: flex;
+      border-top: 1px solid $BASE_COLOR_BORDER_GRAY;
+
+      button {
+        width: 50%;
+        border-radius: 0;
+        background: transparent;
+        font-size: 0.55rem;
+        padding: 0.6rem;
+        border: none;
+        color: $BASE_COLOR_PURPLE;
+      }
+
+      button:first-child {
+        border-right: 1px solid $BASE_COLOR_BORDER_GRAY;
+      }
     }
   }
 }
