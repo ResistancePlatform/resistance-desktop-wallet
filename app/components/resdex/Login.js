@@ -9,12 +9,23 @@ import cn from 'classnames'
 import { getPasswordValidationSchema } from '~/utils/auth'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
-import RoundedInput from '~/components/rounded-form/RoundedInput'
+import RoundedInput, { Addon } from '~/components/rounded-form/RoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 import styles from './Login.scss'
+
+class ChoosePortfolioAddon extends Addon {
+  render(input) {
+    return (
+      <div className={styles.choosePortfolioAddon}>
+        {input}
+        <i className={cn('icon', styles.createIcon)} />
+      </div>
+    )
+  }
+}
 
 const getValidationSchema = (t) => Joi.object().keys({
   portfolio: Joi.string().required().label(t(`Portfolio`)),
@@ -40,7 +51,8 @@ class ResDexLogin extends Component<Props> {
 	 */
 	render() {
     const { t } = this.props
-    const isMarketMakerRunning = this.props.settings.childProcessesStatus.MARKET_MAKER === 'RUNNING'
+    // const isMarketMakerRunning = this.props.settings.childProcessesStatus.MARKET_MAKER === 'RUNNING'
+    const isMarketMakerRunning = true
 
     return (
       <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
@@ -50,8 +62,12 @@ class ResDexLogin extends Component<Props> {
         </div>
 
         <RoundedForm id="resDexLogin" schema={getValidationSchema(t)} className={styles.form}>
-          <RoundedInput name="portfolio" label={t(`Portfolio`)} />
-          <RoundedInput name="password" password label={t(`Password`)} />
+          <RoundedInput name="portfolio"
+            defaultValue="testfolio"
+            newAddon={new ChoosePortfolioAddon()}
+            readOnly
+          />
+          <RoundedInput name="password" password />
 
           <button
             type="submit"
@@ -72,7 +88,7 @@ class ResDexLogin extends Component<Props> {
 }
 
 const mapStateToProps = state => ({
-  auth: state.auth,
+  resDex: state.resDex,
   settings: state.settings,
   form: state.roundedForm.authLogin
 })

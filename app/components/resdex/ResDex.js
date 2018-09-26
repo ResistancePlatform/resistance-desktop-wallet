@@ -15,7 +15,7 @@ import VLayout from '~/assets/styles/v-box-layout.scss'
 import styles from './ResDex.scss'
 
 type Props = {
-  resdex: ResDexState
+  resDex: ResDexState
 }
 
 
@@ -62,7 +62,7 @@ export class ResDex extends Component<Props> {
       <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.resDexContainer)}>
         <div className={styles.dragBar} />
 
-        {this.props.resdex.isLoginRequired
+        {this.props.resDex.isLoginRequired
           ?  <ResDexLogin />
           : this.getTabs()
         }
