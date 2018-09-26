@@ -6,6 +6,14 @@
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
+
+  a {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: $BASE_COLOR_PURPLE;
+    cursor: pointer;
+  }
+
 }
 
 .header {
@@ -30,13 +38,6 @@
     padding-right: 3rem;
   }
   margin-bottom: 1.8rem;
-}
-
-a {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  color: $BASE_COLOR_PURPLE;
-  cursor: pointer;
 }
 
 .choosePortfolioAddon {
