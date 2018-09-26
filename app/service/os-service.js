@@ -1,10 +1,9 @@
 // @flow
+/* eslint-disable global-require */
 import * as fs from 'fs';
 import path from 'path'
 import { spawn } from 'child_process'
 import { app, remote } from 'electron'
-
-import { translate } from '../i18next.config'
 
 /**
  * ES6 singleton
@@ -35,8 +34,6 @@ export class OSService {
     if (!instance) {
       instance = this
     }
-
-    instance.t = translate('service')
 
     // Create a global var to store child processes information for the cleanup
     if (process.type === 'browser' && global.childProcesses === undefined) {
@@ -141,6 +138,17 @@ export class OSService {
 	 * @returns {string}
 	 */
 	getBinariesPath() {
+		const resourcesPath = this.getResourcesPath()
+		return path.join(resourcesPath, 'bin', this.getOS())
+	}
+
+	/**
+   * Returns correct resource path for both development and production environments.
+   *
+	 * @memberof OSService
+	 * @returns {string}
+	 */
+  getResourcesPath() {
 		let resourcesPath
 
 		if (/[\\/](Electron\.app|Electron|Electron\.exe)[\\/]/i.test(process.execPath)) {
@@ -149,8 +157,8 @@ export class OSService {
       ({ resourcesPath } = process)
 		}
 
-		return path.join(resourcesPath, 'bin', this.getOS())
-	}
+    return resourcesPath
+  }
 
 	/**
 	 * @memberof OSService
@@ -258,8 +266,10 @@ export class OSService {
 
       childProcess.on('close', (code) => {
         if (!childProcessInfo.isGettingKilled) {
-          const errorKey =  `Process {{processName}} unexpectedly exited with code {{code}}.`
-          this.dispatchAction(actions.childProcessFailed(processName, this.t(errorKey, processName, code)))
+          // Avoid circular dependency
+          const t = require('../i18next.config').i18n.getFixedT(null, 'service')
+          const errorMessage =  t(`Process {{processName}} unexpectedly exited with code {{code}}.`, { processName, code })
+          this.dispatchAction(actions.childProcessFailed(processName, errorMessage))
         }
 
         childProcessInfo.isGettingKilled = false
