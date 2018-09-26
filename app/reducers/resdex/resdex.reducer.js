@@ -6,6 +6,7 @@ import { preloadedState } from '../preloaded.state'
 export type Order = {}
 
 export type ResDexState = {
+  isLoginRequired: boolean,
   assets: {
   },
   buySell: {
