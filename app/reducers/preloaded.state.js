@@ -100,7 +100,10 @@ export const preloadedState: State = {
     language: 'en'
 	},
   resDex: {
-    isLoginRequired: true,
+    login: {
+      isRequired: true,
+      portfolios: []
+    },
     assets: {
     },
     buySell: {

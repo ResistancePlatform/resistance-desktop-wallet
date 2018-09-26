@@ -5,8 +5,17 @@ import { preloadedState } from '../preloaded.state'
 
 export type Order = {}
 
+export type Portfolio = {
+  name: string,
+  encryptedSeedPhrase: string,
+  appVersion: string
+}
+
 export type ResDexState = {
-  isLoginRequired: boolean,
+  login: {
+    isRequired: boolean,
+    portfolios: { [string]: Portfolio}
+  },
   assets: {
   },
   buySell: {
@@ -22,9 +31,7 @@ export type ResDexState = {
 export const ResDexActions = createActions(
   {
     EMPTY: undefined,
-    ORDERS: {
-      EMPTY: undefined
-    }
+    LOGIN: (portfolio: string, password: string) => ({ portfolio, password })
   },
   {
     prefix: 'APP/RESDEX'
