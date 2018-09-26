@@ -21,7 +21,7 @@ function getEnsureLoginObservable(reason: string | null, next: Observable, actio
 function getPasswordValidationSchema() {
   const schema = (
     Joi.string().required()
-    .regex(/^[a-zA-Z0-9]{8,30}$/)
+    .regex(/^[a-zA-Z0-9]{4,32}$/)
     .error(() => t(`should contain Latin letters, numbers and special characters`))
     .label(t(`Password`))
   )

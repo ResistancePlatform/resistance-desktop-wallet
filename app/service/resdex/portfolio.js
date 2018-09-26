@@ -1,11 +1,16 @@
 // @flow
 import path from 'path'
-import { app } from 'electron'
+import { remote } from 'electron'
+import dir from 'node-dir'
 import { createSession } from 'iocane'
 import slugify from '@sindresorhus/slugify'
 import randomString from 'crypto-random-string'
 import writeJsonFile from 'write-json-file'
+import loadJsonFile from 'load-json-file'
 
+import { translate } from '~/i18next.config'
+
+const t = translate('resdex')
 
 const iocane = (
   createSession()
@@ -13,10 +18,19 @@ const iocane = (
     .setDerivationRounds(300000)
 )
 
-const portfolioPath = path.join(app.getPath('userData'), 'portfolios');
-const idToFileName = id => `resdex-portfolio-${id}.json`;
+const portfolioPath = path.join(remote.app.getPath('userData'), 'portfolios')
+
+const fileNameToId = fileName => fileName.replace(/^resdex-portfolio-/, '').replace(/\.json$/, '')
+const idToFileName = id => `resdex-portfolio-${id}.json`
 const generateId = name => `${slugify(name).slice(0, 40)}-${randomString(6)}`
 
+
+class IncorrectPasswordError extends Error {
+	constructor() {
+		super(t(`Incorrect password`))
+		Error.captureStackTrace(this, IncorrectPasswordError)
+	}
+}
 
 /**
  * ES6 singleton
@@ -56,16 +70,43 @@ export class ResDexPortfolioService {
     return id
   }
 
-}
+  async getPortfolios(): Portfolio[] {
+    let portfolioFiles
 
-// async function decryptSeedPhrase(seedPhrase, password) {
-// 	try {
-// 		return await decrypt(seedPhrase, password);
-// 	} catch (error) {
-// 		if (/Authentication failed/.test(error.message)) {
-// 			throw new IncorrectPasswordError()
-// 		}
-//
-// 		throw error
-// 	}
-// }
+    try {
+      portfolioFiles = await dir.promiseFiles(portfolioPath)
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        return []
+      }
+
+      throw error
+    }
+
+    const extension = '.json'
+    portfolioFiles = portfolioFiles.filter(x => x.endsWith(extension))
+
+    const portfolios = await Promise.all(portfolioFiles.map(async filePath => {
+      const portfolio = await loadJsonFile(filePath)
+      portfolio.fileName  = path.basename(filePath, extension)
+      portfolio.id = fileNameToId(portfolio.fileName)
+
+      return portfolio
+    }))
+
+    return portfolios.sort((a, b) => a.fileName.localeCompare(b.fileName))
+  }
+
+  async decryptSeedPhrase(seedPhrase: string, password: string) {
+    try {
+      return await iocane.decrypt(seedPhrase, password)
+    } catch (error) {
+      if (/Authentication failed/.test(error.message)) {
+        throw new IncorrectPasswordError()
+      }
+
+      throw error
+    }
+  }
+
+}

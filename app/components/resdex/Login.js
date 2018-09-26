@@ -8,7 +8,7 @@ import cn from 'classnames'
 
 import { getPasswordValidationSchema } from '~/utils/auth'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
-import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
+import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 import RoundedInput, { Addon } from '~/components/rounded-form/RoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
@@ -21,14 +21,20 @@ class ChoosePortfolioAddon extends Addon {
     return (
       <div className={styles.choosePortfolioAddon}>
         {input}
-        <i className={cn('icon', styles.createIcon)} />
+        <i
+          role="button"
+          tabIndex={0}
+          className={cn('icon', styles.createIcon)}
+          // onClick={this.props.actions.createPortfolio}
+          onKeyDown={() => false}
+        />
       </div>
     )
   }
 }
 
 const getValidationSchema = (t) => Joi.object().keys({
-  portfolio: Joi.string().required().label(t(`Portfolio`)),
+  portfolioId: Joi.string().required().label(t(`Portfolio`)),
   password: getPasswordValidationSchema(),
 })
 
@@ -44,6 +50,13 @@ type Props = {
  */
 class ResDexLogin extends Component<Props> {
 	props: Props
+
+	/**
+	 * @memberof ResDexLogin
+	 */
+	componentDidMount() {
+    this.props.actions.getPortfolios()
+  }
 
 	/**
 	 * @returns
@@ -62,7 +75,7 @@ class ResDexLogin extends Component<Props> {
         </div>
 
         <RoundedForm id="resDexLogin" schema={getValidationSchema(t)} className={styles.form}>
-          <RoundedInput name="portfolio"
+          <RoundedInput name="portfolioId"
             defaultValue="testfolio"
             newAddon={new ChoosePortfolioAddon()}
             readOnly
@@ -79,7 +92,11 @@ class ResDexLogin extends Component<Props> {
           </button>
         </RoundedForm>
 
-        <a>{t(`Forgot password`)}</a>
+        <a role="button"
+          tabIndex={0}
+          onClick={this.props.actions.forgotPassword}
+          onKeyDown={ () => false }
+        >{t(`Forgot password`)}</a>
 
       </div>
     )
@@ -94,7 +111,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(ResDexActions, dispatch)
+  actions: bindActionCreators(ResDexLoginActions, dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexLogin))

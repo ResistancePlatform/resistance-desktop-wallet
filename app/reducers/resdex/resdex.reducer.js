@@ -1,7 +1,9 @@
 // @flow
-import { createActions, handleActions } from 'redux-actions'
+import { createActions } from 'redux-actions'
+import { combineReducers } from 'redux'
 
-import { preloadedState } from '../preloaded.state'
+import { preloadedState } from '~/reducers/preloaded.state'
+import { ResDexLoginActions, ResDexLoginReducer } from './login/reducer'
 
 export type Order = {}
 
@@ -14,7 +16,7 @@ export type Portfolio = {
 export type ResDexState = {
   login: {
     isRequired: boolean,
-    portfolios: { [string]: Portfolio}
+    portfolios: Portfolio[]
   },
   assets: {
   },
@@ -31,13 +33,16 @@ export type ResDexState = {
 export const ResDexActions = createActions(
   {
     EMPTY: undefined,
-    LOGIN: (portfolio: string, password: string) => ({ portfolio, password })
   },
   {
     prefix: 'APP/RESDEX'
   }
 )
 
-export const ResDexReducer = handleActions(
-  {
-  }, preloadedState)
+export const ResDexReducer = combineReducers({
+  login: ResDexLoginReducer,
+  assets: (arg1, arg2) => arg2,
+  buySell: (arg1, arg2) => arg2,
+  orders: (arg1, arg2) => preloadedState.resDex.orders,
+  accounts: (arg1, arg2) => arg2,
+})

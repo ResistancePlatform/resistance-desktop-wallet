@@ -34,5 +34,11 @@
   "Add new coin": "Add new coin",
   "Sent {{name}}": "Sent {{name}}",
   "To {{name}} address": "To {{name}} address",
-  "Read more:": "Read more:"
+  "Read more:": "Read more:",
+  "Withdraw": "Withdraw",
+  "Deposit": "Deposit",
+  "Portfolio": "Portfolio",
+  "Login": "Login",
+  "Waiting for the ResDEX daemon...": "Waiting for the ResDEX daemon...",
+  "Forgot password": "Forgot password"
 }

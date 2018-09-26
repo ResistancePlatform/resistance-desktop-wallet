@@ -33,5 +33,11 @@
   "Open orders": "Open orders",
   "No open orders to display.": "No open orders to display.",
   "Swap history": "Swap history",
-  "No completed orders to display.": "No completed orders to display."
+  "No completed orders to display.": "No completed orders to display.",
+  "Withdraw": "Withdraw",
+  "Deposit": "Deposit",
+  "Portfolio": "Portfolio",
+  "Login": "Login",
+  "Waiting for the ResDEX daemon...": "Waiting for the ResDEX daemon...",
+  "Forgot password": "Forgot password"
 }

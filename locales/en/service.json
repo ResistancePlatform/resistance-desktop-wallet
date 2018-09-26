@@ -17,5 +17,6 @@
   "Z-addresses are 95 characters long, not {{length}}": "Z-addresses are 95 characters long, not {{length}}",
   "is not a valid Resistance address": "is not a valid Resistance address",
   "Address already exists in the database.": "Address already exists in the database.",
-  "Address not found in the database.": "Address not found in the database."
+  "Address not found in the database.": "Address not found in the database.",
+  "Incorrect password": "Incorrect password"
 }
