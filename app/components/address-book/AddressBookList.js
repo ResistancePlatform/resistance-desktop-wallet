@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import { translate } from 'react-i18next'
 
-import { AddressBookRecord } from '~/state/reducers/address-book/address-book.reducer'
+import { AddressBookRecord } from '~/reducers/address-book/address-book.reducer'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 
 type Props = {

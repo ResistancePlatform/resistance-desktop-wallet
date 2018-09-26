@@ -1,9 +1,8 @@
-@import "../../theme/vars.scss";
-@import "../../theme/generic-component.scss";
+@import "../../assets/styles/vars.scss";
+@import "../../assets/styles/generic-component.scss";
 
 .sendCashContainer {
     padding: 3rem 2rem;
-
     min-width: 30rem;
 }
 
@@ -41,8 +40,6 @@
 
 .fromAddressContainer {
     position: relative;
-    margin-bottom: 1rem;
-
     font-size: 0.7rem;
     font-weight: 300;
 
@@ -137,22 +134,22 @@
 }
 
 .amountContainer {
-    .transactionFeeContainer {
-        display: inline-block;
+  .transactionFeeContainer {
+    display: inline-block;
 
-        font-weight: 300;
-        font-size: 0.6rem;
+    font-weight: 300;
+    font-size: 0.6rem;
 
-        color: $BASE_COLOR_BUTTON_FONT_GRAY;
+    color: $BASE_COLOR_BUTTON_FONT_GRAY;
 
-        span {
-            margin-right: 0.5rem;
-        }
-
-        .part2 {
-            font-weight: 500;
-        }
+    span {
+      margin-right: 0.5rem;
     }
+
+    .part2 {
+      font-weight: 500;
+    }
+  }
 }
 
 // Overwrite the CSS for the <RoundedInput> --> <input> --> <span> left

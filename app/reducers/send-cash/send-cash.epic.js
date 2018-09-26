@@ -4,12 +4,12 @@ import { merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
-import { TRANSACTION_FEE } from '~/constants'
+import { DECIMAL } from '~/constants/decimal'
 import { i18n } from '~/i18next.config'
 import { Action } from '../types'
 import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { SendCashActions, SendCashState, checkPrivateTransactionRule } from './send-cash.reducer'
-import { AddressBookRow } from '../address-book/address-book.reducer'
+import { AddressBookRecord } from '../address-book/address-book.reducer'
 import { RpcService } from '~/service/rpc-service'
 import { AddressBookService } from '~/service/address-book-service'
 
@@ -32,7 +32,7 @@ const allowToSend = (sendCashState: SendCashState) => {
 		return t(`"FROM ADDRESS" or "DESTINATION ADDRESS" cannot be the same.`)
   }
 
-  if (sendCashState.amount.lessThanOrEqualTo(TRANSACTION_FEE)) {
+  if (sendCashState.amount.lessThanOrEqualTo(DECIMAL.transactionFee)) {
 		return t(`"AMOUNT" is required.`)
 	}
 
@@ -103,7 +103,7 @@ const checkAddressBookByNameEpic = (action$: ActionsObservable<Action>, state$) 
 			of(addressBookState.addresses) : addressBookService.loadAddressBook()
 
 		return addressbookContent$.pipe(
-			map((addressBookRows: AddressBookRow[]) => {
+			map((addressBookRows: AddressBookRecord[]) => {
 				if (!addressBookRows || addressBookRows.length <= 0) {
 					return SendCashActions.empty()
 				}

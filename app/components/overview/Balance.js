@@ -3,11 +3,11 @@ import React, { Component } from 'react'
 import classNames from 'classnames'
 import { translate } from 'react-i18next'
 
-import { truncateAmount } from '~/constants'
-import { Balances } from '~/state/reducers/overview/overview.reducer'
+import { truncateAmount } from '~/utils/decimal'
+import { Balances } from '~/reducers/overview/overview.reducer'
 
 import styles from './Balance.scss'
-import HLayout from '~/theme/h-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
 
 type Props = {
   t: any,

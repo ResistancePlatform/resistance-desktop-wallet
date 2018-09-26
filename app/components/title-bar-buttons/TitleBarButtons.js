@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 // TODO: move from Navi actions to here #114
-import { NaviActions } from '~/state/reducers/navi/navi.reducer'
+import { NaviActions } from '~/reducers/navi/navi.reducer'
 import styles from './TitleBarButtons.scss'
 
 type Props = {

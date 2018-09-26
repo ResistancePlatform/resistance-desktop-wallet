@@ -5,8 +5,8 @@ import { NavLink } from 'react-router-dom'
 import cn from 'classnames'
 
 import { ResistanceService } from '~/service/resistance-service'
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 import styles from './GetStarted.scss'
 
 const resistance = new ResistanceService()

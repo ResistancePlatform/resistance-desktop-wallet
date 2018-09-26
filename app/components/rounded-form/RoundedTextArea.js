@@ -58,7 +58,7 @@ export default class RoundedTextArea extends Component<Props> {
       <div>
         <div
           className={classNames(
-            styles.roundedInputContainer,
+            styles.container,
             {
               [styles.important]: this.props.important,
               [styles.error]: Boolean(this.props.error)

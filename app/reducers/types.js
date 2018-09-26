@@ -10,12 +10,13 @@ import { OverviewState } from './overview/overview.reducer'
 import { OwnAddressesState } from './own-addresses/own-addresses.reducer'
 import { SendCashState } from './send-cash/send-cash.reducer'
 import { SettingsState } from './settings/settings.reducer'
+import { ResDexState } from './resdex/resdex.reducer'
 import { AddressBookState } from './address-book/address-book.reducer'
 
 export type Action = {
-    +type: string,
-    payload?: any,
-    meta?: any
+  +type: string,
+  payload?: any,
+  meta?: any
 }
 
 export type State = {
@@ -28,7 +29,8 @@ export type State = {
 	overview: OverviewState,
 	ownAddresses: OwnAddressesState,
 	sendCash: SendCashState,
+	addressBook: AddressBookState,
 	settings: SettingsState,
-	addressBook: AddressBookState
+	resDex: ResDexState
 }
 

@@ -3,9 +3,9 @@ import moment from 'moment'
 import React, { Component } from 'react'
 import { translate } from 'react-i18next'
 
-import { truncateAmount } from '~/constants'
+import { truncateAmount } from '~/utils/decimal'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
-import { Transaction } from '~/state/reducers/overview/overview.reducer'
+import { Transaction } from '~/reducers/overview/overview.reducer'
 
 const transactionDirectionMap = t => ({
   receive: t(`In`),

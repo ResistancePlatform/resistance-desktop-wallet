@@ -1,8 +1,8 @@
 // @flow
 import { app, Menu, shell, BrowserWindow } from 'electron'
-import { i18n } from './i18next.config'
+import { translate } from './i18next.config'
 
-const t = i18n.getFixedT(null, 'menu')
+const t = translate('menu')
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow

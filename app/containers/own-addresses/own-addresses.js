@@ -7,14 +7,14 @@ import { translate } from 'react-i18next'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import OwnAddressList from '~/components/own-addresses/own-address-list'
-import { PopupMenuActions } from '~/state/reducers/popup-menu/popup-menu.reducer'
-import { SettingsState } from '~/state/reducers/settings/settings.reducer'
-import { OwnAddressesActions, OwnAddressesState } from '~/state/reducers/own-addresses/own-addresses.reducer'
+import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
+import { SettingsState } from '~/reducers/settings/settings.reducer'
+import { OwnAddressesActions, OwnAddressesState } from '~/reducers/own-addresses/own-addresses.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 
 import styles from './own-addresses.scss'
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 
 const pollingInterval = 5.0
 const addressRowPopupMenuId = 'own-addresses-address-row-popup-menu-id'
@@ -116,17 +116,6 @@ class OwnAddresses extends Component<Props> {
                 </button>
 
                 <div role="none" className={styles.addAddressButtonContainer}>
-                  <button
-                    type="button"
-                    className={styles.addNewAddressButton}
-                    onClick={() => this.props.popupMenu.show(createAddressPopupMenuId)}
-                    onKeyDown={() => this.props.popupMenu.show(createAddressPopupMenuId)}
-                    disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
-                  >
-                    + {t(`Add new address`)}
-										<span className="icon-arrow-down" />
-									</button>
-
                   <PopupMenu id={createAddressPopupMenuId} relative>
                     <PopupMenuItem onClick={() => this.props.actions.createAddress(false)}>
                       {t(`New transparent (R) address`)}
@@ -144,6 +133,17 @@ class OwnAddresses extends Component<Props> {
                       {t(`Export private keys`)}
                     </PopupMenuItem>
                   </PopupMenu>
+
+                  <button
+                    type="button"
+                    className={styles.addNewAddressButton}
+                    onClick={() => this.props.popupMenu.show(createAddressPopupMenuId)}
+                    onKeyDown={() => this.props.popupMenu.show(createAddressPopupMenuId)}
+                    disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
+                  >
+                    + {t(`Add new address`)}
+										<span className="icon-arrow-down" />
+									</button>
 
 								</div>
 							</div>

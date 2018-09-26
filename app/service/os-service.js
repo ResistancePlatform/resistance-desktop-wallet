@@ -4,7 +4,7 @@ import path from 'path'
 import { spawn } from 'child_process'
 import { app, remote } from 'electron'
 
-import { i18n } from '../i18next.config'
+import { translate } from '../i18next.config'
 
 /**
  * ES6 singleton
@@ -13,7 +13,7 @@ let instance = null
 
 const ps = require('ps-node')
 
-export type ChildProcessName = 'NODE' | 'TOR' | 'MINER'
+export type ChildProcessName = 'NODE' | 'TOR' | 'MINER' | 'MARKET_MAKER'
 export type ChildProcessStatus = 'RUNNING' | 'STARTING' | 'RESTARTING' | 'FAILED' | 'STOPPING' | 'MURDER FAILED' | 'NOT RUNNING'
 
 const ChildProcessCommands = {
@@ -36,7 +36,7 @@ export class OSService {
       instance = this
     }
 
-    instance.t = i18n.getFixedT(null, 'service')
+    instance.t = translate('service')
 
     // Create a global var to store child processes information for the cleanup
     if (process.type === 'browser' && global.childProcesses === undefined) {
@@ -59,7 +59,7 @@ export class OSService {
 
 	/**
 	 * We CANNOT use:
-	 *   import { appStore } from '../state/store/configureStore'
+	 *   import { appStore } from '../store/configureStore'
 	 *
 	 * As that will import BEFORE the `appStore` be created !!!
 	 * We have to require the latest `appStore` to make sure it has been created !!!
@@ -68,7 +68,7 @@ export class OSService {
 	 * @memberof RpcService
 	 */
 	dispatchAction(action) {
-		const storeModule = require('~/state/store/configureStore')
+		const storeModule = require('~/store/configureStore')
 		if (storeModule && storeModule.appStore) {
 			storeModule.appStore.dispatch(action)
 		}
@@ -167,7 +167,7 @@ export class OSService {
 	 * @memberof OSService
 	 */
   getSettingsActions() {
-    const settingsReducerModule = require('~/state/reducers/settings/settings.reducer')
+    const settingsReducerModule = require('~/reducers/settings/settings.reducer')
     return settingsReducerModule.SettingsActions
   }
 

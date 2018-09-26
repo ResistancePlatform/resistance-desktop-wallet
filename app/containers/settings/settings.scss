@@ -1,6 +1,6 @@
-@import "../../theme/vars.scss";
-@import "../../theme/generic-component.scss";
-@import "../../theme/toggle-button.scss";
+@import "../../assets/styles/vars.scss";
+@import "../../assets/styles/generic-component.scss";
+@import "../../assets/styles/toggle-button.scss";
 
 @mixin settingButton() {
     @include roundedButton(true);
@@ -20,6 +20,10 @@
 .titleBar {
     font-size: 1.2rem;
     margin-bottom: 2rem;
+}
+
+.languageContainer {
+  position: relative;
 }
 
 .savePasswordButton {

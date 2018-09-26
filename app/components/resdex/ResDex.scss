@@ -1,0 +1,53 @@
+@import "~/assets/styles/vars.scss";
+@import "~/assets/styles/tabs.scss";
+
+.dragBar {
+  -webkit-app-region: drag;
+  height: 3.5rem;
+  display: block;
+}
+
+.tabList {
+  color: $BASE_COLOR_FONT_GRAY;
+  font-weight: 200;
+  font-size: 0.8rem;
+  text-align: left;
+  margin-top: 0.5rem;
+  border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+}
+
+.tab {
+  padding: 0.8rem 0.3rem;
+  margin: 0 1.5rem;
+  text-align: left;
+}
+
+.selectedTab {
+  background: transparent;
+  color: $BASE_COLOR_WHITE;
+  border-bottom: 1px solid $BASE_COLOR_LIGHT_BLUE;
+}
+
+.selectedTabPanel {
+  padding: 0;
+  margin: 0;
+}
+
+.resDexContainer {
+  justify-content: start;
+  display: inline;
+  position: relative;
+}
+
+/* Base classes for all top level containers inside the tab panel */
+%largeContainer {
+  border-radius: 0.5rem;
+  background: red;
+  background: $BASE_COLOR_DARK_BLUE_3;
+  padding: 0;
+}
+
+%smallContainer {
+  @extend %largeContainer;
+  padding: 0;
+}

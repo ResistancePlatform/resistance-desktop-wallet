@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
 import cn from 'classnames'
 
-import { appStore } from '~/state/store/configureStore'
-import { PopupMenuState, PopupMenuActions } from '~/state/reducers/popup-menu/popup-menu.reducer'
+import { appStore } from '~/store/configureStore'
+import { PopupMenuState, PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 
 import styles from './popup-menu.scss'
 
@@ -83,13 +83,11 @@ class PopupMenu extends Component<Props> {
 			display: props.isVisible ? 'block' : 'none'
 		}
 
-    if (this.props.relative) {
-      containerStyles.position = 'relative'
-    } else {
+    if (!this.props.relative) {
       Object.assign(containerStyles, {
-        position: 'absolute',
         top: props.top,
-        left: props.left
+        left: props.left,
+        transform: 'none'
       })
     }
 
