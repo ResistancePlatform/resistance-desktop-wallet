@@ -1,6 +1,9 @@
 import i18n from 'i18next'
+import path from 'path'
 import { reactI18nextModule } from 'react-i18next'
 import i18nextBackend from 'i18next-node-fs-backend'
+
+import { OSService } from './service/os-service'
 
 const availableLanguages = ['en', 'eo', 'ko']
 
@@ -19,11 +22,15 @@ const availableNamespaces = [
 ]
 
 const isDev = process.env.NODE_ENV === 'development'
+const os = new OSService()
+
+const localesPath = path.join(os.getResourcesPath(), 'locales')
+
 
 const i18nextOptions = {
   backend:{
-    loadPath: './locales/{{lng}}/{{ns}}.json',
-    addPath: './locales/{{lng}}/{{ns}}.missing.json',
+    loadPath: path.join(localesPath, '{{lng}}', '{{ns}}.json'),
+    addPath: path.join(localesPath, '{{lng}}', '{{ns}}.missing.json'),
     jsonIndent: 2,
   },
   interpolation: {

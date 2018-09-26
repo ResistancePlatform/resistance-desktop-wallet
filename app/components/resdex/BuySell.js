@@ -8,6 +8,8 @@ import { translate } from 'react-i18next'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 import RoundedInput, { ChooseWalletAddon } from '~/components/rounded-form/RoundedInput'
 
+import btcImage from '~/assets/images/resdex/BTC.svg'
+import ethImage from '~/assets/images/resdex/ETH.svg'
 import styles from './BuySell.scss'
 
 const validationSchema = Joi.object().keys({
@@ -106,7 +108,7 @@ class ResDexBuySell extends Component<Props> {
 
           <div className={styles.fromTo}>
             <div className={styles.wallet}>
-              <img src="assets/images/resdex/BTC.svg" alt="Bitcoin"/>
+              <img src={btcImage} alt="Bitcoin"/>
               <div>
                 <span>Sell from</span>
                 BTC Wallet
@@ -114,7 +116,7 @@ class ResDexBuySell extends Component<Props> {
             </div>
 
             <div className={styles.wallet}>
-              <img src="assets/images/resdex/ETH.svg" alt="Ethereum"/>
+              <img src={ethImage} alt="Ethereum"/>
               <div>
                 <span>Deposit to</span>
                 ETH Wallet

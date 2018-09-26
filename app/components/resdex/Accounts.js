@@ -7,6 +7,7 @@ import cn from 'classnames'
 
 import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
 
+import btcImage from '~/assets/images/resdex/BTC.svg'
 import styles from './Accounts.scss'
 
 type Props = {
@@ -34,7 +35,7 @@ class ResDexAccounts extends Component<Props> {
           <div className={styles.record}>
             <div className={styles.columnsWrapper}>
               <div className={styles.account}>
-                <img src="assets/images/resdex/BTC.svg" alt="Bitcoin"/>
+                <img src={btcImage} alt="Bitcoin"/>
               </div>
 
               <div className={styles.balance}>
