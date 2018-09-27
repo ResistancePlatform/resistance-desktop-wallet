@@ -5,6 +5,8 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import ResDexLogin from './Login'
+import DepositModal from './DepositModal'
+import WithdrawModal from './WithdrawModal'
 import ResDexAssets from './Assets'
 import ResDexBuySell from './BuySell'
 import ResDexOrders from './Orders'
@@ -65,6 +67,14 @@ export class ResDex extends Component<Props> {
         {this.props.resDex.login.isRequired
           ?  <ResDexLogin />
           : this.getTabs()
+        }
+
+        {this.props.resDex.accounts.depositModal.isVisible &&
+          <DepositModal />
+        }
+
+        {this.props.resDex.accounts.withdrawModal.isVisible &&
+          <WithdrawModal />
         }
 
       </div>

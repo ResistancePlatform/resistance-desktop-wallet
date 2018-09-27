@@ -149,6 +149,14 @@ export const preloadedState: State = {
       }],
     },
     accounts: {
+      depositModal: {
+        isVisible: false,
+        currency: null
+      },
+      withdrawModal: {
+        isVisible: false,
+        currency: null
+      }
     }
   }
 }

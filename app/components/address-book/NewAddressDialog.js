@@ -3,6 +3,7 @@ import * as Joi from 'joi'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import { translate } from 'react-i18next'
 
 import ValidateAddressService from '~/service/validate-address-service'
 import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
@@ -25,7 +26,7 @@ const validationSchema = Joi.object().keys({
 })
 
 type Props = {
-  actions: Object,
+  actions: object,
   newAddressDialog: AddressBookState.newAddressDialog
 }
 
@@ -37,6 +38,8 @@ class NewAddressDialog extends Component<Props> {
 	props: Props
 
 	render() {
+    const { t } = this.props
+
     if (!this.props.newAddressDialog.isVisible) {
       return null
     }
@@ -62,7 +65,9 @@ class NewAddressDialog extends Component<Props> {
 
 				{/* Title */}
         <div className={styles.title}>
-          { this.props.newAddressDialog.isInEditMode ? `Edit Address` : `New Address` }
+          { this.props.newAddressDialog.isInEditMode
+            ? t(`Edit address`)
+            : t(`New address`) }
         </div>
 
         <RoundedForm
@@ -73,7 +78,7 @@ class NewAddressDialog extends Component<Props> {
           <RoundedInput
             name="name"
             defaultValue={this.props.newAddressDialog.defaultValues.name}
-            label="Name"
+            label={t(`Name`)}
             addon={nameAddon}
           />
 
@@ -102,7 +107,7 @@ class NewAddressDialog extends Component<Props> {
                 ? this.props.actions.updateAddress
                 : this.props.actions.addAddress}
               onKeyDown={() => {}}
-            >{ this.props.newAddressDialog.isInEditMode ? 'Edit' : 'Add' }
+            >{ this.props.newAddressDialog.isInEditMode ? t(`Edit`) : t(`Add`) }
             </button>
           </div>
         </RoundedForm>
@@ -117,4 +122,4 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = dispatch => ({ actions: bindActionCreators(AddressBookActions.newAddressDialog, dispatch) })
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewAddressDialog)
+export default connect(mapStateToProps, mapDispatchToProps)(translate('address-book')(NewAddressDialog))
