@@ -225,6 +225,7 @@
     "prop-types": "^15.6.2",
     "properties-reader": "^0.0.16",
     "ps-node": "^0.1.6",
+    "qrcode.react": "^0.8.0",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "react-hot-loader": "^4.2.0",

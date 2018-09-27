@@ -1,6 +1,8 @@
 // @flow
 import moment from 'moment'
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
 import {
@@ -12,6 +14,8 @@ import {
   AreaSeries
 } from 'react-vis'
 
+import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
+
 import btcImage from '~/assets/images/resdex/BTC.svg'
 import ethImage from '~/assets/images/resdex/ETH.svg'
 import ltcImage from '~/assets/images/resdex/LTC.svg'
@@ -19,7 +23,8 @@ import etcImage from '~/assets/images/resdex/ETC.svg'
 import styles from './Assets.scss'
 
 type Props = {
-  t: any
+  t: any,
+  accountsActions: object
 }
 
 
@@ -176,8 +181,8 @@ class ResDexAssets extends Component<Props> {
             </div>
 
             <div className={styles.buttons}>
-              <button type="button">{t(`Withdraw`)}</button>
-              <button type="button">{t(`Deposit`)}</button>
+              <button type="button" onClick={this.props.accountsActions.withdraw}>{t(`Withdraw`)}</button>
+              <button type="button" onClick={this.props.accountsActions.deposit}>{t(`Deposit`)}</button>
             </div>
           </div>
         </div>
@@ -187,4 +192,12 @@ class ResDexAssets extends Component<Props> {
   }
 }
 
-export default translate('resdex')(ResDexAssets)
+const mapStateToProps = (state) => ({
+	assets: state.resDex.assets
+})
+
+const mapDispatchToProps = dispatch => ({
+  accountsActions: bindActionCreators(ResDexAccountsActions, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexAssets))

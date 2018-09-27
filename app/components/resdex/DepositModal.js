@@ -1,21 +1,16 @@
 // @flow
-import * as Joi from 'joi'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
+import QRCode from 'qrcode.react'
 
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
+import RoundedInput, { CopyAddon } from '~/components/rounded-form/RoundedInput'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
 import styles from './DepositModal.scss'
-
-const validationSchema = Joi.object().keys({
-  address: (
-    Joi.string().required().label(`Address`)
-  )
-})
 
 type Props = {
   t: any,
@@ -47,6 +42,17 @@ class DepositModal extends Component<Props> {
         <div className={styles.title}>
           {t(`Deposit`)}
         </div>
+
+        <QRCode className={styles.qr} value={this.props.accounts.depositModal.address} />
+
+        <RoundedInput
+          name="address"
+          defaultValue={this.props.accounts.depositModal.address}
+          label="Address"
+          newAddon={new CopyAddon()}
+          readOnly
+        />
+
       </div>
     )
   }

@@ -6,7 +6,7 @@ import { ResDexLoginReducer } from './login/reducer'
 import { ResDexAssetsReducer } from './assets/reducer'
 import { ResDexBuySellReducer } from './buy-sell/reducer'
 import { ResDexOrdersReducer } from './orders/reducer'
-import { ResDexAccountsReducer } from './accounts/reducer'
+import { EnabledCurrency, ResDexAccountsReducer } from './accounts/reducer'
 
 
 export type Order = {}
@@ -31,6 +31,7 @@ export type ResDexState = {
     completedOrders: Order[]
   },
   accounts: {
+    enabledCurrencies: EnabledCurrency[],
     depositModal: {
       isVisible: boolean,
       currency: string | null

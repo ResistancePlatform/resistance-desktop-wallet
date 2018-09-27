@@ -2,6 +2,12 @@
 import { createActions, handleActions } from 'redux-actions'
 import { preloadedState } from '~/reducers/preloaded.state'
 
+export type EnabledCurrency = {
+  code: string,
+  port?: number,
+  useElectrum: boolean
+}
+
 export const ResDexAccountsActions = createActions(
   {
     EMPTY: undefined,

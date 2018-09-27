@@ -28,6 +28,19 @@ export class Addon {
   }
 }
 
+export class CopyAddon extends Addon {
+  static get type() { return 'copy' }
+
+  render(input) {
+    return (
+      <div>
+        {input}
+        <i className={cn('icon', styles.copy)} />
+      </div>
+    )
+  }
+}
+
 export class ChooseWalletAddon extends Addon {
   wallets: object[]
   chosenWallet: string

@@ -1,5 +1,6 @@
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
+import { RESDEX } from '~/constants/resdex'
 
 export const preloadedState: State = {
   auth: {
@@ -149,6 +150,7 @@ export const preloadedState: State = {
       }],
     },
     accounts: {
+      enabledCurrencies: [],
       depositModal: {
         isVisible: false,
         currency: null
@@ -170,4 +172,8 @@ Object.assign(preloadedState.settings, {
 	isMinerEnabled: config.get('manageDaemon.enableMiner', true),
 	isTorEnabled: config.get('manageDaemon.enableTor', false),
 	language: config.get('language', 'en')
+})
+
+Object.assign(preloadedState.resDex.accounts, {
+  enabledCurrencies: config.get('resDex.enabledCurrencies', RESDEX.alwaysEnabledCurrencies)
 })

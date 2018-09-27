@@ -24,6 +24,14 @@
     top: 0.35rem;
   }
 
+  .copy:before {
+    content: '\e92c';
+    font-size: 1.2rem;
+    position: relative;
+    left: 0.9rem;
+    top: 0.35rem;
+  }
+
   &.chooseWallet {
     display: flex;
     font-size: 0.6rem;
