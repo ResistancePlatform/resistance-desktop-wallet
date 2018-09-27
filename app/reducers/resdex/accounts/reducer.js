@@ -3,7 +3,7 @@ import { createActions, handleActions } from 'redux-actions'
 import { preloadedState } from '~/reducers/preloaded.state'
 
 export type EnabledCurrency = {
-  code: string,
+  symbol: string,
   port?: number,
   useElectrum: boolean
 }

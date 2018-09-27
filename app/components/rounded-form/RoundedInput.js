@@ -3,7 +3,8 @@ import { clipboard, remote } from 'electron'
 import React, { Component } from 'react'
 import cn from 'classnames'
 
-import btcImage from '~/assets/images/resdex/BTC.svg'
+import CurrencyIcon from '~/components/resdex/CurrencyIcon'
+
 import styles from './RoundedInput.scss'
 
 type AddonType = null | 'paste' | 'dropdown' | 'text_placeholder' | 'choose_file' | 'choose_wallet'
@@ -56,7 +57,7 @@ export class ChooseWalletAddon extends Addon {
   render(input) {
     return (
       <div className={cn(styles.newAddon, styles.chooseWallet)}>
-        <img src={btcImage} alt="Bitcoin"/>
+        <CurrencyIcon symbol="BTC" size="1.2rem" />
         <span>BTC Wallet</span>
         {input}
         <span>BTC</span>

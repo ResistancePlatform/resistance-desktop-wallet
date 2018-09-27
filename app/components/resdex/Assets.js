@@ -15,15 +15,14 @@ import {
 } from 'react-vis'
 
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
+import CurrencyIcon from './CurrencyIcon'
+import { getCurrencyName } from '~/utils/resdex'
 
-import btcImage from '~/assets/images/resdex/BTC.svg'
-import ethImage from '~/assets/images/resdex/ETH.svg'
-import ltcImage from '~/assets/images/resdex/LTC.svg'
-import etcImage from '~/assets/images/resdex/ETC.svg'
 import styles from './Assets.scss'
 
 type Props = {
   t: any,
+  accounts: ResDexAccountsState,
   accountsActions: object
 }
 
@@ -43,6 +42,7 @@ class ResDexAssets extends Component<Props> {
 	render() {
     const { t } = this.props
 
+    console.log('this.props.accounts.enabledCurrencies', this.props.accounts.enabledCurrencies)
     const plotData = [
       {x: moment().add(-1, 'months'), y: 12},
       {x: moment().add(-2, 'months'), y: 15},
@@ -122,69 +122,25 @@ class ResDexAssets extends Component<Props> {
         </XYPlot>
 
         <div className={styles.coins}>
-          <div className={styles.coin}>
-            <img src={btcImage} alt="Bitcoin"/>
+          {this.props.accounts.enabledCurrencies.map(currency => (
+            <div className={styles.coin}>
+              <CurrencyIcon symbol={currency.symbol} size="1.6rem" />
 
-            Bitcoin
-            <div className={styles.amount}>0.0097521 BTC</div>
+              {getCurrencyName(currency.symbol)}
 
-            <div className={styles.equity}>
-              <sub>$</sub>279.21
+              <div className={styles.amount}>21.478472 {currency.symbol}</div>
+
+              <div className={styles.equity}>
+                <sub>$</sub>67.44342
+              </div>
+
+              <div className={styles.buttons}>
+                <button type="button" onClick={() => this.props.accountsActions.withdraw(currency.symbol)}>{t(`Withdraw`)}</button>
+                <button type="button" onClick={() => this.props.accountsActions.deposit(currency.symbol)}>{t(`Deposit`)}</button>
+              </div>
             </div>
+          ))}
 
-            <div className={styles.buttons}>
-              <button type="button">{t(`Withdraw`)}</button>
-              <button type="button">{t(`Deposit`)}</button>
-            </div>
-          </div>
-
-          <div className={styles.coin}>
-            <img src={ltcImage} alt="Litecoin"/>
-
-            Litecoin
-            <div className={styles.amount}>1.3758594 LTC</div>
-
-            <div className={styles.equity}>
-              <sub>$</sub>75.40
-            </div>
-
-            <div className={styles.buttons}>
-              <button type="button">{t(`Withdraw`)}</button>
-              <button type="button">{t(`Deposit`)}</button>
-            </div>
-          </div>
-
-          <div className={styles.coin}>
-            <img src={ethImage} alt="Ethereum"/>
-
-            Ethereum
-            <div className={styles.amount}>0.983243245 ETH</div>
-
-            <div className={styles.equity}>
-              <sub>$</sub>186.21
-            </div>
-
-            <div className={styles.buttons}>
-              <button type="button">{t(`Withdraw`)}</button>
-              <button type="button">{t(`Deposit`)}</button>
-            </div>
-          </div>
-
-          <div className={styles.coin}>
-            <img src={etcImage} alt="Ethereum Classic"/>
-
-            Ethereum Classic
-            <div className={styles.amount}>21.478472 ETC</div>
-
-            <div className={styles.equity}>
-              <sub>$</sub>67.44342
-            </div>
-
-            <div className={styles.buttons}>
-              <button type="button" onClick={this.props.accountsActions.withdraw}>{t(`Withdraw`)}</button>
-              <button type="button" onClick={this.props.accountsActions.deposit}>{t(`Deposit`)}</button>
-            </div>
-          </div>
         </div>
 
       </div>
@@ -193,7 +149,8 @@ class ResDexAssets extends Component<Props> {
 }
 
 const mapStateToProps = (state) => ({
-	assets: state.resDex.assets
+	assets: state.resDex.assets,
+	accounts: state.resDex.accounts
 })
 
 const mapDispatchToProps = dispatch => ({

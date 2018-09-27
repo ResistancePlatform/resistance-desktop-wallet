@@ -57,6 +57,9 @@ dll
 main.js
 main.js.map
 
+# Copied by Webpack
+app/assets/images/resdex/cryptocurrency-icons
+
 .idea
 npm-debug.log.*
 package-lock.json
