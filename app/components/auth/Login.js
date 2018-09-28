@@ -50,7 +50,7 @@ class Login extends Component<Props> {
 
     return (
       <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
-        <div className={cn(styles.title, { [styles.ready]: this.props.form && this.props.form.isValid })}>
+        <div className={cn(styles.header, { [styles.ready]: this.props.form && this.props.form.isValid })}>
           {this.props.auth.enter ? t(`Enter Resistance`) : t(`Confirm your login`)}
         </div>
 
