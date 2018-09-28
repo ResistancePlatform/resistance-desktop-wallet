@@ -75,13 +75,14 @@ export class CreateNewWallet extends Component<Props> {
 
             <NavLink className={styles.prevLink} to="/get-started/get-started" />
             <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/choose-password" />
-
-            <div className={styles.paginationDots}>
-              <div className={styles.complete} />
-              <div className={styles.empty} />
-              <div className={styles.empty} />
-            </div>
           </RoundedForm>
+        </div>
+
+
+        <div className={styles.paginationDots}>
+          <div className={styles.complete} />
+          <div className={styles.empty} />
+          <div className={styles.empty} />
         </div>
       </div>
     )

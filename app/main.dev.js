@@ -60,6 +60,33 @@ const checkAndCreateWalletAppFolder = () => {
   }
 }
 
+const getWindowSize = (isGetStartedComplete: boolean = false) => {
+  if (isGetStartedComplete || !config.get('getStartedInProgress', true)) {
+    const width = 1024
+    const height = 728
+
+    return {
+      width,
+      height,
+      minWidth: width,
+      minHeight: height,
+      resizable: true,
+    }
+  }
+
+  const width = 710
+  const height = 530
+
+  return {
+    width,
+    height,
+    minWidth: width,
+    minHeight: height,
+    resizable: false
+  }
+
+}
+
 
 // Propagate Resistance node config for the RPC service
 global.resistanceNodeConfig = resistanceService.checkAndCreateConfig()
@@ -93,10 +120,7 @@ app.on('ready', async () => {
   }
 
   mainWindow = new BrowserWindow({
-    minHeight: 728,
-    height: 728,
-    minWidth: 1024,
-    width: 1024,
+    ...getWindowSize(),
     show: false,
     frame: false,
     backgroundColor: '#1d2440',
@@ -155,6 +179,13 @@ app.on('ready', async () => {
     if (isReadyToShow) {
       showMainWindow()
     }
+  })
+
+  ipcMain.on('resize', () => {
+    const windowSize = getWindowSize(true)
+    mainWindow.setResizable(windowSize.resizable)
+    mainWindow.setMinimumSize(windowSize.minWidth, windowSize.minHeight)
+    mainWindow.setSize(windowSize.width, windowSize.height)
   })
 
   mainWindow.on('closed', () => {

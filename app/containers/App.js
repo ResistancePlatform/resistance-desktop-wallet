@@ -121,7 +121,7 @@ class App extends React.Component<Props> {
     }
 
 		return (
-			<div id="App" className={[styles.appContainer, VLayout.vBoxContainer].join(' ')}>
+			<div id="App" className={cn(styles.appContainer, VLayout.vBoxContainer)}>
         {content}
 			</div>
 		)

@@ -16,7 +16,7 @@ $innerContainerWidth: 23.75rem;
 }
 
 .historyLink {
-  position: absolute;
+  position: fixed;
   width: 2.8rem;
   height: 2.8rem;
   top: 50%;
@@ -38,13 +38,13 @@ $innerContainerWidth: 23.75rem;
 
 .prevLink {
   @extend .historyLink;
-  left: 3rem;
+  left: 2rem;
   transform: scale(-1, 1);
 }
 
 .nextLink {
   @extend .historyLink;
-  right: 3rem;
+  right: 2rem;
 }
 
 .title {
@@ -98,7 +98,7 @@ $innerContainerWidth: 23.75rem;
 }
 
 .paginationDots {
-  position: absolute;
+  position: fixed;
   left: 50%;
   transform: translateX(-50%);
   bottom: 2.1rem;
@@ -131,8 +131,8 @@ $innerContainerWidth: 23.75rem;
 }
 
 .chooseFlowLink {
-  width: 16rem;
-  height: 14rem;
+  width: 14.7rem;
+  height: 12.7rem;
   font-size: 1rem;
   border-radius: 0.3rem;
   text-align: center;
@@ -164,7 +164,7 @@ $innerContainerWidth: 23.75rem;
 
 .chooseFlowLink:hover {
   background: #009dd7;
-  border: none;
+  border: 1px solid #009dd7;
 
   i {
     color: $BASE_COLOR_WHITE;
