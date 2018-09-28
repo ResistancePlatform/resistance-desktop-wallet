@@ -15,6 +15,7 @@
 
 .newAddon {
   width: 100%;
+  display: flex;
 
   .arrowDown:before {
     content: '\e90e';
@@ -26,10 +27,11 @@
 
   .copy:before {
     content: '\e92c';
-    font-size: 1.2rem;
+    font-size: 1rem;
+    color: $BASE_COLOR_PURPLE;
     position: relative;
-    left: 0.9rem;
-    top: 0.35rem;
+    left: 0.6rem;
+    top: 0.4rem;
   }
 
   &.chooseWallet {

@@ -153,11 +153,11 @@ export const preloadedState: State = {
       enabledCurrencies: [],
       depositModal: {
         isVisible: false,
-        currency: null
+        symbol: null
       },
       withdrawModal: {
         isVisible: false,
-        currency: null
+        symbol: null
       }
     }
   }

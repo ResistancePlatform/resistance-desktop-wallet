@@ -15,17 +15,18 @@ import styles from './NewAddressDialog.scss'
 
 const validateAddress = new ValidateAddressService()
 
-const validationSchema = Joi.object().keys({
-  name: Joi.string().required().label(`Name`),
+const getValidationSchema = t => Joi.object().keys({
+  name: Joi.string().required().label(t(`Name`)),
   address: (
     validateAddress.getJoi()
     .resistanceAddress()
     .rZ().rLength().zLength().valid()
-    .required().label(`Address`)
+    .required().label(t(`Address`))
   )
 })
 
 type Props = {
+  t: any,
   actions: object,
   newAddressDialog: AddressBookState.newAddressDialog
 }
@@ -72,7 +73,7 @@ class NewAddressDialog extends Component<Props> {
 
         <RoundedForm
           id="addressBookNewAddressDialog"
-          schema={validationSchema}
+          schema={getValidationSchema(t)}
         >
           {/* Name */}
           <RoundedInput

@@ -64,17 +64,17 @@ export class ResDex extends Component<Props> {
       <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.resDexContainer)}>
         <div className={styles.dragBar} />
 
-        {this.props.resDex.login.isRequired
-          ?  <ResDexLogin />
-          : this.getTabs()
-        }
-
         {this.props.resDex.accounts.depositModal.isVisible &&
           <DepositModal />
         }
 
         {this.props.resDex.accounts.withdrawModal.isVisible &&
           <WithdrawModal />
+        }
+
+        {this.props.resDex.login.isRequired
+          ?  <ResDexLogin />
+          : this.getTabs()
         }
 
       </div>

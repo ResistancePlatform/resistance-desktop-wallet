@@ -11,8 +11,10 @@ export type EnabledCurrency = {
 export const ResDexAccountsActions = createActions(
   {
     EMPTY: undefined,
-    DEPOSIT: (currency: string) => ({ currency }),
-    WITHDRAW: (currency: string) => ({ currency }),
+    DEPOSIT: (symbol: string) => ({ symbol }),
+    WITHDRAW: (symbol: string) => ({ symbol }),
+    CLOSE_DEPOSIT_MODAL: undefined,
+    CLOSE_WITDRAW_MODAL: undefined
   },
   {
     prefix: 'APP/RESDEX/ACCOUNTS'
@@ -25,14 +27,22 @@ export const ResDexAccountsReducer = handleActions(
       ...state,
       depositModal: {
         isVisible: true,
-        currency: action.payload.currency
+        symbol: action.payload.symbol
       }
     }),
     [ResDexAccountsActions.withraw]: (state, action) => ({
       ...state,
       withdrawModal: {
         isVisible: true,
-        currency: action.payload.currency
+        symbol: action.payload.symbol
       }
+    }),
+    [ResDexAccountsActions.closeDepositModal]: (state) => ({
+      ...state,
+      depositModal: { isVisible: false, symbol: null }
+    }),
+    [ResDexAccountsActions.closeWithdrawModal]: (state) => ({
+      ...state,
+      withdrawModal: { isVisible: false, symbol: null }
     }),
   }, preloadedState)

@@ -10,7 +10,7 @@ import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import RoundedInput, { CopyAddon } from '~/components/rounded-form/RoundedInput'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
-import styles from './DepositModal.scss'
+import styles from './Modal.scss'
 
 type Props = {
   t: any,
@@ -29,31 +29,34 @@ class DepositModal extends Component<Props> {
     const { t } = this.props
 
     return (
-      <div className={styles.container}>
-				<div
-          role="button"
-          tabIndex={0}
-					className={cn('icon', styles.closeButton)}
-					onClick={this.props.actions.close}
-					onKeyDown={() => {}}
-				/>
+      <div className={styles.overlay}>
+        <div className={styles.container}>
+          <div
+            role="button"
+            tabIndex={0}
+            className={cn('icon', styles.closeButton)}
+            onClick={this.props.actions.closeDepositModal}
+            onKeyDown={() => {}}
+          />
 
-				{/* Title */}
+        {/* Title */}
         <div className={styles.title}>
           {t(`Deposit`)}
         </div>
 
-        <QRCode className={styles.qr} value={this.props.accounts.depositModal.address} />
+        <QRCode className={styles.qr} value="this.props.accounts.depositModal.address" />
 
         <RoundedInput
           name="address"
+          labelClassName={styles.addressInputLabel}
           defaultValue={this.props.accounts.depositModal.address}
           label="Address"
           newAddon={new CopyAddon()}
           readOnly
         />
 
-      </div>
+    </div>
+    </div>
     )
   }
 }

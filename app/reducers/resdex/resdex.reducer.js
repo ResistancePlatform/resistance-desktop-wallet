@@ -34,11 +34,11 @@ export type ResDexState = {
     enabledCurrencies: EnabledCurrency[],
     depositModal: {
       isVisible: boolean,
-      currency: string | null
+      symbol: string | null
     },
     withdrawModal: {
       isVisible: boolean,
-      currency: string | null
+      symbol: string | null
     }
   }
 }
