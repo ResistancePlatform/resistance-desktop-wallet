@@ -1,17 +1,24 @@
 // @flow
 import React, { Component } from 'react'
 import cn from 'classnames'
+import Flag from 'react-world-flags'
 import Iso6391 from 'iso-639-1'
 
 import { availableLanguages } from '~/i18next.config'
 
+import eoFlag from '~/assets/images/eo.svg'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
-import styles from './GetStarted.scss'
+import styles from './ChooseLanguage.scss'
 
 type Props = {
   actions: object
 }
+
+const getCountryFromLanguage = code => ({
+  en: 'usa',
+  ko: 'kor',
+})[code] || code
 
 
 /**
@@ -36,6 +43,10 @@ export class ChooseLanguage extends Component<Props> {
         onClick={() => this.props.actions.chooseLanguage(language.code)}
         onKeyDown={() => this.props.actions.chooseLanguage(language.code)}
       >
+        <div className={cn(styles.flag, styles[language.code])}>
+          <Flag code={getCountryFromLanguage(language.code)} fallback={ <img src={eoFlag} alt="eo" />} />
+        </div>
+
         {language.nativeName}
       </div>
     ))
@@ -48,7 +59,7 @@ export class ChooseLanguage extends Component<Props> {
 	render() {
 		return (
       <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
-        <div className={styles.languageTiles}>
+        <div className={cn(styles.innerContainer, styles.languageTiles)}>
         {this.getLanguageTiles()}
         </div>
       </div>

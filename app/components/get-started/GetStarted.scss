@@ -10,25 +10,9 @@ $innerContainerWidth: 23.75rem;
 }
 
 .innerContainer {
+  position: relative;
   margin: 0 auto;
   min-width: $innerContainerWidth;
-}
-
-.languageTiles {
-  display: flex;
-  flex-wrap: nowrap;
-  vertical-align: middle;
-
-  .tile {
-    padding: 1rem;
-    cursor: default;
-    width: 10rem;
-    text-align: center;
-  }
-
-  .tile:hover {
-    background: #009dd7;
-  }
 }
 
 .historyLink {
