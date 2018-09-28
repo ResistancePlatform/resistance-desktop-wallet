@@ -3,11 +3,14 @@ import { remote } from 'electron'
 import React, { Component } from 'react'
 import { NavLink } from 'react-router-dom'
 import cn from 'classnames'
+import Iso6391 from 'iso-639-1'
 
+import { i18n } from '~/i18next.config'
 import { ResistanceService } from '~/service/resistance-service'
+
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
-import styles from './GetStarted.scss'
+import styles from './Welcome.scss'
 
 const resistance = new ResistanceService()
 
@@ -95,14 +98,14 @@ export class Welcome extends Component<Props> {
           {this.props.welcome.hint || t(`Check the wallet configuration before applying`)}
         </div>
 
-        <div className={styles.welcomeContainer}>
-          <div className={styles.summaryTitle}>
+        <div className={cn(styles.innerContainer, styles.summary)}>
+          <div className={styles.title}>
             {t(`Here's a summary of your new wallet configuration`)}:
           </div>
 
-          <ul className={styles.summary}>
+          <ul className={styles.body}>
             <li>
-              <span>{t(`Language`)}:</span> English
+              <span>{t(`Language`)}:</span> {Iso6391.getNativeName(i18n.language)}
             </li>
             <li>
               <span>{t(`Wallet name`)}:</span> {this.getWalletName()}
@@ -118,6 +121,9 @@ export class Welcome extends Component<Props> {
             </li>
           </ul>
 
+        </div>
+
+        <div className={styles.buttons}>
           {!this.props.welcome.isReadyToUse &&
             <button
               type="button"

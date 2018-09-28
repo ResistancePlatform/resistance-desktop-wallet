@@ -30,11 +30,10 @@ export class ChoosePassword extends Component<Props> {
     const { t } = this.props
 
     const schema = Joi.object().keys({
-      // #?!@$%^&*-'`;
       password: (
         Joi.string().required()
-        .regex(/^[a-zA-Z0-9]{8,30}$/)
-        .error(() => t(`should contain Latin letters, numbers and special characters`))
+        .min(6)
+        .token()
         .label(t(`Password`))
       ),
       confirmPassword: (
@@ -67,28 +66,31 @@ export class ChoosePassword extends Component<Props> {
 
         <div className={styles.hint}>{t(`Enter a strong password (using letters, numbers and/or symbols)`)}</div>
 
-        <RoundedForm id="getStartedChoosePassword" schema={this.getValidationSchema()}>
+        <div className={styles.innerContainer}>
+          <RoundedForm id="getStartedChoosePassword" schema={this.getValidationSchema()}>
 
-          <RoundedInput name="password" password label={t(`Password`)} />
-          <RoundedInput name="confirmPassword" password label={t(`Confirm password`)} />
+            <RoundedInput name="password" password label={t(`Password`)} />
+            <RoundedInput name="confirmPassword" password label={t(`Confirm password`)} />
 
-          <div className={styles.note}>
-            <strong>{t('Note')}: </strong>
-            {t('choose-password-note')}
-          </div>
+            <div className={styles.note}>
+              <strong>{t('Note')}: </strong>
+              {t('choose-password-note')}
+            </div>
 
-          <PasswordStrength password={this.props.form && this.props.form.fields.password} />
+            <PasswordStrength password={this.props.form && this.props.form.fields.password} />
 
-          <NavLink className={styles.prevLink} to={`/get-started/${prevPath}`} />
-          <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/welcome" />
+            <NavLink className={styles.prevLink} to={`/get-started/${prevPath}`} />
+            <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/welcome" />
 
-          <div className={styles.paginationDots}>
-            <div className={styles.complete} />
-            <div className={styles.complete} />
-            <div className={styles.empty} />
-          </div>
+          </RoundedForm>
+        </div>
 
-        </RoundedForm>
+        <div className={styles.paginationDots}>
+          <div className={styles.complete} />
+          <div className={styles.complete} />
+          <div className={styles.empty} />
+        </div>
+
       </div>
     )
   }
