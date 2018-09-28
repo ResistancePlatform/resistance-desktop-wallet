@@ -11,6 +11,7 @@
   justify-content: center;
   font-size: 1.3rem;
   padding-bottom: 1.4rem;
+  line-height: 4rem;
 
   img {
     width: 4rem;
@@ -38,6 +39,10 @@
   .passwordInput {
     max-width: 24rem;
   }
+}
+
+.loginButton {
+  margin-top: 0.5rem;
 }
 
 .loginButton:not(:disabled) {

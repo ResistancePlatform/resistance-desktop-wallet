@@ -12,7 +12,7 @@ import ChoosePasswordPage from './get-started/ChoosePasswordPage'
 import WelcomePage from './get-started/WelcomePage'
 
 import Login from '~/components/auth/Login'
-import TitleBarButtons from '~/components/title-bar-buttons/TitleBarButtons'
+import TitleBarButtons, { DragBar } from '~/components/title-bar-buttons/TitleBarButtons'
 import NaviBar from './navigation/navi-bar'
 import SystemInfo from './system-info/system-info'
 import Overview from './overview/overview'
@@ -61,6 +61,7 @@ class App extends React.Component<Props> {
     return (
       <div className={[styles.contentContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
         <TitleBarButtons />
+        <DragBar />
         <div className={[styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer].join(' ')}>
           <Switch>
             <Route exact path="/get-started/choose-language" component={ChooseLanguagePage} />

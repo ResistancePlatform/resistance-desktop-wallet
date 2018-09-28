@@ -1,4 +1,4 @@
-@import "../../assets/styles/vars.scss";
+@import "~/assets/styles/vars.scss";
 
 @mixin titleBarButton {
   -webkit-app-region: no-drag;
@@ -38,4 +38,15 @@
     @include titleBarButton();
     background-color: $TITLE_BAR_BUTTONS_MAXIMIZE_COLOR;
   }
+  z-index: 10;
+}
+
+.dragBar {
+  -webkit-app-region: drag;
+  height: 3.5rem;
+  display: block;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
 }
