@@ -6,7 +6,6 @@ import config from 'electron-settings'
 import { app, remote } from 'electron'
 
 import { OSService } from './os-service'
-import { FetchParametersService } from './fetch-parameters-service'
 
 const generator = require('generate-password')
 const PropertiesReader = require('properties-reader')
@@ -53,11 +52,15 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
   getDataPath() {
-    let fetchParametersService = new FetchParametersService()
     const validApp = process.type === 'renderer' ? remote.app : app
-    return path.join(validApp.getPath('appData'), configFolderName)
+    let configFolder = path.join(validApp.getPath('appData'), configFolderName)
+    if (osService.getOS() === 'linux') {
+      configFolder = path.join(validApp.getPath('home'), '.resistance')
+    }
+    return configFolder;
   }
 
+  //This is for the raw wallet path i.e. the testnet3 directory
   getWalletPath() {
     return path.join(this.getDataPath(), walletFolderName)
   }
@@ -67,11 +70,6 @@ export class ResistanceService {
     return path.join(validApp.getPath('appData'), paramFolderName)
   }
 
-  getConfigFile() {
-    const configFolder = this.getDataPath()
-    return path.join(configFolder, configFileName)
-  }
-
 	/**
    * Checks if Resistance node config is present and creates one if it doesn't.
    *
@@ -79,8 +77,9 @@ export class ResistanceService {
 	 * @returns {Object} Node configuration dictionary
 	 */
   checkAndCreateConfig(): Object {
-    let configFile = this.getConfigFile()
-    let configFolder = this.getDataPath()
+    const configFolder = this.getDataPath()
+    const configFile = path.join(configFolder, configFileName)
+
     if (!fs.existsSync(configFolder)) {
       fs.mkdirSync(configFolder)
     }
