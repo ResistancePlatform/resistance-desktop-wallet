@@ -22,8 +22,14 @@ import { ResistanceService } from './service/resistance-service'
 import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
 
-
 const osService = new OSService()
+let appDataPath = osService.getAppDataPath()
+if (!fs.existsSync(appDataPath)) {
+  fs.mkdirSync(appDataPath)
+}
+log.transports.file.maxSize = 5 * 1024 * 1024;
+log.transports.file.file = path.join(osService.getAppDataPath(), 'reswallet.log')
+
 const fetchParamsService = new FetchParametersService()
 const resistanceService = new ResistanceService()
 
@@ -85,9 +91,9 @@ app.on('window-all-closed', () => {
 
 app.on('ready', async () => {
   app.on('before-quit', () => {
-    //log.info(`Killing all child processes...`)
+    log.info(`Killing all child processes...`)
     osService.stopChildProcesses()
-    //log.info(`Done`)
+    log.info(`Done`)
   })
 
   if (

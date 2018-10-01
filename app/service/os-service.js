@@ -1,6 +1,7 @@
 // @flow
 import * as fs from 'fs';
 import path from 'path'
+import log from 'electron-log'
 import { spawn } from 'child_process'
 import { app, remote } from 'electron'
 
@@ -105,7 +106,7 @@ export class OSService {
       if (item.instance !== null && !item.instance.killed) {
         global.childProcesses[processName].isGettingKilled = true
 
-        console.log(`Killing child process ${processName} with PID ${item.instance.pid}`)
+        log.info(`Killing child process ${processName} with PID ${item.instance.pid}`)
 
         // childProcess.kill() doesn't work for an unknown reason
         if (item.pid) {
@@ -193,7 +194,7 @@ export class OSService {
 	 * @memberof OSService
 	 */
   restartProcess(processName: ChildProcessName, args = [], stdoutHandler) {
-    console.log(`Restarting ${processName} process.`)
+    log.info(`Restarting ${processName} process.`)
     this.killProcess(processName, () => {
       this.execProcess(processName, args, stdoutHandler)
     })
@@ -233,7 +234,7 @@ export class OSService {
 
       const childProcessInfo = remote.getGlobal('childProcesses')[processName]
 
-      console.log(`Executing command ${commandPath} with arguments ${args.join(' ')}.`)
+      log.info(`Executing command ${commandPath} with arguments ${args.join(' ')}.`)
       const childProcess = spawn(commandPath, args, options)
 
       const onData = (data: Buffer) => {
@@ -304,7 +305,7 @@ export class OSService {
         childProcessInfo.isGettingKilled = true
         return this.killPid(pid)
       }
-      console.log(`Process ${processName} isn't running`)
+      log.info(`Process ${processName} isn't running`)
       return Promise.resolve()
     }).then(() => {
       if (customSuccessHandler) {
@@ -331,7 +332,7 @@ export class OSService {
 				if (err) {
 					reject(err)
 				}
-				console.log('Process %s has been killed!', pid)
+				log.info('Process %s has been killed!', pid)
 				resolve(pid)
 			})
 		})
@@ -361,7 +362,7 @@ export class OSService {
 						resolve(process.pid)
 					} else {
 						resolve(0)
-						console.log('No such process found!')
+						log.info('No such process found!')
 					}
 				}
 			)

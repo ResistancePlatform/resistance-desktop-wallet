@@ -1,6 +1,7 @@
 // @flow
 import * as fs from 'fs'
 import path from 'path'
+import log from 'electron-log'
 import config from 'electron-settings'
 
 import { i18n } from '../i18next.config'
@@ -71,9 +72,9 @@ export class FetchParametersService {
     const quickHashes = config.get(quickHashesConfigKey, {})
 
     const verifySproutFile = async (fileName, index) => {
-      console.log(`Sprout file ${fileName} verification . . .`)
+      log.info(`Sprout file ${fileName} verification . . .`)
       if (!quickHashes[fileName]) {
-        console.log(`Quick hash not found for ${fileName}, calculating SHA256 checksum...`)
+        log.info(`Quick hash not found for ${fileName}, calculating SHA256 checksum...`)
         await this.verifyChecksum(fileName, sproutFiles[index].checksum)
         await this.saveQuickFileHash(fileName)
       } else {
@@ -81,6 +82,7 @@ export class FetchParametersService {
         if (quickHash !== quickHashes[fileName]) {
           return false
         }
+        log.info(`Quick hash for ${fileName} matches`)
       }
 
       return true
@@ -93,8 +95,9 @@ export class FetchParametersService {
       try {
         /* eslint-disable-next-line no-await-in-loop */
         isVerified = await verifySproutFile(fileName, index)
+        log.info(`Sprout file ${fileName} verification succeeded.`)
       } catch (err) {
-        console.error(`Sprout file ${fileName} verification failed.`, err.toString())
+        log.error(`Sprout file ${fileName} verification failed.`, err.toString())
         return false
       }
 
