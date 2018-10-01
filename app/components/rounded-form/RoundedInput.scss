@@ -4,7 +4,7 @@
   padding: 2px 6px;
   color: #e20063;
   font-size: 0.6rem;
-  height: 1rem;
+  height: 0.75rem;
 }
 
 .important {
@@ -92,6 +92,8 @@
     text-transform: uppercase;
     white-space: nowrap;
     border-right: 1.5px solid $BASE_COLOR_BORDER_GRAY;
+    user-select: none;
+    cursor: default;
   }
 
 

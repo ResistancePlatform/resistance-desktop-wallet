@@ -30,7 +30,7 @@ export const ResDexAccountsReducer = handleActions(
         symbol: action.payload.symbol
       }
     }),
-    [ResDexAccountsActions.withraw]: (state, action) => ({
+    [ResDexAccountsActions.withdraw]: (state, action) => ({
       ...state,
       withdrawModal: {
         isVisible: true,

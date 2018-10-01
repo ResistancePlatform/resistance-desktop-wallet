@@ -1,6 +1,7 @@
 @import "~/assets/styles/vars.scss";
 
-$dialogWidth: 17rem;
+$depositDialogWidth: 17rem;
+$withdrawDialogWidth: 26.25rem;
 
 .overlay {
   position: fixed;
@@ -15,8 +16,7 @@ $dialogWidth: 17rem;
 
 .container {
   position: absolute;
-  padding: 1.8rem;
-  width: $dialogWidth;
+  height: 26.875rem;
   height: 24.5rem;
   top: 50%;
   left: 50%;
@@ -39,19 +39,54 @@ $dialogWidth: 17rem;
 
 .title {
   font-size: 1.2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.75rem;
+  user-select: none;
+  cursor: default;
 }
 
-.qr {
-  width: $dialogWidth - (1.8rem) * 2 !important;
-  height: $dialogWidth - (1.8rem) * 2 !important;
-  padding: 1.6rem;
-  position: relative;
-  border-radius: 0.35rem;
-  margin-bottom: 1.6rem;
-  background: white;
+.deposit {
+  width: $depositDialogWidth;
+  padding: 1.8rem;
+
+  .qr {
+    width: $depositDialogWidth - (1.8rem) * 2 !important;
+    height: $depositDialogWidth - (1.8rem) * 2 !important;
+    padding: 1.6rem;
+    position: relative;
+    border-radius: 0.35rem;
+    margin-top: 0.25rem;
+    margin-bottom: 1.6rem;
+    background: white;
+  }
+
+  .addressInputLabel {
+    min-width: 4rem !important;
+  }
 }
 
-.addressInputLabel {
-  min-width: 4rem !important;
+.withdraw {
+  padding: 2rem;
+  width: $withdrawDialogWidth;
+
+  .inputsRow {
+    display: flex;
+    .amount {
+      text-align: left;
+    }
+  }
+
+  .caption {
+    color: $BASE_COLOR_FONT_GRAY_2;
+    height: 0.65rem;
+    margin-left: 2rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+  }
+
+  button[type='submit'] {
+    margin-top: 0.75rem;
+    float: right;
+  }
+
 }

@@ -30,7 +30,7 @@ class DepositModal extends Component<Props> {
 
     return (
       <div className={styles.overlay}>
-        <div className={styles.container}>
+        <div className={cn(styles.container, styles.deposit)}>
           <div
             role="button"
             tabIndex={0}
