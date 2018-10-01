@@ -1,11 +1,11 @@
 // @flow
 import * as fs from 'fs'
 import path from 'path'
+import { download } from 'electron-dl'
+import { app, dialog } from 'electron'
 import config from 'electron-settings'
 
 import { i18n } from '../i18next.config'
-import { app, dialog } from 'electron'
-import { download } from 'electron-dl'
 
 const crypto = require('crypto')
 const ProgressBar = require('electron-progressbar')
@@ -176,8 +176,10 @@ export class FetchParametersService {
       const receivedMb = (progress  * totalMb).toFixed(2)
       this.progressBar.value = rate
 
-      const detailMessageKey = `Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...`
-      this.progressBar.detail = this.t(detailMessageKey, { fileName, receivedMb, totalMb, roundedRate })
+      this.progressBar.detail = this.t(
+        `Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...`,
+        { fileName, receivedMb, totalMb, roundedRate }
+      )
     }
 
     const onStarted = item => {
