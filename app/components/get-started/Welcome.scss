@@ -1,0 +1,47 @@
+@import "./GetStarted.scss";
+
+.summary {
+  width: 20rem;
+  border: 1px solid $BASE_COLOR_BORDER_GRAY;
+  border-radius: 0.5rem;
+  margin-bottom: 2.2rem;
+
+  .title {
+    text-align: left;
+    color: $BASE_COLOR_FONT_GRAY_2;
+    font-size: 0.7rem;
+    border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+    padding: 0.9rem 2rem;
+  }
+
+  .body {
+    padding: 0.3rem 2rem 0.1rem 2rem;
+    text-align: left;
+    list-style: none;
+
+    li {
+      font-size: 0.7rem;
+      font-weight: normal;
+      white-space: nowrap;
+      overflow: hidden;
+      margin-bottom: 1.1rem;
+    }
+
+    span {
+      color: $BASE_COLOR_FONT_GRAY;
+      width: 7rem;
+      display: inline-block;
+      font-weight: 500;
+    }
+  }
+
+}
+
+.buttons {
+  text-align: center;
+
+  button {
+    padding-left: 1.8rem;
+    padding-right: 1.8rem;
+  }
+}

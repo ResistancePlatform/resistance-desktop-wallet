@@ -2,11 +2,11 @@
 import config from 'electron-settings'
 import { of, concat, merge } from 'rxjs'
 import { filter, switchMap, take, map, mergeMap, mapTo, catchError } from 'rxjs/operators'
-import { remote } from 'electron'
+import { remote, ipcRenderer } from 'electron'
 import { ofType } from 'redux-observable'
 import { push } from 'react-router-redux'
-import { i18n } from '~/i18next.config'
 
+import { i18n } from '~/i18next.config'
 import { Action } from '../types'
 import { getStartLocalNodeObservable } from '~/utils/child-process'
 import { AUTH } from '~/constants/auth'
@@ -153,7 +153,10 @@ const walletBootstrappingSucceededEpic = (action$: ActionsObservable<Action>) =>
 
 const useResistanceEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(WelcomeActions.useResistance),
-  mapTo(push('/overview'))
+  map(() => {
+    ipcRenderer.send('resize')
+    return push('/overview')
+  })
 )
 
 export const GetStartedEpic = (action$, state$) => merge(

@@ -11,6 +11,10 @@ type Props = {
   navi: Object
 }
 
+export const DragBar = () => (
+  <div className={styles.dragBar} />
+)
+
 class TitleBarButtons extends Component<Props> {
 	props: Props
 

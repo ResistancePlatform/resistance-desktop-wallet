@@ -88,8 +88,7 @@
 
   .label {
     color: $BASE_COLOR_BUTTON_FONT_GRAY;
-    min-width: 9rem;
-    padding: 0.5rem 0.5rem 0 0;
+    padding: 0.5rem 1.1rem 0 0;
     text-transform: uppercase;
     white-space: nowrap;
     border-right: 1.5px solid $BASE_COLOR_BORDER_GRAY;
@@ -153,9 +152,11 @@
       }
 
       &.choose_file {
-        i {
-          position: absolute;
-          top: 7px;
+        i:before {
+          position: relative;
+          top: -0.2rem;
+          left: 0.8rem;
+          color: $BASE_COLOR_PURPLE;
         }
       }
     }
