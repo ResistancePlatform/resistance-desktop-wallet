@@ -25,7 +25,9 @@ export class Bip39Service {
 	 * @memberof Bip39Service
 	 */
 	constructor() {
-		if (!instance) { instance = this }
+    if (!instance) {
+      instance = this
+    }
 
     instance.t = i18n.getFixedT(null, 'service')
 

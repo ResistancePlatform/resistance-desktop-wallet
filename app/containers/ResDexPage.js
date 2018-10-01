@@ -6,7 +6,7 @@ import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
 import { translate } from 'react-i18next'
 
 const mapStateToProps = state => ({
-  resdex: state.resdex
+  resDex: state.resDex
 })
 
 const mapDispatchToProps = dispatch => ({

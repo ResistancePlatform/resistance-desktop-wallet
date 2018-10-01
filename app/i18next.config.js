@@ -50,8 +50,15 @@ if (!i18n.isInitialized) {
   i18n.init(i18nextOptions)
 }
 
+function translate(namespaces) {
+  return namespaces
+    ? i18n.getFixedT(null, namespaces)
+    : i18n.t.bind(i18n)
+}
+
 export {
   i18n,
+  translate,
   availableLanguages,
   availableNamespaces
 }
