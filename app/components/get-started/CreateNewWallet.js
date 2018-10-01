@@ -63,24 +63,27 @@ export class CreateNewWallet extends Component<Props> {
 
         <div className={styles.hint}>{t(`Choose a name for your wallet`)}</div>
 
-        <RoundedForm id="getStartedCreateNewWallet" schema={validationSchema}>
-          <RoundedInput name="walletName" label={t(`Wallet name`)} defaultValue={userInfo().username} />
+        <div className={styles.innerContainer}>
+          <RoundedForm id="getStartedCreateNewWallet" schema={validationSchema}>
+            <RoundedInput name="walletName" label={t(`Wallet name`)} defaultValue={userInfo().username} />
 
-          <RoundedInput
-            name="walletPath"
-            label={t(`Your wallet stored in`)}
-            defaultValue={resistance.getWalletPath()}
-            readOnly />
+            <RoundedInput
+              name="walletPath"
+              label={t(`Your wallet stored in`)}
+              defaultValue={resistance.getWalletPath()}
+              readOnly />
 
-          <NavLink className={styles.prevLink} to="/get-started/get-started" />
-          <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/choose-password" />
+            <NavLink className={styles.prevLink} to="/get-started/get-started" />
+            <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/choose-password" />
+          </RoundedForm>
+        </div>
 
-          <div className={styles.paginationDots}>
-            <div className={styles.complete} />
-            <div className={styles.empty} />
-            <div className={styles.empty} />
-          </div>
-        </RoundedForm>
+
+        <div className={styles.paginationDots}>
+          <div className={styles.complete} />
+          <div className={styles.empty} />
+          <div className={styles.empty} />
+        </div>
       </div>
     )
   }

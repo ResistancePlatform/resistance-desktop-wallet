@@ -185,11 +185,12 @@ export class FetchParametersService {
     const onStarted = item => {
       totalBytes = item.getTotalBytes()
       this.progressBar.value = 0
-      const textKey = `Fetching Resistance parameters (file {{fileIndex}} of {{filesNumber}})...`
-      this.progressBar.text = this.t(textKey, {
-        index: index + 1,
-        filesNumber: sproutFiles.length
-      })
+      this.progressBar.text = this.t(
+        `Fetching Resistance parameters (file {{fileIndex}} of {{filesNumber}})...`,
+        {
+          fileIndex: index + 1,
+          filesNumber: sproutFiles.length
+        })
     }
 
     const downloadPromise = download(this.parentWindow, `${sproutUrl}/${fileName}`, {

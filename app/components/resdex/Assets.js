@@ -12,6 +12,10 @@ import {
   AreaSeries
 } from 'react-vis'
 
+import btcImage from '~/assets/images/resdex/BTC.svg'
+import ethImage from '~/assets/images/resdex/ETH.svg'
+import ltcImage from '~/assets/images/resdex/LTC.svg'
+import etcImage from '~/assets/images/resdex/ETC.svg'
 import styles from './Assets.scss'
 
 type Props = {
@@ -114,7 +118,7 @@ class ResDexAssets extends Component<Props> {
 
         <div className={styles.coins}>
           <div className={styles.coin}>
-            <img src="assets/images/resdex/BTC.svg" alt="Bitcoin"/>
+            <img src={btcImage} alt="Bitcoin"/>
 
             Bitcoin
             <div className={styles.amount}>0.0097521 BTC</div>
@@ -130,7 +134,7 @@ class ResDexAssets extends Component<Props> {
           </div>
 
           <div className={styles.coin}>
-            <img src="assets/images/resdex/LTC.svg" alt="Litecoin"/>
+            <img src={ltcImage} alt="Litecoin"/>
 
             Litecoin
             <div className={styles.amount}>1.3758594 LTC</div>
@@ -146,7 +150,7 @@ class ResDexAssets extends Component<Props> {
           </div>
 
           <div className={styles.coin}>
-            <img src="assets/images/resdex/ETH.svg" alt="Ethereum"/>
+            <img src={ethImage} alt="Ethereum"/>
 
             Ethereum
             <div className={styles.amount}>0.983243245 ETH</div>
@@ -162,7 +166,7 @@ class ResDexAssets extends Component<Props> {
           </div>
 
           <div className={styles.coin}>
-            <img src="assets/images/resdex/ETC.svg" alt="Ethereum"/>
+            <img src={etcImage} alt="Ethereum Classic"/>
 
             Ethereum Classic
             <div className={styles.amount}>21.478472 ETC</div>

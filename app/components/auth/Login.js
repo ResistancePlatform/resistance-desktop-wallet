@@ -10,11 +10,13 @@ import { getPasswordValidationSchema } from '~/utils/auth'
 import { RoundedFormRoot } from '~/reducers/rounded-form/rounded-form.reducer'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { AuthState, AuthActions } from '~/reducers/auth/auth.reducer'
+import TitleBarButtons, { DragBar } from '~/components/title-bar-buttons/TitleBarButtons'
 import RoundedInput from '~/components/rounded-form/RoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
+import resistanceLogo from '~/assets/images/logo.svg'
 import styles from './Login.scss'
 
 const getValidationSchema = () => Joi.object().keys({
@@ -46,7 +48,13 @@ class Login extends Component<Props> {
 
     return (
       <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
-        <div className={cn(styles.title, { [styles.ready]: this.props.form && this.props.form.isValid })}>
+        <TitleBarButtons />
+        <DragBar />
+
+        <div className={styles.dragBar} />
+
+        <div className={cn(styles.header, { [styles.ready]: this.props.form && this.props.form.isValid })}>
+          <img src={resistanceLogo} alt="Resistance" />
           {this.props.auth.enter ? t(`Enter Resistance`) : t(`Confirm your login`)}
         </div>
 
