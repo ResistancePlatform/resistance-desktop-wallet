@@ -1,6 +1,15 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import { createActions, handleActions } from 'redux-actions'
 import { preloadedState } from '~/reducers/preloaded.state'
+
+export type Currency = {
+  symbol: string,
+  address: string,
+  amount: Decimal,
+  price: Decimal,
+  balance: Decimal
+}
 
 export type EnabledCurrency = {
   symbol: string,
@@ -11,10 +20,15 @@ export type EnabledCurrency = {
 export const ResDexAccountsActions = createActions(
   {
     EMPTY: undefined,
+
+    GET_CURRENCIES: undefined,
+    GOT_CURRENCIES: (currencies: Currency[]) => ({ currencies }),
+    GET_CURRENCIES_FAILED: (errorMessage: string) => ({ errorMessage }),
+
     DEPOSIT: (symbol: string) => ({ symbol }),
     WITHDRAW: (symbol: string) => ({ symbol }),
     CLOSE_DEPOSIT_MODAL: undefined,
-    CLOSE_WITDRAW_MODAL: undefined
+    CLOSE_WITHDRAW_MODAL: undefined
   },
   {
     prefix: 'APP/RESDEX/ACCOUNTS'
@@ -23,6 +37,10 @@ export const ResDexAccountsActions = createActions(
 
 export const ResDexAccountsReducer = handleActions(
   {
+    [ResDexAccountsActions.gotCurrencies]: (state, action) => ({
+      ...state,
+      currencies: action.payload.currencies
+    }),
     [ResDexAccountsActions.deposit]: (state, action) => ({
       ...state,
       depositModal: {

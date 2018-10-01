@@ -82,6 +82,8 @@ $withdrawDialogWidth: 26.25rem;
     margin-bottom: 0.85rem;
     font-size: 0.65rem;
     text-transform: uppercase;
+    user-select: none;
+    cursor: default;
   }
 
   button[type='submit'] {

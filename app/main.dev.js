@@ -90,6 +90,8 @@ const getWindowSize = (isGetStartedComplete: boolean = false) => {
 
 // Propagate Resistance node config for the RPC service
 global.resistanceNodeConfig = resistanceService.checkAndCreateConfig()
+// Set ResDEX global var for further use in renderer process, see ./service/resdex/api.js
+global.resDex = { apiToken: '' }
 
 checkAndCreateWalletAppFolder()
 

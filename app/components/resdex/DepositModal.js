@@ -28,6 +28,10 @@ class DepositModal extends Component<Props> {
 	render() {
     const { t } = this.props
 
+    const { address } = this.props.accounts.currencies.find(currency => (
+      currency.symbol === this.props.accounts.depositModal.symbol
+    ))
+
     return (
       <div className={styles.overlay}>
         <div className={cn(styles.container, styles.deposit)}>
@@ -44,12 +48,14 @@ class DepositModal extends Component<Props> {
           {t(`Deposit`)}
         </div>
 
-        <QRCode className={styles.qr} value="this.props.accounts.depositModal.address" />
+        {address &&
+          <QRCode className={styles.qr} value={address} />
+        }
 
         <RoundedInput
           name="address"
           labelClassName={styles.addressInputLabel}
-          defaultValue={this.props.accounts.depositModal.address}
+          defaultValue={address}
           label="Address"
           newAddon={new CopyAddon()}
           readOnly

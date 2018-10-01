@@ -73,6 +73,7 @@ class WithdrawModal extends Component<Props> {
         <RoundedInput
           name="recipientAddress"
           label={t(`Recipient wallet`)}
+          addon={{ enable: true, type: 'PASTE' }}
         />
 
         <RoundedInput

@@ -150,6 +150,7 @@ export const preloadedState: State = {
       }],
     },
     accounts: {
+      currencies: [],
       enabledCurrencies: [],
       depositModal: {
         isVisible: false,

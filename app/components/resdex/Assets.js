@@ -136,7 +136,14 @@ class ResDexAssets extends Component<Props> {
 
               <div className={styles.buttons}>
                 <button type="button" onClick={() => this.props.accountsActions.withdraw(currency.symbol)}>{t(`Withdraw`)}</button>
-                <button type="button" onClick={() => this.props.accountsActions.deposit(currency.symbol)}>{t(`Deposit`)}</button>
+
+                <button
+                  type="button"
+                  onClick={() => this.props.accountsActions.deposit(currency.symbol)}
+                  disabled={this.props.accounts.currencies.length === 0}
+                >
+                  {t(`Deposit`)}
+                </button>
               </div>
             </div>
           ))}
