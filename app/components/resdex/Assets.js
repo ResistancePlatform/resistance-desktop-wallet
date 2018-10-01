@@ -34,6 +34,44 @@ type Props = {
 class ResDexAssets extends Component<Props> {
 	props: Props
 
+  getWalletContents(t, symbol: string) {
+    const currency = this.props.accounts.currencies[symbol]
+
+    return (
+      <div className={styles.coin}>
+        <CurrencyIcon symbol={symbol} size="1.6rem" />
+
+        {getCurrencyName(symbol)}
+
+        <div className={styles.amount}>
+          {currency ? `${currency.balance} ${symbol}` : t(`N/A`)}
+        </div>
+
+        <div className={styles.equity}>
+          <sub>$</sub>{currency ? currency.price.mul(currency.balance).toString() : t(`N/A`)}
+        </div>
+
+        <div className={styles.buttons}>
+          <button
+            type="button"
+            onClick={() => this.props.accountsActions.withdraw(currency.symbol)}
+            disabled={!currency}
+          >
+            {t(`Withdraw`)}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => this.props.accountsActions.deposit(currency.symbol)}
+            disabled={!currency}
+          >
+            {t(`Deposit`)}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
 	/**
 	 * @returns
    *
@@ -122,32 +160,7 @@ class ResDexAssets extends Component<Props> {
         </XYPlot>
 
         <div className={styles.coins}>
-          {this.props.accounts.enabledCurrencies.map(currency => (
-            <div className={styles.coin}>
-              <CurrencyIcon symbol={currency.symbol} size="1.6rem" />
-
-              {getCurrencyName(currency.symbol)}
-
-              <div className={styles.amount}>21.478472 {currency.symbol}</div>
-
-              <div className={styles.equity}>
-                <sub>$</sub>67.44342
-              </div>
-
-              <div className={styles.buttons}>
-                <button type="button" onClick={() => this.props.accountsActions.withdraw(currency.symbol)}>{t(`Withdraw`)}</button>
-
-                <button
-                  type="button"
-                  onClick={() => this.props.accountsActions.deposit(currency.symbol)}
-                  disabled={this.props.accounts.currencies.length === 0}
-                >
-                  {t(`Deposit`)}
-                </button>
-              </div>
-            </div>
-          ))}
-
+          {this.props.accounts.enabledCurrencies.map(currency => this.getWalletContents(t, currency.symbol))}
         </div>
 
       </div>

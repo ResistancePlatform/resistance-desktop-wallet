@@ -28,9 +28,8 @@ class DepositModal extends Component<Props> {
 	render() {
     const { t } = this.props
 
-    const { address } = this.props.accounts.currencies.find(currency => (
-      currency.symbol === this.props.accounts.depositModal.symbol
-    ))
+    const { symbol } = this.props.accounts.depositModal
+    const { address } = this.props.accounts.currencies[symbol]
 
     return (
       <div className={styles.overlay}>
@@ -45,7 +44,7 @@ class DepositModal extends Component<Props> {
 
         {/* Title */}
         <div className={styles.title}>
-          {t(`Deposit`)}
+          {t(`Deposit {{symbol}}`, { symbol })}
         </div>
 
         {address &&

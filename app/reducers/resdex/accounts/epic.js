@@ -19,13 +19,16 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   switchMap(() => (
     from(api.getPortfolio()).pipe(
       switchMap(response => {
-        const currencies = response.portfolio.map(currency => ({
-          symbol: currency.coin,
-          address: currency.address,
-          balance: Decimal(currency.balance),
-          price: Decimal(currency.price),
-          amount: Decimal(currency.amount),
-        }))
+        const currencies = response.portfolio.reduce((accumulator, currency) => ({
+          ...accumulator,
+          [currency.coin]: {
+            symbol: currency.coin,
+            address: currency.address,
+            balance: Decimal(currency.balance),
+            price: Decimal(currency.price),
+            amount: Decimal(currency.amount),
+          }
+        }), {})
 
         return of(ResDexAccountsActions.gotCurrencies(currencies))
       }),

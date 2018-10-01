@@ -31,7 +31,7 @@ export type ResDexState = {
     completedOrders: Order[]
   },
   accounts: {
-    currencies: Currency[],
+    currencies: { [string]: Currency },
     enabledCurrencies: EnabledCurrency[],
     depositModal: {
       isVisible: boolean,

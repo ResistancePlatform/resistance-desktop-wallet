@@ -34,7 +34,7 @@ export class ResDex extends Component<Props> {
 	 * @returns
    * @memberof ResDex
 	 */
-  getTabs() {
+  getContents() {
     return (
       <div>
         <RpcPolling
@@ -45,6 +45,13 @@ export class ResDex extends Component<Props> {
             failure: ResDexAccountsActions.getCurrenciesFailed
           }}
         />
+
+        {this.props.resDex.accounts.depositModal.isVisible &&
+          <DepositModal />
+        }
+        {this.props.resDex.accounts.withdrawModal.isVisible &&
+          <WithdrawModal />
+        }
 
         <Tabs
           className={styles.tabs}
@@ -77,16 +84,9 @@ export class ResDex extends Component<Props> {
       <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.resDexContainer)}>
         <div className={styles.dragBar} />
 
-        {this.props.resDex.accounts.depositModal.isVisible &&
-          <DepositModal />
-        }
-        {this.props.resDex.accounts.withdrawModal.isVisible &&
-          <WithdrawModal />
-        }
-
         {this.props.resDex.login.isRequired
           ?  <ResDexLogin />
-          : this.getTabs()
+          : this.getContents()
         }
 
       </div>

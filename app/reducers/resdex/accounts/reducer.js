@@ -22,7 +22,7 @@ export const ResDexAccountsActions = createActions(
     EMPTY: undefined,
 
     GET_CURRENCIES: undefined,
-    GOT_CURRENCIES: (currencies: Currency[]) => ({ currencies }),
+    GOT_CURRENCIES: (currencies: { [string]: Currency }) => ({ currencies }),
     GET_CURRENCIES_FAILED: (errorMessage: string) => ({ errorMessage }),
 
     DEPOSIT: (symbol: string) => ({ symbol }),
