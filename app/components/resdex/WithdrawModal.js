@@ -1,5 +1,4 @@
 // @flow
-import { Decimal } from 'decimal.js'
 import * as Joi from 'joi'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -10,7 +9,8 @@ import cn from 'classnames'
 import ValidateAddressService from '~/service/validate-address-service'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
-import RoundedInput, { ChooseWalletAddon } from '~/components/rounded-form/RoundedInput'
+import RoundedInput from '~/components/rounded-form/RoundedInput'
+import ChooseWallet from '~/components/rounded-form/ChooseWallet'
 import RoundedTextArea from '~/components/rounded-form/RoundedTextArea'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
@@ -44,11 +44,6 @@ class WithdrawModal extends Component<Props> {
 	render() {
     const { t } = this.props
 
-    const wallets = [{
-      currency: 'BTC',
-      balance: Decimal('2.12400181')
-    }]
-
     return (
       <div className={styles.overlay}>
         <div className={cn(styles.container, styles.withdraw)}>
@@ -76,11 +71,11 @@ class WithdrawModal extends Component<Props> {
           addon={{ enable: true, type: 'PASTE' }}
         />
 
-        <RoundedInput
+        <ChooseWallet
           name="withdrawFrom"
           label={t(`Withdraw from`)}
-          newAddon={new ChooseWalletAddon(wallets)}
-          number
+          defaultValue={this.props.accounts.withdrawModal.symbol}
+          currencies={this.props.accounts.currencies}
         />
 
         <div className={styles.inputsRow}>

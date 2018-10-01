@@ -3,11 +3,9 @@ import { clipboard, remote } from 'electron'
 import React, { Component } from 'react'
 import cn from 'classnames'
 
-import CurrencyIcon from '~/components/resdex/CurrencyIcon'
-
 import styles from './RoundedInput.scss'
 
-type AddonType = null | 'paste' | 'dropdown' | 'text_placeholder' | 'choose_file' | 'choose_wallet'
+type AddonType = null | 'paste' | 'dropdown' | 'text_placeholder' | 'choose_file'
 
 export type RoundedInputAddon = {
 	enable: boolean,
@@ -37,31 +35,6 @@ export class CopyAddon extends Addon {
       <div>
         {input}
         <i className={cn('icon', styles.copy)} />
-      </div>
-    )
-  }
-}
-
-export class ChooseWalletAddon extends Addon {
-  wallets: object[]
-  chosenWallet: string
-
-  static get type() { return 'choose_wallet' }
-
-  constructor(wallets) {
-    super()
-    this.wallets = wallets
-    this.chosenWallet = wallets[0].currency
-  }
-
-  render(input) {
-    return (
-      <div className={cn(styles.newAddon, styles.chooseWallet)}>
-        <CurrencyIcon symbol="BTC" size="1.2rem" />
-        <span>BTC Wallet</span>
-        {input}
-        <span>BTC</span>
-        <i className={cn('icon', styles.arrowDown)} />
       </div>
     )
   }

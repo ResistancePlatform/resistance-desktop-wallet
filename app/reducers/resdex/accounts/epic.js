@@ -6,6 +6,7 @@ import { switchMap, map, catchError } from 'rxjs/operators'
 import { actions as toastrActions } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
+import { getCurrencyName } from '~/utils/resdex'
 import { ResDexApiService } from '~/service/resdex/api'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
@@ -23,6 +24,7 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
           ...accumulator,
           [currency.coin]: {
             symbol: currency.coin,
+            name: getCurrencyName(currency.coin),
             address: currency.address,
             balance: Decimal(currency.balance),
             price: Decimal(currency.price),
