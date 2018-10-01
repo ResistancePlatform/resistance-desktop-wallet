@@ -24,7 +24,9 @@ const availableNamespaces = [
 const isDev = process.env.NODE_ENV === 'development'
 const os = new OSService()
 
-const localesPath = path.join(os.getResourcesPath(), 'locales')
+const localesPath = (process.versions.electron
+  ? path.join(os.getResourcesPath(), 'locales')
+  : './locales')
 
 
 const i18nextOptions = {

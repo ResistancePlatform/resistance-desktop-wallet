@@ -8,6 +8,7 @@
   "Fetching Resistance parameters...": "Fetching Resistance parameters...",
   "This will take awhile, but it's just a one time operation :)": "This will take awhile, but it's just a one time operation :)",
   "Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...": "Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...",
+  "Process {{processName}} unexpectedly exited with code {{code}}.": "Process {{processName}} unexpectedly exited with code {{code}}.",
   "Unable to get Resistance local node info": "Unable to get Resistance local node info",
   "Unable to get transactions from the wallet": "Unable to get transactions from the wallet",
   "Unable to get blockchain info": "Unable to get blockchain info",

@@ -40,5 +40,8 @@
   "Portfolio": "Portfolio",
   "Login": "Login",
   "Waiting for the ResDEX daemon...": "Waiting for the ResDEX daemon...",
-  "Forgot password": "Forgot password"
+  "Forgot password": "Forgot password",
+  "Resipient wallet": "Resipient wallet",
+  "Withdraw from": "Withdraw from",
+  "Amount": "Amount"
 }
