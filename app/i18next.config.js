@@ -11,6 +11,7 @@ const availableNamespaces = [
   'address-book',
   'send-cash',
   'settings',
+  'resdex',
   'service',
   'validation',
   'menu',

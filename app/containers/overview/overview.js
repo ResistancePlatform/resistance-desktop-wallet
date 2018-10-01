@@ -5,16 +5,16 @@ import cn from 'classnames'
 import { translate } from 'react-i18next'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
-import { OverviewActions } from '~/state/reducers/overview/overview.reducer'
-import { appStore } from '~/state/store/configureStore'
+import { OverviewActions } from '~/reducers/overview/overview.reducer'
+import { appStore } from '~/store/configureStore'
 import Balance from '~/components/overview/Balance'
 import TransactionList from '~/components/overview/TransactionList'
 import TransactionPopupMenu from '~/components/overview/transaction-popup-menu'
 import TransactionDetailList from '~/components/overview/transaction-detail'
 
 import styles from './overview.scss'
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 
 const walletInfoPollingInterval = 2.0
 const transactionsPollingInterval = 5.0

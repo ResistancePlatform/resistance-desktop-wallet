@@ -2,7 +2,7 @@ import { take, mergeMap } from 'rxjs/operators'
 import { of, concat } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 
-import { AuthActions } from '~/state/reducers/auth/auth.reducer'
+import { AuthActions } from '~/reducers/auth/auth.reducer'
 
 
 function getEnsureLoginObservable(reason: string | null, next: Observable, action$: ActionsObservable<Action>) {

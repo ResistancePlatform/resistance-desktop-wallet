@@ -3,8 +3,8 @@ import React, { Component } from 'react'
 import { NavLink } from 'react-router-dom'
 import classNames from 'classnames'
 
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 import styles from './GetStarted.scss'
 
 type Props = {

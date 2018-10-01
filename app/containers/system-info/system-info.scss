@@ -1,5 +1,5 @@
-@import "../../theme/generic-component.scss";
-@import "../../theme/vars.scss";
+@import "../../assets/styles/generic-component.scss";
+@import "../../assets/styles/vars.scss";
 
 $SYSTEM_INFO_BAR_HEIGHT: 5.5rem;
 
@@ -89,7 +89,7 @@ $SYSTEM_INFO_BAR_HEIGHT: 5.5rem;
 
 @font-face {
   font-family: 'custom-icons';
-  src:  url(fonts/custom-icons.woff2) format('woff2');
+  src:  url(assets/fonts/custom-icons.woff2) format('woff2');
   font-weight: normal;
   font-style: normal;
 }

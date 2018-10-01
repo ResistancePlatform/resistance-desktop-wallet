@@ -4,9 +4,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { appStore } from '~/state/store/configureStore'
-import { SettingsState } from '~/state/reducers/settings/settings.reducer'
-import { RpcPollingActions, RpcPollingState } from '~/state/reducers/rpc-polling/rpc-polling.reducer'
+import { appStore } from '~/store/configureStore'
+import { SettingsState } from '~/reducers/settings/settings.reducer'
+import { RpcPollingActions, RpcPollingState } from '~/reducers/rpc-polling/rpc-polling.reducer'
 
 type ActionKind = 'polling' | 'success' | 'failure'
 

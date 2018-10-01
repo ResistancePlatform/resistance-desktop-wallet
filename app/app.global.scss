@@ -5,7 +5,7 @@
 @import "~font-awesome/css/font-awesome.css";
 @import "./app.icomoon.font.scss";
 @import "./app.quicksand.font.scss";
-@import "./theme/full-screen.scss";
+@import "./assets/styles/full-screen.scss";
 
 html {
   @include full-screen();

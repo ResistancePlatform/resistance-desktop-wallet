@@ -2,7 +2,7 @@
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { ChooseLanguage } from '~/components/get-started/ChooseLanguage'
-import { GetStartedActions } from '~/state/reducers/get-started/get-started.reducer'
+import { GetStartedActions } from '~/reducers/get-started/get-started.reducer'
 import { translate } from 'react-i18next'
 
 const mapStateToProps = state => ({

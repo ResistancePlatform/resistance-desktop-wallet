@@ -10,8 +10,8 @@ import classNames from 'classnames'
 
 import 'react-tabs/style/react-tabs.scss'
 import { OSService, ChildProcessName } from '~/service/os-service'
-import { appStore } from '~/state/store/configureStore'
-import { SettingsActions, SettingsState } from '~/state/reducers/settings/settings.reducer'
+import { appStore } from '~/store/configureStore'
+import { SettingsActions, SettingsState } from '~/reducers/settings/settings.reducer'
 import styles from './status-modal.scss'
 
 const osService = new OSService()

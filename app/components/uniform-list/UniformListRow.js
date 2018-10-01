@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import classNames from 'classnames'
 
 import styles from './UniformList.scss'
-import HLayout from '~/theme/h-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
 
 type Props = {
   className?: string,

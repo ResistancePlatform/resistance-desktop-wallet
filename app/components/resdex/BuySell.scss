@@ -1,0 +1,214 @@
+@import "~/assets/styles/vars.scss";
+@import "./ResDex.scss";
+
+.container {
+  display: flex;
+  margin: 1.5rem;
+}
+
+.inputLabel {
+  min-width: 5rem !important;
+}
+
+.actionContainer {
+  @extend %smallContainer;
+  width: 50%;
+  padding: 1rem;
+
+  .inputsRow {
+    display: flex;
+
+    div {
+      .caption {
+        padding-left: 1rem;
+        display: block;
+        font-size: 0.7rem;
+        color: $BASE_COLOR_FONT_GRAY_2;
+        text-transform: uppercase;
+        padding-bottom: 1rem;
+        white-space: nowrap;
+      }
+
+      i:after {
+        content: 'i';
+        font-style: normal;
+        color: $BASE_COLOR_LIGHT_BLUE;
+        text-transform: lowercase;
+        margin-left: 1rem;
+      }
+
+      input {
+        text-align: left;
+      }
+
+      .maxAmount {
+        margin-right: 1rem;
+      }
+    }
+
+  }
+
+  .enhancedPrivacy {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.7rem;
+    color: $BASE_COLOR_FONT_GRAY;
+    text-align: justify;
+
+    label {
+      color: $BASE_COLOR_WHITE;
+      display: block;
+      margin-bottom: 0.5rem;
+      user-select: none;
+    }
+
+    strong {
+      font-weight: normal;
+      color: $BASE_COLOR_FONT_GRAY_2;
+    }
+  }
+
+  input[type=checkbox] {
+    margin: 0;
+    margin-right: 0.9rem;
+    visibility: hidden;
+  }
+
+  input[type=checkbox]:before {
+    content: '\0020';
+    display: inline-block;
+    background: #151a35;
+    font-size: 0.8rem;
+    border-radius: 0.2rem;
+    color: $BASE_COLOR_PURPLE;
+    width: 0.8rem;
+    height: 0.8rem;
+    visibility: visible;
+  }
+
+  input[type=checkbox]:checked:before {
+    content: '\2713';
+  }
+
+  button {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.summaryContainer {
+  @extend %smallContainer;
+  width: 50%;
+  margin-left: 2rem;
+
+  .briefContainer {
+    font-size: 0.7rem;
+    text-align: center;
+
+    .brief {
+      text-transform: uppercase;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .amount {
+      font-size: 2.2rem;
+      margin-bottom: 0.7rem;
+
+      span {
+        font-size: 1.2rem;
+      }
+    }
+
+    .at {
+    }
+
+  }
+
+  .fromTo {
+    margin-top: 2.6rem;
+    display: flex;
+    border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+    padding: 1rem;
+
+    .wallet {
+      width: 50%;
+
+      img {
+        width: 1.3rem;
+        padding: 0.25rem;
+        background: $BASE_COLOR_WHITE;
+        float: left;
+        margin-right: 0.3rem;
+      }
+
+      div {
+        font-size: 0.7rem;
+
+        span {
+          font-size: 0.6rem;
+          display: block;
+          color: $BASE_COLOR_FONT_GRAY_2;
+          text-transform: uppercase;
+          margin-bottom: 0.25rem;
+        }
+      }
+    }
+  }
+
+  .list {
+    padding: 1rem;
+    margin: 0;
+    list-style: none;
+    white-space: nowrap;
+
+    li {
+      display: flex;
+      position: relative;
+      width: 100%;
+      font-size: 0.7rem;
+      color: $BASE_COLOR_FONT_GRAY_2;
+      line-height: 2rem;
+
+      hr {
+        width: 100%;
+        margin: 1rem 0.5rem 0 0.5rem;
+        height: 1px;
+        display: inline-block;
+        border: none;
+        border-top: 1px dashed $BASE_COLOR_FONT_GRAY;
+      }
+
+      &.res {
+        hr:before {
+          position: absolute;
+          content: 'RES';
+
+          left: 51%;
+          top: 0.1rem;
+          transform: translateX(-50%);
+
+          color: $BASE_COLOR_WHITE;
+          background: $BASE_COLOR_PURPLE;
+
+          font-size: 0.6rem;
+          font-weight: 500;
+          line-height: 0.7rem;
+
+          padding: 0.1rem 0.5rem;
+          border-radius: 1.05rem;
+          border: 0.5rem solid $BASE_COLOR_DARK_BLUE_3;
+        }
+      }
+    }
+
+    li:last-child {
+      span {
+        color: $BASE_COLOR_WHITE;
+      }
+    }
+  }
+
+}

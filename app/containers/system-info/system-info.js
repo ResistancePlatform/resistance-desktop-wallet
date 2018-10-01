@@ -10,14 +10,14 @@ import { toastr } from 'react-redux-toastr'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { OSService } from '~/service/os-service'
-import { SystemInfoActions, SystemInfoState } from '~/state/reducers/system-info/system-info.reducer'
-import { appStore } from '~/state/store/configureStore'
-import { State } from '~/state/reducers/types'
+import { SystemInfoActions, SystemInfoState } from '~/reducers/system-info/system-info.reducer'
+import { appStore } from '~/store/configureStore'
+import { State } from '~/reducers/types'
 import OperationsModal from '~/components/system-info/OperationsModal'
 import humanizeOperationName from '~/components/system-info/humanize-operation'
 
 import styles from './system-info.scss'
-import HLayout from '~/theme/h-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
 
 const osService = new OSService()
 

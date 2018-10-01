@@ -7,7 +7,7 @@ import { bindActionCreators } from 'redux'
 import ValidateAddressService from '~/service/validate-address-service'
 import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
-import { AddressBookActions, AddressBookState } from '~/state/reducers/address-book/address-book.reducer'
+import { AddressBookActions, AddressBookState } from '~/reducers/address-book/address-book.reducer'
 
 import styles from './NewAddressDialog.scss'
 

@@ -1,28 +1,68 @@
 // @flow
 import { clipboard, remote } from 'electron'
 import React, { Component } from 'react'
-import classNames from 'classnames'
+import cn from 'classnames'
 
 import styles from './RoundedInput.scss'
 
+type AddonType = null | 'paste' | 'dropdown' | 'text_placeholder' | 'choose_file' | 'choose_wallet'
+
 export type RoundedInputAddon = {
 	enable: boolean,
-	type: 'PASTE' | 'DROPDOWN' | 'TEXT_PLACEHOLDER' | 'CHOOSE_FILE',
+	type: 'PASTE' | 'DROPDOWN' | 'TEXT_PLACEHOLDER' | 'CHOOSE_FILE' | 'CHOOSE_WALLET',
   data?: { [string]: any },
 	value: string | undefined,
 	onClick?: addonType => void,
 	onEnterPressed?: () => void
 }
 
+class Addon {
+	enable: boolean
+	value: string | undefined
+
+  static get type(): AddonType { return null }
+
+  render(input) {
+    return input
+  }
+}
+
+export class ChooseWalletAddon extends Addon {
+  wallets: object[]
+  chosenWallet: string
+
+  static get type() { return 'choose_wallet' }
+
+  constructor(wallets) {
+    super()
+    this.wallets = wallets
+    this.chosenWallet = wallets[0].currency
+  }
+
+  render(input) {
+    return (
+      <div className={cn(styles.newAddon, styles.chooseWallet)}>
+        <img src="assets/images/resdex/BTC.svg" alt="Bitcoin"/>
+        <span>BTC Wallet</span>
+        {input}
+        <span>BTC</span>
+        <i className={cn('icon', styles.arrowDown)} />
+      </div>
+    )
+  }
+}
+
 type Props = {
 	name: string,
   className?: string,
+  labelClassName?: string,
   defaultValue?: string,
 	number?: boolean,
   password?: boolean,
 	label: string,
 	onChange?: value => void,
 	addon?: RoundedInputAddon,
+  newAddon?: Addon,
 	disabled?: boolean,
 	tooltip?: string,
   onEnterPressed: func,
@@ -139,7 +179,7 @@ class RoundedInput extends Component<Props> {
 
     if (this.props.addon.type === 'TEXT_PLACEHOLDER') {
 			return (
-				<span className={classNames(styles.addon, styles.text)}>
+				<span className={cn(styles.addon, styles.text)}>
 					{this.props.addon.value}
 				</span>
 			)
@@ -173,7 +213,7 @@ class RoundedInput extends Component<Props> {
     return (
 				<span
           role="none"
-					className={classNames(styles.addon, styles[this.props.addon.type.toLowerCase()])}
+					className={cn(styles.addon, styles[this.props.addon.type.toLowerCase()])}
 					onClick={event => this.onAddonClick(event)}
 					onKeyDown={event => this.onAddonClick(event)}
 				>
@@ -205,36 +245,47 @@ class RoundedInput extends Component<Props> {
 	}
 
 	render() {
+    const input = (
+      <input
+        type={this.getInputType()}
+        value={this.state.value}
+        disabled={this.props.disabled}
+        onChange={event => this.onChangeHandler(event)}
+        onFocus={(event) => this.onFocusHandler(event)}
+        onBlur={(event) => this.onBlurHandler(event)}
+        onKeyPress={(event) => this.onEnterPressedEventHandler(event)}
+        readOnly={this.props.readOnly}
+      />
+    )
+
 		return (
       <div>
         <div
           name={this.props.name}
           disabled={this.props.disabled}
-          className={classNames(
+          className={cn(
             this.props.className,
-            styles.roundedInputContainer,
+            styles.container,
             {
               [styles.important]: this.props.important,
               [styles.error]: Boolean(this.props.error)
             }
           )}
         >
-          <div className={styles.roundedInputLabel}>
-            {this.props.label || ''}
-          </div>
+          {this.props.label &&
+            <div className={cn(styles.label, this.props.labelClassName)}>
+              {this.props.label}
+            </div>
+          }
 
-          <div className={classNames(styles.inputContainer)}>
-            <input
-              type={this.getInputType()}
-              value={this.state.value}
-              disabled={this.props.disabled}
-              onChange={event => this.onChangeHandler(event)}
-              onFocus={(event) => this.onFocusHandler(event)}
-              onBlur={(event) => this.onBlurHandler(event)}
-              onKeyPress={(event) => this.onEnterPressedEventHandler(event)}
-              readOnly={this.props.readOnly}
-            />
+          <div className={cn(styles.inputContainer)}>
+            {this.props.newAddon
+              ? this.props.newAddon.render(input)
+              : input
+            }
+
             {this.renderAddon()}
+
             {this.renderTooltip()}
           </div>
           {this.props.children ? this.props.children : null}

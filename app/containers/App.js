@@ -19,16 +19,17 @@ import Overview from './overview/overview'
 import OwnAddress from './own-addresses/own-addresses'
 import SendCash from './send-cash/send-cash'
 import Settings from './settings/settings'
+import ResDexPage from './ResDexPage'
 import AddressBookPage from './AddressBookPage'
 
-import { appStore } from '../state/store/configureStore'
-import { AuthState } from '~/state/reducers/auth/auth.reducer'
-import { GetStartedState } from '~/state/reducers/get-started/get-started.reducer'
-import { SettingsActions } from '~/state/reducers/settings/settings.reducer'
+import { appStore } from '../store/configureStore'
+import { AuthState } from '~/reducers/auth/auth.reducer'
+import { GetStartedState } from '~/reducers/get-started/get-started.reducer'
+import { SettingsActions } from '~/reducers/settings/settings.reducer'
 
 import styles from './App.scss'
-import HLayout from '../theme/h-box-layout.scss'
-import VLayout from '../theme/v-box-layout.scss'
+import HLayout from '../assets/styles/h-box-layout.scss'
+import VLayout from '../assets/styles/v-box-layout.scss'
 
 type Props = {
   auth: AuthState,
@@ -79,7 +80,7 @@ class App extends React.Component<Props> {
     return (
       <div className={cn(styles.contentContainer, VLayout.vBoxContainer)}>
 				{ /* Content container */}
-				<div className={[VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
+				<div className={cn(VLayout.vBoxChild, HLayout.hBoxContainer)}>
           <TitleBarButtons />
 					<NaviBar />
 
@@ -91,6 +92,7 @@ class App extends React.Component<Props> {
 							<Route exact path="/send-cash" component={SendCash} />
 							<Route exact path="/settings" component={Settings} />
 							<Route exact path="/address-book" component={AddressBookPage} />
+							<Route exact path="/resdex" component={ResDexPage} />
 							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
 						</Switch>
 					</div>

@@ -1,7 +1,7 @@
 // @flow
 import config from 'electron-settings'
 import { of, throwError } from 'rxjs'
-import { AddressBookRecord } from '../state/reducers/address-book/address-book.reducer'
+import { AddressBookRecord } from '../reducers/address-book/address-book.reducer'
 
 import { i18n } from '~/i18next.config'
 

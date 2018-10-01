@@ -5,15 +5,15 @@ import { connect } from 'react-redux'
 import { clipboard } from 'electron'
 import { translate } from 'react-i18next'
 
-import { TRANSACTION_FEE } from '~/constants'
-import { appStore } from '~/state/store/configureStore'
+import { DECIMAL } from '~/constants/decimal'
+import { appStore } from '~/store/configureStore'
 import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
 import AddressDropdownPopupMenu from '~/components/send-cash/address-drodown-popup-menu'
-import { SendCashActions, SendCashState } from '~/state/reducers/send-cash/send-cash.reducer'
+import { SendCashActions, SendCashState } from '~/reducers/send-cash/send-cash.reducer'
 
 import styles from './send-cash.scss'
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 
 type Props = {
   t: any,
@@ -159,7 +159,7 @@ class SendCash extends Component<Props> {
 									<AddressDropdownPopupMenu
 										addressList={this.props.sendCash.addressList}
 										onPickupAddress={(event, address) => this.onPickupAddressHandler(event, address)}
-									/>re
+									/>
 								</div>
 							</RoundedInput>
 
@@ -207,7 +207,7 @@ class SendCash extends Component<Props> {
 							/>
 							<div className={styles.transactionFeeContainer}>
 								<span className={styles.part1}>{t(`Transaction fee:`)} </span>
-								<span className={styles.part2}>{TRANSACTION_FEE.toString()}</span>
+								<span className={styles.part2}>{DECIMAL.transactionFee.toString()}</span>
 								<span className={styles.part3}>RES</span>
 							</div>
 						</div>

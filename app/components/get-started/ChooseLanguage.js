@@ -5,8 +5,8 @@ import Iso6391 from 'iso-639-1'
 
 import { availableLanguages } from '~/i18next.config'
 
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 import styles from './GetStarted.scss'
 
 type Props = {
@@ -15,7 +15,7 @@ type Props = {
 
 
 /**
- * @class GetStarted
+ * @class ChooseLanguage
  * @extends {Component<Props>}
  */
 export class ChooseLanguage extends Component<Props> {

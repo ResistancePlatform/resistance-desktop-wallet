@@ -1,9 +1,9 @@
 :global {
-  @import '../theme/toastr/index.scss';
+  @import '../assets/styles/toastr/index.scss';
 }
 
-@import "../theme/full-screen.scss";
-@import "../theme/vars.scss";
+@import "../assets/styles/full-screen.scss";
+@import "../assets/styles/vars.scss";
 
 .appContainer {
     @include full-screen();

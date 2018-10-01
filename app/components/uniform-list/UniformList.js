@@ -1,11 +1,11 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import classNames from 'classnames'
+import cn from 'classnames'
 import { translate } from 'react-i18next'
 
 import styles from './UniformList.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 
 type Props = {
   t: any,
@@ -41,7 +41,7 @@ class UniformList extends Component<Props> {
 	 */
   getHeader() {
     return React.cloneElement(this.header, {
-      className: classNames(styles.header, this.header.props.className),
+      className: cn(styles.header, this.header.props.className),
       header: true
     })
   }
@@ -89,7 +89,7 @@ class UniformList extends Component<Props> {
     const { t } = this.props
 
     return (
-      <div className={classNames(styles.container, VLayout.vBoxChild, this.props.className)}>
+      <div className={cn(styles.container, VLayout.vBoxChild, this.props.className)}>
 
         {this.props.items.length > 0 && this.getHeader()}
 

@@ -11,16 +11,16 @@ import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
 import { i18n } from '~/i18next.config'
-import { TRANSACTION_FEE } from '~/constants'
+import { DECIMAL } from '~/constants/decimal'
 import { LoggerService, ConsoleTheme } from './logger-service'
 import { OSService } from './os-service'
 import { ResistanceService } from './resistance-service'
 import { AddressBookService } from './address-book-service'
-import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../state/reducers/system-info/system-info.reducer'
-import { Balances, OverviewActions, Transaction } from '../state/reducers/overview/overview.reducer'
-import { OwnAddressesActions, AddressRow } from '../state/reducers/own-addresses/own-addresses.reducer'
-import { SendCashActions } from '~/state/reducers/send-cash/send-cash.reducer'
-import { AddressBookRecord } from '~/state/reducers/address-book/address-book.reducer'
+import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../reducers/system-info/system-info.reducer'
+import { Balances, OverviewActions, Transaction } from '../reducers/overview/overview.reducer'
+import { OwnAddressesActions, AddressRow } from '../reducers/own-addresses/own-addresses.reducer'
+import { SendCashActions } from '~/reducers/send-cash/send-cash.reducer'
+import { AddressBookRecord } from '~/reducers/address-book/address-book.reducer'
 
 /**
  * ES6 singleton
@@ -299,7 +299,7 @@ export class RpcService {
 
     const commandParameters= [
       fromAddress,
-      [{ address: toAddress, amount: amountToSend.sub(TRANSACTION_FEE) }]
+      [{ address: toAddress, amount: amountToSend.sub(DECIMAL.transactionFee) }]
     ]
 
     // Confirmations number, important!

@@ -8,8 +8,8 @@ import RoundedInput from '~/components/rounded-form/RoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 import PasswordStrength from '~/components/password-strength/PasswordStrength'
 
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 import styles from './GetStarted.scss'
 
 type Props = {

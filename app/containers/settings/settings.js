@@ -13,13 +13,13 @@ import { availableLanguages } from '~/i18next.config'
 import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import styles from './settings.scss'
-import HLayout from '~/theme/h-box-layout.scss'
-import VLayout from '~/theme/v-box-layout.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
 
-import { appStore } from '~/state/store/configureStore'
-import { PopupMenuActions } from '~/state/reducers/popup-menu/popup-menu.reducer'
-import { SystemInfoState } from '~/state/reducers/system-info/system-info.reducer'
-import { SettingsActions, SettingsState } from '~/state/reducers/settings/settings.reducer'
+import { appStore } from '~/store/configureStore'
+import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
+import { SystemInfoState } from '~/reducers/system-info/system-info.reducer'
+import { SettingsActions, SettingsState } from '~/reducers/settings/settings.reducer'
 import StatusModal from '~/components/settings/status-modal'
 
 const generator = require('generate-password')
@@ -328,18 +328,17 @@ class Settings extends Component<Props> {
 
 						{/* Language */}
             <div className={styles.languageContainer}>
+              <PopupMenu id={languagePopupMenuId} relative>
+                {this.getLanguageMenuItems()}
+              </PopupMenu>
+
               <RoundedInput
                 name="language"
                 defaultValue={Iso6391.getNativeName(this.props.settings.language)}
                 label={t(`Language`)}
                 addon={languageDropdownAddon}
                 readOnly
-              >
-                {/* Dropdown menu container */}
-                <PopupMenu id={languagePopupMenuId} relative>
-                  {this.getLanguageMenuItems()}
-                </PopupMenu>
-              </RoundedInput>
+              />
             </div>
 
             <div className={cn(styles.sectionContainer, styles.walletPassword)}>
