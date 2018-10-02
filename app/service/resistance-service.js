@@ -57,7 +57,6 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
   getDataPath() {
-    log.info(`getDataPath`)
     const validApp = process.type === 'renderer' ? remote.app : app
     let configFolder = path.join(validApp.getPath('appData'), configFolderName)
     if (osService.getOS() === 'linux') {
@@ -68,14 +67,16 @@ export class ResistanceService {
 
   //This is for the raw wallet path i.e. the testnet3 directory
   getWalletPath() {
-    log.info(`getWalletPath`)
     return path.join(this.getDataPath(), walletFolderName)
   }
 
   getParamsPath() {
-    log.info(`getParamsPath`)
     const validApp = process.type === 'renderer' ? remote.app : app
-    return path.join(validApp.getPath('appData'), paramFolderName)
+    let paramsPath = path.join(validApp.getPath('appData'), paramFolderName)
+    if (osService.getOS() === 'linux') {
+      configFolder = path.join(validApp.getPath('home'), '.resistance-params')
+    }
+    return paramsPath
   }
 
 	/**
@@ -85,7 +86,6 @@ export class ResistanceService {
 	 * @returns {Object} Node configuration dictionary
 	 */
   checkAndCreateConfig(): Object {
-    log.info(`checkAndCreateConfig`)
     const configFolder = this.getDataPath()
     const configFile = path.join(configFolder, configFileName)
 
@@ -113,7 +113,6 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
 	start(isTorEnabled: boolean) {
-    log.info(`start`)
     this::startOrRestart(isTorEnabled, true)
 	}
 
@@ -124,7 +123,6 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
 	restart(isTorEnabled: boolean) {
-    log.info(`restart`)
     this::startOrRestart(isTorEnabled, false)
 	}
 
@@ -174,13 +172,11 @@ export class ResistanceService {
  */
 function startOrRestart(isTorEnabled: boolean, start: boolean) {
   const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
-  log.info(`ummmm`)
   // TODO: support system wide wallet paths, stored in config.get('wallet.path')
   // https://github.com/ResistancePlatform/resistance-core/issues/84
 
   const walletName = config.get('wallet.name', 'wallet')
   args.push(`-wallet=${walletName}.dat`)
-  log.info(`THIS FAR???`)
   const caller = start ? osService.execProcess : osService.restartProcess
 
   this::verifyExportDirExistence().then(exportDir => {
