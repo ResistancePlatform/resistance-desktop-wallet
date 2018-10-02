@@ -25,8 +25,9 @@ export const ResDexAccountsActions = createActions(
     GOT_CURRENCIES: (currencies: { [string]: Currency }) => ({ currencies }),
     GET_CURRENCIES_FAILED: (errorMessage: string) => ({ errorMessage }),
 
-    DEPOSIT: (symbol: string) => ({ symbol }),
-    WITHDRAW: (symbol: string) => ({ symbol }),
+    WITHDRAW: undefined,
+    SHOW_DEPOSIT_MODAL: (symbol: string) => ({ symbol }),
+    SHOW_WITHDRAW_MODAL: (symbol: string) => ({ symbol }),
     CLOSE_DEPOSIT_MODAL: undefined,
     CLOSE_WITHDRAW_MODAL: undefined
   },
@@ -41,14 +42,14 @@ export const ResDexAccountsReducer = handleActions(
       ...state,
       currencies: action.payload.currencies
     }),
-    [ResDexAccountsActions.deposit]: (state, action) => ({
+    [ResDexAccountsActions.showDepositModal]: (state, action) => ({
       ...state,
       depositModal: {
         isVisible: true,
         symbol: action.payload.symbol
       }
     }),
-    [ResDexAccountsActions.withdraw]: (state, action) => ({
+    [ResDexAccountsActions.showWithdrawModal]: (state, action) => ({
       ...state,
       withdrawModal: {
         isVisible: true,

@@ -7,7 +7,7 @@ import * as Joi from 'joi'
 import { i18n } from '~/i18next.config'
 import { RoundedFormState, RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 
-const inputChildComponentNames = ['RoundedInput', 'RoundedTextArea']
+const inputChildComponentNames = ['RoundedInput', 'RoundedTextArea', 'ChooseWallet', 'Connect(ChooseWallet)']
 
 type Props = {
   actions: object,

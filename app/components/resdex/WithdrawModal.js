@@ -6,7 +6,6 @@ import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 
-import ValidateAddressService from '~/service/validate-address-service'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import RoundedInput from '~/components/rounded-form/RoundedInput'
@@ -16,16 +15,12 @@ import RoundedForm from '~/components/rounded-form/RoundedForm'
 
 import styles from './Modal.scss'
 
-const validateAddress = new ValidateAddressService()
-
 const getValidationSchema = t => Joi.object().keys({
-  name: Joi.string().required().label(t(`Name`)),
-  address: (
-    validateAddress.getJoi()
-    .resistanceAddress()
-    .rZ().rLength().zLength().valid()
-    .required().label(t(`Address`))
-  )
+  recipientAddress: Joi.string().required().label(t(`Recipient address`)),
+  withdrawFrom: Joi.string().required(),
+  amount: Joi.number().required().label(t(`Amount`)),
+  equity: Joi.number(),
+  note: Joi.string().optional().label(t(`Note`)),
 })
 
 type Props = {
@@ -97,7 +92,7 @@ class WithdrawModal extends Component<Props> {
           {t(`Write an optional message`)}
         </RoundedTextArea>
 
-        <button type="submit">{t(`Withdraw`)}</button>
+        <button type="submit" onClick={this.props.actions.withdraw}>{t(`Withdraw`)}</button>
     </RoundedForm>
 
   </div>

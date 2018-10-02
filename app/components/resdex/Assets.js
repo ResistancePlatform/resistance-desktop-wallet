@@ -1,4 +1,5 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import moment from 'moment'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -48,21 +49,21 @@ class ResDexAssets extends Component<Props> {
         </div>
 
         <div className={styles.equity}>
-          <sub>$</sub>{currency ? currency.price.mul(currency.balance).toString() : t(`N/A`)}
+          <sub>$</sub>{currency ? Decimal('0.001314').mul(currency.balance).toString() : t(`N/A`)}
         </div>
 
         <div className={styles.buttons}>
           <button
             type="button"
-            onClick={() => this.props.accountsActions.withdraw(currency.symbol)}
-            disabled={!currency}
+            onClick={() => this.props.accountsActions.showWithdrawModal(currency.symbol)}
+            disabled={!currency || currency.balance.isZero()}
           >
             {t(`Withdraw`)}
           </button>
 
           <button
             type="button"
-            onClick={() => this.props.accountsActions.deposit(currency.symbol)}
+            onClick={() => this.props.accountsActions.showDepositModal(currency.symbol)}
             disabled={!currency}
           >
             {t(`Deposit`)}

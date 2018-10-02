@@ -21,7 +21,7 @@ type Props = {
 	label?: string,
   currencies: { [string]: Currency },
   defaultValue?: string | null,
-	onChange?: symbol => void,
+	onChange?: value => void,
   disabled?: boolean,
   popupMenu: object
 }
@@ -66,7 +66,7 @@ class ChooseWallet extends Component<Props> {
 
 		return (
       <div
-        className={cn(styles.container, this.props.className)}
+        className={cn(styles.container, styles.chooseWalletContainer, this.props.className)}
         name={this.props.name}
         disabled={this.props.disabled}
       >
@@ -77,17 +77,20 @@ class ChooseWallet extends Component<Props> {
         </div>
       }
 
-      <div className={cn(styles.chooseWallet)}>
-        <CurrencyIcon symbol={this.state.symbol} size="1.2rem" />
-        <span>{t(`{{symbol}} Wallet`, {symbol: this.state.symbol})}</span>
-        {selectedCurrency && selectedCurrency.balance.toString()}
-        <span>{this.state.symbol.symbol}</span>
+      <div className={styles.chooseWallet}>
+        <CurrencyIcon className={styles.currencyIcon} symbol={this.state.symbol} size="1.2rem" />
 
-        <i
+        <div className={styles.walletName}>{t(`{{symbol}} Wallet`, {symbol: this.state.symbol})}</div>
+
+        <div className={styles.balance}>{selectedCurrency && selectedCurrency.balance.toString()}</div>
+
+        <div className={styles.symbol}>{this.state.symbol}</div>
+
+        <div
+          className={cn('icon', styles.arrowDownButton)}
           role="button"
           tabIndex={0}
-          className={cn('icon', styles.arrowDown)}
-          onClick={this.props.popupMenu.show(this.popupMenuId)}
+          onClick={() => this.props.popupMenu.show(this.popupMenuId) && false }
           onKeyDown={() => false}
         />
 
@@ -98,10 +101,10 @@ class ChooseWallet extends Component<Props> {
               className={styles.menuItem}
               onClick={e => this.onChangeHandler(e, currency.symbol)}
             >
-              <CurrencyIcon symbol={currency.symbol} size="1rem" />
-              <div>{currency.name}</div>
-              <div>{currency.balance.toString()}</div>
-              <div>{currency.symbol}</div>
+              <CurrencyIcon className={styles.icon} symbol={currency.symbol} size="1rem" />
+              <div className={styles.walletName}>{currency.name}</div>
+              <div className={styles.balance}>{currency.balance.toString()}</div>
+              <div className={styles.symbol}>{currency.symbol}</div>
             </PopupMenuItem>
           ))
           }
