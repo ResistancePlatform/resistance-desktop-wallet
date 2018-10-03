@@ -3,13 +3,15 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 
+import { NaviState } from '~/reducers/navi/navi.reducer'
 import FetchParametersState from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import FetchParametersProgress from '~/components/fetch-parameters/FetchParametersProgress'
 import styles from './Footer.scss'
 
 type Props = {
   t: any,
-  fetchParameters: FetchParametersState
+  fetchParameters: FetchParametersState,
+	navi: NaviState
 }
 
 class Footer extends Component<Props> {
@@ -25,7 +27,7 @@ class Footer extends Component<Props> {
 			<div className={styles.container}>
         {t(``)}
 
-        {!this.props.fetchParameters.isDownloadComplete &&
+        {!this.props.fetchParameters.isDownloadComplete && !this.props.navi.currentNaviPath.includes('/welcome') &&
           <FetchParametersProgress className={styles.progressBar} />
         }
 			</div>
@@ -34,7 +36,8 @@ class Footer extends Component<Props> {
 }
 
 const mapStateToProps = state => ({
-	fetchParameters: state.fetchParameters
+	fetchParameters: state.fetchParameters,
+	navi: state.navi
 })
 
 export default connect(mapStateToProps, null)(translate('get-started')(Footer))

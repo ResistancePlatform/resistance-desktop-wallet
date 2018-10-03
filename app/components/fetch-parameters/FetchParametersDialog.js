@@ -1,31 +1,49 @@
 // @flow
 import React, { Component } from 'react'
 import { translate } from 'react-i18next'
+import { connect } from 'react-redux'
+import cn from 'classnames'
 
-import styles from './FetchParametersFooter.scss'
+import FetchParametersProgress from '~/components/fetch-parameters/FetchParametersProgress'
+import FetchParametersState from '~/reducers/fetch-parameters/fetch-parameters.reducer'
+
+import resistanceLogo from '~/assets/images/logo.svg'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
+import styles from './FetchParametersDialog.scss'
 
 type Props = {
   t: any,
-  getStarted: GetStartedState
+  fetchParameters: FetchParametersState
 }
 
-class FetchParametersFooter extends Component<Props> {
+class FetchParametersDialog extends Component<Props> {
 	props: Props
 
 	/**
-	 * @memberof FetchParametersFooter
+	 * @memberof FetchParametersDialog
 	 */
 	render() {
     const { t } = this.props
 
 		return (
-			<div className={styles.container}>
-        {t(``)}
-        {this.props.getStarted}
-			</div>
+      <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
+        <div className={cn(styles.header)}>
+          {t(``)}
+          <img src={resistanceLogo} alt="Resistance" />
+          Resistance
+        </div>
+        <div className={styles.hint}>
+          Fetching Resistance parameters
+          <FetchParametersProgress />
+        </div>
+      </div>
 		)
 	}
 }
 
-export default translate('get-started')(FetchParametersFooter)
+const mapStateToProps = state => ({
+	fetchParameters: state.fetchParameters
+})
 
+export default connect(mapStateToProps, null)(translate('other')(FetchParametersDialog))

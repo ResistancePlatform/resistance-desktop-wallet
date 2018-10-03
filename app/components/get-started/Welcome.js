@@ -6,6 +6,7 @@ import cn from 'classnames'
 import Iso6391 from 'iso-639-1'
 
 import { i18n } from '~/i18next.config'
+import FetchParametersState from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import { ResistanceService } from '~/service/resistance-service'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
@@ -18,6 +19,7 @@ type Props = {
   t: any,
   roundedForm: object,
   getStarted: object,
+  fetchParameters: FetchParametersState,
   welcome: object,
   actions: object
 }
@@ -90,12 +92,22 @@ export class Welcome extends Component<Props> {
 	render() {
     const { t } = this.props
 
+    // <div className={cn(styles.hint, styles[this.props.welcome.status])}>
+    //  {this.props.welcome.hint || t(`Check the wallet configuration before applying`)}
+    // </div>
+
 		return (
       <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
         <div className={styles.title}>{t(`Welcome to Resistance!`)}</div>
 
-        <div className={cn(styles.hint, styles[this.props.welcome.status])}>
-          {this.props.welcome.hint || t(`Check the wallet configuration before applying`)}
+        <div className={styles.downloadProgressContainer}>
+         <div className={styles.downloadProgress}>
+            {t(`Please wait for Resistance parameters download to complete`)}
+            <div style={{ width: `${68}%` }}>
+              {t(`Please wait for Resistance parameters download to complete`)}
+            </div>
+          </div>
+
         </div>
 
         <div className={cn(styles.innerContainer, styles.summary)}>
@@ -129,7 +141,7 @@ export class Welcome extends Component<Props> {
               type="button"
               onClick={this.props.actions.applyConfiguration}
               onKeyDown={this.props.actions.applyConfiguration}
-              disabled={this.props.welcome.isBootstrapping}
+              disabled={!this.props.fetchParameters.isDownloadComplete || this.props.welcome.isBootstrapping}
             >
               {t(`Apply configuration`)}
             </button>
