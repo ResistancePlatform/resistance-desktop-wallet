@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
 import cn from 'classnames'
 
+import FetchParametersFooter from './get-started/FetchParametersFooter'
 import ChooseLanguagePage from './get-started/ChooseLanguagePage'
 import GetStartedPage from './get-started/GetStartedPage'
 import CreateNewWalletPage from './get-started/CreateNewWalletPage'
@@ -73,6 +74,7 @@ class App extends React.Component<Props> {
             <Route exact path="/" render={() => (<Redirect to="/get-started/choose-language" />)} />
           </Switch>
         </div>
+        <FetchParametersFooter />
       </div>
     )
   }

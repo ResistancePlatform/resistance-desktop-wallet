@@ -8,6 +8,9 @@ export const preloadedState: State = {
     isLoginRequired: true, // process.env.NODE_ENV !== 'development'
   },
   roundedForm: {},
+  fetchParameters: {
+    isDownloadComplete: false,
+  },
   getStarted: {
     createNewWallet: {
       wallet: null

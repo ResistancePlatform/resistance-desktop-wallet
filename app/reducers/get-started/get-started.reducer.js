@@ -19,6 +19,7 @@ export type GetStartedState = {
     isBootstrapping: boolean,
     isReadyToUse: boolean
   },
+  isParametersDownloadComplete: boolean,
   isCreatingNewWallet: boolean,
   isInProgress: boolean
 }
