@@ -92,23 +92,27 @@ export class Welcome extends Component<Props> {
 	render() {
     const { t } = this.props
 
-    // <div className={cn(styles.hint, styles[this.props.welcome.status])}>
-    //  {this.props.welcome.hint || t(`Check the wallet configuration before applying`)}
-    // </div>
-
 		return (
       <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
         <div className={styles.title}>{t(`Welcome to Resistance!`)}</div>
 
-        <div className={styles.downloadProgressContainer}>
-         <div className={styles.downloadProgress}>
-            {t(`Please wait for Resistance parameters download to complete`)}
-            <div style={{ width: `${68}%` }}>
-              {t(`Please wait for Resistance parameters download to complete`)}
+        {this.props.fetchParameters.isDownloadComplete
+          ? (
+            <div className={cn(styles.hint, styles[this.props.welcome.status])}>
+              {this.props.welcome.hint || t(`Check the wallet configuration before applying`)}
             </div>
-          </div>
-
-        </div>
+          )
+          : (
+            <div className={styles.downloadProgressContainer}>
+              <div className={styles.downloadProgress}>
+                {t(`Please wait for Resistance parameters download to complete`)}
+                <div style={{ width: `${this.props.fetchParameters.progressRate}%` }}>
+                  {t(`Please wait for Resistance parameters download to complete`)}
+                </div>
+              </div>
+            </div>
+          )
+        }
 
         <div className={cn(styles.innerContainer, styles.summary)}>
           <div className={styles.title}>

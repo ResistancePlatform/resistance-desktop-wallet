@@ -9,6 +9,7 @@ export const preloadedState: State = {
   },
   roundedForm: {},
   fetchParameters: {
+    progressRate: 68.0,
     isDownloadComplete: false,
   },
   getStarted: {
