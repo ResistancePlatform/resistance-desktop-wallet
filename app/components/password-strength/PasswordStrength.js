@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react'
-import * as owasp from 'owasp-password-strength-test'
+import { PasswordMeter } from 'password-meter'
 import { translate } from 'react-i18next'
 
 import styles from './PasswordStrength.scss'
@@ -38,6 +38,7 @@ class PasswordStrength extends Component<Props> {
       strengthRate: 0,
       status: null
     }
+
 	}
 
 	/**
@@ -45,12 +46,13 @@ class PasswordStrength extends Component<Props> {
 	 */
   componentDidUpdate(prevProps) {
     if (prevProps.password !== this.props.password) {
-      const result = owasp.test(this.props.password || '')
-      const strengthRate = Math.round(100 * result.passedTests.length / (result.passedTests.length + result.failedTests.length))
+      const passwordMeter = new PasswordMeter({})
+      const strengthRate = passwordMeter.getResult(this.props.password).percent
+      console.log(strengthRate)
 
       let status = null
 
-      if (result.strong) {
+      if (strengthRate >= 99) {
         status = 'excellent'
       } else if (strengthRate <= 50) {
         status = 'weak'
