@@ -40,5 +40,7 @@
   "Starting the local node again...": "Starting the local node again...",
   "Restore Resistance wallet from a private keys file": "Restore Resistance wallet from a private keys file",
   "Keys files": "Keys files",
-  "Restoring the wallet from the private keys...": "Restoring the wallet from the private keys..."
+  "Restoring the wallet from the private keys...": "Restoring the wallet from the private keys...",
+  "Private keys file": "Private keys file",
+  "Please wait for Resistance parameters download to complete": "Please wait for Resistance parameters download to complete"
 }

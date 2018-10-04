@@ -109,6 +109,11 @@ app.on('window-all-closed', () => {
 });
 
 app.on('ready', async () => {
+  // Check resistance parameters presence relying on quick hashes only,
+  // The use case when the actual parameters are present and the quick hashes are not
+  // is covered in FetchParameters component
+  global.isParametersPresenceConfirmed = await fetchParamsService.checkPresenceWithQuickHashes()
+
   app.on('before-quit', () => {
     console.log(`Killing all child processes...`)
     osService.stopChildProcesses()
@@ -143,10 +148,6 @@ app.on('ready', async () => {
   ipcMain.on('change-language', (event, code) => {
     i18n.changeLanguage(code)
   })
-
-  if (!await fetchParamsService.checkPresence()) {
-    await fetchParamsService.fetch(mainWindow)
-  }
 
   // Disabling eval for security reasons,
   // https://github.com/ResistancePlatform/resistance-desktop-wallet/issues/155

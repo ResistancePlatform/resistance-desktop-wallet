@@ -1,3 +1,4 @@
+import { remote } from 'electron'
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
 
@@ -9,7 +10,9 @@ export const preloadedState: State = {
   },
   roundedForm: {},
   fetchParameters: {
-    progressRate: 68.0,
+    progressRate: 0,
+    statusMessage: '',
+    errorMessage: null,
     isDownloadComplete: false,
   },
   getStarted: {
@@ -154,6 +157,10 @@ export const preloadedState: State = {
 }
 
 // Load serialized settings
+Object.assign(preloadedState.fetchParameters, {
+  isDownloadComplete: remote.getGlobal('isParametersPresenceConfirmed', false)
+})
+
 Object.assign(preloadedState.getStarted, {
 	isInProgress: config.get('getStartedInProgress', true)
 })

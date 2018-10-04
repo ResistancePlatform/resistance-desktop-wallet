@@ -33,5 +33,7 @@
   "Open orders": "Open orders",
   "No open orders to display.": "No open orders to display.",
   "Swap history": "Swap history",
-  "No completed orders to display.": "No completed orders to display."
+  "No completed orders to display.": "No completed orders to display.",
+  "Withdraw": "Withdraw",
+  "Deposit": "Deposit"
 }

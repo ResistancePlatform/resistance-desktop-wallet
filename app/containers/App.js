@@ -24,6 +24,7 @@ import ResDexPage from './ResDexPage'
 import AddressBookPage from './AddressBookPage'
 
 import { appStore } from '../store/configureStore'
+import { FetchParametersState, FetchParametersActions } from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import { AuthState } from '~/reducers/auth/auth.reducer'
 import { GetStartedState } from '~/reducers/get-started/get-started.reducer'
 import { SettingsActions } from '~/reducers/settings/settings.reducer'
@@ -34,6 +35,7 @@ import VLayout from '../assets/styles/v-box-layout.scss'
 
 type Props = {
   auth: AuthState,
+  fetchParameters: FetchParametersState,
   getStarted: GetStartedState
 }
 
@@ -44,7 +46,7 @@ type Props = {
  * @extends {React.Component<Props>}
  */
 class App extends React.Component<Props> {
-	props: Props;
+	props: Props
 
 	/**
    * Triggers child processes.
@@ -56,14 +58,19 @@ class App extends React.Component<Props> {
     if (!this.props.getStarted.isInProgress) {
       appStore.dispatch(SettingsActions.kickOffChildProcesses())
     }
+
+    if(!this.props.fetchParameters.isDownloadComplete) {
+      appStore.dispatch(FetchParametersActions.fetch())
+    }
+
   }
 
   getGetStartedContent() {
     return (
-      <div className={[styles.contentContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
+      <div className={cn(styles.contentContainer, VLayout.vBoxChild, HLayout.hBoxContainer)}>
         <TitleBarButtons />
         <DragBar />
-        <div className={[styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer].join(' ')}>
+        <div className={cn(styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer)}>
           <Switch>
             <Route exact path="/get-started/choose-language" component={ChooseLanguagePage} />
             <Route exact path="/get-started/get-started" component={GetStartedPage} />

@@ -18,5 +18,7 @@
   "is not a valid Resistance address": "is not a valid Resistance address",
   "Address already exists in the database.": "Address already exists in the database.",
   "Address not found in the database.": "Address not found in the database.",
-  "Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...": "Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)..."
+  "Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...": "Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...",
+  "Fetching Resistance parameters (file {{fileIndex}} of {{filesNumber}})...": "Fetching Resistance parameters (file {{fileIndex}} of {{filesNumber}})...",
+  "Process {{processName}} unexpectedly exited with code {{code}}.": "Process {{processName}} unexpectedly exited with code {{code}}."
 }

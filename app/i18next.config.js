@@ -24,7 +24,9 @@ const availableNamespaces = [
 const isDev = process.env.NODE_ENV === 'development'
 const os = new OSService()
 
-const localesPath = path.join(os.getResourcesPath(), 'locales')
+const localesPath = (process.versions.electron
+  ? path.join(os.getResourcesPath(), 'locales')
+  : './locales')
 
 
 const i18nextOptions = {
@@ -57,8 +59,15 @@ if (!i18n.isInitialized) {
   i18n.init(i18nextOptions)
 }
 
+function translate(namespaces) {
+  return namespaces
+    ? i18n.getFixedT(null, namespaces)
+    : i18n.t.bind(i18n)
+}
+
 export {
   i18n,
+  translate,
   availableLanguages,
   availableNamespaces
 }
