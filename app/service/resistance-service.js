@@ -97,7 +97,7 @@ export class ResistanceService {
 
     if (fs.existsSync(configFile)) {
       resistanceNodeConfig = PropertiesReader(configFile).path()
-      log.info(`The Resistance config file ${configFile} and does not need to be created.`);
+      log.info(`The Resistance config file ${configFile} exists and does not need to be created.`);
     } else {
       resistanceNodeConfig = this.createConfig(configFile)
       log.info(`The Resistance config file ${configFile} was successfully created.`);

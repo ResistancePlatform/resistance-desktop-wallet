@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid'
 import { remote } from 'electron'
 import Client from 'bitcoin-core'
 import { from, of, Observable } from 'rxjs'
-import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
+import { map, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
 import { i18n } from '~/i18next.config'
@@ -75,6 +75,7 @@ export class RpcService {
 
     instance.t = i18n.getFixedT(null, 'service')
 
+		this.logger = new LoggerService()
 		this.osService = new OSService()
 		this.resistanceService = new ResistanceService()
 		this.addressBookService = new AddressBookService()
@@ -140,9 +141,6 @@ export class RpcService {
 
     from(client.command(commandList))
     .pipe(
-      tap(result =>
-          log.debug(`requestWalletInfo result: ${result}`)
-         ),
          map(result => ({
            transparentBalance: Decimal(result[0].transparent),
            privateBalance: Decimal(result[0].private),
@@ -157,7 +155,7 @@ export class RpcService {
         this.osService.dispatchAction(OverviewActions.gotWalletInfo(result))
       },
       error => {
-        log.debug(this, `startPollingWalletInfo`, `subscribe error: `, ConsoleTheme.error, error)
+        log.debug(`Error fetching the wallet balances: ${error}`)
         // TODO: move the prefix to toastr error title in the epic #114
         const errorPrefix = this.t(`Unable to get Resistance local node info`)
         this.osService.dispatchAction(OverviewActions.getWalletInfoFailure(`${errorPrefix}: ${error}`))
@@ -190,11 +188,11 @@ export class RpcService {
     this::applyAddressBookNamesToTransactions(combineQueryPromise)
       .subscribe(
         result => {
-          log.debug(`requestTransactionsDataFromWallet, subscribe result: ${result}`)
+          log.debug(`Wallet transactions: ${result}`)
           this.osService.dispatchAction(OverviewActions.gotTransactionDataFromWallet(result.transactions))
         },
         error => {
-          log.debug(`requestTransactionsDataFromWallet, subscribe error: ${error}`)
+          log.debug(`Error fetching wallet transactions: ${error}`)
           // TODO: move the prefix to toastr error title in the epic #114
           const errorPrefix = this.t(`Unable to get transactions from the wallet`)
           this.osService.dispatchAction(OverviewActions.getTransactionDataFromWalletFailure(`${errorPrefix}: ${error}`))
@@ -224,14 +222,14 @@ export class RpcService {
       .then(result => client.getBlockHash(result))
       .then(result => client.getBlock(result))
       .then(result => {
-        log.debug(`requestBlockchainInfo result: ${result}`)
+        log.debug(`Blockchain info: ${result}`)
         blockchainInfo.lastBlockDate = new Date(result.time * 1000)
         blockchainInfo.blockchainSynchronizedPercentage = this.getBlockchainSynchronizedPercentage(blockchainInfo.lastBlockDate)
         this.osService.dispatchAction(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
         return Promise.resolve()
       })
       .catch(err => {
-        log.debug(`requestBlockchainInfo error: ${err}`)
+        log.debug(`Error fetching the blockchain: ${err}`)
         // TODO: move the prefix to toastr error title in the epic #114
         const errorPrefix = this.t(`Unable to get blockchain info`)
         this.osService.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`${errorPrefix}: ${err}`, err.code))
@@ -277,9 +275,8 @@ export class RpcService {
 
 		return from(createNewAddressPromise).pipe(
 			map(result => result[0]),
-			tap(newAddress => log.debug(`createNewAddress create ${isPrivate ? 'private ' : 'transparent '} address: ${newAddress}`)),
 			catchError(error => {
-				log.debug(`createNewAddress error: ${error}`)
+				log.debug(`There was an error creating a new address: ${error}`)
 				return of('')
 			})
 		)
@@ -376,12 +373,10 @@ export class RpcService {
 					}))
           .filter(item => !(item.address.startsWith('rr') || item.address.startsWith('rs')))
 
-				log.debug(`getWalletAddressAndBalance, combinedAddresses: ${combinedAddresses}`)
+				log.debug(`Fetching the balances for the combined addresses: ${combinedAddresses}`)
 				return this::getAddressesBalance(client, combinedAddresses)
 			})
 			.then(addresses => {
-				log.debug(`getWalletAddressAndBalance, addresses: ${addresses}`)
-
 				let addressList = null
 
 				// Sort for each groups
@@ -419,14 +414,14 @@ export class RpcService {
 				if (disableThePrivateAddress) {
 					const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')
 					const processedAddressList = addressList.map(tempAddressItem => isPrivateAddress(tempAddressItem.address) ? { ...tempAddressItem, disabled: true } : tempAddressItem)
-					log.debug(`getWalletAddressAndBalance, processedAddressList: ${processedAddressList}`)
+					log.debug(`The processed address list: ${processedAddressList}`)
 					return processedAddressList
 				}
 
 				return addressList
 			})
 			.catch(error => {
-				log.debug(`getWalletAddressAndBalance, error: ${error}`)
+				log.debug(`An error occurred when fetching the wallet addresses and balances: ${error}`)
 				return []
 			})
 
@@ -517,7 +512,6 @@ export class RpcService {
 
 		return from(queryPromise).pipe(
 			map(results => results[0]),
-			tap(result => log.debug(`getTransactionDetail, result: ${result}`)),
 			map(result => {
 				if (result.name === 'RpcError') {
 					return result.message
@@ -541,12 +535,12 @@ export class RpcService {
 				delete detailResult.vjoinsplit
 				delete detailResult.walletconflicts
 
-				log.debug(`getTransactionDetail, detailResult: ${detailResult}`)
+				log.debug(`Transaction details: ${detailResult}`)
 
 				return detailResult
 			}),
 			catchError(error => {
-				log.debug(`getTransactionDetail, error: ${error}`)
+				log.debug(`An error occurred while fetching transcation details: ${error}`)
 				return of(error.message)
 			})
 		)
@@ -809,7 +803,7 @@ function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise
       return addresses
     })
     .catch(err => {
-      log.debug(`getAddressesBalance, error: ${err}`)
+      log.debug(`An error occurred while fetching an address balances: ${err}`)
 
       const addresses = addressRows.map(address => ({
         ...address,

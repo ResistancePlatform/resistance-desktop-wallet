@@ -1,4 +1,4 @@
-/* eslint global-require: 0, flowtype-errors/show-errors: 0 */
+/* eslint gloal-require: 0, flowtype-errors/show-errors: 0 */
 
 /**
  * This module executes inside of electron's main process. You can start
@@ -118,7 +118,7 @@ app.on('ready', async () => {
     show: false,
     frame: false,
     backgroundColor: '#1d2440',
-    icon: path.join(__dirname, '..', `/resources/${iconFileName}`)
+    icon: path.join(osService.getInstallationPath(), 'resources', `${iconFileName}`)
   });
 
   const menuBuilder = new MenuBuilder(mainWindow)

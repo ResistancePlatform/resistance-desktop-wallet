@@ -8,6 +8,9 @@ import { i18n } from '../i18next.config'
 import { app, dialog } from 'electron'
 import { download } from 'electron-dl'
 
+import { OSService } from './os-service'
+
+const osService = new OSService()
 const crypto = require('crypto')
 const ProgressBar = require('electron-progressbar')
 
@@ -64,9 +67,12 @@ export class FetchParametersService {
 	 */
   async checkPresence() {
     const resistanceParamsFolder = this.getResistanceParamsFolder()
-
+    log.info(`Checking for params directory ${resistanceParamsFolder}`)
     if (!fs.existsSync(resistanceParamsFolder)) {
+      log.info(`The params directory ${resistanceParamsFolder} does not exist`)
       return false
+    } else {
+      log.info(`The params directory ${resistanceParamsFolder} exists`)
     }
 
     const quickHashes = config.get(quickHashesConfigKey, {})
@@ -155,7 +161,11 @@ export class FetchParametersService {
 
   getResistanceParamsFolder(): string {
     const validApp = process.type === 'renderer' ? remote.app : app
-    return path.join(app.getPath('appData'), paramsFolderName)
+    let paramFolder = path.join(app.getPath('appData'), paramsFolderName)
+    if (osService.getOS() === 'linux') {
+      paramFolder = path.join(app.getPath('home'), '.resistance-params')
+    }
+    return paramFolder
   }
 
   createProgressBar(): ProgressBar {
@@ -188,7 +198,7 @@ export class FetchParametersService {
     const onStarted = item => {
       totalBytes = item.getTotalBytes()
       this.progressBar.value = 0
-      //const textKey = `Fetching Resistance parameters (file ${fileIndex} of ${filesNumber})...`
+      //const textKey = `Fetching Resistance parameters (file {{fileIndex}} of {{filesNumber}})...`
       const textKey = `Fetching Resistance parameters files ...`
       this.progressBar.text = this.t(textKey, {
         index: index + 1,
