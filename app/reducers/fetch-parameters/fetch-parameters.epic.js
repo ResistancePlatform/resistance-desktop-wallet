@@ -1,6 +1,6 @@
 // @flow
-import { of, from, merge } from 'rxjs'
-import { switchMap, map } from 'rxjs/operators'
+import { of, from, concat, merge } from 'rxjs'
+import { switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 
 import { translate } from '~/i18next.config'
@@ -13,26 +13,29 @@ const fetchParameters = new FetchParametersService()
 
 const fetchEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(FetchParametersActions.fetch),
-  switchMap(() => (
-    of(
+  switchMap(() => {
+    const checkPresenceObservable = from(fetchParameters.checkPresenceWithoutQuickHashes()).pipe(
+      switchMap(isPresenceConfirmed => {
+        if (isPresenceConfirmed) {
+          console.error("Presence confirmed LOL")
+          return of(FetchParametersActions.downloadComplete())
+        }
+        console.error("Presence not confirmed")
+
+        return from(fetchParameters.fetch()).pipe(
+          switchMap(() => of(FetchParametersActions.downloadComplete())),
+          catchError(err => of(FetchParametersActions.downloadFailed(err.message)))
+        )
+
+      })
+    )
+
+    return concat(
       of(FetchParametersActions.status(t(`Calculating Resistance parameter files checksums`))),
-      from(fetchParameters.checkPresenceWithoutQuickHashes()),
+      checkPresenceObservable
     )
-  )),
-  switchMap(isPresenceConfirmed => {
-    if (isPresenceConfirmed) {
-      return of(FetchParametersActions.downloadComplete())
-    }
-
-    const fetchObservable = from(fetchParameters.fetch()).pipe(
-      switchMap(),
-      catchError(err => of(FetchParametersActions.downloadFailed(err.message)))
-    )
-
-    return fetchObservable
   })
 )
 
-export const ResDexEpic = (action$, state$) => merge(
-  fetchEpic(action$, state$),
+export const FetchParametersEpic = (action$, state$) => merge(
 )

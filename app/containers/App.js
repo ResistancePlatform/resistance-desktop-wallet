@@ -24,6 +24,7 @@ import ResDexPage from './ResDexPage'
 import AddressBookPage from './AddressBookPage'
 
 import { appStore } from '../store/configureStore'
+import { FetchParametersService } from '~/service/fetch-parameters-service'
 import { FetchParametersState, FetchParametersActions } from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import { AuthState } from '~/reducers/auth/auth.reducer'
 import { GetStartedState } from '~/reducers/get-started/get-started.reducer'
@@ -33,12 +34,14 @@ import styles from './App.scss'
 import HLayout from '../assets/styles/h-box-layout.scss'
 import VLayout from '../assets/styles/v-box-layout.scss'
 
+
+const fetchParameters = new FetchParametersService()
+
 type Props = {
   auth: AuthState,
   fetchParameters: FetchParametersState,
   getStarted: GetStartedState
 }
-
 
 /**
  * @export
@@ -49,20 +52,19 @@ class App extends React.Component<Props> {
 	props: Props
 
 	/**
-   * Triggers child processes.
+   * Triggers child processes and binds Resistance parameters download event handlers.
    *
 	 * @returns
    * @memberof App
 	 */
   componentDidMount() {
+    if (!this.props.fetchParameters.isDownloadComplete) {
+      fetchParameters.bindRendererHandlers(appStore.dispatch, FetchParametersActions)
+    }
+
     if (!this.props.getStarted.isInProgress) {
       appStore.dispatch(SettingsActions.kickOffChildProcesses())
     }
-
-    if(!this.props.fetchParameters.isDownloadComplete) {
-      appStore.dispatch(FetchParametersActions.fetch())
-    }
-
   }
 
   getGetStartedContent() {

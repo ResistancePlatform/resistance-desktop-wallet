@@ -26,7 +26,7 @@ class FetchParametersProgress extends Component<Props> {
         <div className={styles.nothing}>
           {t(``)}
         </div>
-        <div className={styles.progressBar}>
+        <div className={styles.progressBar} title={this.props.fetchParameters.statusMessage}>
           <div style={{ width: `${this.props.fetchParameters.progressRate}%` }} />
         </div>
 			</div>

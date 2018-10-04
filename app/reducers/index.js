@@ -21,6 +21,7 @@ import { AddressBookReducer } from './address-book/address-book.reducer'
 
 // Epics
 import { AuthEpic } from './auth/auth.epic'
+import { FetchParametersEpic } from './fetch-parameters/fetch-parameters.epic'
 import { GetStartedEpic } from './get-started/get-started.epic'
 import { OwnAddressesEpics } from './own-addresses/own-addresses.epic'
 import { NaviEpics } from './navi/navi.epic'
@@ -51,6 +52,7 @@ const rootReducer = combineReducers({
 
 const rootEpic = combineEpics(
   AuthEpic,
+  FetchParametersEpic,
   GetStartedEpic,
 	NaviEpics,
 	SystemInfoEpics,

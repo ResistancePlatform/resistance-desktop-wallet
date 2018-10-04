@@ -1,32 +1,30 @@
 // @flow
 import * as fs from 'fs'
 import path from 'path'
-import { app, remote } from 'electron'
+import { app, remote, ipcRenderer } from 'electron'
 import config from 'electron-settings'
 import crypto from 'crypto'
 
 import { translate } from '../i18next.config'
-import { OSService } from './os-service'
 
 
 const t = translate('service')
-const os = new OSService()
 
 const quickHashesConfigKey = 'resistanceParameters.quickHashes'
 const paramsFolderName = 'ResistanceParams'
 
-// const sproutUrl = `https://d3idekp8vvpxdr.cloudfront.net`
-// const sproutFiles = [
-//   { name: 'sprout-proving.key', checksum: "8bc20a7f013b2b58970cddd2e7ea028975c88ae7ceb9259a5344a16bc2c0eef7" },
-//   { name: 'sprout-verifying.key', checksum: "4bd498dae0aacfd8e98dc306338d017d9c08dd0918ead18172bd0aec2fc5df82" }
-// ]
+const sproutUrl = `https://d3idekp8vvpxdr.cloudfront.net`
+const sproutFiles = [
+  { name: 'sprout-proving.key', checksum: "8bc20a7f013b2b58970cddd2e7ea028975c88ae7ceb9259a5344a16bc2c0eef7" },
+  { name: 'sprout-verifying.key', checksum: "4bd498dae0aacfd8e98dc306338d017d9c08dd0918ead18172bd0aec2fc5df82" }
+]
 
 // Shorter files for testing purposes
-const sproutUrl = 'https://www.sample-videos.com/video/mp4/480'
-const sproutFiles = [
-  { name: 'big_buck_bunny_480p_5mb.mp4', checksum: "287d49daf0fa4c0a12aa31404fd408b1156669084496c8031c0e1a4ce18c5247" },
-  { name: 'big_buck_bunny_480p_1mb.mp4', checksum: "6b83d01a1bddbb6481001d8bb644bd4eb376922a4cf363fda9c14826534e17b3" }
-]
+// const sproutUrl = 'https://www.sample-videos.com/video/mp4/480'
+// const sproutFiles = [
+//   { name: 'big_buck_bunny_480p_5mb.mp4', checksum: "287d49daf0fa4c0a12aa31404fd408b1156669084496c8031c0e1a4ce18c5247" },
+//   { name: 'big_buck_bunny_480p_1mb.mp4', checksum: "6b83d01a1bddbb6481001d8bb644bd4eb376922a4cf363fda9c14826534e17b3" }
+// ]
 
 /**
  * ES6 singleton
@@ -38,7 +36,7 @@ let instance = null
  * @class FetchParametersService
  */
 export class FetchParametersService {
-  currentWindow = null
+  mainWindow = null
   totalBytes: number
 	completedBytes: number
   downloadItems: set
@@ -57,11 +55,12 @@ export class FetchParametersService {
 	}
 
   getResistanceParamsFolder(): string {
-    return path.join(app.getPath('appData'), paramsFolderName)
+    const validApp = process.type === 'renderer' ? remote.app : app
+    return path.join(validApp.getPath('appData'), paramsFolderName)
   }
 
 	/**
-   * Returns true if Resistance parameters are present.
+   * Called from the main process. Returns true if Resistance parameters are present.
    * The use case when the sprout files exist but there's no corresponding quick hash record
    * the checksums verification and quick hash generation has to be triggered separately
    * by the checkPresenceWithoutQuickHashes() function.
@@ -96,6 +95,27 @@ export class FetchParametersService {
     return this::verifySproutFiles(verifySproutFile)
   }
 
+  bindRendererHandlers(dispatch, actions) {
+    ipcRenderer.on('fetch-parameters-status', (event, message) => {
+      dispatch(actions.status(message))
+    })
+
+    ipcRenderer.on('fetch-parameters-download-progress', (event, {receivedBytes, totalBytes}) => {
+      console.log(receivedBytes, totalBytes)
+      dispatch(actions.downloadProgress(receivedBytes, totalBytes))
+    })
+
+    ipcRenderer.on('fetch-parameters-download-complete', () => {
+      dispatch(actions.downloadComplete())
+    })
+
+    ipcRenderer.on('fetch-parameters-download-failed', (event, errorMessage) => {
+      dispatch(actions.downloadFailed(errorMessage))
+    })
+
+    ipcRenderer.send('fetch-parameters')
+  }
+
 	/**
    * In case the quick hashes are not present, calculates SHA-256 for the sprout files and generates quick hashes.
    * This operation takes about few seconds and should be initiated by the the renderer process.
@@ -106,7 +126,7 @@ export class FetchParametersService {
   async checkPresenceWithoutQuickHashes() {
     const quickHashes = config.get(quickHashesConfigKey, {})
 
-    const verifySproutFile = async fileName => {
+    const verifySproutFile = async (fileName, index) => {
       if (quickHashes[fileName]) {
         return true
       }
@@ -124,16 +144,14 @@ export class FetchParametersService {
 	 * @memberof FetchParametersService
 	 * @returns {boolean}
 	 */
-  async fetch() {
-    this.currentWindow = remote.getCurrentWindow()
+  async fetch(mainWindow) {
+    this.mainWindow = mainWindow
     this.totalBytes = 0
 		this.completedBytes = 0
     this.downloadItems = new Set()
-    this.actions = require('../reducers/fetch-parameters/fetch-parameters.reducer').FetchParametersActions
 
     const resistanceParamsFolder = this.getResistanceParamsFolder()
 
-    // TODO: fix me
     if (!fs.existsSync(resistanceParamsFolder)) {
       fs.mkdirSync(resistanceParamsFolder)
     }
@@ -142,13 +160,12 @@ export class FetchParametersService {
     await Promise.all(downloadPromises)
 
     // All the sprout keys downloaded, calculating checksums and quick hashes
-    os.dispatchAction(this.actions.status(t(`Calculating checksums...`)))
+    mainWindow.webContents.send('fetch-parameters-status', t(`Calculating checksums...`))
 
     for (let index = 0; index < sproutFiles.length; index += 1) {
       const fileName = sproutFiles[index].name
       const filePath = path.join(resistanceParamsFolder, fileName)
 
-      // TODO: fix me
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath)
       }
@@ -159,37 +176,36 @@ export class FetchParametersService {
       /* eslint-enable no-await-in-loop */
     }
 
+    mainWindow.webContents.send('fetch-parameters-download-complete')
   }
 
 }
 
-function getDownloadDoneCallback(state, downloadItem, resolve, reject) {
-  const callback = () => {
-    this.currentWindow.setProgressBar(-1)
-    this.downloadItems.delete(downloadItem)
+function downloadDoneCallback(state, downloadItem, resolve, reject) {
+  this.downloadItems.delete(downloadItem)
+  this.mainWindow.setProgressBar(-1)
 
-    switch(state) {
-      case 'cancelled':
-        reject(new Error(t(`The download of {{fileName}} has been cancelled`, { fileName })))
-      break
-      case 'interrupted':
-        reject(new Error(t(`The download of {{fileName}} was interruped`, { fileName })))
-      break
-      case 'completed':
-        resolve()
-      break
-      default:
-        console.error(`The download of ${fileName} finished with an unknown state ${state}`)
-      reject(new Error(t(`The download of {{fileName}} has failed, check the log for details`, { fileName })))
-    }
+  switch(state) {
+    case 'cancelled':
+      reject(new Error(t(`The download of {{fileName}} has been cancelled`, { fileName })))
+    break
+    case 'interrupted':
+      reject(new Error(t(`The download of {{fileName}} was interruped`, { fileName })))
+    break
+    case 'completed':
+      resolve()
+    break
+    default:
+      console.error(`The download of ${fileName} finished with an unknown state ${state}`)
+    reject(new Error(t(`The download of {{fileName}} has failed, check the log for details`, { fileName })))
   }
 
-  return callback
 }
 
 function getDownloadListener(fileName: string, resolve: func, reject: func) {
   const listener = (e, downloadItem) => {
     this.downloadItems.add(downloadItem)
+    console.error("downloadItem", downloadItem)
     this.totalBytes += downloadItem.getTotalBytes()
 
     const savePath = path.join(this.getResistanceParamsFolder(), fileName)
@@ -198,7 +214,7 @@ function getDownloadListener(fileName: string, resolve: func, reject: func) {
     downloadItem.on('updated', () => this::downloadUpdatedCallback())
 
     downloadItem.on('done', (event, state) => (
-      this::getDownloadDoneCallback(state, downloadItem, resolve, reject)
+      this::downloadDoneCallback(state, downloadItem, resolve, reject)
     ))
   }
 
@@ -210,15 +226,18 @@ function downloadUpdatedCallback() {
     bytesCounter + item.getReceivedBytes()
   ), this.completedBytes)
 
-  this.currentWindow.setProgressBar(() => receivedBytes / this.totalBytes)
-  os.dispatchAction(this.actions.downloadProgress(receivedBytes, this.totalBytes))
+  this.mainWindow.setProgressBar(receivedBytes / this.totalBytes)
+  this.mainWindow.webContents.send('fetch-parameters-download-progress', {
+    receivedBytes,
+    totalBytes: this.totalBytes,
+  })
 }
 
 function downloadSproutKey(fileName) {
   const downloadPromise = new Promise((resolve, reject) => {
     const listener = this::getDownloadListener(fileName, resolve, reject)
 
-    const { webContents } = this.currentWindow
+    const { webContents } = this.mainWindow
 
     webContents.session.on('will-download', listener)
     webContents.downloadURL(`${sproutUrl}/${fileName}`)
@@ -315,7 +334,7 @@ async function verifySproutFiles(verifier: (fileName, index) => boolean): boolea
       /* eslint-disable-next-line no-await-in-loop */
       isVerified = await verifier(fileName, index)
     } catch (err) {
-      console.error(`Sprout file ${fileName} verification failed.`, err.toString())
+      console.log(`Sprout file ${fileName} verification failed.`, err.toString())
       return false
     }
 

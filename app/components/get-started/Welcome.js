@@ -103,7 +103,7 @@ export class Welcome extends Component<Props> {
             </div>
           )
           : (
-            <div className={styles.downloadProgressContainer}>
+            <div className={styles.downloadProgressContainer} title={this.props.fetchParameters.statusMessage}>
               <div className={styles.downloadProgress}>
                 {t(`Please wait for Resistance parameters download to complete`)}
                 <div style={{ width: `${this.props.fetchParameters.progressRate}%` }}>

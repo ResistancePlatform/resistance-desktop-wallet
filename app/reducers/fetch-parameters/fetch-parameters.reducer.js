@@ -56,6 +56,10 @@ export const FetchParametersReducer = handleActions(
 
       return { ...state, progressRate, statusMessage }
     },
+    [FetchParametersActions.status]: (state, action) => ({
+      ...state,
+      statusMessage: action.payload.message,
+    }),
     [FetchParametersActions.downloadComplete]: state => ({
       ...state,
       isDownloadComplete: true,
