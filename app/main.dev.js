@@ -150,6 +150,7 @@ app.on('ready', async () => {
   global.isParametersPresenceConfirmed = await fetchParameters.checkPresenceWithQuickHashes()
 
   ipcMain.on('fetch-parameters', async () => {
+    console.log('got fetch-parameters message!')
     await fetchParameters.fetch(mainWindow)
   })
 

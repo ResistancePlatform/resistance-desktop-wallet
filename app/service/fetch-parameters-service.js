@@ -156,8 +156,7 @@ export class FetchParametersService {
       fs.mkdirSync(resistanceParamsFolder)
     }
 
-    const downloadPromises = sproutFiles.map(sproutFile => this::downloadSproutKey(sproutFile.name))
-    await Promise.all(downloadPromises)
+    await this::downloadSproutKeys()
 
     // All the sprout keys downloaded, calculating checksums and quick hashes
     mainWindow.webContents.send('fetch-parameters-status', t(`Calculating checksums...`))
@@ -182,33 +181,41 @@ export class FetchParametersService {
 }
 
 function downloadDoneCallback(state, downloadItem, resolve, reject) {
+  this.completedBytes += downloadItem.getTotalBytes()
   this.downloadItems.delete(downloadItem)
-  this.mainWindow.setProgressBar(-1)
+
+  if (!this.mainWindow.isDestroyed()) {
+    this.mainWindow.setProgressBar(-1)
+  }
+
+  const fileName = downloadItem.getFilename()
 
   switch(state) {
     case 'cancelled':
       reject(new Error(t(`The download of {{fileName}} has been cancelled`, { fileName })))
-    break
+      break
     case 'interrupted':
       reject(new Error(t(`The download of {{fileName}} was interruped`, { fileName })))
-    break
+      break
     case 'completed':
-      resolve()
-    break
+      if (this.downloadItems.size === 0) {
+        resolve()
+      }
+      break
     default:
       console.error(`The download of ${fileName} finished with an unknown state ${state}`)
-    reject(new Error(t(`The download of {{fileName}} has failed, check the log for details`, { fileName })))
+      reject(new Error(t(`The download of {{fileName}} has failed, check the log for details`, { fileName })))
   }
 
 }
 
-function getDownloadListener(fileName: string, resolve: func, reject: func) {
+function registerDownloadListener(resolve, reject) {
   const listener = (e, downloadItem) => {
+    // console.error("added download item", downloadItem.getFilename(), downloadItem.getTotalBytes(), this.totalBytes)
     this.downloadItems.add(downloadItem)
-    console.error("downloadItem", downloadItem)
     this.totalBytes += downloadItem.getTotalBytes()
 
-    const savePath = path.join(this.getResistanceParamsFolder(), fileName)
+    const savePath = path.join(this.getResistanceParamsFolder(), downloadItem.getFilename())
     downloadItem.setSavePath(savePath)
 
     downloadItem.on('updated', () => this::downloadUpdatedCallback())
@@ -218,7 +225,7 @@ function getDownloadListener(fileName: string, resolve: func, reject: func) {
     ))
   }
 
-  return listener
+  this.mainWindow.webContents.session.on('will-download', listener)
 }
 
 function downloadUpdatedCallback() {
@@ -233,14 +240,13 @@ function downloadUpdatedCallback() {
   })
 }
 
-function downloadSproutKey(fileName) {
+function downloadSproutKeys() {
   const downloadPromise = new Promise((resolve, reject) => {
-    const listener = this::getDownloadListener(fileName, resolve, reject)
+    this::registerDownloadListener(resolve, reject)
 
-    const { webContents } = this.mainWindow
-
-    webContents.session.on('will-download', listener)
-    webContents.downloadURL(`${sproutUrl}/${fileName}`)
+    sproutFiles.forEach(({name: fileName}) => {
+      this.mainWindow.webContents.downloadURL(`${sproutUrl}/${fileName}`)
+    })
   })
 
   return downloadPromise
