@@ -1,10 +1,10 @@
-@import "../../assets/styles/vars.scss";
+@import "~/assets/styles/vars.scss";
 
-$NAVI_BAR_CONTAINER_WIDTH: 13.5rem;
+$NAVI_BAR_CONTAINER_WIDTH: 12.7rem;
 
 .container {
   padding-top: 3.6rem;
-  padding-left: 0.8rem;
+  padding-left: 1.2rem;
   -webkit-app-region: drag;
   background-color: $NAVI_BAR_BACKGROUND_COLOR;
   min-width: $NAVI_BAR_CONTAINER_WIDTH;
@@ -14,16 +14,18 @@ $NAVI_BAR_CONTAINER_WIDTH: 13.5rem;
 
 .item {
   -webkit-app-region: no-drag;
+  font-size: 0.88rem;
+  font-weight: 300;
   align-items: center !important;
-  padding: 0.8rem 0;
+  padding: 0.5rem 0;
 
   i {
     font-family: 'icomoon' !important;
     font-style: normal;
     -webkit-font-smoothing: antialiased;
     font-size: 1.5rem;
-    margin-right: 0.8rem;
     color: $NAVI_BAR_ITEM_ICON_COLOR;
+    width: 2.3rem;
   }
 
   i:before {
@@ -50,7 +52,7 @@ $NAVI_BAR_CONTAINER_WIDTH: 13.5rem;
 .overview {
   i:before {
     content: "\e90a";
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     margin-left: -0.2rem;
   }
 }
@@ -58,34 +60,31 @@ $NAVI_BAR_CONTAINER_WIDTH: 13.5rem;
 .ownAddresses {
   i:before {
     content: "\e90b";
-    font-size: 1.2rem;
+    font-size: 0.9rem;
     top: -0.1rem;
-    margin-right: 0.1rem;
   }
 }
 
 .sendCash {
   i:before {
     content: "\e909";
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     margin-left: -0.2rem;
-    margin-right: 0.1rem;
   }
 }
 
 .addressBook {
   i:before {
     content: "\e908";
-    font-size: 1.25rem;
+    font-size: 1.08rem;
     margin-left: 0.1rem;
-    margin-right: 0.4rem;
   }
 }
 
 .settings {
   i:before {
     content: "\e907";
-    font-size: 1.7rem;
+    font-size: 1.6rem;
     margin-left: -0.2rem;
   }
 }
@@ -95,16 +94,16 @@ $NAVI_BAR_CONTAINER_WIDTH: 13.5rem;
     content: "\e909";
     font-size: 1.6rem;
     margin-left: -0.2rem;
-    margin-right: 0.1rem;
   }
 
   span {
     margin-left: 0.7rem;
     color: $BASE_COLOR_WHITE;
-    padding: 0.3rem 0.5rem;
+    padding: 0.25rem 0.55rem;
     border-radius: 2rem;
     background: $BASE_COLOR_PURPLE;
-    font-size: 0.6rem;
+    font-size: 0.55rem;
+    font-weight: 400;
     text-transform: uppercase;
   }
 }

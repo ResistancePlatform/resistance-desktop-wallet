@@ -93,6 +93,9 @@ global.resistanceNodeConfig = resistanceService.checkAndCreateConfig()
 
 checkAndCreateWalletAppFolder()
 
+// Temporarily disable GPU acceleration to make the app working in Parallels Desktop
+app.disableHardwareAcceleration()
+
 /**
  * Add event listeners...
  */
