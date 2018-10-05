@@ -6,25 +6,21 @@ import { translate } from 'react-i18next'
 import * as Joi from 'joi'
 import cn from 'classnames'
 
+import { getPasswordValidationSchema } from '~/utils/auth'
 import { RoundedFormRoot } from '~/reducers/rounded-form/rounded-form.reducer'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { AuthState, AuthActions } from '~/reducers/auth/auth.reducer'
 import TitleBarButtons, { DragBar } from '~/components/title-bar-buttons/TitleBarButtons'
 import RoundedInput from '~/components/rounded-form/RoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
+
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
-
 import resistanceLogo from '~/assets/images/logo.svg'
 import styles from './Login.scss'
 
-const getValidationSchema = t => Joi.object().keys({
-  password: (
-    Joi.string().required()
-    .min(6)
-    .token()
-    .label(t(`Password`))
-  )
+const getValidationSchema = () => Joi.object().keys({
+  password: getPasswordValidationSchema()
 })
 
 type Props = {
@@ -68,7 +64,7 @@ class Login extends Component<Props> {
           </div>
         }
 
-        <RoundedForm id="authLogin" schema={getValidationSchema(t)} className={styles.form}>
+        <RoundedForm id="authLogin" schema={getValidationSchema()} className={styles.form}>
           <RoundedInput name="password" password label={t(`Password`)} />
 
           <button

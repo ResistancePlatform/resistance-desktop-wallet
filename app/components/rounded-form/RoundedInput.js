@@ -17,7 +17,7 @@ export type RoundedInputAddon = {
 	onEnterPressed?: () => void
 }
 
-class Addon {
+export class Addon {
 	enable: boolean
 	value: string | undefined
 
@@ -60,7 +60,7 @@ type Props = {
   defaultValue?: string,
 	number?: boolean,
   password?: boolean,
-	label: string,
+	label?: string,
 	onChange?: value => void,
 	addon?: RoundedInputAddon,
   newAddon?: Addon,
@@ -173,6 +173,13 @@ class RoundedInput extends Component<Props> {
 		}
 	}
 
+  renderNewAddon(input) {
+    const el = this.props.newAddon.render(input)
+    return React.cloneElement(el, {
+      className: cn(styles.newAddon, el.props.className)
+    })
+  }
+
 	renderAddon() {
 		if (!this.props.addon || !this.props.addon.enable) {
 			return null
@@ -281,12 +288,10 @@ class RoundedInput extends Component<Props> {
 
           <div className={cn(styles.inputContainer)}>
             {this.props.newAddon
-              ? this.props.newAddon.render(input)
+              ? this.renderNewAddon(input)
               : input
             }
-
             {this.renderAddon()}
-
             {this.renderTooltip()}
           </div>
           {this.props.children ? this.props.children : null}

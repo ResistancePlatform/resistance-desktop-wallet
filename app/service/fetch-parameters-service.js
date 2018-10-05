@@ -2,13 +2,15 @@
 import * as fs from 'fs'
 import path from 'path'
 import { app, remote, ipcRenderer } from 'electron'
+import log from 'electron-log'
 import config from 'electron-settings'
 import crypto from 'crypto'
 
 import { translate } from '../i18next.config'
-
+import { OSService } from './os-service'
 
 const t = translate('service')
+const os = new OSService()
 
 const quickHashesConfigKey = 'resistanceParameters.quickHashes'
 const paramsFolderName = 'ResistanceParams'
@@ -19,12 +21,12 @@ const sproutFiles = [
   { name: 'sprout-verifying.key', checksum: "4bd498dae0aacfd8e98dc306338d017d9c08dd0918ead18172bd0aec2fc5df82" }
 ]
 
-// Shorter files for testing purposes
-// const sproutUrl = 'https://www.sample-videos.com/video/mp4/480'
-// const sproutFiles = [
-//   { name: 'big_buck_bunny_480p_5mb.mp4', checksum: "287d49daf0fa4c0a12aa31404fd408b1156669084496c8031c0e1a4ce18c5247" },
-//   { name: 'big_buck_bunny_480p_1mb.mp4', checksum: "6b83d01a1bddbb6481001d8bb644bd4eb376922a4cf363fda9c14826534e17b3" }
-// ]
+/* Shorter files for testing purposes
+ const sproutUrl = 'https://www.sample-videos.com/video/mp4/480'
+ const sproutFiles = [
+   { name: 'big_buck_bunny_480p_5mb.mp4', checksum: "287d49daf0fa4c0a12aa31404fd408b1156669084496c8031c0e1a4ce18c5247" },
+   { name: 'big_buck_bunny_480p_1mb.mp4', checksum: "6b83d01a1bddbb6481001d8bb644bd4eb376922a4cf363fda9c14826534e17b3" }
+ ] */
 
 /**
  * ES6 singleton
@@ -56,7 +58,13 @@ export class FetchParametersService {
 
   getResistanceParamsFolder(): string {
     const validApp = process.type === 'renderer' ? remote.app : app
-    return path.join(validApp.getPath('appData'), paramsFolderName)
+    let paramFolder = path.join(validApp.getPath('appData'), paramsFolderName)
+
+    if (os.getOS() === 'linux') {
+      paramFolder = path.join(validApp.getPath('home'), '.resistance-params')
+    }
+
+    return paramFolder
   }
 
 	/**
@@ -76,17 +84,23 @@ export class FetchParametersService {
   async checkPresence({calculateChecksums}) {
     const resistanceParamsFolder = this.getResistanceParamsFolder()
 
+    log.info(`Checking for params directory ${resistanceParamsFolder}`)
+
     if (!fs.existsSync(resistanceParamsFolder)) {
+      log.info(`The params directory ${resistanceParamsFolder} does not exist`)
       return false
     }
 
+    log.info(`The params directory ${resistanceParamsFolder} exists`)
+
     const quickHashes = config.get(quickHashesConfigKey, {})
 
-    const verifySproutFile = async fileName => {
+    const verifySproutFile = async (fileName, index) => {
+      log.info(`Sprout file ${fileName} verification . . .`)
       if (!quickHashes[fileName]) {
 
         if (calculateChecksums) {
-          console.log(`Quick hash not found for ${fileName}, calculating SHA256 checksum...`)
+          log.info(`Quick hash not found for ${fileName}, calculating SHA256 checksum...`)
           await this::verifyChecksum(fileName, sproutFiles[index].checksum)
           await this::saveQuickFileHash(fileName)
           return true
@@ -142,8 +156,8 @@ export class FetchParametersService {
       await this::fetchOrThrowError()
     } catch(err) {
       if (mainWindow.isDestroyed()) {
-        console.error(`Fetching Resistance parameters aborted due to the main window destruction.`)
-        console.error(err.toString())
+        log.error(`Fetching Resistance parameters aborted due to the main window destruction.`)
+        log.error(err.toString())
       } else {
         mainWindow.webContents.send('fetch-parameters-download-failed', err.message)
       }
@@ -215,7 +229,7 @@ function downloadDoneCallback(state, downloadItem, resolve, reject) {
 
       break
     default:
-      console.error(`The download of ${fileName} finished with an unknown state ${state}`)
+      log.error(`The download of ${fileName} finished with an unknown state ${state}`)
       error = new Error(t(`The download of {{fileName}} has failed, check the log for details`, { fileName }))
   }
 
@@ -335,6 +349,7 @@ async function saveQuickFileHash(fileName: string) {
  * @returns {Promise}
  */
 function calculateQuickHash(fileName: string) {
+  log.info(`Calculating a quick file hash for ${fileName}`)
   const filePath = path.join(this.getResistanceParamsFolder(), fileName)
 
   const calcFromStats = stats => {
@@ -369,8 +384,9 @@ async function verifySproutFiles(verifier: (fileName, index) => boolean): boolea
     try {
       /* eslint-disable-next-line no-await-in-loop */
       isVerified = await verifier(fileName, index)
+      log.info(`Sprout file ${fileName} verification succeeded.`)
     } catch (err) {
-      console.log(`Sprout file ${fileName} verification failed.`, err.toString())
+      log.info(`Sprout file ${fileName} verification failed.`, err.toString())
       return false
     }
 
@@ -389,7 +405,7 @@ async function verifySproutFiles(verifier: (fileName, index) => boolean): boolea
  */
 function downloadComplete() {
   if (!this.mainWindow.isDestroyed()) {
-    console.log(`Resistance parameters download completed`)
+    log.info(`Resistance parameters download completed`)
     this.mainWindow.webContents.send('fetch-parameters-download-complete')
   }
 }

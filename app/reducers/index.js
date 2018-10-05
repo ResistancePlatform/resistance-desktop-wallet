@@ -1,5 +1,5 @@
 // @flow
-import { combineReducers } from 'redux';
+import { combineReducers } from 'redux'
 import { combineEpics } from 'redux-observable'
 import { reducer as toastrReducer } from 'react-redux-toastr'
 

@@ -2,6 +2,7 @@
 /* eslint-disable global-require */
 import * as fs from 'fs';
 import path from 'path'
+import log from 'electron-log'
 import { spawn } from 'child_process'
 import { app, remote } from 'electron'
 
@@ -12,7 +13,7 @@ let instance = null
 
 const ps = require('ps-node')
 
-export type ChildProcessName = 'NODE' | 'TOR' | 'MINER'
+export type ChildProcessName = 'NODE' | 'TOR' | 'MINER' | 'MARKET_MAKER'
 export type ChildProcessStatus = 'RUNNING' | 'STARTING' | 'RESTARTING' | 'FAILED' | 'STOPPING' | 'MURDER FAILED' | 'NOT RUNNING'
 
 const ChildProcessCommands = {
@@ -102,7 +103,7 @@ export class OSService {
       if (item.instance !== null && !item.instance.killed) {
         global.childProcesses[processName].isGettingKilled = true
 
-        console.log(`Killing child process ${processName} with PID ${item.instance.pid}`)
+        log.info(`Killing child process ${processName} with PID ${item.instance.pid}`)
 
         // childProcess.kill() doesn't work for an unknown reason
         if (item.pid) {
@@ -115,11 +116,19 @@ export class OSService {
   }
 
 	/**
+   * Returns a common name/alias for each OS family
+   *
 	 * @memberof OSService
 	 * @returns {string}
 	 */
 	getOS() {
-    return process.platform === 'darwin' ? 'macos' : 'windows'
+    let os = 'linux'
+    if (process.platform === 'darwin') {
+      os = 'macos'
+    } else if (process.platform === 'win32') {
+      os = 'windows'
+    }
+    return os
 	}
 
 	/**
@@ -129,8 +138,21 @@ export class OSService {
 	 * @returns {string}
 	 */
   getInstallationPath() {
-    const walkUpPath = this.getOS() === 'windows' ? '/../../../' : '/../../../../'
-    return path.join(remote.app.getAppPath(), walkUpPath)
+    const validApp = process.type === 'renderer' ? remote.app : app
+    let walkUpPath
+    switch (this.getOS()) {
+      case 'windows':
+        walkUpPath = '/../../../'
+        break
+      case 'macos':
+        walkUpPath = '/../../../../'
+        break
+      case 'linux':
+        walkUpPath = '/../../../../..'
+        break
+    }
+    log.info(validApp.getAppPath())
+    return path.join(validApp.getAppPath(), walkUpPath)
   }
 
 	/**
@@ -193,7 +215,7 @@ export class OSService {
 	 * @memberof OSService
 	 */
   restartProcess(processName: ChildProcessName, args = [], stdoutHandler) {
-    console.log(`Restarting ${processName} process.`)
+    log.info(`Restarting ${processName} process.`)
     this.killProcess(processName, () => {
       this.execProcess(processName, args, stdoutHandler)
     })
@@ -233,7 +255,7 @@ export class OSService {
 
       const childProcessInfo = remote.getGlobal('childProcesses')[processName]
 
-      console.log(`Executing command ${commandPath} with arguments ${args.join(' ')}.`)
+      log.info(`Executing command ${commandPath} with arguments ${args.join(' ')}.`)
       const childProcess = spawn(commandPath, args, options)
 
       const onData = (data: Buffer) => {
@@ -306,7 +328,7 @@ export class OSService {
         childProcessInfo.isGettingKilled = true
         return this.killPid(pid)
       }
-      console.log(`Process ${processName} isn't running`)
+      log.info(`Process ${processName} isn't running`)
       return Promise.resolve()
     }).then(() => {
       if (customSuccessHandler) {
@@ -333,7 +355,7 @@ export class OSService {
 				if (err) {
 					reject(err)
 				}
-				console.log('Process %s has been killed!', pid)
+				log.info('Process %s has been killed!', pid)
 				resolve(pid)
 			})
 		})
@@ -363,7 +385,7 @@ export class OSService {
 						resolve(process.pid)
 					} else {
 						resolve(0)
-						console.log('No such process found!')
+						log.info('No such process found!')
 					}
 				}
 			)

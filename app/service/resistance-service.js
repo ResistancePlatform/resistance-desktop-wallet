@@ -2,6 +2,7 @@
 import { EOL } from 'os'
 import * as fs from 'fs';
 import path from 'path'
+import log from 'electron-log'
 import config from 'electron-settings'
 import { app, remote } from 'electron'
 
@@ -19,6 +20,7 @@ const osService = new OSService()
 
 const walletFolderName = 'testnet3'
 const configFolderName = 'Resistance'
+const paramFolderName = 'ResistanceParams'
 const configFileName = 'resistance.conf'
 const configFileContents = [
   `testnet=1`,
@@ -29,9 +31,9 @@ const configFileContents = [
   ``
 ].join(EOL)
 
-
 const resistancedArgs = ['-printtoconsole', '-rpcthreads=8']
 const torSwitch = '-proxy=127.0.0.1:9050'
+
 
 /**
  * @export
@@ -56,11 +58,25 @@ export class ResistanceService {
 	 */
   getDataPath() {
     const validApp = process.type === 'renderer' ? remote.app : app
-    return path.join(validApp.getPath('appData'), configFolderName)
+    let configFolder = path.join(validApp.getPath('appData'), configFolderName)
+    if (osService.getOS() === 'linux') {
+      configFolder = path.join(validApp.getPath('home'), '.resistance')
+    }
+    return configFolder;
   }
 
+  //This is for the raw wallet path i.e. the testnet3 directory
   getWalletPath() {
     return path.join(this.getDataPath(), walletFolderName)
+  }
+
+  getParamsPath() {
+    const validApp = process.type === 'renderer' ? remote.app : app
+    let paramsPath = path.join(validApp.getPath('appData'), paramFolderName)
+    if (osService.getOS() === 'linux') {
+      configFolder = path.join(validApp.getPath('home'), '.resistance-params')
+    }
+    return paramsPath
   }
 
 	/**
@@ -81,9 +97,10 @@ export class ResistanceService {
 
     if (fs.existsSync(configFile)) {
       resistanceNodeConfig = PropertiesReader(configFile).path()
+      log.info(`The Resistance config file ${configFile} exists and does not need to be created.`);
     } else {
       resistanceNodeConfig = this.createConfig(configFile)
-      console.log(`Resistance config has been successfully created.`)
+      log.info(`The Resistance config file ${configFile} was successfully created.`);
     }
 
     return resistanceNodeConfig
@@ -155,13 +172,11 @@ export class ResistanceService {
  */
 function startOrRestart(isTorEnabled: boolean, start: boolean) {
   const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
-
   // TODO: support system wide wallet paths, stored in config.get('wallet.path')
   // https://github.com/ResistancePlatform/resistance-core/issues/84
 
   const walletName = config.get('wallet.name', 'wallet')
   args.push(`-wallet=${walletName}.dat`)
-
   const caller = start ? osService.execProcess : osService.restartProcess
 
   this::verifyExportDirExistence().then(exportDir => {

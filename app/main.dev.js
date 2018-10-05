@@ -14,6 +14,7 @@ import * as fs from 'fs'
 import path from 'path'
 import config from 'electron-settings'
 import { app, ipcMain, BrowserWindow } from 'electron'
+import log from 'electron-log'
 
 import { i18n } from './i18next.config'
 import { OSService } from './service/os-service'
@@ -21,14 +22,26 @@ import { ResistanceService } from './service/resistance-service'
 import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
 
-
 const os = new OSService()
-const fetchParameters = new FetchParametersService()
 const resistance = new ResistanceService()
+const fetchParameters = new FetchParametersService()
+
+const appDataPath = os.getAppDataPath()
+
+if (!fs.existsSync(appDataPath)) {
+  fs.mkdirSync(appDataPath)
+}
+
+log.transports.file.maxSize = 5 * 1024 * 1024
+log.transports.file.file = path.join(os.getAppDataPath(), 'reswallet.log')
 
 let mainWindow = null
 
 if (process.env.NODE_ENV === 'production') {
+  // Just to be explicit, warn is the default
+  log.transports.file.level = 'warn'
+  log.transports.console.level = 'warn'
+
   const sourceMapSupport = require('source-map-support')
   sourceMapSupport.install()
 }
@@ -37,6 +50,9 @@ if (
   process.env.NODE_ENV === 'development' ||
   process.env.DEBUG_PROD === 'true'
 ) {
+  log.transports.file.level = 'debug'
+  log.transports.console.level = 'debug'
+
   require('electron-debug')()
   const p = path.join(__dirname, '..', 'app', 'node_modules')
   require('module').globalPaths.push(p)
@@ -110,9 +126,9 @@ app.on('window-all-closed', () => {
 
 app.on('ready', async () => {
   app.on('before-quit', () => {
-    console.log(`Killing all child processes...`)
+    log.info(`Killing all child processes...`)
     os.stopChildProcesses()
-    console.log(`Done`)
+    log.info(`Done`)
   })
 
   if (
@@ -122,11 +138,19 @@ app.on('ready', async () => {
     await installExtensions()
   }
 
+  let iconFileName = 'icon.png'
+  if (os.getOS() === 'macos') {
+    iconFileName = 'icon.icns'
+  } else if (os.getOS() === 'windows') {
+    iconFileName = 'icon.ico'
+  }
+
   mainWindow = new BrowserWindow({
     ...getWindowSize(),
     show: false,
     frame: false,
     backgroundColor: '#1d2440',
+    icon: path.join(os.getInstallationPath(), 'resources', `${iconFileName}`)
   })
 
   const menuBuilder = new MenuBuilder(mainWindow)
