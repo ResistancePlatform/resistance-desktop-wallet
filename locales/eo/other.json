@@ -86,5 +86,13 @@
   "Address balance error": "Address balance error",
   "Unable to get operations": "Unable to get operations",
   "),this.nestingSuffix=t.nestingSuffix?p(t.nestingSuffix):t.nestingSuffixEscaped||p(": "),this.nestingSuffix=t.nestingSuffix?p(t.nestingSuffix):t.nestingSuffixEscaped||p(",
-  ",nestingSuffix:": ",nestingSuffix:"
+  ",nestingSuffix:": ",nestingSuffix:",
+  "Please wait for Resistance parameters download to complete": "Please wait for Resistance parameters download to complete",
+  "Resistance parameters download failed": "Resistance parameters download failed",
+  "Check your network connection and hit Retry": "Check your network connection and hit Retry",
+  "Retry": "Retry",
+  "Quit app": "Quit app",
+  "Download in progress, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)": "Download in progress, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)",
+  "Download complete": "Download complete",
+  "Download failed": "Download failed"
 }

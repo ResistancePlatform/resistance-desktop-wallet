@@ -20,5 +20,10 @@
   "Address not found in the database.": "Address not found in the database.",
   "Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...": "Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...",
   "Fetching Resistance parameters (file {{fileIndex}} of {{filesNumber}})...": "Fetching Resistance parameters (file {{fileIndex}} of {{filesNumber}})...",
-  "Process {{processName}} unexpectedly exited with code {{code}}.": "Process {{processName}} unexpectedly exited with code {{code}}."
+  "Process {{processName}} unexpectedly exited with code {{code}}.": "Process {{processName}} unexpectedly exited with code {{code}}.",
+  "Calculating checksums...": "Calculating checksums...",
+  "The download of {{fileName}} has been cancelled": "The download of {{fileName}} has been cancelled",
+  "The download of {{fileName}} was interruped": "The download of {{fileName}} was interruped",
+  "The download of {{fileName}} has failed, check the log for details": "The download of {{fileName}} has failed, check the log for details",
+  "No Internet": "No Internet"
 }

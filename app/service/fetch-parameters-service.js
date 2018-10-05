@@ -132,6 +132,8 @@ export class FetchParametersService {
 
       await this::verifyChecksum(fileName, sproutFiles[index].checksum)
       await this::saveQuickFileHash(fileName)
+
+      return true
     }
 
     return this::verifySproutFiles(verifySproutFile)
@@ -164,6 +166,13 @@ export class FetchParametersService {
 }
 
 async function fetchOrThrowError() {
+  this::status(t(`Checking Resistance parameters presence...`))
+
+  if (await this.checkPresenceWithoutQuickHashes()) {
+    this::downloadComplete()
+    return
+  }
+
   const resistanceParamsFolder = this.getResistanceParamsFolder()
 
   if (!fs.existsSync(resistanceParamsFolder)) {
@@ -172,12 +181,8 @@ async function fetchOrThrowError() {
 
   await this::downloadSproutKeys()
 
-  if (this.mainWindow.isDestroyed()) {
-    throw new Error(`Main window got destroyed`)
-  }
-
   // All the sprout keys downloaded, calculating checksums and quick hashes
-  this.mainWindow.webContents.send('fetch-parameters-status', t(`Calculating checksums...`))
+  this::status(t(`Calculating checksums...`))
 
   for (let index = 0; index < sproutFiles.length; index += 1) {
     const fileName = sproutFiles[index].name
@@ -188,7 +193,7 @@ async function fetchOrThrowError() {
     /* eslint-enable no-await-in-loop */
   }
 
-  this.mainWindow.webContents.send('fetch-parameters-download-complete')
+  this::downloadComplete()
 }
 
 function downloadDoneCallback(state, downloadItem, resolve, reject) {
@@ -388,4 +393,27 @@ async function verifySproutFiles(verifier: (fileName, index) => boolean): boolea
   }
 
   return true
+}
+
+/**
+ * Private method. Informs renderer on download completion.
+ *
+ * @memberof FetchParametersService
+ */
+function downloadComplete() {
+  if (!this.mainWindow.isDestroyed()) {
+    console.log(`Resistance parameters download completed`)
+    this.mainWindow.webContents.send('fetch-parameters-download-complete')
+  }
+}
+
+/**
+ * Private method. Reports the download status to the renderer.
+ *
+ * @memberof FetchParametersService
+ */
+function status(message: string) {
+  if (!this.mainWindow.isDestroyed()) {
+    this.mainWindow.webContents.send('fetch-parameters-status', message)
+  }
 }

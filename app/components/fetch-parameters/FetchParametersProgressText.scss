@@ -1,6 +1,8 @@
 @import "~/assets/styles/vars.scss";
 
 .container {
+  cursor: default;
+  user-select: none;
 }
 
 .progress {
