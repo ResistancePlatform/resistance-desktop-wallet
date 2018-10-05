@@ -5,7 +5,7 @@ import { translate } from 'react-i18next'
 
 import { NaviState } from '~/reducers/navi/navi.reducer'
 import FetchParametersState from '~/reducers/fetch-parameters/fetch-parameters.reducer'
-import FetchParametersProgress from '~/components/fetch-parameters/FetchParametersProgress'
+import FetchParametersProgressBar from '~/components/fetch-parameters/FetchParametersProgressBar'
 
 import styles from './Footer.scss'
 
@@ -29,7 +29,7 @@ class Footer extends Component<Props> {
         {t(``)}
 
         {!this.props.fetchParameters.isDownloadComplete && !this.props.navi.currentNaviPath.includes('/welcome') &&
-          <FetchParametersProgress className={styles.progressBar} />
+          <FetchParametersProgressBar className={styles.progressBar} />
         }
 			</div>
 		)

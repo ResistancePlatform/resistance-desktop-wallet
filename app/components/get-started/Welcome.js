@@ -6,6 +6,7 @@ import cn from 'classnames'
 import Iso6391 from 'iso-639-1'
 
 import { i18n } from '~/i18next.config'
+import FetchParametersProgressText from '~/components/fetch-parameters/FetchParametersProgressText'
 import FetchParametersState from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import { ResistanceService } from '~/service/resistance-service'
 
@@ -101,17 +102,7 @@ export class Welcome extends Component<Props> {
             <div className={cn(styles.hint, styles[this.props.welcome.status])}>
               {this.props.welcome.hint || t(`Check the wallet configuration before applying`)}
             </div>
-          )
-          : (
-            <div className={styles.downloadProgressContainer} title={this.props.fetchParameters.statusMessage}>
-              <div className={styles.downloadProgress}>
-                {t(`Please wait for Resistance parameters download to complete`)}
-                <div style={{ width: `${this.props.fetchParameters.progressRate}%` }}>
-                  {t(`Please wait for Resistance parameters download to complete`)}
-                </div>
-              </div>
-            </div>
-          )
+          ) : (<FetchParametersProgressText />)
         }
 
         <div className={cn(styles.innerContainer, styles.summary)}>

@@ -5,18 +5,18 @@ import { connect } from 'react-redux'
 
 import FetchParametersState from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 
-import styles from './FetchParametersProgress.scss'
+import styles from './FetchParametersProgressBar.scss'
 
 type Props = {
   t: any,
   fetchParameters: FetchParametersState
 }
 
-class FetchParametersProgress extends Component<Props> {
+class FetchParametersProgressBar extends Component<Props> {
 	props: Props
 
 	/**
-	 * @memberof FetchParametersProgress
+	 * @memberof FetchParametersProgressBar
 	 */
 	render() {
     const { t } = this.props
@@ -38,4 +38,4 @@ const mapStateToProps = state => ({
 	fetchParameters: state.fetchParameters
 })
 
-export default connect(mapStateToProps, null)(translate('other')(FetchParametersProgress))
+export default connect(mapStateToProps, null)(translate('other')(FetchParametersProgressBar))

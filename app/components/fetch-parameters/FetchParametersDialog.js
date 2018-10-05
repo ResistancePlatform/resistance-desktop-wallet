@@ -4,8 +4,7 @@ import { translate } from 'react-i18next'
 import { connect } from 'react-redux'
 import cn from 'classnames'
 
-import FetchParametersProgress from '~/components/fetch-parameters/FetchParametersProgress'
-import FetchParametersState from '~/reducers/fetch-parameters/fetch-parameters.reducer'
+import FetchParametersProgressText from '~/components/fetch-parameters/FetchParametersProgressText'
 
 import resistanceLogo from '~/assets/images/logo.svg'
 import HLayout from '~/assets/styles/h-box-layout.scss'
@@ -13,8 +12,7 @@ import VLayout from '~/assets/styles/v-box-layout.scss'
 import styles from './FetchParametersDialog.scss'
 
 type Props = {
-  t: any,
-  fetchParameters: FetchParametersState
+  t: any
 }
 
 class FetchParametersDialog extends Component<Props> {
@@ -33,10 +31,8 @@ class FetchParametersDialog extends Component<Props> {
           <img src={resistanceLogo} alt="Resistance" />
           Resistance
         </div>
-        <div className={styles.hint}>
-          Fetching Resistance parameters
-          <FetchParametersProgress />
-        </div>
+
+        <FetchParametersProgressText />
       </div>
 		)
 	}

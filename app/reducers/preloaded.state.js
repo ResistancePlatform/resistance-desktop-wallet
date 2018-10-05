@@ -166,7 +166,7 @@ Object.assign(preloadedState.getStarted, {
 })
 
 Object.assign(preloadedState.settings, {
-	isMinerEnabled: config.get('manageDaemon.enableMiner', true),
+	isMinerEnabled: config.get('manageDaemon.enableMiner', false),
 	isTorEnabled: config.get('manageDaemon.enableTor', false),
 	language: config.get('language', 'en')
 })

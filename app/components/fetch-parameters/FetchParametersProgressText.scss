@@ -1,0 +1,28 @@
+@import "~/assets/styles/vars.scss";
+
+.container {
+}
+
+.progress {
+  color: $BASE_COLOR_FONT_GRAY;
+  display: inline-block;
+  position: relative;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+
+  div {
+    position: absolute;
+    top: 0;
+    background: $BALANCE_BACKGROUND_IMAGE;
+    // background: $BASE_COLOR_PURPLE;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+}
+

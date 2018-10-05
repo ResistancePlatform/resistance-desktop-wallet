@@ -24,6 +24,7 @@ import ResDexPage from './ResDexPage'
 import AddressBookPage from './AddressBookPage'
 
 import { appStore } from '../store/configureStore'
+import FetchParametersDialog from '~/components/fetch-parameters/FetchParametersDialog'
 import { FetchParametersService } from '~/service/fetch-parameters-service'
 import { FetchParametersState, FetchParametersActions } from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import { AuthState } from '~/reducers/auth/auth.reducer'
@@ -59,7 +60,7 @@ class App extends React.Component<Props> {
 	 */
   componentDidMount() {
     if (!this.props.fetchParameters.isDownloadComplete) {
-      fetchParameters.bindRendererHandlers(appStore.dispatch, FetchParametersActions)
+      fetchParameters.bindRendererHandlersAndFetch(appStore.dispatch, FetchParametersActions)
     }
 
     if (!this.props.getStarted.isInProgress) {
@@ -126,10 +127,10 @@ class App extends React.Component<Props> {
 
     if (this.props.getStarted.isInProgress) {
       content = this.getGetStartedContent()
+    } else if (!this.props.fetchParameters.isDownloadComplete) {
+      content = (<FetchParametersDialog />)
     } else {
-      content = this.props.auth.isLoginRequired ? (
-        <Login />
-      ) : this.getMainContent()
+      content = this.props.auth.isLoginRequired ? (<Login />) : this.getMainContent()
     }
 
 		return (

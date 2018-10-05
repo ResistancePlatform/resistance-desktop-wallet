@@ -37,10 +37,10 @@ let instance = null
  */
 export class FetchParametersService {
   mainWindow = null
+  downloadListener: () => void
   totalBytes: number
 	completedBytes: number
   downloadItems: set
-  actions: object
 
 	/**
 	 * Creates an instance of FetchParametersService.
@@ -95,13 +95,12 @@ export class FetchParametersService {
     return this::verifySproutFiles(verifySproutFile)
   }
 
-  bindRendererHandlers(dispatch, actions) {
+  bindRendererHandlersAndFetch(dispatch, actions) {
     ipcRenderer.on('fetch-parameters-status', (event, message) => {
       dispatch(actions.status(message))
     })
 
     ipcRenderer.on('fetch-parameters-download-progress', (event, {receivedBytes, totalBytes}) => {
-      console.log(receivedBytes, totalBytes)
       dispatch(actions.downloadProgress(receivedBytes, totalBytes))
     })
 
@@ -150,68 +149,96 @@ export class FetchParametersService {
 		this.completedBytes = 0
     this.downloadItems = new Set()
 
-    const resistanceParamsFolder = this.getResistanceParamsFolder()
-
-    if (!fs.existsSync(resistanceParamsFolder)) {
-      fs.mkdirSync(resistanceParamsFolder)
-    }
-
-    await this::downloadSproutKeys()
-
-    // All the sprout keys downloaded, calculating checksums and quick hashes
-    mainWindow.webContents.send('fetch-parameters-status', t(`Calculating checksums...`))
-
-    for (let index = 0; index < sproutFiles.length; index += 1) {
-      const fileName = sproutFiles[index].name
-      const filePath = path.join(resistanceParamsFolder, fileName)
-
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath)
+    try {
+      await this::fetchOrThrowError()
+    } catch(err) {
+      if (mainWindow.isDestroyed()) {
+        console.error(`Fetching Resistance parameters aborted due to the main window destruction.`)
+        console.error(err.toString())
+      } else {
+        mainWindow.webContents.send('fetch-parameters-download-failed', err.message)
       }
-
-      /* eslint-disable no-await-in-loop */
-      await this::verifyChecksum(fileName, sproutFiles[index].checksum)
-      await this::saveQuickFileHash(fileName)
-      /* eslint-enable no-await-in-loop */
     }
-
-    mainWindow.webContents.send('fetch-parameters-download-complete')
   }
 
 }
 
+async function fetchOrThrowError() {
+  const resistanceParamsFolder = this.getResistanceParamsFolder()
+
+  if (!fs.existsSync(resistanceParamsFolder)) {
+    fs.mkdirSync(resistanceParamsFolder)
+  }
+
+  await this::downloadSproutKeys()
+
+  if (this.mainWindow.isDestroyed()) {
+    throw new Error(`Main window got destroyed`)
+  }
+
+  // All the sprout keys downloaded, calculating checksums and quick hashes
+  this.mainWindow.webContents.send('fetch-parameters-status', t(`Calculating checksums...`))
+
+  for (let index = 0; index < sproutFiles.length; index += 1) {
+    const fileName = sproutFiles[index].name
+
+    /* eslint-disable no-await-in-loop */
+    await this::verifyChecksum(fileName, sproutFiles[index].checksum)
+    await this::saveQuickFileHash(fileName)
+    /* eslint-enable no-await-in-loop */
+  }
+
+  this.mainWindow.webContents.send('fetch-parameters-download-complete')
+}
+
 function downloadDoneCallback(state, downloadItem, resolve, reject) {
+  let error = null
+
   this.completedBytes += downloadItem.getTotalBytes()
   this.downloadItems.delete(downloadItem)
 
-  if (!this.mainWindow.isDestroyed()) {
-    this.mainWindow.setProgressBar(-1)
-  }
-
   const fileName = downloadItem.getFilename()
+
+  const removeListener = () => (
+    !this.mainWindow.isDestroyed() &&
+      this.mainWindow.webContents.session.removeListener('will-download', this.downloadListener)
+  )
 
   switch(state) {
     case 'cancelled':
-      reject(new Error(t(`The download of {{fileName}} has been cancelled`, { fileName })))
+      error = new Error(t(`The download of {{fileName}} has been cancelled`, { fileName }))
       break
     case 'interrupted':
-      reject(new Error(t(`The download of {{fileName}} was interruped`, { fileName })))
+      error = new Error(t(`The download of {{fileName}} was interruped`, { fileName }))
       break
     case 'completed':
-      if (this.downloadItems.size === 0) {
-        resolve()
+      if (this.downloadItems.size !== 0) {
+        break
       }
+
+      if (!this.mainWindow.isDestroyed()) {
+        this.mainWindow.setProgressBar(-1)
+      }
+
+      removeListener()
+      resolve()
+
       break
     default:
       console.error(`The download of ${fileName} finished with an unknown state ${state}`)
-      reject(new Error(t(`The download of {{fileName}} has failed, check the log for details`, { fileName })))
+      error = new Error(t(`The download of {{fileName}} has failed, check the log for details`, { fileName }))
+  }
+
+  if (error !== null) {
+    removeListener()
+    reject(error)
   }
 
 }
 
 function registerDownloadListener(resolve, reject) {
-  const listener = (e, downloadItem) => {
-    // console.error("added download item", downloadItem.getFilename(), downloadItem.getTotalBytes(), this.totalBytes)
+  this.downloadListener = (e, downloadItem) => {
+
     this.downloadItems.add(downloadItem)
     this.totalBytes += downloadItem.getTotalBytes()
 
@@ -225,7 +252,7 @@ function registerDownloadListener(resolve, reject) {
     ))
   }
 
-  this.mainWindow.webContents.session.on('will-download', listener)
+  this.mainWindow.webContents.session.on('will-download', this.downloadListener)
 }
 
 function downloadUpdatedCallback() {
@@ -233,11 +260,13 @@ function downloadUpdatedCallback() {
     bytesCounter + item.getReceivedBytes()
   ), this.completedBytes)
 
-  this.mainWindow.setProgressBar(receivedBytes / this.totalBytes)
-  this.mainWindow.webContents.send('fetch-parameters-download-progress', {
-    receivedBytes,
-    totalBytes: this.totalBytes,
-  })
+  if (!this.mainWindow.isDestroyed()) {
+    this.mainWindow.setProgressBar(receivedBytes / this.totalBytes)
+    this.mainWindow.webContents.send('fetch-parameters-download-progress', {
+      receivedBytes,
+      totalBytes: this.totalBytes,
+    })
+  }
 }
 
 function downloadSproutKeys() {
@@ -245,6 +274,12 @@ function downloadSproutKeys() {
     this::registerDownloadListener(resolve, reject)
 
     sproutFiles.forEach(({name: fileName}) => {
+      const filePath = path.join(this.getResistanceParamsFolder(), fileName)
+
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath)
+      }
+
       this.mainWindow.webContents.downloadURL(`${sproutUrl}/${fileName}`)
     })
   })
@@ -293,7 +328,7 @@ function verifyChecksum(fileName, checksum) {
  */
 async function saveQuickFileHash(fileName: string) {
   const quickHashes = config.get(quickHashesConfigKey, {})
-  quickHashes[fileName] = await this.calculateQuickHash(fileName)
+  quickHashes[fileName] = await this::calculateQuickHash(fileName)
   config.set(quickHashesConfigKey, quickHashes)
 }
 
