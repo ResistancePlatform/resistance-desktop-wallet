@@ -43,7 +43,7 @@ export const FetchParametersReducer = handleActions(
     [FetchParametersActions.downloadProgress]: (state, action) => {
       const { receivedBytes, totalBytes } = action.payload
 
-      const simpleRate = receivedBytes / totalBytes
+      const simpleRate = receivedBytes / (totalBytes + 1)
       const progressRate = simpleRate * 100.0
       const roundedRate = Math.round(progressRate)
       const totalMb = (totalBytes / 1024 / 1024).toFixed(2)

@@ -199,10 +199,12 @@ function downloadDoneCallback(state, downloadItem, resolve, reject) {
 
   const fileName = downloadItem.getFilename()
 
-  const removeListener = () => (
-    !this.mainWindow.isDestroyed() &&
+  const removeListener = () => {
+    if (!this.mainWindow.isDestroyed()) {
       this.mainWindow.webContents.session.removeListener('will-download', this.downloadListener)
-  )
+      this.mainWindow.setProgressBar(-1)
+    }
+  }
 
   switch(state) {
     case 'cancelled':
@@ -214,10 +216,6 @@ function downloadDoneCallback(state, downloadItem, resolve, reject) {
     case 'completed':
       if (this.downloadItems.size !== 0) {
         break
-      }
-
-      if (!this.mainWindow.isDestroyed()) {
-        this.mainWindow.setProgressBar(-1)
       }
 
       removeListener()
@@ -241,6 +239,11 @@ function registerDownloadListener(resolve, reject) {
 
     this.downloadItems.add(downloadItem)
     this.totalBytes += downloadItem.getTotalBytes()
+
+    // It seems that Chrome doesn't perform error handling, came up with this check:
+    if (downloadItem.getTotalBytes() === 0) {
+      reject(Error(t(`No Internet`)))
+    }
 
     const savePath = path.join(this.getResistanceParamsFolder(), downloadItem.getFilename())
     downloadItem.setSavePath(savePath)

@@ -4,3 +4,8 @@ if (process.env.NODE_ENV === 'production') {
 } else {
 	module.exports = require('./configureStore.dev') // eslint-disable-line global-require
 }
+
+// Allows module import when the store is not yet initialized
+export function getStore() {
+  return module.exports.appStore
+}

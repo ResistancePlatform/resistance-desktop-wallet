@@ -25,7 +25,6 @@ import AddressBookPage from './AddressBookPage'
 
 import { appStore } from '../store/configureStore'
 import FetchParametersDialog from '~/components/fetch-parameters/FetchParametersDialog'
-import { FetchParametersService } from '~/service/fetch-parameters-service'
 import { FetchParametersState, FetchParametersActions } from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import { AuthState } from '~/reducers/auth/auth.reducer'
 import { GetStartedState } from '~/reducers/get-started/get-started.reducer'
@@ -35,8 +34,6 @@ import styles from './App.scss'
 import HLayout from '../assets/styles/h-box-layout.scss'
 import VLayout from '../assets/styles/v-box-layout.scss'
 
-
-const fetchParameters = new FetchParametersService()
 
 type Props = {
   auth: AuthState,
@@ -60,10 +57,8 @@ class App extends React.Component<Props> {
 	 */
   componentDidMount() {
     if (!this.props.fetchParameters.isDownloadComplete) {
-      fetchParameters.bindRendererHandlersAndFetch(appStore.dispatch, FetchParametersActions)
-    }
-
-    if (!this.props.getStarted.isInProgress) {
+      appStore.dispatch(FetchParametersActions.fetch())
+    } else if (!this.props.getStarted.isInProgress) {
       appStore.dispatch(SettingsActions.kickOffChildProcesses())
     }
   }
