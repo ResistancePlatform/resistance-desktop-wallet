@@ -141,8 +141,21 @@ export class OSService {
 	 * @returns {string}
 	 */
   getInstallationPath() {
-    const walkUpPath = this.getOS() === 'windows' ? '/../../../' : '/../../../../'
-    return path.join(remote.app.getAppPath(), walkUpPath)
+    const validApp = process.type === 'renderer' ? remote.app : app
+    let walkUpPath
+    switch (this.getOS()) {
+      case 'windows':
+        walkUpPath = '/../../../'
+        break
+      case 'macos':
+        walkUpPath = '/../../../../'
+        break
+      case 'linux':
+        walkUpPath = '/../../../../..'
+        break
+    }
+    log.info(validApp.getAppPath())
+    return path.join(validApp.getAppPath(), walkUpPath)
   }
 
 	/**

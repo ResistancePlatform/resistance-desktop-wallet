@@ -270,6 +270,7 @@ export class FetchParametersService {
 	 * @returns {Promise}
 	 */
   calculateQuickHash(fileName: string) {
+    log.info(`Calculating a quick file hash for ${fileName}`)
     const filePath = path.join(this.getResistanceParamsFolder(), fileName)
 
     const calcFromStats = stats => {

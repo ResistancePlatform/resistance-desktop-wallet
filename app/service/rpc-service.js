@@ -75,7 +75,6 @@ export class RpcService {
 
     instance.t = i18n.getFixedT(null, 'service')
 
-		this.logger = new LoggerService()
 		this.osService = new OSService()
 		this.resistanceService = new ResistanceService()
 		this.addressBookService = new AddressBookService()
