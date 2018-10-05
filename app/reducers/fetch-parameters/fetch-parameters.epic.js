@@ -7,6 +7,7 @@ import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { getStore } from '~/store/configureStore'
+import { SettingsActions } from '~/reducers/settings/settings.reducer'
 import { FetchParametersService } from '~/service/fetch-parameters-service'
 import { FetchParametersActions } from './fetch-parameters.reducer'
 
@@ -21,6 +22,13 @@ const fetchEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     fetchParameters.bindRendererHandlersAndFetch(getStore().dispatch, FetchParametersActions)
     return FetchParametersActions.empty()
   })
+)
+
+const downloadCompleteEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(FetchParametersActions.downloadComplete),
+  map(() => (
+    state$.value.getStarted.isInProgress ? FetchParametersActions.empty() : SettingsActions.kickOffChildProcesses()
+  ))
 )
 
 const downloadFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
@@ -53,5 +61,6 @@ const downloadFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 
 export const FetchParametersEpic = (action$, state$) => merge(
   fetchEpic(action$, state$),
+  downloadCompleteEpic(action$, state$),
   downloadFailedEpic(action$, state$),
 )

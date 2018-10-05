@@ -147,7 +147,7 @@ app.on('ready', async () => {
   // Check resistance parameters presence relying on quick hashes only,
   // The use case when the actual parameters are present and the quick hashes are not
   // is covered in FetchParameters component
-  global.isParametersPresenceConfirmed = await fetchParameters.checkPresenceWithQuickHashes()
+  global.isParametersPresenceConfirmed = await fetchParameters.checkPresence({calculateChecksums: false})
 
   ipcMain.on('fetch-parameters', async () => {
     await fetchParameters.fetch(mainWindow)

@@ -60,17 +60,20 @@ export class FetchParametersService {
   }
 
 	/**
-   * Called from the main process. Returns true if Resistance parameters are present.
+   * Returns true if Resistance parameters are present.
    * The use case when the sprout files exist but there's no corresponding quick hash record
    * the checksums verification and quick hash generation has to be triggered separately
    * by the checkPresenceWithoutQuickHashes() function.
    * The reason for that is to avoid locking the main process during SHA-256 checksums calculation.
    * Called from the main process.
+   * In case the quick hashes are not present, calculates SHA-256 for the sprout files and generates quick hashes.
+   * This operation takes about few seconds and should be initiated by the the renderer process.
    *
+   * @param {boolean} calculateChecksums
 	 * @memberof FetchParametersService
 	 * @returns {boolean}
 	 */
-  async checkPresenceWithQuickHashes() {
+  async checkPresence({calculateChecksums}) {
     const resistanceParamsFolder = this.getResistanceParamsFolder()
 
     if (!fs.existsSync(resistanceParamsFolder)) {
@@ -81,6 +84,14 @@ export class FetchParametersService {
 
     const verifySproutFile = async fileName => {
       if (!quickHashes[fileName]) {
+
+        if (calculateChecksums) {
+          console.log(`Quick hash not found for ${fileName}, calculating SHA256 checksum...`)
+          await this::verifyChecksum(fileName, sproutFiles[index].checksum)
+          await this::saveQuickFileHash(fileName)
+          return true
+        }
+
         return false
       }
 
@@ -116,30 +127,6 @@ export class FetchParametersService {
   }
 
 	/**
-   * In case the quick hashes are not present, calculates SHA-256 for the sprout files and generates quick hashes.
-   * This operation takes about few seconds and should be initiated by the the renderer process.
-   *
-	 * @memberof FetchParametersService
-	 * @returns {boolean}
-	 */
-  async checkPresenceWithoutQuickHashes() {
-    const quickHashes = config.get(quickHashesConfigKey, {})
-
-    const verifySproutFile = async (fileName, index) => {
-      if (quickHashes[fileName]) {
-        return true
-      }
-
-      await this::verifyChecksum(fileName, sproutFiles[index].checksum)
-      await this::saveQuickFileHash(fileName)
-
-      return true
-    }
-
-    return this::verifySproutFiles(verifySproutFile)
-  }
-
-	/**
    * Downloads Resistance parameters
    *
 	 * @memberof FetchParametersService
@@ -168,7 +155,7 @@ export class FetchParametersService {
 async function fetchOrThrowError() {
   this::status(t(`Checking Resistance parameters presence...`))
 
-  if (await this.checkPresenceWithoutQuickHashes()) {
+  if (await this.checkPresence({calculateChecksums: true})) {
     this::downloadComplete()
     return
   }
