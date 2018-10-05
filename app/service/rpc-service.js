@@ -2,17 +2,17 @@
 import path from 'path'
 import * as fs from 'fs'
 import { promisify } from 'util'
+import log from 'electron-log'
 import { Decimal } from 'decimal.js'
 import { v4 as uuid } from 'uuid'
 import { remote } from 'electron'
 import Client from 'bitcoin-core'
 import { from, of, Observable } from 'rxjs'
-import { map, tap, take, catchError, switchMap } from 'rxjs/operators'
+import { map, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
 import { i18n } from '~/i18next.config'
 import { DECIMAL } from '~/constants/decimal'
-import { LoggerService, ConsoleTheme } from './logger-service'
 import { OSService } from './os-service'
 import { ResistanceService } from './resistance-service'
 import { AddressBookService } from './address-book-service'
@@ -59,7 +59,6 @@ const getClientInstance = () => {
  * @class RpcService
  */
 export class RpcService {
-	logger: LoggerService
   osService: OSService
   resistanceService: ResistanceService
 	addressBookService: AddressBookService
@@ -76,7 +75,6 @@ export class RpcService {
 
     instance.t = i18n.getFixedT(null, 'service')
 
-		this.logger = new LoggerService()
 		this.osService = new OSService()
 		this.resistanceService = new ResistanceService()
 		this.addressBookService = new AddressBookService()
@@ -142,9 +140,6 @@ export class RpcService {
 
     from(client.command(commandList))
     .pipe(
-      tap(result =>
-          this.logger.debug(this, `requestWalletInfo`, `result: `, ConsoleTheme.testing, result)
-         ),
          map(result => ({
            transparentBalance: Decimal(result[0].transparent),
            privateBalance: Decimal(result[0].private),
@@ -159,7 +154,7 @@ export class RpcService {
         this.osService.dispatchAction(OverviewActions.gotWalletInfo(result))
       },
       error => {
-        this.logger.debug(this, `startPollingWalletInfo`, `subscribe error: `, ConsoleTheme.error, error)
+        log.debug(`Error fetching the wallet balances: ${error}`)
         // TODO: move the prefix to toastr error title in the epic #114
         const errorPrefix = this.t(`Unable to get Resistance local node info`)
         this.osService.dispatchAction(OverviewActions.getWalletInfoFailure(`${errorPrefix}: ${error}`))
@@ -192,11 +187,11 @@ export class RpcService {
     this::applyAddressBookNamesToTransactions(combineQueryPromise)
       .subscribe(
         result => {
-          this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe result: `, ConsoleTheme.testing, result)
+          log.debug(`Wallet transactions: ${result}`)
           this.osService.dispatchAction(OverviewActions.gotTransactionDataFromWallet(result.transactions))
         },
         error => {
-          this.logger.debug(this, `requestTransactionsDataFromWallet`, `subscribe error: `, ConsoleTheme.error, error)
+          log.debug(`Error fetching wallet transactions: ${error}`)
           // TODO: move the prefix to toastr error title in the epic #114
           const errorPrefix = this.t(`Unable to get transactions from the wallet`)
           this.osService.dispatchAction(OverviewActions.getTransactionDataFromWalletFailure(`${errorPrefix}: ${error}`))
@@ -226,14 +221,14 @@ export class RpcService {
       .then(result => client.getBlockHash(result))
       .then(result => client.getBlock(result))
       .then(result => {
-        this.logger.debug(this, `requestBlockchainInfo`, `gotBlockchainInfo`, ConsoleTheme.testing, result)
+        log.debug(`Blockchain info: ${result}`)
         blockchainInfo.lastBlockDate = new Date(result.time * 1000)
         blockchainInfo.blockchainSynchronizedPercentage = this.getBlockchainSynchronizedPercentage(blockchainInfo.lastBlockDate)
         this.osService.dispatchAction(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
         return Promise.resolve()
       })
       .catch(err => {
-        this.logger.debug(this, `requestBlockchainInfo`, `getBlockchainInfoFailure`, ConsoleTheme.error, err)
+        log.debug(`Error fetching the blockchain: ${err}`)
         // TODO: move the prefix to toastr error title in the epic #114
         const errorPrefix = this.t(`Unable to get blockchain info`)
         this.osService.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`${errorPrefix}: ${err}`, err.code))
@@ -279,9 +274,8 @@ export class RpcService {
 
 		return from(createNewAddressPromise).pipe(
 			map(result => result[0]),
-			tap(newAddress => this.logger.debug(this, `createNewAddress`, `create ${isPrivate ? 'private ' : 'transparent '} address: `, ConsoleTheme.testing, newAddress)),
 			catchError(error => {
-				this.logger.debug(this, `createNewAddress`, `Error happened: `, ConsoleTheme.error, error)
+				log.debug(`There was an error creating a new address: ${error}`)
 				return of('')
 			})
 		)
@@ -378,12 +372,10 @@ export class RpcService {
 					}))
           .filter(item => !(item.address.startsWith('rr') || item.address.startsWith('rs')))
 
-				this.logger.debug(this, `getWalletAddressAndBalance`, `combinedAddresses: `, ConsoleTheme.testing, combinedAddresses)
+				log.debug(`Fetching the balances for the combined addresses: ${combinedAddresses}`)
 				return this::getAddressesBalance(client, combinedAddresses)
 			})
 			.then(addresses => {
-				this.logger.debug(this, `getWalletAddressAndBalance`, `addresses: `, ConsoleTheme.testing, addresses)
-
 				let addressList = null
 
 				// Sort for each groups
@@ -421,14 +413,14 @@ export class RpcService {
 				if (disableThePrivateAddress) {
 					const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')
 					const processedAddressList = addressList.map(tempAddressItem => isPrivateAddress(tempAddressItem.address) ? { ...tempAddressItem, disabled: true } : tempAddressItem)
-					this.logger.debug(this, `getWalletAddressAndBalance`, `processedAddressList: `, ConsoleTheme.testing, processedAddressList)
+					log.debug(`The processed address list: ${processedAddressList}`)
 					return processedAddressList
 				}
 
 				return addressList
 			})
 			.catch(error => {
-				this.logger.debug(this, `getWalletAddressAndBalance`, `Error happened: `, ConsoleTheme.error, error)
+				log.debug(`An error occurred when fetching the wallet addresses and balances: ${error}`)
 				return []
 			})
 
@@ -519,7 +511,6 @@ export class RpcService {
 
 		return from(queryPromise).pipe(
 			map(results => results[0]),
-			tap(result => this.logger.debug(this, `getTransactionDetail`, `result: `, ConsoleTheme.testing, result)),
 			map(result => {
 				if (result.name === 'RpcError') {
 					return result.message
@@ -543,12 +534,12 @@ export class RpcService {
 				delete detailResult.vjoinsplit
 				delete detailResult.walletconflicts
 
-				this.logger.debug(this, `getTransactionDetail`, `detailResult: `, ConsoleTheme.testing, detailResult)
+				log.debug(`Transaction details: ${detailResult}`)
 
 				return detailResult
 			}),
 			catchError(error => {
-				this.logger.debug(this, `getTransactionDetail`, `Error happened: `, ConsoleTheme.error, error)
+				log.debug(`An error occurred while fetching transcation details: ${error}`)
 				return of(error.message)
 			})
 		)
@@ -811,7 +802,7 @@ function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise
       return addresses
     })
     .catch(err => {
-      this.logger.debug(this, `getAddressesBalance`, `Error occurred: `, ConsoleTheme.error, err)
+      log.debug(`An error occurred while fetching an address balances: ${err}`)
 
       const addresses = addressRows.map(address => ({
         ...address,

@@ -3,10 +3,14 @@ import * as fs from 'fs'
 import path from 'path'
 import { download } from 'electron-dl'
 import { app, dialog } from 'electron'
+import log from 'electron-log'
 import config from 'electron-settings'
 
 import { i18n } from '../i18next.config'
 
+import { OSService } from './os-service'
+
+const osService = new OSService()
 const crypto = require('crypto')
 const ProgressBar = require('electron-progressbar')
 
@@ -19,12 +23,12 @@ const sproutFiles = [
   { name: 'sprout-verifying.key', checksum: "4bd498dae0aacfd8e98dc306338d017d9c08dd0918ead18172bd0aec2fc5df82" }
 ]
 
-// Shorter files for testing purposes
-// const sproutUrl = 'https://www.sample-videos.com/video/mp4/480'
-// const sproutFiles = [
-//   { name: 'big_buck_bunny_480p_5mb.mp4', checksum: "287d49daf0fa4c0a12aa31404fd408b1156669084496c8031c0e1a4ce18c5247" },
-//   { name: 'big_buck_bunny_480p_1mb.mp4', checksum: "6b83d01a1bddbb6481001d8bb644bd4eb376922a4cf363fda9c14826534e17b3" }
-// ]
+/* Shorter files for testing purposes
+ const sproutUrl = 'https://www.sample-videos.com/video/mp4/480'
+ const sproutFiles = [
+   { name: 'big_buck_bunny_480p_5mb.mp4', checksum: "287d49daf0fa4c0a12aa31404fd408b1156669084496c8031c0e1a4ce18c5247" },
+   { name: 'big_buck_bunny_480p_1mb.mp4', checksum: "6b83d01a1bddbb6481001d8bb644bd4eb376922a4cf363fda9c14826534e17b3" }
+ ] */
 
 /**
  * ES6 singleton
@@ -63,16 +67,20 @@ export class FetchParametersService {
 	 */
   async checkPresence() {
     const resistanceParamsFolder = this.getResistanceParamsFolder()
-
+    log.info(`Checking for params directory ${resistanceParamsFolder}`)
     if (!fs.existsSync(resistanceParamsFolder)) {
+      log.info(`The params directory ${resistanceParamsFolder} does not exist`)
       return false
+    } else {
+      log.info(`The params directory ${resistanceParamsFolder} exists`)
     }
 
     const quickHashes = config.get(quickHashesConfigKey, {})
 
     const verifySproutFile = async (fileName, index) => {
+      log.info(`Sprout file ${fileName} verification . . .`)
       if (!quickHashes[fileName]) {
-        console.log(`Quick hash not found for ${fileName}, calculating SHA256 checksum...`)
+        log.info(`Quick hash not found for ${fileName}, calculating SHA256 checksum...`)
         await this.verifyChecksum(fileName, sproutFiles[index].checksum)
         await this.saveQuickFileHash(fileName)
       } else {
@@ -80,6 +88,7 @@ export class FetchParametersService {
         if (quickHash !== quickHashes[fileName]) {
           return false
         }
+        log.info(`Quick hash for ${fileName} matches`)
       }
 
       return true
@@ -92,8 +101,9 @@ export class FetchParametersService {
       try {
         /* eslint-disable-next-line no-await-in-loop */
         isVerified = await verifySproutFile(fileName, index)
+        log.info(`Sprout file ${fileName} verification succeeded.`)
       } catch (err) {
-        console.error(`Sprout file ${fileName} verification failed.`, err.toString())
+        log.error(`Sprout file ${fileName} verification failed.`, err.toString())
         return false
       }
 
@@ -133,7 +143,7 @@ export class FetchParametersService {
         /* eslint-disable no-await-in-loop */
 
         await this.downloadSproutKey(fileName, index)
-        this.progressBar.detail = this.t(`Calculating checksum for {{fileName}}...`, { fileName })
+        this.progressBar.detail = this.t(`Calculating checksum for ${fileName}...`, { fileName })
         await this.verifyChecksum(fileName, sproutFiles[index].checksum)
         await this.saveQuickFileHash(fileName)
 
@@ -150,7 +160,12 @@ export class FetchParametersService {
   }
 
   getResistanceParamsFolder(): string {
-    return path.join(app.getPath('appData'), paramsFolderName)
+    const validApp = process.type === 'renderer' ? remote.app : app
+    let paramFolder = path.join(app.getPath('appData'), paramsFolderName)
+    if (osService.getOS() === 'linux') {
+      paramFolder = path.join(app.getPath('home'), '.resistance-params')
+    }
+    return paramFolder
   }
 
   createProgressBar(): ProgressBar {
@@ -171,7 +186,7 @@ export class FetchParametersService {
 
     const onProgress = progress => {
       const rate = progress * 100
-      const roundedRate = Math.round(rate)
+      const roundedRate = Math.round(rate)  
       const totalMb = (totalBytes / 1024 / 1024).toFixed(2)
       const receivedMb = (progress  * totalMb).toFixed(2)
       this.progressBar.value = rate
@@ -257,6 +272,7 @@ export class FetchParametersService {
 	 * @returns {Promise}
 	 */
   calculateQuickHash(fileName: string) {
+    log.info(`Calculating a quick file hash for ${fileName}`)
     const filePath = path.join(this.getResistanceParamsFolder(), fileName)
 
     const calcFromStats = stats => {
