@@ -43,6 +43,17 @@ const generateWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	map(result => GetStartedActions.createNewWallet.gotGeneratedWallet(result))
 )
 
+/*
+ * Main use case actions sequences.
+ *
+ * Create new wallet:
+ *   applyConfiguration → encryptWallet → authenticate → walletBootstrappingSucceeded
+ *
+ * Restore from backup:
+ *   applyConfiguration → restoreWallet → authenticate → changePassword → walletBootstrappingSucceeded
+ *
+ */
+
 const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(WelcomeActions.applyConfiguration),
   switchMap(() => {
@@ -60,8 +71,14 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
       path: form.fields.walletPath
     })
 
+    // const nextAction = state.getStarted.isCreatingNewWallet
+    //   ? WelcomeActions.encryptWallet()
+    //   : WelcomeActions.restoreWallet()
+
+    const nextAction = WelcomeActions.encryptWallet()
+
     const nodeStartedObservable = getStartLocalNodeObservable(
-      of(WelcomeActions.encryptWallet()),
+      of(nextAction),
       of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
       action$
     )
@@ -71,6 +88,16 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
       of(SettingsActions.startLocalNode()),
       nodeStartedObservable
     )
+  })
+)
+
+const restoreWalletEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(WelcomeActions.restoreWallet),
+  switchMap(() => {
+    const restoreForm = state$.value.roundedForm.getStartedRestoreYourWallet
+
+    // Copying the user wallet to Resistance data folder
+    // const newWalletPath = path.join(resistanceService.getWalletPath(), restoreForm.walletName)
   })
 )
 
@@ -164,6 +191,7 @@ export const GetStartedEpic = (action$, state$) => merge(
 	generateWalletEpic(action$, state$),
 	applyConfigurationEpic(action$, state$),
   encryptWalletEpic(action$, state$),
+  restoreWalletEpic(action$, state$),
   authenticateAndRestoreWalletEpic(action$, state$),
   walletBootstrappingSucceededEpic(action$, state$),
   useResistanceEpic(action$, state$)
