@@ -5,6 +5,7 @@ import classNames from 'classnames'
 import { NavLink } from 'react-router-dom'
 import * as Joi from 'joi'
 
+import { getPasswordValidationSchema } from '~/utils/auth'
 import { getWalletNameJoi } from '~/utils/get-started'
 import { ResistanceService } from '~/service/resistance-service'
 import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
@@ -16,11 +17,12 @@ import styles from './RestoreYourWallet.scss'
 
 const resistance = new ResistanceService()
 
-const validationSchema = Joi.object().keys({
+const getValidationSchema = t => Joi.object().keys({
   walletName: getWalletNameJoi().walletName().fileDoesntExist(Joi.ref('walletPath')).required().label(`Wallet name`),
-  backupFile: Joi.string().required().label(`Private keys file`),
-  restoreHeight: Joi.number().integer().optional().allow('').label(`Restore height`),
-  walletPath: Joi.string().required().label(`Wallet path`)
+  backupFile: Joi.string().required().label(t(`Backup file`)),
+  password: getPasswordValidationSchema(t(`Wallet password`)),
+  restoreHeight: Joi.number().integer().optional().allow('').label(t(`Restore height`)),
+  walletPath: Joi.string().required().label(t(`Wallet path`))
 })
 
 type Props = {
@@ -54,8 +56,8 @@ export class RestoreYourWallet extends Component<Props> {
 			enable: true,
       type: 'CHOOSE_FILE',
       data: {
-        title: t(`Restore Resistance wallet from a private keys file`),
-        filters: [{ name: t(`Keys files`),  extensions: ['keys'] }]
+        title: t(`Restore Resistance wallet from a backup file`),
+        filters: [{ name: t(`Wallet files`),  extensions: ['dat'] }]
       }
 		}
 
@@ -67,11 +69,12 @@ export class RestoreYourWallet extends Component<Props> {
           <RoundedForm
             id="getStartedRestoreYourWallet"
             options={{ stripUnknown: true }}
-            schema={validationSchema}
+            schema={getValidationSchema(t)}
           >
             <RoundedInput name="walletName" defaultValue={userInfo().username} label={t(`Wallet name`)} />
 
-            <RoundedInput name="backupFile" label={t(`Private keys file`)} addon={backupFileAddon} readOnly />
+            <RoundedInput name="backupFile" label={t(`Backup file`)} addon={backupFileAddon} readOnly />
+            <RoundedInput name="password" password label={t(`Wallet password`)} />
 
             <RoundedInput
               name="walletPath"

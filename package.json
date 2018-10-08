@@ -55,6 +55,7 @@
       "locales"
     ],
     "dmg": {
+      "icon": "resources/drive-icon.icns",
       "contents": [
         {
           "x": 130,

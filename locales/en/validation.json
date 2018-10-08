@@ -116,7 +116,7 @@
     "alphanum": "must only contain alpha-numeric characters",
     "token": "must only contain alpha-numeric and underscore characters",
     "regex": {
-      "base": "with value \"{{!value}}\" fails to match the required pattern: {{pattern}}",
+      "base": "can contain letters, numbers, special characters and spaces",
       "name": "with value \"{{!value}}\" fails to match the {{name}} pattern",
       "invert": {
         "base": "with value \"{{!value}}\" matches the inverted pattern: {{pattern}}",
