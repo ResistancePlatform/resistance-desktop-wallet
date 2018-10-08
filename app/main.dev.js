@@ -78,8 +78,8 @@ const checkAndCreateWalletAppFolder = () => {
 
 const getWindowSize = (isGetStartedComplete: boolean = false) => {
   if (isGetStartedComplete || !config.get('getStartedInProgress', true)) {
-    const width = 1024
-    const height = 728
+    const width = 943
+    const height = 568
 
     return {
       width,

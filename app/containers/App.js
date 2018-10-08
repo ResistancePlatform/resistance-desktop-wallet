@@ -15,6 +15,7 @@ import WelcomePage from './get-started/WelcomePage'
 import Login from '~/components/auth/Login'
 import TitleBarButtons, { DragBar } from '~/components/title-bar-buttons/TitleBarButtons'
 import NaviBar from './navigation/navi-bar'
+import StatusIcons from '~/components/status-icons/StatusIcons'
 import SystemInfo from './system-info/system-info'
 import Overview from './overview/overview'
 import OwnAddress from './own-addresses/own-addresses'
@@ -91,6 +92,7 @@ class App extends React.Component<Props> {
 				<div className={cn(VLayout.vBoxChild, HLayout.hBoxContainer)}>
           <TitleBarButtons />
 					<NaviBar />
+          <StatusIcons />
 
 					{ /* Route content container */}
 					<div className={cn(styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer)}>

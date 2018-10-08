@@ -24,7 +24,7 @@ const rpc = new RpcService()
 
 
 const WelcomeActions = GetStartedActions.welcome
-const unableToStartLocalNodeMessage = t(`Unable to start Resistance local node, please try again or contact the support.`)
+const unableToStartLocalNodeMessage = t(`Unable to start Resistance local node`)
 
 const chooseLanguageEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(GetStartedActions.chooseLanguage),

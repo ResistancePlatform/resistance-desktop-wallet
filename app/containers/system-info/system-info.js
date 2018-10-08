@@ -1,19 +1,17 @@
 // @flow
-import { EOL } from 'os'
-
 import moment from 'moment'
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import { translate } from 'react-i18next'
-import classNames from 'classnames'
+import cn from 'classnames'
 import { toastr } from 'react-redux-toastr'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
+import { getChildProcessStatusName } from '~/utils/child-process'
 import { OSService } from '~/service/os-service'
 import { SystemInfoActions, SystemInfoState } from '~/reducers/system-info/system-info.reducer'
 import { appStore } from '~/store/configureStore'
 import { State } from '~/reducers/types'
-import OperationsModal from '~/components/system-info/OperationsModal'
 import humanizeOperationName from '~/components/system-info/humanize-operation'
 
 import styles from './system-info.scss'
@@ -29,7 +27,6 @@ type Props = {
   t: any,
   i18n: any,
 	systemInfo: SystemInfoState,
-	sendCash: SendCashState,
 	settings: SettingsState
 }
 
@@ -93,20 +90,6 @@ class SystemInfo extends Component<Props> {
     })
   }
 
-  getChildProcessStatusName(t, processName) {
-    const nameMap = {
-      'RUNNING' : t(`Running`),
-      'STARTING' : t(`Starting`),
-      'RESTARTING' : t(`Restarting`),
-      'FAILED' : t(`Failed`),
-      'STOPPING' : t(`Stopping`),
-      'MURDER FAILED' : t(`Murder failed`),
-      'NOT RUNNING' : t(`Not running`)
-    }
-    const status = this.props.settings.childProcessesStatus[processName]
-    return nameMap[status] || t(`Unknown`)
-  }
-
 	/**
 	 * @memberof SystemInfo
 	 */
@@ -150,74 +133,6 @@ class SystemInfo extends Component<Props> {
     return tempDate ? moment().locale(i18n.language).calendar(tempDate) : t(`N/A`)
 	}
 
-  getMinerStatusIconTitle() {
-    const { t } = this.props
-    const minerStatus = this.props.settings.childProcessesStatus.MINER
-
-    if (minerStatus !== 'RUNNING') {
-      return `${t('Miner status:')} ${minerStatus}`
-    }
-
-    const minerInfo = this.props.systemInfo.miner
-
-    const tooltip = [
-      t(`Mining in progress...`),
-      t(`Hashing power: {{hashingPower}} khash/s`, minerInfo.hashingPower),
-      `${t('Mined blocks number:')} ${minerInfo.minedBlocksNumber}`
-    ].join(EOL)
-
-    return tooltip
-  }
-
-  getOperationsCount(...args) {
-    const operationsCount = this.props.systemInfo.operations.reduce((counter, operation) => (
-      counter + (args.indexOf(operation.status) === -1 ? 0 : 1)
-    ), 0)
-    return operationsCount
-  }
-
-  getOperationIconHint() {
-    let iconHint
-    const pendingNumber = this.getOperationsCount('queued', 'executing')
-
-    if (pendingNumber) {
-      iconHint = (
-        <span
-          role="none"
-          className={styles.operationsIconHint}
-          title={this.getOperationsIconTitle()}
-          onClick={e => this.onOperationsIconClicked(e)}
-          onKeyDown={e => this.onOperationsIconClicked(e)}
-        >
-          {pendingNumber}
-        </span>
-      )
-    }
-    return iconHint
-  }
-
-  getOperationsIconTitle() {
-    const { t } = this.props
-
-    if (!this.props.systemInfo.operations.length) {
-      return t(`No pending operations.`)
-    }
-
-    const titleKey = `{{pendingCoun}} pending, {{successCount}} complete, {{failed}} failed operations.`
-
-    return t(
-      titleKey,
-      this.getOperationsCount('queued', 'executing'),
-      this.getOperationsCount('success'),
-      this.getOperationsCount('failed')
-    )
-  }
-
-  onOperationsIconClicked() {
-    appStore.dispatch(SystemInfoActions.openOperationsModal())
-    return false
-  }
-
 	/**
 	 * @returns
 	 * @memberof SystemInfo
@@ -226,7 +141,7 @@ class SystemInfo extends Component<Props> {
     const { t } = this.props
 
 		return (
-			<div className={[styles.systemInfoContainer, HLayout.hBoxContainer].join(' ')}>
+			<div className={cn(styles.systemInfoContainer, HLayout.hBoxContainer)}>
         <RpcPolling
           interval={daemonInfoPollingInterval}
           actions={{
@@ -255,13 +170,16 @@ class SystemInfo extends Component<Props> {
         />
 
 				{ /* Status column container */}
-				<div className={[styles.statusContainer, HLayout.hBoxChild].join(' ')}>
+				<div className={cn(styles.statusContainer, HLayout.hBoxChild)}>
 
 					{ /* Resistance status coloumn */}
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>{t(`Resistance status`)}</div>
 						<div className={styles.statusColoumnValue}>
-              <span className={styles.nodeStatusContainer}><i className={this.getLocalNodeStatusClassNames()} /><span>{t(this.getChildProcessStatusName(t, 'NODE'))}</span></span>
+              <span className={styles.nodeStatusContainer}>
+                <i className={this.getLocalNodeStatusClassNames()} />
+                <span>{t(getChildProcessStatusName(this.props.settings.childProcessesStatus.NODE))}</span>
+              </span>
 						</div>
 					</div>
 
@@ -308,37 +226,6 @@ class SystemInfo extends Component<Props> {
           >
             {t(`Installation folder`)}
           </button>
-        </div>
-
-
-        <div className={styles.statusCustomIconsContainer}>
-          <i
-            role="none"
-            className={classNames(styles.customIconOperations, styles.statusIcon, { [styles.active]: this.props.systemInfo.operations.length })}
-            title={this.getOperationsIconTitle()}
-            onClick={e => this.onOperationsIconClicked(e)}
-            onKeyDown={e => this.onOperationsIconClicked(e)}
-          />
-          {this.getOperationIconHint()}
-
-          <i
-            className={classNames(styles.customIconMining, styles.statusIcon, { [styles.active]: this.props.settings.childProcessesStatus.MINER === 'RUNNING' })}
-            title={this.getMinerStatusIconTitle()}
-          />
-          <i
-            className={classNames(styles.customIconPrivacy, styles.statusIcon, { [styles.active]: this.props.sendCash.isPrivateTransactions })}
-            title={
-              this.props.sendCash.isPrivateTransactions
-                ? t(`Private transactions are enabled`)
-                : t(`Private transactions are disabled`)
-            }
-          />
-          <i
-            className={classNames(styles.customIconTor, styles.statusIcon, { [styles.active]: this.props.settings.childProcessesStatus.TOR === 'RUNNING' })}
-            title={t(`Tor status: {{status}}`, this.props.settings.childProcessesStatus.TOR)}
-          />
-
-          <OperationsModal />
         </div>
 
 			</div>
