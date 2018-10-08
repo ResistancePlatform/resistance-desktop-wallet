@@ -109,7 +109,7 @@ export const preloadedState: State = {
 	},
   resDex: {
     login: {
-      isRequired: true,
+      isRequired: false,
       portfolios: []
     },
     assets: {
