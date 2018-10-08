@@ -1,9 +1,5 @@
 // @flow
 
-// const coinlist = require('coinlist');
-// const _ = require('lodash');
-// const {hiddenCurrencies} = require('../constants');
-
 /*
 Info:
 We use the `name` property only when the currency is not on `coinmarketcap.com`.
@@ -1101,7 +1097,7 @@ const supportedCurrencies = [
 				port: 10009,
 			},
 		],
-	},
+  }, */
 	{
 		coin: 'HODLC',
 		name: 'Hodlcoin',
@@ -1121,7 +1117,6 @@ const supportedCurrencies = [
 			},
 		],
 	},
-	*/
 	{
 		coin: 'HUSH',
 		rpcport: 8822,
@@ -2330,41 +2325,8 @@ const supportedCurrencies = [
 		etomic: '0xE41d2489571d322189246DaFA5ebDe1F4699F498',
 		rpcport: 80,
 	},
-];
+]
 
-/*
-const getCurrencySymbols = () => (
-	_(supportedCurrencies)
-		.chain()
-		.map('coin')
-		.without(...hiddenCurrencies)
-		.orderBy()
-		.value()
-);
-
-const getCurrencyName = symbol => {
-	const coinParams = supportedCurrencies.find(currency => currency.coin === symbol);
-
-	return coinParams.name || coinlist.get(symbol, 'name') || symbol;
-};
-
-const getCurrency = symbol => supportedCurrencies.find(currency => currency.coin === symbol);
-
-const isEtomic = symbol => {
-	const currency = getCurrency(symbol);
-
-	if (!currency) {
-		throw new Error(`Unsupported currency: "${symbol}"`);
-	}
-
-	return currency.etomic;
-};
-
-*/
-module.exports = {
+export {
 	supportedCurrencies,
-	// getCurrencySymbols,
-	// getCurrencyName,
-	// getCurrency,
-	// isEtomic,
-};
+}

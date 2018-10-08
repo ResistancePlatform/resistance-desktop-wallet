@@ -21,5 +21,6 @@
   "R-addresses are 35 characters long, not {{length}}": "R-addresses are 35 characters long, not {{length}}",
   "Z-addresses are 95 characters long, not {{length}}": "Z-addresses are 95 characters long, not {{length}}",
   "is not a valid Resistance address": "is not a valid Resistance address",
+  "Authentication failed": "Authentication failed",
   "Incorrect password": "Incorrect password"
 }

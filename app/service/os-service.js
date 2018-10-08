@@ -19,7 +19,8 @@ export type ChildProcessStatus = 'RUNNING' | 'STARTING' | 'RESTARTING' | 'FAILED
 const ChildProcessCommands = {
   NODE: 'resistanced',
   MINER: 'minerd',
-  TOR: 'tor-proxy'
+  TOR: 'tor-proxy',
+  MARKET_MAKER: 'marketmaker'
 }
 
 /**
@@ -39,7 +40,7 @@ export class OSService {
     // Create a global var to store child processes information for the cleanup
     if (process.type === 'browser' && global.childProcesses === undefined) {
       const childProcesses = {}
-      const processNames = ['NODE', 'MINER', 'TOR']
+      const processNames = ['NODE', 'MINER', 'TOR', 'MARKET_MAKER']
 
       processNames.forEach(processName => {
         childProcesses[processName] = {

@@ -6,5 +6,8 @@
   "Remove Address": "Remove Address",
   "Name": "Name",
   "Address": "Address",
-  "You don't have any address records yet.": "You don't have any address records yet."
+  "You don't have any address records yet.": "You don't have any address records yet.",
+  "New address": "New address",
+  "Edit": "Edit",
+  "Add": "Add"
 }

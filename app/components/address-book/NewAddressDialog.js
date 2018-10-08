@@ -3,6 +3,7 @@ import * as Joi from 'joi'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import { translate } from 'react-i18next'
 
 import ValidateAddressService from '~/service/validate-address-service'
 import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
@@ -14,18 +15,19 @@ import styles from './NewAddressDialog.scss'
 
 const validateAddress = new ValidateAddressService()
 
-const validationSchema = Joi.object().keys({
-  name: Joi.string().required().label(`Name`),
+const getValidationSchema = t => Joi.object().keys({
+  name: Joi.string().required().label(t(`Name`)),
   address: (
     validateAddress.getJoi()
     .resistanceAddress()
     .rZ().rLength().zLength().valid()
-    .required().label(`Address`)
+    .required().label(t(`Address`))
   )
 })
 
 type Props = {
-  actions: Object,
+  t: any,
+  actions: object,
   newAddressDialog: AddressBookState.newAddressDialog
 }
 
@@ -37,6 +39,8 @@ class NewAddressDialog extends Component<Props> {
 	props: Props
 
 	render() {
+    const { t } = this.props
+
     if (!this.props.newAddressDialog.isVisible) {
       return null
     }
@@ -62,18 +66,20 @@ class NewAddressDialog extends Component<Props> {
 
 				{/* Title */}
         <div className={styles.title}>
-          { this.props.newAddressDialog.isInEditMode ? `Edit Address` : `New Address` }
+          { this.props.newAddressDialog.isInEditMode
+            ? t(`Edit address`)
+            : t(`New address`) }
         </div>
 
         <RoundedForm
           id="addressBookNewAddressDialog"
-          schema={validationSchema}
+          schema={getValidationSchema(t)}
         >
           {/* Name */}
           <RoundedInput
             name="name"
             defaultValue={this.props.newAddressDialog.defaultValues.name}
-            label="Name"
+            label={t(`Name`)}
             addon={nameAddon}
           />
 
@@ -102,7 +108,7 @@ class NewAddressDialog extends Component<Props> {
                 ? this.props.actions.updateAddress
                 : this.props.actions.addAddress}
               onKeyDown={() => {}}
-            >{ this.props.newAddressDialog.isInEditMode ? 'Edit' : 'Add' }
+            >{ this.props.newAddressDialog.isInEditMode ? t(`Edit`) : t(`Add`) }
             </button>
           </div>
         </RoundedForm>
@@ -117,4 +123,4 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = dispatch => ({ actions: bindActionCreators(AddressBookActions.newAddressDialog, dispatch) })
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewAddressDialog)
+export default connect(mapStateToProps, mapDispatchToProps)(translate('address-book')(NewAddressDialog))

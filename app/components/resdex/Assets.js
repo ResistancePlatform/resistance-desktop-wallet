@@ -1,6 +1,9 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import moment from 'moment'
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
 import {
@@ -12,15 +15,16 @@ import {
   AreaSeries
 } from 'react-vis'
 
-import btcImage from '~/assets/images/resdex/BTC.svg'
-import ethImage from '~/assets/images/resdex/ETH.svg'
-import ltcImage from '~/assets/images/resdex/LTC.svg'
-import etcImage from '~/assets/images/resdex/ETC.svg'
-import bchImage from '~/assets/images/resdex/BCH.svg'
+import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
+import CurrencyIcon from './CurrencyIcon'
+import { getCurrencyName } from '~/utils/resdex'
+
 import styles from './Assets.scss'
 
 type Props = {
-  t: any
+  t: any,
+  accounts: ResDexAccountsState,
+  accountsActions: object
 }
 
 
@@ -30,6 +34,44 @@ type Props = {
  */
 class ResDexAssets extends Component<Props> {
 	props: Props
+
+  getWalletContents(t, symbol: string) {
+    const currency = this.props.accounts.currencies[symbol]
+
+    return (
+      <div className={styles.coin}>
+        <CurrencyIcon symbol={symbol} size="1.6rem" />
+
+        {getCurrencyName(symbol)}
+
+        <div className={styles.amount}>
+          {currency ? `${currency.balance} ${symbol}` : t(`N/A`)}
+        </div>
+
+        <div className={styles.equity}>
+          <sub>$</sub>{currency ? Decimal('0.001314').mul(currency.balance).toString() : t(`N/A`)}
+        </div>
+
+        <div className={styles.buttons}>
+          <button
+            type="button"
+            onClick={() => this.props.accountsActions.showWithdrawModal(currency.symbol)}
+            disabled={!currency || currency.balance.isZero()}
+          >
+            {t(`Withdraw`)}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => this.props.accountsActions.showDepositModal(currency.symbol)}
+            disabled={!currency}
+          >
+            {t(`Deposit`)}
+          </button>
+        </div>
+      </div>
+    )
+  }
 
 	/**
 	 * @returns
@@ -131,91 +173,22 @@ class ResDexAssets extends Component<Props> {
     </FlexibleWidthXYPlot>
   </div>
 
-        <div className={styles.coins}>
-          <div className={styles.coin}>
-            <img src={btcImage} alt="Bitcoin"/>
+  <div className={styles.coins}>
+    {this.props.accounts.enabledCurrencies.map(currency => this.getWalletContents(t, currency.symbol))}
+  </div>
 
-            Bitcoin
-            <div className={styles.amount}>0.0097521 BTC</div>
-
-            <div className={styles.equity}>
-              <sub>$</sub>279.21
-            </div>
-
-            <div className={styles.buttons}>
-              <button type="button">{t(`Withdraw`)}</button>
-              <button type="button">{t(`Deposit`)}</button>
-            </div>
-          </div>
-
-          <div className={styles.coin}>
-            <img src={ltcImage} alt="Litecoin"/>
-
-            Litecoin
-            <div className={styles.amount}>1.3758594 LTC</div>
-
-            <div className={styles.equity}>
-              <sub>$</sub>75.40
-            </div>
-
-            <div className={styles.buttons}>
-              <button type="button">{t(`Withdraw`)}</button>
-              <button type="button">{t(`Deposit`)}</button>
-            </div>
-          </div>
-
-          <div className={styles.coin}>
-            <img src={ethImage} alt="Ethereum"/>
-
-            Ethereum
-            <div className={styles.amount}>0.983243245 ETH</div>
-
-            <div className={styles.equity}>
-              <sub>$</sub>186.21
-            </div>
-
-            <div className={styles.buttons}>
-              <button type="button">{t(`Withdraw`)}</button>
-              <button type="button">{t(`Deposit`)}</button>
-            </div>
-          </div>
-
-          <div className={styles.coin}>
-            <img src={etcImage} alt="Ethereum Classic"/>
-
-            Ethereum Classic
-            <div className={styles.amount}>21.478472 ETC</div>
-
-            <div className={styles.equity}>
-              <sub>$</sub>67.44342
-            </div>
-
-            <div className={styles.buttons}>
-              <button type="button">{t(`Withdraw`)}</button>
-              <button type="button">{t(`Deposit`)}</button>
-            </div>
-          </div>
-
-          <div className={styles.coin}>
-            <img src={bchImage} alt="Bitcoin Cash"/>
-
-            Bitcoin Cash
-            <div className={styles.amount}>1.17374834 BCH</div>
-
-            <div className={styles.equity}>
-              <sub>$</sub>517.40
-            </div>
-
-            <div className={styles.buttons}>
-              <button type="button">{t(`Withdraw`)}</button>
-              <button type="button">{t(`Deposit`)}</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
+</div>
     )
   }
 }
 
-export default translate('resdex')(ResDexAssets)
+const mapStateToProps = (state) => ({
+	assets: state.resDex.assets,
+	accounts: state.resDex.accounts
+})
+
+const mapDispatchToProps = dispatch => ({
+  accountsActions: bindActionCreators(ResDexAccountsActions, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexAssets))
