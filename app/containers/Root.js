@@ -8,6 +8,7 @@ import ReduxToastr from 'react-redux-toastr'
 import { i18n } from '~/i18next.config'
 import App from './App'
 
+
 type Props = {
 	store: object,
 	history: object

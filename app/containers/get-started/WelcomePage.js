@@ -9,7 +9,8 @@ import { Welcome } from '~/components/get-started/Welcome'
 const mapStateToProps = state => ({
   getStarted: state.getStarted,
   welcome: state.getStarted.welcome,
-  roundedForm: state.roundedForm
+  roundedForm: state.roundedForm,
+  fetchParameters: state.fetchParameters
 })
 
 const mapDispatchToProps = dispatch => ({

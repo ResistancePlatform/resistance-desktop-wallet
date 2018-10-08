@@ -1,18 +1,16 @@
 // @flow
 import * as fs from 'fs'
 import path from 'path'
-import { download } from 'electron-dl'
-import { app, dialog } from 'electron'
+import { app, remote, ipcRenderer } from 'electron'
 import log from 'electron-log'
 import config from 'electron-settings'
+import crypto from 'crypto'
 
-import { i18n } from '../i18next.config'
-
+import { translate } from '../i18next.config'
 import { OSService } from './os-service'
 
-const osService = new OSService()
-const crypto = require('crypto')
-const ProgressBar = require('electron-progressbar')
+const t = translate('service')
+const os = new OSService()
 
 const quickHashesConfigKey = 'resistanceParameters.quickHashes'
 const paramsFolderName = 'ResistanceParams'
@@ -40,8 +38,11 @@ let instance = null
  * @class FetchParametersService
  */
 export class FetchParametersService {
-  parentWindow = null
-  progressBar = null
+  mainWindow = null
+  downloadListener: () => void
+  totalBytes: number
+	completedBytes: number
+  downloadItems: set
 
 	/**
 	 * Creates an instance of FetchParametersService.
@@ -52,67 +53,91 @@ export class FetchParametersService {
       instance = this
     }
 
-    instance.t = i18n.getFixedT(null, 'service')
-
 		return instance
 	}
 
+  getResistanceParamsFolder(): string {
+    const validApp = process.type === 'renderer' ? remote.app : app
+    let paramFolder = path.join(validApp.getPath('appData'), paramsFolderName)
+
+    if (os.getOS() === 'linux') {
+      paramFolder = path.join(validApp.getPath('home'), '.resistance-params')
+    }
+
+    return paramFolder
+  }
+
 	/**
    * Returns true if Resistance parameters are present.
-   * If sprout files exist but there's no corresponding quick hash record the checksum verification will be initiated,
-   * followed by quick hash generation.
+   * The use case when the sprout files exist but there's no corresponding quick hash record
+   * the checksums verification and quick hash generation has to be triggered separately
+   * by the checkPresenceWithoutQuickHashes() function.
+   * The reason for that is to avoid locking the main process during SHA-256 checksums calculation.
+   * Called from the main process.
+   * In case the quick hashes are not present, calculates SHA-256 for the sprout files and generates quick hashes.
+   * This operation takes about few seconds and should be initiated by the the renderer process.
    *
+   * @param {boolean} calculateChecksums
 	 * @memberof FetchParametersService
 	 * @returns {boolean}
 	 */
-  async checkPresence() {
+  async checkPresence({calculateChecksums}) {
     const resistanceParamsFolder = this.getResistanceParamsFolder()
+
     log.info(`Checking for params directory ${resistanceParamsFolder}`)
+
     if (!fs.existsSync(resistanceParamsFolder)) {
       log.info(`The params directory ${resistanceParamsFolder} does not exist`)
       return false
-    } else {
-      log.info(`The params directory ${resistanceParamsFolder} exists`)
     }
+
+    log.info(`The params directory ${resistanceParamsFolder} exists`)
 
     const quickHashes = config.get(quickHashesConfigKey, {})
 
     const verifySproutFile = async (fileName, index) => {
       log.info(`Sprout file ${fileName} verification . . .`)
       if (!quickHashes[fileName]) {
-        log.info(`Quick hash not found for ${fileName}, calculating SHA256 checksum...`)
-        await this.verifyChecksum(fileName, sproutFiles[index].checksum)
-        await this.saveQuickFileHash(fileName)
-      } else {
-        const quickHash = await this.calculateQuickHash(fileName)
-        if (quickHash !== quickHashes[fileName]) {
-          return false
+
+        if (calculateChecksums) {
+          log.info(`Quick hash not found for ${fileName}, calculating SHA256 checksum...`)
+          await this::verifyChecksum(fileName, sproutFiles[index].checksum)
+          await this::saveQuickFileHash(fileName)
+          return true
         }
-        log.info(`Quick hash for ${fileName} matches`)
+
+        return false
+      }
+
+      const quickHash = await this::calculateQuickHash(fileName)
+      if (quickHash !== quickHashes[fileName]) {
+        return false
       }
 
       return true
     }
 
-    for (let index = 0; index < sproutFiles.length; index += 1) {
-      const fileName = sproutFiles[index].name
-      let isVerified = false
+    return this::verifySproutFiles(verifySproutFile)
+  }
 
-      try {
-        /* eslint-disable-next-line no-await-in-loop */
-        isVerified = await verifySproutFile(fileName, index)
-        log.info(`Sprout file ${fileName} verification succeeded.`)
-      } catch (err) {
-        log.error(`Sprout file ${fileName} verification failed.`, err.toString())
-        return false
-      }
+  bindRendererHandlersAndFetch(dispatch, actions) {
+    ipcRenderer.on('fetch-parameters-status', (event, message) => {
+      dispatch(actions.status(message))
+    })
 
-      if (!isVerified) {
-        return false
-      }
-    }
+    ipcRenderer.on('fetch-parameters-download-progress', (event, {receivedBytes, totalBytes}) => {
+      dispatch(actions.downloadProgress(receivedBytes, totalBytes))
+    })
 
-    return true
+    ipcRenderer.on('fetch-parameters-download-complete', () => {
+      dispatch(actions.downloadComplete())
+    })
+
+    ipcRenderer.on('fetch-parameters-download-failed', (event, errorMessage) => {
+      dispatch(actions.downloadFailed(errorMessage))
+    })
+
+    ipcRenderer.send('fetch-parameters')
   }
 
 	/**
@@ -121,176 +146,277 @@ export class FetchParametersService {
 	 * @memberof FetchParametersService
 	 * @returns {boolean}
 	 */
-  async fetch(parentWindow) {
-    this.parentWindow = parentWindow
+  async fetch(mainWindow) {
+    this.mainWindow = mainWindow
+    this.totalBytes = 0
+		this.completedBytes = 0
+    this.downloadItems = new Set()
 
-    const resistanceParamsFolder = this.getResistanceParamsFolder()
-    if (!fs.existsSync(resistanceParamsFolder)) {
-      fs.mkdirSync(resistanceParamsFolder)
+    try {
+      await this::fetchOrThrowError()
+    } catch(err) {
+      if (mainWindow.isDestroyed()) {
+        log.error(`Fetching Resistance parameters aborted due to the main window destruction.`)
+        log.error(err.toString())
+      } else {
+        mainWindow.webContents.send('fetch-parameters-download-failed', err.message)
+      }
+    }
+  }
+
+}
+
+async function fetchOrThrowError() {
+  this::status(t(`Checking Resistance parameters presence...`))
+
+  if (await this.checkPresence({calculateChecksums: true})) {
+    this::downloadComplete()
+    return
+  }
+
+  const resistanceParamsFolder = this.getResistanceParamsFolder()
+
+  if (!fs.existsSync(resistanceParamsFolder)) {
+    fs.mkdirSync(resistanceParamsFolder)
+  }
+
+  await this::downloadSproutKeys()
+
+  // All the sprout keys downloaded, calculating checksums and quick hashes
+  this::status(t(`Calculating checksums...`))
+
+  for (let index = 0; index < sproutFiles.length; index += 1) {
+    const fileName = sproutFiles[index].name
+
+    /* eslint-disable no-await-in-loop */
+    await this::verifyChecksum(fileName, sproutFiles[index].checksum)
+    await this::saveQuickFileHash(fileName)
+    /* eslint-enable no-await-in-loop */
+  }
+
+  this::downloadComplete()
+}
+
+function downloadDoneCallback(state, downloadItem, resolve, reject) {
+  let error = null
+
+  this.completedBytes += downloadItem.getTotalBytes()
+  this.downloadItems.delete(downloadItem)
+
+  const fileName = downloadItem.getFilename()
+
+  const removeListener = () => {
+    if (!this.mainWindow.isDestroyed()) {
+      this.mainWindow.webContents.session.removeListener('will-download', this.downloadListener)
+      this.mainWindow.setProgressBar(-1)
+    }
+  }
+
+  switch(state) {
+    case 'cancelled':
+      error = new Error(t(`The download of {{fileName}} has been cancelled`, { fileName }))
+      break
+    case 'interrupted':
+      error = new Error(t(`The download of {{fileName}} was interruped`, { fileName }))
+      break
+    case 'completed':
+      if (this.downloadItems.size !== 0) {
+        break
+      }
+
+      removeListener()
+      resolve()
+
+      break
+    default:
+      log.error(`The download of ${fileName} finished with an unknown state ${state}`)
+      error = new Error(t(`The download of {{fileName}} has failed, check the log for details`, { fileName }))
+  }
+
+  if (error !== null) {
+    removeListener()
+    reject(error)
+  }
+
+}
+
+function registerDownloadListener(resolve, reject) {
+  this.downloadListener = (e, downloadItem) => {
+
+    this.downloadItems.add(downloadItem)
+    this.totalBytes += downloadItem.getTotalBytes()
+
+    // It seems that Chrome doesn't perform error handling, came up with this check:
+    if (downloadItem.getTotalBytes() === 0) {
+      reject(Error(t(`No Internet`)))
     }
 
-    for (let index = 0; index < sproutFiles.length; index += 1) {
-      this.progressBar = this.createProgressBar()
+    const savePath = path.join(this.getResistanceParamsFolder(), downloadItem.getFilename())
+    downloadItem.setSavePath(savePath)
 
-      const fileName = sproutFiles[index].name
-      const filePath = path.join(resistanceParamsFolder, fileName)
+    downloadItem.on('updated', () => this::downloadUpdatedCallback())
+
+    downloadItem.on('done', (event, state) => (
+      this::downloadDoneCallback(state, downloadItem, resolve, reject)
+    ))
+  }
+
+  this.mainWindow.webContents.session.on('will-download', this.downloadListener)
+}
+
+function downloadUpdatedCallback() {
+  const receivedBytes = [...this.downloadItems].reduce((bytesCounter, item) => (
+    bytesCounter + item.getReceivedBytes()
+  ), this.completedBytes)
+
+  if (!this.mainWindow.isDestroyed()) {
+    this.mainWindow.setProgressBar(receivedBytes / this.totalBytes)
+    this.mainWindow.webContents.send('fetch-parameters-download-progress', {
+      receivedBytes,
+      totalBytes: this.totalBytes,
+    })
+  }
+}
+
+function downloadSproutKeys() {
+  const downloadPromise = new Promise((resolve, reject) => {
+    this::registerDownloadListener(resolve, reject)
+
+    sproutFiles.forEach(({name: fileName}) => {
+      const filePath = path.join(this.getResistanceParamsFolder(), fileName)
 
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath)
       }
 
-      try {
-        /* eslint-disable no-await-in-loop */
+      this.mainWindow.webContents.downloadURL(`${sproutUrl}/${fileName}`)
+    })
+  })
 
-        await this.downloadSproutKey(fileName, index)
-        this.progressBar.detail = this.t(`Calculating checksum for ${fileName}...`, { fileName })
-        await this.verifyChecksum(fileName, sproutFiles[index].checksum)
-        await this.saveQuickFileHash(fileName)
+  return downloadPromise
+}
 
-        /* eslint-enable no-await-in-loop */
-      } catch(err) {
-        dialog.showErrorBox(this.t(`Unable to fetch Resistance parameters`), err.toString())
-        app.quit()
-        break
-      }
+/**
+ * Private method. Calculates and compares downloaded file checksum
+ *
+ * @memberof FetchParametersService
+ * @returns {Promise}
+ */
+function verifyChecksum(fileName, checksum) {
+  const filePath = path.join(this.getResistanceParamsFolder(), fileName)
+  const hash = crypto.createHash('sha256')
+  const stream = fs.ReadStream(filePath)
 
-      this.progressBar.setCompleted()
-      this.progressBar.close()
-    }
-  }
+  hash.setEncoding('hex')
+  stream.pipe(hash)
 
-  getResistanceParamsFolder(): string {
-    const validApp = process.type === 'renderer' ? remote.app : app
-    let paramFolder = path.join(app.getPath('appData'), paramsFolderName)
-    if (osService.getOS() === 'linux') {
-      paramFolder = path.join(app.getPath('home'), '.resistance-params')
-    }
-    return paramFolder
-  }
+  const promise = new Promise((resolve, reject) => {
+    stream.on('error', (err) => {
+      reject(new Error(`Unable to read from ${fileName}, the error message was: ${err}`))
+    })
 
-  createProgressBar(): ProgressBar {
-    const progressBar = new ProgressBar({
-      indeterminate: false,
-      closeOnComplete: false,
-      text: this.t(`Fetching Resistance parameters...`),
-      detail: this.t(`This will take awhile, but it's just a one time operation :)`),
-      browserWindow: {
-        parent: this.parentWindow
+    stream.on('end', () => {
+      hash.end()
+      const calculatedChecksum = hash.read()
+      if (calculatedChecksum === checksum) {
+        resolve()
+      } else {
+        reject(new Error(`Checksum doesn't match for ${fileName}.`))
       }
     })
-    return progressBar
+  })
+
+  return promise
+}
+
+/**
+ * Private method. Saves a downloaded file quick hash to the application config.
+ * Later we use the hash to verify Resistance parameters presence.
+ *
+ * @memberof FetchParametersService
+ */
+async function saveQuickFileHash(fileName: string) {
+  const quickHashes = config.get(quickHashesConfigKey, {})
+  quickHashes[fileName] = await this::calculateQuickHash(fileName)
+  config.set(quickHashesConfigKey, quickHashes)
+}
+
+/**
+ * Private method. Creates a downloaded file hash based on its size, creation and modification dates.
+ * This is faster than calculating a proper checksum.
+ *
+ * @memberof FetchParametersService
+ * @returns {Promise}
+ */
+function calculateQuickHash(fileName: string) {
+  log.info(`Calculating a quick file hash for ${fileName}`)
+  const filePath = path.join(this.getResistanceParamsFolder(), fileName)
+
+  const calcFromStats = stats => {
+    const data = `${fileName};${stats.size};${stats.ctime.toISOString()};${stats.mtime.toISOString()}`
+    return crypto.createHash('sha512').update(data).digest("hex")
   }
 
-  downloadSproutKey(fileName, index) {
-    let totalBytes
+  const promise = new Promise((resolve, reject) => {
+    fs.stat(filePath, (err, stats) => {
+      if (err) {
+        reject(new Error(`Unable to retrieve file info for ${filePath}, the error message was: ${err}`))
+      } else {
+        resolve(calcFromStats(stats))
+      }
+    })
+  })
 
-    const onProgress = progress => {
-      const rate = progress * 100
-      const roundedRate = Math.round(rate)  
-      const totalMb = (totalBytes / 1024 / 1024).toFixed(2)
-      const receivedMb = (progress  * totalMb).toFixed(2)
-      this.progressBar.value = rate
+  return promise
+}
 
-      this.progressBar.detail = this.t(
-        `Downloading {{fileName}}, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)...`,
-        { fileName, receivedMb, totalMb, roundedRate }
-      )
+/**
+ * Private method. Iterates sprout files with a verifier async function.
+ *
+ * @returns boolean
+ * @memberof FetchParametersService
+ */
+async function verifySproutFiles(verifier: (fileName, index) => boolean): boolean {
+  for (let index = 0; index < sproutFiles.length; index += 1) {
+    const fileName = sproutFiles[index].name
+    let isVerified = false
+
+    try {
+      /* eslint-disable-next-line no-await-in-loop */
+      isVerified = await verifier(fileName, index)
+      log.info(`Sprout file ${fileName} verification succeeded.`)
+    } catch (err) {
+      log.info(`Sprout file ${fileName} verification failed.`, err.toString())
+      return false
     }
 
-    const onStarted = item => {
-      totalBytes = item.getTotalBytes()
-      this.progressBar.value = 0
-      this.progressBar.text = this.t(
-        `Fetching Resistance parameters (file {{fileIndex}} of {{filesNumber}})...`,
-        {
-          fileIndex: index + 1,
-          filesNumber: sproutFiles.length
-        })
+    if (!isVerified) {
+      return false
     }
-
-    const downloadPromise = download(this.parentWindow, `${sproutUrl}/${fileName}`, {
-      saveAs: false,
-      filename: fileName,
-      directory: this.getResistanceParamsFolder(),
-      onProgress,
-      onStarted
-    })
-
-    return downloadPromise
   }
 
-	/**
-   * Calculates and compares downloaded file checksum
-   *
-	 * @memberof FetchParametersService
-	 * @returns {Promise}
-	 */
-  verifyChecksum(fileName, checksum) {
-    const filePath = path.join(this.getResistanceParamsFolder(), fileName)
-    const hash = crypto.createHash('sha256')
-    const stream = fs.ReadStream(filePath)
+  return true
+}
 
-    hash.setEncoding('hex')
-    stream.pipe(hash)
-
-    const promise = new Promise((resolve, reject) => {
-      stream.on('error', (err) => {
-        reject(new Error(`Unable to read from ${fileName}, the error message was: ${err}`))
-      })
-
-      stream.on('end', () => {
-        hash.end()
-        const calculatedChecksum = hash.read()
-        if (calculatedChecksum === checksum) {
-          resolve()
-        } else {
-          reject(new Error(`Checksum doesn't match for ${fileName}.`))
-        }
-      })
-    })
-
-    return promise
+/**
+ * Private method. Informs renderer on download completion.
+ *
+ * @memberof FetchParametersService
+ */
+function downloadComplete() {
+  if (!this.mainWindow.isDestroyed()) {
+    log.info(`Resistance parameters download completed`)
+    this.mainWindow.webContents.send('fetch-parameters-download-complete')
   }
+}
 
-	/**
-   * Saves a downloaded file quick hash to the application config.
-   * Later we use the hash to verify Resistance parameters presence.
-   *
-	 * @memberof FetchParametersService
-	 */
-  async saveQuickFileHash(fileName: string) {
-    const quickHashes = config.get(quickHashesConfigKey, {})
-    quickHashes[fileName] = await this.calculateQuickHash(fileName)
-    config.set(quickHashesConfigKey, quickHashes)
+/**
+ * Private method. Reports the download status to the renderer.
+ *
+ * @memberof FetchParametersService
+ */
+function status(message: string) {
+  if (!this.mainWindow.isDestroyed()) {
+    this.mainWindow.webContents.send('fetch-parameters-status', message)
   }
-
-	/**
-   * Creates a downloaded file hash based on its size, creation and modification dates.
-   * This is faster than calculating a proper checksum.
-   *
-	 * @memberof FetchParametersService
-	 * @returns {Promise}
-	 */
-  calculateQuickHash(fileName: string) {
-    log.info(`Calculating a quick file hash for ${fileName}`)
-    const filePath = path.join(this.getResistanceParamsFolder(), fileName)
-
-    const calcFromStats = stats => {
-      const data = `${fileName};${stats.size};${stats.ctime.toISOString()};${stats.mtime.toISOString()}`
-      return crypto.createHash('sha512').update(data).digest("hex")
-    }
-
-    const promise = new Promise((resolve, reject) => {
-      fs.stat(filePath, (err, stats) => {
-        if (err) {
-          reject(new Error(`Unable to retrieve file info for ${filePath}, the error message was: ${err}`))
-        } else {
-          resolve(calcFromStats(stats))
-        }
-      })
-    })
-
-    return promise
-  }
-
 }

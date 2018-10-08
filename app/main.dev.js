@@ -22,52 +22,57 @@ import { ResistanceService } from './service/resistance-service'
 import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
 
-const osService = new OSService()
-let appDataPath = osService.getAppDataPath()
+const os = new OSService()
+const resistance = new ResistanceService()
+const fetchParameters = new FetchParametersService()
+
+const appDataPath = os.getAppDataPath()
+
 if (!fs.existsSync(appDataPath)) {
   fs.mkdirSync(appDataPath)
 }
-log.transports.file.maxSize = 5 * 1024 * 1024;
-log.transports.file.file = path.join(osService.getAppDataPath(), 'reswallet.log')
 
-const fetchParamsService = new FetchParametersService()
-const resistanceService = new ResistanceService()
+log.transports.file.maxSize = 5 * 1024 * 1024
+log.transports.file.file = path.join(os.getAppDataPath(), 'reswallet.log')
 
-let mainWindow = null;
+let mainWindow = null
 
 if (process.env.NODE_ENV === 'production') {
-  log.transports.file.level = 'warn'; //Just to be explicit, warn is the default
-  log.transports.console.level = 'warn'; //Just to be explicit, warn is the default
+  // Just to be explicit, warn is the default
+  log.transports.file.level = 'warn'
+  log.transports.console.level = 'warn'
+
   const sourceMapSupport = require('source-map-support')
-  sourceMapSupport.install();
+  sourceMapSupport.install()
 }
 
 if (
   process.env.NODE_ENV === 'development' ||
   process.env.DEBUG_PROD === 'true'
 ) {
-  log.transports.file.level = 'debug';
-  log.transports.console.level = 'debug';
-  require('electron-debug')();
+  log.transports.file.level = 'debug'
+  log.transports.console.level = 'debug'
+
+  require('electron-debug')()
   const p = path.join(__dirname, '..', 'app', 'node_modules')
-  require('module').globalPaths.push(p);
+  require('module').globalPaths.push(p)
 }
 
 const installExtensions = async () => {
-  const installer = require('electron-devtools-installer');
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+  const installer = require('electron-devtools-installer')
+  const forceDownload = !!process.env.UPGRADE_EXTENSIONS
+  const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS']
 
   return Promise.all(
     extensions.map(name => installer.default(installer[name], forceDownload))
-  ).catch(console.log);
-};
+  ).catch(console.log)
+}
 
 const checkAndCreateWalletAppFolder = () => {
   const walletAppFolder = path.join(app.getPath('appData'), 'ResistanceWallet')
 
   if (!fs.existsSync(walletAppFolder)) {
-    fs.mkdirSync(walletAppFolder);
+    fs.mkdirSync(walletAppFolder)
   }
 }
 
@@ -100,7 +105,7 @@ const getWindowSize = (isGetStartedComplete: boolean = false) => {
 
 
 // Propagate Resistance node config for the RPC service
-global.resistanceNodeConfig = resistanceService.checkAndCreateConfig()
+global.resistanceNodeConfig = resistance.checkAndCreateConfig()
 
 checkAndCreateWalletAppFolder()
 
@@ -115,14 +120,14 @@ app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   if (process.platform !== 'darwin') {
-    app.quit();
+    app.quit()
   }
-});
+})
 
 app.on('ready', async () => {
   app.on('before-quit', () => {
     log.info(`Killing all child processes...`)
-    osService.stopChildProcesses()
+    os.stopChildProcesses()
     log.info(`Done`)
   })
 
@@ -134,9 +139,9 @@ app.on('ready', async () => {
   }
 
   let iconFileName = 'icon.png'
-  if (osService.getOS() === 'macos') {
+  if (os.getOS() === 'macos') {
     iconFileName = 'icon.icns'
-  } else if (osService.getOS() === 'windows') {
+  } else if (os.getOS() === 'windows') {
     iconFileName = 'icon.ico'
   }
 
@@ -145,15 +150,15 @@ app.on('ready', async () => {
     show: false,
     frame: false,
     backgroundColor: '#1d2440',
-    icon: path.join(osService.getInstallationPath(), 'resources', `${iconFileName}`)
-  });
+    icon: path.join(os.getInstallationPath(), 'resources', `${iconFileName}`)
+  })
 
   const menuBuilder = new MenuBuilder(mainWindow)
 
   i18n.on('loaded', () => {
     i18n.changeLanguage(config.get('language', 'en'))
     i18n.off('loaded')
-  });
+  })
 
   i18n.on('languageChanged', () => {
     menuBuilder.buildMenu()
@@ -163,9 +168,14 @@ app.on('ready', async () => {
     i18n.changeLanguage(code)
   })
 
-  if (!await fetchParamsService.checkPresence()) {
-    await fetchParamsService.fetch(mainWindow)
-  }
+  // Check resistance parameters presence relying on quick hashes only,
+  // The use case when the actual parameters are present and the quick hashes are not
+  // is covered in FetchParameters component
+  global.isParametersPresenceConfirmed = await fetchParameters.checkPresence({calculateChecksums: false})
+
+  ipcMain.on('fetch-parameters', async () => {
+    await fetchParameters.fetch(mainWindow)
+  })
 
   // Disabling eval for security reasons,
   // https://github.com/ResistancePlatform/resistance-desktop-wallet/issues/155
@@ -214,4 +224,4 @@ app.on('ready', async () => {
     mainWindow = null
   })
 
-});
+})

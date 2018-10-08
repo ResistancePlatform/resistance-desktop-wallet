@@ -1,3 +1,4 @@
+import { remote } from 'electron'
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
 
@@ -8,6 +9,12 @@ export const preloadedState: State = {
     isLoginRequired: true, // process.env.NODE_ENV !== 'development'
   },
   roundedForm: {},
+  fetchParameters: {
+    progressRate: 0,
+    statusMessage: '',
+    errorMessage: null,
+    isDownloadComplete: false,
+  },
   getStarted: {
     createNewWallet: {
       wallet: null
@@ -154,12 +161,16 @@ export const preloadedState: State = {
 }
 
 // Load serialized settings
+Object.assign(preloadedState.fetchParameters, {
+  isDownloadComplete: remote.getGlobal('isParametersPresenceConfirmed', false)
+})
+
 Object.assign(preloadedState.getStarted, {
 	isInProgress: config.get('getStartedInProgress', true)
 })
 
 Object.assign(preloadedState.settings, {
-	isMinerEnabled: config.get('manageDaemon.enableMiner', true),
+	isMinerEnabled: config.get('manageDaemon.enableMiner', false),
 	isTorEnabled: config.get('manageDaemon.enableTor', false),
 	language: config.get('language', 'en')
 })

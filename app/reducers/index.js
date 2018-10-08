@@ -8,6 +8,7 @@ import { AuthReducer } from './auth/auth.reducer'
 import { RoundedFormReducer } from './rounded-form/rounded-form.reducer'
 import { RpcPollingReducer } from './rpc-polling/rpc-polling.reducer'
 import { PopupMenuReducer } from './popup-menu/popup-menu.reducer'
+import { FetchParametersReducer } from './fetch-parameters/fetch-parameters.reducer'
 import { NaviReducer } from './navi/navi.reducer'
 import { GetStartedReducer } from './get-started/get-started.reducer'
 import { SystemInfoReducer } from './system-info/system-info.reducer'
@@ -20,6 +21,7 @@ import { AddressBookReducer } from './address-book/address-book.reducer'
 
 // Epics
 import { AuthEpic } from './auth/auth.epic'
+import { FetchParametersEpic } from './fetch-parameters/fetch-parameters.epic'
 import { GetStartedEpic } from './get-started/get-started.epic'
 import { OwnAddressesEpics } from './own-addresses/own-addresses.epic'
 import { NaviEpics } from './navi/navi.epic'
@@ -37,6 +39,7 @@ const rootReducer = combineReducers({
   getStarted: GetStartedReducer,
   rpcPolling: RpcPollingReducer,
   popupMenu: PopupMenuReducer,
+  fetchParameters: FetchParametersReducer,
 	navi: NaviReducer,
 	systemInfo: SystemInfoReducer,
 	overview: OverviewReducer,
@@ -49,6 +52,7 @@ const rootReducer = combineReducers({
 
 const rootEpic = combineEpics(
   AuthEpic,
+  FetchParametersEpic,
   GetStartedEpic,
 	NaviEpics,
 	SystemInfoEpics,

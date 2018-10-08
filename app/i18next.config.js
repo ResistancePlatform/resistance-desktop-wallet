@@ -21,10 +21,12 @@ const availableNamespaces = [
   'other'
 ]
 
-const isDev = process.env.NODE_ENV === 'development'
+// const isDev = process.env.NODE_ENV === 'development'
 const os = new OSService()
 
-const localesPath = path.join(os.getResourcesPath(), 'locales')
+const localesPath = (process.versions.electron
+  ? path.join(os.getResourcesPath(), 'locales')
+  : './locales')
 
 
 const i18nextOptions = {
@@ -36,8 +38,8 @@ const i18nextOptions = {
   interpolation: {
     escapeValue: false
   },
-  debug: isDev,
-  saveMissing: false,
+  debug: false, // isDev,
+  saveMissing: false, // isDev,
   fallbackLng: 'en',
   whitelist: availableLanguages,
   keySeparator: false,

@@ -9,6 +9,8 @@
   "1W": "1W",
   "1M": "1M",
   "1Y": "1Y",
+  "Withdraw": "Withdraw",
+  "Deposit": "Deposit",
   "Sell from": "Sell from",
   "Deposit to": "Deposit to",
   "Max. amount": "Max. amount",
@@ -21,6 +23,10 @@
   "DEX Fee": "DEX Fee",
   "RES Fee": "RES Fee",
   "Max. Total Payout": "Max. Total Payout",
+  "Portfolio": "Portfolio",
+  "Login": "Login",
+  "Waiting for the ResDEX daemon...": "Waiting for the ResDEX daemon...",
+  "Forgot password": "Forgot password",
   "Pending": "Pending",
   "Matched": "Matched",
   "Unmatched": "Unmatched",
@@ -33,11 +39,5 @@
   "Open orders": "Open orders",
   "No open orders to display.": "No open orders to display.",
   "Swap history": "Swap history",
-  "No completed orders to display.": "No completed orders to display.",
-  "Withdraw": "Withdraw",
-  "Deposit": "Deposit",
-  "Portfolio": "Portfolio",
-  "Login": "Login",
-  "Waiting for the ResDEX daemon...": "Waiting for the ResDEX daemon...",
-  "Forgot password": "Forgot password"
+  "No completed orders to display.": "No completed orders to display."
 }

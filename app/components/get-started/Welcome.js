@@ -6,6 +6,8 @@ import cn from 'classnames'
 import Iso6391 from 'iso-639-1'
 
 import { i18n } from '~/i18next.config'
+import FetchParametersProgressText from '~/components/fetch-parameters/FetchParametersProgressText'
+import FetchParametersState from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import { ResistanceService } from '~/service/resistance-service'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
@@ -18,6 +20,7 @@ type Props = {
   t: any,
   roundedForm: object,
   getStarted: object,
+  fetchParameters: FetchParametersState,
   welcome: object,
   actions: object
 }
@@ -94,9 +97,13 @@ export class Welcome extends Component<Props> {
       <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
         <div className={styles.title}>{t(`Welcome to Resistance!`)}</div>
 
-        <div className={cn(styles.hint, styles[this.props.welcome.status])}>
-          {this.props.welcome.hint || t(`Check the wallet configuration before applying`)}
-        </div>
+        {this.props.fetchParameters.isDownloadComplete
+          ? (
+            <div className={cn(styles.hint, styles[this.props.welcome.status])}>
+              {this.props.welcome.hint || t(`Check the wallet configuration before applying`)}
+            </div>
+          ) : (<FetchParametersProgressText />)
+        }
 
         <div className={cn(styles.innerContainer, styles.summary)}>
           <div className={styles.title}>
@@ -129,7 +136,7 @@ export class Welcome extends Component<Props> {
               type="button"
               onClick={this.props.actions.applyConfiguration}
               onKeyDown={this.props.actions.applyConfiguration}
-              disabled={this.props.welcome.isBootstrapping}
+              disabled={!this.props.fetchParameters.isDownloadComplete || this.props.welcome.isBootstrapping}
             >
               {t(`Apply configuration`)}
             </button>

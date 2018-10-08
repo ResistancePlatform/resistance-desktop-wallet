@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
 import cn from 'classnames'
 
+import Footer from '~/components/get-started/Footer'
 import ChooseLanguagePage from './get-started/ChooseLanguagePage'
 import GetStartedPage from './get-started/GetStartedPage'
 import CreateNewWalletPage from './get-started/CreateNewWalletPage'
@@ -23,6 +24,8 @@ import ResDexPage from './ResDexPage'
 import AddressBookPage from './AddressBookPage'
 
 import { appStore } from '../store/configureStore'
+import FetchParametersDialog from '~/components/fetch-parameters/FetchParametersDialog'
+import { FetchParametersState, FetchParametersActions } from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import { AuthState } from '~/reducers/auth/auth.reducer'
 import { GetStartedState } from '~/reducers/get-started/get-started.reducer'
 import { SettingsActions } from '~/reducers/settings/settings.reducer'
@@ -31,11 +34,12 @@ import styles from './App.scss'
 import HLayout from '../assets/styles/h-box-layout.scss'
 import VLayout from '../assets/styles/v-box-layout.scss'
 
+
 type Props = {
   auth: AuthState,
+  fetchParameters: FetchParametersState,
   getStarted: GetStartedState
 }
-
 
 /**
  * @export
@@ -43,26 +47,28 @@ type Props = {
  * @extends {React.Component<Props>}
  */
 class App extends React.Component<Props> {
-	props: Props;
+	props: Props
 
 	/**
-   * Triggers child processes.
+   * Triggers child processes and binds Resistance parameters download event handlers.
    *
 	 * @returns
    * @memberof App
 	 */
   componentDidMount() {
-    if (!this.props.getStarted.isInProgress) {
+    if (!this.props.fetchParameters.isDownloadComplete) {
+      appStore.dispatch(FetchParametersActions.fetch())
+    } else if (!this.props.getStarted.isInProgress) {
       appStore.dispatch(SettingsActions.kickOffChildProcesses())
     }
   }
 
   getGetStartedContent() {
     return (
-      <div className={[styles.contentContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
+      <div className={cn(styles.contentContainer, VLayout.vBoxChild, HLayout.hBoxContainer)}>
         <TitleBarButtons />
         <DragBar />
-        <div className={[styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer].join(' ')}>
+        <div className={cn(styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer)}>
           <Switch>
             <Route exact path="/get-started/choose-language" component={ChooseLanguagePage} />
             <Route exact path="/get-started/get-started" component={GetStartedPage} />
@@ -73,6 +79,7 @@ class App extends React.Component<Props> {
             <Route exact path="/" render={() => (<Redirect to="/get-started/choose-language" />)} />
           </Switch>
         </div>
+        <Footer />
       </div>
     )
   }
@@ -115,10 +122,10 @@ class App extends React.Component<Props> {
 
     if (this.props.getStarted.isInProgress) {
       content = this.getGetStartedContent()
+    } else if (!this.props.fetchParameters.isDownloadComplete) {
+      content = (<FetchParametersDialog />)
     } else {
-      content = this.props.auth.isLoginRequired ? (
-        <Login />
-      ) : this.getMainContent()
+      content = this.props.auth.isLoginRequired ? (<Login />) : this.getMainContent()
     }
 
 		return (

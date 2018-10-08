@@ -1,0 +1,13 @@
+@import "~/assets/styles/vars.scss";
+
+.container {
+}
+
+.progressBar {
+  background: $BASE_COLOR_DARK_BLUE_2;
+
+  div {
+    height: 0.3rem;
+    background: $BALANCE_BACKGROUND_IMAGE;
+  }
+}

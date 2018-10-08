@@ -22,7 +22,7 @@
     z-index: 9;
     top: 40%;
     left: 50%;
-    margin-left: -160px;
+    transform: translateX(-50%);
     border: 1.5px solid $BASE_COLOR_BORDER_GRAY;
     border-radius: 0.3rem;
     overflow: hidden;
