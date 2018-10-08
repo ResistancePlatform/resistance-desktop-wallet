@@ -2,50 +2,51 @@
 
 // Generic Toggle button container
 .toggleButtonContainer {
-    margin-left: 1rem;
-    text-transform: uppercase;
+  position: relative;
+  margin-left: 1rem;
+  text-transform: uppercase;
 
-    .toggleButtonContainerTitle {
-        color: $BASE_COLOR_BUTTON_FONT_GRAY;
-    }
+  .toggleButtonContainerTitle {
+    color: $BASE_COLOR_BUTTON_FONT_GRAY;
+  }
 }
 
 .toggleButtonContainer:disabled, .toggleButtonContainer[disabled] {
-    @include roundedButton(false);
+  @include roundedButton(false);
 }
 
 // Generic Toggle button
 .toggleButton {
-    position: absolute;
-    width: 3.8rem;
-    height: 1.4rem;
-    margin-top: -0.55rem;
-    margin-left: 1rem;
-    padding: 0.2rem;
+  position: absolute;
+  width: 3.8rem;
+  height: 1.4rem;
+  margin-top: -0.55rem;
+  margin-left: 1rem;
+  padding: 0.2rem;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    background-color: $BASE_COLOR_DARK_BLUE_2;
+  background-color: $BASE_COLOR_DARK_BLUE_2;
+  border-radius: 5rem;
+
+  .toggleButtonSwitcher {
+    margin-left: 0.1rem;
+    margin-top: 0.025rem;
+
+    height: 1.35rem;
+    width: 1.35rem;
+
     border-radius: 5rem;
+    background-color: $BASE_COLOR_PURPLE;
+  }
 
-    .toggleButtonSwitcher {
-        margin-left: 0.1rem;
-        margin-top: 0.025rem;
+  .toggleButtonText {
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
 
-        height: 1.35rem;
-        width: 1.35rem;
-
-        border-radius: 5rem;
-        background-color: $BASE_COLOR_PURPLE;
-    }
-
-    .toggleButtonText {
-        position: absolute;
-        right: 0.5rem;
-        top: 0.5rem;
-
-        color: $BASE_COLOR_GRAY;
-    }
+    color: $BASE_COLOR_GRAY;
+  }
 }
 
 .toggleButton[disabled] {
@@ -59,13 +60,13 @@
 
 // Generic Toggle button turned ON
 .toggleButtonOn {
-    .toggleButtonSwitcher {
-        margin-left: 2.3rem;
-    }
+  .toggleButtonSwitcher {
+    margin-left: 2.3rem;
+  }
 
-    .toggleButtonText {
-        left: 0.5rem;
-        right: unset;
-        color: $SEND_CASH_TOGGLE_BUTTON_SWITCHER_COLOR;
-    }
+  .toggleButtonText {
+    left: 0.5rem;
+    right: unset;
+    color: $SEND_CASH_TOGGLE_BUTTON_SWITCHER_COLOR;
+  }
 }

@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { toastr } from 'react-redux-toastr'
 import { translate } from 'react-i18next'
+import cn from 'classnames'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import OwnAddressList from '~/components/own-addresses/own-address-list'
@@ -86,7 +87,7 @@ class OwnAddresses extends Component<Props> {
 			// Layout container
 			<div
         role="none"
-				className={[styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}
+				className={cn(HLayout.hBoxChild, VLayout.vBoxContainer)}
 			>
         <RpcPolling
           interval={pollingInterval}
@@ -98,16 +99,16 @@ class OwnAddresses extends Component<Props> {
         />
 
 				{ /* Route content */}
-				<div className={[styles.ownAddressesContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
+				<div className={cn(styles.ownAddressesContainer, VLayout.vBoxChild, HLayout.hBoxContainer)}>
 
-					<div className={[HLayout.hBoxChild, VLayout.vBoxContainer].join(' ')}>
+					<div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer)}>
 
 						{ /* Top bar */}
-						<div className={[styles.topBar, HLayout.hBoxContainer].join(' ')}>
+						<div className={cn(styles.topBar, HLayout.hBoxContainer)}>
 
 							<div className={styles.topBarTitle}>{t(`Own Addresses`)}</div>
 
-							<div className={[styles.topBarButtonContainer, HLayout.hBoxChild].join(' ')}>
+							<div className={cn(styles.topBarButtonContainer, HLayout.hBoxChild)}>
                 <button
                   type="button"
                   onClick={() => false}

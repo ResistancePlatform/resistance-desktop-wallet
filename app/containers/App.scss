@@ -6,7 +6,7 @@
 @import "../assets/styles/vars.scss";
 
 .appContainer {
-    @include full-screen();
+  @include full-screen();
 }
 
 .contentContainer {
@@ -14,5 +14,5 @@
 }
 
 .routeContentContainer {
-    background-color: $BASE_COLOR_DARK_BLUE;
+  background-color: $BASE_COLOR_DARK_BLUE;
 }

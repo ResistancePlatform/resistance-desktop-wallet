@@ -13,12 +13,12 @@
     align-items: stretch;
 
     // This flag control how the items align in `another direction`, same values with `align-items`
-    // justify-content: center;
-    overflow: hidden;
+    justify-content: start;
+    overflow: scroll;
 }
 
 .hBoxChild {
     // In FlexBox layout, `flex` controls how much percent the element will use, `1` is hte baseline, it will
     // take all the space (like `width: 100%` in 'row' mode, or `height: 100%` in 'column' mode).
-    flex: 1
+    flex: 1;
 }

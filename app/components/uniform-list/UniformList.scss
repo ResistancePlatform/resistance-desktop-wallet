@@ -1,9 +1,8 @@
-@import "../../assets/styles/vars.scss";
+@import "~/assets/styles/vars.scss";
 
 .container {
   background-color: $BASE_COLOR_DARK_BLUE;
   color: $BASE_COLOR_WHITE;
-  overflow: hidden;
 }
 
 .header {
@@ -43,3 +42,8 @@
   }
 }
 
+.row:last-child {
+  div {
+    border: none
+  }
+}

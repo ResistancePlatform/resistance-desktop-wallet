@@ -1,66 +1,68 @@
 @import "~/assets/styles/vars.scss";
 
 .balanceContainer {
-    height: 12rem;
+  -webkit-app-region: drag;
+  height: 12rem;
 
-    align-items: center !important;
+  align-items: center !important;
 
-    background-image: $BALANCE_BACKGROUND_IMAGE;
+  background-image: $BALANCE_BACKGROUND_IMAGE;
 
-    div {
-        text-align: center;
-    }
+  div {
+    text-align: center;
+  }
 }
 
 .transparentBalance {
-    display: flex;
+  display: flex;
 }
 
 .privateBalance {
-    display: flex;
+  display: flex;
 }
 
 .totalBalance {
-    display: flex;
+  display: flex;
 }
 
 // Make the 'balanceWraper' sitting center of its parent, make sure its parent set to 'display: flex'
 .balanceWraper {
-    margin: auto;
+  -webkit-app-region: no-drag;
+  margin: auto;
 }
 
 .balanceTitle {
-    text-align: left !important;
-    font-size: 0.7rem;
-    color: $BALANCE_TITLE_FONT_COLOR;
-    opacity: 0.6;
-    text-transform: uppercase;
+  text-align: left !important;
+  font-size: 0.7rem;
+  color: $BALANCE_TITLE_FONT_COLOR;
+  opacity: 0.6;
+  text-transform: uppercase;
 }
 
 .balanceValue {
-    display: inline-block;
-    position: relative;
+  display: inline-block;
+  position: relative;
 
-    text-align: left !important;
-    font-size: 2rem;
-    font-weight: 400;
+  text-align: left !important;
+  font-size: 2rem;
+  font-weight: 400;
 
-    .balanceDecimalPart {
-        position: absolute;
-        top: 0.25rem;
+  .balanceDecimalPart {
+    position: absolute;
+    top: 0.25rem;
 
-        font-size: 1.4rem;
-        vertical-align: text-top;
-    }
+    font-size: 1.4rem;
+    vertical-align: text-top;
+  }
 }
 
 .balanceValueUnit {
-    display: inline-block;
-    margin-left: 4rem;
+  display: inline-block;
+  margin-left: 4rem;
 
-    font-size: 1.25rem;
+  font-size: 1.25rem;
 }
 
 .hasUnconfirmedTransactionBalance {
-    color: $BALANCE_VALUE_UNCONFIRMED_COLOR;
+  color: $BALANCE_VALUE_UNCONFIRMED_COLOR;
 }
