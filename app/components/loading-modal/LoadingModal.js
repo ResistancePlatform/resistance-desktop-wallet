@@ -1,35 +1,42 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { translate } from 'react-i18next'
 
-import genericIcon from '~/assets/images/resdex/cryptocurrency-icons/generic.svg'
+import animatedLoader from '~/assets/images/animated-loader.svg'
+import styles from './LoadingModal.scss'
 
-const icons = require.context('~/assets/images/resdex/cryptocurrency-icons', false, /.svg/)
-const customIcons = require.context('~/assets/images/resdex/custom-cryptocurrency-icons', false, /.svg/)
 
-const CurrencyIcon = ({symbol, size, ...props}) => {
+type Props = {
+  t: any
+}
 
-  const findIcon = context => {
-    const lowerCasedSymbol = symbol.toLowerCase()
-    const iconKey = context.keys().find(key => key.toLowerCase().includes(lowerCasedSymbol))
-    return iconKey ? context(iconKey) : null
+
+/**
+ * @class LoadingModal
+ * @extends {Component<Props>}
+ */
+class LoadingModal extends Component<Props> {
+  render() {
+    const { t } = this.props
+
+    return (
+      <div className={styles.overlay}>
+        <div className={styles.container}>
+          <img className={styles.animatedLoader} src={animatedLoader} alt={t(`Resistance`)} />
+          <div className={styles.header}>
+            {t(`Please wait`)}
+          </div>
+          <div className={styles.explanation}>
+            {0}
+          </div>
+        </div>
+      </div>
+    )
   }
-
-	return (
-    <img
-			{...props}
-      src={findIcon(customIcons) || findIcon(icons) || genericIcon}
-      alt={symbol}
-      style={{
-        width: size,
-        height: size
-      }}
-    />
-	)
 }
 
-CurrencyIcon.propTypes = {
-	symbol: PropTypes.string,
-	size: PropTypes.string,
-}
+const mapStateToProps = (state) => ({
+	newAddressDialog: state.addressBook.newAddressDialog
+})
 
-export default CurrencyIcon
+export default connect(mapStateToProps, null)(translate('other')(LoadingModal))
