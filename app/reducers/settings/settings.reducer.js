@@ -128,6 +128,12 @@ export const SettingsReducer = handleActions(
       isTorEnabled: false
     }),
 
+    // ResDEX
+    [SettingsActions.startResdex]: state => ({
+      ...state,
+      childProcessesStatus: { ...state.childProcessesStatus, RESDEX: 'STARTING' }
+    }),
+
     // Child process updates
     [SettingsActions.childProcessStarted]: (state, action) => (
       getChildProcessUpdateFinishedState(state, action, 'RUNNING')

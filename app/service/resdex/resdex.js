@@ -1,5 +1,7 @@
 // @flow
+import os from 'os'
 import path from 'path'
+import log from 'electron-log'
 
 import { OSService } from '../os-service'
 import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
@@ -15,7 +17,7 @@ const passPhrase = 'treat board tree once reduce reduce expose coil guilt fish f
  */
 let instance = null
 
-const os = new OSService()
+const osService = new OSService()
 
 /**
  * @export
@@ -40,9 +42,7 @@ export class ResDexService {
    *
 	 * @memberof ResDexService
 	 */
-  start() {
-    const homePath = os.getAppDataPath()
-
+  start(seedPhrase) {
     const currenciesWithoutElectrum = supportedCurrencies.map(currency => {
       const result = {...currency}
       delete result.electrumServers
@@ -55,12 +55,20 @@ export class ResDexService {
       rpcport: rpcPort,
       canbind: 0,
       seednode: seedNodeAddress,
-      userhome: homePath + path.sep,
-      passphrase: passPhrase,
+      userhome: os.homedir(),
+      passphrase: seedPhrase || passPhrase,
       coins: currenciesWithoutElectrum,
     }
 
-    os.execProcess('RESDEX', [JSON.stringify(options)], this::handleStdout)
+    const resDexDir = path.join(osService.getAppDataPath(), 'ResDEX')
+
+    osService.verifyDirectoryExistence(resDexDir).then(() => (
+      osService.execProcess('RESDEX', [JSON.stringify(options)], this::handleStdout, { cwd: resDexDir })
+    )).catch(err => {
+      const actions = osService.getSettingsActions()
+      osService.dispatchAction(actions.childProcessFailed('RESDEX', err.toString()))
+    })
+
 	}
 
 	/**
@@ -69,11 +77,12 @@ export class ResDexService {
 	 * @memberof ResDexService
 	 */
 	stop() {
-    os.killProcess('RESDEX')
+    osService.killProcess('RESDEX')
 	}
 
 }
 
 function handleStdout(data: Buffer) {
-  return data.toString().includes(`API enabled at unixtime`)
+  // API enabled at unixtime
+  return data.toString().includes(`ResDEX Marketmaker`)
 }

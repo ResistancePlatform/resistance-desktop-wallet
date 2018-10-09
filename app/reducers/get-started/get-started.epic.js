@@ -8,7 +8,7 @@ import { push } from 'react-router-redux'
 
 import { i18n } from '~/i18next.config'
 import { Action } from '../types'
-import { getStartLocalNodeObservable } from '~/utils/child-process'
+import { getChildProcessObservable } from '~/utils/child-process'
 import { AUTH } from '~/constants/auth'
 import { RpcService } from '~/service/rpc-service'
 import { Bip39Service } from '~/service/bip39-service'
@@ -77,11 +77,12 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
 
     const nextAction = WelcomeActions.encryptWallet()
 
-    const nodeStartedObservable = getStartLocalNodeObservable(
-      of(nextAction),
-      of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
+    const nodeStartedObservable = getChildProcessObservable({
+      processName: 'NODE',
+      onSuccess: of(nextAction),
+      onFailure: of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
       action$
-    )
+    })
 
     return concat(
       of(WelcomeActions.displayHint(t(`Starting local Resistance node...`))),
@@ -107,11 +108,12 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
 
     // Wallet encryption shuts the node down, let's start it back up and trigger the next action
-    const nodeStartedObservable = getStartLocalNodeObservable(
-      of(WelcomeActions.authenticateAndRestoreWallet()),
-      of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
+    const nodeStartedObservable = getChildProcessObservable({
+      processName: 'NODE',
+      onSuccess: of(WelcomeActions.authenticateAndRestoreWallet()),
+      onFailure: of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
       action$
-    )
+    })
 
     const nodeShutDownObservable = action$.pipe(
       ofType(SettingsActions.childProcessFailed),

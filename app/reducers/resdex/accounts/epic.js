@@ -15,6 +15,26 @@ const t = translate('resdex')
 const api = new ResDexApiService()
 
 
+const enableCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(ResDexAccountsActions.enableCurrencies),
+  switchMap(() => {
+    const { enabledCurrencies } = state$.value.resDex.accounts
+
+    const promise = Promise.all(enabledCurrencies.map(currency => api.enableCurrency(currency.symbol)))
+
+    const enableCurrenciesObservable = from(promise).pipe(
+      switchMap(() => of(ResDexAccountsActions.empty())),
+      catchError(err => of(toastrActions.add({
+        type: 'error',
+        title: t(`Error enabling currencies`),
+        message: err.message,
+      })))
+    )
+
+    return enableCurrenciesObservable
+  })
+)
+
 const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexAccountsActions.getCurrencies),
   switchMap(() => (
@@ -49,6 +69,7 @@ const getCurrenciesFailedEpic = (action$: ActionsObservable<Action>) => action$.
 )
 
 export const ResDexAccountsEpic = (action$, state$) => merge(
+  enableCurrenciesEpic(action$, state$),
   getCurrenciesEpic(action$, state$),
   getCurrenciesFailedEpic(action$, state$),
 )

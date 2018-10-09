@@ -1,9 +1,11 @@
 // @flow
 import crypto from 'crypto'
 import rp from 'request-promise-native'
+import log from 'electron-log'
 import { remote } from 'electron'
 
 import { translate } from '~/i18next.config'
+import { getCurrency } from '~/utils/resdex'
 import { OSService } from '~/service/os-service'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 
@@ -42,6 +44,37 @@ export class ResDexApiService {
 
   getPortfolio() {
     return this.query({ method: 'portfolio' })
+  }
+
+  async enableCurrency(symbol: string) {
+		const currency = getCurrency(symbol)
+
+		if (!currency) {
+      log.error(`Tried to enable unsupported currency:`, symbol)
+      return
+		}
+
+		if (currency.electrumServers) {
+			const queries = currency.electrumServers.map(server => this.query({
+				method: 'electrum',
+				coin: symbol,
+				ipaddr: server.host,
+				port: server.port,
+			}))
+
+			const responses = await Promise.all(queries)
+			const success = responses.filter(response => response.result === 'success').length > 0
+
+			if (!success) {
+        log.error(`Could not connect to ${symbol} Electrum server`)
+        throw new Error(t(`Could not connect to {{symbol}} Electrum server`, { symbol }))
+			}
+
+			return success
+		}
+
+		const response = await this.query({ method: 'enable', coin: symbol })
+		return response.status === 'active'
   }
 
 	/**

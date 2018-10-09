@@ -1,6 +1,6 @@
 // @flow
 import { EOL } from 'os'
-import * as fs from 'fs';
+import * as fs from 'fs'
 import path from 'path'
 import log from 'electron-log'
 import config from 'electron-settings'
@@ -187,7 +187,7 @@ function startOrRestart(isTorEnabled: boolean, start: boolean) {
   args.push(`-wallet=${walletName}.dat`)
   const caller = start ? osService.execProcess : osService.restartProcess
 
-  this::verifyExportDirExistence().then(exportDir => {
+  osService.verifyDirectoryExistence(this.getExportDir()).then(exportDir => {
     args.push(`-exportdir=${exportDir}`)
     caller.bind(osService)('NODE', args, this::handleStdout)
     return Promise.resolve()
@@ -205,25 +205,4 @@ function startOrRestart(isTorEnabled: boolean, start: boolean) {
  */
 function handleStdout(data: Buffer) {
   return data.toString().includes(`init message: Done loading`)
-}
-
-/**
- * Privte method. Checks if local node export directory exists, otherwise creates one.
- *
- * @returns {Promise}
- * @memberof ResistanceService
- */
-function verifyExportDirExistence() {
-  const exportDir = this.getExportDir()
-
-  const promise = new Promise((resolve, reject) => {
-    fs.access(exportDir, err => {
-      if (err) {
-        fs.mkdir(exportDir, mkdirError => mkdirError ? reject(mkdirError) : resolve(exportDir))
-      }
-      resolve(exportDir)
-    })
-  })
-
-  return promise
 }

@@ -220,10 +220,10 @@ export class OSService {
 	 * @param {function} stdoutHandler If returns true the process is considered started.
 	 * @memberof OSService
 	 */
-  restartProcess(processName: ChildProcessName, args = [], stdoutHandler) {
+  restartProcess(processName: ChildProcessName, args = [], stdoutHandler, spawnOptions = {}) {
     log.info(`Restarting ${processName} process.`)
     this.killProcess(processName, () => {
-      this.execProcess(processName, args, stdoutHandler)
+      this.execProcess(processName, args, stdoutHandler, spawnOptions)
     })
   }
 
@@ -235,7 +235,7 @@ export class OSService {
 	 * @param {function} stdoutHandler If returns true the process is considered started.
 	 * @memberof OSService
 	 */
-  execProcess(processName: ChildProcessName, args = [], stdoutHandler) {
+  execProcess(processName: ChildProcessName, args = [], stdoutHandler, spawnOptions = {}) {
     const actions = this.getSettingsActions()
 
     const errorHandler = (err) => {
@@ -246,18 +246,19 @@ export class OSService {
     const command = ChildProcessCommands[processName]
 
     this.killProcess(processName, () => {}).then(() => {
-      let options
+      const options = { ...spawnOptions }
       let isUpdateFinished = false
       const commandPath = path.join(this.getBinariesPath(), command)
 
       if (this.getOS() === 'macos') {
-        options = {
-          env: {
-            ...process.env,
-            DYLD_LIBRARY_PATH: this.getBinariesPath()
-          }
+        options.env = {
+          ...process.env,
+          DYLD_LIBRARY_PATH: this.getBinariesPath()
         }
       }
+
+      const logFile = this.getLogFilePath(processName)
+      const logStream = fs.createWriteStream(logFile, {flags: 'a'})
 
       const childProcessInfo = remote.getGlobal('childProcesses')[processName]
 
@@ -303,9 +304,6 @@ export class OSService {
 
         childProcessInfo.isGettingKilled = false
       })
-
-      const logFile = this.getLogFilePath(processName)
-      const logStream = fs.createWriteStream(logFile, {flags: 'a'})
 
       childProcess.stdout.pipe(logStream)
       childProcess.stderr.pipe(logStream)
@@ -424,4 +422,24 @@ export class OSService {
 
     return promise
   }
+
+  /**
+   * Checks if a directory exists, otherwise creates one.
+   *
+   * @returns {Promise}
+   * @memberof ResistanceService
+   */
+  verifyDirectoryExistence(directoryPath: string) {
+    const promise = new Promise((resolve, reject) => {
+      fs.access(directoryPath, err => {
+        if (err) {
+          fs.mkdir(directoryPath, mkdirError => mkdirError ? reject(mkdirError) : resolve(directoryPath))
+        }
+        resolve(directoryPath)
+      })
+    })
+
+    return promise
+  }
+
 }

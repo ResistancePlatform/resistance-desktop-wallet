@@ -10,20 +10,19 @@ import { ofType } from 'redux-observable'
 import { toastr, actions as toastrActions } from 'react-redux-toastr'
 
 import { i18n } from '~/i18next.config'
+import { getChildProcessObservable } from '~/utils/child-process'
 import { getEnsureLoginObservable } from '~/utils/auth'
 import { Action } from '../types'
-import { getStartLocalNodeObservable } from '~/utils/child-process'
 import { AuthActions } from '../auth/auth.reducer'
+import { ResDexActions } from '../resdex/resdex.reducer'
 import { SettingsActions } from './settings.reducer'
 import { RpcService } from '~/service/rpc-service'
 import { ResistanceService } from '~/service/resistance-service'
 import { MinerService } from '~/service/miner-service'
 import { TorService } from '~/service/tor-service'
-import { ResDexService } from '~/service/resdex/resdex'
 
 const t = i18n.getFixedT(null, 'settings')
 const rpc = new RpcService()
-const resDex = new ResDexService()
 const resistanceService = new ResistanceService()
 const minerService = new MinerService()
 const torService = new TorService()
@@ -60,7 +59,7 @@ const kickOffChildProcessesEpic = (action$: ActionsObservable<Action>, state$) =
       )
     }
 
-    return concat(observables, of(SettingsActions.startResdex()))
+    return concat(observables, of(ResDexActions.startResdex()))
   })
 )
 
@@ -115,14 +114,6 @@ const disableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.p
   tap(() => { toastr.info(t(`Restarting the local node due to Tor shutdown.`)) }),
   filter(() => state$.value.settings.childProcessesStatus.NODE === 'RUNNING'),
   mapTo(SettingsActions.restartLocalNode())
-)
-
-const startResDexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(SettingsActions.startResdex),
-  map(() => {
-		resDex.start()
-    return SettingsActions.empty()
-  })
 )
 
 const initiateWalletBackupEpic = (action$: ActionsObservable<Action>) => action$.pipe(
@@ -198,17 +189,18 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     const newWalletPath = path.join(resistanceService.getWalletPath(), walletFileName)
 
     // Third, send the password for the new wallet
-    const startLocalNodeObservable = getStartLocalNodeObservable(
-      concat(
+    const startLocalNodeObservable = getChildProcessObservable({
+      processName: 'NODE',
+      onSuccess: concat(
         of(AuthActions.ensureLogin(t(`Your restored wallet password is required`), true)),
         of(toastrActions.add({
           type: 'success',
           title: t(`Wallet restored successfully.`)
         }))
       ),
-      of(SettingsActions.restoringWalletFailed()),
+      onFailure: of(SettingsActions.restoringWalletFailed()),
       action$
-    )
+    })
 
     const copyPromise = promisify(fs.copyFile)(action.payload.filePath, newWalletPath)
 
@@ -292,7 +284,6 @@ export const SettingsEpics = (action$, state$) => merge(
 	disableMinerEpic(action$, state$),
 	enableTorEpic(action$, state$),
 	disableTorEpic(action$, state$),
-  startResDexEpic(action$, state$),
   initiateWalletBackupEpic(action$, state$),
   initiateWalletRestoreEpic(action$, state$),
   backupWalletEpic(action$, state$),

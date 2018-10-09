@@ -22,9 +22,7 @@ function getChildProcessStatusName(processStatus) {
   return nameMap[processStatus] || t(`Unknown`)
 }
 
-function getStartLocalNodeObservable(onSuccess: Observable, onFailure: Observable, action$: ActionsObservable<Action>) {
-  const processName: string = 'NODE'
-
+function getChildProcessObservable({processName, onSuccess, onFailure, action$}) {
   const observable = race(
     action$.pipe(
       ofType(SettingsActions.childProcessStarted),
@@ -45,5 +43,5 @@ function getStartLocalNodeObservable(onSuccess: Observable, onFailure: Observabl
 
 export {
   getChildProcessStatusName,
-  getStartLocalNodeObservable,
+  getChildProcessObservable,
 }
