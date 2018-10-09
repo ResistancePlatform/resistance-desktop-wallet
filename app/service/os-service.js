@@ -5,22 +5,25 @@ import path from 'path'
 import log from 'electron-log'
 import { spawn } from 'child_process'
 import { app, remote } from 'electron'
+import ps from 'ps-node'
+
 
 /**
  * ES6 singleton
  */
 let instance = null
 
-const ps = require('ps-node')
-
-export type ChildProcessName = 'NODE' | 'TOR' | 'MINER' | 'MARKET_MAKER'
+export type ChildProcessName = 'NODE' | 'TOR' | 'MINER' | 'RESDEX'
 export type ChildProcessStatus = 'RUNNING' | 'STARTING' | 'RESTARTING' | 'FAILED' | 'STOPPING' | 'MURDER FAILED' | 'NOT RUNNING'
+
+
+const childProcessNames = ['NODE', 'MINER', 'TOR', 'RESDEX']
 
 const ChildProcessCommands = {
   NODE: 'resistanced',
   MINER: 'minerd',
   TOR: 'tor-proxy',
-  MARKET_MAKER: 'marketmaker'
+  RESDEX: 'resdex'
 }
 
 /**
@@ -40,9 +43,8 @@ export class OSService {
     // Create a global var to store child processes information for the cleanup
     if (process.type === 'browser' && global.childProcesses === undefined) {
       const childProcesses = {}
-      const processNames = ['NODE', 'MINER', 'TOR', 'MARKET_MAKER']
 
-      processNames.forEach(processName => {
+      childProcessNames.forEach(processName => {
         childProcesses[processName] = {
           pid: null,
           instance: null,
@@ -141,6 +143,7 @@ export class OSService {
   getInstallationPath() {
     const validApp = process.type === 'renderer' ? remote.app : app
     let walkUpPath
+
     switch (this.getOS()) {
       case 'windows':
         walkUpPath = '/../../../'
@@ -148,11 +151,13 @@ export class OSService {
       case 'macos':
         walkUpPath = '/../../../../'
         break
-      case 'linux':
+      default:
         walkUpPath = '/../../../../..'
         break
     }
+
     log.info(validApp.getAppPath())
+
     return path.join(validApp.getAppPath(), walkUpPath)
   }
 
@@ -256,7 +261,8 @@ export class OSService {
 
       const childProcessInfo = remote.getGlobal('childProcesses')[processName]
 
-      log.info(`Executing command ${commandPath} with arguments ${args.join(' ')}.`)
+      const truncatedArguments = args.join(' ').substring(0, 256)
+      log.info(`Executing command ${commandPath} with arguments ${truncatedArguments}.`)
       const childProcess = spawn(commandPath, args, options)
 
       const onData = (data: Buffer) => {

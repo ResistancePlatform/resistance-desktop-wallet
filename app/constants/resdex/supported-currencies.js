@@ -2327,6 +2327,6 @@ const supportedCurrencies = [
 	},
 ]
 
-export {
+export default {
 	supportedCurrencies,
 }

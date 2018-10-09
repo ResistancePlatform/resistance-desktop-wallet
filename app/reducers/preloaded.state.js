@@ -103,7 +103,8 @@ export const preloadedState: State = {
 		childProcessesStatus: {
 			NODE: 'NOT RUNNING',
 			MINER: 'NOT RUNNING',
-			TOR: 'NOT RUNNING'
+      TOR: 'NOT RUNNING',
+      RESDEX: 'NOT RUNNING',
     },
     language: 'en'
 	},

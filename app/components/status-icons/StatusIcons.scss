@@ -6,11 +6,11 @@
   left: 0;
   bottom: $SYSTEM_INFO_BAR_HEIGHT;
   width: $NAVI_BAR_CONTAINER_WIDTH + 1.2rem;
-  height: 1rem;
+  height: 1.2rem;
   display: flex;
   background: $STATUS_ICONS_BACKGROUND_COLOR;
   border-top: 1px solid $BASE_COLOR_BORDER_BLUE;
-  padding: 1rem 0;
+  padding: 0.7rem 0;
 
   > div {
     display: inline-block;
@@ -31,6 +31,7 @@
 
   .mining:before {
     content: '\e914';
+    margin-left: 0.25rem;
   }
 
   .privateTransactions {
@@ -47,6 +48,7 @@
 
   .tor:before {
     content: '\e913';
+    margin-left: 0.22rem;
   }
 
   .operations {
@@ -55,9 +57,11 @@
 
   .operations:before {
     content: '\e915';
+    font-size: 1rem;
+    font-weight: 50;
+    margin-left: 0.19rem;
   }
 
-  //
 }
 
 .operationsIconHint {

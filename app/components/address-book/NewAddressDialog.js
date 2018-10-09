@@ -121,6 +121,8 @@ const mapStateToProps = (state) => ({
 	newAddressDialog: state.addressBook.newAddressDialog
 })
 
-const mapDispatchToProps = dispatch => ({ actions: bindActionCreators(AddressBookActions.newAddressDialog, dispatch) })
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(AddressBookActions.newAddressDialog, dispatch)
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate('address-book')(NewAddressDialog))

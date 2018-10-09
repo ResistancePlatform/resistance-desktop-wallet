@@ -20,7 +20,6 @@ const osService = new OSService()
 
 const walletFolderName = 'testnet3'
 const configFolderName = 'Resistance'
-const paramFolderName = 'ResistanceParams'
 const configFileName = 'resistance.conf'
 const configFileContents = [
   `testnet=1`,
@@ -65,17 +64,26 @@ export class ResistanceService {
     return configFolder;
   }
 
-  //This is for the raw wallet path i.e. the testnet3 directory
+	/**
+   * This is for the raw wallet path i.e. the testnet3 directory
+   *
+	 * @memberof ResistanceService
+	 * @returns {string}
+	 */
   getWalletPath() {
     return path.join(this.getDataPath(), walletFolderName)
   }
 
   getParamsPath() {
     const validApp = process.type === 'renderer' ? remote.app : app
-    let paramsPath = path.join(validApp.getPath('appData'), paramFolderName)
+    let paramsPath
+
     if (osService.getOS() === 'linux') {
-      configFolder = path.join(validApp.getPath('home'), '.resistance-params')
+      paramsPath  = path.join(validApp.getPath('home'), '.resistance-params')
+    } else {
+      paramsPath = path.join(validApp.getPath('appData'), 'ResistanceParams')
     }
+
     return paramsPath
   }
 
