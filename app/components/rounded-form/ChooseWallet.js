@@ -5,6 +5,7 @@ import cn from 'classnames'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
+import { toDecimalPlaces } from '~/utils/decimal'
 import { translate } from '~/i18next.config'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
@@ -82,7 +83,7 @@ class ChooseWallet extends Component<Props> {
 
         <div className={styles.walletName}>{t(`{{symbol}} Wallet`, {symbol: this.state.symbol})}</div>
 
-        <div className={styles.balance}>{selectedCurrency && selectedCurrency.balance.toString()}</div>
+        <div className={styles.balance}>{selectedCurrency && toDecimalPlaces(selectedCurrency.balance)}</div>
 
         <div className={styles.symbol}>{this.state.symbol}</div>
 

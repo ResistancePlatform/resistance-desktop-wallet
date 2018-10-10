@@ -6,6 +6,7 @@ import log from 'electron-log'
 import { OSService } from '../os-service'
 import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 
+const netId = 2045
 const rpcPort = 17445
 const seedNodeAddress = '35.174.118.206'
 // TODO: provide the one decrypted with the password
@@ -52,6 +53,7 @@ export class ResDexService {
     const options = {
       gui: 'resdex',
       client: 1,
+      netid: netId,
       rpcport: rpcPort,
       canbind: 0,
       seednode: seedNodeAddress,

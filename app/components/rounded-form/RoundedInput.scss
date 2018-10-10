@@ -210,10 +210,11 @@
 
   .balance {
     width: 100%;
+    display: inline-block;
     text-align: right;
     margin-right: 0.4rem;
-    overflow-x: hidden;
     font-weight: 300;
+    overflow-x: hidden;
   }
 
   .symbol {

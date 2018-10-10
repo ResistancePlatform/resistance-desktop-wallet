@@ -15,6 +15,7 @@ import {
   AreaSeries
 } from 'react-vis'
 
+import { toDecimalPlaces } from '~/utils/decimal'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import CurrencyIcon from './CurrencyIcon'
 import { getCurrencyName } from '~/utils/resdex'
@@ -49,7 +50,7 @@ class ResDexAssets extends Component<Props> {
         </div>
 
         <div className={styles.equity}>
-          <sub>$</sub>{currency ? Decimal('0.001314').mul(currency.balance).toDP(8, Decimal.ROUND_FLOOR).toString() : t(`N/A`)}
+          <sub>$</sub>{currency ? toDecimalPlaces(Decimal('0.001314').mul(currency.balance), 2) : t(`N/A`)}
         </div>
 
         <div className={styles.buttons}>

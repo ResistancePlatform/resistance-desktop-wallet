@@ -10,6 +10,14 @@ import { EnabledCurrency, ResDexAccountsReducer } from './accounts/reducer'
 
 
 export type Order = {}
+  // id?: string,
+  // address?: string,
+  // depth: any,
+  // price: Decimal,
+  // averageVolume: Decimal,
+  // maxVolume: Decimal,
+  // utxoCount: number,
+  // zCredits: any
 
 export type Portfolio = {
   name: string,
@@ -25,6 +33,11 @@ export type ResDexState = {
   assets: {
   },
   buySell: {
+    baseCurrency: string,
+    quoteCurrency: string,
+    orderBook: {
+      ['bids' | 'asks']: Order[]
+    }
   },
   orders: {
     openOrders: Order[],

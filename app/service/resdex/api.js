@@ -1,4 +1,5 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import crypto from 'crypto'
 import rp from 'request-promise-native'
 import log from 'electron-log'
@@ -77,20 +78,47 @@ export class ResDexApiService {
 		return response.status === 'active'
   }
 
+	async getOrderBook(base, rel) {
+		const response = await this.query({
+			method: 'orderbook',
+			base,
+			rel,
+		})
+
+		const formatOrders = orders => orders
+			.filter(order => order.numutxos > 0)
+			.map(order => ({
+				address: order.address,
+				depth: order.depth,
+				price: Decimal(order.price),
+				utxoCount: order.numutxos,
+				averageVolume: Decimal(order.avevolume),
+				maxVolume: Decimal(order.maxvolume),
+				zCredits: order.zcredits,
+			}))
+
+		const formattedResponse = {
+			asks: formatOrders(response.asks),
+			bids: formatOrders(response.bids),
+		}
+
+		return formattedResponse
+	}
+
 	/**
 	 * Creates an order.
    *
 	 * @memberof ResDexApiService
 	 */
-  order(opts) {
+  createMarketOrder(opts) {
     return this.query({
       method: opts.type,
       gtc: 1,
       base: opts.baseCurrency,
       rel: opts.quoteCurrency,
-      basevolume: opts.amount,
-      relvolume: opts.total,
-      price: opts.price,
+      basevolume: opts.amount.toString(),
+      relvolume: opts.total.toString(),
+      price: opts.price.toString(),
     })
   }
 
@@ -101,6 +129,8 @@ export class ResDexApiService {
 	 */
   query(data: object) {
     const token = remote.getGlobal('resDex').apiToken
+
+    log.debug(`Calling ResDEX API method ${data.method}`, JSON.stringify(data))
 
     if (!token) {
       os.dispatchAction(ResDexLoginActions.showDialog())
@@ -118,7 +148,7 @@ export class ResDexApiService {
     }
 
     return rp(options).then(response => {
-      if (response.result !== 'success') {
+      if (response.result && response.result !== 'success') {
         throw new Error(response.error)
       }
       return response

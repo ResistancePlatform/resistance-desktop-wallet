@@ -11,6 +11,7 @@ import { getChildProcessObservable } from '~/utils/child-process'
 import { ResDexService } from '~/service/resdex/resdex'
 import { ResDexLoginEpic } from './login/epic'
 import { ResDexAccountsEpic } from './accounts/epic'
+import { ResDexBuySellEpic } from './buy-sell/epic'
 
 
 const t = translate('resdex')
@@ -21,7 +22,7 @@ const startResDexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   switchMap(() => {
     const resDexStartedObservable = getChildProcessObservable({
       processName: 'RESDEX',
-      onSuccess: of(ResDexAccountsActions.enableCurrencies()).pipe(delay(3000)),
+      onSuccess: of(ResDexAccountsActions.enableCurrencies()).pipe(delay(5000)),
       onFailure: of(toastrActions.add({ type: 'error', title: t('Unable to start ResDEX, check the log for details') })),
       action$
     })
@@ -39,4 +40,5 @@ export const ResDexEpic = combineEpics(
   defaultEpic,
   ResDexLoginEpic,
   ResDexAccountsEpic,
+  ResDexBuySellEpic,
 )

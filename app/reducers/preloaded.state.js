@@ -116,6 +116,12 @@ export const preloadedState: State = {
     assets: {
     },
     buySell: {
+      baseCurrency: 'RES',
+      quoteCurrency: 'HODLC',
+      orderBook: {
+        bids: [],
+        asks: []
+      }
     },
     orders: {
       openOrders: [{

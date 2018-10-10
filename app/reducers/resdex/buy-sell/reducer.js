@@ -5,6 +5,13 @@ import { preloadedState } from '~/reducers/preloaded.state'
 export const ResDexBuySellActions = createActions(
   {
     EMPTY: undefined,
+
+    GET_ORDER_BOOK: undefined,
+    GOT_ORDER_BOOK: orderBook => ({ orderBook }),
+    GET_ORDER_BOOK_FAILED: (errorMessage: string) => ({ errorMessage }),
+
+    CREATE_MARKET_ORDER: undefined,
+    CREATE_LIMIT_ORDER: undefined,
   },
   {
     prefix: 'APP/RESDEX/BUY_SELL'
@@ -13,4 +20,15 @@ export const ResDexBuySellActions = createActions(
 
 export const ResDexBuySellReducer = handleActions(
   {
+    [ResDexBuySellActions.gotOrderBook]: (state, action) => ({
+      ...state,
+      orderBook: action.payload.orderBook
+    }),
+    [ResDexBuySellActions.getOrderBookFailed]: state => ({
+      ...state,
+      orderBook: {
+        asks: [],
+        bids: [],
+      }
+    }),
   }, preloadedState)

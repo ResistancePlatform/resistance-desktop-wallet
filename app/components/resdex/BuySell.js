@@ -7,8 +7,9 @@ import cn from 'classnames'
 import { translate } from 'react-i18next'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
+import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
-import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
+import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 import RoundedInput from '~/components/rounded-form/RoundedInput'
 import ChooseWallet from '~/components/rounded-form/ChooseWallet'
@@ -27,7 +28,9 @@ const validationSchema = Joi.object().keys({
 
 type Props = {
   t: any,
-  accounts: ResDexAccountsActions
+  accounts: ResDexState.accounts,
+  buySell: ResDexState.buySell,
+  actions: object
 }
 
 
@@ -47,6 +50,15 @@ class ResDexBuySell extends Component<Props> {
 
 		return (
       <div className={cn(styles.container)}>
+        <RpcPolling
+          interval={1.0}
+          actions={{
+            polling: ResDexBuySellActions.getOrderBook,
+            success: ResDexBuySellActions.gotOrderBook,
+            failure: ResDexBuySellActions.getOrderBookFailed
+          }}
+        />
+
         <div className={styles.actionContainer}>
           <Tabs
             className={styles.tabs}
@@ -65,12 +77,14 @@ class ResDexBuySell extends Component<Props> {
               >
                 <ChooseWallet
                   name="sendFrom"
+                  defaultValue={this.props.buySell.baseCurrency}
                   label={t(`Send from`)}
                   currencies={this.props.accounts.currencies}
                 />
 
                 <ChooseWallet
                   name="receiveTo"
+                  defaultValue={this.props.buySell.quoteCurrency}
                   label={t(`Receive to`)}
                   currencies={this.props.accounts.currencies}
                 />
@@ -89,7 +103,7 @@ class ResDexBuySell extends Component<Props> {
                   </label>
                 </div>
 
-                <button type="submit">{t(`Exchange`)}</button>
+                <button type="submit" onClick={this.props.actions.createMarketOrder}>{t(`Exchange`)}</button>
               </RoundedForm>
             </TabPanel>
 
