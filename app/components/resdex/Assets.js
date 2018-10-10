@@ -39,7 +39,7 @@ class ResDexAssets extends Component<Props> {
     const currency = this.props.accounts.currencies[symbol]
 
     return (
-      <div className={styles.coin}>
+      <div className={styles.coin} key={symbol}>
         <CurrencyIcon symbol={symbol} size="1.6rem" />
 
         {getCurrencyName(symbol)}
@@ -49,7 +49,7 @@ class ResDexAssets extends Component<Props> {
         </div>
 
         <div className={styles.equity}>
-          <sub>$</sub>{currency ? Decimal('0.001314').mul(currency.balance).toString() : t(`N/A`)}
+          <sub>$</sub>{currency ? Decimal('0.001314').mul(currency.balance).toDP(8, Decimal.ROUND_FLOOR).toString() : t(`N/A`)}
         </div>
 
         <div className={styles.buttons}>

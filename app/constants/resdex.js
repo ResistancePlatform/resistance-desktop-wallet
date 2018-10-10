@@ -1,6 +1,10 @@
 const RESDEX = {
   alwaysEnabledCurrencies: [
     {
+      symbol: 'RES',
+      useElectrum: false
+    },
+    {
       symbol: 'BTC',
       useElectrum: true
     },
@@ -9,16 +13,12 @@ const RESDEX = {
       useElectrum: true
     },
     {
+      symbol: 'DGB',
+      useElectrum: true
+    },
+    {
       symbol: 'HODLC',
       useElectrum: false
-    },
-    {
-      symbol: 'BEER',
-      useElectrum: true
-    },
-    {
-      symbol: 'PIZZA',
-      useElectrum: true
     },
   ]
 }

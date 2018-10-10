@@ -1,25 +1,33 @@
 // @flow
-import { Decimal } from 'decimal.js'
 import * as Joi from 'joi'
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
+import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
+import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
-import RoundedInput, { ChooseWalletAddon } from '~/components/rounded-form/RoundedInput'
+import RoundedInput from '~/components/rounded-form/RoundedInput'
+import ChooseWallet from '~/components/rounded-form/ChooseWallet'
 import CurrencyIcon from './CurrencyIcon'
 
 import styles from './BuySell.scss'
 
 const validationSchema = Joi.object().keys({
-  name: Joi.string().required().label(`Name`),
+  sendFrom: Joi.string().required().label(`Send from`),
+  receiveTo: Joi.string().required().label(`Receive to`),
+  maxAmount: Joi.number().required().label(`Max. amount`),
   address: (
     Joi.string().required().label(`Address`)
   )
 })
 
 type Props = {
-  t: any
+  t: any,
+  accounts: ResDexAccountsActions
 }
 
 
@@ -37,63 +45,63 @@ class ResDexBuySell extends Component<Props> {
 	render() {
     const { t } = this.props
 
-    const wallets = [{
-      currency: 'BTC',
-      balance: Decimal('2.12400181')
-    }]
-
 		return (
       <div className={cn(styles.container)}>
         <div className={styles.actionContainer}>
-          <RoundedForm
-              id="resDexBuySell"
-              schema={validationSchema}
+          <Tabs
+            className={styles.tabs}
+            selectedTabClassName={styles.selectedTab}
+            selectedTabPanelClassName={styles.selectedTabPanel}
           >
-            <RoundedInput
-              name="sellFrom"
-              labelClassName={styles.inputLabel}
-              label={t(`Sell from`)}
-              newAddon={new ChooseWalletAddon(wallets)}
-              number
-            />
+            <TabList className={styles.tabList}>
+              <Tab className={styles.tab}>{t(`Simple`)}</Tab>
+              <Tab className={styles.tab} disabled>{t(`Advanced`)}</Tab>
+            </TabList>
 
-            <RoundedInput
-              name="depositTo"
-              labelClassName={styles.inputLabel}
-              label={t(`Deposit to`)}
-              newAddon={new ChooseWalletAddon(wallets)}
-              number
-            />
+            <TabPanel className={styles.tabPanel}>
+              <RoundedForm
+                id="resDexBuySell"
+                schema={validationSchema}
+              >
+                <ChooseWallet
+                  name="sendFrom"
+                  label={t(`Send from`)}
+                  currencies={this.props.accounts.currencies}
+                />
 
-            <div className={styles.inputsRow}>
-              <div>
-                <div className={styles.caption}>{t(`Max. amount`)}<i /></div>
-                <RoundedInput className={styles.maxAmount} name="maxAmount" number />
-              </div>
+                <ChooseWallet
+                  name="receiveTo"
+                  label={t(`Receive to`)}
+                  currencies={this.props.accounts.currencies}
+                />
 
-              <div>
-                <div className={styles.caption}>{t(`Exchange rate`)}<i /></div>
-                <RoundedInput name="exchangeRate" number />
-              </div>
+                <RoundedInput
+                  className={styles.maxAmount}
+                  label={t(`Max. {{symbol}}`, { symbol: 'BTC' })}
+                  name="maxAmount"
+                  number />
 
-            </div>
+                <div className={styles.enhancedPrivacy}>
+                  <label htmlFor="enhancedPrivacyInputId">
+                    <input id="enhancedPrivacyInputId" type="checkbox" name="enhancedPrivacy" />
+                    {t(`Enhanced privacy`)}
+                    <i className={styles.info} />
+                  </label>
+                </div>
 
-            <div className={styles.enhancedPrivacy}>
-              <label htmlFor="enhancedPrivacyInputId">
-                <input id="enhancedPrivacyInputId" type="checkbox" name="enhancedPrivacy" />
-                {t(`Enhanced privacy`)}
-              </label>
+                <button type="submit">{t(`Exchange`)}</button>
+              </RoundedForm>
+            </TabPanel>
 
-              <strong>{t(`Read more:`)}</strong> {t(`enhanced-privacy`)}
-            </div>
+            <TabPanel className={styles.tabPanel} />
+          </Tabs>
 
-            <button type="submit">{t(`Sell {{name}}`, { name: 'Bitcoin' })}</button>
-          </RoundedForm>
+
         </div>
 
         <div className={styles.summaryContainer}>
           <div className={styles.briefContainer}>
-            <div className={styles.brief}>{t(`You are selling`)}</div>
+            <div className={styles.brief}>{t(`You are sending`)}</div>
 
             <div className={styles.amount}>
               1.01679 <span>BTC</span>
@@ -107,17 +115,19 @@ class ResDexBuySell extends Component<Props> {
 
           <div className={styles.fromTo}>
             <div className={styles.wallet}>
-              <CurrencyIcon symbol="BTC" size="1.3rem" />
+              <CurrencyIcon symbol="BTC" size="1.24rem" />
               <div>
-                <span>Sell from</span>
+                <span>Send</span>
                 BTC Wallet
               </div>
             </div>
 
+            <div className={cn('icon', styles.exchangeIcon)} />
+
             <div className={styles.wallet}>
-              <CurrencyIcon symbol="ETH" size="1.3rem" />
+              <CurrencyIcon symbol="ETH" size="1.24rem" />
               <div>
-                <span>Deposit to</span>
+                <span>Receive</span>
                 ETH Wallet
               </div>
             </div>
@@ -153,4 +163,13 @@ class ResDexBuySell extends Component<Props> {
   }
 }
 
-export default translate('resdex')(ResDexBuySell)
+const mapStateToProps = (state) => ({
+	buySell: state.resDex.buySell,
+	accounts: state.resDex.accounts,
+})
+
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(ResDexBuySellActions, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexBuySell))

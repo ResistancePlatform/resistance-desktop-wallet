@@ -197,12 +197,13 @@ div[name="amount"] {
 
 .sendButtonContainer {
     margin-bottom: 1.5rem;
+
     button {
         @include roundedButton(true);
 
         margin-left: 0;
         margin-right: 2rem;
-        padding: 0.5rem 2rem;
+        padding: 0.4rem 2rem;
     }
 
     div {

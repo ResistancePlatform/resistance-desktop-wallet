@@ -4,31 +4,31 @@
 // Generic rounded button
 // ------------------------------------------------------------------------------------------------------
 @mixin roundedButton($activeStyle: false) {
-    padding: 0.6rem 1.2rem;
+  padding: 0.7rem 1.2rem;
 
-    @if $activeStyle {
-        background-color: $BASE_COLOR_PURPLE;
-        border: 1.5px solid $BASE_COLOR_PURPLE;
-        color: $BASE_COLOR_WHITE;
-    } @else {
-        background-color: transparent;
-        border: 1.5px solid $BASE_COLOR_BORDER_GRAY;
-        color: $BASE_COLOR_BUTTON_FONT_GRAY;
-    }
+  @if $activeStyle {
+    background-color: $BASE_COLOR_PURPLE;
+    border: 1px solid $BASE_COLOR_PURPLE;
+    color: $BASE_COLOR_WHITE;
+  } @else {
+    background-color: transparent;
+    border: 1px solid $BASE_COLOR_BORDER_GRAY;
+    color: $BASE_COLOR_BUTTON_FONT_GRAY;
+  }
 
-    border-radius: 5rem;
+  border-radius: 5rem;
 
-    font-size: 0.7rem;
-    font-weight: 300;
+  font-size: 0.62rem;
+  font-weight: 300;
 
-    &:focus {
-        outline: none;
-    }
+  &:focus {
+    outline: none;
+  }
 
-    &:disabled {
-        opacity: 0.6;
-        cursor: default;
-    }
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
 }
 
 
@@ -38,4 +38,3 @@
 @mixin roundedInput() {
 
 }
-

@@ -78,7 +78,7 @@ class ChooseWallet extends Component<Props> {
       }
 
       <div className={styles.chooseWallet}>
-        <CurrencyIcon className={styles.currencyIcon} symbol={this.state.symbol} size="1.2rem" />
+        <CurrencyIcon className={styles.currencyIcon} symbol={this.state.symbol} size="1.0rem" />
 
         <div className={styles.walletName}>{t(`{{symbol}} Wallet`, {symbol: this.state.symbol})}</div>
 

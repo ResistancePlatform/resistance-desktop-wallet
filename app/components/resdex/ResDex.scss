@@ -41,8 +41,8 @@
 
 /* Base classes for all top level containers inside the tab panel */
 %largeContainer {
-  border-radius: 0.5rem;
-  background: red;
+  border-radius: 0.3rem;
+  border: 1px solid $BASE_COLOR_BORDER_BLUE;
   background: $BASE_COLOR_DARK_BLUE_3;
   padding: 0;
 }

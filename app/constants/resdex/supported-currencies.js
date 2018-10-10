@@ -1804,6 +1804,12 @@ const supportedCurrencies = [
 		rpcport: 80,
 	},
 	{
+		coin: 'RES',
+		name: 'Resistance',
+		asset: 'RES',
+		rpcport: 18232,
+  },
+	{
 		coin: 'REVS',
 		name: 'Revs',
 		asset: 'REVS',

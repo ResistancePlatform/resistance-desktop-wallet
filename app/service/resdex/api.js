@@ -78,6 +78,23 @@ export class ResDexApiService {
   }
 
 	/**
+	 * Creates an order.
+   *
+	 * @memberof ResDexApiService
+	 */
+  order(opts) {
+    return this.query({
+      method: opts.type,
+      gtc: 1,
+      base: opts.baseCurrency,
+      rel: opts.quoteCurrency,
+      basevolume: opts.amount,
+      relvolume: opts.total,
+      price: opts.price,
+    })
+  }
+
+	/**
 	 * Creates an instance of ResDexApiService.
    *
 	 * @memberof ResDexApiService
