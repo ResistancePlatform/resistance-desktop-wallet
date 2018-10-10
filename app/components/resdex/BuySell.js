@@ -20,14 +20,12 @@ import styles from './BuySell.scss'
 const validationSchema = Joi.object().keys({
   sendFrom: Joi.string().required().label(`Send from`),
   receiveTo: Joi.string().required().label(`Receive to`),
-  maxAmount: Joi.number().required().label(`Max. amount`),
-  address: (
-    Joi.string().required().label(`Address`)
-  )
+  maxRel: Joi.number().required().label(`Max. amount`),
 })
 
 type Props = {
   t: any,
+  roundedForm: object,
   accounts: ResDexState.accounts,
   buySell: ResDexState.buySell,
   actions: object
@@ -41,12 +39,27 @@ type Props = {
 class ResDexBuySell extends Component<Props> {
 	props: Props
 
+  // Can't create a market order if there's no liquidity or when sending an order
+  getSubmitButtonDisabledAttribute() {
+    const { baseCurrency, quoteCurrency, orderBook, isSendingOrder } = this.props.buySell
+
+    return (
+      isSendingOrder
+      || orderBook.baseCurrency !== baseCurrency
+      || orderBook.quoteCurrency !== quoteCurrency
+      || orderBook.asks.length === 0
+    )
+
+  }
+
 	/**
 	 * @returns
    * @memberof ResDexBuySell
 	 */
 	render() {
     const { t } = this.props
+    const form = this.props.roundedForm.resDexBuySell
+    const { orderBook } = this.props.buySell
 
 		return (
       <div className={cn(styles.container)}>
@@ -77,22 +90,22 @@ class ResDexBuySell extends Component<Props> {
               >
                 <ChooseWallet
                   name="sendFrom"
-                  defaultValue={this.props.buySell.baseCurrency}
+                  defaultValue={this.props.buySell.quoteCurrency}
                   label={t(`Send from`)}
                   currencies={this.props.accounts.currencies}
                 />
 
                 <ChooseWallet
                   name="receiveTo"
-                  defaultValue={this.props.buySell.quoteCurrency}
+                  defaultValue={this.props.buySell.baseCurrency}
                   label={t(`Receive to`)}
                   currencies={this.props.accounts.currencies}
                 />
 
                 <RoundedInput
-                  className={styles.maxAmount}
-                  label={t(`Max. {{symbol}}`, { symbol: 'BTC' })}
-                  name="maxAmount"
+                  className={styles.maxRel}
+                  label={t(`Max. {{symbol}}`, { symbol: this.props.buySell.quoteCurrency })}
+                  name="maxRel"
                   number />
 
                 <div className={styles.enhancedPrivacy}>
@@ -103,7 +116,13 @@ class ResDexBuySell extends Component<Props> {
                   </label>
                 </div>
 
-                <button type="submit" onClick={this.props.actions.createMarketOrder}>{t(`Exchange`)}</button>
+                <button
+                  type="submit"
+                  onClick={this.props.actions.createMarketOrder}
+                  disabled={this.getSubmitButtonDisabledAttribute()}
+                >
+                  {t(`Exchange`)}
+                </button>
               </RoundedForm>
             </TabPanel>
 
@@ -118,11 +137,15 @@ class ResDexBuySell extends Component<Props> {
             <div className={styles.brief}>{t(`You are sending`)}</div>
 
             <div className={styles.amount}>
-              1.01679 <span>BTC</span>
+              {form && form.fields.maxRel || '0'} <span>{form && form.fields.sendFrom }</span>
             </div>
 
             <div className={styles.at}>
-              @ 24.69 ETH per BTC
+              {orderBook.asks.length
+                ? `@ X ${this.props.buySell.baseCurrency} per ${this.props.buySell.quoteCurrency}`
+                : t(`No liquidity available yet`)
+              }
+
             </div>
 
           </div>
@@ -178,6 +201,7 @@ class ResDexBuySell extends Component<Props> {
 }
 
 const mapStateToProps = (state) => ({
+	roundedForm: state.roundedForm,
 	buySell: state.resDex.buySell,
 	accounts: state.resDex.accounts,
 })

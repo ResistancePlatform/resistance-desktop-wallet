@@ -46,7 +46,7 @@ class ChooseWallet extends Component<Props> {
 		super(props)
     this.popupMenuId = `popup-menu-${uuid()}`
     this.state = {
-      symbol: props.defaultValue || 'BTC',
+      symbol: props.defaultValue || 'RES',
     }
 	}
 

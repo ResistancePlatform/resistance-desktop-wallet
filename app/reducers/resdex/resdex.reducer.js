@@ -35,7 +35,10 @@ export type ResDexState = {
   buySell: {
     baseCurrency: string,
     quoteCurrency: string,
+    isSendingOrder: boolean,
     orderBook: {
+      baseCurrency?: string,
+      quoteCurrency?: string,
       ['bids' | 'asks']: Order[]
     }
   },

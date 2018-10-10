@@ -5,12 +5,14 @@ import { ofType } from 'redux-observable'
 import { actions as toastrActions } from 'react-redux-toastr'
 
 // import { translate } from '~/i18next.config'
+import { SwapDBService } from '~/service/resdex/swap-db'
 import { ResDexPortfolioService } from '~/service/resdex/portfolio'
 import { ResDexApiService } from '~/service/resdex/api'
 import { ResDexLoginActions } from './reducer'
 
 // const t = translate('resdex')
 const api = new ResDexApiService()
+const swapDB = new SwapDBService()
 const portfolio = new ResDexPortfolioService()
 const displayErrorAction = err => toastrActions.add({ type: 'error', title: err.message })
 
@@ -37,6 +39,7 @@ const login = (action$: ActionsObservable<Action>, state$) => action$.pipe(
     return decryptObservable.pipe(
       switchMap((seedPhrase: string) => {
         api.setToken(seedPhrase)
+        swapDB.init(seedPhrase)
 
         return of(
           ResDexLoginActions.loginSucceeded(),

@@ -11,6 +11,9 @@ export const ResDexBuySellActions = createActions(
     GET_ORDER_BOOK_FAILED: (errorMessage: string) => ({ errorMessage }),
 
     CREATE_MARKET_ORDER: undefined,
+    CREATE_MARKET_ORDER_SUCCEEDED: undefined,
+    CREATE_MARKET_ORDER_FAILED: (errorMessage: string) => ({ errorMessage }),
+
     CREATE_LIMIT_ORDER: undefined,
   },
   {
@@ -30,5 +33,17 @@ export const ResDexBuySellReducer = handleActions(
         asks: [],
         bids: [],
       }
+    }),
+    [ResDexBuySellActions.createMarketOrder]: state => ({
+      ...state,
+      isSendingOrder: true,
+    }),
+    [ResDexBuySellActions.createMarketOrderSucceeded]: state => ({
+      ...state,
+      isSendingOrder: false,
+    }),
+    [ResDexBuySellActions.createMarketOrderFailed]: state => ({
+      ...state,
+      isSendingOrder: false,
     }),
   }, preloadedState)

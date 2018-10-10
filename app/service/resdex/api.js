@@ -15,6 +15,13 @@ const resDexUri = 'http://127.0.0.1:17445'
 const t = translate('service')
 const os = new OSService()
 
+class ResDexApiError extends Error {
+  constructor(response) {
+    super(response.error)
+    this.response = response
+  }
+}
+
 /**
  * ES6 singleton
  */
@@ -98,6 +105,8 @@ export class ResDexApiService {
 			}))
 
 		const formattedResponse = {
+			baseCurrency: response.base,
+			quoteCurrency: response.rel,
 			asks: formatOrders(response.asks),
 			bids: formatOrders(response.bids),
 		}
@@ -148,8 +157,8 @@ export class ResDexApiService {
     }
 
     return rp(options).then(response => {
-      if (response.result && response.result !== 'success') {
-        throw new Error(response.error)
+      if (response.error) {
+        throw new ResDexApiError(response)
       }
       return response
     })
