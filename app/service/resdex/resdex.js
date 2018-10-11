@@ -1,6 +1,7 @@
 // @flow
 import os from 'os'
 import path from 'path'
+import { remote } from 'electron'
 import log from 'electron-log'
 
 import { OSService } from '../os-service'
@@ -9,8 +10,6 @@ import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 const netId = 2045
 const rpcPort = 17445
 const seedNodeAddress = '35.174.118.206'
-// TODO: provide the one decrypted with the password
-const passPhrase = 'treat board tree once reduce reduce expose coil guilt fish flat boil'
 
 
 /**
@@ -58,7 +57,7 @@ export class ResDexService {
       canbind: 0,
       seednode: seedNodeAddress,
       userhome: os.homedir(),
-      passphrase: seedPhrase || passPhrase,
+      passphrase: seedPhrase || remote.getGlobal('resDex').seedPhrase,
       coins: currenciesWithoutElectrum,
     }
 

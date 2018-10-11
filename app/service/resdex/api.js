@@ -58,7 +58,7 @@ export class ResDexApiService {
 
 	async enableSocket() {
 		const port = await getPort()
-		const {endpoint} = await this.request({method: 'getendpoint', port})
+		const {endpoint} = await this.query({method: 'getendpoint', port})
 		const socket = new MarketmakerSocket(endpoint)
 		await socket.connected
 		this.socket = socket

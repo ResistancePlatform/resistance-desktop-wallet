@@ -63,6 +63,7 @@ export type ResDexState = {
 export const ResDexActions = createActions(
   {
     EMPTY: undefined,
+
     START_RESDEX: undefined,
     STOP_RESDEX: undefined,
   },

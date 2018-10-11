@@ -10,6 +10,9 @@ export const ResDexBuySellActions = createActions(
     GOT_ORDER_BOOK: orderBook => ({ orderBook }),
     GET_ORDER_BOOK_FAILED: (errorMessage: string) => ({ errorMessage }),
 
+    UPDATE_BASE_CURRENCY: (symbol: string) => ({ symbol }),
+    UPDATE_QUOTE_CURRENCY: (symbol: string) => ({ symbol }),
+
     CREATE_MARKET_ORDER: undefined,
     CREATE_MARKET_ORDER_SUCCEEDED: undefined,
     CREATE_MARKET_ORDER_FAILED: (errorMessage: string) => ({ errorMessage }),
@@ -33,6 +36,14 @@ export const ResDexBuySellReducer = handleActions(
         asks: [],
         bids: [],
       }
+    }),
+    [ResDexBuySellActions.updateBaseCurrency]: (state, action) => ({
+      ...state,
+      baseCurrency: action.payload.symbol,
+    }),
+    [ResDexBuySellActions.updateQuoteCurrency]: (state, action) => ({
+      ...state,
+      quoteCurrency: action.payload.symbol,
     }),
     [ResDexBuySellActions.createMarketOrder]: state => ({
       ...state,

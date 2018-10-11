@@ -79,7 +79,11 @@ class SystemInfo extends Component<Props> {
             const amount = currentOperation.params.amounts[0]
             description = t(
               `Sent {{amount}} RES from {{from}} to {{to}}.`,
-              amount.amount, currentOperation.params.fromaddress, amount.address
+              {
+                amount: amount.amount,
+                from: currentOperation.params.fromaddress,
+                to: amount.address
+              }
             )
           }
           toastr.success(`${successTitle}${description ? '' : '.'}`, description)
