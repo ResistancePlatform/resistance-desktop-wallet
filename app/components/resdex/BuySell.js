@@ -87,6 +87,13 @@ class ResDexBuySell extends Component<Props> {
 
   }
 
+  getQuoteAmountCaption() {
+    const form = this.props.roundedForm.resDexBuySell
+    const amount = Decimal(form && form.fields.maxRel || '0')
+
+    return toDecimalPlaces(amount)
+  }
+
   // Can't create a market order if there's no liquidity or when sending an order
   getSubmitButtonDisabledAttribute() {
     const { baseCurrency, quoteCurrency, orderBook, isSendingOrder } = this.props.buySell
@@ -106,7 +113,7 @@ class ResDexBuySell extends Component<Props> {
 	 */
 	render() {
     const { t } = this.props
-    const form = this.props.roundedForm.resDexBuySell
+    const { baseCurrency, quoteCurrency } = this.props.buySell
 
 		return (
       <div className={cn(styles.container)}>
@@ -137,21 +144,21 @@ class ResDexBuySell extends Component<Props> {
               >
                 <ChooseWallet
                   name="sendFrom"
-                  defaultValue={this.props.buySell.quoteCurrency}
+                  defaultValue={quoteCurrency}
                   label={t(`Send from`)}
                   currencies={this.props.accounts.currencies}
                 />
 
                 <ChooseWallet
                   name="receiveTo"
-                  defaultValue={this.props.buySell.baseCurrency}
+                  defaultValue={baseCurrency}
                   label={t(`Receive to`)}
                   currencies={this.props.accounts.currencies}
                 />
 
                 <RoundedInput
                   className={styles.maxRel}
-                  label={t(`Max. {{symbol}}`, { symbol: this.props.buySell.quoteCurrency })}
+                  label={t(`Max. {{quoteCurrency}}`, { quoteCurrency })}
                   name="maxRel"
                   number />
 
@@ -184,7 +191,8 @@ class ResDexBuySell extends Component<Props> {
             <div className={styles.brief}>{t(`You are sending`)}</div>
 
             <div className={styles.amount}>
-              {form && form.fields.maxRel || '0'} <span>{form && form.fields.sendFrom }</span>
+              {this.getQuoteAmountCaption()}
+              <span>{quoteCurrency}</span>
             </div>
 
             <div className={styles.at}>{this.getAtCaption(t)}</div>
@@ -193,20 +201,20 @@ class ResDexBuySell extends Component<Props> {
 
           <div className={styles.fromTo}>
             <div className={styles.wallet}>
-              <CurrencyIcon symbol={ this.props.buySell.quoteCurrency } size="1.24rem" />
+              <CurrencyIcon symbol={quoteCurrency} size="1.24rem" />
               <div>
                 <span>{t(`Send`)}</span>
-                {t(`{{symbol}} Wallet`, { symbol: this.props.buySell.quoteCurrency })}
+                {t(`{{quoteCurrency}} Wallet`, { quoteCurrency })}
               </div>
             </div>
 
             <div className={cn('icon', styles.exchangeIcon)} />
 
             <div className={styles.wallet}>
-              <CurrencyIcon symbol={ this.props.buySell.baseCurrency } size="1.24rem" />
+              <CurrencyIcon symbol={baseCurrency} size="1.24rem" />
               <div>
                 <span>{t(`Receive`)}</span>
-                {t(`{{symbol}} Wallet`, { symbol: this.props.buySell.baseCurrency })}
+                {t(`{{baseCurrency}} Wallet`, { baseCurrency })}
               </div>
             </div>
 
@@ -214,7 +222,8 @@ class ResDexBuySell extends Component<Props> {
 
           <ul className={styles.list}>
             <li className={cn({ [styles.res]: this.props.buySell.enhancedPrivacy })}>
-              {form && form.maxRel} {this.props.buySell.quoteCurrency}
+              {this.getQuoteAmountCaption()}&nbsp;
+              {quoteCurrency}
               <hr />
               <span>{this.getMaxPayoutCaption()}</span>
             </li>

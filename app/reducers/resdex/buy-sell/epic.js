@@ -67,15 +67,13 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
         }
 
         const swap = result.pending
+        swapDB.insertSwapData(swap, requestOpts)
 
-        const insertSwapObservable = from(swapDB.insertSwapData(swap, requestOpts)).pipe(
-          switchMap(() => of(ResDexBuySellActions.createMarketOrderSucceeded()))
-        )
-
-        return insertSwapObservable
+        return of(ResDexBuySellActions.createMarketOrderSucceeded())
       }),
       catchError(err => {
         let { message } = err
+        log.error(`Swap error`, err)
 
         if (message === 'only one pending request at a time') {
           message = t(`Only one pending swap at a time, try again in {{wait}} seconds.`, { wait: err.response.wait})

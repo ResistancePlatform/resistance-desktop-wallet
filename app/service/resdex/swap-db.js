@@ -1,6 +1,6 @@
 import PouchDB from 'pouchdb-browser'
 import pouchDBFind from 'pouchdb-find'
-import cryptoPouch from 'crypto-pouch'
+// import cryptoPouch from 'crypto-pouch'
 import Emittery from 'emittery'
 import PQueue from 'p-queue'
 import roundTo from 'round-to'
@@ -15,7 +15,8 @@ const t = translate('service')
 const swapTransactions = ['myfee', 'bobdeposit', 'alicepayment', 'bobpayment', 'alicespend']
 
 PouchDB.plugin(pouchDBFind)
-PouchDB.plugin(cryptoPouch)
+// TODO: Re-enable after fixing the yarn dependency
+// PouchDB.plugin(cryptoPouch)
 
   /**
    * ES6 singleton
