@@ -15,7 +15,7 @@ const t = translate('service')
 const swapTransactions = ['myfee', 'bobdeposit', 'alicepayment', 'bobpayment', 'alicespend']
 
 PouchDB.plugin(pouchDBFind)
-// TODO: Re-enable after fixing the yarn dependency
+// TODO: Re-enable after fixing the yarn dependency, also line 48
 // PouchDB.plugin(cryptoPouch)
 
   /**
@@ -45,7 +45,7 @@ export class SwapDBService {
   init(portfolioId, seedPhrase) {
     this.db = new PouchDB(`swaps-${portfolioId}`, {adapter: 'idb'})
 
-    this.db.crypto(seedPhrase)
+    // this.db.crypto(seedPhrase)
 
     const ee = new Emittery()
     this.on = ee.on.bind(ee)
