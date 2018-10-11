@@ -127,44 +127,7 @@ export const preloadedState: State = {
       }
     },
     orders: {
-      openOrders: [{
-        id: '1',
-        time: 1,
-        base: 'XBT',
-        rel: 'RES',
-        amountOut: -1.20014,
-        amountIn: 0.01679,
-        isPrivate: true,
-        status: 'pending'
-      }, {
-        id: '2',
-        time: 1,
-        base: 'XBT',
-        rel: 'HODL',
-        amountOut: -1.20014,
-        amountIn: 0.01679,
-        isPrivate: false,
-        status: 'pending'
-      }],
-      completedOrders: [{
-        id: '1',
-        time: 1,
-        base: 'XBT',
-        rel: 'ETH',
-        amountOut: -1.20014,
-        amountIn: 0.01679,
-        isPrivate: false,
-        status: 'matched'
-      }, {
-        id: '2',
-        time: 1,
-        base: 'XBT',
-        rel: 'HODL',
-        amountOut: -1.20014,
-        amountIn: 0.01679,
-        isPrivate: false,
-        status: 'unmatched'
-      }],
+      swapHistory: [],
     },
     accounts: {
       currencies: {},

@@ -7,6 +7,7 @@ import { ofType } from 'redux-observable'
 import { actions as toastrActions } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
+import { RESDEX } from '~/constants/resdex'
 import { flattenDecimals } from '~/utils/decimal'
 import { SwapDBService } from '~/service/resdex/swap-db'
 import { ResDexApiService } from '~/service/resdex/api'
@@ -48,6 +49,8 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
     const { orderBook } = state$.value.resDex.buySell
 
     const { price } = orderBook.asks[0]
+
+    // Price*0.15%+0.0001+0.0001
 
 		const requestOpts = {
 			type: 'buy',

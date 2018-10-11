@@ -43,8 +43,7 @@ export type ResDexState = {
     }
   },
   orders: {
-    openOrders: Order[],
-    completedOrders: Order[]
+    swapHistory: [],
   },
   accounts: {
     currencies: { [string]: Currency },
