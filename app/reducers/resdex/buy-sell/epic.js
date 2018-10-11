@@ -7,6 +7,7 @@ import { ofType } from 'redux-observable'
 import { actions as toastrActions } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
+import { flattenDecimals } from '~/utils/decimal'
 import { SwapDBService } from '~/service/resdex/swap-db'
 import { ResDexApiService } from '~/service/resdex/api'
 import { ResDexBuySellActions } from './reducer'
@@ -67,7 +68,9 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
         }
 
         const swap = result.pending
-        swapDB.insertSwapData(swap, requestOpts)
+        const flattenedOptions = flattenDecimals(requestOpts)
+        log.debug(`Inserting a swap`, flattenedOptions)
+        swapDB.insertSwapData(swap, flattenedOptions)
 
         return of(ResDexBuySellActions.createMarketOrderSucceeded())
       }),

@@ -19,18 +19,26 @@ const api = new ResDexApiService()
 const initSwapHistoryEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexOrdersActions.initSwapHistory),
   map(() => {
-		swapDB.on('change', getStore().dispatch(ResDexOrdersActions.getSwapHistory()))
+    swapDB.on('change', () => { getStore().dispatch(ResDexOrdersActions.getSwapHistory()) } )
 
     const { swapHistory } = state$.value.resDex.orders
 
-		api.socket.on('message', message => {
-			const uuids = swapHistory.map(swap => swap.uuid)
+    from(api.enableSocket()).pipe(
+      map(() => {
+        api.socket.on('message', message => {
+          log.debug(`Got a ResDEX socket message`, message)
+          const uuids = swapHistory.map(swap => swap.uuid)
 
-			if (uuids.includes(message.uuid)) {
-				swapDB.updateSwapData(message)
-			}
+          if (uuids.includes(message.uuid)) {
+            log.debug(`Updating swap data`)
+            swapDB.updateSwapData(message)
+          }
 
-		})
+        })
+
+        return ResDexOrdersActions.empty()
+      })
+    )
 
     return ResDexOrdersActions.getSwapHistory()
   })
@@ -40,7 +48,10 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexOrdersActions.getSwapHistory),
   switchMap(() => {
     const observable = from(swapDB.getSwaps()).pipe(
-      switchMap(swapHistory => of(ResDexOrdersActions.gotSwapHistory(swapHistory))),
+      switchMap(swapHistory => {
+        log.debug('Swap history changed', swapHistory)
+        return of(ResDexOrdersActions.gotSwapHistory(swapHistory))
+      }),
       catchError(err => {
         log.error(`Error getting swap history`, err)
 

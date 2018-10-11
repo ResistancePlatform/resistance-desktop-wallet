@@ -62,12 +62,12 @@
     background: $BASE_COLOR_GRAY_3;
   }
 
-  &.matched {
+  &.completed {
     color: $BASE_COLOR_DARK_BLUE_3;
     background: $BASE_COLOR_LIGHT_GREEN;
   }
 
-  &.unmatched {
+  &.failed {
     color: $BASE_COLOR_DARK_BLUE_3;
     background: $BASE_COLOR_LIGHT_RED;
   }

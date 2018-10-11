@@ -37,7 +37,7 @@ export class ResDex extends Component<Props> {
 	 * @returns
    * @memberof ResDex
 	 */
-  componentDidInitialMount() {
+  componentDidMount() {
     this.props.ordersActions.initSwapHistory()
   }
 

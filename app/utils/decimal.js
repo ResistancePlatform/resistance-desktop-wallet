@@ -11,7 +11,22 @@ function toDecimalPlaces(amount: Decimal, places: number = 4) {
   return amount.toDP(places, Decimal.ROUND_FLOOR).toString()
 }
 
+function flattenDecimals(object) {
+  const result = {}
+
+  Object.keys(object).forEach(key => {
+    const value = object[key]
+
+    result[key] = typeof value === typeof Decimal(0)
+      ? Number(value.toString())
+      : value
+  })
+
+  return result
+}
+
 export {
   truncateAmount,
-  toDecimalPlaces
+  toDecimalPlaces,
+  flattenDecimals
 }

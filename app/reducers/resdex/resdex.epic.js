@@ -12,6 +12,7 @@ import { ResDexService } from '~/service/resdex/resdex'
 import { ResDexLoginEpic } from './login/epic'
 import { ResDexAccountsEpic } from './accounts/epic'
 import { ResDexBuySellEpic } from './buy-sell/epic'
+import { ResDexOrdersEpic } from './orders/epic'
 
 
 const t = translate('resdex')
@@ -40,5 +41,6 @@ export const ResDexEpic = combineEpics(
   defaultEpic,
   ResDexLoginEpic,
   ResDexAccountsEpic,
+  ResDexOrdersEpic,
   ResDexBuySellEpic,
 )

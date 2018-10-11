@@ -20,10 +20,7 @@ const enableCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => act
   switchMap(() => {
     const { enabledCurrencies } = state$.value.resDex.accounts
 
-    const promises = enabledCurrencies.map(currency => api.enableCurrency(currency.symbol))
-    promises.push(api.enableSocket())
-
-    const promise = Promise.all(promises)
+    const promise = Promise.all(enabledCurrencies.map(currency => api.enableCurrency(currency.symbol)))
 
     const enableCurrenciesObservable = from(promise).pipe(
       switchMap(() => of(ResDexAccountsActions.empty())),
