@@ -19,7 +19,8 @@ import VLayout from '~/assets/styles/v-box-layout.scss'
 import styles from './ResDex.scss'
 
 type Props = {
-  resDex: ResDexState
+  resDex: ResDexState,
+  ordersActions: object
 }
 
 
@@ -31,10 +32,31 @@ export class ResDex extends Component<Props> {
 	props: Props
 
 	/**
+   * Initiates swap history fetching.
+   *
+	 * @returns
+   * @memberof ResDex
+	 */
+  componentDidInitialMount() {
+    this.props.ordersActions.initSwapHistory()
+  }
+
+	/**
 	 * @returns
    * @memberof ResDex
 	 */
   getContents() {
+    /*
+    <RpcPolling
+      interval={15.0 * 60}
+      actions={{
+        polling: ResDexOrdersActions.kickStartStuckSwaps,
+        success: ResDexAccountsActions.kickStartStuckSwapsSucceeded,
+        failure: ResDexAccountsActions.kickStartStuckSwapsFailed
+      }}
+    />
+    */
+
     return (
       <div>
         <RpcPolling

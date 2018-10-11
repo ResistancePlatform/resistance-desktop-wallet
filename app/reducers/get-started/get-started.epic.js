@@ -1,7 +1,7 @@
 // @flow
 import config from 'electron-settings'
 import { of, concat, merge } from 'rxjs'
-import { filter, switchMap, take, map, mergeMap, mapTo, catchError } from 'rxjs/operators'
+import { filter, switchMap, take, map, mergeMap, mapTo, catchError, delay } from 'rxjs/operators'
 import { remote, ipcRenderer } from 'electron'
 import { ofType } from 'redux-observable'
 import { push } from 'react-router-redux'
@@ -86,7 +86,7 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
 
     return concat(
       of(WelcomeActions.displayHint(t(`Starting local Resistance node...`))),
-      of(SettingsActions.startLocalNode()),
+      of(SettingsActions.kickOffChildProcesses()),
       nodeStartedObservable
     )
   })
@@ -129,7 +129,7 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
     const observable = rpc.encryptWallet(choosePasswordForm.fields.password).pipe(
       switchMap(() => nodeShutDownObservable),
       catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.toString())))
-    )
+    ).pipe(delay(20000))
 
     return concat(of(WelcomeActions.displayHint(t(`Encrypting the wallet...`))), observable)
   })

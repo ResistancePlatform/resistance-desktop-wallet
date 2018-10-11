@@ -7,7 +7,7 @@ export const preloadedState: State = {
   auth: {
     reason: null,
     enter: true,
-    isLoginRequired: true,
+    isLoginRequired: true
   },
   roundedForm: {},
   fetchParameters: {
