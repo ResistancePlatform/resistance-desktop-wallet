@@ -1,4 +1,5 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import * as Joi from 'joi'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -7,6 +8,8 @@ import cn from 'classnames'
 import { translate } from 'react-i18next'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
+import { RESDEX } from '~/constants/resdex'
+import { truncateAmount, toDecimalPlaces } from '~/utils/decimal'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
@@ -39,6 +42,51 @@ type Props = {
 class ResDexBuySell extends Component<Props> {
 	props: Props
 
+  getBaseAmount(): Decimal | null {
+    const { orderBook } = this.props.buySell
+    const form = this.props.roundedForm.resDexBuySell
+
+    if (!orderBook.asks.length || !form || !form.fields) {
+      return null
+    }
+
+    const { price } = orderBook.asks[0]
+    const baseAmount = Decimal(form.fields.maxRel || '0').div(price)
+
+    return baseAmount
+  }
+
+  getMaxPayoutCaption(): string {
+    const { baseCurrency } = this.props.buySell
+    let baseAmount = this.getBaseAmount()
+
+    if (baseAmount === null) {
+      return `0 ${baseCurrency}`
+    }
+
+    const fee = RESDEX.dexFee.add(RESDEX.resFee).div(Decimal('100'))
+    baseAmount = baseAmount.sub(baseAmount.mul(fee))
+
+    return `${toDecimalPlaces(baseAmount)} ${baseCurrency}`
+  }
+
+  getAtCaption(t) {
+    const baseAmount = this.getBaseAmount()
+
+    if (baseAmount === null) {
+      return t(`No liquidity available yet`)
+    }
+
+    const { baseCurrency, quoteCurrency } = this.props.buySell
+
+    return t(`@ {{baseAmount}} {{baseCurrency}} per {{quoteCurrency}}`, {
+      baseAmount: truncateAmount(baseAmount),
+      baseCurrency,
+      quoteCurrency
+    })
+
+  }
+
   // Can't create a market order if there's no liquidity or when sending an order
   getSubmitButtonDisabledAttribute() {
     const { baseCurrency, quoteCurrency, orderBook, isSendingOrder } = this.props.buySell
@@ -59,7 +107,6 @@ class ResDexBuySell extends Component<Props> {
 	render() {
     const { t } = this.props
     const form = this.props.roundedForm.resDexBuySell
-    const { orderBook } = this.props.buySell
 
 		return (
       <div className={cn(styles.container)}>
@@ -140,57 +187,51 @@ class ResDexBuySell extends Component<Props> {
               {form && form.fields.maxRel || '0'} <span>{form && form.fields.sendFrom }</span>
             </div>
 
-            <div className={styles.at}>
-              {orderBook.asks.length
-                ? `@ X ${this.props.buySell.baseCurrency} per ${this.props.buySell.quoteCurrency}`
-                : t(`No liquidity available yet`)
-              }
-
-            </div>
+            <div className={styles.at}>{this.getAtCaption(t)}</div>
 
           </div>
 
           <div className={styles.fromTo}>
             <div className={styles.wallet}>
-              <CurrencyIcon symbol="BTC" size="1.24rem" />
+              <CurrencyIcon symbol={ this.props.buySell.quoteCurrency } size="1.24rem" />
               <div>
-                <span>Send</span>
-                BTC Wallet
+                <span>{t(`Send`)}</span>
+                {t(`{{symbol}} Wallet`, { symbol: this.props.buySell.quoteCurrency })}
               </div>
             </div>
 
             <div className={cn('icon', styles.exchangeIcon)} />
 
             <div className={styles.wallet}>
-              <CurrencyIcon symbol="ETH" size="1.24rem" />
+              <CurrencyIcon symbol={ this.props.buySell.baseCurrency } size="1.24rem" />
               <div>
-                <span>Receive</span>
-                ETH Wallet
+                <span>{t(`Receive`)}</span>
+                {t(`{{symbol}} Wallet`, { symbol: this.props.buySell.baseCurrency })}
               </div>
             </div>
 
           </div>
 
           <ul className={styles.list}>
-            <li className={styles.res}>
-              1.01679 BTC
+            <li className={cn({ [styles.res]: this.props.buySell.enhancedPrivacy })}>
+              {form && form.maxRel} {this.props.buySell.quoteCurrency}
               <hr />
-              <span>24.69 ETH</span>
+              <span>{this.getMaxPayoutCaption()}</span>
             </li>
             <li>
               {t(`DEX Fee`)}
               <hr />
-              <span>0.15%</span>
+              <span>{RESDEX.dexFee.toFixed(2)}%</span>
             </li>
             <li>
               {t(`RES Fee`)}
               <hr />
-              <span>0.10%</span>
+              <span>{RESDEX.resFee.toFixed(2)}%</span>
             </li>
             <li>
               {t(`Max. Total Payout`)}
               <hr />
-              <span>25.26 ETH</span>
+              <span>{this.getMaxPayoutCaption()}</span>
             </li>
           </ul>
 

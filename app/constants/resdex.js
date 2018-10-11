@@ -1,4 +1,8 @@
+import { Decimal } from 'decimal.js'
+
 const RESDEX = {
+  dexFee: Decimal('0.15'),
+  resFee: Decimal('0.1'),
   alwaysEnabledCurrencies: [
     {
       symbol: 'RES',
