@@ -1,4 +1,5 @@
 // @flow
+import log from 'electron-log'
 import { Decimal } from 'decimal.js'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -35,7 +36,6 @@ type Props = {
   accountsActions: object
 }
 
-
 /**
  * @class ResDexAssets
  * @extends {Component<Props>}
@@ -43,8 +43,54 @@ type Props = {
 class ResDexAssets extends Component<Props> {
 	props: Props
 
+  getPortfolioValueForHoursAgo(hoursNumber: number) {
+    const { currencyHistory } = this.props.assets
+    const { currencies } = this.props.accounts
+
+    let value = Decimal('0')
+
+    if (currencyHistory.hour) {
+      value = Object.keys(currencyHistory.hour).reduce((previousValue, symbol) => {
+        const prices = currencyHistory.hour[symbol]
+
+        if (symbol in currencies && prices) {
+          const price = prices.slice(-hoursNumber - 1)[0].value
+          return previousValue.plus(price.times(currencies[symbol].balance))
+        }
+
+        return previousValue
+      }, value)
+    }
+
+    return value
+  }
+
+  getSinceLastHour() {
+    const now = this.getPortfolioValueForHoursAgo(0)
+    const hourAgo = this.getPortfolioValueForHoursAgo(1)
+
+    if (hourAgo.isZero()) {
+      return Decimal('0')
+    }
+
+    return now.minus(hourAgo).dividedBy(hourAgo).times(Decimal(100))
+  }
+
+  getTotalPortfolioValue(): { floor: string, fraction: string } {
+    const value = this.getPortfolioValueForHoursAgo(0)
+
+    const result = {
+      floor: value.floor().toFixed(),
+      fraction: value.minus(value.floor()).toFixed(2).slice(2)
+    }
+
+    return result
+  }
+
   getWalletContents(t, symbol: string) {
     const currency = this.props.accounts.currencies[symbol]
+    const { currencyHistory } = this.props.assets
+    const price = currencyHistory.hour && currencyHistory.hour[symbol].slice(-1)[0].value
 
     return (
       <div className={styles.coin} key={symbol}>
@@ -57,7 +103,7 @@ class ResDexAssets extends Component<Props> {
         </div>
 
         <div className={styles.equity}>
-          <sub>$</sub>{currency ? toDecimalPlaces(Decimal('0.001314').mul(currency.balance), 2) : t(`N/A`)}
+          <sub>$</sub>{currency && price ? toDecimalPlaces(price.mul(currency.balance), 2) : t(`N/A`)}
         </div>
 
         <div className={styles.buttons}>
@@ -89,7 +135,9 @@ class ResDexAssets extends Component<Props> {
 	 */
 	render() {
     const { t, i18n } = this.props
-    const totalPortfolioValue = Decimal(0)
+
+    const totalPortfolioValue = this.getTotalPortfolioValue()
+    const sinceLastHour = this.getSinceLastHour()
 
 		return (
       <div className={cn(styles.container)}>
@@ -109,13 +157,17 @@ class ResDexAssets extends Component<Props> {
               {t(`Total portfolio value`)}
               <span>
                 <sup>$</sup>
-                {totalPortfolioValue.floor().toString()}
-                <sub>.{totalPortfolioValue.minus(totalPortfolioValue.floor()).toFixed()}</sub>
+                {totalPortfolioValue.floor}
+                <sub>.{totalPortfolioValue.fraction}</sub>
               </span>
             </div>
             <div>
               {t(`Since last hour`)}
-              <span><i>+</i>12,56<sub>%</sub></span>
+              <span>
+                <i className={cn({ [styles.positive]: sinceLastHour.isPositive() })}>+</i>
+                {sinceLastHour.abs().toFixed(2).replace('.', ',')}
+                <sub>%</sub>
+              </span>
             </div>
           </div>
 

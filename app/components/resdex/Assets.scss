@@ -40,10 +40,14 @@
       i {
         display: inline-block;
         position: relative;
-        color: $BASE_COLOR_LIGHT_GREEN;
+        color: $BASE_COLOR_LIGHT_RED;
         font-style: normal;
         font-size: 1.2rem;
         top: -0.3rem;
+
+        &.positive {
+          color: $BASE_COLOR_LIGHT_GREEN;
+        }
       }
     }
   }
