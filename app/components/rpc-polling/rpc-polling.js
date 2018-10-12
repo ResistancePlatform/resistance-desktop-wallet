@@ -12,6 +12,7 @@ type ActionKind = 'polling' | 'success' | 'failure'
 
 type Props = {
   interval: float,
+  criticalChildProcess?: string,
   actions: { [ActionKind]: func },
   onError?: func,
 	settings: SettingsState,

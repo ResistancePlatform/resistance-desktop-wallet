@@ -1,4 +1,5 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import pMap from 'p-map'
 
 import { RESDEX } from '~/constants/resdex'
@@ -28,48 +29,68 @@ export class CurrencyHistoryService {
 		return instance
 	}
 
-  async fetch(symbol, resolution) {
-    if (!symbol) {
-      return
-    }
+  async fetch(symbols) {
+    const history = await pMap(
+      RESDEX.currencyHistoryResolutions,
+      resolution => this::fetchSymbols(symbols, resolution), {concurrency: 2}
+    )
 
-    // We won't even bother to fetch if we know it won't work
-    if (RESDEX.ignoreExternalPrice.has(symbol) || noPriceHistory.has(symbol)) {
-      return
-    }
-
-    let json
-    try {
-      const response = await fetch(this::currencyHistoryUrl(symbol, resolution))
-      json = await response.json()
-    } catch (error) {
-      console.error('Failed to get price history:', error)
-    }
-
-    if (!json || json.Data.length === 0) {
-      noPriceHistory.add(symbol)
-      return
-    }
-
-    const prices = json.Data.map(({time, close}) => ({
-      time: time * 1000,
-      value: close,
-    }))
-
-    return prices
-  }
-
-  async fetchAll(symbols, resolution) {
-		const history = await pMap(symbols, symbol => this.fetch(symbol, resolution), {concurrency: 6});
-
-    const result = symbols.reduce((accumulated, symbol, index) => ({
+    const result = RESDEX.currencyHistoryResolutions.reduce((accumulated, resolution, index) => ({
       ...accumulated,
-      [symbol]: history[index]
+      [resolution]: history[index]
     }), {})
 
     return result
   }
 
+}
+
+async function fetchSymbols(symbols, resolution) {
+  const history = await pMap(symbols, symbol => this::fetchSymbol(symbol, resolution), {concurrency: 3})
+
+  const result = symbols.reduce((accumulated, symbol, index) => ({
+    ...accumulated,
+    [symbol]: history[index]
+  }), {})
+
+  return result
+}
+
+async function fetchSymbol(symbol, resolution) {
+  if (!symbol) {
+    return
+  }
+
+  let querySymbol = symbol
+
+  if (['HODLC', 'RES'].includes(symbol)) {
+    querySymbol = 'HODL'
+  }
+
+  // We won't even bother to fetch if we know it won't work
+  if (RESDEX.ignoreExternalPrice.has(symbol) || noPriceHistory.has(querySymbol)) {
+    return
+  }
+
+  let json
+  try {
+    const response = await fetch(this::currencyHistoryUrl(querySymbol, resolution))
+    json = await response.json()
+  } catch (error) {
+    console.error('Failed to get price history:', error)
+  }
+
+  if (!json || json.Data.length === 0) {
+    noPriceHistory.add(querySymbol)
+    return
+  }
+
+  const prices = json.Data.map(({time, close}) => ({
+    time: time * 1000,
+    value: Decimal(symbol === 'RES' ? close * 1000 : close),
+  }))
+
+  return prices
 }
 
 function currencyHistoryUrl(symbol, resolution) {

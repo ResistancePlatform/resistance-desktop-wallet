@@ -49,7 +49,7 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   switchMap(() => {
     const observable = from(swapDB.getSwaps()).pipe(
       switchMap(swapHistory => {
-        log.debug('Swap history changed', swapHistory)
+        log.debug(`Swap history changed, got ${swapHistory.length} swaps`)
         return of(ResDexOrdersActions.gotSwapHistory(swapHistory))
       }),
       catchError(err => {

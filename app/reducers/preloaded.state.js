@@ -114,7 +114,7 @@ export const preloadedState: State = {
       portfolios: []
     },
     assets: {
-      resolution: 'hour',
+      resolution: 'month',
       currencyHistory: {},
     },
     buySell: {

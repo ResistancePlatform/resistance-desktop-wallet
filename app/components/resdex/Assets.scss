@@ -54,7 +54,7 @@
   }
 }
 
-.period {
+.resolution {
   $bulletDiameter: 1.35rem;
   user-select: none;
   float: right;
@@ -66,7 +66,7 @@
   white-space: nowrap;
 
   li {
-    cursor: default;
+    cursor: pointer;
     color: #9fabdc;
     display: inline-block;
     font-size: 0.6rem;
@@ -84,27 +84,6 @@
       border-radius: 50%;
     }
   }
-}
-
-.chartContainer {
-  height: 7.43rem;
-  margin-bottom: 1.35rem;
-
-  .tooltip {
-    border-radius: 0.4rem;
-    font-size: 0.6rem;
-    font-family: inherit;
-    background: #262c47;
-    color: #a4abc7;
-    padding: 0.4rem;
-    font-weight: 100;
-
-    strong {
-      color: $BASE_COLOR_WHITE;
-      font-weight: 100;
-    }
-  }
-
 }
 
 .coins {

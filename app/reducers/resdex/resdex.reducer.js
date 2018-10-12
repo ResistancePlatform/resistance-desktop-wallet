@@ -35,10 +35,10 @@ export type ResDexState = {
   assets: {
     resolution: CurrencyHistoryResolution,
     currencyHistory: {
-      [CurrencyHistoryResolution]: {
+      [CurrencyHistoryResolution]: undefined | {
         [string]: {
           time: number,
-          value: number
+          value: any
         }[]
       }
     }

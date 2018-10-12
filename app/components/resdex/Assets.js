@@ -1,30 +1,37 @@
 // @flow
-import moment from 'moment'
 import { Decimal } from 'decimal.js'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  Tooltip,
-} from 'recharts'
 
+import { RESDEX } from '~/constants/resdex'
 import { toDecimalPlaces } from '~/utils/decimal'
+import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
+import { ResDexAssetsActions } from '~/reducers/resdex/assets/reducer'
 import CurrencyIcon from './CurrencyIcon'
+import Chart from './Chart'
 import { getCurrencyName } from '~/utils/resdex'
 
 import styles from './Assets.scss'
+
+
+const getResolutionCaption = (t, resolution) => ({
+  hour: t(`1H`),
+  day: t(`24H`),
+  week: t(`1W`),
+  month: t(`1M`),
+  year: t(`1Y`),
+})[resolution]
 
 type Props = {
   t: any,
   i18n: any,
   accounts: ResDexAccountsState,
+  assets: ResDexAssetsState,
+  actions: object,
   accountsActions: object
 }
 
@@ -75,24 +82,6 @@ class ResDexAssets extends Component<Props> {
   }
 
 
-  renderTooltip({payload}) {
-    if (payload.length === 0) {
-      return null
-    }
-
-    const value = payload[0].payload
-    const time = moment.unix(value.x).locale(this.props.i18n.language).format('L kk:mm')
-
-    return (
-
-      <div className={styles.tooltip}>
-        <strong>${value.y.toFixed(2)}</strong>
-        &nbsp;
-        {time}
-      </div>
-    )
-  }
-
 	/**
 	 * @returns
    *
@@ -100,34 +89,29 @@ class ResDexAssets extends Component<Props> {
 	 */
 	render() {
     const { t, i18n } = this.props
-
-    const btcPlotPrices = [
-      {'x':1511308800, 'y':8268.035}, {'x':1511395200, 'y':8148.95}, {'x':1511481600, 'y':8250.978333333334}, {'x':1511568000, 'y':8707.407266666667},
-      {'x':1511654400, 'y':9284.1438}, {'x':1511740800, 'y':9718.29505}, {'x':1511827200, 'y':9952.50882}, {'x':1511913600, 'y':9879.328333333333},
-      {'x':1512000000, 'y':10147.372}, {'x':1512086400, 'y':10883.912}, {'x':1512172800, 'y':11071.368333333332}, {'x':1512259200, 'y':11332.622},
-      {'x':1512345600, 'y':11584.83}, {'x':1512432000, 'y':11878.433333333334}, {'x':1512518400, 'y':13540.980000000001}, {'x':1512604800, 'y':16501.971666666668},
-      {'x':1512691200, 'y':16007.436666666666}, {'x':1512777600, 'y':15142.834152123332}, {'x':1512864000, 'y':14869.805}, {'x':1512950400, 'y':16762.116666666665},
-      {'x':1513036800, 'y':17276.393333333333}, {'x':1513123200, 'y':16808.366666666665}, {'x':1513209600, 'y':16678.892}, {'x':1513296000, 'y':17771.899999999998},
-      {'x':1513382400, 'y':19498.683333333334}, {'x':1513468800, 'y':19289.785}, {'x':1513555200, 'y':18961.856666666667}, {'x':1513641600, 'y':17737.111666666668},
-      {'x':1513728000, 'y':16026.271666666667}
-    ]
-
-    const tickFormatter = tick => (
-      moment
-        .unix(tick)
-        .locale(i18n.language)
-        .format('MMM DD')
-        .toUpperCase()
-    )
+    const totalPortfolioValue = Decimal(0)
 
 		return (
       <div className={cn(styles.container)}>
+
+        <RpcPolling
+          interval={10.0 * 60 * 60}
+          actions={{
+            polling: ResDexAssetsActions.getCurrencyHistory,
+            success: ResDexAssetsActions.gotCurrencyHistory,
+            failure: ResDexAssetsActions.getCurrencyHistoryFailed
+          }}
+        />
 
         <div className={styles.top}>
           <div className={styles.summary}>
             <div>
               {t(`Total portfolio value`)}
-              <span><sup>$</sup>240<sub>.12</sub></span>
+              <span>
+                <sup>$</sup>
+                {totalPortfolioValue.floor().toString()}
+                <sub>.{totalPortfolioValue.minus(totalPortfolioValue.floor()).toFixed()}</sub>
+              </span>
             </div>
             <div>
               {t(`Since last hour`)}
@@ -135,66 +119,34 @@ class ResDexAssets extends Component<Props> {
             </div>
           </div>
 
-          <ul className={styles.period}>
-            <li>{t(`1H`)}</li>
-            <li>{t(`24H`)}</li>
-            <li>{t(`1W`)}</li>
-            <li className={styles.active}>{t(`1M`)}</li>
-            <li>{t(`1Y`)}</li>
+          <ul className={styles.resolution}>
+            {
+              RESDEX.currencyHistoryResolutions.map((resolution) => (
+                <li
+                  role="none"
+                  key={resolution}
+                  className={cn({ [styles.active]: resolution === this.props.assets.resolution })}
+                  onClick={() => this.props.actions.changeChartResolution(resolution)}
+                >
+                  {getResolutionCaption(t, resolution)}
+                </li>
+              ))
+            }
           </ul>
         </div>
 
-        <div className={styles.chartContainer}>
-          <ResponsiveContainer width="100%" height="100%" debounce={1}>
-            <AreaChart
-              data={btcPlotPrices}
-              margin={{left: 0, right: 0, top: 0, bottom: 0}}
-            >
-              <defs>
-                <linearGradient id="fillGradient" x1="0" y1="1" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#1e4266" />
-                  <stop offset="100%" stopColor="#3f356e" />
-                </linearGradient>
-                <linearGradient id="strokeGradient" x1="0" y1="1" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#009ed7" />
-                  <stop offset="100%" stopColor="#9c62e5" />
-                </linearGradient>
-              </defs>
+        <Chart
+          language={i18n.language}
+          resolution={this.props.assets.resolution}
+          currencies={this.props.accounts.currencies}
+          currencyHistory={this.props.assets.currencyHistory}
+        />
 
-              <Area type="monotone" dataKey="y" stroke="url(#strokeGradient)" fill="url(#fillGradient)" fillOpacity={1}/>
+      <div className={styles.coins}>
+        {this.props.accounts.enabledCurrencies.map(currency => this.getWalletContents(t, currency.symbol))}
+      </div>
 
-              <XAxis
-                dataKey="x"
-                height={1}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={tickFormatter}
-                tick={{
-                  fill: '#a4abc7',
-                  fontFamily: 'inherit',
-                  fontSize: '0.55rem',
-                  fontWeight: 100,
-                  dy: -35,
-                }}
-                scale="time"
-                type="number"
-                domain={['dataMin', 'dataMax']}
-              />
-
-              <Tooltip
-                cursor={{ stroke: '#9168db', strokeWidth: 1 }}
-                content={data => this.renderTooltip(data)}
-              />
-
-              </AreaChart>
-            </ResponsiveContainer>
-  </div>
-
-  <div className={styles.coins}>
-    {this.props.accounts.enabledCurrencies.map(currency => this.getWalletContents(t, currency.symbol))}
-  </div>
-
-</div>
+      </div>
     )
   }
 }
@@ -205,6 +157,7 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(ResDexAssetsActions, dispatch),
   accountsActions: bindActionCreators(ResDexAccountsActions, dispatch)
 })
 
