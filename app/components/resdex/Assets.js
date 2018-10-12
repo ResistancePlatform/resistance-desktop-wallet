@@ -90,7 +90,8 @@ class ResDexAssets extends Component<Props> {
   getWalletContents(t, symbol: string) {
     const currency = this.props.accounts.currencies[symbol]
     const { currencyHistory } = this.props.assets
-    const price = currencyHistory.hour && currencyHistory.hour[symbol].slice(-1)[0].value
+    const hourHistory = currencyHistory.hour && currencyHistory.hour[symbol]
+    const price = hourHistory && hourHistory.slice(-1)[0].value
 
     return (
       <div className={styles.coin} key={symbol}>
