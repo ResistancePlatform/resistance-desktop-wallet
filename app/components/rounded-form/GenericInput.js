@@ -1,10 +1,11 @@
 // @flow
+import log from 'electron-log'
 import React, { Component } from 'react'
 import cn from 'classnames'
 
-import styles from './RoundedInput.scss'
+import genericStyles from './GenericInput.scss'
 
-type Props = {
+type GenericProps = {
   className?: string,
   labelClassName?: string,
 	label?: string,
@@ -13,15 +14,13 @@ type Props = {
 	onChange?: value => void,
 	disabled?: boolean,
   readOnly?: boolean,
-  important?: boolean,
-	tooltip?: string,
-  onEnterDown: func,
+	title?: string,
   error?: string | null,
 	children: any
 }
 
 export default class GenericInput extends Component<Props> {
-	props: Props
+	props: GenericProps
 
   static get displayName() { return 'GenericInput' }
 
@@ -33,9 +32,48 @@ export default class GenericInput extends Component<Props> {
 		}
 	}
 
+  appendContent() {
+    return null
+  }
+
+  renderContent() {
+    log.error(`Generic input component cannot be used directly and should be inherited`)
+    return null
+  }
+
 	render() {
 		return (
-      <div className={styles.container} disabled={this.props.disabled} >
+      <div className={genericStyles.wrapper}>
+        <div
+          className={cn(
+            this.props.className,
+            genericStyles.container,
+            { [genericStyles.hasError]: Boolean(this.props.error) }
+          )}
+          disabled={this.props.disabled}
+        >
+
+        {this.props.label &&
+          <div className={cn(this.props.labelClassName, genericStyles.label)}>
+            {this.props.label}
+          </div>
+        }
+
+        <div className={genericStyles.content}>
+          {this.renderContent()}
+        </div>
+
+        {this.props.children &&
+          this.props.children}
+        </div>
+
+        <div className={genericStyles.error}>
+          {this.props.error
+            && !this.state.isFocused
+            && this.props.error
+          }
+        </div>
+
       </div>
 		)
 	}

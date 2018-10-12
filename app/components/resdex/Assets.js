@@ -1,19 +1,18 @@
 // @flow
-import { Decimal } from 'decimal.js'
 import moment from 'moment'
+import { Decimal } from 'decimal.js'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
 import {
-  FlexibleWidthXYPlot,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
   XAxis,
-  GradientDefs,
-  linearGradient,
-  LineSeries,
-  AreaSeries
-} from 'react-vis'
+  Tooltip,
+} from 'recharts'
 
 import { toDecimalPlaces } from '~/utils/decimal'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
@@ -24,6 +23,7 @@ import styles from './Assets.scss'
 
 type Props = {
   t: any,
+  i18n: any,
   accounts: ResDexAccountsState,
   accountsActions: object
 }
@@ -74,13 +74,32 @@ class ResDexAssets extends Component<Props> {
     )
   }
 
+
+  renderTooltip({payload}) {
+    if (payload.length === 0) {
+      return null
+    }
+
+    const value = payload[0].payload
+    const time = moment.unix(value.x).locale(this.props.i18n.language).format('L kk:mm')
+
+    return (
+
+      <div className={styles.tooltip}>
+        <strong>${value.y.toFixed(2)}</strong>
+        &nbsp;
+        {time}
+      </div>
+    )
+  }
+
 	/**
 	 * @returns
    *
    * @memberof ResDexAssets
 	 */
 	render() {
-    const { t } = this.props
+    const { t, i18n } = this.props
 
     const btcPlotPrices = [
       {'x':1511308800, 'y':8268.035}, {'x':1511395200, 'y':8148.95}, {'x':1511481600, 'y':8250.978333333334}, {'x':1511568000, 'y':8707.407266666667},
@@ -93,11 +112,13 @@ class ResDexAssets extends Component<Props> {
       {'x':1513728000, 'y':16026.271666666667}
     ]
 
-    const maxPrice = Math.max(...btcPlotPrices.map(point => point.y))
-    const plotData = btcPlotPrices.map((point, index) => ({
-      x: moment().add(-btcPlotPrices.length + index - 1, 'days'),
-      y: point.y
-    }))
+    const tickFormatter = tick => (
+      moment
+        .unix(tick)
+        .locale(i18n.language)
+        .format('MMM DD')
+        .toUpperCase()
+    )
 
 		return (
       <div className={cn(styles.container)}>
@@ -124,54 +145,49 @@ class ResDexAssets extends Component<Props> {
         </div>
 
         <div className={styles.chartContainer}>
-          <FlexibleWidthXYPlot
-            className={styles.chart}
-            height={119}
-            yDomain={[maxPrice / 8, maxPrice]}
-            xType="time"
-            margin={{left: 0, right: 0, top: 0, bottom: 0}}
-          >
+          <ResponsiveContainer width="100%" height="100%" debounce={1}>
+            <AreaChart
+              data={btcPlotPrices}
+              margin={{left: 0, right: 0, top: 0, bottom: 0}}
+            >
+              <defs>
+                <linearGradient id="fillGradient" x1="0" y1="1" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#1e4266" />
+                  <stop offset="100%" stopColor="#3f356e" />
+                </linearGradient>
+                <linearGradient id="strokeGradient" x1="0" y1="1" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#009ed7" />
+                  <stop offset="100%" stopColor="#9c62e5" />
+                </linearGradient>
+              </defs>
 
-          <GradientDefs>
-            <linearGradient id="fillGradient" x1="0" y1="1" x2="1" y2="1">
-              <stop offset="0%" stopColor="#1e4266" />
-              <stop offset="100%" stopColor="#3f356e" />
-            </linearGradient>
-            <linearGradient id="outlineGradient" x1="0" y1="1" x2="1" y2="1">
-              <stop offset="0%" stopColor="#009ed7" />
-              <stop offset="100%" stopColor="#9c62e5" />
-            </linearGradient>
-          </GradientDefs>
+              <Area type="monotone" dataKey="y" stroke="url(#strokeGradient)" fill="url(#fillGradient)" fillOpacity={1}/>
 
-          <AreaSeries
-            color="url(#fillGradient)"
-            data={plotData}
-          />
+              <XAxis
+                dataKey="x"
+                height={1}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={tickFormatter}
+                tick={{
+                  fill: '#a4abc7',
+                  fontFamily: 'inherit',
+                  fontSize: '0.55rem',
+                  fontWeight: 100,
+                  dy: -35,
+                }}
+                scale="time"
+                type="number"
+                domain={['dataMin', 'dataMax']}
+              />
 
-        {/* Outline */}
-        <LineSeries
-          strokeWidth={1}
-          color="url(#outlineGradient)"
-          data={plotData}
-        />
+              <Tooltip
+                cursor={{ stroke: '#9168db', strokeWidth: 1 }}
+                content={data => this.renderTooltip(data)}
+              />
 
-      <XAxis
-        left={20}
-        tickTotal={9}
-        top={78}
-        style={{
-          line: {stroke: 'transparent'},
-          text: {
-            fill: '#a4abc7',
-            fontFamily: 'inherit',
-            fontSize: '0.55rem',
-            fontWeight: '100',
-            textTransform: 'uppercase'
-          }
-        }}
-        hideLine
-      />
-    </FlexibleWidthXYPlot>
+              </AreaChart>
+            </ResponsiveContainer>
   </div>
 
   <div className={styles.coins}>

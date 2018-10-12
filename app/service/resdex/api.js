@@ -39,8 +39,6 @@ export class ResDexApiService {
 	currentQueueId = 0
 
 	/**
-	 * Creates an instance of ResDexApiService.
-   *
 	 * @memberof ResDexApiService
 	 */
 	constructor() {

@@ -25,12 +25,23 @@ export type Portfolio = {
   appVersion: string
 }
 
+export type CurrencyHistoryResolution = 'hour' | 'day' | 'week' | 'month' | 'year'
+
 export type ResDexState = {
   login: {
     isRequired: boolean,
     portfolios: Portfolio[]
   },
   assets: {
+    resolution: CurrencyHistoryResolution,
+    currencyHistory: {
+      [CurrencyHistoryResolution]: {
+        [string]: {
+          time: number,
+          value: number
+        }[]
+      }
+    }
   },
   buySell: {
     baseCurrency: string,
@@ -43,7 +54,7 @@ export type ResDexState = {
     }
   },
   orders: {
-    swapHistory: [],
+    swapHistory: []
   },
   accounts: {
     currencies: { [string]: Currency },
