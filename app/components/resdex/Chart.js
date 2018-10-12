@@ -88,10 +88,19 @@ class Chart extends Component<Props> {
    * @memberof ResDexAssets
 	 */
   render() {
+
+    const timeFormat = {
+      hour: 'kk:mm',
+      day: 'ddd kk:mm',
+      week: 'MMM DD kk:mm',
+      month: 'MMM DD',
+      year: 'YYYY'
+    }[this.props.resolution]
+
     const tickFormatter = tick => (
       moment(tick)
         .locale(this.props.language)
-        .format('MMM DD')
+        .format(timeFormat)
         .toUpperCase()
     )
 

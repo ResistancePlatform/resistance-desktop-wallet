@@ -118,6 +118,7 @@ class ResDexBuySell extends Component<Props> {
 		return (
       <div className={cn(styles.container)}>
         <RpcPolling
+          criticalChildProcess="RESDEX"
           interval={1.0}
           actions={{
             polling: ResDexBuySellActions.getOrderBook,

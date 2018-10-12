@@ -127,6 +127,7 @@ class Overview extends Component<Props> {
 
         <RpcPolling
           interval={walletInfoPollingInterval}
+          criticalChildProcess="NODE"
           actions={{
             polling: OverviewActions.getWalletInfo,
             success: OverviewActions.gotWalletInfo,
@@ -136,6 +137,7 @@ class Overview extends Component<Props> {
 
         <RpcPolling
           interval={transactionsPollingInterval}
+          criticalChildProcess="NODE"
           actions={{
             polling: OverviewActions.getTransactionDataFromWallet,
             success: OverviewActions.gotTransactionDataFromWallet,

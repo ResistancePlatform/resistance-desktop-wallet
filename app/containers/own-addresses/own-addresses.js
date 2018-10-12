@@ -91,6 +91,7 @@ class OwnAddresses extends Component<Props> {
 			>
         <RpcPolling
           interval={pollingInterval}
+          criticalChildProcess="NODE"
           actions={{
             polling: OwnAddressesActions.getOwnAddresses,
             success: OwnAddressesActions.gotOwnAddresses,

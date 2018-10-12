@@ -49,6 +49,7 @@ export class ResDex extends Component<Props> {
     /*
     <RpcPolling
       interval={15.0 * 60}
+      criticalChildProcess="RESDEX"
       actions={{
         polling: ResDexOrdersActions.kickStartStuckSwaps,
         success: ResDexAccountsActions.kickStartStuckSwapsSucceeded,
@@ -61,6 +62,7 @@ export class ResDex extends Component<Props> {
       <div>
         <RpcPolling
           interval={1.0}
+          criticalChildProcess="RESDEX"
           actions={{
             polling: ResDexAccountsActions.getCurrencies,
             success: ResDexAccountsActions.gotCurrencies,

@@ -147,6 +147,7 @@ class SystemInfo extends Component<Props> {
 		return (
 			<div className={cn(styles.systemInfoContainer, HLayout.hBoxContainer)}>
         <RpcPolling
+          criticalChildProcess="NODE"
           interval={daemonInfoPollingInterval}
           actions={{
             polling: SystemInfoActions.getDaemonInfo,
@@ -157,6 +158,7 @@ class SystemInfo extends Component<Props> {
 
         <RpcPolling
           interval={blockchainInfoPollingInterval}
+          criticalChildProcess="NODE"
           actions={{
             polling: SystemInfoActions.getBlockchainInfo,
             success: SystemInfoActions.gotBlockchainInfo,
@@ -166,6 +168,7 @@ class SystemInfo extends Component<Props> {
 
         <RpcPolling
           interval={operationsPollingInterval}
+          criticalChildProcess="NODE"
           actions={{
             polling: SystemInfoActions.getOperations,
             success: SystemInfoActions.gotOperations,

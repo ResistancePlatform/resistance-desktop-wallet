@@ -4,7 +4,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { appStore } from '~/store/configureStore'
+import { getStore } from '~/store/configureStore'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { RpcPollingActions, RpcPollingState } from '~/reducers/rpc-polling/rpc-polling.reducer'
 
@@ -41,9 +41,13 @@ class RpcPolling extends Component<Props> {
 	componentDidMount() {
     const { actions } = this.props
     this.isActive = false
-    appStore.dispatch(RpcPollingActions.registerActions(
-      actions.polling.toString(), actions.success.toString(), actions.failure.toString()
-    ))
+
+    if (this.props.criticalChildProcess) {
+      getStore().dispatch(RpcPollingActions.registerActions(
+        actions.polling.toString(), actions.success.toString(), actions.failure.toString()
+      ))
+    }
+
     this.start()
 	}
 
@@ -52,13 +56,19 @@ class RpcPolling extends Component<Props> {
 	 * @memberof RpcPolling
 	 */
   componentDidUpdate() {
-    const isNodeRunning = this.props.settings.childProcessesStatus.NODE === 'RUNNING'
+    const { criticalChildProcess } = this.props
+
+    if (!criticalChildProcess) {
+      return
+    }
+
+    const isNodeRunning = this.props.settings.childProcessesStatus[criticalChildProcess] === 'RUNNING'
 
     /**
      * Resend mechanism: If already got queued action and `NODE` status is `RUNNING`, then resend the polling action immediate
      */
     if (isNodeRunning && this.isActionQueued) {
-      this.dispatchActionIfNodeReady()
+      this.dispatchActionIfNeeded()
     }
   }
 
@@ -70,7 +80,7 @@ class RpcPolling extends Component<Props> {
 			clearInterval(this.intervalId)
       this.intervalId = -1
 		}
-    appStore.dispatch(RpcPollingActions.unregisterActions(this.props.actions.polling.toString()))
+    getStore().dispatch(RpcPollingActions.unregisterActions(this.props.actions.polling.toString()))
 	}
 
 	/**
@@ -78,14 +88,21 @@ class RpcPolling extends Component<Props> {
 	 */
   start() {
     this.isActionQueued = false
-    this.dispatchActionIfNodeReady()
+    this.dispatchActionIfNeeded()
     this.intervalId = setInterval(
-      () => { this.dispatchActionIfNodeReady() },
+      () => { this.dispatchActionIfNeeded() },
         this.props.interval * 1000
     )
   }
 
-  dispatchActionIfNodeReady() {
+  dispatchActionIfNeeded() {
+    const { criticalChildProcess } = this.props
+
+    if (!criticalChildProcess) {
+      getStore().dispatch(this.props.actions.polling())
+      return
+    }
+
     const pollingActionType = this.props.actions.polling.toString()
 
     // Make sure a response to the previously dispatched action has been received
@@ -95,13 +112,16 @@ class RpcPolling extends Component<Props> {
       return
     }
 
-    if (this.props.settings.childProcessesStatus.NODE === 'RUNNING') {
+    if (this.props.settings.childProcessesStatus[criticalChildProcess] === 'RUNNING') {
       this.isActionQueued = false
       this.isActive = true
-      appStore.dispatch(this.props.actions.polling())
+      getStore().dispatch(this.props.actions.polling())
     } else {
       this.isActionQueued = true
-      this.props.onError ? this.props.onError(this.props.actions.polling) : null
+
+      if (this.props.onError) {
+        this.props.onError(this.props.actions.polling)
+      }
     }
   }
 
