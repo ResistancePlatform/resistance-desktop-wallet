@@ -6,4 +6,5 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Allows module import when the store is not yet initialized
-module.exports.getStore = () => module.exports.appStore
+export const getStore = () => module.exports.appStore
+module.exports.getStore = getStore

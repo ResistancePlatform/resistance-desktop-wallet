@@ -19,7 +19,8 @@ const api = new ResDexApiService()
 const initSwapHistoryEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexOrdersActions.initSwapHistory),
   map(() => {
-    swapDB.on('change', () => { getStore().dispatch(ResDexOrdersActions.getSwapHistory()) } )
+    const store = getStore()
+    swapDB.on('change', () => { store.dispatch(ResDexOrdersActions.getSwapHistory()) } )
 
     const { swapHistory } = state$.value.resDex.orders
 
