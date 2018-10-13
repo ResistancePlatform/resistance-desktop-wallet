@@ -1,4 +1,5 @@
 // @flow
+import log from 'electron-log'
 import { Decimal } from 'decimal.js'
 import { of, from, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
@@ -20,10 +21,29 @@ const enableCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => act
   switchMap(() => {
     const { enabledCurrencies } = state$.value.resDex.accounts
 
-    const promise = Promise.all(enabledCurrencies.map(currency => api.enableCurrency(currency.symbol)))
+    const symbols = enabledCurrencies.map(currency => currency.symbol)
+    const enableCurrenciesPromise = Promise.all(symbols.map(symbol => api.enableCurrency(symbol)))
+    const getFeesPromise = Promise.all(symbols.map(symbol => api.getFee(symbol)))
 
-    const enableCurrenciesObservable = from(promise).pipe(
-      switchMap(() => of(ResDexAccountsActions.empty())),
+    const getFeesObservable = from(getFeesPromise).pipe(
+      switchMap(fees => {
+        const feesMap = fees.reduce((previous, fee, index) =>(
+          { ...previous, [symbols[index]]: fee }
+        ), {})
+        return of(ResDexAccountsActions.gotCurrencyFees(feesMap))
+      }),
+      catchError(err => {
+        log.error(`Failed to get currencies fees`, err)
+
+        return of(toastrActions.add({
+          type: 'error',
+          title: t(`Error getting currencies fees`),
+        }))
+      })
+    )
+
+    const enableCurrenciesObservable = from(enableCurrenciesPromise).pipe(
+      switchMap(() => getFeesObservable),
       catchError(err => of(toastrActions.add({
         type: 'error',
         title: t(`Error enabling currencies`),

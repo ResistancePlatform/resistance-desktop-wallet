@@ -7,7 +7,7 @@ export const preloadedState: State = {
   auth: {
     reason: null,
     enter: true,
-    isLoginRequired: process.env.NODE_ENV !== 'development'
+    isLoginRequired: true,
   },
   roundedForm: {},
   fetchParameters: {
@@ -134,6 +134,7 @@ export const preloadedState: State = {
     accounts: {
       currencies: {},
       enabledCurrencies: [],
+      currencyFees: {},
       depositModal: {
         isVisible: false,
         symbol: null

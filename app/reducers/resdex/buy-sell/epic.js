@@ -46,19 +46,21 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
 	ofType(ResDexBuySellActions.createMarketOrder),
   switchMap(() => {
 		const { sendFrom, receiveTo, maxRel } = state$.value.roundedForm.resDexBuySell.fields
-    const { orderBook } = state$.value.resDex.buySell
+    const { quoteCurrency, orderBook } = state$.value.resDex.buySell
 
+    const txFee = state$.value.resDex.accounts.currencyFees[quoteCurrency]
     const { price } = orderBook.asks[0]
 
-    // Price*0.15%+0.0001+0.0001
+    const dexFee = RESDEX.dexFee.div(Decimal('100'))
+    const divider = price.plus(price.times(dexFee)).plus(txFee)
 
 		const requestOpts = {
 			type: 'buy',
 			baseCurrency: receiveTo,
 			quoteCurrency: sendFrom,
-			price,
-			amount: Decimal(maxRel).div(price),
-			total: Decimal(maxRel)
+			price: divider,
+			amount: Decimal(maxRel).dividedBy(price).toDP(8, Decimal.ROUND_FLOOR),
+			total: Decimal(maxRel).toDP(8, Decimal.ROUND_FLOOR)
 		}
 
     log.debug(`Submitting a swap`, requestOpts)
@@ -72,7 +74,7 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
 
         const swap = result.pending
         const flattenedOptions = flattenDecimals(requestOpts)
-        log.debug(`Inserting a swap`, flattenedOptions)
+        log.debug(`Inserting a swap`, result.swaps, swap, flattenedOptions)
         swapDB.insertSwapData(swap, flattenedOptions)
 
         return of(ResDexBuySellActions.createMarketOrderSucceeded())
@@ -95,22 +97,24 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
 
 const createMarketOrderSucceededEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.createMarketOrderSucceeded),
-  map(() => (
+  switchMap(() => of(
     toastrActions.add({
       type: 'success',
       title: t(`Market order created successfully`),
-    })
+    }),
+    ResDexBuySellActions.empty()
   ))
 )
 
 const createMarketOrderFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.createMarketOrderFailed),
-  map(action => (
+  switchMap(action => of(
     toastrActions.add({
       type: 'error',
       title: t(`Error creating a market order`),
       message: action.payload.errorMessage,
-    })
+    }),
+    ResDexBuySellActions.empty()
   ))
 )
 

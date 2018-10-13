@@ -9,6 +9,7 @@ import { translate } from 'react-i18next'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
 import { RESDEX } from '~/constants/resdex'
+import { calculateMaxTotalPayout } from '~/utils/resdex'
 import { truncateAmount, toDecimalPlaces } from '~/utils/decimal'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
@@ -18,6 +19,7 @@ import RoundedInput from '~/components/rounded-form/RoundedInput'
 import ChooseWallet from '~/components/rounded-form/ChooseWallet'
 import CurrencyIcon from './CurrencyIcon'
 
+import animatedSpinner from '~/assets/images/animated-spinner.svg'
 import styles from './BuySell.scss'
 
 const validationSchema = Joi.object().keys({
@@ -42,8 +44,8 @@ type Props = {
 class ResDexBuySell extends Component<Props> {
 	props: Props
 
-  getBaseAmount(): Decimal | null {
-    const { orderBook } = this.props.buySell
+  getBaseAmount(applyFees: boolean = false): Decimal | null {
+    const { quoteCurrency, orderBook } = this.props.buySell
     const form = this.props.roundedForm.resDexBuySell
 
     if (!orderBook.asks.length || !form || !form.fields) {
@@ -51,21 +53,23 @@ class ResDexBuySell extends Component<Props> {
     }
 
     const { price } = orderBook.asks[0]
-    const baseAmount = Decimal(form.fields.maxRel || '0').div(price)
+    const quoteAmount = Decimal(form.fields.maxRel || '0')
 
-    return baseAmount
+    if (applyFees) {
+      const txFee = this.props.accounts.currencyFees[quoteCurrency]
+      return calculateMaxTotalPayout(quoteAmount, price, txFee || Decimal(0))
+    }
+
+    return quoteAmount.div(price)
   }
 
   getMaxPayoutCaption(): string {
     const { baseCurrency } = this.props.buySell
-    let baseAmount = this.getBaseAmount()
+    const baseAmount = this.getBaseAmount(true)
 
     if (baseAmount === null) {
       return `0 ${baseCurrency}`
     }
-
-    const fee = RESDEX.dexFee.add(RESDEX.resFee).div(Decimal('100'))
-    baseAmount = baseAmount.sub(baseAmount.mul(fee))
 
     return `${toDecimalPlaces(baseAmount)} ${baseCurrency}`
   }
@@ -114,6 +118,7 @@ class ResDexBuySell extends Component<Props> {
 	render() {
     const { t } = this.props
     const { baseCurrency, quoteCurrency } = this.props.buySell
+    const txFee = this.props.accounts.currencyFees[quoteCurrency]
 
 		return (
       <div className={cn(styles.container)}>
@@ -176,8 +181,11 @@ class ResDexBuySell extends Component<Props> {
                 <button
                   type="submit"
                   onClick={this.props.actions.createMarketOrder}
-                  disabled={this.getSubmitButtonDisabledAttribute()}
+                  disabled={txFee && this.getSubmitButtonDisabledAttribute()}
                 >
+                  {this.props.buySell.isSendingOrder &&
+                    <img src={animatedSpinner} alt={t(`Sending the order...`)} />
+                  }
                   {t(`Exchange`)}
                 </button>
               </RoundedForm>
@@ -236,9 +244,9 @@ class ResDexBuySell extends Component<Props> {
               <span>{RESDEX.dexFee.toFixed(2)}%</span>
             </li>
             <li>
-              {t(`RES Fee`)}
+              {t(`{{symbol}} Fee`, { symbol: quoteCurrency })}
               <hr />
-              <span>{RESDEX.resFee.toFixed(2)}%</span>
+              <span>{txFee && txFee.toString()}</span>
             </li>
             <li>
               {t(`Max. Total Payout`)}

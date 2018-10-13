@@ -64,10 +64,10 @@ class ResDexOrders extends Component<Props> {
           {order.baseCurrency}/{order.quoteCurrency}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.lesser)}>
-          {order.quoteCurrencyAmount} {order.quoteCurrency}
+          -{order.requested.quoteCurrencyAmount} {order.quoteCurrency}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.greater)}>
-          {order.baseCurrencyAmount} {order.baseCurrency}
+          {order.requested.baseCurrencyAmount} {order.baseCurrency}
         </UniformListColumn>
         <UniformListColumn>
           <i className={cn('icon', styles.private, { [styles.enabled]: order.isPrivate })} />

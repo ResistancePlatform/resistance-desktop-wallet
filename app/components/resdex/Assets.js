@@ -143,15 +143,6 @@ class ResDexAssets extends Component<Props> {
 		return (
       <div className={cn(styles.container)}>
 
-        <RpcPolling
-          interval={10.0 * 60 * 60}
-          actions={{
-            polling: ResDexAssetsActions.getCurrencyHistory,
-            success: ResDexAssetsActions.gotCurrencyHistory,
-            failure: ResDexAssetsActions.getCurrencyHistoryFailed
-          }}
-        />
-
         <div className={styles.top}>
           <div className={styles.summary}>
             <div>

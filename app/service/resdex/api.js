@@ -64,6 +64,15 @@ export class ResDexApiService {
 		return this.socket
 	}
 
+	async getFee(coin) {
+		const response = await this.query({
+			method: 'getfee',
+			coin,
+		})
+
+		return Decimal(response.txfee)
+	}
+
   getPortfolio() {
     return this.query({ method: 'portfolio' })
   }
@@ -137,11 +146,12 @@ export class ResDexApiService {
     return this.query({
       method: opts.type,
       gtc: 1,
+      duration: 240,
       base: opts.baseCurrency,
       rel: opts.quoteCurrency,
-      basevolume: opts.amount.toString(),
-      relvolume: opts.total.toString(),
-      price: opts.price.toString(),
+      basevolume: opts.amount.toNumber(),
+      relvolume: opts.total.toNumber(),
+      price: opts.price.toNumber(),
     })
   }
 
@@ -180,6 +190,7 @@ export class ResDexApiService {
 
 }
 
+/* Querying method reusing queues, taken from HyperDEX
 async function query(data) {
 	const queueId = (this.useQueue && this.socket) ? ++this.currentQueueId : 0
 
@@ -193,3 +204,4 @@ async function query(data) {
 
 	return (this.useQueue && this.socket) ? this.socket.getResponse(queueId) : response.json()
 }
+*/

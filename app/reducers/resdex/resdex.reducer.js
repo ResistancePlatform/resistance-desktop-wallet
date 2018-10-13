@@ -59,6 +59,7 @@ export type ResDexState = {
   accounts: {
     currencies: { [string]: Currency },
     enabledCurrencies: EnabledCurrency[],
+    currencyFees: { [string]: any },
     depositModal: {
       isVisible: boolean,
       symbol: string | null

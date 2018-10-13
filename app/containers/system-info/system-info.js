@@ -9,6 +9,7 @@ import { toastr } from 'react-redux-toastr'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { getChildProcessStatusName } from '~/utils/child-process'
 import { OSService } from '~/service/os-service'
+import { ResDexAssetsActions } from '~/reducers/resdex/assets/reducer'
 import { SystemInfoActions, SystemInfoState } from '~/reducers/system-info/system-info.reducer'
 import { appStore } from '~/store/configureStore'
 import { State } from '~/reducers/types'
@@ -173,6 +174,15 @@ class SystemInfo extends Component<Props> {
             polling: SystemInfoActions.getOperations,
             success: SystemInfoActions.gotOperations,
             failure: SystemInfoActions.getOperationsFailure
+          }}
+        />
+
+        <RpcPolling
+          interval={10.0 * 60 * 60}
+          actions={{
+            polling: ResDexAssetsActions.getCurrencyHistory,
+            success: ResDexAssetsActions.gotCurrencyHistory,
+            failure: ResDexAssetsActions.getCurrencyHistoryFailed
           }}
         />
 

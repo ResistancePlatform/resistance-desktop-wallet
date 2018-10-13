@@ -1,0 +1,2 @@
+class RoundedInputWithCopy extends GenericInput {
+}
