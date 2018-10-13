@@ -95,7 +95,7 @@ class ChooseWallet extends Component<Props> {
           onKeyDown={() => false}
         />
 
-        <PopupMenu id={this.popupMenuId} relative>
+        <PopupMenu id={this.popupMenuId} className={styles.menu} relative>
           { sortedCurrencies.map(currency => (
             <PopupMenuItem
               key={currency.symbol}

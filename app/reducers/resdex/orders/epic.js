@@ -4,6 +4,7 @@ import { of, from, merge } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { actions as toastrActions } from 'react-redux-toastr'
+import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { getStore } from '~/store/configureStore'
@@ -32,6 +33,7 @@ const initSwapHistoryEpic = (action$: ActionsObservable<Action>, state$) => acti
 
           if (uuids.includes(message.uuid)) {
             log.debug(`Updating swap data`)
+            toastr.info(t(`Swap status update received`))
             swapDB.updateSwapData(message)
           }
 
