@@ -71,6 +71,7 @@
 .actionContainer {
   @extend %smallContainer;
   min-width: 23.75rem;
+  width: 100%;
   padding: 0;
 
   .enhancedPrivacy {
@@ -127,7 +128,8 @@
 
 .summaryContainer {
   @extend %smallContainer;
-  width: 17.125rem;
+  min-width: 17.125rem;
+  max-width: 17.125rem;
   margin-left: 2rem;
 
   .briefContainer {
