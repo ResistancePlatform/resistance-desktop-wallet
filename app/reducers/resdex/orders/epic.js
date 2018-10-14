@@ -3,8 +3,7 @@ import log from 'electron-log'
 import { of, from, merge } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
-import { actions as toastrActions } from 'react-redux-toastr'
-import { toastr } from 'react-redux-toastr'
+import { toastr, actions as toastrActions } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { getStore } from '~/store/configureStore'
@@ -17,19 +16,17 @@ const t = translate('resdex')
 const swapDB = new SwapDBService()
 const api = new ResDexApiService()
 
-const initSwapHistoryEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+const initSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexOrdersActions.initSwapHistory),
   map(() => {
     const store = getStore()
     swapDB.on('change', () => { store.dispatch(ResDexOrdersActions.getSwapHistory()) } )
 
-    const { swapHistory } = state$.value.resDex.orders
-
     from(api.enableSocket()).pipe(
       map(() => {
         api.socket.on('message', message => {
           log.debug(`Got a ResDEX socket message`, message)
-          const uuids = swapHistory.map(swap => swap.uuid)
+          const uuids = store.getState().resDex.orders.swapHistory.map(swap => swap.uuid)
 
           if (uuids.includes(message.uuid)) {
             log.debug(`Updating swap data`)
