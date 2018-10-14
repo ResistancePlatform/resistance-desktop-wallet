@@ -94,7 +94,7 @@ class Chart extends Component<Props> {
       day: 'ddd kk:mm',
       week: 'MMM DD kk:mm',
       month: 'MMM DD',
-      year: 'YYYY'
+      year: 'MMM YYYY'
     }[this.props.resolution]
 
     const tickFormatter = tick => (

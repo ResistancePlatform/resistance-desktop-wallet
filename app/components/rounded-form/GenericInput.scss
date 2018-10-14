@@ -1,0 +1,60 @@
+@import "~/assets/styles/vars.scss";
+
+.hasError {
+  border: 1px solid $BASE_COLOR_LIGHT_RED;
+  box-shadow: 0 0 0.4rem $BASE_COLOR_LIGHT_RED;
+}
+
+.container {
+  height: 1.7rem;
+
+  display: flex;
+  overflow: visible;
+  text-align: left;
+
+  border: 1px solid $BASE_COLOR_BORDER_GRAY;
+  border-radius: 1rem;
+
+  > div {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  padding-left: 0.9rem;
+  padding-right: 0.55rem;
+}
+
+.input {
+  overflow: hidden;
+}
+
+.label {
+  color: $BASE_COLOR_BUTTON_FONT_GRAY;
+
+  font-size: 0.61rem;
+  font-weight: 100;
+
+  padding-right: 0;
+  border-right: 1px solid $BASE_COLOR_BORDER_GRAY;
+
+  user-select: none;
+  cursor: default;
+
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.addon {
+  color: $BASE_COLOR_PURPLE;
+  font-size: 0.62rem;
+  font-weight: 100;
+  text-transform: uppercase;
+}
+
+.error {
+  padding: 2px 6px;
+  color: $BASE_COLOR_LIGHT_RED;
+  font-size: 0.6rem;
+  height: 0.75rem;
+}

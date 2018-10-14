@@ -6,7 +6,7 @@ import { remote, ipcRenderer } from 'electron'
 import { ofType } from 'redux-observable'
 import { push } from 'react-router-redux'
 
-import { i18n } from '~/i18next.config'
+import { translate } from '~/i18next.config'
 import { Action } from '../types'
 import { getChildProcessObservable } from '~/utils/child-process'
 import { AUTH } from '~/constants/auth'
@@ -18,7 +18,7 @@ import { RoundedFormActions } from '../rounded-form/rounded-form.reducer'
 import { SettingsActions } from '../settings/settings.reducer'
 
 
-const t = i18n.getFixedT(null, 'get-started')
+const t = translate('get-started')
 const bip39 = new Bip39Service()
 const rpc = new RpcService()
 

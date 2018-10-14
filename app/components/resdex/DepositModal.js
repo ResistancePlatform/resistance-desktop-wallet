@@ -7,7 +7,7 @@ import cn from 'classnames'
 import QRCode from 'qrcode.react'
 
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
-import RoundedInput, { CopyAddon } from '~/components/rounded-form/RoundedInput'
+import RoundedInputWithCopy from '~/components/rounded-form/RoundedInputWithCopy'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
 import styles from './Modal.scss'
@@ -51,12 +51,10 @@ class DepositModal extends Component<Props> {
           <QRCode className={styles.qr} value={address} />
         }
 
-        <RoundedInput
-          name="address"
+        <RoundedInputWithCopy
           labelClassName={styles.addressInputLabel}
           defaultValue={address}
           label="Address"
-          newAddon={new CopyAddon()}
           readOnly
         />
 

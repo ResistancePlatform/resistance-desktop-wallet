@@ -5,16 +5,14 @@ import cn from 'classnames'
 
 import genericStyles from './GenericInput.scss'
 
-type GenericProps = {
+export type GenericProps = {
   className?: string,
   labelClassName?: string,
+  inputClassName?: string,
+  addonClassName?: string,
 	label?: string,
-	name?: string,
-  defaultValue?: string | null,
 	onChange?: value => void,
 	disabled?: boolean,
-  readOnly?: boolean,
-	title?: string,
   error?: string | null,
 	children: any
 }
@@ -32,12 +30,12 @@ export default class GenericInput extends Component<Props> {
 		}
 	}
 
-  appendContent() {
+  renderInput() {
+    log.error(`Generic input component cannot be used directly and should be inherited`)
     return null
   }
 
-  renderContent() {
-    log.error(`Generic input component cannot be used directly and should be inherited`)
+  renderAddon(){
     return null
   }
 
@@ -59,8 +57,12 @@ export default class GenericInput extends Component<Props> {
           </div>
         }
 
-        <div className={genericStyles.content}>
-          {this.renderContent()}
+        <div className={cn(this.props.inputClassName, genericStyles.input)}>
+          {this.renderInput()}
+        </div>
+
+        <div className={cn(this.props.addonClassName, genericStyles.addon)}>
+          {this.renderAddon()}
         </div>
 
         {this.props.children &&
