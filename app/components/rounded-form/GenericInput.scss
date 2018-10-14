@@ -1,12 +1,7 @@
 @import "~/assets/styles/vars.scss";
 
-.hasError {
-  border: 1px solid $BASE_COLOR_LIGHT_RED;
-  box-shadow: 0 0 0.4rem $BASE_COLOR_LIGHT_RED;
-}
-
 .container {
-  height: 1.7rem;
+  height: 1.65rem;
 
   display: flex;
   overflow: visible;
@@ -23,9 +18,16 @@
 
   padding-left: 0.9rem;
   padding-right: 0.55rem;
+
+  &.hasError {
+    border: 1px solid $BASE_COLOR_LIGHT_RED;
+    box-shadow: 0 0 0.4rem $BASE_COLOR_LIGHT_RED;
+  }
+
 }
 
 .input {
+  width: 100%;
   overflow: hidden;
 }
 

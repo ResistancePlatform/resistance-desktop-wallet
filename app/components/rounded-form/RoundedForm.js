@@ -161,7 +161,8 @@ class RoundedForm extends Component<Props> {
       }
 
       // Handle child inputs change events
-      if (inputChildComponentNames.includes(child.type.displayName)) {
+      // TODO: leave only isRoundedFormComponent after moving all the components to the new system
+      if (child.type.isRoundedFormComponent || inputChildComponentNames.includes(child.type.displayName)) {
         const formState = this::getFormState()
 
         const onChange = (value) => (

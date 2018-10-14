@@ -1,0 +1,34 @@
+@import "~/assets/styles/vars.scss";
+
+.inputContainer {
+  font-size: 0.65rem;
+  color: $BASE_COLOR_FONT_GRAY;
+  display: flex;
+  padding-right: 0.45rem;
+}
+
+.input {
+  width: 100%;
+  font-size: 0.62rem;
+  font-weight: 100;
+  text-align: left;
+}
+
+.buttonWrapper {
+  width: 3.8rem;
+  border-left: 1px solid $BASE_COLOR_BORDER_GRAY;
+  height: 100%;
+  position: relative;
+
+  .useMaxButton {
+    font-size: 0.52rem;
+    padding: 0 0.4rem 0 0.4rem;
+    white-space: nowrap;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+  }
+}

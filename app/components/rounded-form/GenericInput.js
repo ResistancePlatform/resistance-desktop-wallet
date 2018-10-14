@@ -20,6 +20,7 @@ export type GenericProps = {
 export default class GenericInput extends Component<Props> {
 	props: GenericProps
 
+  static get isRoundedFormComponent() { return true }
   static get displayName() { return 'GenericInput' }
 
 	onChangeHandler(event) {
@@ -29,6 +30,10 @@ export default class GenericInput extends Component<Props> {
 			this.props.onChange(event.target.value)
 		}
 	}
+
+  renderLabel() {
+    return this.props.label
+  }
 
   renderInput() {
     log.error(`Generic input component cannot be used directly and should be inherited`)
@@ -53,7 +58,7 @@ export default class GenericInput extends Component<Props> {
 
         {this.props.label &&
           <div className={cn(this.props.labelClassName, genericStyles.label)}>
-            {this.props.label}
+            {this.renderLabel()}
           </div>
         }
 

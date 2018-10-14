@@ -15,7 +15,7 @@ import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
-import RoundedInput from '~/components/rounded-form/RoundedInput'
+import RoundedInputWithUseMax from '~/components/rounded-form/RoundedInputWithUseMax'
 import ChooseWallet from '~/components/rounded-form/ChooseWallet'
 import CurrencyIcon from './CurrencyIcon'
 
@@ -98,6 +98,12 @@ class ResDexBuySell extends Component<Props> {
     return toDecimalPlaces(amount)
   }
 
+  getMaxQuoteAmount() {
+    const { quoteCurrency } = this.props.buySell
+    const currency = this.props.accounts.currencies[quoteCurrency]
+    return currency && currency.balance || Decimal(0)
+  }
+
   // Can't create a market order if there's no liquidity or when sending an order
   getSubmitButtonDisabledAttribute() {
     const { baseCurrency, quoteCurrency, orderBook, isSendingOrder } = this.props.buySell
@@ -164,10 +170,13 @@ class ResDexBuySell extends Component<Props> {
                   currencies={this.props.accounts.currencies}
                 />
 
-                <RoundedInput
-                  className={styles.maxRel}
-                  label={t(`Max. {{quoteCurrency}}`, { quoteCurrency })}
+                <RoundedInputWithUseMax
                   name="maxRel"
+                  className={styles.maxRel}
+                  labelClassName={styles.inputLabel}
+                  label={t(`Max. {{quoteCurrency}}`, { quoteCurrency })}
+                  maxAmount={this.getMaxQuoteAmount()}
+                  symbol={quoteCurrency}
                   number />
 
                 <div className={styles.enhancedPrivacy}>

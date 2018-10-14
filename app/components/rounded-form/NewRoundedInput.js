@@ -4,7 +4,7 @@ import GenericInput, { GenericProps } from './GenericInput'
 import styles from './NewRoundedInput.scss'
 
 
-type RoundedInputProps = {
+export type RoundedInputProps = {
   ...GenericProps,
 	name: string,
   defaultValue?: string,
@@ -76,6 +76,7 @@ export default class RoundedInput extends GenericInput {
     return (
       <input
         className={styles.input}
+        name={this.props.name}
         type={this.props.type}
         value={this.state.value}
         disabled={this.props.disabled}
