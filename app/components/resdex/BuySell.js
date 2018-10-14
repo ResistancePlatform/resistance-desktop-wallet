@@ -75,16 +75,15 @@ class ResDexBuySell extends Component<Props> {
   }
 
   getAtCaption(t) {
-    const baseAmount = this.getBaseAmount()
+    const { baseCurrency, quoteCurrency, orderBook } = this.props.buySell
+    const { price } = orderBook.asks.length && orderBook.asks[0]
 
-    if (baseAmount === null) {
+    if (!price) {
       return t(`No liquidity available yet`)
     }
 
-    const { baseCurrency, quoteCurrency } = this.props.buySell
-
-    return t(`@ {{baseAmount}} {{baseCurrency}} per {{quoteCurrency}}`, {
-      baseAmount: truncateAmount(baseAmount),
+    return t(`@ {{price}} {{baseCurrency}} per {{quoteCurrency}}`, {
+      price: truncateAmount(price),
       baseCurrency,
       quoteCurrency
     })
