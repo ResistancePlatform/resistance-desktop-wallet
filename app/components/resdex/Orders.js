@@ -1,4 +1,5 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import moment from 'moment'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -6,6 +7,7 @@ import React, { Component } from 'react'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
 
+import { toDecimalPlaces } from '~/utils/decimal'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 
@@ -64,10 +66,10 @@ class ResDexOrders extends Component<Props> {
           {order.baseCurrency}/{order.quoteCurrency}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.lesser)}>
-          -{order.requested.quoteCurrencyAmount} {order.quoteCurrency}
+          -{toDecimalPlaces(Decimal(order.quoteCurrencyAmount))} {order.quoteCurrency}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.greater)}>
-          {order.requested.baseCurrencyAmount} {order.baseCurrency}
+          {toDecimalPlaces(Decimal(order.baseCurrencyAmount))} {order.baseCurrency}
         </UniformListColumn>
         <UniformListColumn>
           <i className={cn('icon', styles.private, { [styles.enabled]: order.isPrivate })} />
