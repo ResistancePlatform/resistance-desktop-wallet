@@ -156,6 +156,7 @@ class ResDexBuySell extends Component<Props> {
               >
                 <ChooseWallet
                   name="sendFrom"
+                  labelClassName={styles.oldInputLabel}
                   defaultValue={quoteCurrency}
                   label={t(`Send from`)}
                   onChange={this.props.actions.updateQuoteCurrency}
@@ -164,6 +165,7 @@ class ResDexBuySell extends Component<Props> {
 
                 <ChooseWallet
                   name="receiveTo"
+                  labelClassName={styles.oldInputLabel}
                   defaultValue={baseCurrency}
                   label={t(`Receive to`)}
                   onChange={this.props.actions.updateBaseCurrency}
