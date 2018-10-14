@@ -120,7 +120,7 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       filter(action => action.payload.processName === 'NODE'),
       take(1),
       switchMap(() => concat(
-        of(WelcomeActions.displayHint(t(`Starting the local node again...`))),
+        of(WelcomeActions.displayHint(t(`Starting the local node and initializing ResDEX...`))),
         of(SettingsActions.kickOffChildProcesses()),
         nodeStartedObservable
       ))

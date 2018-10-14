@@ -115,7 +115,7 @@ global.resDex = {
 
 checkAndCreateWalletAppFolder()
 
-// Temporarily disable GPU acceleration to make the app working in Parallels Desktop
+// Uncomment this line to make the app working in Parallels Desktop
 // app.disableHardwareAcceleration()
 
 /**

@@ -34,9 +34,9 @@ export default class RoundedInputWithUseMax extends RoundedInput {
         <input
           className={cn(parentStyles.input, styles.input)}
           name={this.props.name}
-          step="any"
-          min="0"
           type="number"
+          step="0.00000001"
+          min="0"
           value={this.state.value}
           disabled={this.props.disabled}
           onChange={event => this.onChangeHandler(event)}

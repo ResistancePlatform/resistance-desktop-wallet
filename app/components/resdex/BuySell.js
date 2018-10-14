@@ -25,7 +25,7 @@ import styles from './BuySell.scss'
 const validationSchema = Joi.object().keys({
   sendFrom: Joi.string().required().label(`Send from`),
   receiveTo: Joi.string().required().label(`Receive to`),
-  maxRel: Joi.number().required().label(`Max. amount`),
+  maxRel: Joi.string().required().label(`Max. amount`),
 })
 
 type Props = {
