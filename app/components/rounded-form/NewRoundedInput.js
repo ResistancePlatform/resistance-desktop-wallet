@@ -1,3 +1,4 @@
+import log from 'electron-log'
 import React from 'react'
 import GenericInput, { GenericProps } from './GenericInput'
 
@@ -61,6 +62,7 @@ export default class RoundedInput extends GenericInput {
 
 	onChangeHandler(event) {
 		event.stopPropagation()
+    log.debug('value', event.target.value)
     this.changeValue(event.target.value)
 	}
 

@@ -45,8 +45,8 @@ const getOrderBookFailedEpic = (action$: ActionsObservable<Action>) => action$.p
 const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexBuySellActions.createMarketOrder),
   switchMap(() => {
-		const { sendFrom, receiveTo, maxRel } = state$.value.roundedForm.resDexBuySell.fields
-    const { quoteCurrency, orderBook } = state$.value.resDex.buySell
+		const { maxRel } = state$.value.roundedForm.resDexBuySell.fields
+    const { baseCurrency, quoteCurrency, orderBook } = state$.value.resDex.buySell
 
     const txFee = state$.value.resDex.accounts.currencyFees[quoteCurrency]
     const { price } = orderBook.asks[0]
@@ -56,8 +56,8 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
 
 		const requestOpts = {
 			type: 'buy',
-			baseCurrency: receiveTo,
-			quoteCurrency: sendFrom,
+			baseCurrency,
+			quoteCurrency,
 			price: divider,
 			amount: Decimal(maxRel).dividedBy(price).toDP(8, Decimal.ROUND_FLOOR),
 			total: Decimal(maxRel).toDP(8, Decimal.ROUND_FLOOR)
