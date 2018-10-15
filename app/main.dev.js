@@ -11,6 +11,7 @@
  * @flow
  */
 import * as fs from 'fs'
+import crypto from 'crypto'
 import path from 'path'
 import config from 'electron-settings'
 import { app, ipcMain, BrowserWindow } from 'electron'
@@ -108,15 +109,19 @@ const getWindowSize = (isGetStartedComplete: boolean = false) => {
 global.resistanceNodeConfig = resistance.checkAndCreateConfig()
 // Set ResDEX global var for further use in renderer process, see ./service/resdex/api.js
 // TODO: provide the one decrypted with the password
+
+const seedPhrase =  'jazz calming mantle pit fall alkane koran firework rabin canyons cindy'
+// seedPhrase: 'treat board tree once reduce reduce expose coil guilt fish flat boil',
+
 global.resDex = {
-  apiToken: '62b40fdefab327fd4971db31d0f6667c97f663fa2504425e0fa3c23dd50ab478',
-  seedPhrase: 'treat board tree once reduce reduce expose coil guilt fish flat boil',
+  apiToken: crypto.createHash('sha256').update(seedPhrase).digest('hex'),
+  seedPhrase,
 }
 
 checkAndCreateWalletAppFolder()
 
 // Uncomment this line to make the app working in Parallels Desktop
-// app.disableHardwareAcceleration()
+app.disableHardwareAcceleration()
 
 /**
  * Add event listeners...

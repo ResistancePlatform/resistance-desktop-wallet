@@ -79,13 +79,13 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
 
     const nodeStartedObservable = getChildProcessObservable({
       processName: 'NODE',
-      onSuccess: of(nextAction),
+      onSuccess: of(nextAction).pipe(delay(30000)),
       onFailure: of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
       action$
     })
 
     return concat(
-      of(WelcomeActions.displayHint(t(`Starting local Resistance node...`))),
+      of(WelcomeActions.displayHint(t(`Starting the local node and initializing ResDEX...`))),
       of(SettingsActions.kickOffChildProcesses()),
       nodeStartedObservable
     )
@@ -120,7 +120,7 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       filter(action => action.payload.processName === 'NODE'),
       take(1),
       switchMap(() => concat(
-        of(WelcomeActions.displayHint(t(`Starting the local node and initializing ResDEX...`))),
+        of(WelcomeActions.displayHint(t(`Starting the local node with the encrypted wallet...`))),
         of(SettingsActions.kickOffChildProcesses()),
         nodeStartedObservable
       ))
@@ -129,7 +129,7 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
     const observable = rpc.encryptWallet(choosePasswordForm.fields.password).pipe(
       switchMap(() => nodeShutDownObservable),
       catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.toString())))
-    ).pipe(delay(20000))
+    )
 
     return concat(of(WelcomeActions.displayHint(t(`Encrypting the wallet...`))), observable)
   })
