@@ -106,12 +106,15 @@ export const preloadedState: State = {
       TOR: 'NOT RUNNING',
       RESDEX: 'NOT RUNNING',
     },
-    language: 'en'
+    language: 'en',
 	},
   resDex: {
+    common: {
+      selectedTabIndex: 0,
+    },
     login: {
       isRequired: false,
-      portfolios: []
+      portfolios: [],
     },
     assets: {
       resolution: 'month',

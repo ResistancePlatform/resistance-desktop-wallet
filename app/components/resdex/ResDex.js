@@ -20,7 +20,8 @@ import styles from './ResDex.scss'
 
 type Props = {
   resDex: ResDexState,
-  ordersActions: object
+  ordersActions: object,
+  actions: object
 }
 
 
@@ -76,9 +77,10 @@ export class ResDex extends Component<Props> {
         {this.props.resDex.accounts.withdrawModal.isVisible &&
           <WithdrawModal />
         }
-
         <Tabs
           className={styles.tabs}
+          selectedIndex={this.props.resDex.common.selectedTabIndex}
+          onSelect={tabIndex => this.props.actions.selectTab(tabIndex)}
           selectedTabClassName={styles.selectedTab}
           selectedTabPanelClassName={styles.selectedTabPanel}
         >

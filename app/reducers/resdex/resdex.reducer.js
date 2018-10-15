@@ -1,7 +1,8 @@
 // @flow
-import { createActions } from 'redux-actions'
+import { createActions, handleActions } from 'redux-actions'
 import { combineReducers } from 'redux'
 
+import { preloadedState } from '~/reducers/preloaded.state'
 import { ResDexLoginReducer } from './login/reducer'
 import { ResDexAssetsReducer } from './assets/reducer'
 import { ResDexBuySellReducer } from './buy-sell/reducer'
@@ -28,6 +29,9 @@ export type Portfolio = {
 export type CurrencyHistoryResolution = 'hour' | 'day' | 'week' | 'month' | 'year'
 
 export type ResDexState = {
+  common: {
+    selectedTabIndex: number
+  },
   login: {
     isRequired: boolean,
     portfolios: Portfolio[]
@@ -77,13 +81,24 @@ export const ResDexActions = createActions(
 
     START_RESDEX: undefined,
     STOP_RESDEX: undefined,
+
+    SELECT_TAB: index => ({ index }),
   },
   {
     prefix: 'APP/RESDEX'
   }
 )
 
+export const ResDexCommonReducer = handleActions(
+  {
+    [ResDexActions.selectTab]: (state, action) => ({
+      ...state,
+      selectedTabIndex: action.payload.index,
+    }),
+  }, preloadedState)
+
 export const ResDexReducer = combineReducers({
+  common: ResDexCommonReducer,
   login: ResDexLoginReducer,
   assets: ResDexAssetsReducer,
   buySell: ResDexBuySellReducer,

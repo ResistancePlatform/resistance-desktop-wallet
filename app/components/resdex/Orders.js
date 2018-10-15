@@ -8,6 +8,7 @@ import cn from 'classnames'
 import { translate } from 'react-i18next'
 
 import { toDecimalPlaces } from '~/utils/decimal'
+import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 
@@ -25,7 +26,8 @@ const getOrderStatusName = (t, status: string) => ({
 type Props = {
   t: any,
   i18n: any,
-  orders: object
+  orders: object,
+  resDexActions: object
 }
 
 
@@ -107,8 +109,18 @@ class ResDexOrders extends Component<Props> {
           items={openOrders}
           headerRenderer={() => this.getListHeaderRenderer()}
           rowRenderer={openOrder => this.getListRowRenderer(openOrder)}
-          emptyMessage={t(`No open orders to display.`)}
+          emptyMessage={false}
         />
+
+        {!openOrders.length &&
+          <div className={styles.noOrders}>
+            <div>{t(`You have no orders yet`)}</div>
+
+            <button type="button" onClick={() => this.props.resDexActions.selectTab(1)}>
+              {t(`Open an order`)}
+            </button>
+          </div>
+        }
 
         <div className={styles.header}>{t(`Swap history`)}</div>
 
@@ -117,8 +129,18 @@ class ResDexOrders extends Component<Props> {
           items={completedOrders}
           headerRenderer={() => this.getListHeaderRenderer()}
           rowRenderer={completedOrder => this.getListRowRenderer(completedOrder)}
-          emptyMessage={t(`No completed orders to display.`)}
+          emptyMessage={false}
         />
+
+        {!completedOrders.length &&
+          <div className={styles.noOrders}>
+            <div>{t(`You have no swap history yet`)}</div>
+
+            <button type="button" onClick={() => this.props.resDexActions.selectTab(1)}>
+              {t(`Open an order`)}
+            </button>
+          </div>
+        }
 
       </div>
     )
@@ -130,7 +152,8 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(ResDexOrdersActions, dispatch)
+  actions: bindActionCreators(ResDexOrdersActions, dispatch),
+  resDexActions: bindActionCreators(ResDexActions, dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexOrders))
