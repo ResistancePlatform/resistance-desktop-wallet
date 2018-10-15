@@ -17,8 +17,8 @@ import { app, ipcMain, BrowserWindow } from 'electron'
 import log from 'electron-log'
 
 import { i18n } from './i18next.config'
-import { OSService } from './service/os-service'
-import { ResistanceService } from './service/resistance-service'
+import { OSService } from './service/os-service-main'
+import { ResistanceService } from './service/resistance-service-main'
 import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
 
@@ -116,7 +116,7 @@ global.resDex = {
 checkAndCreateWalletAppFolder()
 
 // Uncomment this line to make the app working in Parallels Desktop
-// app.disableHardwareAcceleration()
+app.disableHardwareAcceleration()
 
 /**
  * Add event listeners...
@@ -193,7 +193,7 @@ app.on('ready', async () => {
   mainWindow.loadURL(`file://${__dirname}/app.html`)
 
   // Uncomment for debugging in prod mode
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Showing the window if DOM finished loading and the content has been rendered
 

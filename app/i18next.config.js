@@ -3,7 +3,7 @@ import path from 'path'
 import { reactI18nextModule } from 'react-i18next'
 import i18nextBackend from 'i18next-node-fs-backend'
 
-import { OSService } from './service/os-service'
+import { OSService } from './service/os-service-main'
 
 const availableLanguages = ['en', 'eo', 'ko']
 
