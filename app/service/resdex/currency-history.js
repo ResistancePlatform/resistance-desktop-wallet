@@ -1,4 +1,6 @@
 // @flow
+import rp from 'promise-request-retry'
+import log from 'electron-log'
 import { Decimal } from 'decimal.js'
 import pMap from 'p-map'
 
@@ -73,15 +75,27 @@ async function fetchSymbol(symbol, resolution) {
   }
 
   let json
+
   try {
-    const response = await fetch(this::currencyHistoryUrl(querySymbol, resolution))
-    json = await response.json()
+    json = await rp({
+      uri: this::currencyHistoryUrl(querySymbol, resolution),
+      retry: 10,  // To be sure!
+      json: true,
+      transform: body => {
+        if (!body || body.Data.length === 0) {
+          throw new Error(`Request returned no data`)
+        }
+
+        return body
+      }
+    })
   } catch (error) {
-    console.error('Failed to get price history:', error)
+    log.error('Failed to get price history:', error)
   }
 
   if (!json || json.Data.length === 0) {
-    noPriceHistory.add(querySymbol)
+    log.warn('No price history for', querySymbol, resolution)
+    // noPriceHistory.add(querySymbol)
     return
   }
 

@@ -1,3 +1,4 @@
+import log from 'electron-log'
 import moment from 'moment'
 import { Decimal } from 'decimal.js'
 import React, { Component } from 'react'
@@ -35,6 +36,7 @@ class Chart extends Component<Props> {
     const currencyHistoryFirstValue = Object.values(symbolsHistory).find(value => value && value.length)
 
 		if (!currencyHistoryFirstValue) {
+      log.debug(`No symbol history found for ${this.props.resolution}`, symbolsHistory)
 			return []
 		}
 

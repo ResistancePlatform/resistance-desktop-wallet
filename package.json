@@ -234,6 +234,7 @@
     "password-meter": "^3.1.0",
     "pouchdb-browser": "^7.0.0",
     "pouchdb-find": "^7.0.0",
+    "promise-request-retry": "^1.0.1",
     "prop-types": "^15.6.2",
     "properties-reader": "^0.0.16",
     "ps-node": "^0.1.6",
