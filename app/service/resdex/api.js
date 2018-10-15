@@ -13,7 +13,6 @@ import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 
 const resDexUri = 'http://127.0.0.1:17445'
 
-const getPort = remote.require('get-port')
 const t = translate('service')
 const os = new OSService()
 
@@ -55,6 +54,7 @@ export class ResDexApiService {
   }
 
 	async enableSocket() {
+    const getPort = remote.require('get-port')
 		const port = await getPort()
 		const {endpoint} = await this.query({method: 'getendpoint', port})
 		const socket = new MarketmakerSocket(endpoint)

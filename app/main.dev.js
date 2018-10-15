@@ -116,7 +116,7 @@ global.resDex = {
 checkAndCreateWalletAppFolder()
 
 // Uncomment this line to make the app working in Parallels Desktop
-app.disableHardwareAcceleration()
+// app.disableHardwareAcceleration()
 
 /**
  * Add event listeners...
