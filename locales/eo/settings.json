@@ -76,5 +76,6 @@
   "Wallet restored successfully.": "Wallet restored successfully.",
   "Restarting the local node with the new wallet...": "Restarting the local node with the new wallet...",
   "Wallet file \"{{walletFileName}}\" already exists.": "Wallet file \"{{walletFileName}}\" already exists.",
-  "Failed to restore the wallet": "Failed to restore the wallet"
+  "Failed to restore the wallet": "Failed to restore the wallet",
+  "ResDEX Log": "ResDEX Log"
 }

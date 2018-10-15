@@ -6,6 +6,24 @@
   margin: 1.5rem;
 }
 
+.tooltip {
+  &.enhancedPrivacy {
+    width: 22rem !important;
+  }
+
+  background: $BASE_BACKGROUND_COLOR_DARK_BLUE !important;
+  color: #a4abc7 !important;
+  opacity: 1 !important;
+  border-radius: 0.4rem;
+  font-size: 0.6rem;
+  font-family: inherit;
+  font-weight: 100;
+}
+
+.tooltip:after {
+	border-top: 0.5rem solid $BASE_BACKGROUND_COLOR_DARK_BLUE !important;
+}
+
 .inputLabel {
   width: 5rem;
 }
@@ -32,8 +50,8 @@
   font-size: 0.55rem;
   color: $BASE_COLOR_LIGHT_BLUE;
   text-transform: lowercase;
-  left: 50%;
-  top: 50%;
+  left: 48%;
+  top: 48%;
   transform: translate(-50%, -50%);
 }
 
@@ -102,6 +120,7 @@
   }
 
   input[type=checkbox]:before {
+    position: relative;
     content: '\0020';
     display: inline-block;
     background: #151a35;
@@ -111,6 +130,7 @@
     width: 0.8rem;
     height: 0.8rem;
     visibility: visible;
+    top: 0;
   }
 
   input[type=checkbox]:checked:before {

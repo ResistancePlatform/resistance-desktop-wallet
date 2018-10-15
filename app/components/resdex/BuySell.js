@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
+import ReactTooltip from 'react-tooltip'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
 import { RESDEX } from '~/constants/resdex'
@@ -181,10 +182,11 @@ class ResDexBuySell extends Component<Props> {
                   number />
 
                 <div className={styles.enhancedPrivacy}>
-                  <label htmlFor="enhancedPrivacyInputId">
-                    <input id="enhancedPrivacyInputId" type="checkbox" name="enhancedPrivacy" />
+                  <label htmlFor="input-resdex-enhanced-privacy-id">
+                    <input id="input-resdex-enhanced-privacy-id" type="checkbox" name="enhancedPrivacy" />
                     {t(`Enhanced privacy`)}
-                    <i className={styles.info} />
+                    <i className={styles.info} data-tip={t('enhanced-privacy')} data-for="tooltip-resdex-enhanced-privacy-id" data-offset="{'left': 16}"/>
+                    <ReactTooltip id="tooltip-resdex-enhanced-privacy-id" className={cn(styles.tooltip, styles.enhancedPrivacy)}/>
                   </label>
                 </div>
 
@@ -266,6 +268,7 @@ class ResDexBuySell extends Component<Props> {
           </ul>
 
         </div>
+
       </div>
     )
   }
