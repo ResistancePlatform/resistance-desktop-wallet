@@ -62,6 +62,11 @@
     background: $BASE_COLOR_GRAY_3;
   }
 
+  &.matched, &.swapping {
+    color: $BASE_COLOR_DARK_BLUE_3;
+    background: $BASE_COLOR_LIGHT_BLUE;
+  }
+
   &.completed {
     color: $BASE_COLOR_DARK_BLUE_3;
     background: $BASE_COLOR_LIGHT_GREEN;

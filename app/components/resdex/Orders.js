@@ -16,8 +16,11 @@ import styles from './Orders.scss'
 const getOrderStatusName = (t, status: string) => ({
   pending: t(`Pending`),
   completed: t(`Completed`),
+  matched: t(`Matched`),
+  swapping: t(`Swapping`),
+  unmatched: t(`Unmatched`),
   failed: t(`Failed`),
-}[status])
+}[status] || status)
 
 type Props = {
   t: any,

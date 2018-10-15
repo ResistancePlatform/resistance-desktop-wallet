@@ -24,17 +24,6 @@ const initSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe
 
     from(api.enableSocket()).pipe(
       map(() => {
-        api.socket.on('message', message => {
-          log.debug(`Got a ResDEX socket message`, message)
-          const uuids = store.getState().resDex.orders.swapHistory.map(swap => swap.uuid)
-
-          if (uuids.includes(message.uuid)) {
-            log.debug(`Updating swap data`)
-            toastr.info(t(`Swap status update received`))
-            swapDB.updateSwapData(message)
-          }
-
-        })
 
         return ResDexOrdersActions.empty()
       })

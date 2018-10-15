@@ -5,6 +5,7 @@ import Emittery from 'emittery'
 import PQueue from 'p-queue'
 import roundTo from 'round-to'
 import {subDays, isAfter} from 'date-fns'
+import { toastr } from 'react-redux-toastr'
 import appContainer from 'containers/App'
 
 import { translate } from '~/i18next.config'
@@ -106,6 +107,7 @@ export class SwapDBService {
   updateSwapData(message) {
     return this.queue(async () => {
       const swap = await this::getSwapData(message.uuid)
+      // showMessageNotifications(swap, message)
       swap.messages.push(message)
 
       return this.db.put(swap)
@@ -164,6 +166,33 @@ async function getSwapData(uuid) {
   })
 
   return docs[0]
+}
+
+function showMessageNotifications(swap, message) {
+    const pair = `${swap.baseCurrency}/${swap.quoteCurrency}`
+
+    if (message.method === 'connected') {
+      toastr.info(pair, `The order has been matched`)
+    }
+
+    if (message.method === 'update') {
+      toastr.info(pair, `Swapping in progress`)
+    }
+
+    if (message.method === 'tradestatus' && message.status === 'finished') {
+      toastr.success(pair, `The order has been completed`)
+    }
+
+      if (!(
+        message.sentflags.includes('alicespend') ||
+        message.sentflags.includes('aliceclaim')
+      )) {
+        toastr.error(pair, `The order has failed`)
+      }
+
+    if (message.method === 'failed') {
+        toastr.error(pair, `The order has failed`)
+    }
 }
 
 // TODO: We should refactor this into a seperate file

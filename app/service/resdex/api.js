@@ -176,6 +176,8 @@ export class ResDexApiService {
       body: {
         ...data,
         userpass: token,
+        queueid: 0,
+        needjson: 1,
       },
       json: true
     }

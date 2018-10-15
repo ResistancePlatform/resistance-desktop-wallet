@@ -1,4 +1,6 @@
 // @flow
+
+import log from 'electron-log'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
