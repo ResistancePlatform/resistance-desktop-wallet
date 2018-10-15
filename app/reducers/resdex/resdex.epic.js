@@ -24,7 +24,7 @@ const startResDexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   switchMap(() => {
     const resDexStartedObservable = getChildProcessObservable({
       processName: 'RESDEX',
-      onSuccess: of(ResDexAccountsActions.enableCurrencies()).pipe(delay(15000)),
+      onSuccess: of(ResDexAccountsActions.enableCurrencies()).pipe(delay(10000)),
       onFailure: of(toastrActions.add({ type: 'error', title: t('Unable to start ResDEX, check the log for details') })),
       action$
     })

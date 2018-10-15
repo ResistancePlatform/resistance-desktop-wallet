@@ -2,12 +2,12 @@
 import { Decimal } from 'decimal.js'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { clipboard } from 'electron'
 import { translate } from 'react-i18next'
 
 import { DECIMAL } from '~/constants/decimal'
-import { appStore } from '~/store/configureStore'
+import { getStore } from '~/store/configureStore'
 import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
+import RoundedInputWithPaste from '~/components/rounded-form/RoundedInputWithPaste'
 import AddressDropdownPopupMenu from '~/components/send-cash/address-drodown-popup-menu'
 import { SendCashActions, SendCashState } from '~/reducers/send-cash/send-cash.reducer'
 
@@ -31,7 +31,7 @@ class SendCash extends Component<Props> {
 	 * @memberof SendCash
 	 */
 	componentDidMount() {
-    appStore.dispatch(SendCashActions.checkAddressBookByName())
+    getStore().dispatch(SendCashActions.checkAddressBookByName())
 	}
 
 	eventConfirm(event) {
@@ -51,34 +51,30 @@ class SendCash extends Component<Props> {
 
 	onPrivateSendToggleClicked(event) {
 		this.eventConfirm(event)
-    appStore.dispatch(SendCashActions.togglePrivateSend())
+    getStore().dispatch(SendCashActions.togglePrivateSend())
 	}
 
 	onFromAddressDropdownClicked() {
-		appStore.dispatch(SendCashActions.getAddressList(true))
-		appStore.dispatch(SendCashActions.updateDropdownMenuVisibility(true))
+		getStore().dispatch(SendCashActions.getAddressList(true))
+		getStore().dispatch(SendCashActions.updateDropdownMenuVisibility(true))
 	}
 
 	onFromAddressInputChanged(value) {
-		appStore.dispatch(SendCashActions.updateFromAddress(value))
-	}
-
-	onDestAddressPasteClicked() {
-		appStore.dispatch(SendCashActions.updateToAddress(clipboard.readText()))
+		getStore().dispatch(SendCashActions.updateFromAddress(value))
 	}
 
 	onDestAddressInputChanged(value) {
-    appStore.dispatch(SendCashActions.checkAddressBookByName())
-		appStore.dispatch(SendCashActions.updateToAddress(value))
+    getStore().dispatch(SendCashActions.checkAddressBookByName())
+		getStore().dispatch(SendCashActions.updateToAddress(value))
 	}
 
 	onAmountAddressInputChanged(value) {
-		appStore.dispatch(SendCashActions.updateAmount(Decimal(value)))
+		getStore().dispatch(SendCashActions.updateAmount(Decimal(value)))
 	}
 
 	onSendButtonClicked(event) {
 		this.eventConfirm(event)
-		appStore.dispatch(SendCashActions.sendCash())
+		getStore().dispatch(SendCashActions.sendCash())
 	}
 
 	getDropdownMenuStyles() {
@@ -87,7 +83,7 @@ class SendCash extends Component<Props> {
 
 	commonMenuItemEventHandler(event) {
 		this.eventConfirm(event)
-		appStore.dispatch(SendCashActions.updateDropdownMenuVisibility(false))
+		getStore().dispatch(SendCashActions.updateDropdownMenuVisibility(false))
 	}
 
 	hideDropdownMenu(event) {
@@ -99,7 +95,7 @@ class SendCash extends Component<Props> {
 
 		if (!selectedAddress || selectedAddress.trim() === '') return
 
-		appStore.dispatch(SendCashActions.updateFromAddress(selectedAddress))
+		getStore().dispatch(SendCashActions.updateFromAddress(selectedAddress))
 	}
 
 	/**
@@ -113,12 +109,6 @@ class SendCash extends Component<Props> {
 			enable: true,
 			type: 'DROPDOWN',
 			onClick: this.onFromAddressDropdownClicked
-		}
-
-		const destAddressAddon: RoundedInputAddon = {
-			enable: true,
-			type: 'PASTE',
-			onClick: () => this.onDestAddressPasteClicked()
 		}
 
 		const amountAddressAddon: RoundedInputAddon = {
@@ -149,6 +139,7 @@ class SendCash extends Component<Props> {
 								name="from-address"
                 defaultValue={this.props.sendCash.fromAddress}
 								label={t(`From address`)}
+                labelClassName={styles.oldInputLabel}
 								addon={fromAddressAddon}
 								disabled={this.props.sendCash.isInputDisabled}
 								tooltip={this.props.sendCash.inputTooltips}
@@ -184,11 +175,12 @@ class SendCash extends Component<Props> {
 						</div>
 
 						{/* Destination address */}
-						<RoundedInput
+						<RoundedInputWithPaste
 							name="destination-address"
+              className={styles.destinationAddressInput}
               defaultValue={this.props.sendCash.toAddress}
+              labelClassName={styles.inputLabel}
 							label={t(`Destination address`)}
-							addon={destAddressAddon}
               disabled={this.props.sendCash.isInputDisabled}
 							tooltip={this.props.sendCash.inputTooltips}
 							onChange={value => this.onDestAddressInputChanged(value)}
@@ -200,6 +192,7 @@ class SendCash extends Component<Props> {
 								name="amount"
                 defaultValue={this.props.sendCash.amount.toString()}
 								label={t(`Amount`)}
+                labelClassName={styles.oldInputLabel}
 								addon={amountAddressAddon}
                 disabled={this.props.sendCash.isInputDisabled}
 								onChange={value => this.onAmountAddressInputChanged(value)}

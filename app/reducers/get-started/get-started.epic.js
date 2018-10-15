@@ -13,6 +13,7 @@ import { AUTH } from '~/constants/auth'
 import { RpcService } from '~/service/rpc-service'
 import { Bip39Service } from '~/service/bip39-service'
 import { AuthActions } from '../auth/auth.reducer'
+import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
 import { GetStartedActions } from './get-started.reducer'
 import { RoundedFormActions } from '../rounded-form/rounded-form.reducer'
 import { SettingsActions } from '../settings/settings.reducer'
@@ -77,16 +78,27 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
 
     const nextAction = WelcomeActions.encryptWallet()
 
+    const resDexStartedObservable = getChildProcessObservable({
+      processName: 'RESDEX',
+      onSuccess: of(nextAction).pipe(delay(20000)),
+      onFailure: of(WelcomeActions.walletBootstrappingFailed(t(`Unable to start ResDEX`))),
+      action$
+    })
+
     const nodeStartedObservable = getChildProcessObservable({
       processName: 'NODE',
-      onSuccess: of(nextAction).pipe(delay(30000)),
+      onSuccess: concat(
+        of(WelcomeActions.displayHint(t(`Initializing ResDEX...`))),
+        of(ResDexActions.startResdex()),
+        resDexStartedObservable,
+      ),
       onFailure: of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
       action$
     })
 
     return concat(
-      of(WelcomeActions.displayHint(t(`Starting the local node and initializing ResDEX...`))),
-      of(SettingsActions.kickOffChildProcesses()),
+      of(WelcomeActions.displayHint(t(`Starting the local node...`))),
+      of(SettingsActions.startLocalNode()),
       nodeStartedObservable
     )
   })

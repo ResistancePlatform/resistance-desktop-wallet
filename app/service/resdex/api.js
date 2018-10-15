@@ -5,6 +5,7 @@ import rp from 'request-promise-native'
 import log from 'electron-log'
 import { remote } from 'electron'
 
+import getPort from 'get-port'
 import { translate } from '~/i18next.config'
 import MarketmakerSocket from './marketmaker-socket'
 import { getCurrency } from '~/utils/resdex'
@@ -54,7 +55,6 @@ export class ResDexApiService {
   }
 
 	async enableSocket() {
-    const getPort = remote.require('get-port')
 		const port = await getPort()
 		const {endpoint} = await this.query({method: 'getendpoint', port})
 		const socket = new MarketmakerSocket(endpoint)

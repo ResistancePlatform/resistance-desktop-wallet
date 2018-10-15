@@ -9,18 +9,18 @@ import styles from './RoundedInputWithButton.scss'
 
 const t = translate('other')
 
-export default class RoundedInputWithCopy extends RoundedInput {
+export default class RoundedInputWithPaste extends RoundedInput {
   renderAddon() {
     return (
       <div
         className={styles.button}
-        onClick={() => clipboard.writeText(this.state.value)}
+        onClick={() => this.changeValue(clipboard.readText())}
         onKeyDown={() => false}
         role="button"
         tabIndex={0}
       >
         <div className={cn('icon', styles.icon)} />
-        <div>{t(`Copy`)}</div>
+        <div>{t(`Paste`)}</div>
       </div>
     )
   }

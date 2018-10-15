@@ -23,6 +23,7 @@ import { ResistanceService } from './service/resistance-service-main'
 import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
 
+// For the module to be imported in main, dirty, remove
 const os = new OSService()
 const resistance = new ResistanceService()
 const fetchParameters = new FetchParametersService()
@@ -121,7 +122,7 @@ global.resDex = {
 checkAndCreateWalletAppFolder()
 
 // Uncomment this line to make the app working in Parallels Desktop
-app.disableHardwareAcceleration()
+// app.disableHardwareAcceleration()
 
 /**
  * Add event listeners...
@@ -198,7 +199,7 @@ app.on('ready', async () => {
   mainWindow.loadURL(`file://${__dirname}/app.html`)
 
   // Uncomment for debugging in prod mode
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 
   // Showing the window if DOM finished loading and the content has been rendered
 

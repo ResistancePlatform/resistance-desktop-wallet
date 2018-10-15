@@ -65,8 +65,12 @@ async function fetchSymbol(symbol, resolution) {
 
   let querySymbol = symbol
 
-  if (['HODLC', 'RES'].includes(symbol)) {
+  if (symbol === 'HODLC') {
     querySymbol = 'HODL'
+  }
+
+  if (symbol === 'RES') {
+    querySymbol = 'DGB'
   }
 
   // We won't even bother to fetch if we know it won't work
@@ -101,7 +105,8 @@ async function fetchSymbol(symbol, resolution) {
 
   const prices = json.Data.map(({time, close}) => ({
     time: time * 1000,
-    value: Decimal(symbol === 'RES' ? close * 1000 : close),
+    // 20 RES = 1 DGB for now
+    value: Decimal(symbol === 'RES' ? close / 20 : close),
   }))
 
   return prices
