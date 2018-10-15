@@ -2,7 +2,7 @@
 import { Decimal } from 'decimal.js'
 import log from 'electron-log'
 import { of, from, merge } from 'rxjs'
-import { map, switchMap, catchError } from 'rxjs/operators'
+import { switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { actions as toastrActions } from 'react-redux-toastr'
 
@@ -33,12 +33,13 @@ const getOrderBookEpic = (action$: ActionsObservable<Action>, state$) => action$
 
 const getOrderBookFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.getOrderBookFailed),
-  map(action => (
+  switchMap(action => of(
     toastrActions.add({
       type: 'error',
       title: t(`Error getting the order book`),
       message: action.payload.errorMessage,
-    })
+    }),
+    ResDexBuySellActions.empty()
   ))
 )
 

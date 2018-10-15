@@ -106,7 +106,8 @@ async function fetchSymbol(symbol, resolution) {
   const prices = json.Data.map(({time, close}) => ({
     time: time * 1000,
     // 1 RES ICO price = $0.55046
-    value: Decimal(symbol === 'RES' ? Decimal('0.55046') : close),
+    // 20 RES = 1 DGB for now for a nicer chart
+    value: Decimal(symbol === 'RES' ? close / 20 : close),
   }))
 
   return prices
