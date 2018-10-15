@@ -24,7 +24,7 @@
   right: 0px;
   bottom: 0px;
   background-color: rgba(255, 255, 255, 0.1);
-  z-index: 1000000;
+  z-index: 990
 }
 
 .modalDialog {
@@ -34,10 +34,11 @@
   left: 10%;
   right: 10%;
   bottom: 15%;
-  background: $BASE_COLOR_DARK_BLUE;
-  border: 1.5px solid $BASE_COLOR_BORDER_GRAY;
   border-radius: 0.3rem;
-  z-index: 1000001;
+  border: 1px solid $BASE_COLOR_BORDER_BLUE;
+  background: $BASE_COLOR_DARK_BLUE;
+  outline: 0;
+  z-index: 991
 
   &:focus {
     outline: none;
@@ -62,7 +63,7 @@
 }
 
 .modalBody {
-  height: calc(100% - 6.2rem);
+  height: 100%;
   font-size: 0.9rem;
   z-index: 10000000 !important;
 }

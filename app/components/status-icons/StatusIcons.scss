@@ -25,10 +25,6 @@
     }
   }
 
-  > div:last-child {
-    border: none;
-  }
-
   .mining:before {
     content: '\e914';
     margin-left: 0.25rem;
@@ -53,6 +49,7 @@
 
   .operations {
     cursor: pointer;
+    border: none !important;
   }
 
   .operations:before {
@@ -65,13 +62,12 @@
 }
 
 .operationsIconHint {
-  color: white;
+  color: $BASE_COLOR_FONT_GRAY_2;
   font-size: 0.5rem;
-  background-color: $SYSTEM_INFO_ICON_HINT_COLOR;
-  border-radius: 3px;
-  padding: 0 1px;
-  right: 58px;
-  top: 2px;
+
+  right: 0.6rem;
+  bottom: 0.6rem;
   position: absolute;
   cursor: default;
+  text-align: center;
 }

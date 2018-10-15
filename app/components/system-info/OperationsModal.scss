@@ -9,7 +9,9 @@
 
 .operationsModalBody {
   @extend .modalBody;
-  padding: 6px;
+  padding: 0.4rem;
+  overflow-y: scroll;
+
 }
 
 .clearButton {

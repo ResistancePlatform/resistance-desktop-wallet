@@ -133,27 +133,6 @@ class OperationsModal extends Component<Props> {
           />
         </div>
 
-        <div className={styles.modalFooter}>
-          {/*
-          <button
-            className={styles.clearButton}
-            onClick={event => this.onClearCompletedClicked(event)}
-            onKeyDown={event => this.onClearCompletedClicked(event)}
-          >
-            {t(`Clear completed`)}
-          </button>
-          */}
-
-          <button
-            type="button"
-            className={styles.closeButton}
-            onClick={event => this.onCloseClicked(event)}
-            onKeyDown={event => this.onCloseClicked(event)}
-          >
-            {t(`Close`)}
-          </button>
-        </div>
-
       </Modal>
     )
   }
