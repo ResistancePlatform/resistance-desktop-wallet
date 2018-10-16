@@ -2,7 +2,12 @@
 
 .balanceContainer {
   -webkit-app-region: drag;
-  height: 12rem;
+  // height: 12rem;
+
+  height: 7.875rem;
+  position: absolute;
+  right: 0;
+  left: $NAVI_BAR_CONTAINER_WIDTH + 1.35rem;
 
   align-items: center !important;
 

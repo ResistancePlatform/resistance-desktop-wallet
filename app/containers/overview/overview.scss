@@ -5,9 +5,10 @@
 }
 
 .transactionsContainer {
+  margin-top: 7.875rem;
   padding: 2rem;
   height: 100%;
-  overflow-x: hidden;
+  overflow-x: scroll;
   overflow-y: scroll;
 
   .title {
