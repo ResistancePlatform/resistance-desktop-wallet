@@ -8,7 +8,8 @@ import * as Joi from 'joi'
 import { getPasswordValidationSchema } from '~/utils/auth'
 import { getWalletNameJoi } from '~/utils/get-started'
 import { ResistanceService } from '~/service/resistance-service'
-import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
+import RoundedInput from '~/components/rounded-form/NewRoundedInput'
+import OpenFileInput from '~/components/rounded-form/OpenFileInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
@@ -71,13 +72,28 @@ export class RestoreYourWallet extends Component<Props> {
             options={{ stripUnknown: true }}
             schema={getValidationSchema(t)}
           >
-            <RoundedInput name="walletName" defaultValue={userInfo().username} label={t(`Wallet name`)} />
+            <RoundedInput
+              name="walletName"
+              type="text"
+              defaultValue={userInfo().username}
+              label={t(`Wallet name`)}
+            />
 
-            <RoundedInput name="backupFile" label={t(`Backup file`)} addon={backupFileAddon} readOnly />
-            <RoundedInput name="password" password label={t(`Wallet password`)} />
+            <OpenFileInput
+              name="backupFile"
+              label={t(`Backup file`)}
+              readOnly
+            />
+
+            <RoundedInput
+              name="password"
+              type="password"
+              label={t(`Wallet password`)}
+            />
 
             <RoundedInput
               name="walletPath"
+              type="text"
               label={t(`Your wallet stored in`)}
               defaultValue={resistance.getWalletPath()}
               readOnly />
