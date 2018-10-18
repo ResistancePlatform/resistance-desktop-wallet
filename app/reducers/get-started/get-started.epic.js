@@ -8,7 +8,7 @@ import { push } from 'react-router-redux'
 
 import { i18n } from '~/i18next.config'
 import { Action } from '../types'
-import { getStartLocalNodeObservable } from '~/utils/child-process'
+import { getChildProcessObservable } from '~/utils/child-process'
 import { AUTH } from '~/constants/auth'
 import { RpcService } from '~/service/rpc-service'
 import { Bip39Service } from '~/service/bip39-service'
@@ -24,7 +24,7 @@ const rpc = new RpcService()
 
 
 const WelcomeActions = GetStartedActions.welcome
-const unableToStartLocalNodeMessage = t(`Unable to start Resistance local node, please try again or contact the support.`)
+const unableToStartLocalNodeMessage = t(`Unable to start Resistance local node`)
 
 const chooseLanguageEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(GetStartedActions.chooseLanguage),
@@ -43,6 +43,17 @@ const generateWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	map(result => GetStartedActions.createNewWallet.gotGeneratedWallet(result))
 )
 
+/*
+ * Main use case actions sequences.
+ *
+ * Create new wallet:
+ *   applyConfiguration → encryptWallet → authenticate → walletBootstrappingSucceeded
+ *
+ * Restore from backup:
+ *   applyConfiguration → restoreWallet → authenticate → changePassword → walletBootstrappingSucceeded
+ *
+ */
+
 const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(WelcomeActions.applyConfiguration),
   switchMap(() => {
@@ -60,11 +71,18 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
       path: form.fields.walletPath
     })
 
-    const nodeStartedObservable = getStartLocalNodeObservable(
-      of(WelcomeActions.encryptWallet()),
-      of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
+    // const nextAction = state.getStarted.isCreatingNewWallet
+    //   ? WelcomeActions.encryptWallet()
+    //   : WelcomeActions.restoreWallet()
+
+    const nextAction = WelcomeActions.encryptWallet()
+
+    const nodeStartedObservable = getChildProcessObservable({
+      processName: 'NODE',
+      onSuccess: of(nextAction),
+      onFailure: of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
       action$
-    )
+    })
 
     return concat(
       of(WelcomeActions.displayHint(t(`Starting local Resistance node...`))),
@@ -74,17 +92,28 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
   })
 )
 
+const restoreWalletEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(WelcomeActions.restoreWallet),
+  switchMap(() => {
+    const restoreForm = state$.value.roundedForm.getStartedRestoreYourWallet
+
+    // Copying the user wallet to Resistance data folder
+    // const newWalletPath = path.join(resistanceService.getWalletPath(), restoreForm.walletName)
+  })
+)
+
 const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(WelcomeActions.encryptWallet),
   switchMap(() => {
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
 
     // Wallet encryption shuts the node down, let's start it back up and trigger the next action
-    const nodeStartedObservable = getStartLocalNodeObservable(
-      of(WelcomeActions.authenticateAndRestoreWallet()),
-      of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
+    const nodeStartedObservable = getChildProcessObservable({
+      processName: 'NODE',
+      onSuccess: of(WelcomeActions.authenticateAndRestoreWallet()),
+      onFailure: of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
       action$
-    )
+    })
 
     const nodeShutDownObservable = action$.pipe(
       ofType(SettingsActions.childProcessFailed),
@@ -164,6 +193,7 @@ export const GetStartedEpic = (action$, state$) => merge(
 	generateWalletEpic(action$, state$),
 	applyConfigurationEpic(action$, state$),
   encryptWalletEpic(action$, state$),
+  restoreWalletEpic(action$, state$),
   authenticateAndRestoreWalletEpic(action$, state$),
   walletBootstrappingSucceededEpic(action$, state$),
   useResistanceEpic(action$, state$)

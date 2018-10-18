@@ -6,7 +6,7 @@ import React, { Component } from 'react'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
 
-import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
+import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 
 import styles from './Orders.scss'
@@ -126,7 +126,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(ResDexActions.orders, dispatch)
+  actions: bindActionCreators(ResDexOrdersActions, dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexOrders))

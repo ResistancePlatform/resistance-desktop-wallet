@@ -10,15 +10,16 @@ import { ofType } from 'redux-observable'
 import { toastr, actions as toastrActions } from 'react-redux-toastr'
 
 import { i18n } from '~/i18next.config'
+import { getChildProcessObservable } from '~/utils/child-process'
 import { getEnsureLoginObservable } from '~/utils/auth'
 import { Action } from '../types'
-import { getStartLocalNodeObservable } from '~/utils/child-process'
+import { AuthActions } from '../auth/auth.reducer'
+import { ResDexActions } from '../resdex/resdex.reducer'
+import { SettingsActions } from './settings.reducer'
 import { RpcService } from '~/service/rpc-service'
 import { ResistanceService } from '~/service/resistance-service'
 import { MinerService } from '~/service/miner-service'
 import { TorService } from '~/service/tor-service'
-import { AuthActions } from '../auth/auth.reducer'
-import { SettingsActions } from './settings.reducer'
 
 const t = i18n.getFixedT(null, 'settings')
 const rpc = new RpcService()
@@ -58,7 +59,7 @@ const kickOffChildProcessesEpic = (action$: ActionsObservable<Action>, state$) =
       )
     }
 
-    return observables
+    return concat(observables, of(ResDexActions.startResdex()))
   })
 )
 
@@ -188,17 +189,18 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     const newWalletPath = path.join(resistanceService.getWalletPath(), walletFileName)
 
     // Third, send the password for the new wallet
-    const startLocalNodeObservable = getStartLocalNodeObservable(
-      concat(
+    const startLocalNodeObservable = getChildProcessObservable({
+      processName: 'NODE',
+      onSuccess: concat(
         of(AuthActions.ensureLogin(t(`Your restored wallet password is required`), true)),
         of(toastrActions.add({
           type: 'success',
           title: t(`Wallet restored successfully.`)
         }))
       ),
-      of(SettingsActions.restoringWalletFailed()),
+      onFailure: of(SettingsActions.restoringWalletFailed()),
       action$
-    )
+    })
 
     const copyPromise = promisify(fs.copyFile)(action.payload.filePath, newWalletPath)
 

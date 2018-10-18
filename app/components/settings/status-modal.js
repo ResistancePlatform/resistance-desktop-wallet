@@ -2,26 +2,29 @@
 import * as fs from 'fs'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import Modal from 'react-modal'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { LazyLog } from 'react-lazylog'
 import classNames from 'classnames'
 
-import 'react-tabs/style/react-tabs.scss'
+import { getChildProcessStatusName } from '~/utils/child-process'
 import { OSService, ChildProcessName } from '~/service/os-service'
-import { appStore } from '~/store/configureStore'
 import { SettingsActions, SettingsState } from '~/reducers/settings/settings.reducer'
+
+import 'react-tabs/style/react-tabs.scss'
 import styles from './status-modal.scss'
 
 const osService = new OSService()
 
-const processNames = ['NODE', 'MINER', 'TOR']
+const processNames = ['NODE', 'MINER', 'TOR', 'RESDEX']
 
 type Props = {
   t: any,
 	settings: SettingsState,
-  systemInfo: SystemInfoState
+  systemInfo: SystemInfoState,
+  actions: object
 }
 
 type ModalState = {
@@ -128,12 +131,7 @@ class StatusModal extends Component<Props> {
     const pathWithRefreshKey = `${logFilePath}?refreshPathKey=${this.refreshPathKey}`
 
     this.setState({ processLogFilesPath:  { ...this.state.processLogFilesPath, [processName]: pathWithRefreshKey } })
-    this.refreshPathKey++
-  }
-
-  onCloseClicked(event) {
-		this.eventConfirm(event)
-		appStore.dispatch(SettingsActions.closeStatusModal())
+    this.refreshPathKey += 1
   }
 
   render() {
@@ -152,8 +150,8 @@ class StatusModal extends Component<Props> {
             role="button"
             tabIndex={0}
             className={styles.closeButton}
-            onClick={event => this.onCloseClicked(event)}
-            onKeyDown={event => this.onCloseClicked(event)}
+            onClick={this.props.actions.closeStatusModal}
+            onKeyDown={this.props.actions.closeStatusModal}
           />
           <div className={styles.titleText}>
             {t(`Services Status`)}
@@ -172,23 +170,30 @@ class StatusModal extends Component<Props> {
               <Tab className={styles.tab}>
                 <i
                   className={this.getChildProcessStatusClassNames('NODE')}
-                  title={this.props.settings.childProcessesStatus.NODE}
+                  title={getChildProcessStatusName(this.props.settings.childProcessesStatus.NODE)}
                 />
                 {t(`Node Log`)}
               </Tab>
               <Tab className={styles.tab}>
                 <i
                   className={this.getChildProcessStatusClassNames('MINER')}
-                  title={this.props.settings.childProcessesStatus.MINER}
+                  title={getChildProcessStatusName(this.props.settings.childProcessesStatus.MINER)}
                 />
                 {t(`Miner Log`)}
               </Tab>
               <Tab className={styles.tab}>
                 <i
                   className={this.getChildProcessStatusClassNames('TOR')}
-                  title={this.props.settings.childProcessesStatus.TOR}
+                  title={getChildProcessStatusName(this.props.settings.childProcessesStatus.TOR)}
                 />
                 {t(`Tor Log`)}
+                </Tab>
+                <Tab className={styles.tab}>
+                <i
+                  className={this.getChildProcessStatusClassNames('RESDEX')}
+                  title={getChildProcessStatusName(this.props.settings.childProcessesStatus.RESDEX)}
+                />
+                {t(`ResDEX Log`)}
               </Tab>
             </TabList>
 
@@ -214,17 +219,12 @@ class StatusModal extends Component<Props> {
               </table>
             </TabPanel>
 
-            <TabPanel>
-              {this.getLazyLogElement('NODE')}
-            </TabPanel>
+            {processNames.map(processName => (
+              <TabPanel key={processName}>
+                {this.getLazyLogElement(processName)}
+              </TabPanel>
+            ))}
 
-            <TabPanel>
-              {this.getLazyLogElement('MINER')}
-            </TabPanel>
-
-            <TabPanel>
-              {this.getLazyLogElement('TOR')}
-            </TabPanel>
           </Tabs>
         </div>
 
@@ -242,8 +242,8 @@ class StatusModal extends Component<Props> {
           <button
             type="button"
             className={styles.closeButton}
-            onClick={event => this.onCloseClicked(event)}
-            onKeyDown={event => this.onCloseClicked(event)}
+            onClick={this.props.actions.closeStatusModal}
+            onKeyDown={this.props.actions.closeStatusModal}
           >
             Close
           </button>
@@ -259,4 +259,8 @@ const mapStateToProps = state => ({
   systemInfo: state.systemInfo,
 })
 
-export default connect(mapStateToProps, null)(translate('settings')(StatusModal))
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(SettingsActions, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(translate('settings')(StatusModal))

@@ -6,9 +6,11 @@ import { actions as toastrActions } from 'react-redux-toastr'
 
 // import { translate } from '~/i18next.config'
 import { ResDexPortfolioService } from '~/service/resdex/portfolio'
+import { ResDexApiService } from '~/service/resdex/api'
 import { ResDexLoginActions } from './reducer'
 
 // const t = translate('resdex')
+const api = new ResDexApiService()
 const portfolio = new ResDexPortfolioService()
 const displayErrorAction = err => toastrActions.add({ type: 'error', title: err.message })
 
@@ -33,10 +35,14 @@ const login = (action$: ActionsObservable<Action>, state$) => action$.pipe(
     const decryptObservable = from(portfolio.decryptSeedPhrase(encryptedSeedPhrase, loginFields.password))
 
     return decryptObservable.pipe(
-      switchMap((seedPhrase: string) => of(
-        ResDexLoginActions.loginSucceeded(),
-        ResDexLoginActions.startMarketMaker(seedPhrase)
-      )),
+      switchMap((seedPhrase: string) => {
+        api.setToken(seedPhrase)
+
+        return of(
+          ResDexLoginActions.loginSucceeded(),
+          ResDexLoginActions.startMarketMaker(seedPhrase)
+        )
+      }),
       catchError(err => of(displayErrorAction(err)))
     )
   })

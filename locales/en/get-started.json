@@ -42,5 +42,9 @@
   "Keys files": "Keys files",
   "Restoring the wallet from the private keys...": "Restoring the wallet from the private keys...",
   "Private keys file": "Private keys file",
-  "Please wait for Resistance parameters download to complete": "Please wait for Resistance parameters download to complete"
+  "Please wait for Resistance parameters download to complete": "Please wait for Resistance parameters download to complete",
+  "Restore wallet from backup": "Restore wallet from backup",
+  "Wallet password": "Wallet password",
+  "Restore height": "Restore height",
+  "Wallet files": "Wallet files"
 }

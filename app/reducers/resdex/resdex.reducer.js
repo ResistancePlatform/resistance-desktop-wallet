@@ -2,8 +2,12 @@
 import { createActions } from 'redux-actions'
 import { combineReducers } from 'redux'
 
-import { preloadedState } from '~/reducers/preloaded.state'
-import { ResDexLoginActions, ResDexLoginReducer } from './login/reducer'
+import { ResDexLoginReducer } from './login/reducer'
+import { ResDexAssetsReducer } from './assets/reducer'
+import { ResDexBuySellReducer } from './buy-sell/reducer'
+import { ResDexOrdersReducer } from './orders/reducer'
+import { EnabledCurrency, ResDexAccountsReducer } from './accounts/reducer'
+
 
 export type Order = {}
 
@@ -27,12 +31,24 @@ export type ResDexState = {
     completedOrders: Order[]
   },
   accounts: {
+    currencies: { [string]: Currency },
+    enabledCurrencies: EnabledCurrency[],
+    depositModal: {
+      isVisible: boolean,
+      symbol: string | null
+    },
+    withdrawModal: {
+      isVisible: boolean,
+      symbol: string | null
+    }
   }
 }
 
 export const ResDexActions = createActions(
   {
     EMPTY: undefined,
+    START_RESDEX: undefined,
+    STOP_RESDEX: undefined,
   },
   {
     prefix: 'APP/RESDEX'
@@ -41,8 +57,8 @@ export const ResDexActions = createActions(
 
 export const ResDexReducer = combineReducers({
   login: ResDexLoginReducer,
-  assets: (arg1, arg2) => arg2,
-  buySell: (arg1, arg2) => arg2,
-  orders: (arg1, arg2) => preloadedState.resDex.orders,
-  accounts: (arg1, arg2) => arg2,
+  assets: ResDexAssetsReducer,
+  buySell: ResDexBuySellReducer,
+  orders: ResDexOrdersReducer,
+  accounts: ResDexAccountsReducer,
 })

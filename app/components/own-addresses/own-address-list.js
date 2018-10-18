@@ -21,9 +21,9 @@ class OwnAddressList extends Component<Props> {
   getListHeaderRenderer(t) {
     return (
       <UniformListHeader>
-        <UniformListColumn width="22%">{t(`Balance`)}</UniformListColumn>
-        <UniformListColumn width="18%">{t(`Confirmed`)}</UniformListColumn>
-        <UniformListColumn width="60%">{t(`Address`)}</UniformListColumn>
+        <UniformListColumn width="15%">{t(`Balance`)}</UniformListColumn>
+        <UniformListColumn width="10%">{t(`Confirmed`)}</UniformListColumn>
+        <UniformListColumn width="75%">{t(`Address`)}</UniformListColumn>
       </UniformListHeader>
     )
   }

@@ -1,7 +1,5 @@
-@import "../../assets/styles/generic-component.scss";
-@import "../../assets/styles/vars.scss";
-
-$SYSTEM_INFO_BAR_HEIGHT: 5.5rem;
+@import "~/assets/styles/generic-component.scss";
+@import "~/assets/styles/vars.scss";
 
 .systemInfoContainer {
     padding: 0 2rem 0 1.5rem;
@@ -58,6 +56,10 @@ $SYSTEM_INFO_BAR_HEIGHT: 5.5rem;
   }
 }
 
+.statusButtonsContainer {
+  margin-right: -1.4rem;
+}
+
 .walletInFileManagerButton {
     @include roundedButton();
 }
@@ -66,71 +68,4 @@ $SYSTEM_INFO_BAR_HEIGHT: 5.5rem;
     @include roundedButton();
 
     margin-left: 1rem;
-}
-
-.statusButtonsContainer {
-  margin-right: -1.4rem;
-}
-
-.statusCustomIconsContainer {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  margin-right: 3px;
-}
-
-.statusIcon {
-  color: $BASE_COLOR_INACTIVE_ICON;
-
-  &.active {
-    color: $BASE_COLOR_ACTIVE_ICON;
-  }
-}
-
-@font-face {
-  font-family: 'custom-icons';
-  src:  url(assets/fonts/custom-icons.woff2) format('woff2');
-  font-weight: normal;
-  font-style: normal;
-}
-
-[class*="customIcon"] {
-  font-family: 'custom-icons' !important;
-  speak: none;
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  font-size: 1.4rem;
-  margin-right: 6px;
-}
-
-.customIconTor:before {
-  content: "a";
-}
-
-.customIconMining:before {
-  content: "b";
-}
-
-.customIconPrivacy:before {
-  content: "c";
-}
-
-.customIconOperations:before {
-  content: "d";
-}
-
-.operationsIconHint {
-  color: white;
-  font-size: 0.5rem;
-  background-color: $SYSTEM_INFO_ICON_HINT_COLOR;
-  border-radius: 3px;
-  padding: 0 1px;
-  right: 58px;
-  top: 2px;
-  position: absolute;
-  cursor: default;
 }

@@ -31,6 +31,8 @@ export const SettingsActions = createActions(
     ENABLE_TOR: undefined,
     DISABLE_TOR: undefined,
 
+    START_RESDEX: undefined,
+
     INITIATE_WALLET_BACKUP: undefined,
     BACKUP_WALLET: filePath => ({filePath}),
     INITIATE_WALLET_RESTORE: undefined,
@@ -124,6 +126,12 @@ export const SettingsReducer = handleActions(
       ...state,
       childProcessesStatus: { ...state.childProcessesStatus, TOR: 'STOPPING' },
       isTorEnabled: false
+    }),
+
+    // ResDEX
+    [SettingsActions.startResdex]: state => ({
+      ...state,
+      childProcessesStatus: { ...state.childProcessesStatus, RESDEX: 'STARTING' }
     }),
 
     // Child process updates

@@ -1,12 +1,13 @@
 import { remote } from 'electron'
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
+import { RESDEX } from '~/constants/resdex'
 
 export const preloadedState: State = {
   auth: {
     reason: null,
     enter: true,
-    isLoginRequired: true, // process.env.NODE_ENV !== 'development'
+    isLoginRequired: process.env.NODE_ENV !== 'development'
   },
   roundedForm: {},
   fetchParameters: {
@@ -102,13 +103,14 @@ export const preloadedState: State = {
 		childProcessesStatus: {
 			NODE: 'NOT RUNNING',
 			MINER: 'NOT RUNNING',
-			TOR: 'NOT RUNNING'
+      TOR: 'NOT RUNNING',
+      RESDEX: 'NOT RUNNING',
     },
     language: 'en'
 	},
   resDex: {
     login: {
-      isRequired: true,
+      isRequired: false,
       portfolios: []
     },
     assets: {
@@ -156,6 +158,16 @@ export const preloadedState: State = {
       }],
     },
     accounts: {
+      currencies: {},
+      enabledCurrencies: [],
+      depositModal: {
+        isVisible: false,
+        symbol: null
+      },
+      withdrawModal: {
+        isVisible: false,
+        symbol: null
+      }
     }
   }
 }
@@ -173,4 +185,8 @@ Object.assign(preloadedState.settings, {
 	isMinerEnabled: config.get('manageDaemon.enableMiner', false),
 	isTorEnabled: config.get('manageDaemon.enableTor', false),
 	language: config.get('language', 'en')
+})
+
+Object.assign(preloadedState.resDex.accounts, {
+  enabledCurrencies: config.get('resDex.enabledCurrencies', RESDEX.alwaysEnabledCurrencies)
 })

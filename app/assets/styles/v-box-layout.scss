@@ -13,7 +13,7 @@
     align-items: stretch;
 
     // This flag control how the items align in `another direction`, same values with `align-items`
-    justify-content: center;
+    justify-content: start;
 }
 
 .vBoxChild {
@@ -22,6 +22,6 @@
     // It equals to :
     // flex-grow: 1;
     // flex-shrink: 1;
-    // flex-basis: auto;    
-    flex: 1
+    // flex-basis: auto;
+    flex: 1;
 }

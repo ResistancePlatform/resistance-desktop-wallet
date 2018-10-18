@@ -1,6 +1,6 @@
 // @flow
 import { EOL } from 'os'
-import * as fs from 'fs';
+import * as fs from 'fs'
 import path from 'path'
 import log from 'electron-log'
 import config from 'electron-settings'
@@ -20,7 +20,6 @@ const osService = new OSService()
 
 const walletFolderName = 'testnet3'
 const configFolderName = 'Resistance'
-const paramFolderName = 'ResistanceParams'
 const configFileName = 'resistance.conf'
 const configFileContents = [
   `testnet=1`,
@@ -65,17 +64,26 @@ export class ResistanceService {
     return configFolder;
   }
 
-  //This is for the raw wallet path i.e. the testnet3 directory
+	/**
+   * This is for the raw wallet path i.e. the testnet3 directory
+   *
+	 * @memberof ResistanceService
+	 * @returns {string}
+	 */
   getWalletPath() {
     return path.join(this.getDataPath(), walletFolderName)
   }
 
   getParamsPath() {
     const validApp = process.type === 'renderer' ? remote.app : app
-    let paramsPath = path.join(validApp.getPath('appData'), paramFolderName)
+    let paramsPath
+
     if (osService.getOS() === 'linux') {
-      configFolder = path.join(validApp.getPath('home'), '.resistance-params')
+      paramsPath  = path.join(validApp.getPath('home'), '.resistance-params')
+    } else {
+      paramsPath = path.join(validApp.getPath('appData'), 'ResistanceParams')
     }
+
     return paramsPath
   }
 
@@ -179,7 +187,7 @@ function startOrRestart(isTorEnabled: boolean, start: boolean) {
   args.push(`-wallet=${walletName}.dat`)
   const caller = start ? osService.execProcess : osService.restartProcess
 
-  this::verifyExportDirExistence().then(exportDir => {
+  osService.verifyDirectoryExistence(this.getExportDir()).then(exportDir => {
     args.push(`-exportdir=${exportDir}`)
     caller.bind(osService)('NODE', args, this::handleStdout)
     return Promise.resolve()
@@ -197,25 +205,4 @@ function startOrRestart(isTorEnabled: boolean, start: boolean) {
  */
 function handleStdout(data: Buffer) {
   return data.toString().includes(`init message: Done loading`)
-}
-
-/**
- * Privte method. Checks if local node export directory exists, otherwise creates one.
- *
- * @returns {Promise}
- * @memberof ResistanceService
- */
-function verifyExportDirExistence() {
-  const exportDir = this.getExportDir()
-
-  const promise = new Promise((resolve, reject) => {
-    fs.access(exportDir, err => {
-      if (err) {
-        fs.mkdir(exportDir, mkdirError => mkdirError ? reject(mkdirError) : resolve(exportDir))
-      }
-      resolve(exportDir)
-    })
-  })
-
-  return promise
 }

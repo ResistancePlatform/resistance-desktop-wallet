@@ -5,21 +5,25 @@ import path from 'path'
 import log from 'electron-log'
 import { spawn } from 'child_process'
 import { app, remote } from 'electron'
+import ps from 'ps-node'
+
 
 /**
  * ES6 singleton
  */
 let instance = null
 
-const ps = require('ps-node')
-
-export type ChildProcessName = 'NODE' | 'TOR' | 'MINER' | 'MARKET_MAKER'
+export type ChildProcessName = 'NODE' | 'TOR' | 'MINER' | 'RESDEX'
 export type ChildProcessStatus = 'RUNNING' | 'STARTING' | 'RESTARTING' | 'FAILED' | 'STOPPING' | 'MURDER FAILED' | 'NOT RUNNING'
+
+
+const childProcessNames = ['NODE', 'MINER', 'TOR', 'RESDEX']
 
 const ChildProcessCommands = {
   NODE: 'resistanced',
   MINER: 'minerd',
-  TOR: 'tor-proxy'
+  TOR: 'tor-proxy',
+  RESDEX: 'resdex'
 }
 
 /**
@@ -39,9 +43,8 @@ export class OSService {
     // Create a global var to store child processes information for the cleanup
     if (process.type === 'browser' && global.childProcesses === undefined) {
       const childProcesses = {}
-      const processNames = ['NODE', 'MINER', 'TOR']
 
-      processNames.forEach(processName => {
+      childProcessNames.forEach(processName => {
         childProcesses[processName] = {
           pid: null,
           instance: null,
@@ -140,6 +143,7 @@ export class OSService {
   getInstallationPath() {
     const validApp = process.type === 'renderer' ? remote.app : app
     let walkUpPath
+
     switch (this.getOS()) {
       case 'windows':
         walkUpPath = '/../../../'
@@ -147,11 +151,13 @@ export class OSService {
       case 'macos':
         walkUpPath = '/../../../../'
         break
-      case 'linux':
+      default:
         walkUpPath = '/../../../../..'
         break
     }
+
     log.info(validApp.getAppPath())
+
     return path.join(validApp.getAppPath(), walkUpPath)
   }
 
@@ -214,10 +220,10 @@ export class OSService {
 	 * @param {function} stdoutHandler If returns true the process is considered started.
 	 * @memberof OSService
 	 */
-  restartProcess(processName: ChildProcessName, args = [], stdoutHandler) {
+  restartProcess(processName: ChildProcessName, args = [], stdoutHandler, spawnOptions = {}) {
     log.info(`Restarting ${processName} process.`)
     this.killProcess(processName, () => {
-      this.execProcess(processName, args, stdoutHandler)
+      this.execProcess(processName, args, stdoutHandler, spawnOptions)
     })
   }
 
@@ -229,7 +235,7 @@ export class OSService {
 	 * @param {function} stdoutHandler If returns true the process is considered started.
 	 * @memberof OSService
 	 */
-  execProcess(processName: ChildProcessName, args = [], stdoutHandler) {
+  execProcess(processName: ChildProcessName, args = [], stdoutHandler, spawnOptions = {}) {
     const actions = this.getSettingsActions()
 
     const errorHandler = (err) => {
@@ -240,22 +246,24 @@ export class OSService {
     const command = ChildProcessCommands[processName]
 
     this.killProcess(processName, () => {}).then(() => {
-      let options
+      const options = { ...spawnOptions }
       let isUpdateFinished = false
       const commandPath = path.join(this.getBinariesPath(), command)
 
       if (this.getOS() === 'macos') {
-        options = {
-          env: {
-            ...process.env,
-            DYLD_LIBRARY_PATH: this.getBinariesPath()
-          }
+        options.env = {
+          ...process.env,
+          DYLD_LIBRARY_PATH: this.getBinariesPath()
         }
       }
 
+      const logFile = this.getLogFilePath(processName)
+      const logStream = fs.createWriteStream(logFile, {flags: 'a'})
+
       const childProcessInfo = remote.getGlobal('childProcesses')[processName]
 
-      log.info(`Executing command ${commandPath} with arguments ${args.join(' ')}.`)
+      const truncatedArguments = args.join(' ').substring(0, 256)
+      log.info(`Executing command ${commandPath} with arguments ${truncatedArguments}.`)
       const childProcess = spawn(commandPath, args, options)
 
       const onData = (data: Buffer) => {
@@ -296,9 +304,6 @@ export class OSService {
 
         childProcessInfo.isGettingKilled = false
       })
-
-      const logFile = this.getLogFilePath(processName)
-      const logStream = fs.createWriteStream(logFile, {flags: 'a'})
 
       childProcess.stdout.pipe(logStream)
       childProcess.stderr.pipe(logStream)
@@ -417,4 +422,24 @@ export class OSService {
 
     return promise
   }
+
+  /**
+   * Checks if a directory exists, otherwise creates one.
+   *
+   * @returns {Promise}
+   * @memberof ResistanceService
+   */
+  verifyDirectoryExistence(directoryPath: string) {
+    const promise = new Promise((resolve, reject) => {
+      fs.access(directoryPath, err => {
+        if (err) {
+          fs.mkdir(directoryPath, mkdirError => mkdirError ? reject(mkdirError) : resolve(directoryPath))
+        }
+        resolve(directoryPath)
+      })
+    })
+
+    return promise
+  }
+
 }

@@ -14,8 +14,10 @@ import chalk from 'chalk';
 import merge from 'webpack-merge';
 import { spawn, execSync } from 'child_process';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import CopyPlugin from 'copy-webpack-plugin'
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
+
 
 CheckNodeEnv('development');
 
@@ -242,7 +244,15 @@ export default merge.smart(baseConfig, {
 
     new ExtractTextPlugin({
       filename: '[name].css'
-    })
+    }),
+
+    new CopyPlugin([
+			{
+				context: 'node_modules/cryptocurrency-icons/svg/color',
+				from: '*.svg',
+        to: 'app/assets/images/resdex/cryptocurrency-icons'
+			}
+		])
   ],
 
   node: {

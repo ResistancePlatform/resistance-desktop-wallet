@@ -5,9 +5,9 @@ import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 
-import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
+import CurrencyIcon from './CurrencyIcon'
+import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 
-import btcImage from '~/assets/images/resdex/BTC.svg'
 import styles from './Accounts.scss'
 
 type Props = {
@@ -35,7 +35,7 @@ class ResDexAccounts extends Component<Props> {
           <div className={styles.record}>
             <div className={styles.columnsWrapper}>
               <div className={styles.account}>
-                <img src={btcImage} alt="Bitcoin"/>
+              <CurrencyIcon symbol="BTC" size="1.5rem" />
               </div>
 
               <div className={styles.balance}>
@@ -95,7 +95,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(ResDexActions.orders, dispatch)
+  actions: bindActionCreators(ResDexOrdersActions, dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexAccounts))

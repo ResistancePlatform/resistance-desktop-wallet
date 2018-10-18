@@ -1,0 +1,77 @@
+@import "~/assets/styles/vars.scss";
+
+.container {
+  -webkit-app-region: no-drag;
+  position: absolute;
+  left: 0;
+  bottom: $SYSTEM_INFO_BAR_HEIGHT;
+  width: $NAVI_BAR_CONTAINER_WIDTH + 1.35rem;
+  height: 1.2rem;
+  display: flex;
+  background: $STATUS_ICONS_BACKGROUND_COLOR;
+  border-top: 1px solid $BASE_COLOR_BORDER_BLUE;
+  padding: 0.7rem 0;
+
+  > div {
+    display: inline-block;
+    width: 25%;
+    border-right: 1px solid $BASE_COLOR_BORDER_BLUE;
+    padding: 0 1rem;
+    color: $BASE_COLOR_INACTIVE_ICON;
+    font-size: 1.1rem;
+
+    &.active {
+      color: $BASE_COLOR_ACTIVE_ICON;
+    }
+  }
+
+  > div:last-child {
+    border: none;
+  }
+
+  .mining:before {
+    content: '\e914';
+    margin-left: 0.25rem;
+  }
+
+  .privateTransactions {
+    font-size: 1.3rem;
+  }
+
+  .privateTransactions:before {
+    content: '\e911';
+  }
+
+  .privateTransactions.active:before {
+    content: '\e912';
+  }
+
+  .tor:before {
+    content: '\e913';
+    margin-left: 0.22rem;
+  }
+
+  .operations {
+    cursor: pointer;
+  }
+
+  .operations:before {
+    content: '\e915';
+    font-size: 1rem;
+    font-weight: 50;
+    margin-left: 0.19rem;
+  }
+
+}
+
+.operationsIconHint {
+  color: white;
+  font-size: 0.5rem;
+  background-color: $SYSTEM_INFO_ICON_HINT_COLOR;
+  border-radius: 3px;
+  padding: 0 1px;
+  right: 58px;
+  top: 2px;
+  position: absolute;
+  cursor: default;
+}

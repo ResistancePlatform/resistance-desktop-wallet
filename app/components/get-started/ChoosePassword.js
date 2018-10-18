@@ -4,6 +4,7 @@ import classNames from 'classnames'
 import { NavLink } from 'react-router-dom'
 import * as Joi from 'joi'
 
+import { getPasswordValidationSchema } from '~/utils/auth'
 import RoundedInput from '~/components/rounded-form/RoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 import PasswordStrength from '~/components/password-strength/PasswordStrength'
@@ -30,12 +31,7 @@ export class ChoosePassword extends Component<Props> {
     const { t } = this.props
 
     const schema = Joi.object().keys({
-      password: (
-        Joi.string().required()
-        .min(6)
-        .token()
-        .label(t(`Password`))
-      ),
+      password: getPasswordValidationSchema(),
       confirmPassword: (
         Joi.string().required().valid(Joi.ref('password'))
         .label(t(`Confirm password`))
