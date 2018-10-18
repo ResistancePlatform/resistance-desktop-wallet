@@ -14,6 +14,7 @@ import TitleBarButtons, { DragBar } from '~/components/title-bar-buttons/TitleBa
 import RoundedInput from '~/components/rounded-form/RoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
+import animatedSpinner from '~/assets/images/animated-spinner.svg'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 import resistanceLogo from '~/assets/images/logo.svg'
@@ -74,7 +75,10 @@ class Login extends Component<Props> {
             onKeyDown={this.props.actions.submitPassword}
             disabled={!isNodeRunning}
           >
-            { isNodeRunning ? t(`Submit`) : t(`Waiting for the daemon...`) }
+            {!isNodeRunning &&
+              <img src={animatedSpinner} alt={t(`Loading`)} title={t(`Waiting for the daemon...`)}/>
+            }
+            {t(`Login`)}
           </button>
         </RoundedForm>
       </div>

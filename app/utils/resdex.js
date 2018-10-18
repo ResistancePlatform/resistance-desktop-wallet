@@ -1,4 +1,7 @@
+import { Decimal } from 'decimal.js'
 import coinlist from 'coinlist'
+
+import { RESDEX } from '~/constants/resdex'
 import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 
 // const getCurrencySymbols = () => (
@@ -27,9 +30,17 @@ const isEtomic = symbol => {
 	return currency.etomic
 }
 
+const calculateMaxTotalPayout = (quoteAmount, price, quoteFee) => {
+  const dexFee = RESDEX.dexFee.div(Decimal('100'))
+  const divider = price.plus(price.times(dexFee)).plus(quoteFee)
+  return quoteAmount.dividedBy(divider)
+}
+
+
 export {
 	// getCurrencySymbols,
 	getCurrencyName,
 	getCurrency,
-	isEtomic
+  isEtomic,
+  calculateMaxTotalPayout,
 }

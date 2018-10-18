@@ -8,6 +8,7 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import merge from 'webpack-merge';
 import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
+import CopyPlugin from 'copy-webpack-plugin';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
 
@@ -174,6 +175,14 @@ export default merge.smart(baseConfig, {
     }),
 
     new ExtractTextPlugin('style.css'),
+
+    // new CopyPlugin([
+		// 	{
+		// 		context: 'node_modules/cryptocurrency-icons/svg/color',
+		// 		from: '*.svg',
+    //     to: 'app/assets/images/resdex/cryptocurrency-icons'
+		// 	}
+		// ]),
 
     new BundleAnalyzerPlugin({
       analyzerMode:

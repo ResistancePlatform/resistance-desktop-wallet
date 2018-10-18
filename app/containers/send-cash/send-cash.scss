@@ -6,6 +6,14 @@
     min-width: 30rem;
 }
 
+.oldInputLabel {
+  min-width: 7.21rem !important;
+}
+
+.inputLabel {
+  min-width: 8.25rem !important;
+}
+
 .wrapperContainer {
     justify-content: flex-start;
     align-items: flex-start;
@@ -13,8 +21,9 @@
 }
 
 .titleBar {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
+  font-size: 1.25rem;
+  font-weight: 100;
+  margin-bottom: 2rem;
 }
 
 .sendFromContainer {
@@ -55,6 +64,7 @@
 
 .toggleButton {
     display: block !important;
+    text-transform: uppercase;
 
     position: relative;
     width: 3.8rem;
@@ -142,8 +152,8 @@
   .transactionFeeContainer {
     font-weight: 300;
     font-size: 0.6rem;
-    padding-top: 1rem;
-    margin-right: 2.5rem;
+    padding-top: 0.5rem;
+    margin-right: 3rem;
 
     color: $BASE_COLOR_BUTTON_FONT_GRAY;
 
@@ -161,26 +171,27 @@
 
 // Overwrite the CSS for the <RoundedInput> --> <input> --> <span> left
 div[name="from-address"] {
-    span[class*="tooltips"] {
-        &:after {
-            left: 25% !important;
-        }
+  width: 23rem;
+  span[class*="tooltips"] {
+    &:after {
+      left: 25% !important;
     }
+  }
 }
 
 // Overwrite the CSS for the <input> width, and the <RoundedInput> --> <input> --> <span> left
-div[name="destination-address"] {
-    width: 35.5rem;
+.destinationAddressInput {
+  width: 37rem;
 
-    input {
-        min-width: 20rem !important;
-        max-width: 25rem !important;
-        width: 21rem !important;
-    }
+  // input {
+  //   min-width: 20rem !important;
+  //   max-width: 25rem !important;
+  //   width: 21rem !important;
+  // }
 
-    span[class*="tooltips"] {
-        left: 27% !important;
-    }
+  // span[class*="tooltips"] {
+  //   left: 27% !important;
+  // }
 }
 
 div[name="amount"] {
@@ -197,12 +208,13 @@ div[name="amount"] {
 
 .sendButtonContainer {
     margin-bottom: 1.5rem;
+
     button {
         @include roundedButton(true);
 
         margin-left: 0;
         margin-right: 2rem;
-        padding: 0.5rem 2rem;
+        padding: 0.4rem 2rem;
     }
 
     div {

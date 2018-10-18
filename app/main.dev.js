@@ -11,17 +11,19 @@
  * @flow
  */
 import * as fs from 'fs'
+import crypto from 'crypto'
 import path from 'path'
 import config from 'electron-settings'
 import { app, ipcMain, BrowserWindow } from 'electron'
 import log from 'electron-log'
 
 import { i18n } from './i18next.config'
-import { OSService } from './service/os-service'
-import { ResistanceService } from './service/resistance-service'
+import { OSService } from './service/os-service-main'
+import { ResistanceService } from './service/resistance-service-main'
 import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
 
+// For the module to be imported in main, dirty, remove
 const os = new OSService()
 const resistance = new ResistanceService()
 const fetchParameters = new FetchParametersService()
@@ -78,7 +80,7 @@ const checkAndCreateWalletAppFolder = () => {
 
 const getWindowSize = (isGetStartedComplete: boolean = false) => {
   if (isGetStartedComplete || !config.get('getStartedInProgress', true)) {
-    const width = 943
+    const width = 960
     const height = 568
 
     return {
@@ -107,12 +109,20 @@ const getWindowSize = (isGetStartedComplete: boolean = false) => {
 // Propagate Resistance node config for the RPC service
 global.resistanceNodeConfig = resistance.checkAndCreateConfig()
 // Set ResDEX global var for further use in renderer process, see ./service/resdex/api.js
-global.resDex = { apiToken: '62b40fdefab327fd4971db31d0f6667c97f663fa2504425e0fa3c23dd50ab478' }
+// TODO: provide the one decrypted with the password
+
+const seedPhrase =  'jazz calming mantle pit fall alkane koran firework rabin canyons cindy'
+// const seedPhrase = 'treat board tree once reduce reduce expose coil guilt fish flat boil'
+
+global.resDex = {
+  apiToken: crypto.createHash('sha256').update(seedPhrase).digest('hex'),
+  seedPhrase,
+}
 
 checkAndCreateWalletAppFolder()
 
-// Temporarily disable GPU acceleration to make the app working in Parallels Desktop
-app.disableHardwareAcceleration()
+// Uncomment this line to make the app working in Parallels Desktop
+// app.disableHardwareAcceleration()
 
 /**
  * Add event listeners...

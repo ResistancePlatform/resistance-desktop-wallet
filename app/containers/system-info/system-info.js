@@ -9,6 +9,7 @@ import { toastr } from 'react-redux-toastr'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { getChildProcessStatusName } from '~/utils/child-process'
 import { OSService } from '~/service/os-service'
+import { ResDexAssetsActions } from '~/reducers/resdex/assets/reducer'
 import { SystemInfoActions, SystemInfoState } from '~/reducers/system-info/system-info.reducer'
 import { appStore } from '~/store/configureStore'
 import { State } from '~/reducers/types'
@@ -79,7 +80,11 @@ class SystemInfo extends Component<Props> {
             const amount = currentOperation.params.amounts[0]
             description = t(
               `Sent {{amount}} RES from {{from}} to {{to}}.`,
-              amount.amount, currentOperation.params.fromaddress, amount.address
+              {
+                amount: amount.amount,
+                from: currentOperation.params.fromaddress,
+                to: amount.address
+              }
             )
           }
           toastr.success(`${successTitle}${description ? '' : '.'}`, description)
@@ -143,6 +148,7 @@ class SystemInfo extends Component<Props> {
 		return (
 			<div className={cn(styles.systemInfoContainer, HLayout.hBoxContainer)}>
         <RpcPolling
+          criticalChildProcess="NODE"
           interval={daemonInfoPollingInterval}
           actions={{
             polling: SystemInfoActions.getDaemonInfo,
@@ -153,6 +159,7 @@ class SystemInfo extends Component<Props> {
 
         <RpcPolling
           interval={blockchainInfoPollingInterval}
+          criticalChildProcess="NODE"
           actions={{
             polling: SystemInfoActions.getBlockchainInfo,
             success: SystemInfoActions.gotBlockchainInfo,
@@ -162,10 +169,20 @@ class SystemInfo extends Component<Props> {
 
         <RpcPolling
           interval={operationsPollingInterval}
+          criticalChildProcess="NODE"
           actions={{
             polling: SystemInfoActions.getOperations,
             success: SystemInfoActions.gotOperations,
             failure: SystemInfoActions.getOperationsFailure
+          }}
+        />
+
+        <RpcPolling
+          interval={10.0 * 60 * 60}
+          actions={{
+            polling: ResDexAssetsActions.getCurrencyHistory,
+            success: ResDexAssetsActions.gotCurrencyHistory,
+            failure: ResDexAssetsActions.getCurrencyHistoryFailed
           }}
         />
 

@@ -47,5 +47,10 @@
   "Restore wallet from backup": "Restore wallet from backup",
   "Wallet password": "Wallet password",
   "Restore height": "Restore height",
-  "Wallet files": "Wallet files"
+  "Wallet files": "Wallet files",
+  "Unable to start Resistance local node": "Unable to start Resistance local node",
+  "Unable to start ResDEX": "Unable to start ResDEX",
+  "Initializing ResDEX...": "Initializing ResDEX...",
+  "Starting the local node...": "Starting the local node...",
+  "Starting the local node with the encrypted wallet...": "Starting the local node with the encrypted wallet..."
 }

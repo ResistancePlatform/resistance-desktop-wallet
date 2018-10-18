@@ -88,6 +88,8 @@ class UniformList extends Component<Props> {
   render() {
     const { t } = this.props
 
+    const emptyMessage = this.props.emptyMessage === false ? '' : this.props.emptyMessage || t(`No data to display.`)
+
     return (
       <div className={cn(styles.container, VLayout.vBoxChild, this.props.className)}>
 
@@ -95,7 +97,7 @@ class UniformList extends Component<Props> {
 
         {this.props.items.length
           ? this.getSortedItems().map(item => this.applyColumnWidths(this.props.rowRenderer(item)))
-          : this.props.emptyMessage || t(`No data to display.`)
+          : emptyMessage
         }
       </div>
     )

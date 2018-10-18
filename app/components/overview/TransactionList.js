@@ -32,9 +32,9 @@ class TransactionList extends Component<Props> {
       <UniformListHeader>
         <UniformListColumn width="6rem">{t(`Type`)}</UniformListColumn>
         <UniformListColumn width="5rem">{t(`Direction`)}</UniformListColumn>
-        <UniformListColumn width="5rem">{t(`Confirmed`)}</UniformListColumn>
-        <UniformListColumn width="6rem">{t(`Amount`)}</UniformListColumn>
-        <UniformListColumn width="9rem">{t(`Date`)}</UniformListColumn>
+        <UniformListColumn width="4rem">{t(`Confirmed`)}</UniformListColumn>
+        <UniformListColumn width="5rem">{t(`Amount`)}</UniformListColumn>
+        <UniformListColumn width="7.6rem">{t(`Date`)}</UniformListColumn>
         <UniformListColumn>{t(`Destination address`)}</UniformListColumn>
       </UniformListHeader>
     )

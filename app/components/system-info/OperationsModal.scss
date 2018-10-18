@@ -1,7 +1,7 @@
-@import "../../assets/styles/generic-component.scss";
-@import "../../assets/styles/vars.scss";
-@import "../../assets/styles/modal-dialog.scss";
-@import "../../assets/styles/table.scss";
+@import "~/assets/styles/generic-component.scss";
+@import "~/assets/styles/vars.scss";
+@import "~/assets/styles/modal-dialog.scss";
+@import "~/assets/styles/table.scss";
 
 .operationsModal {
   @extend .modalDialog;
@@ -9,7 +9,9 @@
 
 .operationsModalBody {
   @extend .modalBody;
-  padding: 6px;
+  padding: 0.4rem;
+  overflow-y: scroll;
+
 }
 
 .clearButton {

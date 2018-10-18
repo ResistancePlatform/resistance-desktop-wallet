@@ -1,7 +1,7 @@
 {
   "name": "resistance-desktop-wallet",
   "productName": "ResistanceWallet",
-  "version": "1.0.5-4",
+  "version": "1.0.5-10",
   "description": "Resistance cross-platform desktop wallet",
   "main": "./main.prod.js",
   "author": {

@@ -6,53 +6,97 @@
   margin: 1.5rem;
 }
 
+.tooltip {
+  &.enhancedPrivacy {
+    width: 22rem !important;
+  }
+
+  background: $BASE_BACKGROUND_COLOR_DARK_BLUE !important;
+  color: #a4abc7 !important;
+  opacity: 1 !important;
+  border-radius: 0.4rem;
+  font-size: 0.6rem;
+  font-family: inherit;
+  font-weight: 100;
+}
+
+.tooltip:after {
+	border-top: 0.5rem solid $BASE_BACKGROUND_COLOR_DARK_BLUE !important;
+}
+
+.inputLabel {
+  width: 5rem;
+}
+
+.oldInputLabel {
+  width: 5.2rem;
+}
+
+.info {
+  display: inline-block;
+  margin-left: 0.4rem;
+  border-radius: 50%;
+  border: 1px solid $BASE_COLOR_LIGHT_BLUE;
+  width: 0.65rem;
+  height: 0.65rem;
+  position: relative;
+  top: 0;
+}
+
+.info:after {
+  position: absolute;
+  content: 'i';
+  font-style: normal;
+  font-size: 0.55rem;
+  color: $BASE_COLOR_LIGHT_BLUE;
+  text-transform: lowercase;
+  left: 48%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+}
+
+.tabList {
+  margin-bottom: 0.38rem;
+  white-space: nowrap;
+  display: flex;
+}
+
+.tab {
+  margin: 0;
+  flex: 0.5;
+  text-align: center;
+  padding: 0.8rem 0 1.8rem 0;
+}
+
+.tab:last-child {
+  border-right: none;
+}
+
+.tabs {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.selectedTabPanel {
+  padding: 1rem;
+}
+
 .inputLabel {
   min-width: 5rem !important;
 }
 
 .actionContainer {
   @extend %smallContainer;
-  width: 50%;
-  padding: 1rem;
-
-  .inputsRow {
-    display: flex;
-
-    div {
-      .caption {
-        padding-left: 1rem;
-        display: block;
-        font-size: 0.7rem;
-        color: $BASE_COLOR_FONT_GRAY_2;
-        text-transform: uppercase;
-        padding-bottom: 1rem;
-        white-space: nowrap;
-      }
-
-      i:after {
-        content: 'i';
-        font-style: normal;
-        color: $BASE_COLOR_LIGHT_BLUE;
-        text-transform: lowercase;
-        margin-left: 1rem;
-      }
-
-      input {
-        text-align: left;
-      }
-
-      .maxAmount {
-        margin-right: 1rem;
-      }
-    }
-
-  }
+  min-width: 23.75rem;
+  width: 100%;
+  padding: 0;
 
   .enhancedPrivacy {
     margin-left: 1rem;
     margin-right: 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.7rem;
+    margin-bottom: 1.3rem;
+    font-size: 0.65rem;
     color: $BASE_COLOR_FONT_GRAY;
     text-align: justify;
 
@@ -76,6 +120,7 @@
   }
 
   input[type=checkbox]:before {
+    position: relative;
     content: '\0020';
     display: inline-block;
     background: #151a35;
@@ -85,6 +130,7 @@
     width: 0.8rem;
     height: 0.8rem;
     visibility: visible;
+    top: 0;
   }
 
   input[type=checkbox]:checked:before {
@@ -95,27 +141,36 @@
     position: relative;
     left: 50%;
     transform: translateX(-50%);
+    padding-left: 3rem;
+    padding-right: 3rem;
   }
 }
 
 .summaryContainer {
   @extend %smallContainer;
-  width: 50%;
+  min-width: 17.125rem;
+  max-width: 17.125rem;
   margin-left: 2rem;
 
   .briefContainer {
-    font-size: 0.7rem;
+    font-size: 0.61rem;
+    font-weight: 100;
     text-align: center;
+    background: $BALANCE_BACKGROUND_IMAGE;
+    border-radius: 0.3rem 0.3rem 0 0;
+    padding-bottom: 1.8rem;
 
     .brief {
       text-transform: uppercase;
-      margin-top: 2rem;
-      margin-bottom: 0.5rem;
+      padding-top: 2rem;
+      padding-bottom: 0.35rem;
     }
 
     .amount {
       font-size: 2.2rem;
       margin-bottom: 0.7rem;
+      overflow-x: hidden;
+      padding: 0 0.4rem;
 
       span {
         font-size: 1.2rem;
@@ -123,18 +178,33 @@
     }
 
     .at {
+      font-size: 0.58rem;
+      overflow-x: hidden;
+      padding: 0 0.4rem;
+      white-space: nowrap;
     }
 
   }
 
   .fromTo {
-    margin-top: 2.6rem;
     display: flex;
-    border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+    border-bottom: 1px solid $BASE_COLOR_BORDER_BLUE;
     padding: 1rem;
+
+    .exchangeIcon {
+      color: $BASE_COLOR_FONT_GRAY;
+      width: 3rem;
+      position: relative;
+    }
+
+    .exchangeIcon:before {
+      content: '\e916';
+      font-size: 1.41rem;
+    }
 
     .wallet {
       width: 50%;
+      white-space: nowrap;
 
       img {
         width: 1.3rem;
@@ -144,10 +214,10 @@
       }
 
       div {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
 
         span {
-          font-size: 0.6rem;
+          font-size: 0.55rem;
           display: block;
           color: $BASE_COLOR_FONT_GRAY_2;
           text-transform: uppercase;
@@ -158,7 +228,7 @@
   }
 
   .list {
-    padding: 1rem;
+    padding: 0.65rem 1rem;
     margin: 0;
     list-style: none;
     white-space: nowrap;
@@ -167,17 +237,25 @@
       display: flex;
       position: relative;
       width: 100%;
-      font-size: 0.7rem;
+      font-size: 0.625rem;
+      font-weight: 100;
       color: $BASE_COLOR_FONT_GRAY_2;
-      line-height: 2rem;
+      line-height: 1.65rem;
+      overflow-x: hidden;
 
       hr {
         width: 100%;
-        margin: 1rem 0.5rem 0 0.5rem;
+        margin: 0.77rem 0.5rem 0 0.5rem;
         height: 1px;
         display: inline-block;
         border: none;
-        border-top: 1px dashed $BASE_COLOR_FONT_GRAY;
+        // border-top: 1px dotted $BASE_COLOR_FONT_GRAY;
+
+        // Border
+        background-image: linear-gradient(to right, $BASE_COLOR_BORDER_GRAY 66%, rgba(255,255,255,0) 0%);
+        background-position: top;
+        background-size: 3px 1px;
+        background-repeat: repeat-x;
       }
 
       &.res {
@@ -186,19 +264,19 @@
           content: 'RES';
 
           left: 51%;
-          top: 0.1rem;
+          top: -0.1rem;
           transform: translateX(-50%);
 
           color: $BASE_COLOR_WHITE;
           background: $BASE_COLOR_PURPLE;
 
-          font-size: 0.6rem;
+          font-size: 0.58rem;
           font-weight: 500;
           line-height: 0.7rem;
 
-          padding: 0.1rem 0.5rem;
+          padding: 0.1rem 0.55rem;
           border-radius: 1.05rem;
-          border: 0.5rem solid $BASE_COLOR_DARK_BLUE_3;
+          border: 0.4rem solid $BASE_COLOR_DARK_BLUE_3;
         }
       }
     }

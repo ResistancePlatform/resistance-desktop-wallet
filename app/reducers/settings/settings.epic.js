@@ -9,7 +9,7 @@ import { of, from, bindCallback, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { toastr, actions as toastrActions } from 'react-redux-toastr'
 
-import { i18n } from '~/i18next.config'
+import { i18n, translate } from '~/i18next.config'
 import { getChildProcessObservable } from '~/utils/child-process'
 import { getEnsureLoginObservable } from '~/utils/auth'
 import { Action } from '../types'
@@ -21,7 +21,7 @@ import { ResistanceService } from '~/service/resistance-service'
 import { MinerService } from '~/service/miner-service'
 import { TorService } from '~/service/tor-service'
 
-const t = i18n.getFixedT(null, 'settings')
+const t = translate('settings')
 const rpc = new RpcService()
 const resistanceService = new ResistanceService()
 const minerService = new MinerService()

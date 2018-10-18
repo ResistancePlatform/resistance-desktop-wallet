@@ -6,7 +6,7 @@ import { translate } from 'react-i18next'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { OverviewActions } from '~/reducers/overview/overview.reducer'
-import { appStore } from '~/store/configureStore'
+import { getStore } from '~/store/configureStore'
 import Balance from '~/components/overview/Balance'
 import TransactionList from '~/components/overview/TransactionList'
 import TransactionPopupMenu from '~/components/overview/transaction-popup-menu'
@@ -35,7 +35,7 @@ class Overview extends Component<Props> {
 	 * @memberof Overview
 	 */
 	onTransactionRowClickHandler() {
-    appStore.dispatch(OverviewActions.updatePopupMenuVisibility(false, -1, -1, ''))
+    getStore().dispatch(OverviewActions.updatePopupMenuVisibility(false, -1, -1, ''))
 	}
 
 	/**
@@ -44,7 +44,7 @@ class Overview extends Component<Props> {
 	 * @memberof Overview
 	 */
 	onTransactionRowContextMenuHandler(event: SyntheticEvent<any>, transactionId: string) {
-    appStore.dispatch(OverviewActions.updatePopupMenuVisibility(true, event.clientX, event.clientY, transactionId))
+    getStore().dispatch(OverviewActions.updatePopupMenuVisibility(true, event.clientX, event.clientY, transactionId))
 	}
 
 	/**
@@ -60,7 +60,7 @@ class Overview extends Component<Props> {
 				break
 			}
 			case "SHOW_DETAILS": {
-				appStore.dispatch(OverviewActions.showTransactionDetail())
+				getStore().dispatch(OverviewActions.showTransactionDetail())
 				break
 			}
 			case "SHOW_IN_BLOCK_EXPLORER": {
@@ -74,14 +74,14 @@ class Overview extends Component<Props> {
 			}
 		}
 
-		appStore.dispatch(OverviewActions.updatePopupMenuVisibility(false, -1, -1, ''))
+		getStore().dispatch(OverviewActions.updatePopupMenuVisibility(false, -1, -1, ''))
 	}
 
 	/**
 	 * @memberof Overview
 	 */
 	onBackToTransactionListClickHandler() {
-		appStore.dispatch(OverviewActions.backToTransactionList())
+		getStore().dispatch(OverviewActions.backToTransactionList())
 	}
 
 	/**
@@ -127,6 +127,7 @@ class Overview extends Component<Props> {
 
         <RpcPolling
           interval={walletInfoPollingInterval}
+          criticalChildProcess="NODE"
           actions={{
             polling: OverviewActions.getWalletInfo,
             success: OverviewActions.gotWalletInfo,
@@ -136,6 +137,7 @@ class Overview extends Component<Props> {
 
         <RpcPolling
           interval={transactionsPollingInterval}
+          criticalChildProcess="NODE"
           actions={{
             polling: OverviewActions.getTransactionDataFromWallet,
             success: OverviewActions.gotTransactionDataFromWallet,

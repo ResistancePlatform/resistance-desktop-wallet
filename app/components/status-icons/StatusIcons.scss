@@ -8,7 +8,7 @@
   width: $NAVI_BAR_CONTAINER_WIDTH + 1.35rem;
   height: 1.2rem;
   display: flex;
-  background: $STATUS_ICONS_BACKGROUND_COLOR;
+  background: $BASE_BACKGROUND_COLOR_DARK_BLUE;
   border-top: 1px solid $BASE_COLOR_BORDER_BLUE;
   padding: 0.7rem 0;
 
@@ -23,10 +23,6 @@
     &.active {
       color: $BASE_COLOR_ACTIVE_ICON;
     }
-  }
-
-  > div:last-child {
-    border: none;
   }
 
   .mining:before {
@@ -53,6 +49,7 @@
 
   .operations {
     cursor: pointer;
+    border: none !important;
   }
 
   .operations:before {
@@ -65,13 +62,12 @@
 }
 
 .operationsIconHint {
-  color: white;
+  color: $BASE_COLOR_FONT_GRAY_2;
   font-size: 0.5rem;
-  background-color: $SYSTEM_INFO_ICON_HINT_COLOR;
-  border-radius: 3px;
-  padding: 0 1px;
-  right: 58px;
-  top: 2px;
+
+  right: 0.6rem;
+  bottom: 0.6rem;
   position: absolute;
   cursor: default;
+  text-align: center;
 }

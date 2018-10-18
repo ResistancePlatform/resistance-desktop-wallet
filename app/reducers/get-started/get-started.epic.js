@@ -1,24 +1,25 @@
 // @flow
 import config from 'electron-settings'
 import { of, concat, merge } from 'rxjs'
-import { filter, switchMap, take, map, mergeMap, mapTo, catchError } from 'rxjs/operators'
+import { filter, switchMap, take, map, mergeMap, mapTo, catchError, delay } from 'rxjs/operators'
 import { remote, ipcRenderer } from 'electron'
 import { ofType } from 'redux-observable'
 import { push } from 'react-router-redux'
 
-import { i18n } from '~/i18next.config'
+import { translate } from '~/i18next.config'
 import { Action } from '../types'
 import { getChildProcessObservable } from '~/utils/child-process'
 import { AUTH } from '~/constants/auth'
 import { RpcService } from '~/service/rpc-service'
 import { Bip39Service } from '~/service/bip39-service'
 import { AuthActions } from '../auth/auth.reducer'
+import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
 import { GetStartedActions } from './get-started.reducer'
 import { RoundedFormActions } from '../rounded-form/rounded-form.reducer'
 import { SettingsActions } from '../settings/settings.reducer'
 
 
-const t = i18n.getFixedT(null, 'get-started')
+const t = translate('get-started')
 const bip39 = new Bip39Service()
 const rpc = new RpcService()
 
@@ -77,15 +78,26 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
 
     const nextAction = WelcomeActions.encryptWallet()
 
+    const resDexStartedObservable = getChildProcessObservable({
+      processName: 'RESDEX',
+      onSuccess: of(nextAction).pipe(delay(20000)),
+      onFailure: of(WelcomeActions.walletBootstrappingFailed(t(`Unable to start ResDEX`))),
+      action$
+    })
+
     const nodeStartedObservable = getChildProcessObservable({
       processName: 'NODE',
-      onSuccess: of(nextAction),
+      onSuccess: concat(
+        of(WelcomeActions.displayHint(t(`Initializing ResDEX...`))),
+        of(ResDexActions.startResdex()),
+        resDexStartedObservable,
+      ),
       onFailure: of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
       action$
     })
 
     return concat(
-      of(WelcomeActions.displayHint(t(`Starting local Resistance node...`))),
+      of(WelcomeActions.displayHint(t(`Starting the local node...`))),
       of(SettingsActions.startLocalNode()),
       nodeStartedObservable
     )
@@ -120,7 +132,7 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       filter(action => action.payload.processName === 'NODE'),
       take(1),
       switchMap(() => concat(
-        of(WelcomeActions.displayHint(t(`Starting the local node again...`))),
+        of(WelcomeActions.displayHint(t(`Starting the local node with the encrypted wallet...`))),
         of(SettingsActions.kickOffChildProcesses()),
         nodeStartedObservable
       ))

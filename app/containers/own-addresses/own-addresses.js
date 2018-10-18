@@ -91,6 +91,7 @@ class OwnAddresses extends Component<Props> {
 			>
         <RpcPolling
           interval={pollingInterval}
+          criticalChildProcess="NODE"
           actions={{
             polling: OwnAddressesActions.getOwnAddresses,
             success: OwnAddressesActions.gotOwnAddresses,
@@ -143,7 +144,7 @@ class OwnAddresses extends Component<Props> {
                     disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
                   >
                     + {t(`Add new address`)}
-										<span className="icon-arrow-down" />
+										<span className={cn('icon', styles.arrowDownIcon)} />
 									</button>
 
 								</div>

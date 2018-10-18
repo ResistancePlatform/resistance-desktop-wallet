@@ -2,24 +2,39 @@
 import { Decimal } from 'decimal.js'
 import * as Joi from 'joi'
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
+import ReactTooltip from 'react-tooltip'
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
+import { RESDEX } from '~/constants/resdex'
+import { calculateMaxTotalPayout } from '~/utils/resdex'
+import { truncateAmount, toDecimalPlaces } from '~/utils/decimal'
+import RpcPolling from '~/components/rpc-polling/rpc-polling'
+import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
+import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
-import RoundedInput, { ChooseWalletAddon } from '~/components/rounded-form/RoundedInput'
+import RoundedInputWithUseMax from '~/components/rounded-form/RoundedInputWithUseMax'
+import ChooseWallet from '~/components/rounded-form/ChooseWallet'
 import CurrencyIcon from './CurrencyIcon'
 
+import animatedSpinner from '~/assets/images/animated-spinner.svg'
 import styles from './BuySell.scss'
 
 const validationSchema = Joi.object().keys({
-  name: Joi.string().required().label(`Name`),
-  address: (
-    Joi.string().required().label(`Address`)
-  )
+  sendFrom: Joi.string().required().label(`Send from`),
+  receiveTo: Joi.string().required().label(`Receive to`),
+  maxRel: Joi.string().required().label(`Max. amount`),
 })
 
 type Props = {
-  t: any
+  t: any,
+  roundedForm: object,
+  accounts: ResDexState.accounts,
+  buySell: ResDexState.buySell,
+  actions: object
 }
 
 
@@ -30,127 +45,243 @@ type Props = {
 class ResDexBuySell extends Component<Props> {
 	props: Props
 
+  getBaseAmount(applyFees: boolean = false): Decimal | null {
+    const { quoteCurrency, orderBook } = this.props.buySell
+    const form = this.props.roundedForm.resDexBuySell
+
+    if (!orderBook.asks.length || !form || !form.fields) {
+      return null
+    }
+
+    const { price } = orderBook.asks[0]
+    const quoteAmount = Decimal(form.fields.maxRel || '0')
+
+    if (applyFees) {
+      const txFee = this.props.accounts.currencyFees[quoteCurrency]
+      return calculateMaxTotalPayout(quoteAmount, price, txFee || Decimal(0))
+    }
+
+    return quoteAmount.div(price)
+  }
+
+  getMaxPayoutCaption(): string {
+    const { baseCurrency } = this.props.buySell
+    const baseAmount = this.getBaseAmount(true)
+
+    if (baseAmount === null) {
+      return `0 ${baseCurrency}`
+    }
+
+    return `${toDecimalPlaces(baseAmount)} ${baseCurrency}`
+  }
+
+  getAtCaption(t) {
+    const { baseCurrency, quoteCurrency, orderBook } = this.props.buySell
+    const { price } = orderBook.asks.length && orderBook.asks[0]
+
+    if (!price) {
+      return t(`No liquidity available yet`)
+    }
+
+    return t(`@ {{price}} {{baseCurrency}} per {{quoteCurrency}}`, {
+      price: truncateAmount(price),
+      baseCurrency,
+      quoteCurrency
+    })
+
+  }
+
+  getQuoteAmountCaption() {
+    const form = this.props.roundedForm.resDexBuySell
+    const amount = Decimal(form && form.fields.maxRel || '0')
+
+    return toDecimalPlaces(amount)
+  }
+
+  getMaxQuoteAmount() {
+    const { quoteCurrency } = this.props.buySell
+    const currency = this.props.accounts.currencies[quoteCurrency]
+    return currency && currency.balance || Decimal(0)
+  }
+
+  // Can't create a market order if there's no liquidity or when sending an order
+  getSubmitButtonDisabledAttribute() {
+    const { baseCurrency, quoteCurrency, orderBook, isSendingOrder } = this.props.buySell
+
+    return (
+      isSendingOrder
+      || orderBook.baseCurrency !== baseCurrency
+      || orderBook.quoteCurrency !== quoteCurrency
+      || orderBook.asks.length === 0
+    )
+
+  }
+
 	/**
 	 * @returns
    * @memberof ResDexBuySell
 	 */
 	render() {
     const { t } = this.props
-
-    const wallets = [{
-      currency: 'BTC',
-      balance: Decimal('2.12400181')
-    }]
+    const { baseCurrency, quoteCurrency } = this.props.buySell
+    const txFee = this.props.accounts.currencyFees[quoteCurrency]
 
 		return (
       <div className={cn(styles.container)}>
+        <RpcPolling
+          criticalChildProcess="RESDEX"
+          interval={1.0}
+          actions={{
+            polling: ResDexBuySellActions.getOrderBook,
+            success: ResDexBuySellActions.gotOrderBook,
+            failure: ResDexBuySellActions.getOrderBookFailed
+          }}
+        />
+
         <div className={styles.actionContainer}>
-          <RoundedForm
-              id="resDexBuySell"
-              schema={validationSchema}
+          <Tabs
+            className={styles.tabs}
+            selectedTabClassName={styles.selectedTab}
+            selectedTabPanelClassName={styles.selectedTabPanel}
           >
-            <RoundedInput
-              name="sellFrom"
-              labelClassName={styles.inputLabel}
-              label={t(`Sell from`)}
-              newAddon={new ChooseWalletAddon(wallets)}
-              number
-            />
+            <TabList className={styles.tabList}>
+              <Tab className={styles.tab}>{t(`Simple`)}</Tab>
+              <Tab className={styles.tab} disabled>{t(`Advanced`)}</Tab>
+            </TabList>
 
-            <RoundedInput
-              name="depositTo"
-              labelClassName={styles.inputLabel}
-              label={t(`Deposit to`)}
-              newAddon={new ChooseWalletAddon(wallets)}
-              number
-            />
+            <TabPanel className={styles.tabPanel}>
+              <RoundedForm
+                id="resDexBuySell"
+                schema={validationSchema}
+              >
+                <ChooseWallet
+                  name="sendFrom"
+                  labelClassName={styles.oldInputLabel}
+                  defaultValue={quoteCurrency}
+                  label={t(`Send from`)}
+                  onChange={this.props.actions.updateQuoteCurrency}
+                  currencies={this.props.accounts.currencies}
+                />
 
-            <div className={styles.inputsRow}>
-              <div>
-                <div className={styles.caption}>{t(`Max. amount`)}<i /></div>
-                <RoundedInput className={styles.maxAmount} name="maxAmount" number />
-              </div>
+                <ChooseWallet
+                  name="receiveTo"
+                  labelClassName={styles.oldInputLabel}
+                  defaultValue={baseCurrency}
+                  label={t(`Receive to`)}
+                  onChange={this.props.actions.updateBaseCurrency}
+                  currencies={this.props.accounts.currencies}
+                />
 
-              <div>
-                <div className={styles.caption}>{t(`Exchange rate`)}<i /></div>
-                <RoundedInput name="exchangeRate" number />
-              </div>
+                <RoundedInputWithUseMax
+                  name="maxRel"
+                  className={styles.maxRel}
+                  labelClassName={styles.inputLabel}
+                  label={t(`Max. {{quoteCurrency}}`, { quoteCurrency })}
+                  maxAmount={this.getMaxQuoteAmount()}
+                  symbol={quoteCurrency}
+                  number />
 
-            </div>
+                <div className={styles.enhancedPrivacy}>
+                  <label htmlFor="input-resdex-enhanced-privacy-id">
+                    <input id="input-resdex-enhanced-privacy-id" type="checkbox" name="enhancedPrivacy" />
+                    {t(`Enhanced privacy`)}
+                    <i className={styles.info} data-tip={t('enhanced-privacy')} data-for="tooltip-resdex-enhanced-privacy-id" data-offset="{'left': 16}"/>
+                    <ReactTooltip id="tooltip-resdex-enhanced-privacy-id" className={cn(styles.tooltip, styles.enhancedPrivacy)}/>
+                  </label>
+                </div>
 
-            <div className={styles.enhancedPrivacy}>
-              <label htmlFor="enhancedPrivacyInputId">
-                <input id="enhancedPrivacyInputId" type="checkbox" name="enhancedPrivacy" />
-                {t(`Enhanced privacy`)}
-              </label>
+                <button
+                  type="submit"
+                  onClick={this.props.actions.createMarketOrder}
+                  disabled={txFee && this.getSubmitButtonDisabledAttribute()}
+                >
+                  {this.props.buySell.isSendingOrder &&
+                    <img src={animatedSpinner} alt={t(`Sending the order...`)} />
+                  }
+                  {t(`Exchange`)}
+                </button>
+              </RoundedForm>
+            </TabPanel>
 
-              <strong>{t(`Read more:`)}</strong> {t(`enhanced-privacy`)}
-            </div>
+            <TabPanel className={styles.tabPanel} />
+          </Tabs>
 
-            <button type="submit">{t(`Sell {{name}}`, { name: 'Bitcoin' })}</button>
-          </RoundedForm>
+
         </div>
 
         <div className={styles.summaryContainer}>
           <div className={styles.briefContainer}>
-            <div className={styles.brief}>{t(`You are selling`)}</div>
+            <div className={styles.brief}>{t(`You are sending`)}</div>
 
             <div className={styles.amount}>
-              1.01679 <span>BTC</span>
+              {this.getQuoteAmountCaption()}
+              <span>{quoteCurrency}</span>
             </div>
 
-            <div className={styles.at}>
-              @ 24.69 ETH per BTC
-            </div>
+            <div className={styles.at}>{this.getAtCaption(t)}</div>
 
           </div>
 
           <div className={styles.fromTo}>
             <div className={styles.wallet}>
-              <CurrencyIcon symbol="BTC" size="1.3rem" />
+              <CurrencyIcon symbol={quoteCurrency} size="1.24rem" />
               <div>
-                <span>Sell from</span>
-                BTC Wallet
+                <span>{t(`Send`)}</span>
+                {t(`{{quoteCurrency}} Wallet`, { quoteCurrency })}
               </div>
             </div>
 
+            <div className={cn('icon', styles.exchangeIcon)} />
+
             <div className={styles.wallet}>
-              <CurrencyIcon symbol="ETH" size="1.3rem" />
+              <CurrencyIcon symbol={baseCurrency} size="1.24rem" />
               <div>
-                <span>Deposit to</span>
-                ETH Wallet
+                <span>{t(`Receive`)}</span>
+                {t(`{{baseCurrency}} Wallet`, { baseCurrency })}
               </div>
             </div>
 
           </div>
 
           <ul className={styles.list}>
-            <li className={styles.res}>
-              1.01679 BTC
+            <li className={cn({ [styles.res]: this.props.buySell.enhancedPrivacy })}>
+              {this.getQuoteAmountCaption()}&nbsp;
+              {quoteCurrency}
               <hr />
-              <span>24.69 ETH</span>
+              <span>{this.getMaxPayoutCaption()}</span>
             </li>
             <li>
               {t(`DEX Fee`)}
               <hr />
-              <span>0.15%</span>
+              <span>{RESDEX.dexFee.toFixed(2)}%</span>
             </li>
             <li>
-              {t(`RES Fee`)}
+              {t(`{{symbol}} Fee`, { symbol: quoteCurrency })}
               <hr />
-              <span>0.10%</span>
+              <span>{txFee && txFee.toString()}</span>
             </li>
             <li>
               {t(`Max. Total Payout`)}
               <hr />
-              <span>25.26 ETH</span>
+              <span>{this.getMaxPayoutCaption()}</span>
             </li>
           </ul>
 
         </div>
+
       </div>
     )
   }
 }
 
-export default translate('resdex')(ResDexBuySell)
+const mapStateToProps = (state) => ({
+	roundedForm: state.roundedForm,
+	buySell: state.resDex.buySell,
+	accounts: state.resDex.accounts,
+})
+
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(ResDexBuySellActions, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexBuySell))

@@ -88,5 +88,13 @@
   "Unknown stream": "Unknown stream",
   "),this.nestingSuffix=t.nestingSuffix?p(t.nestingSuffix):t.nestingSuffixEscaped||p(": "),this.nestingSuffix=t.nestingSuffix?p(t.nestingSuffix):t.nestingSuffixEscaped||p(",
   ",nestingSuffix:": ",nestingSuffix:",
-  "should contain letters, numbers and special characters, passphrases are supported too": "should contain letters, numbers and special characters, passphrases are supported too"
+  "should contain letters, numbers and special characters, passphrases are supported too": "should contain letters, numbers and special characters, passphrases are supported too",
+  "),this.nestingSuffix=t.nestingSuffix?h(t.nestingSuffix):t.nestingSuffixEscaped||h(": "),this.nestingSuffix=t.nestingSuffix?h(t.nestingSuffix):t.nestingSuffixEscaped||h(",
+  "Loading": "Loading",
+  "Login": "Login",
+  "Resistance": "Resistance",
+  "Please wait": "Please wait",
+  "Copy": "Copy",
+  "Paste": "Paste",
+  "Use max": "Use max"
 }

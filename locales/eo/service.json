@@ -22,5 +22,12 @@
   "Z-addresses are 95 characters long, not {{length}}": "Z-addresses are 95 characters long, not {{length}}",
   "is not a valid Resistance address": "is not a valid Resistance address",
   "Authentication failed": "Authentication failed",
-  "Incorrect password": "Incorrect password"
+  "Incorrect password": "Incorrect password",
+  "Could not connect to {{symbol}} Electrum server": "Could not connect to {{symbol}} Electrum server",
+  "status.pending": "status.pending",
+  "status.unmatched": "status.unmatched",
+  "status.cancelled": "status.cancelled",
+  "status.reverted": "status.reverted",
+  "statusInformation.reverted": "statusInformation.reverted",
+  "status.open": "status.open"
 }

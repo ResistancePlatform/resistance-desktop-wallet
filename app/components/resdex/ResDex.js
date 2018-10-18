@@ -19,7 +19,9 @@ import VLayout from '~/assets/styles/v-box-layout.scss'
 import styles from './ResDex.scss'
 
 type Props = {
-  resDex: ResDexState
+  resDex: ResDexState,
+  ordersActions: object,
+  actions: object
 }
 
 
@@ -31,14 +33,37 @@ export class ResDex extends Component<Props> {
 	props: Props
 
 	/**
+   * Initiates swap history fetching.
+   *
+	 * @returns
+   * @memberof ResDex
+	 */
+  componentDidMount() {
+    this.props.ordersActions.initSwapHistory()
+  }
+
+	/**
 	 * @returns
    * @memberof ResDex
 	 */
   getContents() {
+    /*
+    <RpcPolling
+      interval={15.0 * 60}
+      criticalChildProcess="RESDEX"
+      actions={{
+        polling: ResDexOrdersActions.kickStartStuckSwaps,
+        success: ResDexAccountsActions.kickStartStuckSwapsSucceeded,
+        failure: ResDexAccountsActions.kickStartStuckSwapsFailed
+      }}
+    />
+    */
+
     return (
       <div>
         <RpcPolling
           interval={1.0}
+          criticalChildProcess="RESDEX"
           actions={{
             polling: ResDexAccountsActions.getCurrencies,
             success: ResDexAccountsActions.gotCurrencies,
@@ -52,9 +77,10 @@ export class ResDex extends Component<Props> {
         {this.props.resDex.accounts.withdrawModal.isVisible &&
           <WithdrawModal />
         }
-
         <Tabs
           className={styles.tabs}
+          selectedIndex={this.props.resDex.common.selectedTabIndex}
+          onSelect={tabIndex => this.props.actions.selectTab(tabIndex)}
           selectedTabClassName={styles.selectedTab}
           selectedTabPanelClassName={styles.selectedTabPanel}
         >

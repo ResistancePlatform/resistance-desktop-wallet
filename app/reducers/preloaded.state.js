@@ -7,7 +7,7 @@ export const preloadedState: State = {
   auth: {
     reason: null,
     enter: true,
-    isLoginRequired: process.env.NODE_ENV !== 'development'
+    isLoginRequired: true,
   },
   roundedForm: {},
   fetchParameters: {
@@ -106,60 +106,38 @@ export const preloadedState: State = {
       TOR: 'NOT RUNNING',
       RESDEX: 'NOT RUNNING',
     },
-    language: 'en'
+    language: 'en',
 	},
   resDex: {
+    common: {
+      selectedTabIndex: 0,
+    },
     login: {
       isRequired: false,
-      portfolios: []
+      portfolios: [],
     },
     assets: {
+      resolution: 'month',
+      currencyHistory: {},
     },
     buySell: {
+      isSendingOrder: false,
+      baseCurrency: 'RES',
+      quoteCurrency: 'DGB',
+      orderBook: {
+        baseCurrency: 'RES',
+        quoteCurrency: 'DGB',
+        bids: [],
+        asks: []
+      }
     },
     orders: {
-      openOrders: [{
-        id: '1',
-        time: 1,
-        base: 'XBT',
-        rel: 'RES',
-        amountOut: -1.20014,
-        amountIn: 0.01679,
-        isPrivate: true,
-        status: 'pending'
-      }, {
-        id: '2',
-        time: 1,
-        base: 'XBT',
-        rel: 'HODL',
-        amountOut: -1.20014,
-        amountIn: 0.01679,
-        isPrivate: false,
-        status: 'pending'
-      }],
-      completedOrders: [{
-        id: '1',
-        time: 1,
-        base: 'XBT',
-        rel: 'ETH',
-        amountOut: -1.20014,
-        amountIn: 0.01679,
-        isPrivate: false,
-        status: 'matched'
-      }, {
-        id: '2',
-        time: 1,
-        base: 'XBT',
-        rel: 'HODL',
-        amountOut: -1.20014,
-        amountIn: 0.01679,
-        isPrivate: false,
-        status: 'unmatched'
-      }],
+      swapHistory: [],
     },
     accounts: {
       currencies: {},
       enabledCurrencies: [],
+      currencyFees: {},
       depositModal: {
         isVisible: false,
         symbol: null

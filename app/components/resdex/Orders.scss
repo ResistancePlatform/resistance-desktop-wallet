@@ -5,6 +5,7 @@
   @extend %largeContainer;
   padding: 1.8rem;
   margin: 1.5rem;
+  height: 100%;
 }
 
 .header {
@@ -16,6 +17,16 @@
 .list {
   background: $BASE_COLOR_DARK_BLUE_3;
   margin-bottom: 2rem;
+}
+
+.noOrders {
+  text-align: center;
+  color: $BASE_COLOR_FONT_GRAY;
+  margin-bottom: 1rem;
+
+  button {
+    margin-top: 1.2rem;
+  }
 }
 
 /* Columns */
@@ -62,12 +73,17 @@
     background: $BASE_COLOR_GRAY_3;
   }
 
-  &.matched {
+  &.matched, &.swapping {
+    color: $BASE_COLOR_DARK_BLUE_3;
+    background: $BASE_COLOR_LIGHT_BLUE;
+  }
+
+  &.completed {
     color: $BASE_COLOR_DARK_BLUE_3;
     background: $BASE_COLOR_LIGHT_GREEN;
   }
 
-  &.unmatched {
+  &.failed {
     color: $BASE_COLOR_DARK_BLUE_3;
     background: $BASE_COLOR_LIGHT_RED;
   }

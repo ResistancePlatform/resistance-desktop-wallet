@@ -161,7 +161,8 @@ class RoundedForm extends Component<Props> {
       }
 
       // Handle child inputs change events
-      if (inputChildComponentNames.includes(child.type.displayName)) {
+      // TODO: leave only isRoundedFormComponent after moving all the components to the new system
+      if (child.type.isRoundedFormComponent || inputChildComponentNames.includes(child.type.displayName)) {
         const formState = this::getFormState()
 
         const onChange = (value) => (
@@ -180,7 +181,7 @@ class RoundedForm extends Component<Props> {
         return React.cloneElement(child, {
           onChange: child.props.onChange ? child.props.onChange : onChange,
           error: child.props.error ? child.props.error : error,
-          defaultValue: defaultValue || defaultValue === '' ? defaultValue : child.props.defaultValue,
+          defaultValue: defaultValue !== null && defaultValue !== undefined ? defaultValue.toString() : child.props.defaultValue,
           important: child.props.important ? child.props.important : this.props.important
         })
       }

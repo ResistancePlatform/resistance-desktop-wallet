@@ -5,6 +5,7 @@
   position: relative;
   margin-left: 1rem;
   text-transform: uppercase;
+  margin-right: 5rem;
 
   .toggleButtonContainerTitle {
     color: $BASE_COLOR_BUTTON_FONT_GRAY;
@@ -44,8 +45,8 @@
     position: absolute;
     right: 0.5rem;
     top: 0.5rem;
-
     color: $BASE_COLOR_GRAY;
+    text-transform: uppercase;
   }
 }
 

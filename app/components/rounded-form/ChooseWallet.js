@@ -5,6 +5,7 @@ import cn from 'classnames'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
+import { toDecimalPlaces } from '~/utils/decimal'
 import { translate } from '~/i18next.config'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
@@ -45,7 +46,7 @@ class ChooseWallet extends Component<Props> {
 		super(props)
     this.popupMenuId = `popup-menu-${uuid()}`
     this.state = {
-      symbol: props.defaultValue || 'BTC',
+      symbol: props.defaultValue || 'RES',
     }
 	}
 
@@ -78,11 +79,11 @@ class ChooseWallet extends Component<Props> {
       }
 
       <div className={styles.chooseWallet}>
-        <CurrencyIcon className={styles.currencyIcon} symbol={this.state.symbol} size="1.2rem" />
+        <CurrencyIcon className={styles.currencyIcon} symbol={this.state.symbol} size="1.0rem" />
 
         <div className={styles.walletName}>{t(`{{symbol}} Wallet`, {symbol: this.state.symbol})}</div>
 
-        <div className={styles.balance}>{selectedCurrency && selectedCurrency.balance.toString()}</div>
+        <div className={styles.balance}>{selectedCurrency && toDecimalPlaces(selectedCurrency.balance)}</div>
 
         <div className={styles.symbol}>{this.state.symbol}</div>
 
@@ -94,7 +95,7 @@ class ChooseWallet extends Component<Props> {
           onKeyDown={() => false}
         />
 
-        <PopupMenu id={this.popupMenuId} relative>
+        <PopupMenu id={this.popupMenuId} className={styles.menu} relative>
           { sortedCurrencies.map(currency => (
             <PopupMenuItem
               key={currency.symbol}

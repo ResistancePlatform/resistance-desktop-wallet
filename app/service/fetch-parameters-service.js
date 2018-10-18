@@ -7,7 +7,7 @@ import config from 'electron-settings'
 import crypto from 'crypto'
 
 import { translate } from '../i18next.config'
-import { OSService } from './os-service'
+import { OSService } from './os-service-main'
 
 const t = translate('service')
 const os = new OSService()
