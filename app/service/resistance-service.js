@@ -204,5 +204,6 @@ function startOrRestart(isTorEnabled: boolean, start: boolean) {
  * @memberof ResistanceService
  */
 function handleStdout(data: Buffer) {
-  return data.toString().includes(`init message: Done loading`)
+  // return data.toString().includes(`init message: Done loading`)
+  return data.toString().includes(`ProcessMessages: advertizing address`)
 }

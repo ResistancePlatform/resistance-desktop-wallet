@@ -39,7 +39,7 @@ export const GetStartedActions = createActions(
     WELCOME: {
       ENCRYPT_WALLET: undefined,
       RESTORE_WALLET: undefined,
-      AUTHENTICATE_AND_RESTORE_WALLET: undefined,
+      AUTHENTICATE: undefined,
       CHANGE_PASSWORD: undefined,
 
       DISPLAY_HINT: (message: string) => ({ message }),

@@ -1,89 +1,72 @@
+import { remote } from 'electron'
+import cn from 'classnames'
 import React from 'react'
-import GenericInput, { GenericProps } from './GenericInput'
+import RoundedInput, { RoundedInputProps } from './NewRoundedInput'
 
-import styles from './NewRoundedInput.scss'
+import parentStyles from './NewRoundedInput.scss'
+import styles from './OpenFileInput.scss'
 
 
-export type RoundedInputProps = {
-  ...GenericProps,
+export type OpenFileInputProps = {
+  ...RoundedInputProps,
 	name: string,
   defaultValue?: string,
-  type: 'text' | 'number' | 'password',
-  readOnly?: boolean
-}
-
-type RoundedInputState = {
-  value: string,
-  isFocused: boolean
-}
-
-export default class RoundedInput extends GenericInput {
-  props: RoundedInputProps
-  state: RoundedInputState
-
-  static get displayName() { return 'RoundedInput' }
-
-	/**
-	 * @param {*} props
-	 * @memberof RoundedInput
-	 */
-	constructor(props) {
-		super(props)
-
-    this.state = {
-      value: props.defaultValue || '',
-      isFocused: false
-    }
-	}
-
-	/**
-	 * @param {*} prevProps
-	 * @memberof RoundedInput
-	 */
-  componentDidUpdate(prevProps) {
-    if (prevProps.defaultValue !== this.props.defaultValue ) {
-        /* eslint-disable-next-line react/no-did-update-set-state */
-        this.setState({ value: this.props.defaultValue || '' })
-    }
+  options?: {
+    title?: string,
+    defaultPath?: string,
+    message?: string,
+    filters?: string[]
   }
 
-	/**
-	 * @param {string} value
-	 * @memberof RoundedInput
-	 */
-  changeValue(value: string) {
-    this.setState({ value })
+}
 
-		if (this.props.onChange) {
-			this.props.onChange(value)
-		}
+export default class OpenFileInput extends RoundedInput {
+  props: OpenFileInputProps
+
+  onOpenFileClick(event) {
+    event.stopPropagation()
+
+    const options = this.props.options || {}
+
+    const callback = filePaths => {
+      if (filePaths && filePaths.length) {
+        const value = filePaths.pop()
+        this.changeValue(value)
+      }
+    }
+
+    remote.dialog.showOpenDialog({
+      title: options.title,
+      defaultPath: options.defaultPath || remote.app.getPath('documents'),
+      message: options.message || options.title,
+      filters: options.filters
+    }, callback)
+
+    return false
   }
-
-	onChangeHandler(event) {
-		event.stopPropagation()
-    this.changeValue(event.target.value)
-	}
-
-	onFocusHandler() {
-		this.setState({ isFocused: true })
-	}
-
-	onBlurHandler() {
-		this.setState({ isFocused: false })
-	}
 
   renderInput() {
     return (
       <input
-        className={styles.input}
+        className={parentStyles.input}
         name={this.props.name}
-        type={this.props.type}
+        type="text"
         value={this.state.value}
         disabled={this.props.disabled}
         onChange={event => this.onChangeHandler(event)}
-        onFocus={(event) => this.onFocusHandler(event)}
-        onBlur={(event) => this.onBlurHandler(event)}
-        readOnly={this.props.readOnly}
+        readOnly
+      />
+    )
+  }
+
+  renderAddon() {
+    return (
+      <div
+        onClick={e => this.onOpenFileClick(e)}
+        onKeyDown={() => false}
+        role="button"
+        tabIndex={0}
+        className={cn('icon', styles.icon)}
       />
     )
   }

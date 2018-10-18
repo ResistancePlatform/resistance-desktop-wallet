@@ -218,7 +218,7 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
           startLocalNodeObservable
         )
       }),
-      catchError(err => SettingsActions.restoringWalletFailed(err.message))
+      catchError(err => of(SettingsActions.restoringWalletFailed(err.message)))
     )
 
     // First, check if wallet file already exists

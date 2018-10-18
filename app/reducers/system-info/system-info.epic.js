@@ -6,6 +6,7 @@ import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
 import { Action } from '../types'
+import { RPC } from '~/constants/rpc'
 import { SystemInfoActions } from './system-info.reducer'
 import { RpcService } from '~/service/rpc-service'
 import { ResistanceService } from '~/service/resistance-service'
@@ -18,7 +19,7 @@ const osService = new OSService()
 // TODO: Get rid of the behaviour after the issue is fixed:
 // https://github.com/ResistancePlatform/resistance-core/issues/94
 function suppressRpcWarmupError(action, callable) {
-  if (action.payload.code !== -28 && action.payload.code !== 'ECONNREFUSED') {
+  if (action.payload.code !== RPC.IN_WARMUP && action.payload.code !== 'ECONNREFUSED') {
     callable()
   } else {
     console.log(`Suppressing RPC initialization error display:`, action.payload)

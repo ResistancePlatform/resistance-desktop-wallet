@@ -5,13 +5,13 @@ import { NavLink } from 'react-router-dom'
 import * as Joi from 'joi'
 
 import { getPasswordValidationSchema } from '~/utils/auth'
-import RoundedInput from '~/components/rounded-form/RoundedInput'
+import RoundedInput from '~/components/rounded-form/NewRoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 import PasswordStrength from '~/components/password-strength/PasswordStrength'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
-import styles from './GetStarted.scss'
+import styles from './ChoosePassword.scss'
 
 type Props = {
   t: any,
@@ -65,8 +65,19 @@ export class ChoosePassword extends Component<Props> {
         <div className={styles.innerContainer}>
           <RoundedForm id="getStartedChoosePassword" schema={this.getValidationSchema()}>
 
-            <RoundedInput name="password" password label={t(`Password`)} />
-            <RoundedInput name="confirmPassword" password label={t(`Confirm password`)} />
+            <RoundedInput
+              name="password"
+              labelClassName={styles.inputLabel}
+              type="password"
+              label={t(`Password`)}
+            />
+
+            <RoundedInput
+              name="confirmPassword"
+              labelClassName={styles.inputLabel}
+              type="password"
+              label={t(`Confirm password`)}
+            />
 
             <div className={styles.note}>
               <strong>{t('Note')}: </strong>

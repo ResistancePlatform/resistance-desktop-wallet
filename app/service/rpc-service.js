@@ -89,8 +89,7 @@ export class RpcService {
 	 */
   encryptWallet(password: string) {
     const client = getClientInstance()
-
-    return from(client.command('encryptwallet', password))
+    return client.command('encryptwallet', password)
   }
 
 	/**
@@ -100,10 +99,18 @@ export class RpcService {
 	 */
   sendWalletPassword(password: string, timeoutSec: number) {
     const client = getClientInstance()
-
-    return from(client.command('walletpassphrase', password, timeoutSec))
+    return client.command('walletpassphrase', password, timeoutSec)
   }
 
+	/**
+	 * Encrypts the wallet with a passphrase.
+   *
+	 * @memberof RpcService
+	 */
+  changeWalletPassword(oldPassword: string, newPassword: string) {
+    const client = getClientInstance()
+    return client.command('walletpassphrasechange', oldPassword, newPassword)
+  }
 
 	/**
 	 * Requests Resistance node running status and memory usage.
