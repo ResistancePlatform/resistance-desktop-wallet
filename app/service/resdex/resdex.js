@@ -64,7 +64,12 @@ export class ResDexService {
     const resDexDir = path.join(osService.getAppDataPath(), 'ResDEX')
 
     osService.verifyDirectoryExistence(resDexDir).then(() => (
-      osService.execProcess('RESDEX', [JSON.stringify(options)], this::handleStdout, { cwd: resDexDir })
+      osService.execProcess({
+        processName: 'RESDEX',
+        args: [JSON.stringify(options)],
+        stdoutHandler: this::handleStdout,
+        spawnOptions: { cwd: resDexDir }
+      })
     )).catch(err => {
       const actions = osService.getSettingsActions()
       osService.dispatchAction(actions.childProcessFailed('RESDEX', err.toString()))

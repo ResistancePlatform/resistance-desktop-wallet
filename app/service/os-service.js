@@ -220,10 +220,10 @@ export class OSService {
 	 * @param {function} stdoutHandler If returns true the process is considered started.
 	 * @memberof OSService
 	 */
-  restartProcess(processName: ChildProcessName, args = [], stdoutHandler, spawnOptions = {}) {
-    log.info(`Restarting ${processName} process.`)
-    this.killProcess(processName, () => {
-      this.execProcess(processName, args, stdoutHandler, spawnOptions)
+  restartProcess(options) {
+    log.info(`Restarting ${options.processName} process.`)
+    this.killProcess(options.processName, () => {
+      this.execProcess(options)
     })
   }
 
@@ -235,7 +235,7 @@ export class OSService {
 	 * @param {function} stdoutHandler If returns true the process is considered started.
 	 * @memberof OSService
 	 */
-  execProcess(processName: ChildProcessName, args = [], stdoutHandler, spawnOptions = {}) {
+  execProcess({processName, args = [], stdoutHandler, spawnOptions = {}}) {
     const actions = this.getSettingsActions()
 
     const errorHandler = (err) => {

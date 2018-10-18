@@ -45,7 +45,7 @@ export class MinerService {
       args.push('--background')
     }
 
-    osService.execProcess('MINER', args, this.handleStdout)
+    osService.execProcess({processName: 'MINER', args, stdoutHandler: this.handleStdout})
 	}
 
 	/**

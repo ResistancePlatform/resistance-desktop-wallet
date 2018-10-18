@@ -189,7 +189,11 @@ function startOrRestart(isTorEnabled: boolean, start: boolean) {
 
   osService.verifyDirectoryExistence(this.getExportDir()).then(exportDir => {
     args.push(`-exportdir=${exportDir}`)
-    caller.bind(osService)('NODE', args, this::handleStdout)
+    caller.bind(osService)({
+      processName: 'NODE',
+      args,
+      stdoutHandler: this::handleStdout,
+    })
     return Promise.resolve()
   }).catch(err => {
     const actions = osService.getSettingsActions()
