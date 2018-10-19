@@ -12,10 +12,9 @@ import { map, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
-import { moveFile } from '~/utils/os'
+import { getExportDir, moveFile } from '~/utils/os'
 import { DECIMAL } from '~/constants/decimal'
 import { getStore } from '~/store/configureStore'
-import { ResistanceService } from './resistance-service'
 import { AddressBookService } from './address-book-service'
 import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions, Transaction } from '../reducers/overview/overview.reducer'
@@ -26,7 +25,6 @@ import { AddressBookRecord } from '~/reducers/address-book/address-book.reducer'
 
 const t = translate('service')
 
-const resistanceService = new ResistanceService()
 const addressBookService = new AddressBookService()
 
 /**
@@ -38,7 +36,7 @@ let clientInstance = null
 /**
  * Create a new resistance client instance.
  */
-const getClientInstance = () => {
+export const getClientInstance = () => {
   if (!clientInstance) {
     const nodeConfig = remote.getGlobal('resistanceNodeConfig')
     let network
@@ -568,7 +566,7 @@ export class RpcService {
     const client = getClientInstance()
 
     const importFileName = uuid().replace(/-/g, '')
-    const importFilePath = path.join(resistanceService.getExportDir(), importFileName)
+    const importFilePath = path.join(getExportDir(), importFileName)
 
     const observable = from(
       promisify(fs.copyFile)(filePath, importFilePath)
@@ -845,7 +843,7 @@ function exportFileWithMethod(method, filePath) {
   const client = getClientInstance()
 
   const exportFileName = uuid().replace(/-/g, '')
-  const exportFilePath = path.join(resistanceService.getExportDir(), exportFileName)
+  const exportFilePath = path.join(getExportDir(), exportFileName)
 
   return from(
     client.command(method, exportFileName)

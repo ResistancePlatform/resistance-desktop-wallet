@@ -256,6 +256,36 @@ export class ChildProcessService {
 		})
 	}
 
+
+  /**
+   * Returns a polling function calling checker until it returns true
+   *
+   * @memberof ChildProcessService
+   */
+  createReadinessWaiter(checker: () => boolean): () => void {
+    const promise = new Promise((resolve, reject) => {
+      const interval = setInterval(() => {
+
+        checker().then(isReady => {
+          if (isReady) {
+            clearInterval(interval)
+            setTimeout(resolve, 100)
+          }
+          return null
+        }).catch(err => {
+          log.error(`Process status checker async function threw an exception`, err)
+        })
+
+      }, 100)
+
+      setTimeout(() => {
+        clearInterval(interval)
+        reject(new Error(`Process startup timed out`))
+      }, 10000)
+    })
+
+    return () => promise
+}
 }
 
 function spawnProcess(processName, args, spawnOptions) {

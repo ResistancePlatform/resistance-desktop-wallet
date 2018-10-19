@@ -6,10 +6,11 @@ import log from 'electron-log'
 import generator from 'generate-password'
 import PropertiesReader from 'properties-reader'
 import config from 'electron-settings'
-import { app, remote, net } from 'electron'
+import { app, remote } from 'electron'
 
+import { getClientInstance } from '~/service/rpc-service'
 import { getStore } from '~/store/configureStore'
-import { getOS, getAppDataPath, verifyDirectoryExistence } from '~/utils/os'
+import { getOS, getExportDir, verifyDirectoryExistence } from '~/utils/os'
 import { ChildProcessService } from './child-process-service'
 
 const childProcess = new ChildProcessService()
@@ -161,15 +162,6 @@ export class ResistanceService {
     return PropertiesReader().read(contentsWithPassword).path()
   }
 
-	/**
-   * Returns Resistance export dir as provided with -exportdir command line argument to the node.
-   *
-	 * @memberof ResistanceService
-	 */
-  getExportDir() {
-    return path.join(getAppDataPath(), 'ExportDir')
-  }
-
 }
 
 /* Resistance Service private methods */
@@ -190,7 +182,7 @@ async function startOrRestart(isTorEnabled: boolean, start: boolean) {
   args.push(`-wallet=${walletName}.dat`)
   const caller = start ? childProcess.execProcess : childProcess.restartProcess
 
-  const exportDir = this.getExportDir()
+  const exportDir = getExportDir()
 
   try {
     await verifyDirectoryExistence(exportDir)
@@ -206,47 +198,19 @@ async function startOrRestart(isTorEnabled: boolean, start: boolean) {
   await caller.bind(childProcess)({
     processName: 'NODE',
     args,
-    outputHandler: this::handleOutput,
+    waitUntilReady: childProcess.createReadinessWaiter(this::checkRpcAvailability)
   })
 }
 
-/**
- * Private method. Called on new data in stdout, returns true if Resistance node has been initialized.
- *
- * @param {string} configFilePath
- * @memberof ResistanceService
- */
-function handleOutput(data: Buffer) {
-  return data.toString().includes(`init message: Done loading`)
-}
+async function checkRpcAvailability() {
+  const client = getClientInstance()
+  log.debug(`Checking if resistanced is ready to accept RPC calls`)
 
-/**
- * Returns Resistance export dir as provided with -exportdir command line argument to the node.
- *
- * @memberof ResistanceService
- */
-function isReady() {
-  const nodeConfig = remote.getGlobal('resistanceNodeConfig')
+  try {
+    await client.getInfo()
+    return true
+  } catch (err) {
+    return false
+  }
 
-  return new Promise((resolve, reject) => {
-    const interval = setInterval(() => {
-      const request = net.request(`http://localhost:${nodeConfig.port}`)
-
-      request.on('response', response => {
-        if (response.statusCode === 405) {
-          clearInterval(interval)
-
-          // Give it a little more time to avoid issues
-          setTimeout(resolve, 500)
-        }
-      })
-      request.on('error', () => {})
-      request.end()
-    }, 100)
-
-    setTimeout(() => {
-      clearInterval(interval)
-      reject(new Error('Giving up trying to connect to marketmaker'))
-    }, 10000)
-  })
 }
