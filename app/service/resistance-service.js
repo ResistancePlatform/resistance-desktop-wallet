@@ -4,7 +4,7 @@ import * as fs from 'fs'
 import path from 'path'
 import log from 'electron-log'
 import config from 'electron-settings'
-import { app, remote } from 'electron'
+import { app, remote, net } from 'electron'
 
 import { OSService } from './os-service'
 
@@ -61,7 +61,7 @@ export class ResistanceService {
     if (osService.getOS() === 'linux') {
       configFolder = path.join(validApp.getPath('home'), '.resistance')
     }
-    return configFolder;
+    return configFolder
   }
 
 	/**
@@ -105,10 +105,10 @@ export class ResistanceService {
 
     if (fs.existsSync(configFile)) {
       resistanceNodeConfig = PropertiesReader(configFile).path()
-      log.info(`The Resistance config file ${configFile} exists and does not need to be created.`);
+      log.info(`The Resistance config file ${configFile} exists and does not need to be created.`)
     } else {
       resistanceNodeConfig = this.createConfig(configFile)
-      log.info(`The Resistance config file ${configFile} was successfully created.`);
+      log.info(`The Resistance config file ${configFile} was successfully created.`)
     }
 
     return resistanceNodeConfig
@@ -167,6 +167,7 @@ export class ResistanceService {
   getExportDir() {
     return path.join(osService.getAppDataPath(), 'ExportDir')
   }
+
 }
 
 /* Resistance Service private methods */
@@ -208,6 +209,36 @@ function startOrRestart(isTorEnabled: boolean, start: boolean) {
  * @memberof ResistanceService
  */
 function handleStdout(data: Buffer) {
-  // return data.toString().includes(`init message: Done loading`)
-  return data.toString().includes(`ProcessMessages: advertizing address`)
+  return data.toString().includes(`init message: Done loading`)
+}
+
+/**
+ * Returns Resistance export dir as provided with -exportdir command line argument to the node.
+ *
+ * @memberof ResistanceService
+ */
+function isReady() {
+  const nodeConfig = remote.getGlobal('resistanceNodeConfig')
+
+  return new Promise((resolve, reject) => {
+    const interval = setInterval(() => {
+      const request = net.request(`http://localhost:${nodeConfig.port}`)
+
+      request.on('response', response => {
+        if (response.statusCode === 405) {
+          clearInterval(interval)
+
+          // Give it a little more time to avoid issues
+          setTimeout(resolve, 500)
+        }
+      })
+      request.on('error', () => {})
+      request.end()
+    }, 100)
+
+    setTimeout(() => {
+      clearInterval(interval)
+      reject(new Error('Giving up trying to connect to marketmaker'))
+    }, 10000)
+  })
 }
