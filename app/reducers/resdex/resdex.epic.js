@@ -5,9 +5,9 @@ import { switchMap, delay } from 'rxjs/operators'
 import { actions as toastrActions } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
+import { ChildProcessService } from '~/service/child-process-service'
 import { ResDexAccountsActions } from './accounts/reducer'
 import { ResDexActions } from './resdex.reducer'
-import { getChildProcessObservable } from '~/utils/child-process'
 import { ResDexService } from '~/service/resdex/resdex'
 import { ResDexLoginEpic } from './login/epic'
 import { ResDexAssetsEpic } from './assets/epic'
@@ -18,11 +18,12 @@ import { ResDexAccountsEpic } from './accounts/epic'
 
 const t = translate('resdex')
 const resDex = new ResDexService()
+const childProcess = new ChildProcessService()
 
 const startResDexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexActions.startResdex),
   switchMap(() => {
-    const resDexStartedObservable = getChildProcessObservable({
+    const resDexStartedObservable = childProcess.getObservable({
       processName: 'RESDEX',
       onSuccess: of(ResDexAccountsActions.enableCurrencies()).pipe(delay(10000)),
       onFailure: of(toastrActions.add({ type: 'error', title: t('Unable to start ResDEX, check the log for details') })),

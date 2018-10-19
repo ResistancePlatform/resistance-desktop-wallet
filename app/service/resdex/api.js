@@ -4,18 +4,17 @@ import crypto from 'crypto'
 import rp from 'request-promise-native'
 import log from 'electron-log'
 import { remote } from 'electron'
-
 import getPort from 'get-port'
+
+import { getStore } from '~/store/configureStore'
 import { translate } from '~/i18next.config'
 import MarketmakerSocket from './marketmaker-socket'
 import { getCurrency } from '~/utils/resdex'
-import { OSService } from '~/service/os-service'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 
 const resDexUri = 'http://127.0.0.1:17445'
 
 const t = translate('service')
-const os = new OSService()
 
 class ResDexApiError extends Error {
   constructor(response) {
@@ -166,7 +165,7 @@ export class ResDexApiService {
     log.debug(`Calling ResDEX API method ${data.method}`, JSON.stringify(data))
 
     if (!token) {
-      os.dispatchAction(ResDexLoginActions.showDialog())
+      getStore().dispatch(ResDexLoginActions.showDialog())
       return Promise.reject(new Error(t(`Authentication failed`)))
     }
 

@@ -1,7 +1,9 @@
 // @flow
 import { remote } from 'electron'
 
-import { OSService } from './os-service'
+import { getStore } from '~/store/configureStore'
+import { getOS } from '~/utils/os'
+import { ChildProcessService } from './child-process-service'
 import { SystemInfoActions } from '../reducers/system-info/system-info.reducer'
 
 /**
@@ -9,7 +11,7 @@ import { SystemInfoActions } from '../reducers/system-info/system-info.reducer'
  */
 let instance = null
 
-const osService = new OSService()
+const childProcess = new ChildProcessService()
 
 const minerCommandExtraArgs = ['--no-stratum', '--no-getwork']
 
@@ -31,7 +33,7 @@ export class MinerService {
 	/**
 	 * @memberof MinerService
 	 */
-	start() {
+	async start() {
     const nodeConfig = remote.getGlobal('resistanceNodeConfig')
     const args = minerCommandExtraArgs.slice()
 
@@ -41,28 +43,28 @@ export class MinerService {
     // RPC credentials
     args.push(`--user=${nodeConfig.rpcuser}`, `--pass=${nodeConfig.rpcpassword}`)
 
-    if (osService.getOS() === 'windows') {
+    if (getOS() === 'windows') {
       args.push('--background')
     }
 
-    osService.execProcess({processName: 'MINER', args, stdoutHandler: this.handleStdout})
+    await childProcess.execProcess({processName: 'MINER', args, outputHandler: this.handleOutput})
 	}
 
 	/**
 	 * @memberof MinerService
 	 */
-	stop() {
-    osService.killProcess('MINER')
+	async stop() {
+    await childProcess.killProcess('MINER')
 	}
 
-  handleStdout(data: Buffer) {
+  handleOutput(data: Buffer) {
     const regex = /^.* accepted: \d+\/(\d+) \(100.00%\), (\d+\.\d+) khash\/s \(yay!!!\)$/m
     const matchResult = data.toString().match(regex)
 
     if (matchResult) {
       const hashPower = parseFloat(matchResult[2])
       const blocksNumber = parseInt(matchResult[1], 10)
-      osService.dispatchAction(SystemInfoActions.updateMinerInfo(hashPower, blocksNumber))
+      getStore().dispatch(SystemInfoActions.updateMinerInfo(hashPower, blocksNumber))
     }
   }
 

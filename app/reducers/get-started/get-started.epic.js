@@ -13,8 +13,8 @@ import { push } from 'react-router-redux'
 import { translate } from '~/i18next.config'
 import { RPC } from '~/constants/rpc'
 import { Action } from '../types'
-import { getChildProcessObservable } from '~/utils/child-process'
 import { AUTH } from '~/constants/auth'
+import { ChildProcessService } from '~/service/child-process-service'
 import { ResistanceService } from '~/service/resistance-service'
 import { RpcService } from '~/service/rpc-service'
 import { Bip39Service } from '~/service/bip39-service'
@@ -29,6 +29,7 @@ const t = translate('get-started')
 const bip39 = new Bip39Service()
 const rpc = new RpcService()
 const resistance = new ResistanceService()
+const childProcess = new ChildProcessService()
 
 
 const WelcomeActions = GetStartedActions.welcome
@@ -89,14 +90,14 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
 
     const nextAction = WelcomeActions.encryptWallet()
 
-    const resDexStartedObservable = getChildProcessObservable({
+    const resDexStartedObservable = childProcess.getObservable({
       processName: 'RESDEX',
       onSuccess: of(nextAction).pipe(delay(20000)),
       onFailure: of(WelcomeActions.walletBootstrappingFailed(t(`Unable to start ResDEX`))),
       action$
     })
 
-    const nodeStartedObservable = getChildProcessObservable({
+    const nodeStartedObservable = childProcess.getObservable({
       processName: 'NODE',
       onSuccess: concat(
         of(WelcomeActions.displayHint(t(`Initializing ResDEX...`))),
@@ -142,7 +143,7 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>, state$) => action
     })
     )
 
-    const nodeStartedObservable = getChildProcessObservable({
+    const nodeStartedObservable = childProcess.getObservable({
       processName: 'NODE',
       onSuccess: concat(
         of(WelcomeActions.displayHint(t(`Changing the wallet password...`))),
@@ -175,7 +176,7 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
 
     // Wallet encryption shuts the node down, let's start it back up and trigger the next action
-    const nodeStartedObservable = getChildProcessObservable({
+    const nodeStartedObservable = childProcess.getObservable({
       processName: 'NODE',
       onSuccess: of(WelcomeActions.authenticate()),
       onFailure: of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),

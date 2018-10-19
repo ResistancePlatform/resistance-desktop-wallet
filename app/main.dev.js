@@ -18,24 +18,23 @@ import { app, ipcMain, BrowserWindow } from 'electron'
 import log from 'electron-log'
 
 import { i18n } from './i18next.config'
-import { OSService } from './service/os-service-main'
+import { getOS, getAppDataPath, getInstallationPath, getChildProcessesGlobal, stopChildProcesses } from './utils/os'
 import { ResistanceService } from './service/resistance-service-main'
 import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
 
 // For the module to be imported in main, dirty, remove
-const os = new OSService()
 const resistance = new ResistanceService()
 const fetchParameters = new FetchParametersService()
 
-const appDataPath = os.getAppDataPath()
+const appDataPath = getAppDataPath()
 
 if (!fs.existsSync(appDataPath)) {
   fs.mkdirSync(appDataPath)
 }
 
 log.transports.file.maxSize = 5 * 1024 * 1024
-log.transports.file.file = path.join(os.getAppDataPath(), 'reswallet.log')
+log.transports.file.file = path.join(appDataPath, 'reswallet.log')
 
 let mainWindow = null
 
@@ -105,9 +104,11 @@ const getWindowSize = (isGetStartedComplete: boolean = false) => {
 
 }
 
+global.childProcesses = getChildProcessesGlobal()
 
 // Propagate Resistance node config for the RPC service
 global.resistanceNodeConfig = resistance.checkAndCreateConfig()
+
 // Set ResDEX global var for further use in renderer process, see ./service/resdex/api.js
 // TODO: provide the one decrypted with the password
 
@@ -142,7 +143,7 @@ app.on('window-all-closed', () => {
 app.on('ready', async () => {
   app.on('before-quit', () => {
     log.info(`Killing all child processes...`)
-    os.stopChildProcesses()
+    stopChildProcesses()
     log.info(`Done`)
   })
 
@@ -154,9 +155,9 @@ app.on('ready', async () => {
   }
 
   let iconFileName = 'icon.png'
-  if (os.getOS() === 'macos') {
+  if (getOS() === 'macos') {
     iconFileName = 'icon.icns'
-  } else if (os.getOS() === 'windows') {
+  } else if (getOS() === 'windows') {
     iconFileName = 'icon.ico'
   }
 
@@ -165,7 +166,7 @@ app.on('ready', async () => {
     show: false,
     frame: false,
     backgroundColor: '#1d2440',
-    icon: path.join(os.getInstallationPath(), 'resources', `${iconFileName}`)
+    icon: path.join(getInstallationPath(), 'resources', `${iconFileName}`)
   })
 
   const menuBuilder = new MenuBuilder(mainWindow)

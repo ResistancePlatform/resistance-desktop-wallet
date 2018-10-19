@@ -10,13 +10,13 @@ import { ofType } from 'redux-observable'
 import { toastr, actions as toastrActions } from 'react-redux-toastr'
 
 import { i18n, translate } from '~/i18next.config'
-import { getChildProcessObservable } from '~/utils/child-process'
 import { getEnsureLoginObservable } from '~/utils/auth'
 import { Action } from '../types'
 import { AuthActions } from '../auth/auth.reducer'
 import { ResDexActions } from '../resdex/resdex.reducer'
 import { SettingsActions } from './settings.reducer'
 import { RpcService } from '~/service/rpc-service'
+import { ChildProcessService } from '~/service/child-process-service'
 import { ResistanceService } from '~/service/resistance-service'
 import { MinerService } from '~/service/miner-service'
 import { TorService } from '~/service/tor-service'
@@ -25,6 +25,7 @@ const t = translate('settings')
 const rpc = new RpcService()
 const resistanceService = new ResistanceService()
 const minerService = new MinerService()
+const childProcess = new ChildProcessService()
 const torService = new TorService()
 
 const updateLanguageEpic = (action$: ActionsObservable<Action>) => action$.pipe(
@@ -65,11 +66,11 @@ const kickOffChildProcessesEpic = (action$: ActionsObservable<Action>, state$) =
 
 const startLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.startLocalNode),
-	tap(() => {
+  map(() => {
 		const settingsState = state$.value.settings
 		resistanceService.start(settingsState.isTorEnabled)
-	}),
-  mapTo(SettingsActions.empty())
+    return SettingsActions.empty()
+  })
 )
 
 const restartLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
@@ -189,7 +190,7 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     const newWalletPath = path.join(resistanceService.getWalletPath(), walletFileName)
 
     // Third, send the password for the new wallet
-    const startLocalNodeObservable = getChildProcessObservable({
+    const startLocalNodeObservable = childProcess.getObservable({
       processName: 'NODE',
       onSuccess: concat(
         of(AuthActions.ensureLogin(t(`Your restored wallet password is required`), true)),

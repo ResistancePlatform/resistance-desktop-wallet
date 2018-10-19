@@ -6,11 +6,10 @@ import log from 'electron-log'
 import config from 'electron-settings'
 import crypto from 'crypto'
 
+import { getOS } from '../utils/os'
 import { translate } from '../i18next.config'
-import { OSService } from './os-service-main'
 
 const t = translate('service')
-const os = new OSService()
 
 const quickHashesConfigKey = 'resistanceParameters.quickHashes'
 const paramsFolderName = 'ResistanceParams'
@@ -60,7 +59,7 @@ export class FetchParametersService {
     const validApp = process.type === 'renderer' ? remote.app : app
     let paramFolder = path.join(validApp.getPath('appData'), paramsFolderName)
 
-    if (os.getOS() === 'linux') {
+    if (getOS() === 'linux') {
       paramFolder = path.join(validApp.getPath('home'), '.resistance-params')
     }
 

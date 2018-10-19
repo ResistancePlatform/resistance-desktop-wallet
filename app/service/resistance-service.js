@@ -3,20 +3,22 @@ import { EOL } from 'os'
 import * as fs from 'fs'
 import path from 'path'
 import log from 'electron-log'
+import generator from 'generate-password'
+import PropertiesReader from 'properties-reader'
 import config from 'electron-settings'
 import { app, remote, net } from 'electron'
 
-import { OSService } from './os-service'
+import { getStore } from '~/store/configureStore'
+import { getOS, getAppDataPath, verifyDirectoryExistence } from '~/utils/os'
+import { ChildProcessService } from './child-process-service'
 
-const generator = require('generate-password')
-const PropertiesReader = require('properties-reader')
+const childProcess = new ChildProcessService()
+
 
 /**
  * ES6 singleton
  */
 let instance = null
-
-const osService = new OSService()
 
 const walletFolderName = 'testnet3'
 const configFolderName = 'Resistance'
@@ -58,7 +60,7 @@ export class ResistanceService {
   getDataPath() {
     const validApp = process.type === 'renderer' ? remote.app : app
     let configFolder = path.join(validApp.getPath('appData'), configFolderName)
-    if (osService.getOS() === 'linux') {
+    if (getOS() === 'linux') {
       configFolder = path.join(validApp.getPath('home'), '.resistance')
     }
     return configFolder
@@ -78,7 +80,7 @@ export class ResistanceService {
     const validApp = process.type === 'renderer' ? remote.app : app
     let paramsPath
 
-    if (osService.getOS() === 'linux') {
+    if (getOS() === 'linux') {
       paramsPath  = path.join(validApp.getPath('home'), '.resistance-params')
     } else {
       paramsPath = path.join(validApp.getPath('appData'), 'ResistanceParams')
@@ -120,8 +122,8 @@ export class ResistanceService {
    * @param {boolean} isTorEnabled
 	 * @memberof ResistanceService
 	 */
-	start(isTorEnabled: boolean) {
-    this::startOrRestart(isTorEnabled, true)
+	async start(isTorEnabled: boolean) {
+    await this::startOrRestart(isTorEnabled, true)
 	}
 
 	/**
@@ -130,8 +132,8 @@ export class ResistanceService {
    * @param {boolean} isTorEnabled
 	 * @memberof ResistanceService
 	 */
-	restart(isTorEnabled: boolean) {
-    this::startOrRestart(isTorEnabled, false)
+	async restart(isTorEnabled: boolean) {
+    await this::startOrRestart(isTorEnabled, false)
 	}
 
 	/**
@@ -139,8 +141,8 @@ export class ResistanceService {
    *
 	 * @memberof ResistanceService
 	 */
-	stop() {
-    osService.killProcess('NODE')
+	async stop() {
+    await childProcess.killProcess('NODE')
 	}
 
 	/**
@@ -165,7 +167,7 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
   getExportDir() {
-    return path.join(osService.getAppDataPath(), 'ExportDir')
+    return path.join(getAppDataPath(), 'ExportDir')
   }
 
 }
@@ -179,26 +181,32 @@ export class ResistanceService {
  * @param {boolean} start Starts if true, restarts otherwise
  * @memberof ResistanceService
  */
-function startOrRestart(isTorEnabled: boolean, start: boolean) {
+async function startOrRestart(isTorEnabled: boolean, start: boolean) {
   const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
   // TODO: support system wide wallet paths, stored in config.get('wallet.path')
   // https://github.com/ResistancePlatform/resistance-core/issues/84
 
   const walletName = config.get('wallet.name', 'wallet')
   args.push(`-wallet=${walletName}.dat`)
-  const caller = start ? osService.execProcess : osService.restartProcess
+  const caller = start ? childProcess.execProcess : childProcess.restartProcess
 
-  osService.verifyDirectoryExistence(this.getExportDir()).then(exportDir => {
-    args.push(`-exportdir=${exportDir}`)
-    caller.bind(osService)({
-      processName: 'NODE',
-      args,
-      stdoutHandler: this::handleStdout,
-    })
-    return Promise.resolve()
-  }).catch(err => {
-    const actions = osService.getSettingsActions()
-    osService.dispatchAction(actions.childProcessFailed('NODE', err.toString()))
+  const exportDir = this.getExportDir()
+
+  try {
+    await verifyDirectoryExistence(exportDir)
+  } catch (err) {
+    log.error(`Can't create local node export directory`, err)
+    const actions = childProcess.getSettingsActions()
+    getStore().dispatch(actions.childProcessFailed('NODE', err.message))
+    return
+  }
+
+  args.push(`-exportdir=${exportDir}`)
+
+  await caller.bind(childProcess)({
+    processName: 'NODE',
+    args,
+    outputHandler: this::handleOutput,
   })
 }
 
@@ -208,7 +216,7 @@ function startOrRestart(isTorEnabled: boolean, start: boolean) {
  * @param {string} configFilePath
  * @memberof ResistanceService
  */
-function handleStdout(data: Buffer) {
+function handleOutput(data: Buffer) {
   return data.toString().includes(`init message: Done loading`)
 }
 

@@ -3,7 +3,7 @@ import path from 'path'
 import { reactI18nextModule } from 'react-i18next'
 import i18nextBackend from 'i18next-node-fs-backend'
 
-import { OSService } from './service/os-service-main'
+import { getResourcesPath } from './utils/os'
 
 const availableLanguages = ['en', 'eo', 'ko']
 
@@ -22,10 +22,9 @@ const availableNamespaces = [
 ]
 
 // const isDev = process.env.NODE_ENV === 'development'
-const os = new OSService()
 
 const localesPath = (process.versions.electron
-  ? path.join(os.getResourcesPath(), 'locales')
+  ? path.join(getResourcesPath(), 'locales')
   : './locales')
 
 

@@ -5,13 +5,16 @@ import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 
-import { getChildProcessStatusName } from '~/utils/child-process'
+import { ChildProcessService } from '~/service/child-process-service'
 import OperationsModal from '~/components/system-info/OperationsModal'
 import { SendCashState } from '~/reducers/send-cash/send-cash.reducer'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { SystemInfoActions, SystemInfoState } from '~/reducers/system-info/system-info.reducer'
 
 import styles from './StatusIcons.scss'
+
+
+const childProcess = new ChildProcessService()
 
 type Props = {
   t: () => string,
@@ -33,7 +36,7 @@ class StatusIcons extends Component<Props> {
     const minerStatus = this.props.settings.childProcessesStatus.MINER
 
     if (minerStatus !== 'RUNNING') {
-      const minerStatusName = getChildProcessStatusName(minerStatus)
+      const minerStatusName = childProcess.getStatusName(minerStatus)
       return `${t('Miner status:')} ${minerStatusName}`
     }
 
@@ -118,7 +121,7 @@ class StatusIcons extends Component<Props> {
 
           <div
             className={cn('icon', styles.tor, { [styles.active]: this.props.settings.childProcessesStatus.TOR === 'RUNNING' })}
-            title={t(`Tor status: {{status}}`, { status: getChildProcessStatusName(this.props.settings.childProcessesStatus.TOR) })}
+            title={t(`Tor status: {{status}}`, { status: childProcess.getStatusName(this.props.settings.childProcessesStatus.TOR) })}
           />
 
           <div
