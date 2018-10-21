@@ -255,6 +255,11 @@ export class OSService {
           ...process.env,
           DYLD_LIBRARY_PATH: this.getBinariesPath()
         }
+      } else if (this.getOS() === 'linux') {
+        options.env = {
+          ...process.env,
+          'LD_LIBRARY_PATH': this.getBinariesPath()
+	}
       }
 
       const logFile = this.getLogFilePath(processName)
