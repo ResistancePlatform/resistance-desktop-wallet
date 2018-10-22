@@ -135,6 +135,7 @@ export const preloadedState: State = {
       swapHistory: [],
     },
     accounts: {
+      transactions: {},
       currencies: {},
       enabledCurrencies: [],
       currencyFees: {},
@@ -165,6 +166,9 @@ Object.assign(preloadedState.settings, {
 	language: config.get('language', 'en')
 })
 
+const enabledCurrencies = config.get('resDex.enabledCurrencies', RESDEX.alwaysEnabledCurrencies)
+
 Object.assign(preloadedState.resDex.accounts, {
-  enabledCurrencies: config.get('resDex.enabledCurrencies', RESDEX.alwaysEnabledCurrencies)
+  selectedSymbol: enabledCurrencies[0].symbol,
+  enabledCurrencies,
 })

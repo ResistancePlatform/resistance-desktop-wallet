@@ -32,7 +32,12 @@ export const ResDexAccountsActions = createActions(
     SHOW_DEPOSIT_MODAL: (symbol: string) => ({ symbol }),
     SHOW_WITHDRAW_MODAL: (symbol: string) => ({ symbol }),
     CLOSE_DEPOSIT_MODAL: undefined,
-    CLOSE_WITHDRAW_MODAL: undefined
+    CLOSE_WITHDRAW_MODAL: undefined,
+
+    SELECT_CURRENCY: symbol => ({ symbol }),
+    GET_TRANSACTIONS: undefined,
+    GOT_TRANSACTIONS: transactions => ({ transactions }),
+    GET_TRANSACTIONS_FAILED: (errorMessage: string) => ({ errorMessage }),
   },
   {
     prefix: 'APP/RESDEX/ACCOUNTS'
@@ -41,6 +46,14 @@ export const ResDexAccountsActions = createActions(
 
 export const ResDexAccountsReducer = handleActions(
   {
+    [ResDexAccountsActions.selectCurrency]: (state, action) => ({
+      ...state,
+      selectedSymbol: action.payload.symbol,
+    }),
+    [ResDexAccountsActions.gotTransactions]: (state, action) => ({
+      ...state,
+      transactions: action.payload.transactions,
+    }),
     [ResDexAccountsActions.gotCurrencyFees]: (state, action) => ({
       ...state,
       currencyFees: action.payload.fees,

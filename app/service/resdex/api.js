@@ -63,6 +63,29 @@ export class ResDexApiService {
 		return this.socket
 	}
 
+  async listTransactions(coin: string, address: string) {
+    const response = await this.query({
+      method: 'listtransactions',
+      coin,
+      address
+    })
+
+    // TODO: check if it's possible to get rawtransaction for Electrum currencies
+    if (response.length && response[0].tx_hash) {
+      return []
+    }
+
+    log.debug('listTransactions', coin, response.slice(0, 1))
+
+    const result = response.map(transaction => ({
+      ...response,
+      amount: Decimal(transaction.amount),
+      fee: Decimal(transaction.fee),
+    }))
+
+    return result
+  }
+
 	async getFee(coin) {
 		const response = await this.query({
 			method: 'getfee',

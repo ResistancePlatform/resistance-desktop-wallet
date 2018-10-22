@@ -88,9 +88,37 @@ const getCurrenciesFailedEpic = (action$: ActionsObservable<Action>) => action$.
   })))
 )
 
+
+const getTransactionsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(ResDexAccountsActions.getTransactions),
+  switchMap(() => {
+    const { currencies, enabledCurrencies } = state$.value.resDex.accounts
+
+    if (Object.keys(currencies).length === 0) {
+      log.warn(`Portfolio hasn't been fetched yet, can't get transactions history.`)
+      return of(ResDexAccountsActions.gotTransactions({}))
+    }
+
+    const symbols = enabledCurrencies.map(currency => currency.symbol)
+    const mapper = symbol => api.listTransactions(symbol, currencies[symbol].address)
+    const listTransactionsPromise = Promise.all(symbols.map(mapper))
+
+    return from(listTransactionsPromise).pipe(
+      switchMap(results => {
+        const currencyTransactions = results.reduce((accumulator, transaction, index) => (
+          { ...accumulator, [symbols[index]]: transaction }
+        ), {})
+        return of(ResDexAccountsActions.gotTransactions(currencyTransactions))
+      }),
+      catchError(err => of(ResDexAccountsActions.getTransactionsFailed(err.message)))
+    )
+  })
+)
+
 export const ResDexAccountsEpic = (action$, state$) => merge(
   enableCurrenciesEpic(action$, state$),
   getCurrenciesEpic(action$, state$),
   getCurrenciesFailedEpic(action$, state$),
+  getTransactionsEpic(action$, state$),
 )
 

@@ -61,6 +61,8 @@ export type ResDexState = {
     swapHistory: []
   },
   accounts: {
+    selectedSymbol: string,
+    transactions: { [string]: any },
     currencies: { [string]: Currency },
     enabledCurrencies: EnabledCurrency[],
     currencyFees: { [string]: any },

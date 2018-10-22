@@ -1,5 +1,4 @@
 // @flow
-import log from 'electron-log'
 import { Decimal } from 'decimal.js'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -9,7 +8,6 @@ import { translate } from 'react-i18next'
 
 import { RESDEX } from '~/constants/resdex'
 import { toDecimalPlaces } from '~/utils/decimal'
-import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import { ResDexAssetsActions } from '~/reducers/resdex/assets/reducer'
 import CurrencyIcon from './CurrencyIcon'
