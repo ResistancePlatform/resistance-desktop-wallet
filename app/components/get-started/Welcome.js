@@ -40,6 +40,17 @@ export class Welcome extends Component<Props> {
   }
 
 	/**
+   * Triggers child processes and binds Resistance parameters download event handlers.
+   *
+	 * @returns
+   * @memberof App
+	 */
+  componentDidMount() {
+    const { t } = this.props
+    this.props.actions.displayHint(t(`Check the wallet configuration before applying`))
+  }
+	/**
+   *
    * Gets wallet name.
    *
    * @returns string
@@ -100,7 +111,7 @@ export class Welcome extends Component<Props> {
         {this.props.fetchParameters.isDownloadComplete
           ? (
             <div className={cn(styles.hint, styles[this.props.welcome.status])}>
-              {this.props.welcome.hint || t(`Check the wallet configuration before applying`)}
+              {this.props.welcome.hint}
             </div>
           ) : (<FetchParametersProgressText />)
         }

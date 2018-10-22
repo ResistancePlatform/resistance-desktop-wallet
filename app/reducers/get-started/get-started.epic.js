@@ -4,16 +4,17 @@ import * as fs from 'fs'
 import { promisify } from 'util'
 import path from 'path'
 import config from 'electron-settings'
-import { of, concat, from, merge } from 'rxjs'
+import { of, concat, from, merge, defer } from 'rxjs'
 import { filter, switchMap, take, map, mergeMap, catchError, delay } from 'rxjs/operators'
 import { remote, ipcRenderer } from 'electron'
 import { ofType } from 'redux-observable'
 import { push } from 'react-router-redux'
 
+import { Action } from '../types'
 import { translate } from '~/i18next.config'
 import { RPC } from '~/constants/rpc'
-import { Action } from '../types'
 import { AUTH } from '~/constants/auth'
+import { verifyDirectoryExistence } from '~/utils/os'
 import { ChildProcessService } from '~/service/child-process-service'
 import { ResistanceService } from '~/service/resistance-service'
 import { RpcService } from '~/service/rpc-service'
@@ -121,9 +122,10 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>, state$) => action
   switchMap(() => {
     const restoreForm = state$.value.roundedForm.getStartedRestoreYourWallet
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
+    const oldPassword = restoreForm.fields.password || ''
 
     // 2. Changing the node password to the new one
-    const changePasswordObservable = from(rpc.changeWalletPassword(restoreForm.fields.password || '', choosePasswordForm.fields.password)).pipe(
+    const changePasswordObservable = defer(() => from(rpc.changeWalletPassword(oldPassword, choosePasswordForm.fields.password))).pipe(
       switchMap(() => of(WelcomeActions.authenticate())),
       catchError(err => {
         let errorMessage
@@ -133,14 +135,14 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>, state$) => action
         }
 
         if (err.code === RPC.WALLET_PASSPHRASE_INCORRECT) {
-          errorMessage = t(`The backup wallet password is not correct, please go back and change it.`)
+          errorMessage = t(`Invalid backup wallet password, please go back and change it.`)
         } else {
           log.error(`Error changing backup wallet password`, err)
           errorMessage = t(`Can't change the backup wallet password, check the application log for details.`)
         }
 
         return of(WelcomeActions.walletBootstrappingFailed(errorMessage))
-    })
+      })
     )
 
     const nodeStartedObservable = childProcess.getObservable({
@@ -154,13 +156,17 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>, state$) => action
     })
 
     // 1. Copying the user wallet to Resistance data folder
-    const newWalletPath = path.join(resistance.getWalletPath(), restoreForm.fields.walletName)
-    const copyPromise = promisify(fs.copyFile)(restoreForm.fields.backupFile, newWalletPath)
+    const newWalletPath = path.join(resistance.getWalletPath(), `${restoreForm.fields.walletName}.dat`)
+
+
+    const copyPromise = verifyDirectoryExistence(resistance.getWalletPath()).then(() => (
+      promisify(fs.copyFile)(restoreForm.fields.backupFile, newWalletPath)
+    ))
 
     const copyObservable = from(copyPromise).pipe(
       switchMap(() => concat(
         of(WelcomeActions.displayHint(t(`Starting the local node...`))),
-        of(SettingsActions.startLocalNode()),
+        of(SettingsActions.kickOffChildProcesses()),
         nodeStartedObservable
       )),
       catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.message)))

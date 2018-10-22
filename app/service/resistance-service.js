@@ -42,13 +42,17 @@ const torSwitch = '-proxy=127.0.0.1:9050'
  * @class ResistanceService
  */
 export class ResistanceService {
+  isDoneLoading: boolean
+
 	/**
 	 * Creates an instance of ResistanceService.
    *
 	 * @memberof ResistanceService
 	 */
 	constructor() {
-		if (!instance) { instance = this }
+    if (!instance) {
+      instance = this
+    }
 
 		return instance
 	}
@@ -195,6 +199,8 @@ async function startOrRestart(isTorEnabled: boolean, start: boolean) {
 
   args.push(`-exportdir=${exportDir}`)
 
+  this.isDoneLoading = false
+
   await caller.bind(childProcess)({
     processName: 'NODE',
     args,
@@ -204,12 +210,13 @@ async function startOrRestart(isTorEnabled: boolean, start: boolean) {
 
 async function checkRpcAvailability() {
   const client = getClientInstance()
-  log.debug(`Checking if resistanced is ready to accept RPC calls`)
 
   try {
     await client.getInfo()
+    log.debug(`The local node has successfully accepted an RPC call`)
     return true
   } catch (err) {
+    log.debug(`The local node hasn't accepted an RPC check call`)
     return false
   }
 

@@ -12,7 +12,7 @@ import MarketmakerSocket from './marketmaker-socket'
 import { getCurrency } from '~/utils/resdex'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 
-const resDexUri = 'http://127.0.0.1:17445'
+export const resDexUri = 'http://127.0.0.1:17445'
 
 const t = translate('service')
 
@@ -190,19 +190,3 @@ export class ResDexApiService {
   }
 
 }
-
-/* Querying method reusing queues, taken from HyperDEX
-async function query(data) {
-	const queueId = (this.useQueue && this.socket) ? ++this.currentQueueId : 0
-
-	const response = await this.queue.add(() => fetch(this.endpoint, {
-		method: 'post',
-		body: JSON.stringify({
-			...{queueid: queueId},
-			...data}
-		),
-	}))
-
-	return (this.useQueue && this.socket) ? this.socket.getResponse(queueId) : response.json()
-}
-*/

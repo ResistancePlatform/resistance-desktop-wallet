@@ -2,8 +2,10 @@
 import log from 'electron-log'
 import os from 'os'
 import path from 'path'
+import rp from 'request-promise-native'
 import { remote } from 'electron'
 
+import { resDexUri } from '~/service/resdex/api'
 import { getStore } from '~/store/configureStore'
 import { getAppDataPath, verifyDirectoryExistence } from '~/utils/os'
 import { ChildProcessService } from '../child-process-service'
@@ -77,7 +79,7 @@ export class ResDexService {
     await childProcess.execProcess({
       processName: 'RESDEX',
       args: [JSON.stringify(options)],
-      outputHandler: this::handleOutput,
+      waitUntilReady: childProcess.createReadinessWaiter(this::checkApiAvailability),
       spawnOptions: { cwd: resDexDir }
     })
 
@@ -94,7 +96,17 @@ export class ResDexService {
 
 }
 
-function handleOutput(data: Buffer) {
-  // API enabled at unixtime
-  return data.toString().includes(`ResDEX Marketmaker`)
+async function checkApiAvailability() {
+  log.debug(`Checking if resdex API is ready`)
+
+  try {
+    const response = await rp({
+      uri: resDexUri,
+      resolveWithFullResponse: true,
+    })
+    return response.statusCode === 200
+  } catch (err) {
+    return false
+  }
+
 }

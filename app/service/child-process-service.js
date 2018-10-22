@@ -159,7 +159,7 @@ export class ChildProcessService {
       getStore().dispatch(actions.childProcessFailed(processName, err.toString()))
     })
 
-    childProcess.on('close', (code) => {
+    childProcess.on('close', code => {
       if (!childProcessInfo.isGettingKilled) {
         const errorMessage =  t(`Process {{processName}} unexpectedly exited with code {{code}}.`, { processName, code })
         getStore().dispatch(actions.childProcessFailed(processName, errorMessage))
@@ -170,7 +170,12 @@ export class ChildProcessService {
     await this::initAndWaitForFirstOutput(childProcess, outputHandler)
 
     if (waitUntilReady) {
-      await waitUntilReady()
+      try {
+        await waitUntilReady()
+      } catch(err) {
+        getStore().dispatch(actions.childProcessFailed(processName, err.message))
+        return
+      }
     }
 
     getStore().dispatch(actions.childProcessStarted(processName))
@@ -213,7 +218,7 @@ export class ChildProcessService {
 	 * @memberof ChildProcessService
 	 * @returns {Promise<any>}
 	 */
-	killPid(pid) {
+	async killPid(pid) {
 		return new Promise((resolve, reject) => {
 			ps.kill(pid, err => {
 				if (err) {
@@ -230,7 +235,7 @@ export class ChildProcessService {
 	 * @memberof ChildProcessService
 	 * @returns {Promise<number>}
 	 */
-	getPid(processName: string) {
+	async getPid(processName: string) {
 		return new Promise((resolve, reject) => {
 			let process
 
@@ -264,24 +269,29 @@ export class ChildProcessService {
    */
   createReadinessWaiter(checker: () => boolean): () => void {
     const promise = new Promise((resolve, reject) => {
-      const interval = setInterval(() => {
+      let interval = setInterval(() => {
 
         checker().then(isReady => {
           if (isReady) {
             clearInterval(interval)
+            interval = null
             setTimeout(resolve, 100)
           }
           return null
         }).catch(err => {
           log.error(`Process status checker async function threw an exception`, err)
+          reject(new Error(t(`Unexpected error occurred`)))
         })
 
       }, 100)
 
       setTimeout(() => {
-        clearInterval(interval)
-        reject(new Error(`Process startup timed out`))
-      }, 10000)
+        if (interval !== null) {
+          clearInterval(interval)
+          log.error('Child process startup timed out')
+          reject(new Error(`Startup timed out`))
+        }
+      }, 60000)
     })
 
     return () => promise
