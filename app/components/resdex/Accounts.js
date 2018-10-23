@@ -32,6 +32,7 @@ class ResDexAccounts extends Component<Props> {
 
   getEnabledCurrencyContents(t, symbol: string) {
     const currency = this.props.accounts.currencies[symbol]
+    const { selectedSymbol } = this.props.accounts
     const { currencyHistory } = this.props.assets
     const hourHistory = currencyHistory.hour && currencyHistory.hour[symbol]
     const price = hourHistory && hourHistory.slice(-1)[0].value
@@ -39,7 +40,8 @@ class ResDexAccounts extends Component<Props> {
     return (
       <div
         role="none"
-        className={styles.record}
+        key={symbol}
+        className={cn(styles.record, { [styles.selected]: selectedSymbol === symbol })}
         onClick={() => this.props.actions.selectCurrency(symbol)}
       >
         <div className={styles.columnsWrapper}>
@@ -82,7 +84,7 @@ class ResDexAccounts extends Component<Props> {
     const price = hourHistory && hourHistory.slice(-1)[0].value
 
     return (
-      <div className={styles.record}>
+      <div className={styles.record} key={transaction.txid}>
         <div className={styles.date}>
           <span>{time.format('MMM')}</span>
           {time.format('D')}

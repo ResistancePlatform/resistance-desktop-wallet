@@ -72,7 +72,7 @@ export class ResDex extends Component<Props> {
         />
 
         <RpcPolling
-          interval={5.0}
+          interval={1.0 * 60}
           criticalChildProcess="RESDEX"
           actions={{
             polling: ResDexAccountsActions.getTransactions,

@@ -54,7 +54,12 @@
   min-width: 15.1875rem;
 
   .record {
+    cursor: pointer;
     height: 4.1875rem;
+
+    &.selected {
+      background-color: #262e4e;
+    }
 
     .columnsWrapper {
       padding: 1rem 1rem 0.2rem 1rem;
@@ -139,10 +144,6 @@
     }
   }
 
-  .record:hover {
-    background-color: #262e4e;
-  }
-
   .addNewCoin {
     color: $BASE_COLOR_FONT_GRAY;
     font-size: 0.7rem;
@@ -178,6 +179,13 @@
   @extend %smallContainer;
   width: 100%;
   margin-left: 1.5rem;
+
+  .empty {
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 1rem;
+    padding: 1rem;
+    text-align: center;
+  }
 
   .record {
     display: flex;

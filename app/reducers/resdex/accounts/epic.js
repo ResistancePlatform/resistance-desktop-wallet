@@ -1,4 +1,5 @@
 // @flow
+import pMap from 'p-map'
 import log from 'electron-log'
 import { Decimal } from 'decimal.js'
 import { of, from, merge } from 'rxjs'
@@ -55,11 +56,13 @@ const enableCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => act
   })
 )
 
-const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const getCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexAccountsActions.getCurrencies),
   switchMap(() => (
     from(api.getPortfolio()).pipe(
       switchMap(response => {
+        const { currencies: previousCurrencies } = state$.value.resDex.accounts
+
         const currencies = response.portfolio.reduce((accumulator, currency) => ({
           ...accumulator,
           [currency.coin]: {
@@ -72,7 +75,13 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
           }
         }), {})
 
-        return of(ResDexAccountsActions.gotCurrencies(currencies))
+        const actions = [ResDexAccountsActions.gotCurrencies(currencies)]
+
+        if (Object.keys(previousCurrencies).length === 0) {
+          actions.push(ResDexAccountsActions.getTransactions())
+        }
+
+        return of(...actions)
       }),
       catchError(err => of(ResDexAccountsActions.getCurrenciesFailed(err.message)))
     )
@@ -100,8 +109,12 @@ const getTransactionsEpic = (action$: ActionsObservable<Action>, state$) => acti
     }
 
     const symbols = enabledCurrencies.map(currency => currency.symbol)
-    const mapper = symbol => api.listTransactions(symbol, currencies[symbol].address)
-    const listTransactionsPromise = Promise.all(symbols.map(mapper))
+
+    const listTransactionsPromise = pMap(
+      symbols,
+      symbol => api.listTransactions(symbol, currencies[symbol].address),
+      { concurrency: 1 }
+    )
 
     return from(listTransactionsPromise).pipe(
       switchMap(results => {
@@ -110,7 +123,16 @@ const getTransactionsEpic = (action$: ActionsObservable<Action>, state$) => acti
         ), {})
         return of(ResDexAccountsActions.gotTransactions(currencyTransactions))
       }),
-      catchError(err => of(ResDexAccountsActions.getTransactionsFailed(err.message)))
+      catchError(err => {
+        log.error(`Error getting transactions from ResDEX`, err)
+        return of(
+          ResDexAccountsActions.getTransactionsFailed(err.message),
+          toastrActions.add({
+            type: 'error',
+            title: t(`Unable to get transactions from ResDEX, check the application log for details`),
+          })
+        )
+      })
     )
   })
 )
