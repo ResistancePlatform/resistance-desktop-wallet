@@ -21,8 +21,6 @@ export default class RoundedInput extends GenericInput {
   props: RoundedInputProps
   state: RoundedInputState
 
-  static get displayName() { return 'RoundedInput' }
-
 	/**
 	 * @param {*} props
 	 * @memberof RoundedInput

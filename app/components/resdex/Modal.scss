@@ -2,6 +2,7 @@
 
 $depositDialogWidth: 17rem;
 $withdrawDialogWidth: 26.25rem;
+$addCurrencyDialogWidth: 20rem;
 
 .overlay {
   position: fixed;
@@ -11,6 +12,7 @@ $withdrawDialogWidth: 26.25rem;
   bottom: 0px;
   // filter: blur(70px);
   background-color: rgba(255, 255, 255, 0.1);
+  -webkit-app-region: drag;
   z-index: 999;
 }
 
@@ -24,21 +26,27 @@ $withdrawDialogWidth: 26.25rem;
   border-radius: 0.35rem;
   background: $BASE_COLOR_DARK_BLUE_3;
   z-index: 1000;
+  -webkit-app-region: no-drag;
   -webkit-filter: none;
 }
 
-.closeButton:before {
-  float: right;
-  font-size: 0.6rem;
-  cursor: pointer;
-  position: relative;
-  content: "\e906";
-  left: 0.7rem;
-  top: -0.5rem;
+.closeButton {
+  outline: none;
+
+  &.closeButton:before {
+    float: right;
+    font-size: 0.57rem;
+    cursor: pointer;
+    position: relative;
+    content: "\e906";
+    left: 0.7rem;
+    top: -0.5rem;
+  }
 }
 
 .title {
-  font-size: 1.2rem;
+  font-size: 1.05rem;
+  font-weight: 100;
   margin-bottom: 1.75rem;
   user-select: none;
   cursor: default;
@@ -88,6 +96,57 @@ $withdrawDialogWidth: 26.25rem;
 
   button[type='submit'] {
     margin-top: 0.75rem;
+    float: right;
+  }
+
+}
+
+.addCurrency {
+  padding: 2rem;
+  width: $addCurrencyDialogWidth - 2 * 2rem;
+  height: 21.875rem - 2 * 2rem;
+
+  .toggleContainer {
+    margin: 0.1rem 1rem 0.3rem 1rem;
+    display: flex;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: $BASE_COLOR_FONT_GRAY;
+
+    > div {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .label {
+      padding-bottom: 0.75rem;
+    }
+
+    .active {
+      color: $BASE_COLOR_WHITE;
+    }
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid $BASE_COLOR_BORDER_GRAY;
+    margin: 0.2rem 0 0.9rem 0;
+  }
+
+  .memo {
+    font-size: 0.63rem;
+    font-weight: 100;
+    color: $BASE_COLOR_FONT_GRAY_2;
+    margin-bottom: 1rem;
+
+    strong {
+      font-weight: 100;
+      color: $BASE_COLOR_WHITE;
+    }
+  }
+
+  button {
     float: right;
   }
 

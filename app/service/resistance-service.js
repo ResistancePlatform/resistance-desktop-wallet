@@ -204,12 +204,29 @@ async function startOrRestart(isTorEnabled: boolean, start: boolean) {
   await caller.bind(childProcess)({
     processName: 'NODE',
     args,
+    outputHandler: this::handleOutput,
     waitUntilReady: childProcess.createReadinessWaiter(this::checkRpcAvailability)
   })
 }
 
+/**
+ * Private method. Called on new data in stdout, returns true if Resistance node has been initialized.
+ *
+ * @param {string} configFilePath
+ * @memberof ResistanceService
+ */
+function handleOutput(data: Buffer) {
+  if (!this.isDoneLoading) {
+    this.isDoneLoading = data.toString().includes(`init message: Done loading`)
+  }
+}
+
 async function checkRpcAvailability() {
   const client = getClientInstance()
+
+  if (!this.isDoneLoading) {
+    return false
+  }
 
   try {
     await client.getInfo()

@@ -35,6 +35,24 @@ type Props = {
  */
 class ResDexAccounts extends Component<Props> {
 	props: Props
+  currencyColors: { [string]: string }
+
+  constructor(props) {
+    super(props)
+    this.currencyColors = {}
+  }
+
+  currencyIconRef(symbol: string, element: any) {
+    if (!element) {
+      return
+    }
+
+    const [circleElement] = element.getElementsByTagName('circle')
+
+    if (circleElement) {
+      this.currencyColors[symbol] = circleElement.getAttribute('fill')
+    }
+  }
 
   getEnabledCurrencyContents(t, symbol: string) {
     const currency = this.props.accounts.currencies[symbol]
@@ -59,7 +77,7 @@ class ResDexAccounts extends Component<Props> {
       >
         <div className={styles.columnsWrapper}>
           <div className={styles.currency}>
-            <CurrencyIcon symbol={symbol} size="1.3rem" />
+            <CurrencyIcon imageRef={(s, el) => this.currencyIconRef(s, el)} symbol={symbol} size="1.3rem" />
           </div>
 
           <div className={styles.balance}>
@@ -105,7 +123,7 @@ class ResDexAccounts extends Component<Props> {
         </div>
 
         <div className={styles.rateBar}>
-          <div className={styles.btc} style={{ width: `77%` }} />
+          <div className={styles.btc} style={{ width: `77%`, background: this.currencyColors[symbol] || '#9a6de8' }} />
         </div>
 
       </div>

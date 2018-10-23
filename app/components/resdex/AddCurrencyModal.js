@@ -1,4 +1,5 @@
 // @flow
+import * as Joi from 'joi'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -6,10 +7,22 @@ import { translate } from 'react-i18next'
 import cn from 'classnames'
 
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
+import RoundedForm from '~/components/rounded-form/RoundedForm'
 import RoundedInput from '~/components/rounded-form/NewRoundedInput'
+import ToggleButton from '~/components/rounded-form/ToggleButton'
+import ChooseCurrencyInput from '~/components/rounded-form/ChooseCurrencyInput'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
 import styles from './Modal.scss'
+
+
+const getValidationSchema = t => Joi.object().keys({
+  recipientAddress: Joi.string().required().label(t(`Recipient address`)),
+  withdrawFrom: Joi.string().required(),
+  amount: Joi.number().required().label(t(`Amount`)),
+  equity: Joi.number(),
+  note: Joi.string().optional().label(t(`Note`)),
+})
 
 type Props = {
   t: any,
@@ -27,12 +40,16 @@ class AddCurrencyModal extends Component<Props> {
 	render() {
     const { t } = this.props
 
-    const { isInEditMode, symbol } = this.props.accounts.addCurrencyModal
+    const { enabledCurrencies, addCurrencyModal } = this.props.accounts
+    const { isInEditMode, symbol } = addCurrencyModal
+
+    const { useElectrum } = true
+
     // const { address } = this.props.accounts.currencies[symbol]
 
     return (
       <div className={styles.overlay}>
-        <div className={cn(styles.container, styles.deposit)}>
+        <div className={cn(styles.container, styles.addCurrency)}>
           <div
             role="button"
             tabIndex={0}
@@ -45,12 +62,54 @@ class AddCurrencyModal extends Component<Props> {
           {isInEditMode ? t(`Edit coin`) : t(`Add new coin`)}
         </div>
 
-        <RoundedInput
-          defaultValue=""
-          label={t(`RPC port`)}
-        />
+        <RoundedForm
+          id="addressBookNewAddressDialog"
+          schema={getValidationSchema(t)}
+        >
+          <ChooseCurrencyInput
+            name="symbol"
+            defaultValue={symbol}
+            label={t(`Coin`)}
+            symbols={enabledCurrencies.map(currency => currency.symbol)}
+          />
 
-    </div>
+          <div className={styles.toggleContainer}>
+            <div className={cn(styles.label, {[styles.active]: !useElectrum})}>{t(`Native`)}</div>
+
+            <ToggleButton
+              name="useElectrum"
+              defaultValue
+            />
+
+            <div className={cn(styles.label, {[styles.active]: useElectrum})}>{t(`Electrum`)}</div>
+          </div>
+
+          <RoundedInput
+            name="rpcPort"
+            defaultValue=""
+            type="number"
+            label={t(`RPC port`)}
+          />
+
+          <hr />
+
+          <div className={styles.memo}>
+            <strong>{t(`Memo:`)}</strong>&nbsp;
+            {t(`In order to use Native mode you must have the blockchain for this coin downloaded, synced and running.`)}
+          </div>
+
+          {isInEditMode ? (
+            <div className={styles.buttonsRow}>
+              <button type="submit" onClick={this.props.actions.updateCurrency}>{t(`Save`)}</button>
+              <button type="button" onClick={this.props.actions.closeAddCurrencyModal}>{t(`Cancel`)}</button>
+            </div>
+          ) : (
+            <button type="submit" onClick={this.props.actions.addCurrency}>{t(`Add coin`)}</button>
+          )}
+
+        </RoundedForm>
+
+      </div>
     </div>
     )
   }

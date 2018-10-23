@@ -64,11 +64,18 @@ export class ResDexApiService {
 	}
 
   async listTransactions(coin: string, address: string) {
-    const response = await this.query({
-      method: 'listtransactions',
-      coin,
-      address
-    })
+    let response
+
+    try {
+      response = await this.query({
+        method: 'listtransactions',
+        coin,
+        address
+      })
+    } catch (err) {
+      return []
+    }
+
 
     // TODO: check if it's possible to get rawtransaction for Electrum currencies
     if (response.length && response[0].tx_hash) {

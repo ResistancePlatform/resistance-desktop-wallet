@@ -116,8 +116,11 @@ const getTransactionsEpic = (action$: ActionsObservable<Action>, state$) => acti
       { concurrency: 1 }
     )
 
+    log.debug('starting getting transactions')
     return from(listTransactionsPromise).pipe(
       switchMap(results => {
+        log.debug('done getting transactions')
+
         const currencyTransactions = results.reduce((accumulator, transaction, index) => (
           { ...accumulator, [symbols[index]]: transaction }
         ), {})
