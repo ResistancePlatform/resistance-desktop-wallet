@@ -29,10 +29,15 @@ export const ResDexAccountsActions = createActions(
     GET_CURRENCIES_FAILED: (errorMessage: string) => ({ errorMessage }),
 
     WITHDRAW: undefined,
+    COPY_SMART_ADDRESS: (symbol: string) => ({ symbol }),
+    DELETE_CURRENCY: (symbol: string) => ({ symbol }),
     SHOW_DEPOSIT_MODAL: (symbol: string) => ({ symbol }),
     SHOW_WITHDRAW_MODAL: (symbol: string) => ({ symbol }),
+    SHOW_EDIT_CURRENCY_MODAL: (symbol: string) => ({ symbol }),
+    SHOW_ADD_CURRENCY_MODAL: undefined,
     CLOSE_DEPOSIT_MODAL: undefined,
     CLOSE_WITHDRAW_MODAL: undefined,
+    CLOSE_ADD_CURRENCY_MODAL: undefined,
 
     SELECT_CURRENCY: symbol => ({ symbol }),
     GET_TRANSACTIONS: undefined,

@@ -8,18 +8,24 @@ import cn from 'classnames'
 
 import { getCurrencyName } from '~/utils/resdex'
 import { toDecimalPlaces } from '~/utils/decimal'
+import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
+import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import CurrencyIcon from './CurrencyIcon'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
 import styles from './Accounts.scss'
 
+
+const enabledCurrencyPopupMenuId = 'resdex-accounts-enabled-currencies-popup-menu-id'
+
 type Props = {
   t: any,
   i18n: any,
   assets: ResDexState.assets,
   accounts: ResDexState.accounts,
-  actions: object
+  actions: object,
+  popupMenuActions: object
 }
 
 
@@ -36,6 +42,13 @@ class ResDexAccounts extends Component<Props> {
     const { currencyHistory } = this.props.assets
     const hourHistory = currencyHistory.hour && currencyHistory.hour[symbol]
     const price = hourHistory && hourHistory.slice(-1)[0].value
+
+    const showPopupMenu = e => {
+      e.preventDefault()
+      e.stopPropagation()
+      this.props.popupMenuActions.show(enabledCurrencyPopupMenuId, symbol, e.clientY, e.clientX)
+      return false
+    }
 
     return (
       <div
@@ -59,7 +72,34 @@ class ResDexAccounts extends Component<Props> {
           </div>
 
           <div className={styles.more}>
-            <span className={styles.button} />
+            <span
+              role="none"
+              className={styles.button}
+              onClick={showPopupMenu}
+              onContextMenu={showPopupMenu}
+            />
+
+            <PopupMenu id={enabledCurrencyPopupMenuId}>
+              <PopupMenuItem onClick={(e, clickedSymbol) => this.props.actions.showDepositModal(clickedSymbol)}>
+                {t(`Deposit`)}
+              </PopupMenuItem>
+              <PopupMenuItem onClick={(e, clickedSymbol) => this.props.actions.showWithdrawModal(clickedSymbol)}>
+                {t(`Withdraw`)}
+              </PopupMenuItem>
+              <PopupMenuItem onClick={(e, clickedSymbol) => this.props.actions.copySmartAddress(clickedSymbol)}>
+                {t(`Copy smart address`)}
+              </PopupMenuItem>
+              <PopupMenuItem onClick={(e, clickedSymbol) => this.props.actions.showEditCurrencyModal(clickedSymbol)}>
+                {t(`Edit coin`)}
+              </PopupMenuItem>
+              <PopupMenuItem
+                className={styles.deleteCoin}
+                onClick={(e, clickedSymbol) => this.props.actions.deleteCurrency(clickedSymbol)}
+              >
+                {t(`Delete coin`)}
+              </PopupMenuItem>
+            </PopupMenu>
+
           </div>
 
         </div>
@@ -111,14 +151,21 @@ class ResDexAccounts extends Component<Props> {
 	render() {
     const { t } = this.props
     const { selectedSymbol, transactions: transactionsMap } = this.props.accounts
+    const { enabledCurrencies } = this.props.accounts
     const transactions = transactionsMap[selectedSymbol] || []
 
 		return (
       <div className={cn(styles.container)}>
         <div className={styles.enabledCurrenciesContainer}>
-          {this.props.accounts.enabledCurrencies.map(currency => this.getEnabledCurrencyContents(t, currency.symbol))}
+          {enabledCurrencies.map(currency => this.getEnabledCurrencyContents(t, currency.symbol))}
 
-          <div className={styles.addNewCoin}>
+          <div
+            role="button"
+            tabIndex={enabledCurrencies.length}
+            className={styles.addNewCoin}
+            onClick={this.props.actions.showAddCurrencyModal}
+            onKeyDown={() => false}
+          >
             <div className={cn('icon', styles.button)} />
             <div className={styles.caption}>{t(`Add new coin`)}</div>
           </div>
@@ -146,7 +193,8 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(ResDexAccountsActions, dispatch)
+  actions: bindActionCreators(ResDexAccountsActions, dispatch),
+  popupMenuActions: bindActionCreators(PopupMenuActions, dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexAccounts))

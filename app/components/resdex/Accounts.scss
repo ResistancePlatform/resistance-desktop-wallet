@@ -149,6 +149,7 @@
     font-size: 0.7rem;
     padding-left: 1rem;
     cursor: pointer;
+    outline: none;
 
     .button {
       @extend %discButton;
