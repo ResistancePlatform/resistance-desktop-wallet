@@ -9,6 +9,7 @@ import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import ResDexLogin from './Login'
 import DepositModal from './DepositModal'
 import WithdrawModal from './WithdrawModal'
+import AddCurrencyModal from './AddCurrencyModal'
 import ResDexAssets from './Assets'
 import ResDexBuySell from './BuySell'
 import ResDexOrders from './Orders'
@@ -86,6 +87,9 @@ export class ResDex extends Component<Props> {
         }
         {this.props.resDex.accounts.withdrawModal.isVisible &&
           <WithdrawModal />
+        }
+        {this.props.resDex.accounts.addCurrencyModal.isVisible &&
+          <AddCurrencyModal />
         }
         <Tabs
           className={styles.tabs}

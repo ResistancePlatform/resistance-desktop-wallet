@@ -66,6 +66,11 @@ export type ResDexState = {
     currencies: { [string]: Currency },
     enabledCurrencies: EnabledCurrency[],
     currencyFees: { [string]: any },
+    addCurrencyModal: {
+      isInEditMode: boolean,
+      isVisible: boolean,
+      symbol: string | null
+    },
     depositModal: {
       isVisible: boolean,
       symbol: string | null
