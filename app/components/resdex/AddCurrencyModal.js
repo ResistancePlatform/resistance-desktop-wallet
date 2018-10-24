@@ -20,15 +20,14 @@ import styles from './Modal.scss'
 
 
 const getValidationSchema = t => Joi.object().keys({
-  recipientAddress: Joi.string().required().label(t(`Recipient address`)),
-  withdrawFrom: Joi.string().required(),
-  amount: Joi.number().required().label(t(`Amount`)),
-  equity: Joi.number(),
-  note: Joi.string().optional().label(t(`Note`)),
+  symbol: Joi.string().required(),
+  useElectrum: Joi.boolean().required(),
+  rpcPort: Joi.number().min(1024).max(65535).optional().label(t(`RPC port`)),
 })
 
 type Props = {
   t: any,
+  form: object,
   accounts: ResDexState.accounts,
   actions: object
 }
@@ -46,8 +45,10 @@ class AddCurrencyModal extends Component<Props> {
     const { enabledCurrencies, addCurrencyModal } = this.props.accounts
     const { isInEditMode, symbol } = addCurrencyModal
 
-    const { useElectrum } = true
+    const enabledCurrency = enabledCurrencies.find(currency => currency.symbol === symbol)
+    const useElectrum = isInEditMode && enabledCurrency ? enabledCurrency.useElectrum : true
 
+    const { fields } = this.props.form || {}
     // const { address } = this.props.accounts.currencies[symbol]
 
     return (
@@ -66,14 +67,14 @@ class AddCurrencyModal extends Component<Props> {
         </div>
 
         <RoundedForm
-          id="addressBookNewAddressDialog"
+          id="resDexAccountsAddCurrencyModal"
           schema={getValidationSchema(t)}
         >
           <ChooseCurrencyInput
             name="symbol"
             defaultValue={symbol}
             label={t(`Coin`)}
-            symbols={enabledCurrencies.map(currency => currency.symbol)}
+            excludeSymbols={enabledCurrencies.map(currency => currency.symbol)}
             disabled={isInEditMode}
           />
 
@@ -82,7 +83,7 @@ class AddCurrencyModal extends Component<Props> {
 
             <ToggleButton
               name="useElectrum"
-              defaultValue
+              defaultValue={useElectrum}
             />
 
             <div className={cn(styles.label, {[styles.active]: useElectrum})}>{t(`Electrum`)}</div>
@@ -90,9 +91,10 @@ class AddCurrencyModal extends Component<Props> {
 
           <RoundedInput
             name="rpcPort"
-            defaultValue=""
+            defaultValue={isInEditMode && enabledCurrency ? enabledCurrency.port : ''}
             type="number"
             label={t(`RPC port`)}
+            disabled={fields && fields.useElectrum}
           />
 
           <hr />
@@ -126,7 +128,8 @@ class AddCurrencyModal extends Component<Props> {
 }
 
 const mapStateToProps = (state) => ({
-	accounts: state.resDex.accounts
+	accounts: state.resDex.accounts,
+  form: state.roundedForm.resDexAccountsAddCurrencyModal
 })
 
 const mapDispatchToProps = dispatch => ({

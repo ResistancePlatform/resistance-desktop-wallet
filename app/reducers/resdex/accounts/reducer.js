@@ -13,7 +13,7 @@ export type Currency = {
 
 export type EnabledCurrency = {
   symbol: string,
-  port?: number,
+  rpcPort?: number,
   useElectrum: boolean
 }
 
@@ -28,7 +28,11 @@ export const ResDexAccountsActions = createActions(
     GOT_CURRENCIES: (currencies: { [string]: Currency }) => ({ currencies }),
     GET_CURRENCIES_FAILED: (errorMessage: string) => ({ errorMessage }),
 
+    UPDATE_ENABLED_CURRENCIES: (enabledCurrencies: EnabledCurrency[]) => ({ enabledCurrencies }),
+
     WITHDRAW: undefined,
+    ADD_CURRENCY: undefined,
+    UPDATE_CURRENCY: undefined,
     COPY_SMART_ADDRESS: (symbol: string) => ({ symbol }),
     DELETE_CURRENCY: (symbol: string) => ({ symbol }),
     SHOW_DEPOSIT_MODAL: (symbol: string) => ({ symbol }),
@@ -96,6 +100,10 @@ export const ResDexAccountsReducer = handleActions(
         symbol: null,
         isVisible: true
       }
+    }),
+    [ResDexAccountsActions.updateEnabledCurrencies]: (state, action) => ({
+      ...state,
+      enabledCurrencies: action.payload.enabledCurrencies
     }),
     [ResDexAccountsActions.closeDepositModal]: (state) => ({
       ...state,

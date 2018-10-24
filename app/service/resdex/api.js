@@ -63,6 +63,14 @@ export class ResDexApiService {
 		return this.socket
 	}
 
+  setConfirmationsNumber(coin: string, confirmationsNumber: number) {
+    return this.query({
+      method: 'setconfirms',
+      coin,
+      numconfirms: confirmationsNumber
+    })
+  }
+
   async listTransactions(coin: string, address: string) {
     let response
 

@@ -9,6 +9,7 @@ import genericStyles from './GenericInput.scss'
 
 export type GenericInputProps = {
   ...GenericProps,
+  defaultValue?: string,
   labelClassName?: string,
   inputClassName?: string,
   addonClassName?: string,

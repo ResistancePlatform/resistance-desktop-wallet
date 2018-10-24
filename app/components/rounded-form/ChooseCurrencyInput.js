@@ -5,6 +5,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
+import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 import { getCurrencyName } from '~/utils/resdex'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
@@ -16,18 +17,25 @@ import styles from './ChooseCurrencyInput.scss'
 
 export type ChooseCurrencyInputProps = {
   ...GenericInputProps,
-  symbols: string[],
+  excludeSymbols: string[],
   popupMenu: object
 }
 
 class ChooseCurrencyInput extends GenericInput {
   props: ChooseCurrencyInputProps
+  symbols: string[]
   popupMenuId: string
 
 	constructor(props) {
 		super(props)
     this.popupMenuId = `popup-menu-${uuid()}`
-    this.state.value = props.defaultValue || 'RES'
+
+    this.symbols = supportedCurrencies
+      .map(currency => currency.coin)
+      .filter(symbol => !props.excludeSymbols.includes(symbol))
+      .sort()
+
+    this.state.value = props.defaultValue || this.symbols.slice().shift()
 	}
 
   renderInput() {
@@ -40,7 +48,6 @@ class ChooseCurrencyInput extends GenericInput {
   }
 
   renderAddon() {
-    const sortedSymbols = [...this.props.symbols].sort()
 
     return (
       <div className={styles.button}>
@@ -53,7 +60,7 @@ class ChooseCurrencyInput extends GenericInput {
         />
 
         <PopupMenu id={this.popupMenuId} className={styles.menu} relative>
-          { sortedSymbols.map(symbol => (
+          { this.symbols.map(symbol => (
             <PopupMenuItem
               key={symbol}
               className={styles.menuItem}

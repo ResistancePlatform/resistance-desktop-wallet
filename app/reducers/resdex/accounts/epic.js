@@ -1,8 +1,9 @@
 // @flow
 import pMap from 'p-map'
 import log from 'electron-log'
+import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
-import { of, from, merge } from 'rxjs'
+import { of, from, defer, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { switchMap, map, catchError } from 'rxjs/operators'
 import { actions as toastrActions } from 'react-redux-toastr'
@@ -23,8 +24,21 @@ const enableCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => act
     const { enabledCurrencies } = state$.value.resDex.accounts
 
     const symbols = enabledCurrencies.map(currency => currency.symbol)
+
     const enableCurrenciesPromise = Promise.all(symbols.map(symbol => api.enableCurrency(symbol)))
     const getFeesPromise = Promise.all(symbols.map(symbol => api.getFee(symbol)))
+    const getConfirmationsPromise = () => Promise.all(symbols.map(symbol => api.setConfirmationsNumber(symbol, 0)))
+
+    const setConfirmationsObservable = defer(() => from(getConfirmationsPromise())).pipe(
+      switchMap(() => {
+        log.info(`Confirmations number set to 0 for all the currencies`)
+        return of(ResDexAccountsActions.empty())
+      }),
+      catchError(err => {
+        log.error(`Failed to set zero confirmations number`, err)
+        return of(ResDexAccountsActions.empty())
+      })
+    )
 
     const getFeesObservable = from(getFeesPromise).pipe(
       switchMap(fees => {
@@ -44,7 +58,7 @@ const enableCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => act
     )
 
     const enableCurrenciesObservable = from(enableCurrenciesPromise).pipe(
-      switchMap(() => getFeesObservable),
+      switchMap(() => concat(getFeesObservable, setConfirmationsObservable)),
       catchError(err => of(toastrActions.add({
         type: 'error',
         title: t(`Error enabling currencies`),
@@ -116,11 +130,8 @@ const getTransactionsEpic = (action$: ActionsObservable<Action>, state$) => acti
       { concurrency: 1 }
     )
 
-    log.debug('starting getting transactions')
     return from(listTransactionsPromise).pipe(
       switchMap(results => {
-        log.debug('done getting transactions')
-
         const currencyTransactions = results.reduce((accumulator, transaction, index) => (
           { ...accumulator, [symbols[index]]: transaction }
         ), {})
@@ -140,10 +151,40 @@ const getTransactionsEpic = (action$: ActionsObservable<Action>, state$) => acti
   })
 )
 
+const addCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+	ofType(ResDexAccountsActions.addCurrency),
+  switchMap(() => {
+    const enabledCurrencies = state$.value.resDex.accounts.enabledCurrencies.slice()
+    const { fields } = state$.value.roundedForm.resDexAccountsAddCurrencyModal
+
+    enabledCurrencies.push(fields)
+
+    enabledCurrencies.sort(
+      (currency1, currency2) => currency1.symbol.localeCompare(currency2.symbol)
+    )
+
+    config.set('resDex.enabledCurrencies', enabledCurrencies)
+
+    return of(
+      ResDexAccountsActions.updateEnabledCurrencies(enabledCurrencies),
+      toastrActions.add({
+        type: 'success',
+        title: t(`Currency {{currency}} ({{symbol}}) has been added`, {
+          currency: getCurrencyName(fields.symbol),
+          symbol: fields.symbol
+        }),
+      }),
+      ResDexAccountsActions.getCurrencies(),
+      ResDexAccountsActions.closeAddCurrencyModal(),
+    )
+  })
+)
+
 export const ResDexAccountsEpic = (action$, state$) => merge(
   enableCurrenciesEpic(action$, state$),
   getCurrenciesEpic(action$, state$),
   getCurrenciesFailedEpic(action$, state$),
   getTransactionsEpic(action$, state$),
+  addCurrencyEpic(action$, state$),
 )
 
