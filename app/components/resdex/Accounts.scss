@@ -113,33 +113,12 @@
     .rateBar {
       display: block;
       position: relative;
-      width: 100%;
+      width: 14.4rem;
       margin: 0.2rem 0.4rem 0rem 0.4rem;
 
       div {
         height: 0.17rem;
-        background: $BASE_COLOR_LIGHT_BLUE;
         border-radius: 0.05rem;
-
-        &.btc {
-          background: #ffad04;
-        }
-
-        &.ltc {
-          background: #b5b5b5;
-        }
-
-        &.eth {
-          background: #6f7cba;
-        }
-
-        &.etc {
-          background: #59d4af;
-        }
-
-        &.bch {
-          background: #8dc451;
-        }
       }
     }
   }

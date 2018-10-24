@@ -1,4 +1,5 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import moment from 'moment'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -14,6 +15,7 @@ import CurrencyIcon from './CurrencyIcon'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
+import currencyColors from '~/assets/styles/currency-colors.scss'
 import styles from './Accounts.scss'
 
 
@@ -35,26 +37,8 @@ type Props = {
  */
 class ResDexAccounts extends Component<Props> {
 	props: Props
-  currencyColors: { [string]: string }
 
-  constructor(props) {
-    super(props)
-    this.currencyColors = {}
-  }
-
-  currencyIconRef(symbol: string, element: any) {
-    if (!element) {
-      return
-    }
-
-    const [circleElement] = element.getElementsByTagName('circle')
-
-    if (circleElement) {
-      this.currencyColors[symbol] = circleElement.getAttribute('fill')
-    }
-  }
-
-  getEnabledCurrencyContents(t, symbol: string) {
+  getEnabledCurrencyContents(t, symbol: string, totalEquity: object) {
     const currency = this.props.accounts.currencies[symbol]
     const { selectedSymbol } = this.props.accounts
     const { currencyHistory } = this.props.assets
@@ -68,6 +52,8 @@ class ResDexAccounts extends Component<Props> {
       return false
     }
 
+    const equity = currency && price && price.mul(currency.balance)
+
     return (
       <div
         role="none"
@@ -77,7 +63,7 @@ class ResDexAccounts extends Component<Props> {
       >
         <div className={styles.columnsWrapper}>
           <div className={styles.currency}>
-            <CurrencyIcon imageRef={(s, el) => this.currencyIconRef(s, el)} symbol={symbol} size="1.3rem" />
+            <CurrencyIcon symbol={symbol} size="1.3rem" />
           </div>
 
           <div className={styles.balance}>
@@ -86,7 +72,7 @@ class ResDexAccounts extends Component<Props> {
           </div>
 
           <div className={styles.equity}>
-            <i>$</i>{currency && price ? toDecimalPlaces(price.mul(currency.balance), 2) : t(`N/A`)}
+            <i>$</i>{equity ? toDecimalPlaces(equity, 2) : t(`N/A`)}
           </div>
 
           <div className={styles.more}>
@@ -123,7 +109,7 @@ class ResDexAccounts extends Component<Props> {
         </div>
 
         <div className={styles.rateBar}>
-          <div className={styles.btc} style={{ width: `77%`, background: this.currencyColors[symbol] || '#9a6de8' }} />
+          <div className={currencyColors[symbol.toLowerCase()]} style={{ width: `${this::getEquityRate(equity, totalEquity).toFixed(2)}%` }} />
         </div>
 
       </div>
@@ -172,10 +158,12 @@ class ResDexAccounts extends Component<Props> {
     const { enabledCurrencies } = this.props.accounts
     const transactions = transactionsMap[selectedSymbol] || []
 
+    const totalEquity = this::getTotalEquity()
+
 		return (
       <div className={cn(styles.container)}>
         <div className={styles.enabledCurrenciesContainer}>
-          {enabledCurrencies.map(currency => this.getEnabledCurrencyContents(t, currency.symbol))}
+          {enabledCurrencies.map(currency => this.getEnabledCurrencyContents(t, currency.symbol, totalEquity))}
 
           <div
             role="button"
@@ -202,6 +190,32 @@ class ResDexAccounts extends Component<Props> {
       </div>
     )
   }
+}
+
+function getTotalEquity() {
+  const { currencies } = this.props.accounts
+  const { currencyHistory } = this.props.assets
+
+  const totalEquity = Object.values(currencies).reduce((previousBalance, currency) => {
+    const hourHistory = currencyHistory.hour && currencyHistory.hour[currency.symbol]
+    const price = hourHistory && hourHistory.slice(-1)[0].value
+
+    if (!price) {
+      return previousBalance
+    }
+
+    return previousBalance.plus(currency.balance.mul(price))
+  }, Decimal(0))
+
+  return totalEquity
+}
+
+function getEquityRate(equity, totalEquity) {
+  if (!equity || totalEquity.isZero()) {
+    return Decimal(0)
+  }
+
+  return equity.dividedBy(totalEquity).times(Decimal(100))
 }
 
 

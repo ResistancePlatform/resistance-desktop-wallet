@@ -203,7 +203,7 @@ app.on('ready', async () => {
   mainWindow.loadURL(`file://${__dirname}/app.html`)
 
   // Uncomment for debugging in prod mode
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 
   // Showing the window if DOM finished loading and the content has been rendered
 

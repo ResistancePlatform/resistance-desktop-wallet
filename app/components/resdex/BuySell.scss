@@ -25,7 +25,7 @@
 }
 
 .inputLabel {
-  width: 5rem;
+  min-width: 4.3rem;
 }
 
 .oldInputLabel {
@@ -80,10 +80,6 @@
 
 .selectedTabPanel {
   padding: 1rem;
-}
-
-.inputLabel {
-  min-width: 5rem !important;
 }
 
 .actionContainer {

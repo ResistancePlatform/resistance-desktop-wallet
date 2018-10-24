@@ -6,7 +6,7 @@ import genericIcon from '~/assets/images/resdex/cryptocurrency-icons/generic.svg
 const icons = require.context('~/assets/images/resdex/cryptocurrency-icons', false, /.svg/)
 const customIcons = require.context('~/assets/images/resdex/custom-cryptocurrency-icons', false, /.svg/)
 
-const CurrencyIcon = ({symbol, size, imageRef, ...props}) => {
+const CurrencyIcon = ({symbol, size, ...props}) => {
 
   const findIcon = context => {
     const lowerCasedSymbol = symbol.toLowerCase()
@@ -14,12 +14,9 @@ const CurrencyIcon = ({symbol, size, imageRef, ...props}) => {
     return iconKey ? context(iconKey) : null
   }
 
-  const ref = el => imageRef && imageRef(symbol, el)
-
 	return (
     <img
 			{...props}
-      ref={ref}
       src={findIcon(customIcons) || findIcon(icons) || genericIcon}
       alt={symbol}
       style={{
