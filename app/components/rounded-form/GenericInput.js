@@ -1,27 +1,65 @@
 // @flow
 import log from 'electron-log'
-import React, { Component } from 'react'
+import React from 'react'
 import cn from 'classnames'
+
+import GenericControl, { GenericProps } from './GenericControl'
 
 import genericStyles from './GenericInput.scss'
 
-export type GenericProps = {
-  className?: string,
+export type GenericInputProps = {
+  ...GenericProps,
   labelClassName?: string,
   inputClassName?: string,
   addonClassName?: string,
 	label?: string,
 	onChange?: value => void,
-	disabled?: boolean,
   error?: string | null,
 	children: any
 }
 
-export default class GenericInput extends Component<Props> {
-	props: GenericProps
+export type GenericInputState = {
+  value: string
+}
 
-  static get isRoundedFormComponent() { return true }
-  static get displayName() { return 'GenericInput' }
+export default class GenericInput extends GenericControl {
+	props: GenericInputProps
+  state: GenericInputState
+
+	/**
+	 * @param {*} props
+	 * @memberof GenericInput
+	 */
+	constructor(props) {
+		super(props)
+
+    this.state = {
+      value: props.defaultValue || '',
+    }
+	}
+
+	/**
+	 * @param {*} prevProps
+	 * @memberof GenericInput
+	 */
+  componentDidUpdate(prevProps) {
+    if (prevProps.defaultValue !== this.props.defaultValue ) {
+        /* eslint-disable-next-line react/no-did-update-set-state */
+        this.setState({ value: this.props.defaultValue || '' })
+    }
+  }
+
+	/**
+	 * @param {string} value
+	 * @memberof GenericInput
+	 */
+  changeValue(value: string) {
+    this.setState({ value })
+
+		if (this.props.onChange) {
+			this.props.onChange(value)
+		}
+  }
 
 	onChangeHandler(event) {
 		event.stopPropagation()
@@ -44,7 +82,7 @@ export default class GenericInput extends Component<Props> {
     return null
   }
 
-	render() {
+	renderControl() {
 		return (
       <div className={genericStyles.wrapper}>
         <div
@@ -53,7 +91,6 @@ export default class GenericInput extends Component<Props> {
             genericStyles.container,
             { [genericStyles.hasError]: Boolean(this.props.error) }
           )}
-          disabled={this.props.disabled}
         >
 
         {this.props.label &&

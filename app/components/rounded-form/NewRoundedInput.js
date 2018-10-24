@@ -1,11 +1,11 @@
 import React from 'react'
-import GenericInput, { GenericProps } from './GenericInput'
+import GenericInput, { GenericInputProps, GenericInputState  } from './GenericInput'
 
 import styles from './NewRoundedInput.scss'
 
 
 export type RoundedInputProps = {
-  ...GenericProps,
+  ...GenericInputProps,
 	name: string,
   defaultValue?: string,
   type: 'text' | 'number' | 'password',
@@ -13,7 +13,7 @@ export type RoundedInputProps = {
 }
 
 type RoundedInputState = {
-  value: string,
+  ...GenericInputState,
   isFocused: boolean
 }
 
@@ -27,39 +27,7 @@ export default class RoundedInput extends GenericInput {
 	 */
 	constructor(props) {
 		super(props)
-
-    this.state = {
-      value: props.defaultValue || '',
-      isFocused: false
-    }
-	}
-
-	/**
-	 * @param {*} prevProps
-	 * @memberof RoundedInput
-	 */
-  componentDidUpdate(prevProps) {
-    if (prevProps.defaultValue !== this.props.defaultValue ) {
-        /* eslint-disable-next-line react/no-did-update-set-state */
-        this.setState({ value: this.props.defaultValue || '' })
-    }
-  }
-
-	/**
-	 * @param {string} value
-	 * @memberof RoundedInput
-	 */
-  changeValue(value: string) {
-    this.setState({ value })
-
-		if (this.props.onChange) {
-			this.props.onChange(value)
-		}
-  }
-
-	onChangeHandler(event) {
-		event.stopPropagation()
-    this.changeValue(event.target.value)
+    this.state.isFocused = false
 	}
 
 	onFocusHandler() {

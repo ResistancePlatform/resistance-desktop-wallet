@@ -1,13 +1,15 @@
-import React, { Component } from 'react'
+import React from 'react'
 import cn from 'classnames'
+
+import GenericControl, { GenericProps } from './GenericControl'
 
 import styles from './ToggleButton.scss'
 
 
 export type Props = {
+  ...GenericProps,
 	onChange?: value => void,
   defaultValue?: boolean,
-	disabled?: boolean,
   captions?: string[]
 }
 
@@ -15,7 +17,7 @@ type State = {
   value: boolean
 }
 
-export default class ToggleButton extends Component<Props> {
+export default class ToggleButton extends GenericControl {
   props: Props
   state: State
 
@@ -61,7 +63,6 @@ export default class ToggleButton extends Component<Props> {
             {(this.state.value ? onCaption : offCaption) || ''}
           </div>
         </div>
-
     )
   }
 }

@@ -9,18 +9,18 @@ import { getCurrencyName } from '~/utils/resdex'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import CurrencyIcon from '~/components/resdex/CurrencyIcon'
-import RoundedInput, { RoundedInputProps } from './NewRoundedInput'
+import GenericInput, { GenericInputProps } from './GenericInput'
 
 import styles from './ChooseCurrencyInput.scss'
 
 
 export type ChooseCurrencyInputProps = {
-  ...RoundedInputProps,
+  ...GenericInputProps,
   symbols: string[],
   popupMenu: object
 }
 
-class ChooseCurrencyInput extends RoundedInput {
+class ChooseCurrencyInput extends GenericInput {
   props: ChooseCurrencyInputProps
   popupMenuId: string
 
@@ -35,8 +35,6 @@ class ChooseCurrencyInput extends RoundedInput {
       <div className={styles.currency}>
         <CurrencyIcon className={styles.icon} symbol={this.state.value} size="1.1rem" />
         <div className={styles.name}>{getCurrencyName(this.state.value)}</div>
-
-
       </div>
     )
   }

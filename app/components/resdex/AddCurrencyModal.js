@@ -7,10 +7,13 @@ import { translate } from 'react-i18next'
 import cn from 'classnames'
 
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
-import RoundedForm from '~/components/rounded-form/RoundedForm'
-import RoundedInput from '~/components/rounded-form/NewRoundedInput'
-import ToggleButton from '~/components/rounded-form/ToggleButton'
-import ChooseCurrencyInput from '~/components/rounded-form/ChooseCurrencyInput'
+import {
+  RoundedForm,
+  RoundedButton,
+  ToggleButton,
+  RoundedInput,
+  ChooseCurrencyInput
+} from '~/components/rounded-form'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
 import styles from './Modal.scss'
@@ -71,6 +74,7 @@ class AddCurrencyModal extends Component<Props> {
             defaultValue={symbol}
             label={t(`Coin`)}
             symbols={enabledCurrencies.map(currency => currency.symbol)}
+            disabled={isInEditMode}
           />
 
           <div className={styles.toggleContainer}>
@@ -100,11 +104,17 @@ class AddCurrencyModal extends Component<Props> {
 
           {isInEditMode ? (
             <div className={styles.buttonsRow}>
-              <button type="submit" onClick={this.props.actions.updateCurrency}>{t(`Save`)}</button>
-              <button type="button" onClick={this.props.actions.closeAddCurrencyModal}>{t(`Cancel`)}</button>
+              <RoundedButton type="submit" onClick={this.props.actions.updateCurrency} important>
+                {t(`Save`)}
+              </RoundedButton>
+              <RoundedButton onClick={this.props.actions.closeAddCurrencyModal}>
+                {t(`Cancel`)}
+              </RoundedButton>
             </div>
           ) : (
-            <button type="submit" onClick={this.props.actions.addCurrency}>{t(`Add coin`)}</button>
+            <RoundedButton type="submit" onClick={this.props.actions.addCurrency} important >
+              {t(`Add coin`)}
+            </RoundedButton>
           )}
 
         </RoundedForm>

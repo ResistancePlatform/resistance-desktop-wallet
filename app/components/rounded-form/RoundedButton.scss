@@ -1,0 +1,30 @@
+@import "./GenericControl.scss";
+
+.button {
+  padding: 0.52rem 1.4rem;
+
+  background-color: transparent;
+  border: 1px solid $BASE_COLOR_BORDER_GRAY;
+  color: $BASE_COLOR_BUTTON_FONT_GRAY;
+
+  border-radius: 5rem;
+
+  font-size: 0.6rem;
+  font-weight: 300;
+
+  position: relative;
+
+  &.important {
+    background-color: $BASE_COLOR_PURPLE;
+    border: 1px solid $BASE_COLOR_PURPLE;
+    color: $BASE_COLOR_WHITE;
+  }
+
+  .spinner {
+    width: 1.2rem;
+    position: absolute;
+    left: 0.6rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
