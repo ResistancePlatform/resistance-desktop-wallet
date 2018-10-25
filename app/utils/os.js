@@ -14,7 +14,7 @@ function getIsExitForbidden(mainWindow) {
   const t = translate('other')
   const { orders, operations } = global.pendingActivities
 
-  if (orders || !operations) {
+  if (orders || operations) {
     const isExitForbidden = dialog.showMessageBox(mainWindow, {
       type: 'question',
       buttons: [t(`Quit`), t(`Cancel`)],
