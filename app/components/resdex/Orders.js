@@ -63,7 +63,7 @@ class ResDexOrders extends Component<Props> {
     const { t, i18n } = this.props
 
     return (
-      <UniformListRow className={styles.row} key={order.id}>
+      <UniformListRow className={styles.row} key={order.uuid}>
         <UniformListColumn className={styles.time}>
           {moment(order.timeStarted).locale(i18n.language).format('kk:mm L')}
         </UniformListColumn>

@@ -16,7 +16,7 @@ import {
 } from '~/components/rounded-form'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
-import styles from './Modal.scss'
+import styles from './AddCurrencyModal.scss'
 
 
 const getValidationSchema = t => Joi.object().keys({

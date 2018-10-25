@@ -132,6 +132,7 @@ export const preloadedState: State = {
       }
     },
     orders: {
+      isInitialKickStartDone: false,
       swapHistory: [],
     },
     accounts: {

@@ -134,7 +134,10 @@ class StatusIcons extends Component<Props> {
           {this.getOperationIconHint()}
 
         </div>
-        <OperationsModal />
+
+        {this.props.systemInfo.isOperationsModalOpen &&
+          <OperationsModal />
+        }
       </div>
     )
   }

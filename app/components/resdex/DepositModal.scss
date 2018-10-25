@@ -1,0 +1,23 @@
+@import "~/assets/styles/modal.scss";
+
+$depositModalWidth: 17rem;
+
+.deposit {
+  width: $depositModalWidth;
+  padding: 1.8rem;
+
+  .qr {
+    width: $depositModalWidth - (1.8rem) * 2 !important;
+    height: $depositModalWidth - (1.8rem) * 2 !important;
+    padding: 1.6rem;
+    position: relative;
+    border-radius: 0.35rem;
+    margin-top: 0.25rem;
+    margin-bottom: 1.6rem;
+    background: white;
+  }
+
+  .addressInputLabel {
+    min-width: 4rem !important;
+  }
+}

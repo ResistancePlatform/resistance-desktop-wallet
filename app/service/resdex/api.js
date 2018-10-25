@@ -63,6 +63,15 @@ export class ResDexApiService {
 		return this.socket
 	}
 
+  sendWalletPassphrase(coin: string, password: string, timeout: number) {
+		return this.query({
+			method: 'walletpassphrase',
+      coin,
+			password,
+      timeout: String(timeout)
+		})
+  }
+
 	kickstart(requestId: number, quoteId: number) {
 		return this.query({
 			method: 'kickstart',

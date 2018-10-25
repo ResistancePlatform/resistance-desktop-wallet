@@ -1,13 +1,12 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import Modal from 'react-modal'
+import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import moment from 'moment'
 import cn from 'classnames'
 
 import 'react-tabs/style/react-tabs.scss'
-import { appStore } from '~/store/configureStore'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 import { SystemInfoActions } from '~/reducers/system-info/system-info.reducer'
 import humanizeOperationName from './humanize-operation'
@@ -26,27 +25,12 @@ const getStatusName = (t, status) => ({
 type Props = {
   t: any,
   i18n: any,
-  systemInfo: SystemInfoState
+  systemInfo: SystemInfoState,
+  actions: object
 }
 
 class OperationsModal extends Component<Props> {
 	props: Props
-
-	/**
-	 * @memberof OperationsModal
-	 */
-	componentDidMount() {
-    Modal.setAppElement('#App')
-  }
-
-  onClearCompletedClicked() {
-    return false
-  }
-
-  onCloseClicked() {
-		appStore.dispatch(SystemInfoActions.closeOperationsModal())
-    return false
-  }
 
   getSortedOperations() {
     const sortedOperations = this.props.systemInfo.operations.sort((first, second) => {
@@ -70,7 +54,7 @@ class OperationsModal extends Component<Props> {
           {moment.unix(operation.creation_time).locale(i18n.language).fromNow()}
         </UniformListColumn>
         <UniformListColumn>
-          <span className={cn(styles.operationStatus, styles[operation.status])}>{getStatusName(t, operation.status)}</span>
+          <span className={cn(styles.status, styles[operation.status])}>{getStatusName(t, operation.status)}</span>
         </UniformListColumn>
         <UniformListColumn>
           {operation.error && operation.error.message}
@@ -104,36 +88,31 @@ class OperationsModal extends Component<Props> {
     const { t } = this.props
 
     return (
-      <Modal
-        isOpen={this.props.systemInfo.isOperationsModalOpen}
-        className={styles.operationsModal}
-        overlayClassName={styles.modalOverlay}
-        contentLabel={t(`Operations`)}
-      >
-        <div className={cn(styles.modalTitle)}>
+      <div className={styles.overlay}>
+        <div className={cn(styles.container, styles.operationsModal)}>
           <div
             role="button"
             tabIndex={0}
-            className={styles.closeButton}
-            onClick={event => this.onCloseClicked(event)}
-            onKeyDown={event => this.onCloseClicked(event)}
+            className={cn('icon', styles.closeButton)}
+            onClick={this.props.actions.closeOperationsModal}
+            onKeyDown={() => false}
           />
-          <div className={styles.titleText}>
-            {t(`Operations`)}
-            {this.props.systemInfo.operations.length ? `(${this.props.systemInfo.operations.length})`: ``}
-          </div>
-        </div>
 
-        <div className={styles.operationsModalBody}>
+          <div className={styles.title}>
+              {t(`Operations`)}&nbsp;
+              {this.props.systemInfo.operations.length ? `(${this.props.systemInfo.operations.length})`: ``}
+          </div>
+
           <UniformList
+            className={styles.list}
             items={this.props.systemInfo.operations}
             headerRenderer={() => this.getListHeaderRenderer()}
             rowRenderer={operation => this.getListRowRenderer(operation)}
-            emptyMessage={t(`No operations to display.`)}
+            emptyMessage={t(`You have no operations yet`)}
           />
-        </div>
 
-      </Modal>
+        </div>
+      </div>
     )
   }
 }
@@ -142,4 +121,8 @@ const mapStateToProps = state => ({
   systemInfo: state.systemInfo
 })
 
-export default connect(mapStateToProps, null)(translate('other')(OperationsModal))
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(SystemInfoActions, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(translate('other')(OperationsModal))

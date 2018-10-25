@@ -58,6 +58,7 @@ export type ResDexState = {
     }
   },
   orders: {
+    isInitialKickStartDone: boolean,
     swapHistory: []
   },
   accounts: {
