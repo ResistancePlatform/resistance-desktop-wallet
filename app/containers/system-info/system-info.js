@@ -1,5 +1,6 @@
 // @flow
 import moment from 'moment'
+import { remote } from 'electron'
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import { translate } from 'react-i18next'
@@ -51,16 +52,22 @@ class SystemInfo extends Component<Props> {
       {...map, [operation.id]: operation}
     ), {})
 
-    const checkIfPending = (operation) => ['queued', 'executing'].includes(operation.status)
+    const isPending = (operation) => ['queued', 'executing'].includes(operation.status)
+
+    const currentOperations  = this.props.systemInfo.operations
+
+    remote.getGlobal('pendingActivities').operations = Boolean(
+      currentOperations.find(operation => isPending(operation))
+    )
 
     this.props.systemInfo.operations.forEach(currentOperation => {
       const prevOperation = prevOperationsMap[currentOperation.id]
 
-      if (prevOperation && !checkIfPending(prevOperation)) {
+      if (prevOperation && !isPending(prevOperation)) {
         return
       }
 
-      if (!checkIfPending(currentOperation)) {
+      if (!isPending(currentOperation)) {
         getStore().dispatch(SystemInfoActions.operationFinished(currentOperation))
       }
 

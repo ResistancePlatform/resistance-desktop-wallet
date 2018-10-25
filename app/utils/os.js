@@ -2,11 +2,31 @@ import * as fs from 'fs'
 import ps from 'ps-node'
 import path from 'path'
 import log from 'electron-log'
-import { app, remote } from 'electron'
+import { app, dialog, remote } from 'electron'
+
+import { translate } from '../i18next.config'
 
 
 const childProcessNames = ['NODE', 'MINER', 'TOR', 'RESDEX']
 
+
+function getIsExitForbidden(mainWindow) {
+  const t = translate('other')
+  const { orders, operations } = global.pendingActivities
+
+  if (orders || !operations) {
+    const isExitForbidden = dialog.showMessageBox(mainWindow, {
+      type: 'question',
+      buttons: [t(`Quit`), t(`Cancel`)],
+      title: t(`Are you sure?`),
+      message: t(`Pending activities are present, closing the application now can cause irreversible damage.`)
+    })
+
+    return isExitForbidden
+  }
+
+  return false
+}
 
 /**
  * Returns Resistance export dir as provided with -exportdir command line argument to the node.
@@ -174,6 +194,7 @@ function getOS() {
 }
 
 export {
+  getIsExitForbidden,
   getExportDir,
   getChildProcessesGlobal,
   stopChildProcesses,

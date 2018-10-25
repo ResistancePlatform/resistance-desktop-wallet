@@ -18,10 +18,13 @@ import { app, ipcMain, BrowserWindow } from 'electron'
 import log from 'electron-log'
 
 import { i18n } from './i18next.config'
-import { getOS, getAppDataPath, getInstallationPath, getChildProcessesGlobal, stopChildProcesses } from './utils/os'
+import { getOS, getIsExitForbidden, getAppDataPath, getInstallationPath, getChildProcessesGlobal, stopChildProcesses } from './utils/os'
 import { ResistanceService } from './service/resistance-service-main'
 import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
+
+
+let isExiting = false
 
 // For the module to be imported in main, dirty, remove
 const resistance = new ResistanceService()
@@ -104,6 +107,9 @@ const getWindowSize = (isGetStartedComplete: boolean = false) => {
 
 }
 
+// Used to prevent app quit
+global.pendingActivities = { orders: false, operations: false }
+
 global.childProcesses = getChildProcessesGlobal()
 
 // Propagate Resistance node config for the RPC service
@@ -133,15 +139,28 @@ checkAndCreateWalletAppFolder()
  */
 
 app.on('window-all-closed', () => {
-  // Respect the OSX convention of having the application in memory even
-  // after all windows have been closed
-  if (process.platform !== 'darwin') {
+  // Closing main application window just hides it on Macs
+  if (getOS() !== 'macos') {
     app.quit()
   }
 })
 
 app.on('ready', async () => {
-  app.on('before-quit', () => {
+  app.on('activate', () => {
+    if (getOS() === 'macos') {
+      mainWindow.show()
+    }
+  })
+
+  app.on('before-quit', event => {
+    isExiting = true
+
+    // Closing a window just hides it on Macs
+    if (getOS() === 'macos' && getIsExitForbidden(mainWindow)) {
+      event.preventDefault()
+      return
+    }
+
     log.info(`Killing all child processes...`)
     stopChildProcesses()
     log.info(`Done`)
@@ -234,6 +253,19 @@ app.on('ready', async () => {
     mainWindow.setResizable(windowSize.resizable)
     mainWindow.setMinimumSize(windowSize.minWidth, windowSize.minHeight)
     mainWindow.setSize(windowSize.width, windowSize.height)
+  })
+
+  mainWindow.on('close', event => {
+    if (getOS() === 'macos') {
+
+      if (!isExiting) {
+        event.preventDefault()
+        mainWindow.hide()
+      }
+
+    } else if (getIsExitForbidden(mainWindow)) {
+      event.preventDefault()
+    }
   })
 
   mainWindow.on('closed', () => {

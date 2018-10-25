@@ -1,6 +1,7 @@
 // @flow
 import moment from 'moment'
 import pMap from 'p-map'
+import { remote } from 'electron'
 import log from 'electron-log'
 import { of, from, merge } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
@@ -61,7 +62,11 @@ const initSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe
 	ofType(ResDexOrdersActions.initSwapHistory),
   map(() => {
     const store = getStore()
-    swapDB.on('change', () => { store.dispatch(ResDexOrdersActions.getSwapHistory()) } )
+
+    swapDB.on('change', () => {
+      store.dispatch(ResDexOrdersActions.getSwapHistory())
+    })
+
     api.enableSocket()
     return ResDexOrdersActions.getSwapHistory()
   })
@@ -73,6 +78,11 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     const observable = from(swapDB.getSwaps()).pipe(
       switchMap(swapHistory => {
         log.debug(`Swap history changed, got ${swapHistory.length} swaps`)
+
+        remote.getGlobal('pendingActivities').orders = Boolean(
+          swapHistory.find(swap => !['completed', 'failed'].includes(swap.status))
+        )
+
         return of(ResDexOrdersActions.gotSwapHistory(swapHistory))
       }),
       catchError(err => {
