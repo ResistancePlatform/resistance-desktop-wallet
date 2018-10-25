@@ -63,6 +63,14 @@ export class ResDexApiService {
 		return this.socket
 	}
 
+	kickstart(requestId: number, quoteId: number) {
+		return this.query({
+			method: 'kickstart',
+			requestid: requestId,
+			quoteid: quoteId,
+		})
+	}
+
   setConfirmationsNumber(coin: string, confirmationsNumber: number) {
     return this.query({
       method: 'setconfirms',

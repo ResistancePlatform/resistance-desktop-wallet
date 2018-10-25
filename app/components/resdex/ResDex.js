@@ -5,6 +5,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
+import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import ResDexLogin from './Login'
 import DepositModal from './DepositModal'
@@ -48,20 +49,18 @@ export class ResDex extends Component<Props> {
    * @memberof ResDex
 	 */
   getContents() {
-    /*
-    <RpcPolling
-      interval={15.0 * 60}
-      criticalChildProcess="RESDEX"
-      actions={{
-        polling: ResDexOrdersActions.kickStartStuckSwaps,
-        success: ResDexAccountsActions.kickStartStuckSwapsSucceeded,
-        failure: ResDexAccountsActions.kickStartStuckSwapsFailed
-      }}
-    />
-    */
-
     return (
       <div>
+        <RpcPolling
+          interval={15.0 * 60}
+          criticalChildProcess="RESDEX"
+          actions={{
+            polling: ResDexOrdersActions.kickStartStuckSwaps,
+            success: ResDexOrdersActions.kickStartStuckSwapsSucceeded,
+            failure: ResDexOrdersActions.kickStartStuckSwapsFailed
+          }}
+        />
+
         <RpcPolling
           interval={1.0}
           criticalChildProcess="RESDEX"

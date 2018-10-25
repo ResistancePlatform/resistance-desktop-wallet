@@ -45,8 +45,8 @@ export default class GenericInput extends GenericControl {
 	 */
   componentDidUpdate(prevProps) {
     if (prevProps.defaultValue !== this.props.defaultValue ) {
-        /* eslint-disable-next-line react/no-did-update-set-state */
-        this.setState({ value: this.props.defaultValue || '' })
+      /* eslint-disable-next-line react/no-did-update-set-state */
+      this.setState({ value: this.props.defaultValue || '' })
     }
   }
 
@@ -64,10 +64,7 @@ export default class GenericInput extends GenericControl {
 
 	onChangeHandler(event) {
 		event.stopPropagation()
-
-		if (this.props.onChange) {
-			this.props.onChange(event.target.value)
-		}
+    this.changeValue(event.target.value)
 	}
 
   renderLabel() {

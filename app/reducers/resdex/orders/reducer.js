@@ -11,6 +11,8 @@ export const ResDexOrdersActions = createActions(
     GOT_SWAP_HISTORY: swapHistory => ({ swapHistory }),
 
     KICK_START_STUCK_SWAPS: undefined,
+    KICK_START_STUCK_SWAPS_SUCCEEDED: undefined,
+    KICK_START_STUCK_SWAPS_FAILED: undefined,
   },
   {
     prefix: 'APP/RESDEX/ORDERS'
@@ -19,6 +21,10 @@ export const ResDexOrdersActions = createActions(
 
 export const ResDexOrdersReducer = handleActions(
   {
+    [ResDexOrdersActions.kickStartStuckSwapsSucceeded]: state => ({
+      ...state,
+      isInitialKickStartDone: true,
+    }),
     [ResDexOrdersActions.gotSwapHistory]: (state, action) => ({
       ...state,
       swapHistory: action.payload.swapHistory

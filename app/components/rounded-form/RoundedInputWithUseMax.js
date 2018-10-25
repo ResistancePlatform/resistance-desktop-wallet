@@ -20,8 +20,6 @@ type Props = {
 export default class RoundedInputWithUseMax extends RoundedInput {
   props: Props
 
-  static get displayName() { return 'RoundedInputWithUseMax' }
-
   renderLabel() {
     return (
       this.props.label
