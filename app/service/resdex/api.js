@@ -72,6 +72,16 @@ export class ResDexApiService {
 		})
   }
 
+  async getPendingSwaps() {
+    const response = await this.query({
+      method: 'swapstatus',
+      pending: 1
+    })
+
+    log.debug('swapstatus', JSON.stringify(response))
+    return response.swaps
+  }
+
 	kickstart(requestId: number, quoteId: number) {
 		return this.query({
 			method: 'kickstart',

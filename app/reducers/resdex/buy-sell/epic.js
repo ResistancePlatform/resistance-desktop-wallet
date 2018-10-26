@@ -59,7 +59,7 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
 			type: 'buy',
 			baseCurrency,
 			quoteCurrency,
-      price: divider,  // .dividedBy(Decimal(2)),
+      price: divider.dividedBy(Decimal(2)),
 			amount: Decimal(maxRel).dividedBy(price).toDP(8, Decimal.ROUND_FLOOR),
 			total: Decimal(maxRel).toDP(8, Decimal.ROUND_FLOOR)
 		}

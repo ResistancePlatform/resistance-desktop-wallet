@@ -105,7 +105,45 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   })
 )
 
+const updateSwapStatusesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(ResDexOrdersActions.updateSwapStatuses),
+  switchMap(() => {
+
+    const { swapHistory } = state$.value.resDex.orders
+    const pendingOrders = swapHistory.filter(swap => swap.status === 'pending')
+
+    const observable = from(api.getPendingSwaps()).pipe(
+      map(swaps => {
+        const swapsByUuid = swaps.reduce((previous, swap) => ({...previous, [swap.uuid]: swap}), {})
+
+        pendingOrders.forEach(order => {
+          if (!(order.uuid in swapsByUuid)) {
+            log.warn(`Order ${order.uuid} not found in ResDEX pendings`)
+            swapDB.forceSwapFailure(order.uuid)
+          }
+        })
+
+        return ResDexOrdersActions.gotPendingSwaps(swapsByUuid)
+      }),
+      catchError(err => {
+        log.error(`Can't get pending swaps`, err)
+
+        return of(
+          ResDexOrdersActions.updateSwapStatusesFailed(),
+          toastrActions.add({
+            type: 'error',
+            title: t(`Error updating swap statuses`)
+          })
+        )
+      })
+    )
+
+    return observable
+  })
+)
+
 export const ResDexOrdersEpic = (action$, state$) => merge(
+  updateSwapStatusesEpic(action$, state$),
   kickStartStuckSwapsEpic(action$, state$),
   initSwapHistoryEpic(action$, state$),
   getSwapHistoryEpic(action$, state$),

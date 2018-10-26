@@ -24,6 +24,7 @@
   z-index: 1000;
   -webkit-app-region: no-drag;
   -webkit-filter: none;
+  box-shadow: 5px 5px 59px -2px $POPUP_MENU_SHADOW_COLOR;
 }
 
 .closeButton {

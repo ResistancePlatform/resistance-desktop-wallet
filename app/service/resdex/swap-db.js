@@ -114,6 +114,24 @@ export class SwapDBService {
     })
   }
 
+  /**
+   * Marks a swap as 'failed'.
+   * This is a temporary workaround to failed orders that don't get the failed update on the websocket
+   * and thus are stuck as 'pending'
+   *
+   */
+  forceSwapFailure(uuid) {
+    return this.queue(async () => {
+      const swap = await this::getSwapData(uuid)
+      const message = {
+        method: 'failed',
+        error: -1,
+      }
+      swap.messages.push(message)
+      return this.db.put(swap)
+    })
+  }
+
   async getSwaps(options) {
     const swapData = await this::getAllSwapData(options)
     return swapData.map(this::formatSwap)
