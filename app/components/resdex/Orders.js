@@ -7,21 +7,13 @@ import React, { Component } from 'react'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
 
+import { getOrderStatusName } from '~/utils/resdex'
 import { toDecimalPlaces } from '~/utils/decimal'
 import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 
 import styles from './Orders.scss'
-
-const getOrderStatusName = (t, status: string) => ({
-  pending: t(`Pending`),
-  completed: t(`Completed`),
-  matched: t(`Matched`),
-  swapping: t(`Swapping`),
-  unmatched: t(`Unmatched`),
-  failed: t(`Failed`),
-}[status] || status)
 
 type Props = {
   t: any,
@@ -61,7 +53,7 @@ class ResDexOrders extends Component<Props> {
    * @memberof ResDexOrders
 	 */
   getListRowRenderer(order) {
-    const { t, i18n } = this.props
+    const { i18n } = this.props
 
     return (
       <UniformListRow
@@ -86,7 +78,7 @@ class ResDexOrders extends Component<Props> {
         </UniformListColumn>
         <UniformListColumn>
           <span className={cn(styles.status, styles[order.status])}>
-            {getOrderStatusName(t, order.status)}
+            {getOrderStatusName(order.status)}
           </span>
         </UniformListColumn>
       </UniformListRow>

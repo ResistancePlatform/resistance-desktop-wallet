@@ -5,11 +5,13 @@ import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 
+import { getOrderStatusName } from '~/utils/resdex'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import OrderSummary from './OrderSummary'
 
 import styles from './OrderModal.scss'
+import orderStyles from './Orders.scss'
 
 type Props = {
   t: any,
@@ -24,12 +26,27 @@ type Props = {
 class OrderModal extends Component<Props> {
 	props: Props
 
+  getOrder(): object | null {
+    const { uuid } = this.props.orders.orderModal
+    const order = this.props.orders.swapHistory.find(swap => swap.uuid === uuid)
+    return order || null
+  }
+
+  getIsStageComplete(stage: string): boolean {
+    const order = this.getOrder()
+
+    if (!order || !order.transactions) {
+      return false
+    }
+
+    return Boolean(order.transactions.find(chainStage => chainStage.stage === stage))
+  }
+
 	render() {
     const { t } = this.props
 
-    const { uuid } = this.props.orders.orderModal
     const order = {
-      ...this.props.orders.swapHistory.find(swap => swap.uuid === uuid),
+      ...this.getOrder(),
       enhancedPrivacy: false,
     }
 
@@ -47,24 +64,32 @@ class OrderModal extends Component<Props> {
 
             <div className={styles.title}>
               {t(`{{pair}} Buy Order`, { pair: `${order.baseCurrency}/${order.quoteCurrency}` })}
+
+              {order.status &&
+                <div className={styles.statusContainer}>
+                  <div className={cn(orderStyles.status, orderStyles[order.status])}>
+                    {getOrderStatusName(order.status)}
+                  </div>
+                </div>
+              }
             </div>
 
           </div>
 
           <ul className={styles.stagesContainer}>
-            <li className={styles.active}>
+            <li className={cn({ [styles.active]: this.getIsStageComplete('myfee') })}>
               {t(`My fee`)}
             </li>
-            <li>
+            <li className={cn({ [styles.active]: this.getIsStageComplete('bobdeposit') })}>
               {t(`My deposit`)}
             </li>
-            <li>
+            <li className={cn({ [styles.active]: this.getIsStageComplete('alicepayment') })}>
               {t(`Their deposit`)}
             </li>
-            <li>
+            <li className={cn({ [styles.active]: this.getIsStageComplete('bobpayment') })}>
               {t(`My payment`)}
             </li>
-            <li>
+            <li className={cn({ [styles.active]: this.getIsStageComplete('alicespend') })}>
               {t(`Their spend`)}
             </li>
           </ul>
@@ -74,7 +99,7 @@ class OrderModal extends Component<Props> {
           </div>
 
           <div className={styles.id}>
-            ID: {uuid}
+            ID: {order.uuid}
           </div>
 
       </div>

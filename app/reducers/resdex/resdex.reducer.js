@@ -56,7 +56,7 @@ export type ResDexState = {
       quoteCurrency?: string,
       ['bids' | 'asks']: Order[]
     },
-    enhancedPrivacy: boolean,
+    enhancedPrivacy: boolean
   },
   orders: {
     isInitialKickStartDone: boolean,

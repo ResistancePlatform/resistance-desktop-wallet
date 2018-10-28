@@ -11,7 +11,6 @@ import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { getOS } from '~/utils/os'
 import { ChildProcessService } from '~/service/child-process-service'
 import { ResDexAssetsActions } from '~/reducers/resdex/assets/reducer'
-import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import { SystemInfoActions, SystemInfoState } from '~/reducers/system-info/system-info.reducer'
 import { getStore } from '~/store/configureStore'
 import { State } from '~/reducers/types'
@@ -153,6 +152,17 @@ class SystemInfo extends Component<Props> {
 	render() {
     const { t } = this.props
 
+    /*
+    <RpcPolling
+      interval={1.0 * 60}
+      actions={{
+        polling: ResDexOrdersActions.updateSwapStatuses,
+        success: ResDexOrdersActions.gotPendingSwaps,
+        failure: ResDexOrdersActions.updateSwapStatusesFailed
+      }}
+    />
+    */
+
 		return (
 			<div className={cn(styles.systemInfoContainer, HLayout.hBoxContainer)}>
         <RpcPolling
@@ -185,14 +195,6 @@ class SystemInfo extends Component<Props> {
           }}
         />
 
-        <RpcPolling
-          interval={1.0 * 60}
-          actions={{
-            polling: ResDexOrdersActions.updateSwapStatuses,
-            success: ResDexOrdersActions.gotPendingSwaps,
-            failure: ResDexOrdersActions.updateSwapStatusesFailed
-          }}
-        />
         <RpcPolling
           interval={10.0 * 60 * 60}
           actions={{

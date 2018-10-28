@@ -6,8 +6,23 @@ $orderModalWidth: 28.3125rem;
   padding: 1.6rem;
 
   .title {
+    display: inline-block;
     margin-top: 0.3rem;
     margin-bottom: 0.1rem;
+    position: relative;
+  }
+
+  .statusContainer {
+    position: absolute;
+    font-size: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    left: calc(100% + 1rem);
+
+    > div {
+      padding-top: 0.1rem;
+      padding-bottom: 0.1rem;
+    }
   }
 }
 
@@ -17,6 +32,7 @@ $orderModalWidth: 28.3125rem;
   display: flex;
   text-transform: uppercase;
   font-size: 0.7rem;
+  font-weight: 100;
   color: $BASE_COLOR_FONT_GRAY;
   white-space: nowrap;
   padding: 0;
@@ -58,7 +74,7 @@ $orderModalWidth: 28.3125rem;
       color: $BASE_COLOR_LIGHT_BLUE;
       font-size: 1rem;
       font-weight: 600;
-      left: 50%;
+      left: calc(50% - 0.03rem);
       top: 50%;
       transform: translateX(-50%);
     }
