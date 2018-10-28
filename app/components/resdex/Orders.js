@@ -27,6 +27,7 @@ type Props = {
   t: any,
   i18n: any,
   orders: object,
+  actions: object,
   resDexActions: object
 }
 
@@ -63,7 +64,11 @@ class ResDexOrders extends Component<Props> {
     const { t, i18n } = this.props
 
     return (
-      <UniformListRow className={styles.row} key={order.uuid}>
+      <UniformListRow
+        className={styles.row}
+        key={order.uuid}
+        onClick={() => this.props.actions.showOrderModal(order.uuid)}
+      >
         <UniformListColumn className={styles.time}>
           {moment(order.timeStarted).locale(i18n.language).format('kk:mm L')}
         </UniformListColumn>

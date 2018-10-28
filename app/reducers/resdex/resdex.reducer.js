@@ -55,12 +55,17 @@ export type ResDexState = {
       baseCurrency?: string,
       quoteCurrency?: string,
       ['bids' | 'asks']: Order[]
-    }
+    },
+    enhancedPrivacy: boolean,
   },
   orders: {
     isInitialKickStartDone: boolean,
     pendingSwaps: {},
-    swapHistory: []
+    swapHistory: [],
+    orderModal: {
+      isVisible: boolean,
+      uuid: string | null
+    }
   },
   accounts: {
     selectedSymbol: string,

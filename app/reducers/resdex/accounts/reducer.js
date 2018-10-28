@@ -105,7 +105,7 @@ export const ResDexAccountsReducer = handleActions(
       ...state,
       enabledCurrencies: action.payload.enabledCurrencies
     }),
-    [ResDexAccountsActions.closeDepositModal]: (state) => ({
+    [ResDexAccountsActions.closeDepositModal]: state => ({
       ...state,
       depositModal: { isVisible: false, symbol: null }
     }),
@@ -113,7 +113,7 @@ export const ResDexAccountsReducer = handleActions(
       ...state,
       withdrawModal: { isVisible: false, symbol: null }
     }),
-    [ResDexAccountsActions.closeAddCurrencyModal]: (state) => ({
+    [ResDexAccountsActions.closeAddCurrencyModal]: state => ({
       ...state,
       addCurrencyModal: { isInEditMode: false, isVisible: false, symbol: null }
     }),

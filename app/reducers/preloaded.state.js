@@ -129,12 +129,17 @@ export const preloadedState: State = {
         quoteCurrency: 'DGB',
         bids: [],
         asks: []
-      }
+      },
+      enhancedPrivacy: false,
     },
     orders: {
       isInitialKickStartDone: false,
       pendingSwaps: {},
       swapHistory: [],
+      orderModal: {
+        isVisible: false,
+        uuid: null
+      }
     },
     accounts: {
       transactions: {},

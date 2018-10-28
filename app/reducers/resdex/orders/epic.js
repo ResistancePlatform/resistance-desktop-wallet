@@ -119,7 +119,7 @@ const updateSwapStatusesEpic = (action$: ActionsObservable<Action>, state$) => a
         pendingOrders.forEach(order => {
           if (!(order.uuid in swapsByUuid)) {
             log.warn(`Order ${order.uuid} not found in ResDEX pendings`)
-            swapDB.forceSwapFailure(order.uuid)
+            // swapDB.forceSwapFailure(order.uuid)
           }
         })
 
