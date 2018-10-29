@@ -17,9 +17,9 @@ export const ResDexOrdersActions = createActions(
     KICK_START_STUCK_SWAPS_SUCCEEDED: undefined,
     KICK_START_STUCK_SWAPS_FAILED: undefined,
 
-    UPDATE_SWAP_STATUSES: undefined,
+    CLEANUP_PENDING_SWAPS: undefined,
     GOT_PENDING_SWAPS: (swaps: object) => ({ swaps }),
-    UPDATE_SWAP_STATUSES_FAILED: undefined,
+    CLEANUP_PENDING_SWAPS_FAILED: undefined,
   },
   {
     prefix: 'APP/RESDEX/ORDERS'

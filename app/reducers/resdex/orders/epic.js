@@ -105,21 +105,23 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   })
 )
 
-const updateSwapStatusesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(ResDexOrdersActions.updateSwapStatuses),
+const cleanupPendingSwapsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(ResDexOrdersActions.cleanupPendingSwaps),
   switchMap(() => {
-
-    const { swapHistory } = state$.value.resDex.orders
-    const pendingOrders = swapHistory.filter(swap => swap.status === 'pending')
 
     const observable = from(api.getPendingSwaps()).pipe(
       map(swaps => {
         const swapsByUuid = swaps.reduce((previous, swap) => ({...previous, [swap.uuid]: swap}), {})
 
+        const { swapHistory } = state$.value.resDex.orders
+        const pendingOrders = swapHistory.filter(swap => swap.status === 'pending')
+
         pendingOrders.forEach(order => {
-          if (!(order.uuid in swapsByUuid)) {
+          const isPendingForAWhile = moment(order.timeStarted).isBefore(moment().subtract(5, 'minutes'))
+
+          if (!(order.uuid in swapsByUuid) && isPendingForAWhile) {
             log.warn(`Order ${order.uuid} not found in ResDEX pendings`)
-            // swapDB.forceSwapFailure(order.uuid)
+            swapDB.forceSwapFailure(order.uuid)
           }
         })
 
@@ -129,7 +131,7 @@ const updateSwapStatusesEpic = (action$: ActionsObservable<Action>, state$) => a
         log.error(`Can't get pending swaps`, err)
 
         return of(
-          ResDexOrdersActions.updateSwapStatusesFailed(),
+          ResDexOrdersActions.cleanupPendingSwapsFailed(),
           toastrActions.add({
             type: 'error',
             title: t(`Error updating swap statuses`)
@@ -143,7 +145,7 @@ const updateSwapStatusesEpic = (action$: ActionsObservable<Action>, state$) => a
 )
 
 export const ResDexOrdersEpic = (action$, state$) => merge(
-  updateSwapStatusesEpic(action$, state$),
+  cleanupPendingSwapsEpic(action$, state$),
   kickStartStuckSwapsEpic(action$, state$),
   initSwapHistoryEpic(action$, state$),
   getSwapHistoryEpic(action$, state$),
