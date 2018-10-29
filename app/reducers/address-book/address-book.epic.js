@@ -61,8 +61,9 @@ const confirmAddressRemovalEpic = (action$: ActionsObservable<any>) => action$.p
           observer.complete()
         }
       }
-      const confirmKey = `Are you sure want to remove the address for "{{addressName}}"?`
-      toastr.confirm(t(confirmKey, { addressName: action.payload.record.name }), confirmOptions)
+      const message = t(`Are you sure want to remove the address for "{{addressName}}"?`,
+                        { addressName: action.payload.record.name })
+      toastr.confirm(message, confirmOptions)
     })
   )),
   mergeAll()

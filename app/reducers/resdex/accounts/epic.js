@@ -3,10 +3,10 @@ import pMap from 'p-map'
 import log from 'electron-log'
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
-import { of, from, defer, concat, merge } from 'rxjs'
+import { Observable, of, from, defer, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
-import { switchMap, map, catchError } from 'rxjs/operators'
-import { actions as toastrActions } from 'react-redux-toastr'
+import { switchMap, map, catchError, mergeMap, mergeAll } from 'rxjs/operators'
+import { toastr, actions as toastrActions } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { getCurrencyName } from '~/utils/resdex'
@@ -17,6 +17,17 @@ import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 const t = translate('resdex')
 const api = new ResDexApiService()
 
+function saveEnabledCurrencies(currencies) {
+    const sortedCurrencies = currencies.slice().sort(
+      (currency1, currency2) => [currency1.symbol, currency2.symbol].includes('RES')
+        ? currency1 !== 'RES'
+        : currency1.symbol.localeCompare(currency2.symbol)
+    )
+
+    config.set('resDex.enabledCurrencies', sortedCurrencies)
+
+    return sortedCurrencies
+}
 
 const enableCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexAccountsActions.enableCurrencies),
@@ -158,15 +169,10 @@ const addCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.pip
     const { fields } = state$.value.roundedForm.resDexAccountsAddCurrencyModal
 
     enabledCurrencies.push(fields)
-
-    enabledCurrencies.sort(
-      (currency1, currency2) => currency1.symbol.localeCompare(currency2.symbol)
-    )
-
-    config.set('resDex.enabledCurrencies', enabledCurrencies)
+    const sortedCurrencies = saveEnabledCurrencies(enabledCurrencies)
 
     return of(
-      ResDexAccountsActions.updateEnabledCurrencies(enabledCurrencies),
+      ResDexAccountsActions.updateEnabledCurrencies(sortedCurrencies),
       toastrActions.add({
         type: 'success',
         title: t(`Currency {{currency}} ({{symbol}}) has been added`, {
@@ -180,11 +186,44 @@ const addCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.pip
   })
 )
 
+const deleteCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+	ofType(ResDexAccountsActions.deleteCurrency),
+  map(action => {
+    const { enabledCurrencies } = state$.value.resDex.accounts
+    const filteredCurrencies = enabledCurrencies.filter(currency => currency.symbol !== action.payload.symbol)
+    const sortedCurrencies = saveEnabledCurrencies(filteredCurrencies)
+    return ResDexAccountsActions.updateEnabledCurrencies(sortedCurrencies)
+  })
+)
+
+const confirmCurrencyDeletionEpic = (action$: ActionsObservable<any>) => action$.pipe(
+	ofType(ResDexAccountsActions.confirmCurrencyDeletion),
+  mergeMap(action => (
+    Observable.create(observer => {
+      const confirmOptions = {
+        onOk: () => {
+          observer.next(of(ResDexAccountsActions.deleteCurrency(action.payload.symbol)))
+          observer.complete()
+        },
+        onCancel: () => {
+          observer.next(of(ResDexAccountsActions.empty()))
+          observer.complete()
+        }
+      }
+      const message = t(`Are you sure want to delete {{currency}}?`, {currency: getCurrencyName(action.payload.symbol)})
+      toastr.confirm(message, confirmOptions)
+    })
+  )),
+  mergeAll()
+)
+
 export const ResDexAccountsEpic = (action$, state$) => merge(
   enableCurrenciesEpic(action$, state$),
   getCurrenciesEpic(action$, state$),
   getCurrenciesFailedEpic(action$, state$),
   getTransactionsEpic(action$, state$),
   addCurrencyEpic(action$, state$),
+  deleteCurrencyEpic(action$, state$),
+  confirmCurrencyDeletionEpic(action$, state$),
 )
 

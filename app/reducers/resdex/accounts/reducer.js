@@ -34,6 +34,7 @@ export const ResDexAccountsActions = createActions(
     ADD_CURRENCY: undefined,
     UPDATE_CURRENCY: undefined,
     COPY_SMART_ADDRESS: (symbol: string) => ({ symbol }),
+    CONFIRM_CURRENCY_DELETION: (symbol: string) => ({ symbol }),
     DELETE_CURRENCY: (symbol: string) => ({ symbol }),
     SHOW_DEPOSIT_MODAL: (symbol: string) => ({ symbol }),
     SHOW_WITHDRAW_MODAL: (symbol: string) => ({ symbol }),

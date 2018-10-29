@@ -37,7 +37,7 @@
   }
 
   &.disabled {
-    color: $BASE_COLOR_FONT_GRAY;
+    color: $BASE_COLOR_FONT_GRAY !important;
     pointer-events: none;
   }
 

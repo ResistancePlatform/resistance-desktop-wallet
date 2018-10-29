@@ -9,7 +9,8 @@ import cn from 'classnames'
 
 import { getCurrencyName } from '~/utils/resdex'
 import { toDecimalPlaces } from '~/utils/decimal'
-import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
+import { RESDEX } from '~/constants/resdex'
+import { PopupMenuState, PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import CurrencyIcon from './CurrencyIcon'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
@@ -24,6 +25,7 @@ const enabledCurrencyPopupMenuId = 'resdex-accounts-enabled-currencies-popup-men
 type Props = {
   t: any,
   i18n: any,
+  popupMenu: PopupMenuState,
   assets: ResDexState.assets,
   accounts: ResDexState.accounts,
   actions: object,
@@ -37,6 +39,21 @@ type Props = {
  */
 class ResDexAccounts extends Component<Props> {
 	props: Props
+
+  getPopupMenuCurrencyAlwaysEnabled(): boolean {
+    const popupMenu = this.props.popupMenu[enabledCurrencyPopupMenuId]
+    const symbol = popupMenu && popupMenu.data
+
+    if (!symbol) {
+      return true
+    }
+
+    const alwaysEnabledCurrency = RESDEX.alwaysEnabledCurrencies.find(
+      currency => currency.symbol === symbol
+    )
+
+    return Boolean(alwaysEnabledCurrency)
+  }
 
   getEnabledCurrencyContents(t, symbol: string, totalEquity: object) {
     const currency = this.props.accounts.currencies[symbol]
@@ -83,26 +100,6 @@ class ResDexAccounts extends Component<Props> {
               onContextMenu={showPopupMenu}
             />
 
-            <PopupMenu id={enabledCurrencyPopupMenuId}>
-              <PopupMenuItem onClick={(e, clickedSymbol) => this.props.actions.showDepositModal(clickedSymbol)}>
-                {t(`Deposit`)}
-              </PopupMenuItem>
-              <PopupMenuItem onClick={(e, clickedSymbol) => this.props.actions.showWithdrawModal(clickedSymbol)}>
-                {t(`Withdraw`)}
-              </PopupMenuItem>
-              <PopupMenuItem onClick={(e, clickedSymbol) => this.props.actions.copySmartAddress(clickedSymbol)}>
-                {t(`Copy smart address`)}
-              </PopupMenuItem>
-              <PopupMenuItem onClick={(e, clickedSymbol) => this.props.actions.showEditCurrencyModal(clickedSymbol)}>
-                {t(`Edit coin`)}
-              </PopupMenuItem>
-              <PopupMenuItem
-                className={styles.deleteCoin}
-                onClick={(e, clickedSymbol) => this.props.actions.deleteCurrency(clickedSymbol)}
-              >
-                {t(`Delete coin`)}
-              </PopupMenuItem>
-            </PopupMenu>
 
           </div>
 
@@ -176,6 +173,29 @@ class ResDexAccounts extends Component<Props> {
             <div className={styles.caption}>{t(`Add new coin`)}</div>
           </div>
 
+
+          <PopupMenu id={enabledCurrencyPopupMenuId}>
+            <PopupMenuItem onClick={(e, clickedSymbol) => this.props.actions.showDepositModal(clickedSymbol)}>
+              {t(`Deposit`)}
+            </PopupMenuItem>
+            <PopupMenuItem onClick={(e, clickedSymbol) => this.props.actions.showWithdrawModal(clickedSymbol)}>
+              {t(`Withdraw`)}
+            </PopupMenuItem>
+            <PopupMenuItem onClick={(e, clickedSymbol) => this.props.actions.copySmartAddress(clickedSymbol)}>
+              {t(`Copy smart address`)}
+            </PopupMenuItem>
+            <PopupMenuItem onClick={(e, clickedSymbol) => this.props.actions.showEditCurrencyModal(clickedSymbol)}>
+              {t(`Edit coin`)}
+            </PopupMenuItem>
+            <PopupMenuItem
+              className={styles.deleteCoin}
+              onClick={(e, clickedSymbol) => this.props.actions.confirmCurrencyDeletion(clickedSymbol)}
+              disabled={this.getPopupMenuCurrencyAlwaysEnabled()}
+            >
+              {t(`Delete coin`)}
+            </PopupMenuItem>
+          </PopupMenu>
+
         </div>
 
         <div className={styles.historyContainer}>
@@ -221,7 +241,8 @@ function getEquityRate(equity, totalEquity) {
 
 const mapStateToProps = state => ({
 	assets: state.resDex.assets,
-  accounts: state.resDex.accounts
+  accounts: state.resDex.accounts,
+  popupMenu: state.popupMenu,
 })
 
 const mapDispatchToProps = dispatch => ({
