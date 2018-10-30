@@ -24,6 +24,16 @@ const getOrderStatusName = (status: string) => ({
   failed: t(`Failed`),
 }[status] || status)
 
+const getSortedCurrencies = currencies => {
+  const sortedCurrencies = currencies.slice().sort(
+    (currency1, currency2) => [currency1.symbol, currency2.symbol].includes('RES')
+      ? Number(currency1.symbol !== 'RES') * 2 - 1
+      : currency1.symbol.localeCompare(currency2.symbol)
+  )
+
+  return sortedCurrencies
+}
+
 const getCurrency = symbol => supportedCurrencies.find(currency => currency.coin === symbol)
 
 const getCurrencyName = symbol => {
@@ -45,6 +55,7 @@ const isEtomic = symbol => {
 export {
 	// getCurrencySymbols,
   getOrderStatusName,
+  getSortedCurrencies,
 	getCurrencyName,
 	getCurrency,
   isEtomic,

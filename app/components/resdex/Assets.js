@@ -7,12 +7,12 @@ import cn from 'classnames'
 import { translate } from 'react-i18next'
 
 import { RESDEX } from '~/constants/resdex'
+import { getSortedCurrencies, getCurrencyName } from '~/utils/resdex'
 import { toDecimalPlaces } from '~/utils/decimal'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import { ResDexAssetsActions } from '~/reducers/resdex/assets/reducer'
 import CurrencyIcon from './CurrencyIcon'
 import Chart from './Chart'
-import { getCurrencyName } from '~/utils/resdex'
 
 import styles from './Assets.scss'
 
@@ -135,8 +135,10 @@ class ResDexAssets extends Component<Props> {
 	render() {
     const { t, i18n } = this.props
 
+    const { enabledCurrencies } = this.props.accounts
     const totalPortfolioValue = this.getTotalPortfolioValue()
     const sinceLastHour = this.getSinceLastHour()
+    const sortedCurrencies = getSortedCurrencies(enabledCurrencies)
 
 		return (
       <div className={cn(styles.container)}>
@@ -187,7 +189,7 @@ class ResDexAssets extends Component<Props> {
         />
 
       <div className={styles.coins}>
-        {this.props.accounts.enabledCurrencies.map(currency => this.getWalletContents(t, currency.symbol))}
+        {sortedCurrencies.map(currency => this.getWalletContents(t, currency.symbol))}
       </div>
 
       </div>

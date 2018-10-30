@@ -153,10 +153,6 @@
       background-color: #262e4e;
     }
   }
-
-  .deleteCoin {
-    color: $BASE_COLOR_LIGHT_RED;
-  }
 }
 
 .historyContainer {
@@ -164,11 +160,16 @@
   width: 100%;
   margin-left: 1.5rem;
 
-  .empty {
+  .empty, .loading {
     color: $BASE_COLOR_FONT_GRAY;
     font-size: 1rem;
     padding: 1rem;
     text-align: center;
+
+    img {
+      width: 1rem;
+      margin-right: 0.2rem;
+    }
   }
 
   .record {
@@ -201,4 +202,8 @@
     }
 
   }
+}
+
+.deleteCoin {
+  color: $BASE_COLOR_LIGHT_RED;
 }

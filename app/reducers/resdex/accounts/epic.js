@@ -1,5 +1,5 @@
 // @flow
-import pMap from 'p-map'
+import { clipboard } from 'electron'
 import log from 'electron-log'
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
@@ -9,25 +9,13 @@ import { switchMap, map, catchError, mergeMap, mergeAll } from 'rxjs/operators'
 import { toastr, actions as toastrActions } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
-import { getCurrencyName } from '~/utils/resdex'
+import { getSortedCurrencies, getCurrencyName } from '~/utils/resdex'
 import { ResDexApiService } from '~/service/resdex/api'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
 
 const t = translate('resdex')
 const api = new ResDexApiService()
-
-function saveEnabledCurrencies(currencies) {
-    const sortedCurrencies = currencies.slice().sort(
-      (currency1, currency2) => [currency1.symbol, currency2.symbol].includes('RES')
-        ? currency1 !== 'RES'
-        : currency1.symbol.localeCompare(currency2.symbol)
-    )
-
-    config.set('resDex.enabledCurrencies', sortedCurrencies)
-
-    return sortedCurrencies
-}
 
 const enableCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexAccountsActions.enableCurrencies),
@@ -130,35 +118,28 @@ const getTransactionsEpic = (action$: ActionsObservable<Action>, state$) => acti
 
     if (Object.keys(currencies).length === 0) {
       log.warn(`Portfolio hasn't been fetched yet, can't get transactions history.`)
-      return of(ResDexAccountsActions.gotTransactions({}))
+      return of(ResDexAccountsActions.gotCurrencyTransactions('RES', null))
     }
 
-    const symbols = enabledCurrencies.map(currency => currency.symbol)
+    const observables = getSortedCurrencies(enabledCurrencies).map(currency => {
+      const { symbol } = currency
 
-    const listTransactionsPromise = pMap(
-      symbols,
-      symbol => api.listTransactions(symbol, currencies[symbol].address),
-      { concurrency: 1 }
-    )
+      const observable = from(api.listTransactions(symbol, currencies[symbol].address)).pipe(
+        switchMap(transactions => {
+          log.debug(`Got ${transactions.length} transactions for ${symbol}`)
+          return of(ResDexAccountsActions.gotCurrencyTransactions(symbol, transactions.reverse()))
+        }),
+        catchError(err => {
+          log.error(`Can't get transactions for ${symbol}: `, err)
+          return of(ResDexAccountsActions.getTransactionsFailed(err.message))
+        })
+      )
 
-    return from(listTransactionsPromise).pipe(
-      switchMap(results => {
-        const currencyTransactions = results.reduce((accumulator, transaction, index) => (
-          { ...accumulator, [symbols[index]]: transaction }
-        ), {})
-        return of(ResDexAccountsActions.gotTransactions(currencyTransactions))
-      }),
-      catchError(err => {
-        log.error(`Error getting transactions from ResDEX`, err)
-        return of(
-          ResDexAccountsActions.getTransactionsFailed(err.message),
-          toastrActions.add({
-            type: 'error',
-            title: t(`Unable to get transactions from ResDEX, check the application log for details`),
-          })
-        )
-      })
-    )
+      return observable
+    })
+
+    return concat(...observables)
+
   })
 )
 
@@ -169,10 +150,10 @@ const addCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.pip
     const { fields } = state$.value.roundedForm.resDexAccountsAddCurrencyModal
 
     enabledCurrencies.push(fields)
-    const sortedCurrencies = saveEnabledCurrencies(enabledCurrencies)
+    config.set('resDex.enabledCurrencies', enabledCurrencies)
 
     return of(
-      ResDexAccountsActions.updateEnabledCurrencies(sortedCurrencies),
+      ResDexAccountsActions.updateEnabledCurrencies(enabledCurrencies),
       toastrActions.add({
         type: 'success',
         title: t(`Currency {{currency}} ({{symbol}}) has been added`, {
@@ -186,13 +167,27 @@ const addCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.pip
   })
 )
 
+const copySmartAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
+	ofType(ResDexAccountsActions.copySmartAddress),
+  map(action => {
+    const { currencies } = state$.value.resDex.accounts
+    const currency = currencies[action.payload.symbol]
+    clipboard.writeText(currency.address)
+
+    return toastrActions.add({
+      type: 'success',
+      title: t(`{{currency}} smart address copied to clipboard`, { currency: getCurrencyName(action.payload.symbol) })
+    })
+  })
+)
+
 const deleteCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(ResDexAccountsActions.deleteCurrency),
   map(action => {
     const { enabledCurrencies } = state$.value.resDex.accounts
     const filteredCurrencies = enabledCurrencies.filter(currency => currency.symbol !== action.payload.symbol)
-    const sortedCurrencies = saveEnabledCurrencies(filteredCurrencies)
-    return ResDexAccountsActions.updateEnabledCurrencies(sortedCurrencies)
+    config.set('resDex.enabledCurrencies', filteredCurrencies)
+    return ResDexAccountsActions.updateEnabledCurrencies(filteredCurrencies)
   })
 )
 
@@ -223,6 +218,7 @@ export const ResDexAccountsEpic = (action$, state$) => merge(
   getCurrenciesFailedEpic(action$, state$),
   getTransactionsEpic(action$, state$),
   addCurrencyEpic(action$, state$),
+  copySmartAddressEpic(action$, state$),
   deleteCurrencyEpic(action$, state$),
   confirmCurrencyDeletionEpic(action$, state$),
 )

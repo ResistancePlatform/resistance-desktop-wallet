@@ -77,7 +77,7 @@ export class ResDex extends Component<Props> {
           criticalChildProcess="RESDEX"
           actions={{
             polling: ResDexAccountsActions.getTransactions,
-            success: ResDexAccountsActions.gotTransactions,
+            success: ResDexAccountsActions.gotCurrencyTransactions,
             failure: ResDexAccountsActions.getTransactionsFailed
           }}
         />

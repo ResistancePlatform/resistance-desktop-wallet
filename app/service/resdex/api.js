@@ -5,6 +5,7 @@ import rp from 'request-promise-native'
 import log from 'electron-log'
 import { remote } from 'electron'
 import getPort from 'get-port'
+import pMap from 'p-map'
 
 import { getStore } from '~/store/configureStore'
 import { translate } from '~/i18next.config'
@@ -98,26 +99,28 @@ export class ResDexApiService {
     })
   }
 
+  async getRawTransaction(coin: string, txid: string) {
+    return this.query({
+      method: 'getrawtransaction',
+      coin,
+      txid,
+    })
+  }
+
   async listTransactions(coin: string, address: string) {
-    let response
+    const response = await this.query({
+      method: 'listtransactions',
+      coin,
+      address
+    })
 
-    try {
-      response = await this.query({
-        method: 'listtransactions',
-        coin,
-        address
-      })
-    } catch (err) {
-      return []
-    }
-
-
-    // TODO: check if it's possible to get rawtransaction for Electrum currencies
     if (response.length && response[0].tx_hash) {
-      return []
-    }
+      const txids = response.map(item => item.tx_hash)
+      const rawTransactions = await this::fetchTransactionsForAddress(coin, address, txids)
 
-    log.debug('listTransactions', coin, response.slice(0, 1))
+      log.debug('rawTransactions', JSON.stringify(rawTransactions))
+      return rawTransactions
+    }
 
     const result = response.map(transaction => ({
       ...response,
@@ -255,3 +258,36 @@ export class ResDexApiService {
   }
 
 }
+
+/**
+ * Private method. Fetches raw transactions, filters out and calculates amount values for a given address.
+ *
+ */
+async function fetchTransactionsForAddress(coin: string, address: string, txids: string[]) {
+  const rawTransactions = await pMap(
+    txids,
+    txid => this.getRawTransaction(coin, txid), { concurrency: 2 }
+  )
+
+  const transactions = rawTransactions.map(rawTransaction => {
+    const amount = rawTransaction.vout.reduce((previousValue, vout) => {
+      const { scriptPubKey } = vout
+
+      if (!scriptPubKey) {
+        return previousValue
+      }
+
+      const hasAddress = scriptPubKey.addresses.find(voutAddress => voutAddress === address)
+      return hasAddress ? previousValue.plus(Decimal(vout.value)) : previousValue
+
+    }, Decimal(0))
+
+    return {
+      txid: rawTransaction.txid,
+      amount,
+    }
+  })
+
+  return transactions
+}
+

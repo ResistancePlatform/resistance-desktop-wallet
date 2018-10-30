@@ -46,7 +46,7 @@ export const ResDexAccountsActions = createActions(
 
     SELECT_CURRENCY: symbol => ({ symbol }),
     GET_TRANSACTIONS: undefined,
-    GOT_TRANSACTIONS: transactions => ({ transactions }),
+    GOT_CURRENCY_TRANSACTIONS: (symbol: string, transactions: object[] | null) => ({ symbol, transactions }),
     GET_TRANSACTIONS_FAILED: (errorMessage: string) => ({ errorMessage }),
   },
   {
@@ -60,9 +60,12 @@ export const ResDexAccountsReducer = handleActions(
       ...state,
       selectedSymbol: action.payload.symbol,
     }),
-    [ResDexAccountsActions.gotTransactions]: (state, action) => ({
+    [ResDexAccountsActions.gotCurrencyTransactions]: (state, action) => ({
       ...state,
-      transactions: action.payload.transactions,
+      transactions: {
+        ...state.transactions,
+        [action.payload.symbol]: action.payload.transactions,
+      }
     }),
     [ResDexAccountsActions.gotCurrencyFees]: (state, action) => ({
       ...state,
