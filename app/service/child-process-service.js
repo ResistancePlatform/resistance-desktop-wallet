@@ -307,11 +307,22 @@ function spawnProcess(processName, args, spawnOptions) {
 
   const options = { ...spawnOptions }
 
-  if (getOS() === 'macos') {
-    options.env = {
-      ...process.env,
-      DYLD_LIBRARY_PATH: getBinariesPath()
-    }
+  switch (getOS()) {
+    case 'macos':
+      options.env = {
+        ...process.env,
+        DYLD_LIBRARY_PATH: getBinariesPath()
+      }
+      break
+
+    case 'linux':
+      options.env = {
+        ...process.env,
+        'LD_LIBRARY_PATH': this.getBinariesPath()
+      }
+      break
+
+    default:
   }
 
   const childProcess = spawn(commandPath, args, options)
