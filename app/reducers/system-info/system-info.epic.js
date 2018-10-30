@@ -6,19 +6,19 @@ import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
 import { Action } from '../types'
+import { RPC } from '~/constants/rpc'
+import { getInstallationPath } from '~/utils/os'
 import { SystemInfoActions } from './system-info.reducer'
 import { RpcService } from '~/service/rpc-service'
 import { ResistanceService } from '~/service/resistance-service'
-import { OSService } from '~/service/os-service'
 
 const rpcService = new RpcService()
 const resistanceService = new ResistanceService()
-const osService = new OSService()
 
 // TODO: Get rid of the behaviour after the issue is fixed:
 // https://github.com/ResistancePlatform/resistance-core/issues/94
 function suppressRpcWarmupError(action, callable) {
-  if (action.payload.code !== -28 && action.payload.code !== 'ECONNREFUSED') {
+  if (action.payload.code !== RPC.IN_WARMUP && action.payload.code !== 'ECONNREFUSED') {
     callable()
   } else {
     console.log(`Suppressing RPC initialization error display:`, action.payload)
@@ -78,7 +78,7 @@ const openWalletInFileManagerEpic = (action$: ActionsObservable<Action>) => acti
 const openInstallationFolderEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(SystemInfoActions.openInstallationFolder.toString()),
   tap(() => {
-    shell.openItem(osService.getInstallationPath())
+    shell.openItem(getInstallationPath())
   }),
   mapTo(SystemInfoActions.empty())
 )

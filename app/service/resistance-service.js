@@ -3,20 +3,23 @@ import { EOL } from 'os'
 import * as fs from 'fs'
 import path from 'path'
 import log from 'electron-log'
+import generator from 'generate-password'
+import PropertiesReader from 'properties-reader'
 import config from 'electron-settings'
 import { app, remote } from 'electron'
 
-import { OSService } from './os-service'
+import { getClientInstance } from '~/service/rpc-service'
+import { getStore } from '~/store/configureStore'
+import { getOS, getExportDir, verifyDirectoryExistence } from '~/utils/os'
+import { ChildProcessService } from './child-process-service'
 
-const generator = require('generate-password')
-const PropertiesReader = require('properties-reader')
+const childProcess = new ChildProcessService()
+
 
 /**
  * ES6 singleton
  */
 let instance = null
-
-const osService = new OSService()
 
 const walletFolderName = 'testnet3'
 const configFolderName = 'Resistance'
@@ -39,13 +42,17 @@ const torSwitch = '-proxy=127.0.0.1:9050'
  * @class ResistanceService
  */
 export class ResistanceService {
+  isDoneLoading: boolean
+
 	/**
 	 * Creates an instance of ResistanceService.
    *
 	 * @memberof ResistanceService
 	 */
 	constructor() {
-		if (!instance) { instance = this }
+    if (!instance) {
+      instance = this
+    }
 
 		return instance
 	}
@@ -58,10 +65,10 @@ export class ResistanceService {
   getDataPath() {
     const validApp = process.type === 'renderer' ? remote.app : app
     let configFolder = path.join(validApp.getPath('appData'), configFolderName)
-    if (osService.getOS() === 'linux') {
+    if (getOS() === 'linux') {
       configFolder = path.join(validApp.getPath('home'), '.resistance')
     }
-    return configFolder;
+    return configFolder
   }
 
 	/**
@@ -78,7 +85,7 @@ export class ResistanceService {
     const validApp = process.type === 'renderer' ? remote.app : app
     let paramsPath
 
-    if (osService.getOS() === 'linux') {
+    if (getOS() === 'linux') {
       paramsPath  = path.join(validApp.getPath('home'), '.resistance-params')
     } else {
       paramsPath = path.join(validApp.getPath('appData'), 'ResistanceParams')
@@ -105,10 +112,10 @@ export class ResistanceService {
 
     if (fs.existsSync(configFile)) {
       resistanceNodeConfig = PropertiesReader(configFile).path()
-      log.info(`The Resistance config file ${configFile} exists and does not need to be created.`);
+      log.info(`The Resistance config file ${configFile} exists and does not need to be created.`)
     } else {
       resistanceNodeConfig = this.createConfig(configFile)
-      log.info(`The Resistance config file ${configFile} was successfully created.`);
+      log.info(`The Resistance config file ${configFile} was successfully created.`)
     }
 
     return resistanceNodeConfig
@@ -120,8 +127,8 @@ export class ResistanceService {
    * @param {boolean} isTorEnabled
 	 * @memberof ResistanceService
 	 */
-	start(isTorEnabled: boolean) {
-    this::startOrRestart(isTorEnabled, true)
+	async start(isTorEnabled: boolean) {
+    await this::startOrRestart(isTorEnabled, true)
 	}
 
 	/**
@@ -130,8 +137,8 @@ export class ResistanceService {
    * @param {boolean} isTorEnabled
 	 * @memberof ResistanceService
 	 */
-	restart(isTorEnabled: boolean) {
-    this::startOrRestart(isTorEnabled, false)
+	async restart(isTorEnabled: boolean) {
+    await this::startOrRestart(isTorEnabled, false)
 	}
 
 	/**
@@ -139,8 +146,8 @@ export class ResistanceService {
    *
 	 * @memberof ResistanceService
 	 */
-	stop() {
-    osService.killProcess('NODE')
+	async stop() {
+    await childProcess.killProcess('NODE')
 	}
 
 	/**
@@ -159,14 +166,6 @@ export class ResistanceService {
     return PropertiesReader().read(contentsWithPassword).path()
   }
 
-	/**
-   * Returns Resistance export dir as provided with -exportdir command line argument to the node.
-   *
-	 * @memberof ResistanceService
-	 */
-  getExportDir() {
-    return path.join(osService.getAppDataPath(), 'ExportDir')
-  }
 }
 
 /* Resistance Service private methods */
@@ -178,22 +177,35 @@ export class ResistanceService {
  * @param {boolean} start Starts if true, restarts otherwise
  * @memberof ResistanceService
  */
-function startOrRestart(isTorEnabled: boolean, start: boolean) {
+async function startOrRestart(isTorEnabled: boolean, start: boolean) {
   const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
   // TODO: support system wide wallet paths, stored in config.get('wallet.path')
   // https://github.com/ResistancePlatform/resistance-core/issues/84
 
   const walletName = config.get('wallet.name', 'wallet')
   args.push(`-wallet=${walletName}.dat`)
-  const caller = start ? osService.execProcess : osService.restartProcess
+  const caller = start ? childProcess.execProcess : childProcess.restartProcess
 
-  osService.verifyDirectoryExistence(this.getExportDir()).then(exportDir => {
-    args.push(`-exportdir=${exportDir}`)
-    caller.bind(osService)('NODE', args, this::handleStdout)
-    return Promise.resolve()
-  }).catch(err => {
-    const actions = osService.getSettingsActions()
-    osService.dispatchAction(actions.childProcessFailed('NODE', err.toString()))
+  const exportDir = getExportDir()
+
+  try {
+    await verifyDirectoryExistence(exportDir)
+  } catch (err) {
+    log.error(`Can't create local node export directory`, err)
+    const actions = childProcess.getSettingsActions()
+    getStore().dispatch(actions.childProcessFailed('NODE', err.message))
+    return
+  }
+
+  args.push(`-exportdir=${exportDir}`)
+
+  this.isDoneLoading = false
+
+  await caller.bind(childProcess)({
+    processName: 'NODE',
+    args,
+    outputHandler: this::handleOutput,
+    waitUntilReady: childProcess.createReadinessWaiter(this::checkRpcAvailability)
   })
 }
 
@@ -203,6 +215,26 @@ function startOrRestart(isTorEnabled: boolean, start: boolean) {
  * @param {string} configFilePath
  * @memberof ResistanceService
  */
-function handleStdout(data: Buffer) {
-  return data.toString().includes(`init message: Done loading`)
+function handleOutput(data: Buffer) {
+  if (!this.isDoneLoading) {
+    this.isDoneLoading = data.toString().includes(`init message: Done loading`)
+  }
+}
+
+async function checkRpcAvailability() {
+  const client = getClientInstance()
+
+  if (!this.isDoneLoading) {
+    return false
+  }
+
+  try {
+    await client.getInfo()
+    log.debug(`The local node has successfully accepted an RPC call`)
+    return true
+  } catch (err) {
+    log.debug(`The local node hasn't accepted an RPC check call`)
+    return false
+  }
+
 }

@@ -1,0 +1,106 @@
+@import "~/assets/styles/modal.scss";
+
+$orderModalWidth: 28.3125rem;
+
+.titleContainer {
+  padding: 1.6rem;
+
+  .title {
+    display: inline-block;
+    margin-top: 0.3rem;
+    margin-bottom: 0.1rem;
+    position: relative;
+  }
+
+  .statusContainer {
+    position: absolute;
+    font-size: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    left: calc(100% + 1rem);
+
+    > div {
+      padding-top: 0.1rem;
+      padding-bottom: 0.1rem;
+    }
+  }
+}
+
+.stagesContainer {
+  cursor: default;
+  list-style-type: none;
+  display: flex;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 100;
+  color: $BASE_COLOR_FONT_GRAY;
+  white-space: nowrap;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 2rem;
+
+  li {
+    width: 20%;
+    text-align: center;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+    position: relative;
+
+    &:before {
+      position: absolute;
+      content: '';
+      border: 1px solid $BASE_COLOR_BORDER_GRAY;
+      width: 0.7rem;
+      height: 0.7rem;
+      border-radius: 50%;
+      background: $BASE_COLOR_DARK_BLUE_3;
+      top: 100%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    &.active {
+      color: $BASE_COLOR_WHITE;
+      border-bottom: 1px solid $BASE_COLOR_LIGHT_BLUE;
+    }
+
+    &.active:before {
+      border: 1px solid $BASE_COLOR_LIGHT_BLUE;
+    }
+
+    &.active:after {
+      position: absolute;
+      content: '.';
+      color: $BASE_COLOR_LIGHT_BLUE;
+      font-size: 1rem;
+      font-weight: 600;
+      left: calc(50% - 0.03rem);
+      top: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+}
+
+.id {
+  font-size: 0.65rem;
+  color: $BASE_COLOR_FONT_GRAY_2;
+  text-align: center;
+}
+
+.summaryContainer {
+  width: 100%;
+  text-align: center;
+  padding-left: 13%;
+  margin-bottom: 1.6rem;
+}
+
+.summary {
+}
+
+.order {
+  padding: 0;
+  margin: 0;
+  width: $orderModalWidth;
+  height: 33.6875rem;
+}

@@ -5,10 +5,13 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
+import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import ResDexLogin from './Login'
 import DepositModal from './DepositModal'
 import WithdrawModal from './WithdrawModal'
+import AddCurrencyModal from './AddCurrencyModal'
+import OrderModal from './OrderModal'
 import ResDexAssets from './Assets'
 import ResDexBuySell from './BuySell'
 import ResDexOrders from './Orders'
@@ -47,20 +50,18 @@ export class ResDex extends Component<Props> {
    * @memberof ResDex
 	 */
   getContents() {
-    /*
-    <RpcPolling
-      interval={15.0 * 60}
-      criticalChildProcess="RESDEX"
-      actions={{
-        polling: ResDexOrdersActions.kickStartStuckSwaps,
-        success: ResDexAccountsActions.kickStartStuckSwapsSucceeded,
-        failure: ResDexAccountsActions.kickStartStuckSwapsFailed
-      }}
-    />
-    */
-
     return (
       <div>
+        <RpcPolling
+          interval={15.0 * 60}
+          criticalChildProcess="RESDEX"
+          actions={{
+            polling: ResDexOrdersActions.kickStartStuckSwaps,
+            success: ResDexOrdersActions.kickStartStuckSwapsSucceeded,
+            failure: ResDexOrdersActions.kickStartStuckSwapsFailed
+          }}
+        />
+
         <RpcPolling
           interval={1.0}
           criticalChildProcess="RESDEX"
@@ -71,11 +72,27 @@ export class ResDex extends Component<Props> {
           }}
         />
 
+        <RpcPolling
+          interval={1.0 * 60}
+          criticalChildProcess="RESDEX"
+          actions={{
+            polling: ResDexAccountsActions.getTransactions,
+            success: ResDexAccountsActions.gotTransactions,
+            failure: ResDexAccountsActions.getTransactionsFailed
+          }}
+        />
+
         {this.props.resDex.accounts.depositModal.isVisible &&
           <DepositModal />
         }
         {this.props.resDex.accounts.withdrawModal.isVisible &&
           <WithdrawModal />
+        }
+        {this.props.resDex.accounts.addCurrencyModal.isVisible &&
+          <AddCurrencyModal />
+        }
+        {this.props.resDex.orders.orderModal.isVisible &&
+          <OrderModal />
         }
         <Tabs
           className={styles.tabs}

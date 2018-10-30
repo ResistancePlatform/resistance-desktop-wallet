@@ -13,7 +13,7 @@ import ChooseWallet from '~/components/rounded-form/ChooseWallet'
 import RoundedTextArea from '~/components/rounded-form/RoundedTextArea'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
-import styles from './Modal.scss'
+import styles from './WithdrawModal.scss'
 
 const getValidationSchema = t => Joi.object().keys({
   recipientAddress: Joi.string().required().label(t(`Recipient address`)),

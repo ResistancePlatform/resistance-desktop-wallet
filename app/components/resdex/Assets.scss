@@ -93,6 +93,7 @@
 
 .coins {
   display: flex;
+  flex-wrap: wrap;
   padding: 0 1.35rem;
   padding-right: 0;
 
@@ -104,6 +105,7 @@
     padding-top: 1rem;
     font-size: 0.7rem;
     margin-right: 1rem;
+    margin-bottom: 1.4rem;
     border: 0.5px solid $BASE_COLOR_BORDER_BLUE;
 
     img {

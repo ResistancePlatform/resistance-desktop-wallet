@@ -13,7 +13,7 @@ export type Currency = {
 
 export type EnabledCurrency = {
   symbol: string,
-  port?: number,
+  rpcPort?: number,
   useElectrum: boolean
 }
 
@@ -28,11 +28,26 @@ export const ResDexAccountsActions = createActions(
     GOT_CURRENCIES: (currencies: { [string]: Currency }) => ({ currencies }),
     GET_CURRENCIES_FAILED: (errorMessage: string) => ({ errorMessage }),
 
+    UPDATE_ENABLED_CURRENCIES: (enabledCurrencies: EnabledCurrency[]) => ({ enabledCurrencies }),
+
     WITHDRAW: undefined,
+    ADD_CURRENCY: undefined,
+    UPDATE_CURRENCY: undefined,
+    COPY_SMART_ADDRESS: (symbol: string) => ({ symbol }),
+    CONFIRM_CURRENCY_DELETION: (symbol: string) => ({ symbol }),
+    DELETE_CURRENCY: (symbol: string) => ({ symbol }),
     SHOW_DEPOSIT_MODAL: (symbol: string) => ({ symbol }),
     SHOW_WITHDRAW_MODAL: (symbol: string) => ({ symbol }),
+    SHOW_EDIT_CURRENCY_MODAL: (symbol: string) => ({ symbol }),
+    SHOW_ADD_CURRENCY_MODAL: undefined,
     CLOSE_DEPOSIT_MODAL: undefined,
-    CLOSE_WITHDRAW_MODAL: undefined
+    CLOSE_WITHDRAW_MODAL: undefined,
+    CLOSE_ADD_CURRENCY_MODAL: undefined,
+
+    SELECT_CURRENCY: symbol => ({ symbol }),
+    GET_TRANSACTIONS: undefined,
+    GOT_TRANSACTIONS: transactions => ({ transactions }),
+    GET_TRANSACTIONS_FAILED: (errorMessage: string) => ({ errorMessage }),
   },
   {
     prefix: 'APP/RESDEX/ACCOUNTS'
@@ -41,6 +56,14 @@ export const ResDexAccountsActions = createActions(
 
 export const ResDexAccountsReducer = handleActions(
   {
+    [ResDexAccountsActions.selectCurrency]: (state, action) => ({
+      ...state,
+      selectedSymbol: action.payload.symbol,
+    }),
+    [ResDexAccountsActions.gotTransactions]: (state, action) => ({
+      ...state,
+      transactions: action.payload.transactions,
+    }),
     [ResDexAccountsActions.gotCurrencyFees]: (state, action) => ({
       ...state,
       currencyFees: action.payload.fees,
@@ -63,12 +86,36 @@ export const ResDexAccountsReducer = handleActions(
         symbol: action.payload.symbol
       }
     }),
-    [ResDexAccountsActions.closeDepositModal]: (state) => ({
+    [ResDexAccountsActions.showEditCurrencyModal]: (state, action) => ({
+      ...state,
+      addCurrencyModal: {
+        isInEditMode: true,
+        symbol: action.payload.symbol,
+        isVisible: true
+      }
+    }),
+    [ResDexAccountsActions.showAddCurrencyModal]: state => ({
+      ...state,
+      addCurrencyModal: {
+        isInEditMode: false,
+        symbol: null,
+        isVisible: true
+      }
+    }),
+    [ResDexAccountsActions.updateEnabledCurrencies]: (state, action) => ({
+      ...state,
+      enabledCurrencies: action.payload.enabledCurrencies
+    }),
+    [ResDexAccountsActions.closeDepositModal]: state => ({
       ...state,
       depositModal: { isVisible: false, symbol: null }
     }),
     [ResDexAccountsActions.closeWithdrawModal]: (state) => ({
       ...state,
       withdrawModal: { isVisible: false, symbol: null }
+    }),
+    [ResDexAccountsActions.closeAddCurrencyModal]: state => ({
+      ...state,
+      addCurrencyModal: { isInEditMode: false, isVisible: false, symbol: null }
     }),
   }, preloadedState)

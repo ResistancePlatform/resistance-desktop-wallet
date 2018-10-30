@@ -1,9 +1,11 @@
-@import "../../assets/styles/generic-component.scss";
-@import "../../assets/styles/vars.scss";
-@import "../../assets/styles/modal-dialog.scss";
+@import "~/assets/styles/generic-component.scss";
+@import "~/assets/styles/vars.scss";
+@import "~/assets/styles/modal-dialog.scss";
 
 .statusModal {
   @extend .modalDialog;
+  width: 40rem;
+  height: 28rem;
 }
 
 .statusModalBody {
@@ -32,7 +34,7 @@
   }
 
   .tabs {
-    height: 100%;
+    height: 21.75rem;
   }
 
   .tabList {

@@ -26,6 +26,7 @@ class PopupMenuItem extends Component<Props> {
   }
 
   handleClick(event) {
+    event.stopPropagation()
     this.props.onClick(event, this.props.data)
 		appStore.dispatch(PopupMenuActions.hide(this.props.id))
     return false

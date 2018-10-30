@@ -1,5 +1,5 @@
 // @flow
-import { OSService } from './os-service'
+import { ChildProcessService } from './child-process-service'
 
 
 /**
@@ -7,7 +7,7 @@ import { OSService } from './os-service'
  */
 let instance = null
 
-const osService = new OSService()
+const childProcess = new ChildProcessService()
 
 const torCommandArgs = []
 
@@ -31,14 +31,14 @@ export class TorService {
 	/**
 	 * @memberof TorService
 	 */
-  start() {
-    osService.execProcess('TOR', torCommandArgs.slice())
+  async start() {
+    await childProcess.execProcess({processName: 'TOR', args: torCommandArgs.slice()})
   }
 
 	/**
 	 * @memberof TorService
 	 */
-  stop() {
-    osService.killProcess('TOR')
+  async stop() {
+    await childProcess.killProcess('TOR')
   }
 }

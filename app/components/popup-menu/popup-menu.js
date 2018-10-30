@@ -1,10 +1,10 @@
 // @flow
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import cn from 'classnames'
 
-import { appStore } from '~/store/configureStore'
 import { PopupMenuState, PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 
 import styles from './popup-menu.scss'
@@ -13,7 +13,8 @@ type Props = {
   id: string,
   className?: string,
   relative?: boolean,
-  popupMenu: PopupMenuState
+  popupMenu: PopupMenuState,
+  actions: object
 }
 
 class PopupMenu extends Component<Props> {
@@ -45,8 +46,9 @@ class PopupMenu extends Component<Props> {
 
     const props = this.props.popupMenu[this.props.id]
 
-    if (props && props.isVisible && !this.element.contains(event.target)) {
-      appStore.dispatch(PopupMenuActions.hide(this.props.id))
+    // TODO: figure out why Node.contains() doesn't work as expected
+    if (props && props.isVisible && !this.element.innerHTML.includes(event.target.outerHTML)) {
+      this.props.actions.hide(this.props.id)
     }
   }
 
@@ -85,6 +87,7 @@ class PopupMenu extends Component<Props> {
 
     if (!this.props.relative) {
       Object.assign(containerStyles, {
+        position: 'fixed',
         top: props.top,
         left: props.left,
         transform: 'none'
@@ -110,4 +113,8 @@ const mapStateToProps = state => ({
 	popupMenu: state.popupMenu,
 })
 
-export default connect(mapStateToProps, null)(PopupMenu)
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(PopupMenuActions, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(PopupMenu)

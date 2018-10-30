@@ -55,15 +55,29 @@ export type ResDexState = {
       baseCurrency?: string,
       quoteCurrency?: string,
       ['bids' | 'asks']: Order[]
-    }
+    },
+    enhancedPrivacy: boolean
   },
   orders: {
-    swapHistory: []
+    isInitialKickStartDone: boolean,
+    pendingSwaps: {},
+    swapHistory: [],
+    orderModal: {
+      isVisible: boolean,
+      uuid: string | null
+    }
   },
   accounts: {
+    selectedSymbol: string,
+    transactions: { [string]: any },
     currencies: { [string]: Currency },
     enabledCurrencies: EnabledCurrency[],
     currencyFees: { [string]: any },
+    addCurrencyModal: {
+      isInEditMode: boolean,
+      isVisible: boolean,
+      symbol: string | null
+    },
     depositModal: {
       isVisible: boolean,
       symbol: string | null

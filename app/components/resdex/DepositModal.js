@@ -10,7 +10,7 @@ import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import RoundedInputWithCopy from '~/components/rounded-form/RoundedInputWithCopy'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
-import styles from './Modal.scss'
+import styles from './DepositModal.scss'
 
 type Props = {
   t: any,

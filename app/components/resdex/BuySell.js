@@ -9,16 +9,13 @@ import { translate } from 'react-i18next'
 import ReactTooltip from 'react-tooltip'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
-import { RESDEX } from '~/constants/resdex'
-import { calculateMaxTotalPayout } from '~/utils/resdex'
-import { truncateAmount, toDecimalPlaces } from '~/utils/decimal'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 import RoundedInputWithUseMax from '~/components/rounded-form/RoundedInputWithUseMax'
 import ChooseWallet from '~/components/rounded-form/ChooseWallet'
-import CurrencyIcon from './CurrencyIcon'
+import OrderSummary from './OrderSummary'
 
 import animatedSpinner from '~/assets/images/animated-spinner.svg'
 import styles from './BuySell.scss'
@@ -45,59 +42,6 @@ type Props = {
 class ResDexBuySell extends Component<Props> {
 	props: Props
 
-  getBaseAmount(applyFees: boolean = false): Decimal | null {
-    const { quoteCurrency, orderBook } = this.props.buySell
-    const form = this.props.roundedForm.resDexBuySell
-
-    if (!orderBook.asks.length || !form || !form.fields) {
-      return null
-    }
-
-    const { price } = orderBook.asks[0]
-    const quoteAmount = Decimal(form.fields.maxRel || '0')
-
-    if (applyFees) {
-      const txFee = this.props.accounts.currencyFees[quoteCurrency]
-      return calculateMaxTotalPayout(quoteAmount, price, txFee || Decimal(0))
-    }
-
-    return quoteAmount.div(price)
-  }
-
-  getMaxPayoutCaption(): string {
-    const { baseCurrency } = this.props.buySell
-    const baseAmount = this.getBaseAmount(true)
-
-    if (baseAmount === null) {
-      return `0 ${baseCurrency}`
-    }
-
-    return `${toDecimalPlaces(baseAmount)} ${baseCurrency}`
-  }
-
-  getAtCaption(t) {
-    const { baseCurrency, quoteCurrency, orderBook } = this.props.buySell
-    const { price } = orderBook.asks.length && orderBook.asks[0]
-
-    if (!price) {
-      return t(`No liquidity available yet`)
-    }
-
-    return t(`@ {{price}} {{baseCurrency}} per {{quoteCurrency}}`, {
-      price: truncateAmount(price),
-      baseCurrency,
-      quoteCurrency
-    })
-
-  }
-
-  getQuoteAmountCaption() {
-    const form = this.props.roundedForm.resDexBuySell
-    const amount = Decimal(form && form.fields.maxRel || '0')
-
-    return toDecimalPlaces(amount)
-  }
-
   getMaxQuoteAmount() {
     const { quoteCurrency } = this.props.buySell
     const currency = this.props.accounts.currencies[quoteCurrency]
@@ -115,6 +59,27 @@ class ResDexBuySell extends Component<Props> {
       || orderBook.asks.length === 0
     )
 
+  }
+
+  getOrder() {
+    const form = this.props.roundedForm.resDexBuySell
+    const quoteCurrencyAmount = Decimal(form && form.fields.maxRel || '0')
+
+    const { baseCurrency, quoteCurrency, orderBook } = this.props.buySell
+    const { price } = orderBook.asks.length && orderBook.asks[0]
+
+    const { enhancedPrivacy } = this.props.buySell
+
+    const order = {
+      orderType: 'buy',
+      quoteCurrencyAmount,
+      price: price || null,
+      baseCurrency,
+      quoteCurrency,
+      enhancedPrivacy,
+    }
+
+    return order
   }
 
 	/**
@@ -209,65 +174,7 @@ class ResDexBuySell extends Component<Props> {
 
         </div>
 
-        <div className={styles.summaryContainer}>
-          <div className={styles.briefContainer}>
-            <div className={styles.brief}>{t(`You are sending`)}</div>
-
-            <div className={styles.amount}>
-              {this.getQuoteAmountCaption()}
-              <span>{quoteCurrency}</span>
-            </div>
-
-            <div className={styles.at}>{this.getAtCaption(t)}</div>
-
-          </div>
-
-          <div className={styles.fromTo}>
-            <div className={styles.wallet}>
-              <CurrencyIcon symbol={quoteCurrency} size="1.24rem" />
-              <div>
-                <span>{t(`Send`)}</span>
-                {t(`{{quoteCurrency}} Wallet`, { quoteCurrency })}
-              </div>
-            </div>
-
-            <div className={cn('icon', styles.exchangeIcon)} />
-
-            <div className={styles.wallet}>
-              <CurrencyIcon symbol={baseCurrency} size="1.24rem" />
-              <div>
-                <span>{t(`Receive`)}</span>
-                {t(`{{baseCurrency}} Wallet`, { baseCurrency })}
-              </div>
-            </div>
-
-          </div>
-
-          <ul className={styles.list}>
-            <li className={cn({ [styles.res]: this.props.buySell.enhancedPrivacy })}>
-              {this.getQuoteAmountCaption()}&nbsp;
-              {quoteCurrency}
-              <hr />
-              <span>{this.getMaxPayoutCaption()}</span>
-            </li>
-            <li>
-              {t(`DEX Fee`)}
-              <hr />
-              <span>{RESDEX.dexFee.toFixed(2)}%</span>
-            </li>
-            <li>
-              {t(`{{symbol}} Fee`, { symbol: quoteCurrency })}
-              <hr />
-              <span>{txFee && txFee.toString()}</span>
-            </li>
-            <li>
-              {t(`Max. Total Payout`)}
-              <hr />
-              <span>{this.getMaxPayoutCaption()}</span>
-            </li>
-          </ul>
-
-        </div>
+        <OrderSummary order={this.getOrder()} />
 
       </div>
     )

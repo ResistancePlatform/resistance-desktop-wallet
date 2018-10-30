@@ -5,10 +5,10 @@ import classNames from 'classnames'
 import { NavLink } from 'react-router-dom'
 import * as Joi from 'joi'
 
-import { getPasswordValidationSchema } from '~/utils/auth'
 import { getWalletNameJoi } from '~/utils/get-started'
 import { ResistanceService } from '~/service/resistance-service'
-import RoundedInput, { RoundedInputAddon } from '~/components/rounded-form/RoundedInput'
+import RoundedInput from '~/components/rounded-form/NewRoundedInput'
+import OpenFileInput from '~/components/rounded-form/OpenFileInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
@@ -20,7 +20,7 @@ const resistance = new ResistanceService()
 const getValidationSchema = t => Joi.object().keys({
   walletName: getWalletNameJoi().walletName().fileDoesntExist(Joi.ref('walletPath')).required().label(`Wallet name`),
   backupFile: Joi.string().required().label(t(`Backup file`)),
-  password: getPasswordValidationSchema(t(`Wallet password`)),
+  password: Joi.string().optional().label(t(`Wallet password`)),
   restoreHeight: Joi.number().integer().optional().allow('').label(t(`Restore height`)),
   walletPath: Joi.string().required().label(t(`Wallet path`))
 })
@@ -52,15 +52,6 @@ export class RestoreYourWallet extends Component<Props> {
 	render() {
     const { t } = this.props
 
-		const backupFileAddon: RoundedInputAddon = {
-			enable: true,
-      type: 'CHOOSE_FILE',
-      data: {
-        title: t(`Restore Resistance wallet from a backup file`),
-        filters: [{ name: t(`Wallet files`),  extensions: ['dat'] }]
-      }
-		}
-
 		return (
       <div className={classNames(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
         <div className={styles.title}>{t(`Restore your wallet`)}</div>
@@ -71,13 +62,36 @@ export class RestoreYourWallet extends Component<Props> {
             options={{ stripUnknown: true }}
             schema={getValidationSchema(t)}
           >
-            <RoundedInput name="walletName" defaultValue={userInfo().username} label={t(`Wallet name`)} />
+            <RoundedInput
+              name="walletName"
+              labelClassName={styles.inputLabel}
+              type="text"
+              defaultValue={userInfo().username}
+              label={t(`Wallet name`)}
+            />
 
-            <RoundedInput name="backupFile" label={t(`Backup file`)} addon={backupFileAddon} readOnly />
-            <RoundedInput name="password" password label={t(`Wallet password`)} />
+            <OpenFileInput
+              name="backupFile"
+              label={t(`Backup file`)}
+              labelClassName={styles.inputLabel}
+              options={{
+                title: t(`Restore Resistance wallet from a backup file`),
+                filters: [{ name: t(`Wallet files`),  extensions: ['dat'] }]
+              }}
+              readOnly
+            />
+
+            <RoundedInput
+              name="password"
+              labelClassName={styles.inputLabel}
+              type="password"
+              label={t(`Wallet password`)}
+            />
 
             <RoundedInput
               name="walletPath"
+              labelClassName={styles.inputLabel}
+              type="text"
               label={t(`Your wallet stored in`)}
               defaultValue={resistance.getWalletPath()}
               readOnly />

@@ -4,18 +4,17 @@ import crypto from 'crypto'
 import rp from 'request-promise-native'
 import log from 'electron-log'
 import { remote } from 'electron'
-
 import getPort from 'get-port'
+
+import { getStore } from '~/store/configureStore'
 import { translate } from '~/i18next.config'
 import MarketmakerSocket from './marketmaker-socket'
 import { getCurrency } from '~/utils/resdex'
-import { OSService } from '~/service/os-service'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 
-const resDexUri = 'http://127.0.0.1:17445'
+export const resDexUri = 'http://127.0.0.1:17445'
 
 const t = translate('service')
-const os = new OSService()
 
 class ResDexApiError extends Error {
   constructor(response) {
@@ -63,6 +62,71 @@ export class ResDexApiService {
 
 		return this.socket
 	}
+
+  sendWalletPassphrase(coin: string, password: string, timeout: number) {
+		return this.query({
+			method: 'walletpassphrase',
+      coin,
+			password,
+      timeout: String(timeout)
+		})
+  }
+
+  async getPendingSwaps() {
+    const response = await this.query({
+      method: 'swapstatus',
+      pending: 1
+    })
+
+    log.debug('swapstatus', JSON.stringify(response))
+    return response.swaps
+  }
+
+	kickstart(requestId: number, quoteId: number) {
+		return this.query({
+			method: 'kickstart',
+			requestid: requestId,
+			quoteid: quoteId,
+		})
+	}
+
+  setConfirmationsNumber(coin: string, confirmationsNumber: number) {
+    return this.query({
+      method: 'setconfirms',
+      coin,
+      numconfirms: confirmationsNumber
+    })
+  }
+
+  async listTransactions(coin: string, address: string) {
+    let response
+
+    try {
+      response = await this.query({
+        method: 'listtransactions',
+        coin,
+        address
+      })
+    } catch (err) {
+      return []
+    }
+
+
+    // TODO: check if it's possible to get rawtransaction for Electrum currencies
+    if (response.length && response[0].tx_hash) {
+      return []
+    }
+
+    log.debug('listTransactions', coin, response.slice(0, 1))
+
+    const result = response.map(transaction => ({
+      ...response,
+      amount: Decimal(transaction.amount),
+      fee: Decimal(transaction.fee),
+    }))
+
+    return result
+  }
 
 	async getFee(coin) {
 		const response = await this.query({
@@ -166,7 +230,7 @@ export class ResDexApiService {
     log.debug(`Calling ResDEX API method ${data.method}`, JSON.stringify(data))
 
     if (!token) {
-      os.dispatchAction(ResDexLoginActions.showDialog())
+      getStore().dispatch(ResDexLoginActions.showDialog())
       return Promise.reject(new Error(t(`Authentication failed`)))
     }
 
@@ -191,19 +255,3 @@ export class ResDexApiService {
   }
 
 }
-
-/* Querying method reusing queues, taken from HyperDEX
-async function query(data) {
-	const queueId = (this.useQueue && this.socket) ? ++this.currentQueueId : 0
-
-	const response = await this.queue.add(() => fetch(this.endpoint, {
-		method: 'post',
-		body: JSON.stringify({
-			...{queueid: queueId},
-			...data}
-		),
-	}))
-
-	return (this.useQueue && this.socket) ? this.socket.getResponse(queueId) : response.json()
-}
-*/

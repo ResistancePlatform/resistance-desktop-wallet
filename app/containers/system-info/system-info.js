@@ -1,5 +1,6 @@
 // @flow
 import moment from 'moment'
+import { remote } from 'electron'
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import { translate } from 'react-i18next'
@@ -7,18 +8,19 @@ import cn from 'classnames'
 import { toastr } from 'react-redux-toastr'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
-import { getChildProcessStatusName } from '~/utils/child-process'
-import { OSService } from '~/service/os-service'
+import { getOS } from '~/utils/os'
+import { ChildProcessService } from '~/service/child-process-service'
 import { ResDexAssetsActions } from '~/reducers/resdex/assets/reducer'
+import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import { SystemInfoActions, SystemInfoState } from '~/reducers/system-info/system-info.reducer'
-import { appStore } from '~/store/configureStore'
+import { getStore } from '~/store/configureStore'
 import { State } from '~/reducers/types'
 import humanizeOperationName from '~/components/system-info/humanize-operation'
 
 import styles from './system-info.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 
-const osService = new OSService()
+const childProcess = new ChildProcessService()
 
 const daemonInfoPollingInterval = 2.0
 const blockchainInfoPollingInterval = 4.0
@@ -51,17 +53,23 @@ class SystemInfo extends Component<Props> {
       {...map, [operation.id]: operation}
     ), {})
 
-    const checkIfPending = (operation) => ['queued', 'executing'].includes(operation.status)
+    const isPending = (operation) => ['queued', 'executing'].includes(operation.status)
+
+    const currentOperations  = this.props.systemInfo.operations
+
+    remote.getGlobal('pendingActivities').operations = Boolean(
+      currentOperations.find(operation => isPending(operation))
+    )
 
     this.props.systemInfo.operations.forEach(currentOperation => {
       const prevOperation = prevOperationsMap[currentOperation.id]
 
-      if (prevOperation && !checkIfPending(prevOperation)) {
+      if (prevOperation && !isPending(prevOperation)) {
         return
       }
 
-      if (!checkIfPending(currentOperation)) {
-        appStore.dispatch(SystemInfoActions.operationFinished(currentOperation))
+      if (!isPending(currentOperation)) {
+        getStore().dispatch(SystemInfoActions.operationFinished(currentOperation))
       }
 
       let description
@@ -109,7 +117,7 @@ class SystemInfo extends Component<Props> {
       statusClassNames.push('icon-status-stop')
     }
 
-    const color = osService.getChildProcessStatusColor(processStatus)
+    const color = childProcess.getChildProcessStatusColor(processStatus)
 
     if (color) {
       statusClassNames.push(styles[color])
@@ -120,16 +128,16 @@ class SystemInfo extends Component<Props> {
 
   getWalletInFileManagerLabel() {
     const { t } = this.props
-    return osService.getOS() === 'windows' ? t(`Wallet in Explorer`) : t(`Wallet in Finder`)
+    return getOS() === 'windows' ? t(`Wallet in Explorer`) : t(`Wallet in Finder`)
   }
 
   onWalletInFileManagerClicked() {
-    appStore.dispatch(SystemInfoActions.openWalletInFileManager())
+    getStore().dispatch(SystemInfoActions.openWalletInFileManager())
     return false
   }
 
   onInstallationFolderClicked() {
-    appStore.dispatch(SystemInfoActions.openInstallationFolder())
+    getStore().dispatch(SystemInfoActions.openInstallationFolder())
     return false
   }
 
@@ -178,6 +186,14 @@ class SystemInfo extends Component<Props> {
         />
 
         <RpcPolling
+          interval={2.0 * 60}
+          actions={{
+            polling: ResDexOrdersActions.cleanupPendingSwaps,
+            success: ResDexOrdersActions.gotPendingSwaps,
+            failure: ResDexOrdersActions.cleanupPendingSwapsFailed
+          }}
+        />
+        <RpcPolling
           interval={10.0 * 60 * 60}
           actions={{
             polling: ResDexAssetsActions.getCurrencyHistory,
@@ -195,7 +211,7 @@ class SystemInfo extends Component<Props> {
 						<div className={styles.statusColoumnValue}>
               <span className={styles.nodeStatusContainer}>
                 <i className={this.getLocalNodeStatusClassNames()} />
-                <span>{t(getChildProcessStatusName(this.props.settings.childProcessesStatus.NODE))}</span>
+                <span>{t(childProcess.getStatusName(this.props.settings.childProcessesStatus.NODE))}</span>
               </span>
 						</div>
 					</div>

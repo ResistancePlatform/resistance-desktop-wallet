@@ -9,14 +9,13 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { LazyLog } from 'react-lazylog'
 import classNames from 'classnames'
 
-import { getChildProcessStatusName } from '~/utils/child-process'
-import { OSService, ChildProcessName } from '~/service/os-service'
+import { ChildProcessService, ChildProcessName } from '~/service/child-process-service'
 import { SettingsActions, SettingsState } from '~/reducers/settings/settings.reducer'
 
 import 'react-tabs/style/react-tabs.scss'
 import styles from './status-modal.scss'
 
-const osService = new OSService()
+const childProcess = new ChildProcessService()
 
 const processNames = ['NODE', 'MINER', 'TOR', 'RESDEX']
 
@@ -74,7 +73,7 @@ class StatusModal extends Component<Props> {
 	 */
   checkLogFilesExistence() {
     processNames.forEach((processName) => {
-      let logFilePath = osService.getLogFilePath(processName)
+      let logFilePath = childProcess.getLogFilePath(processName)
 
       fs.access(logFilePath, err => {
         if (err) {
@@ -109,7 +108,7 @@ class StatusModal extends Component<Props> {
       statusClassNames.push('icon-status-stop')
     }
 
-    const color = osService.getChildProcessStatusColor(processStatus)
+    const color = childProcess.getChildProcessStatusColor(processStatus)
 
     if (color) {
       statusClassNames.push(styles[color])
@@ -127,7 +126,7 @@ class StatusModal extends Component<Props> {
 		this.eventConfirm(event)
 
     const processName = processNames[this.state.selectedTabIndex - 1]
-    const logFilePath = osService.getLogFilePath(processName)
+    const logFilePath = childProcess.getLogFilePath(processName)
     const pathWithRefreshKey = `${logFilePath}?refreshPathKey=${this.refreshPathKey}`
 
     this.setState({ processLogFilesPath:  { ...this.state.processLogFilesPath, [processName]: pathWithRefreshKey } })
@@ -170,28 +169,28 @@ class StatusModal extends Component<Props> {
               <Tab className={styles.tab}>
                 <i
                   className={this.getChildProcessStatusClassNames('NODE')}
-                  title={getChildProcessStatusName(this.props.settings.childProcessesStatus.NODE)}
+                  title={childProcess.getStatusName(this.props.settings.childProcessesStatus.NODE)}
                 />
                 {t(`Node Log`)}
               </Tab>
               <Tab className={styles.tab}>
                 <i
                   className={this.getChildProcessStatusClassNames('MINER')}
-                  title={getChildProcessStatusName(this.props.settings.childProcessesStatus.MINER)}
+                  title={childProcess.getStatusName(this.props.settings.childProcessesStatus.MINER)}
                 />
                 {t(`Miner Log`)}
               </Tab>
               <Tab className={styles.tab}>
                 <i
                   className={this.getChildProcessStatusClassNames('TOR')}
-                  title={getChildProcessStatusName(this.props.settings.childProcessesStatus.TOR)}
+                  title={childProcess.getStatusName(this.props.settings.childProcessesStatus.TOR)}
                 />
                 {t(`Tor Log`)}
                 </Tab>
                 <Tab className={styles.tab}>
                 <i
                   className={this.getChildProcessStatusClassNames('RESDEX')}
-                  title={getChildProcessStatusName(this.props.settings.childProcessesStatus.RESDEX)}
+                  title={childProcess.getStatusName(this.props.settings.childProcessesStatus.RESDEX)}
                 />
                 {t(`ResDEX Log`)}
               </Tab>

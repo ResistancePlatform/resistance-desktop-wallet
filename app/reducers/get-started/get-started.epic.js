@@ -1,15 +1,22 @@
 // @flow
+import log from 'electron-log'
+import * as fs from 'fs'
+import { promisify } from 'util'
+import path from 'path'
 import config from 'electron-settings'
-import { of, concat, merge } from 'rxjs'
-import { filter, switchMap, take, map, mergeMap, mapTo, catchError, delay } from 'rxjs/operators'
+import { of, concat, from, merge, defer } from 'rxjs'
+import { filter, switchMap, take, map, mergeMap, catchError, delay } from 'rxjs/operators'
 import { remote, ipcRenderer } from 'electron'
 import { ofType } from 'redux-observable'
 import { push } from 'react-router-redux'
 
-import { translate } from '~/i18next.config'
 import { Action } from '../types'
-import { getChildProcessObservable } from '~/utils/child-process'
+import { translate } from '~/i18next.config'
+import { RPC } from '~/constants/rpc'
 import { AUTH } from '~/constants/auth'
+import { verifyDirectoryExistence } from '~/utils/os'
+import { ChildProcessService } from '~/service/child-process-service'
+import { ResistanceService } from '~/service/resistance-service'
 import { RpcService } from '~/service/rpc-service'
 import { Bip39Service } from '~/service/bip39-service'
 import { AuthActions } from '../auth/auth.reducer'
@@ -22,10 +29,13 @@ import { SettingsActions } from '../settings/settings.reducer'
 const t = translate('get-started')
 const bip39 = new Bip39Service()
 const rpc = new RpcService()
+const resistance = new ResistanceService()
+const childProcess = new ChildProcessService()
 
 
 const WelcomeActions = GetStartedActions.welcome
 const unableToStartLocalNodeMessage = t(`Unable to start Resistance local node`)
+
 
 const chooseLanguageEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(GetStartedActions.chooseLanguage),
@@ -50,8 +60,11 @@ const generateWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
  * Create new wallet:
  *   applyConfiguration → encryptWallet → authenticate → walletBootstrappingSucceeded
  *
- * Restore from backup:
+ * Restore from backup (encrypted):
  *   applyConfiguration → restoreWallet → authenticate → changePassword → walletBootstrappingSucceeded
+ *
+ * Restore from backup (unencrypted):
+ *   applyConfiguration → restoreWallet → encryptWallet → authenticate → changePassword → walletBootstrappingSucceeded
  *
  */
 
@@ -72,20 +85,20 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
       path: form.fields.walletPath
     })
 
-    // const nextAction = state.getStarted.isCreatingNewWallet
-    //   ? WelcomeActions.encryptWallet()
-    //   : WelcomeActions.restoreWallet()
+    if (!state.getStarted.isCreatingNewWallet) {
+      return of(WelcomeActions.restoreWallet())
+    }
 
     const nextAction = WelcomeActions.encryptWallet()
 
-    const resDexStartedObservable = getChildProcessObservable({
+    const resDexStartedObservable = childProcess.getObservable({
       processName: 'RESDEX',
       onSuccess: of(nextAction).pipe(delay(20000)),
       onFailure: of(WelcomeActions.walletBootstrappingFailed(t(`Unable to start ResDEX`))),
       action$
     })
 
-    const nodeStartedObservable = getChildProcessObservable({
+    const nodeStartedObservable = childProcess.getObservable({
       processName: 'NODE',
       onSuccess: concat(
         of(WelcomeActions.displayHint(t(`Initializing ResDEX...`))),
@@ -108,9 +121,58 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>, state$) => action
 	ofType(WelcomeActions.restoreWallet),
   switchMap(() => {
     const restoreForm = state$.value.roundedForm.getStartedRestoreYourWallet
+    const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
+    const oldPassword = restoreForm.fields.password || ''
 
-    // Copying the user wallet to Resistance data folder
-    // const newWalletPath = path.join(resistanceService.getWalletPath(), restoreForm.walletName)
+    // 2. Changing the node password to the new one
+    const changePasswordObservable = defer(() => from(rpc.changeWalletPassword(oldPassword, choosePasswordForm.fields.password))).pipe(
+      switchMap(() => of(WelcomeActions.authenticate())),
+      catchError(err => {
+        let errorMessage
+
+        if (err.code === RPC.WALLET_WRONG_ENC_STATE) {
+          return of(WelcomeActions.encryptWallet())
+        }
+
+        if (err.code === RPC.WALLET_PASSPHRASE_INCORRECT) {
+          errorMessage = t(`Invalid backup wallet password, please go back and change it.`)
+        } else {
+          log.error(`Error changing backup wallet password`, err)
+          errorMessage = t(`Can't change the backup wallet password, check the application log for details.`)
+        }
+
+        return of(WelcomeActions.walletBootstrappingFailed(errorMessage))
+      })
+    )
+
+    const nodeStartedObservable = childProcess.getObservable({
+      processName: 'NODE',
+      onSuccess: concat(
+        of(WelcomeActions.displayHint(t(`Changing the wallet password...`))),
+        changePasswordObservable,
+      ),
+      onFailure: of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
+      action$
+    })
+
+    // 1. Copying the user wallet to Resistance data folder
+    const newWalletPath = path.join(resistance.getWalletPath(), `${restoreForm.fields.walletName}.dat`)
+
+
+    const copyPromise = verifyDirectoryExistence(resistance.getWalletPath()).then(() => (
+      promisify(fs.copyFile)(restoreForm.fields.backupFile, newWalletPath)
+    ))
+
+    const copyObservable = from(copyPromise).pipe(
+      switchMap(() => concat(
+        of(WelcomeActions.displayHint(t(`Starting the local node...`))),
+        of(SettingsActions.kickOffChildProcesses()),
+        nodeStartedObservable
+      )),
+      catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.message)))
+    )
+
+    return copyObservable
   })
 )
 
@@ -120,9 +182,9 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
 
     // Wallet encryption shuts the node down, let's start it back up and trigger the next action
-    const nodeStartedObservable = getChildProcessObservable({
+    const nodeStartedObservable = childProcess.getObservable({
       processName: 'NODE',
-      onSuccess: of(WelcomeActions.authenticateAndRestoreWallet()),
+      onSuccess: of(WelcomeActions.authenticate()),
       onFailure: of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
       action$
     })
@@ -138,7 +200,7 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       ))
     )
 
-    const observable = rpc.encryptWallet(choosePasswordForm.fields.password).pipe(
+    const observable = from(rpc.encryptWallet(choosePasswordForm.fields.password)).pipe(
       switchMap(() => nodeShutDownObservable),
       catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.toString())))
     )
@@ -147,34 +209,23 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
   })
 )
 
-const authenticateAndRestoreWalletEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(WelcomeActions.authenticateAndRestoreWallet),
+const authenticateEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(WelcomeActions.authenticate),
   switchMap(() => {
-    const state = state$.value.getStarted
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
-    const nextObservables = [of(AuthActions.loginSucceeded())]
 
-    if (!state.isCreatingNewWallet) {
-      const restoreForm = state$.value.roundedForm.getStartedRestoreYourWallet
-      const keysFilePath = restoreForm.fields.backupFile
+    const nextObservables = [
+      of(AuthActions.loginSucceeded()),
+      of(WelcomeActions.walletBootstrappingSucceeded())
+    ]
 
-      const importPrivateKeysObservable = rpc.importPrivateKeys(keysFilePath).pipe(
-        mapTo(WelcomeActions.walletBootstrappingSucceeded()),
-        catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.message)))
-      )
-
-      nextObservables.push(
-        of(WelcomeActions.displayHint(t(`Restoring the wallet from the private keys...`))),
-        importPrivateKeysObservable
-      )
-    } else {
-      nextObservables.push(of(WelcomeActions.walletBootstrappingSucceeded()))
-    }
-
-    const sendWalletObservable = rpc.sendWalletPassword(choosePasswordForm.fields.password, AUTH.sessionTimeoutSeconds).pipe(
+    const sendWalletObservable = from(rpc.sendWalletPassword(choosePasswordForm.fields.password, AUTH.sessionTimeoutSeconds)).pipe(
       mergeMap(() => concat(...nextObservables)),
-      catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.toString())))
-    )
+      catchError(err => {
+        log.error(`Error sending wallet password`, err)
+        const errorMessage = t(`Error setting the wallet password, check the application log for details.`)
+        return WelcomeActions.walletBootstrappingFailed(errorMessage)
+    }))
 
     return concat(
       of(WelcomeActions.displayHint(t(`Sending the wallet password to the node...`))),
@@ -206,7 +257,7 @@ export const GetStartedEpic = (action$, state$) => merge(
 	applyConfigurationEpic(action$, state$),
   encryptWalletEpic(action$, state$),
   restoreWalletEpic(action$, state$),
-  authenticateAndRestoreWalletEpic(action$, state$),
+  authenticateEpic(action$, state$),
   walletBootstrappingSucceededEpic(action$, state$),
   useResistanceEpic(action$, state$)
 )

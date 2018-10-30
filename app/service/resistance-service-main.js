@@ -5,7 +5,8 @@ import path from 'path'
 import log from 'electron-log'
 import { app, remote } from 'electron'
 
-import { OSService } from './os-service-main'
+import { getOS } from '../utils/os'
+
 
 const generator = require('generate-password')
 const PropertiesReader = require('properties-reader')
@@ -14,8 +15,6 @@ const PropertiesReader = require('properties-reader')
  * ES6 singleton
  */
 let instance = null
-
-const osService = new OSService()
 
 const configFolderName = 'Resistance'
 const configFileName = 'resistance.conf'
@@ -53,7 +52,7 @@ export class ResistanceService {
   getDataPath() {
     const validApp = process.type === 'renderer' ? remote.app : app
     let configFolder = path.join(validApp.getPath('appData'), configFolderName)
-    if (osService.getOS() === 'linux') {
+    if (getOS() === 'linux') {
       configFolder = path.join(validApp.getPath('home'), '.resistance')
     }
     return configFolder

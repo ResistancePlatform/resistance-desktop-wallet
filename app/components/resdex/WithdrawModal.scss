@@ -1,0 +1,32 @@
+@import "~/assets/styles/modal.scss";
+
+$withdrawModalWidth: 26.25rem;
+
+.withdraw {
+  padding: 2rem;
+  width: $withdrawModalWidth;
+
+  .inputsRow {
+    display: flex;
+    .amount {
+      text-align: left;
+    }
+  }
+
+  .caption {
+    color: $BASE_COLOR_FONT_GRAY_2;
+    height: 0.65rem;
+    margin-left: 2rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    user-select: none;
+    cursor: default;
+  }
+
+  button[type='submit'] {
+    margin-top: 0.75rem;
+    float: right;
+  }
+
+}

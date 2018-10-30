@@ -129,15 +129,28 @@ export const preloadedState: State = {
         quoteCurrency: 'DGB',
         bids: [],
         asks: []
-      }
+      },
+      enhancedPrivacy: false,
     },
     orders: {
+      isInitialKickStartDone: false,
+      pendingSwaps: {},
       swapHistory: [],
+      orderModal: {
+        isVisible: false,
+        uuid: null
+      }
     },
     accounts: {
+      transactions: {},
       currencies: {},
       enabledCurrencies: [],
       currencyFees: {},
+      addCurrencyModal: {
+        isInEditMode: false,
+        isVisible: false,
+        symbol: null
+      },
       depositModal: {
         isVisible: false,
         symbol: null
@@ -165,6 +178,9 @@ Object.assign(preloadedState.settings, {
 	language: config.get('language', 'en')
 })
 
+const enabledCurrencies = config.get('resDex.enabledCurrencies', RESDEX.alwaysEnabledCurrencies)
+
 Object.assign(preloadedState.resDex.accounts, {
-  enabledCurrencies: config.get('resDex.enabledCurrencies', RESDEX.alwaysEnabledCurrencies)
+  selectedSymbol: enabledCurrencies[0].symbol,
+  enabledCurrencies,
 })

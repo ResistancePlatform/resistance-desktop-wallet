@@ -11,16 +11,21 @@ import { from, of, Observable } from 'rxjs'
 import { map, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
-import { i18n } from '~/i18next.config'
+import { translate } from '~/i18next.config'
+import { getExportDir, moveFile } from '~/utils/os'
 import { DECIMAL } from '~/constants/decimal'
-import { OSService } from './os-service'
-import { ResistanceService } from './resistance-service'
+import { getStore } from '~/store/configureStore'
 import { AddressBookService } from './address-book-service'
 import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions, Transaction } from '../reducers/overview/overview.reducer'
 import { OwnAddressesActions, AddressRow } from '../reducers/own-addresses/own-addresses.reducer'
 import { SendCashActions } from '~/reducers/send-cash/send-cash.reducer'
 import { AddressBookRecord } from '~/reducers/address-book/address-book.reducer'
+
+
+const t = translate('service')
+
+const addressBookService = new AddressBookService()
 
 /**
  * ES6 singleton
@@ -31,7 +36,7 @@ let clientInstance = null
 /**
  * Create a new resistance client instance.
  */
-const getClientInstance = () => {
+export const getClientInstance = () => {
   if (!clientInstance) {
     const nodeConfig = remote.getGlobal('resistanceNodeConfig')
     let network
@@ -59,10 +64,6 @@ const getClientInstance = () => {
  * @class RpcService
  */
 export class RpcService {
-  osService: OSService
-  resistanceService: ResistanceService
-	addressBookService: AddressBookService
-
 	/**
 	 * Creates an instance of RpcService.
    *
@@ -72,12 +73,6 @@ export class RpcService {
 		if (!instance) {
 			instance = this
 		}
-
-    instance.t = i18n.getFixedT(null, 'service')
-
-		this.osService = new OSService()
-		this.resistanceService = new ResistanceService()
-		this.addressBookService = new AddressBookService()
 
 		return instance
 	}
@@ -89,8 +84,7 @@ export class RpcService {
 	 */
   encryptWallet(password: string) {
     const client = getClientInstance()
-
-    return from(client.command('encryptwallet', password))
+    return client.command('encryptwallet', password)
   }
 
 	/**
@@ -100,10 +94,18 @@ export class RpcService {
 	 */
   sendWalletPassword(password: string, timeoutSec: number) {
     const client = getClientInstance()
-
-    return from(client.command('walletpassphrase', password, timeoutSec))
+    return client.command('walletpassphrase', password, timeoutSec)
   }
 
+	/**
+	 * Encrypts the wallet with a passphrase.
+   *
+	 * @memberof RpcService
+	 */
+  changeWalletPassword(oldPassword: string, newPassword: string) {
+    const client = getClientInstance()
+    return client.command('walletpassphrasechange', oldPassword, newPassword)
+  }
 
 	/**
 	 * Requests Resistance node running status and memory usage.
@@ -115,13 +117,13 @@ export class RpcService {
 
     client.getInfo()
       .then((info: DaemonInfo) => {
-        this.osService.dispatchAction(SystemInfoActions.gotDaemonInfo(info))
+        getStore().dispatch(SystemInfoActions.gotDaemonInfo(info))
         return Promise.resolve()
       })
       .catch(err => {
         // TODO: move the prefix to toastr error title in the epic #114
-        const errorPrefix = this.t(`Unable to get Resistance local node info`)
-        this.osService.dispatchAction(SystemInfoActions.getDaemonInfoFailure(`${errorPrefix}: ${err}`, err.code))
+        const errorPrefix = t(`Unable to get Resistance local node info`)
+        getStore().dispatch(SystemInfoActions.getDaemonInfoFailure(`${errorPrefix}: ${err}`, err.code))
       })
   }
 
@@ -151,13 +153,13 @@ export class RpcService {
     )
     .subscribe(
       (result: Balances) => {
-        this.osService.dispatchAction(OverviewActions.gotWalletInfo(result))
+        getStore().dispatch(OverviewActions.gotWalletInfo(result))
       },
       error => {
         log.debug(`Error fetching the wallet balances: ${error}`)
         // TODO: move the prefix to toastr error title in the epic #114
-        const errorPrefix = this.t(`Unable to get Resistance local node info`)
-        this.osService.dispatchAction(OverviewActions.getWalletInfoFailure(`${errorPrefix}: ${error}`))
+        const errorPrefix = t(`Unable to get Resistance local node info`)
+        getStore().dispatch(OverviewActions.getWalletInfoFailure(`${errorPrefix}: ${error}`))
       }
     )
   }
@@ -188,13 +190,13 @@ export class RpcService {
       .subscribe(
         result => {
           log.debug(`Wallet transactions: ${result}`)
-          this.osService.dispatchAction(OverviewActions.gotTransactionDataFromWallet(result.transactions))
+          getStore().dispatch(OverviewActions.gotTransactionDataFromWallet(result.transactions))
         },
         error => {
           log.debug(`Error fetching wallet transactions: ${error}`)
           // TODO: move the prefix to toastr error title in the epic #114
-          const errorPrefix = this.t(`Unable to get transactions from the wallet`)
-          this.osService.dispatchAction(OverviewActions.getTransactionDataFromWalletFailure(`${errorPrefix}: ${error}`))
+          const errorPrefix = t(`Unable to get transactions from the wallet`)
+          getStore().dispatch(OverviewActions.getTransactionDataFromWalletFailure(`${errorPrefix}: ${error}`))
         }
       )
   }
@@ -224,14 +226,14 @@ export class RpcService {
         log.debug(`Blockchain info: ${result}`)
         blockchainInfo.lastBlockDate = new Date(result.time * 1000)
         blockchainInfo.blockchainSynchronizedPercentage = this.getBlockchainSynchronizedPercentage(blockchainInfo.lastBlockDate)
-        this.osService.dispatchAction(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
+        getStore().dispatch(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
         return Promise.resolve()
       })
       .catch(err => {
         log.debug(`Error fetching the blockchain: ${err}`)
         // TODO: move the prefix to toastr error title in the epic #114
-        const errorPrefix = this.t(`Unable to get blockchain info`)
-        this.osService.dispatchAction(SystemInfoActions.getBlockchainInfoFailure(`${errorPrefix}: ${err}`, err.code))
+        const errorPrefix = t(`Unable to get blockchain info`)
+        getStore().dispatch(SystemInfoActions.getBlockchainInfoFailure(`${errorPrefix}: ${err}`, err.code))
       })
   }
 
@@ -305,14 +307,14 @@ export class RpcService {
 
     command.then(([result])=> {
       if (typeof(result) === 'string') {
-        this.osService.dispatchAction(SendCashActions.sendCashOperationStarted(result))
+        getStore().dispatch(SendCashActions.sendCashOperationStarted(result))
       } else {
-        this.osService.dispatchAction(SendCashActions.sendCashFailure(result.message))
+        getStore().dispatch(SendCashActions.sendCashFailure(result.message))
       }
       return Promise.resolve()
     })
     .catch(err => (
-      this.osService.dispatchAction(SendCashActions.sendCashFailure(err.toString()))
+      getStore().dispatch(SendCashActions.sendCashFailure(err.toString()))
     ))
 	}
 
@@ -407,7 +409,7 @@ export class RpcService {
           const errorMessages = errorAddressItems.map(tempAddressItem => `"${tempAddressItem.errorMessage}"`)
 					const uniqueErrorMessages = Array.from(new Set(errorMessages)).join(', ')
           const errorKey = `Error fetching balances for {{errorCount}} out of {{addressCount}} addresses. Error messages included: {{errorMessages}}.`
-          toastr.error(this.t(`Address balance error`), this.t(errorKey, errorAddressItems.length, addressList.length, uniqueErrorMessages.toString()))
+          toastr.error(t(`Address balance error`), t(errorKey, errorAddressItems.length, addressList.length, uniqueErrorMessages.toString()))
 				}
 
 				if (disableThePrivateAddress) {
@@ -435,9 +437,9 @@ export class RpcService {
 	 */
   requestOwnAddresses() {
     this.getWalletAddressAndBalance(false).subscribe(result => {
-      this.osService.dispatchAction(OwnAddressesActions.gotOwnAddresses(result))
+      getStore().dispatch(OwnAddressesActions.gotOwnAddresses(result))
     }, err => {
-      this.osService.dispatchAction(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
+      getStore().dispatch(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
     })
   }
 
@@ -452,12 +454,12 @@ export class RpcService {
     client.command('z_listoperationids').then(operationIds => (
       client.command('z_getoperationstatus', operationIds)
     )).then(operations => {
-      this.osService.dispatchAction(SystemInfoActions.gotOperations(operations))
+      getStore().dispatch(SystemInfoActions.gotOperations(operations))
       return Promise.resolve()
     }).catch(err => {
       // TODO: move the prefix to toastr error title in the epic #114
-      const errorPrefix = this.t(`Unable to get operations`)
-      return this.osService.dispatchAction(SystemInfoActions.getOperationsFailure(`${errorPrefix}: ${err}`, err.code))
+      const errorPrefix = t(`Unable to get operations`)
+      return getStore().dispatch(SystemInfoActions.getOperationsFailure(`${errorPrefix}: ${err}`, err.code))
     })
   }
 
@@ -564,7 +566,7 @@ export class RpcService {
     const client = getClientInstance()
 
     const importFileName = uuid().replace(/-/g, '')
-    const importFilePath = path.join(this.resistanceService.getExportDir(), importFileName)
+    const importFilePath = path.join(getExportDir(), importFileName)
 
     const observable = from(
       promisify(fs.copyFile)(filePath, importFilePath)
@@ -630,8 +632,8 @@ async function getPublicTransactionsPromise(client: Client) {
     { method: 'listtransactions', parameters: ['', 200] }
   ]
 
-  const noAddressMessage = this.t(`Z address is not listed in the wallet`)
-  const publicAddressMessage = this.t(`R (public)`)
+  const noAddressMessage = t(`Z address is not listed in the wallet`)
+  const publicAddressMessage = t(`R (public)`)
 
   return client.command(command)
     .then(result => result[0])
@@ -729,7 +731,7 @@ function applyAddressBookNamesToTransactions(transactionsPromise) {
           return [result]
         }
 
-        return this.addressBookService.loadAddressBook().pipe(
+        return addressBookService.loadAddressBook().pipe(
           map((addressBookRecords: AddressBookRecord[]) => {
             if (!addressBookRecords.length) {
               return result
@@ -825,9 +827,9 @@ function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise
  */
 function performMergeCoinsCommand(commandPromise: Promise<any>) {
     commandPromise.then((result) => (
-      this.osService.dispatchAction(OwnAddressesActions.mergeCoinsOperationStarted(result.opid))
+      getStore().dispatch(OwnAddressesActions.mergeCoinsOperationStarted(result.opid))
     )).catch(err => (
-      this.osService.dispatchAction(OwnAddressesActions.mergeCoinsFailure(err.toString()))
+      getStore().dispatch(OwnAddressesActions.mergeCoinsFailure(err.toString()))
     ))
 }
 
@@ -841,7 +843,7 @@ function exportFileWithMethod(method, filePath) {
   const client = getClientInstance()
 
   const exportFileName = uuid().replace(/-/g, '')
-  const exportFilePath = path.join(this.resistanceService.getExportDir(), exportFileName)
+  const exportFilePath = path.join(getExportDir(), exportFileName)
 
   return from(
     client.command(method, exportFileName)
@@ -849,7 +851,7 @@ function exportFileWithMethod(method, filePath) {
         if (typeof(result) === 'object' && result.name === 'RpcError') {
           throw new Error(result.message)
         }
-        return this.osService.moveFile(exportFilePath, filePath)
+        return moveFile(exportFilePath, filePath)
       })
   )
 }

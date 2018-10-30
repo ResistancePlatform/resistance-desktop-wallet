@@ -7,21 +7,21 @@
 }
 
 %discButton {
+  cursor: pointer;
   display: inline-block;
   vertical-align: middle;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.2rem;
+  height: 1.2rem;
   border-radius: 50%;
   background: $BASE_COLOR_GRAY_3;
   color: $BASE_COLOR_FONT_GRAY;
+  border: 1px solid $BASE_COLOR_BORDER_GRAY;
 }
 
 %discButton:hover {
-  background: $BASE_COLOR_PURPLE;
-}
-
-%discButton:hover:before {
-  content: '';
+  color: $BASE_COLOR_PURPLE;
+  background-color: #3c396b;
+  border: 1px solid $BASE_COLOR_PURPLE;
 }
 
 %discButton:before {
@@ -29,17 +29,18 @@
 }
 
 .record {
-  border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+  border-bottom: 1px solid $BASE_COLOR_BORDER_BLUE;
 
   %column {
     color: $BASE_COLOR_FONT_GRAY;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     white-space: nowrap;
 
     span {
       color: $BASE_COLOR_WHITE;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       display: block;
+      margin-bottom: 0.3rem;
     }
   }
 }
@@ -48,21 +49,28 @@
   border-bottom: none;
 }
 
-.accountsContainer {
+.enabledCurrenciesContainer {
   @extend %smallContainer;
-  width: 70%;
+  min-width: 15.1875rem;
 
   .record {
+    cursor: pointer;
+    height: 4.1875rem;
+
+    &.selected {
+      background-color: #262e4e;
+    }
+
     .columnsWrapper {
-      padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+      padding: 1rem 1rem 0.2rem 1rem;
       display: flex;
     }
 
-    .account {
-      margin-right: 0.1rem;
+    .currency {
+      margin-right: 0.2rem;
 
       img {
-        width: 1.5rem;
+        width: 1.3rem;
         padding: 0.35rem;
       }
     }
@@ -74,7 +82,8 @@
 
     .equity {
       text-align: right;
-      font-size: 1rem;
+      font-weight: 100;
+      font-size: 0.9rem;
       padding-top: 0.5rem;
 
       i {
@@ -94,9 +103,9 @@
 
       .button:before {
         content: '. . .';
-        font-size: 0.6rem;
-        top: -0.2rem;
-        left: 0.35rem;
+        font-size: 0.5rem;
+        top: -0.32rem;
+        left: 0.29rem;
         font-weight: 600;
       }
     }
@@ -104,59 +113,63 @@
     .rateBar {
       display: block;
       position: relative;
-      width: 100%;
-      margin: 0 0.5rem 0.5rem 0.5rem;
+      width: 14.4rem;
+      margin: 0.2rem 0.4rem 0rem 0.4rem;
 
       div {
-        height: 0.2rem;
-        background: $BASE_COLOR_LIGHT_BLUE;
-        border-radius: 0.15rem;
-
-        &.btc {
-          background: #ffad04;
-        }
-
-        &.ltc {
-          background: #b5b5b5;
-        }
-
-        &.eth {
-          background: #6f7cba;
-        }
-
-        &.etc {
-          background: #59d4af;
-        }
-
-        &.bch {
-          background: #8dc451;
-        }
+        height: 0.17rem;
+        border-radius: 0.05rem;
       }
     }
   }
 
   .addNewCoin {
     color: $BASE_COLOR_FONT_GRAY;
-    padding: 1.5rem;
+    font-size: 0.7rem;
+    padding-left: 1rem;
+    cursor: pointer;
+    outline: none;
 
     .button {
       @extend %discButton;
-      margin-right: 0.8rem;
+      margin-right: 0.5rem;
+      border: 1px solid transparent;
     }
 
     .button:before {
       content: '\e900';
-      font-size: 2rem;
-      top: -0.25rem;
-      left: -0.25rem;
+      font-size: 1.4rem;
+      top: -0.06rem;
+      left: -0.09rem;
     }
+
+    .caption {
+      display: inline-block;
+      line-height: 3.2rem;
+      user-select: none;
+    }
+
+    &:hover {
+      background-color: #262e4e;
+    }
+  }
+
+  .deleteCoin {
+    color: $BASE_COLOR_LIGHT_RED;
   }
 }
 
 .historyContainer {
   @extend %smallContainer;
   width: 100%;
-  margin-left: 2rem;
+  margin-left: 1.5rem;
+
+  .empty {
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 1rem;
+    padding: 1rem;
+    text-align: center;
+  }
 
   .record {
     display: flex;
@@ -164,12 +177,12 @@
 
     .date {
       width: 4rem;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 200;
 
       span {
         color: $BASE_COLOR_PURPLE;
-        font-size: 0.6rem;
+        font-size: 0.57rem;
         text-transform: uppercase;
         display: block;
       }

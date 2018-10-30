@@ -10,7 +10,7 @@ import VLayout from '~/assets/styles/v-box-layout.scss'
 type Props = {
   t: any,
   className?: string,
-  emptyMessage?: string,
+  emptyMessage?: string | false,
   sortKeys?: string[],
   +items: object[],
   +headerRenderer: item => void,

@@ -18,24 +18,26 @@ import { app, ipcMain, BrowserWindow } from 'electron'
 import log from 'electron-log'
 
 import { i18n } from './i18next.config'
-import { OSService } from './service/os-service-main'
+import { getOS, getIsExitForbidden, getAppDataPath, getInstallationPath, getChildProcessesGlobal, stopChildProcesses } from './utils/os'
 import { ResistanceService } from './service/resistance-service-main'
 import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
 
+
+let isExiting = false
+
 // For the module to be imported in main, dirty, remove
-const os = new OSService()
 const resistance = new ResistanceService()
 const fetchParameters = new FetchParametersService()
 
-const appDataPath = os.getAppDataPath()
+const appDataPath = getAppDataPath()
 
 if (!fs.existsSync(appDataPath)) {
   fs.mkdirSync(appDataPath)
 }
 
 log.transports.file.maxSize = 5 * 1024 * 1024
-log.transports.file.file = path.join(os.getAppDataPath(), 'reswallet.log')
+log.transports.file.file = path.join(appDataPath, 'reswallet.log')
 
 let mainWindow = null
 
@@ -105,14 +107,24 @@ const getWindowSize = (isGetStartedComplete: boolean = false) => {
 
 }
 
+// Used to prevent app quit
+global.pendingActivities = { orders: false, operations: false }
+
+global.childProcesses = getChildProcessesGlobal()
 
 // Propagate Resistance node config for the RPC service
 global.resistanceNodeConfig = resistance.checkAndCreateConfig()
+
 // Set ResDEX global var for further use in renderer process, see ./service/resdex/api.js
 // TODO: provide the one decrypted with the password
 
-const seedPhrase =  'jazz calming mantle pit fall alkane koran firework rabin canyons cindy'
-// const seedPhrase = 'treat board tree once reduce reduce expose coil guilt fish flat boil'
+const seedPhrase = (
+  process.env.NODE_ENV === 'development'
+    // Konstantin's seed
+    ? 'treat board tree once reduce reduce expose coil guilt fish flat boil'
+    // Demo seed
+    : 'jazz calming mantle pit fall alkane koran firework rabin canyons cindy'
+)
 
 global.resDex = {
   apiToken: crypto.createHash('sha256').update(seedPhrase).digest('hex'),
@@ -129,17 +141,30 @@ checkAndCreateWalletAppFolder()
  */
 
 app.on('window-all-closed', () => {
-  // Respect the OSX convention of having the application in memory even
-  // after all windows have been closed
-  if (process.platform !== 'darwin') {
+  // Closing main application window just hides it on Macs
+  if (getOS() !== 'macos') {
     app.quit()
   }
 })
 
 app.on('ready', async () => {
-  app.on('before-quit', () => {
+  app.on('activate', () => {
+    if (getOS() === 'macos') {
+      mainWindow.show()
+    }
+  })
+
+  app.on('before-quit', event => {
+    isExiting = true
+
+    // Closing a window just hides it on Macs
+    if (getOS() === 'macos' && getIsExitForbidden(mainWindow)) {
+      event.preventDefault()
+      return
+    }
+
     log.info(`Killing all child processes...`)
-    os.stopChildProcesses()
+    stopChildProcesses()
     log.info(`Done`)
   })
 
@@ -151,9 +176,9 @@ app.on('ready', async () => {
   }
 
   let iconFileName = 'icon.png'
-  if (os.getOS() === 'macos') {
+  if (getOS() === 'macos') {
     iconFileName = 'icon.icns'
-  } else if (os.getOS() === 'windows') {
+  } else if (getOS() === 'windows') {
     iconFileName = 'icon.ico'
   }
 
@@ -162,7 +187,7 @@ app.on('ready', async () => {
     show: false,
     frame: false,
     backgroundColor: '#1d2440',
-    icon: path.join(os.getInstallationPath(), 'resources', `${iconFileName}`)
+    icon: path.join(getInstallationPath(), 'resources', `${iconFileName}`)
   })
 
   const menuBuilder = new MenuBuilder(mainWindow)
@@ -230,6 +255,19 @@ app.on('ready', async () => {
     mainWindow.setResizable(windowSize.resizable)
     mainWindow.setMinimumSize(windowSize.minWidth, windowSize.minHeight)
     mainWindow.setSize(windowSize.width, windowSize.height)
+  })
+
+  mainWindow.on('close', event => {
+    if (getOS() === 'macos') {
+
+      if (!isExiting) {
+        event.preventDefault()
+        mainWindow.hide()
+      }
+
+    } else if (getIsExitForbidden(mainWindow)) {
+      event.preventDefault()
+    }
   })
 
   mainWindow.on('closed', () => {

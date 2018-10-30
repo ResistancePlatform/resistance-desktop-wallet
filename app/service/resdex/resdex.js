@@ -1,14 +1,21 @@
 // @flow
+import log from 'electron-log'
 import os from 'os'
 import path from 'path'
+import rp from 'request-promise-native'
 import { remote } from 'electron'
-import log from 'electron-log'
 
-import { OSService } from '../os-service'
+import { resDexUri } from '~/service/resdex/api'
+import { getStore } from '~/store/configureStore'
+import { getAppDataPath, verifyDirectoryExistence } from '~/utils/os'
+import { ChildProcessService } from '../child-process-service'
 import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 
 const netId = 2045
 const rpcPort = 17445
+
+// const seedNodeAddress = '34.201.64.15'
+// const seedNodeAddress = '34.207.111.158'
 const seedNodeAddress = '35.174.118.206'
 
 
@@ -17,7 +24,7 @@ const seedNodeAddress = '35.174.118.206'
  */
 let instance = null
 
-const osService = new OSService()
+const childProcess = new ChildProcessService()
 
 /**
  * @export
@@ -42,7 +49,7 @@ export class ResDexService {
    *
 	 * @memberof ResDexService
 	 */
-  start(seedPhrase) {
+  async start(seedPhrase) {
     const currenciesWithoutElectrum = supportedCurrencies.map(currency => {
       const result = {...currency}
       delete result.electrumServers
@@ -61,13 +68,22 @@ export class ResDexService {
       coins: currenciesWithoutElectrum,
     }
 
-    const resDexDir = path.join(osService.getAppDataPath(), 'ResDEX')
+    const resDexDir = path.join(getAppDataPath(), 'ResDEX')
 
-    osService.verifyDirectoryExistence(resDexDir).then(() => (
-      osService.execProcess('RESDEX', [JSON.stringify(options)], this::handleStdout, { cwd: resDexDir })
-    )).catch(err => {
-      const actions = osService.getSettingsActions()
-      osService.dispatchAction(actions.childProcessFailed('RESDEX', err.toString()))
+    try {
+      await verifyDirectoryExistence(resDexDir)
+    } catch(err) {
+      log.error(`Can't create ResDEX directory`, err)
+      const actions = childProcess.getSettingsActions()
+      getStore().dispatch(actions.childProcessFailed('RESDEX', err.message))
+      return
+    }
+
+    await childProcess.execProcess({
+      processName: 'RESDEX',
+      args: [JSON.stringify(options)],
+      waitUntilReady: childProcess.createReadinessWaiter(this::checkApiAvailability),
+      spawnOptions: { cwd: resDexDir }
     })
 
 	}
@@ -77,13 +93,23 @@ export class ResDexService {
    *
 	 * @memberof ResDexService
 	 */
-	stop() {
-    osService.killProcess('RESDEX')
+	async stop() {
+    await childProcess.killProcess('RESDEX')
 	}
 
 }
 
-function handleStdout(data: Buffer) {
-  // API enabled at unixtime
-  return data.toString().includes(`ResDEX Marketmaker`)
+async function checkApiAvailability() {
+  log.debug(`Checking if resdex API is ready`)
+
+  try {
+    const response = await rp({
+      uri: resDexUri,
+      resolveWithFullResponse: true,
+    })
+    return response.statusCode === 200
+  } catch (err) {
+    return false
+  }
+
 }

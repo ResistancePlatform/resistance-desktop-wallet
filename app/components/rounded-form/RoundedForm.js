@@ -153,7 +153,13 @@ class RoundedForm extends Component<Props> {
     return this.mapChildrenRecursively(this.props.children, child => {
 
       // Handle form submission
-      if ((child.type === 'button' || child.props.role === 'button') && child.props.type === 'submit') {
+      const isButton = (
+        child.type === 'button'
+        || child.props.role === 'button'
+        || child.type.displayName === 'RoundedButton'
+      )
+
+      if (isButton && child.props.type === 'submit') {
         return React.cloneElement(child, {
           onClick: this.onSubmitHandler(child.props.onClick),
           onKeyDown: this.onSubmitHandler(child.props.onKeyDown)

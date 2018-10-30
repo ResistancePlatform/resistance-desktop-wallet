@@ -7,12 +7,12 @@ import * as Joi from 'joi'
 
 import { getWalletNameJoi } from '~/utils/get-started'
 import { ResistanceService } from '~/service/resistance-service'
-import RoundedInput from '~/components/rounded-form/RoundedInput'
+import RoundedInput from '~/components/rounded-form/NewRoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
-import styles from './GetStarted.scss'
+import styles from './CreateNewWallet.scss'
 
 const resistance = new ResistanceService()
 
@@ -65,16 +65,31 @@ export class CreateNewWallet extends Component<Props> {
 
         <div className={styles.innerContainer}>
           <RoundedForm id="getStartedCreateNewWallet" schema={validationSchema}>
-            <RoundedInput name="walletName" label={t(`Wallet name`)} defaultValue={userInfo().username} />
+
+            <RoundedInput
+              name="walletName"
+              label={t(`Wallet name`)}
+              labelClassName={styles.inputLabel}
+              defaultValue={userInfo().username}
+            />
 
             <RoundedInput
               name="walletPath"
               label={t(`Your wallet stored in`)}
+              labelClassName={styles.inputLabel}
               defaultValue={resistance.getWalletPath()}
-              readOnly />
+              readOnly
+            />
 
             <NavLink className={styles.prevLink} to="/get-started/get-started" />
-            <NavLink className={styles.nextLink} type="submit" role="button" to="/get-started/choose-password" />
+
+            <NavLink
+              className={styles.nextLink}
+              type="submit"
+              role="button"
+              to="/get-started/choose-password"
+            />
+
           </RoundedForm>
         </div>
 

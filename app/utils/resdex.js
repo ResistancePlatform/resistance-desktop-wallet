@@ -1,8 +1,10 @@
-import { Decimal } from 'decimal.js'
 import coinlist from 'coinlist'
 
-import { RESDEX } from '~/constants/resdex'
+import { translate } from '../i18next.config'
 import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
+
+
+const t = translate('resdex')
 
 // const getCurrencySymbols = () => (
 // 	_(supportedCurrencies)
@@ -12,6 +14,15 @@ import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 // 		.orderBy()
 // 		.value()
 // )
+
+const getOrderStatusName = (status: string) => ({
+  pending: t(`Pending`),
+  completed: t(`Completed`),
+  matched: t(`Matched`),
+  swapping: t(`Swapping`),
+  unmatched: t(`Unmatched`),
+  failed: t(`Failed`),
+}[status] || status)
 
 const getCurrency = symbol => supportedCurrencies.find(currency => currency.coin === symbol)
 
@@ -30,17 +41,11 @@ const isEtomic = symbol => {
 	return currency.etomic
 }
 
-const calculateMaxTotalPayout = (quoteAmount, price, quoteFee) => {
-  const dexFee = RESDEX.dexFee.div(Decimal('100'))
-  const divider = price.plus(price.times(dexFee)).plus(quoteFee)
-  return quoteAmount.dividedBy(divider)
-}
-
 
 export {
 	// getCurrencySymbols,
+  getOrderStatusName,
 	getCurrencyName,
 	getCurrency,
   isEtomic,
-  calculateMaxTotalPayout,
 }

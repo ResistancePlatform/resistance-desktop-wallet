@@ -1,0 +1,54 @@
+@import "~/assets/styles/modal.scss";
+
+$addCurrencyModalWidth: 20rem;
+
+.addCurrency {
+  padding: 2rem;
+  width: $addCurrencyModalWidth - 2 * 2rem;
+  height: 21.875rem - 2 * 2rem;
+
+  .toggleContainer {
+    margin: 0.1rem 1rem 0.3rem 1rem;
+    display: flex;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: $BASE_COLOR_FONT_GRAY;
+
+    > div {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .label {
+      padding-bottom: 0.75rem;
+    }
+
+    .active {
+      color: $BASE_COLOR_WHITE;
+    }
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid $BASE_COLOR_BORDER_GRAY;
+    margin: 0.2rem 0 0.9rem 0;
+  }
+
+  .memo {
+    font-size: 0.63rem;
+    font-weight: 100;
+    color: $BASE_COLOR_FONT_GRAY_2;
+    margin-bottom: 1rem;
+
+    strong {
+      font-weight: 100;
+      color: $BASE_COLOR_WHITE;
+    }
+  }
+
+  button {
+    float: right;
+  }
+
+}
