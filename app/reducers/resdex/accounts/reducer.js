@@ -91,6 +91,7 @@ export const ResDexAccountsReducer = handleActions(
     }),
     [ResDexAccountsActions.showEditCurrencyModal]: (state, action) => ({
       ...state,
+      selectedSymbol: action.payload.symbol,
       addCurrencyModal: {
         isInEditMode: true,
         defaultValues: action.payload,

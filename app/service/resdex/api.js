@@ -115,9 +115,18 @@ export class ResDexApiService {
     })
 
     if (response.length && response[0].tx_hash) {
+      return []
+
+      /*
+       * Commented out for now,
+       * see https://github.com/ResistancePlatform/resistance-desktop-wallet/issues/213
+       *
+
       const txids = response.map(item => item.tx_hash)
       const rawTransactions = await this::fetchTransactionsForAddress(coin, address, txids)
       return rawTransactions
+
+      */
     }
 
     const result = response.map(transaction => ({

@@ -218,8 +218,9 @@ class ResDexAccounts extends Component<Props> {
 
 		return (
       <div className={cn(styles.container)}>
+
         <RpcPolling
-          interval={1.0 * 60}
+          interval={5.0 * 60}
           criticalChildProcess="RESDEX"
           actions={{
             polling: ResDexAccountsActions.getTransactions,
