@@ -38,7 +38,7 @@ export const ResDexAccountsActions = createActions(
     DELETE_CURRENCY: (symbol: string) => ({ symbol }),
     SHOW_DEPOSIT_MODAL: (symbol: string) => ({ symbol }),
     SHOW_WITHDRAW_MODAL: (symbol: string) => ({ symbol }),
-    SHOW_EDIT_CURRENCY_MODAL: (symbol: string) => ({ symbol }),
+    SHOW_EDIT_CURRENCY_MODAL: (currency: object) => currency,
     SHOW_ADD_CURRENCY_MODAL: undefined,
     CLOSE_DEPOSIT_MODAL: undefined,
     CLOSE_WITHDRAW_MODAL: undefined,
@@ -93,7 +93,7 @@ export const ResDexAccountsReducer = handleActions(
       ...state,
       addCurrencyModal: {
         isInEditMode: true,
-        symbol: action.payload.symbol,
+        defaultValues: action.payload,
         isVisible: true
       }
     }),
@@ -101,7 +101,11 @@ export const ResDexAccountsReducer = handleActions(
       ...state,
       addCurrencyModal: {
         isInEditMode: false,
-        symbol: null,
+        defaultValues: {
+          symbol: null,
+          rpcPort: null,
+          useElectrum: true
+        },
         isVisible: true
       }
     }),
@@ -119,6 +123,14 @@ export const ResDexAccountsReducer = handleActions(
     }),
     [ResDexAccountsActions.closeAddCurrencyModal]: state => ({
       ...state,
-      addCurrencyModal: { isInEditMode: false, isVisible: false, symbol: null }
+      addCurrencyModal: {
+        isInEditMode: false,
+        isVisible: false,
+        defaultValues: {
+          symbol: null,
+          rpcPort: null,
+          useElectrum: true
+        },
+      }
     }),
   }, preloadedState)

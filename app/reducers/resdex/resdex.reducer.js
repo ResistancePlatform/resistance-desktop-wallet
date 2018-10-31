@@ -76,7 +76,11 @@ export type ResDexState = {
     addCurrencyModal: {
       isInEditMode: boolean,
       isVisible: boolean,
-      symbol: string | null
+      defaultValues: {
+        symbol: string | null,
+        rpcPort: number | null,
+        useElectrum: boolean
+      }
     },
     depositModal: {
       isVisible: boolean,

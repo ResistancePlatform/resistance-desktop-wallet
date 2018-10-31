@@ -5,6 +5,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
+import { translate } from '~/i18next.config'
 import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 import { getCurrencyName } from '~/utils/resdex'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
@@ -14,6 +15,8 @@ import GenericInput, { GenericInputProps } from './GenericInput'
 
 import styles from './ChooseCurrencyInput.scss'
 
+
+const t = translate('resdex')
 
 export type ChooseCurrencyInputProps = {
   ...GenericInputProps,
@@ -34,15 +37,15 @@ class ChooseCurrencyInput extends GenericInput {
       .map(currency => currency.coin)
       .filter(symbol => !props.excludeSymbols.includes(symbol))
       .sort()
-
-    this.state.value = props.defaultValue || this.symbols.slice().shift()
 	}
 
   renderInput() {
     return (
       <div className={styles.currency}>
         <CurrencyIcon className={styles.icon} symbol={this.state.value} size="1.1rem" />
-        <div className={styles.name}>{getCurrencyName(this.state.value)}</div>
+        <div className={styles.name}>
+          {this.state.value ? getCurrencyName(this.state.value) : t(`Choose a currency`)}
+        </div>
       </div>
     )
   }

@@ -9,6 +9,9 @@ const customIcons = require.context('~/assets/images/resdex/custom-cryptocurrenc
 const CurrencyIcon = ({symbol, size, ...props}) => {
 
   const findIcon = context => {
+    if (!symbol) {
+      return genericIcon
+    }
     const lowerCasedSymbol = symbol.toLowerCase()
     const iconKey = context.keys().find(key => key.toLowerCase().includes(lowerCasedSymbol))
     return iconKey ? context(iconKey) : null

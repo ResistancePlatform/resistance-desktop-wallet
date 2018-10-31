@@ -117,8 +117,6 @@ export class ResDexApiService {
     if (response.length && response[0].tx_hash) {
       const txids = response.map(item => item.tx_hash)
       const rawTransactions = await this::fetchTransactionsForAddress(coin, address, txids)
-
-      log.debug('rawTransactions', JSON.stringify(rawTransactions))
       return rawTransactions
     }
 
@@ -144,7 +142,7 @@ export class ResDexApiService {
     return this.query({ method: 'portfolio' })
   }
 
-  async enableCurrency(symbol: string) {
+  async enableCurrency(symbol: string, useElectrum: boolean = true) {
 		const currency = getCurrency(symbol)
 
 		if (!currency) {
@@ -152,7 +150,7 @@ export class ResDexApiService {
       return
 		}
 
-		if (currency.electrumServers) {
+		if (useElectrum && currency.electrumServers) {
 			const queries = currency.electrumServers.map(server => this.query({
 				method: 'electrum',
 				coin: symbol,
@@ -174,6 +172,13 @@ export class ResDexApiService {
 		const response = await this.query({ method: 'enable', coin: symbol })
 		return response.status === 'active'
   }
+
+  disableCurrency(coin: string) {
+		return this.query({
+			method: 'disable',
+			coin,
+		})
+	}
 
 	async getOrderBook(base, rel) {
 		const response = await this.query({

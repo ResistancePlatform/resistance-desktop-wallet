@@ -149,7 +149,11 @@ export const preloadedState: State = {
       addCurrencyModal: {
         isInEditMode: false,
         isVisible: false,
-        symbol: null
+        defaultValues: {
+          symbol: null,
+          useElectrum: true,
+          rpcPort: null
+        }
       },
       depositModal: {
         isVisible: false,

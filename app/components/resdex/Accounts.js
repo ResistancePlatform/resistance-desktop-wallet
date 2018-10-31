@@ -8,7 +8,7 @@ import { translate } from 'react-i18next'
 import cn from 'classnames'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
-import { getSortedCurrencies, getCurrencyName } from '~/utils/resdex'
+import { getSortedCurrencies, getCurrency, getCurrencyName } from '~/utils/resdex'
 import { toDecimalPlaces } from '~/utils/decimal'
 import { RESDEX } from '~/constants/resdex'
 import { PopupMenuState, PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
@@ -41,6 +41,16 @@ type Props = {
  */
 class ResDexAccounts extends Component<Props> {
 	props: Props
+
+  getCurrencyConfig(symbol: string): object {
+    const { enabledCurrencies } = this.props.accounts
+    const currency = enabledCurrencies.find(item => item.symbol === symbol)
+
+    return {
+      ...currency,
+      rpcPort: currency.rpcPort || getCurrency(symbol).rpcport || null
+    }
+  }
 
   getPopupMenuSymbol(): string | null {
     const popupMenu = this.props.popupMenu[enabledCurrencyPopupMenuId]
@@ -268,7 +278,10 @@ class ResDexAccounts extends Component<Props> {
           >
             {t(`Copy smart address`)}
           </PopupMenuItem>
-          <PopupMenuItem onClick={(e, clickedSymbol) => this.props.actions.showEditCurrencyModal(clickedSymbol)}>
+          <PopupMenuItem
+            onClick={(e, clickedSymbol) => this.props.actions.showEditCurrencyModal(this.getCurrencyConfig(clickedSymbol))}
+            disabled={this.getPopupMenuSymbol() === 'RES'}
+          >
             {t(`Edit coin`)}
           </PopupMenuItem>
           <PopupMenuItem

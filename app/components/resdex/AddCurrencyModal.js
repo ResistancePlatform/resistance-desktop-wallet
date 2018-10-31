@@ -20,9 +20,9 @@ import styles from './AddCurrencyModal.scss'
 
 
 const getValidationSchema = t => Joi.object().keys({
-  symbol: Joi.string().required(),
+  symbol: Joi.string().required().label(t(`Coin`)),
   useElectrum: Joi.boolean().required(),
-  rpcPort: Joi.number().min(1024).max(65535).optional().label(t(`RPC port`)),
+  rpcPort: Joi.number().min(1).max(65535).optional().label(t(`RPC port`)),
 })
 
 type Props = {
@@ -42,14 +42,11 @@ class AddCurrencyModal extends Component<Props> {
 	render() {
     const { t } = this.props
 
-    const { enabledCurrencies, addCurrencyModal } = this.props.accounts
-    const { isInEditMode, symbol } = addCurrencyModal
-
-    const enabledCurrency = enabledCurrencies.find(currency => currency.symbol === symbol)
-    const useElectrum = isInEditMode && enabledCurrency ? enabledCurrency.useElectrum : true
+    const { enabledCurrencies } = this.props.accounts
+    const { defaultValues, isInEditMode } = this.props.accounts.addCurrencyModal
 
     const { fields } = this.props.form || {}
-    // const { address } = this.props.accounts.currencies[symbol]
+    const isUseElectrumEnabled = fields && fields.useElectrum || defaultValues.useElectrum
 
     return (
       <div className={styles.overlay}>
@@ -72,29 +69,29 @@ class AddCurrencyModal extends Component<Props> {
         >
           <ChooseCurrencyInput
             name="symbol"
-            defaultValue={symbol}
+            defaultValue={defaultValues.symbol}
             label={t(`Coin`)}
             excludeSymbols={enabledCurrencies.map(currency => currency.symbol)}
             disabled={isInEditMode}
           />
 
           <div className={styles.toggleContainer}>
-            <div className={cn(styles.label, {[styles.active]: !useElectrum})}>{t(`Native`)}</div>
+            <div className={cn(styles.label, {[styles.active]: !isUseElectrumEnabled})}>{t(`Native`)}</div>
 
             <ToggleButton
               name="useElectrum"
-              defaultValue={useElectrum}
+              defaultValue={defaultValues.useElectrum}
             />
 
-            <div className={cn(styles.label, {[styles.active]: useElectrum})}>{t(`Electrum`)}</div>
+            <div className={cn(styles.label, {[styles.active]: isUseElectrumEnabled})}>{t(`Electrum`)}</div>
           </div>
 
           <RoundedInput
             name="rpcPort"
-            defaultValue={isInEditMode && enabledCurrency ? enabledCurrency.port : ''}
+            defaultValue={defaultValues.rpcPort}
             type="number"
             label={t(`RPC port`)}
-            disabled={fields && fields.useElectrum}
+            disabled
           />
 
           <hr />
