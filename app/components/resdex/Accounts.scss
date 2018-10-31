@@ -2,7 +2,6 @@
 @import "./ResDex.scss";
 
 .container {
-  display: flex;
   margin: 1.5rem;
 }
 
@@ -52,6 +51,7 @@
 .enabledCurrenciesContainer {
   @extend %smallContainer;
   min-width: 15.1875rem;
+  float: left;
 
   .record {
     cursor: pointer;
@@ -129,6 +129,7 @@
     padding-left: 1rem;
     cursor: pointer;
     outline: none;
+    height: 3.3rem;
 
     .button {
       @extend %discButton;
@@ -157,22 +158,35 @@
 
 .historyContainer {
   @extend %smallContainer;
-  width: 100%;
-  margin-left: 1.5rem;
+  margin-left: 16.5rem;
+  text-align: center;
 
-  .empty, .loading {
-    color: $BASE_COLOR_FONT_GRAY;
-    font-size: 1rem;
-    padding: 1rem;
+  .loadingContainer, .empty {
     text-align: center;
+    font-size: 1rem;
+    color: $BASE_COLOR_FONT_GRAY;
+    padding: 1rem;
+    height: 1.3rem;
 
-    img {
-      width: 1rem;
-      margin-right: 0.2rem;
+    .loading {
+      display: inline-block;
+      white-space: nowrap;
+
+      img {
+        float: left;
+        width: 1rem;
+        margin-right: 0.4rem;
+      }
+
+      div {
+        line-height: 1rem;
+        margin-right: 1.4rem;
+      }
     }
   }
 
   .record {
+    text-align: left;
     display: flex;
     padding: 1.5rem;
 

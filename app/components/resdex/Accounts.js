@@ -7,6 +7,7 @@ import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 
+import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { getSortedCurrencies, getCurrencyName } from '~/utils/resdex'
 import { toDecimalPlaces } from '~/utils/decimal'
 import { RESDEX } from '~/constants/resdex'
@@ -207,6 +208,16 @@ class ResDexAccounts extends Component<Props> {
 
 		return (
       <div className={cn(styles.container)}>
+        <RpcPolling
+          interval={1.0 * 60}
+          criticalChildProcess="RESDEX"
+          actions={{
+            polling: ResDexAccountsActions.getTransactions,
+            success: ResDexAccountsActions.gotCurrencyTransactions,
+            failure: ResDexAccountsActions.getTransactionsFailed
+          }}
+        />
+
         <div className={styles.enabledCurrenciesContainer}>
           {sortedCurrencies.map(currency => this.getEnabledCurrencyContents(t, currency.symbol, totalEquity))}
 
@@ -225,9 +236,13 @@ class ResDexAccounts extends Component<Props> {
 
         <div className={styles.historyContainer}>
           {transactions === null &&
-            <div className={styles.loading}>
-              <img src={animatedSpinner} alt={t(`Loading transactions...`)} />
-              {t(`Loading transactions for {{currency}}...`, { currency: getCurrencyName(selectedSymbol) })}
+            <div className={styles.loadingContainer}>
+              <div className={styles.loading}>
+                <img src={animatedSpinner} alt={t(`Loading transactions...`)} />
+                <div>
+                  {t(`Loading transactions for {{currency}}...`, { currency: getCurrencyName(selectedSymbol) })}
+                </div>
+              </div>
             </div>
           }
 

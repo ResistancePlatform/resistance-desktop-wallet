@@ -72,16 +72,6 @@ export class ResDex extends Component<Props> {
           }}
         />
 
-        <RpcPolling
-          interval={1.0 * 60}
-          criticalChildProcess="RESDEX"
-          actions={{
-            polling: ResDexAccountsActions.getTransactions,
-            success: ResDexAccountsActions.gotCurrencyTransactions,
-            failure: ResDexAccountsActions.getTransactionsFailed
-          }}
-        />
-
         {this.props.resDex.accounts.depositModal.isVisible &&
           <DepositModal />
         }
