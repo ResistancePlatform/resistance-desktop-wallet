@@ -6,7 +6,6 @@ export const ResDexOrdersActions = createActions(
   {
     EMPTY: undefined,
 
-    INIT_SWAP_HISTORY: undefined,
     GET_SWAP_HISTORY: undefined,
     GOT_SWAP_HISTORY: swapHistory => ({ swapHistory }),
 

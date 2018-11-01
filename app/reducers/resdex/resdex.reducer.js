@@ -34,6 +34,8 @@ export type ResDexState = {
   },
   login: {
     isRequired: boolean,
+    isInProgress: boolean,
+    defaultPortfolioId: string | null,
     portfolios: Portfolio[]
   },
   assets: {
@@ -96,10 +98,6 @@ export type ResDexState = {
 export const ResDexActions = createActions(
   {
     EMPTY: undefined,
-
-    START_RESDEX: undefined,
-    STOP_RESDEX: undefined,
-
     SELECT_TAB: index => ({ index }),
   },
   {

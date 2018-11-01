@@ -27,7 +27,7 @@ const generateId = name => `${slugify(name).slice(0, 40)}-${randomString(6)}`
 
 class IncorrectPasswordError extends Error {
 	constructor() {
-		super(t(`Incorrect password`))
+		super(t(`Incorrect ResDEX password`))
 		Error.captureStackTrace(this, IncorrectPasswordError)
 	}
 }
@@ -62,7 +62,7 @@ export class ResDexPortfolioService {
     const portfolio = {
       name,
       encryptedSeedPhrase: await iocane.encrypt(seedPhrase, password),
-      appVersion: app.getVersion(),
+      appVersion: remote.app.getVersion(),
     }
 
     await writeJsonFile(filePath, portfolio)

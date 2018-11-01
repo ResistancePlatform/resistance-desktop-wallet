@@ -16,6 +16,7 @@ export type GenericInputProps = {
 	label?: string,
 	onChange?: value => void,
   error?: string | null,
+  large?: boolean,
 	children: any
 }
 
@@ -87,7 +88,10 @@ export default class GenericInput extends GenericControl {
           className={cn(
             this.props.className,
             genericStyles.container,
-            { [genericStyles.hasError]: Boolean(this.props.error) }
+            {
+              [genericStyles.hasError]: Boolean(this.props.error),
+              [genericStyles.large]: this.props.large
+            }
           )}
         >
 

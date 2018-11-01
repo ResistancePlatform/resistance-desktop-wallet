@@ -23,7 +23,6 @@ import styles from './ResDex.scss'
 
 type Props = {
   resDex: ResDexState,
-  ordersActions: object,
   actions: object
 }
 
@@ -34,16 +33,6 @@ type Props = {
  */
 export class ResDex extends Component<Props> {
 	props: Props
-
-	/**
-   * Initiates swap history fetching.
-   *
-	 * @returns
-   * @memberof ResDex
-	 */
-  componentDidMount() {
-    this.props.ordersActions.initSwapHistory()
-  }
 
 	/**
 	 * @returns

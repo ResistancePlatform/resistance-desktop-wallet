@@ -9,7 +9,6 @@ import { ofType } from 'redux-observable'
 import { actions as toastrActions } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
-import { getStore } from '~/store/configureStore'
 import { SwapDBService } from '~/service/resdex/swap-db'
 import { ResDexApiService } from '~/service/resdex/api'
 import { ResDexOrdersActions } from './reducer'
@@ -55,20 +54,6 @@ const kickStartStuckSwapsEpic = (action$: ActionsObservable<Action>, state$) => 
     )
 
     return observable
-  })
-)
-
-const initSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(ResDexOrdersActions.initSwapHistory),
-  map(() => {
-    const store = getStore()
-
-    swapDB.on('change', () => {
-      store.dispatch(ResDexOrdersActions.getSwapHistory())
-    })
-
-    api.enableSocket()
-    return ResDexOrdersActions.getSwapHistory()
   })
 )
 
@@ -148,6 +133,5 @@ const cleanupPendingSwapsEpic = (action$: ActionsObservable<Action>, state$) => 
 export const ResDexOrdersEpic = (action$, state$) => merge(
   cleanupPendingSwapsEpic(action$, state$),
   kickStartStuckSwapsEpic(action$, state$),
-  initSwapHistoryEpic(action$, state$),
   getSwapHistoryEpic(action$, state$),
 )

@@ -19,9 +19,12 @@ import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 const t = translate('resdex')
 const api = new ResDexApiService()
 
-const enableCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(ResDexAccountsActions.enableCurrencies),
+const initCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(ResDexAccountsActions.initCurrencies),
   switchMap(() => {
+    log.debug('Initializing currencies')
+    api.enableSocket()
+
     const { enabledCurrencies } = state$.value.resDex.accounts
 
     const symbols = enabledCurrencies.map(currency => currency.symbol)
@@ -307,7 +310,7 @@ const closeAddCurrencyModalEpic = (action$: ActionsObservable<any>) => action$.p
 )
 
 export const ResDexAccountsEpic = (action$, state$) => merge(
-  enableCurrenciesEpic(action$, state$),
+  initCurrenciesEpic(action$, state$),
   getCurrenciesEpic(action$, state$),
   getCurrenciesFailedEpic(action$, state$),
   getTransactionsEpic(action$, state$),

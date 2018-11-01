@@ -113,7 +113,9 @@ export const preloadedState: State = {
       selectedTabIndex: 0,
     },
     login: {
-      isRequired: false,
+      isRequired: true,
+      isInProgress: false,
+      defaultPortfolioId: null,
       portfolios: [],
     },
     assets: {
@@ -182,9 +184,14 @@ Object.assign(preloadedState.settings, {
 	language: config.get('language', 'en')
 })
 
+Object.assign(preloadedState.resDex.login, {
+  defaultPortfolioId: config.get('resDex.defaultPortfolioId', null)
+})
+
 const enabledCurrencies = config.get('resDex.enabledCurrencies', RESDEX.alwaysEnabledCurrencies)
 
 Object.assign(preloadedState.resDex.accounts, {
   selectedSymbol: enabledCurrencies[0].symbol,
   enabledCurrencies,
 })
+

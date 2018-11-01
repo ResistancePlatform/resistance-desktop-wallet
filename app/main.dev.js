@@ -114,22 +114,7 @@ global.childProcesses = getChildProcessesGlobal()
 
 // Propagate Resistance node config for the RPC service
 global.resistanceNodeConfig = resistance.checkAndCreateConfig()
-
-// Set ResDEX global var for further use in renderer process, see ./service/resdex/api.js
-// TODO: provide the one decrypted with the password
-
-const seedPhrase = (
-  process.env.NODE_ENV === 'development'
-    // Konstantin's seed
-    ? 'treat board tree once reduce reduce expose coil guilt fish flat boil'
-    // Demo seed
-    : 'jazz calming mantle pit fall alkane koran firework rabin canyons cindy'
-)
-
-global.resDex = {
-  apiToken: crypto.createHash('sha256').update(seedPhrase).digest('hex'),
-  seedPhrase,
-}
+global.resDex = { apiToken: '' }
 
 checkAndCreateWalletAppFolder()
 

@@ -21,7 +21,7 @@ export const ResDexAccountsActions = createActions(
   {
     EMPTY: undefined,
 
-    ENABLE_CURRENCIES: undefined,
+    INIT_CURRENCIES: (walletPassword: string) => ({ walletPassword }),
     GOT_CURRENCY_FEES: fees => ({ fees }),
 
     GET_CURRENCIES: undefined,

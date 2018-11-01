@@ -24,13 +24,13 @@ $TOP_BAR_HEIGHT: 5rem;
 
 .topBarButtonContainer {
   text-align: right;
-}
 
-button {
+  button {
     margin-left: 0.5rem;
 
     @include roundedButton(true);
     cursor: pointer;
+  }
 }
 
 .addIcon {

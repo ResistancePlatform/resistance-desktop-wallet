@@ -8,7 +8,7 @@ import genericStyles from './GenericControl.scss'
 export type GenericProps = {
   className?: string,
 	disabled?: boolean,
-  tooltip?: string
+  tooltip?: string | null
 }
 
 export default class GenericControl extends Component<Props> {

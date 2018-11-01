@@ -11,6 +11,7 @@ import { getOrderStatusName } from '~/utils/resdex'
 import { toDecimalPlaces } from '~/utils/decimal'
 import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
+import { RoundedButton } from '~/components/rounded-form'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 
 import styles from './Orders.scss'
@@ -113,9 +114,9 @@ class ResDexOrders extends Component<Props> {
           <div className={styles.noOrders}>
             <div>{t(`You have no orders yet`)}</div>
 
-            <button type="button" onClick={() => this.props.resDexActions.selectTab(1)}>
+            <RoundedButton onClick={() => this.props.resDexActions.selectTab(1)} important large>
               {t(`Open an order`)}
-            </button>
+            </RoundedButton>
           </div>
         }
 
@@ -133,9 +134,9 @@ class ResDexOrders extends Component<Props> {
           <div className={styles.noOrders}>
             <div>{t(`You have no swap history yet`)}</div>
 
-            <button type="button" onClick={() => this.props.resDexActions.selectTab(1)}>
+            <RoundedButton onClick={() => this.props.resDexActions.selectTab(1)} important large>
               {t(`Open an order`)}
-            </button>
+            </RoundedButton>
           </div>
         }
 
