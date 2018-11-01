@@ -9,6 +9,7 @@ import { switchMap, map, mapTo, catchError } from 'rxjs/operators'
 import { toastr, actions as toastrActions } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
+import { AUTH } from '~/constants/auth'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { getSortedCurrencies, getCurrencyName } from '~/utils/resdex'
 import { ResDexApiService } from '~/service/resdex/api'
@@ -21,7 +22,7 @@ const api = new ResDexApiService()
 
 const initCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexAccountsActions.initCurrencies),
-  switchMap(() => {
+  switchMap(action => {
     log.debug('Initializing currencies')
     api.enableSocket()
 
@@ -64,8 +65,34 @@ const initCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => actio
       })
     )
 
+    const sendPassphraseColdPromise = defer(
+      () => from(
+        api.sendWalletPassphrase(
+          'RES',
+          action.payload.walletPassword,
+          AUTH.sessionTimeoutSeconds
+        )
+      )
+    )
+
+    const sendPassphraseObservable = sendPassphraseColdPromise.pipe(
+      switchMap(() => of(ResDexAccountsActions.empty())),
+      catchError(err => {
+        log.error(`Failed to send Resistance wallet passphrase`, err)
+
+        return of(toastrActions.add({
+          type: 'error',
+          title: t(`Error sending wallet password`),
+        }))
+      })
+    )
+
     const enableCurrenciesObservable = from(enableCurrenciesPromise).pipe(
-      switchMap(() => concat(getFeesObservable, setConfirmationsObservable)),
+      switchMap(() => concat(
+        sendPassphraseObservable,
+        getFeesObservable,
+        setConfirmationsObservable
+      )),
       catchError(err => of(toastrActions.add({
         type: 'error',
         title: t(`Error enabling currencies`),

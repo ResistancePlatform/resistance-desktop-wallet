@@ -45,6 +45,8 @@ const login = (action$: ActionsObservable<Action>, state$) => action$.pipe(
     const loginFields = state$.value.roundedForm.resDexLogin.fields
     const { encryptedSeedPhrase } = portfolios.find(p => p.id === loginFields.portfolioId)
 
+    // TODO: add wallet password check
+
     const decryptObservable = from(portfolio.decryptSeedPhrase(encryptedSeedPhrase, loginFields.resDexPassword))
 
     return decryptObservable.pipe(
