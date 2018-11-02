@@ -6,6 +6,9 @@ export const ResDexLoginActions = createActions(
   {
     EMPTY: undefined,
 
+    START_PORTFOLIO_CREATION: undefined,
+    SAVE_SEED: undefined,
+    CREATE_PORTFOLIO: undefined,
     GET_PORTFOLIOS: undefined,
     GOT_PORTFOLIOS: portfolios => ({ portfolios }),
 
@@ -27,6 +30,10 @@ export const ResDexLoginActions = createActions(
 
 export const ResDexLoginReducer = handleActions(
   {
+    [ResDexLoginActions.startPortfolioCreation]: state => ({
+      ...state,
+      isCreatingPortfolio: true,
+    }),
     [ResDexLoginActions.gotPortfolios]: (state, action) => ({
       ...state,
       portfolios: action.payload.portfolios

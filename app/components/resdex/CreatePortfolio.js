@@ -21,33 +21,11 @@ import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 import styles from './Login.scss'
 
-const getValidationSchema = (t, isCreatingPortfolio: boolean) => {
-  const keys = {
-    portfolioId: Joi.string().required().label(t(`Portfolio`)),
-    resDexPassword: getPasswordValidationSchema().label(`ResDEX password`),
-    walletPassword: getPasswordValidationSchema().label(`Wallet password`),
-  }
-
-  if (isCreatingPortfolio) {
-    const confirmResDexPassword = (
-      Joi.string().required().valid(Joi.ref('resDexPassword'))
-      .label(t(`Confirm ResDEX password`))
-      .options({
-        language: {
-          any: { allowOnly: `!!${t('Passwords do not match')}`, }
-        }
-      })
-    )
-
-    Object.assign(keys, {
-      portfolioName: Joi.string().required().max(32).label(t(`Portfolio name`)),
-      confirmResDexPassword,
-    })
-
-  }
-
-  return Joi.object().keys(keys)
-}
+const getValidationSchema = t => Joi.object().keys({
+  portfolioId: Joi.string().required().label(t(`Portfolio`)),
+  resDexPassword: getPasswordValidationSchema().label(`ResDEX password`),
+  walletPassword: getPasswordValidationSchema().label(`Wallet password`),
+})
 
 type Props = {
   t: any,
@@ -88,14 +66,7 @@ class ResDexLogin extends Component<Props> {
           ResDEX
         </div>
 
-        <RoundedForm id="resDexLogin" schema={getValidationSchema(t, isCreatingPortfolio)} className={styles.form}>
-          {isCreatingPortfolio &&
-            <RoundedInput
-              name="portfolioName"
-              placeholder={t(`Portfolio name`)}
-              large
-            />
-          }
+        <RoundedForm id="resDexLogin" schema={getValidationSchema(t)} className={styles.form}>
 
           {!isCreatingPortfolio &&
             <ChoosePortfolioInput
@@ -134,13 +105,13 @@ class ResDexLogin extends Component<Props> {
           <RoundedButton
             type="submit"
             className={styles.loginButton}
-            onClick={isCreatingPortfolio ? this.props.actions.saveSeed : this.props.actions.login}
+            onClick={this.props.actions.login}
             spinner={isDisabled}
             disabled={isDisabled}
             important
             large
           >
-            {isCreatingPortfolio ? t(`Next`) : t(`Login`)}
+            {t(`Login`)}
           </RoundedButton>
 
         </RoundedForm>

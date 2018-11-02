@@ -35,6 +35,7 @@ export type ResDexState = {
   login: {
     isRequired: boolean,
     isInProgress: boolean,
+    isCreatingPortfolio: boolean,
     defaultPortfolioId: string | null,
     portfolios: Portfolio[]
   },

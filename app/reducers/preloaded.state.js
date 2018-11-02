@@ -115,6 +115,7 @@ export const preloadedState: State = {
     login: {
       isRequired: true,
       isInProgress: false,
+      isCreatingPortfolio: false,
       defaultPortfolioId: null,
       portfolios: [],
     },
