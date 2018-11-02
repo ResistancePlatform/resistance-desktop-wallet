@@ -96,7 +96,7 @@
     margin-left: -0.1rem;
   }
 
-  span {
+  .resDexStatus {
     position: absolute;
     display: inline-block;
 
@@ -111,8 +111,19 @@
     padding: 0.25rem;
     border-radius: 50%;
 
-    .hasOrders {
-      padding: 0.5rem;
+    &.hasOrders {
+      position: relative;
+      width: 0.9rem;
+      height: 0.9rem;
+      left: 0.8rem;
+      top: 0.4rem;
+
+      .number {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
     }
   }
 }

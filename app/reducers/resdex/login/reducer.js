@@ -15,6 +15,7 @@ export const ResDexLoginActions = createActions(
     SHOW_DIALOG: undefined,
 
     START_RESDEX: (seedPhrase: string, walletPassword: string) => ({ seedPhrase, walletPassword }),
+    INIT_RESDEX: (walletPassword: string) => ({ walletPassword }),
     STOP_RESDEX: undefined,
 
     FORGOT_PASSWORD: undefined,

@@ -3,13 +3,12 @@ import { clipboard } from 'electron'
 import log from 'electron-log'
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
-import { Observable, of, from, defer, concat, merge } from 'rxjs'
+import { Observable, of, from, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { switchMap, map, mapTo, catchError } from 'rxjs/operators'
 import { toastr, actions as toastrActions } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
-import { AUTH } from '~/constants/auth'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { getSortedCurrencies, getCurrencyName } from '~/utils/resdex'
 import { ResDexApiService } from '~/service/resdex/api'
@@ -20,97 +19,11 @@ import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 const t = translate('resdex')
 const api = new ResDexApiService()
 
-const initCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(ResDexAccountsActions.initCurrencies),
-  switchMap(action => {
-    log.debug('Initializing currencies')
-    api.enableSocket()
-
-    const { enabledCurrencies } = state$.value.resDex.accounts
-
-    const symbols = enabledCurrencies.map(currency => currency.symbol)
-
-    const enableCurrenciesPromise = Promise.all(enabledCurrencies.map(currency => (
-      api.enableCurrency(currency.symbol, currency.useElectrum)
-    )))
-
-    const getFeesPromise = Promise.all(symbols.map(symbol => api.getFee(symbol)))
-    const getConfirmationsPromise = () => Promise.all(symbols.map(symbol => api.setConfirmationsNumber(symbol, 0)))
-
-    const setConfirmationsObservable = defer(() => from(getConfirmationsPromise())).pipe(
-      switchMap(() => {
-        log.info(`Confirmations number set to 0 for all the currencies`)
-        return of(ResDexAccountsActions.empty())
-      }),
-      catchError(err => {
-        log.error(`Failed to set zero confirmations number`, err)
-        return of(ResDexAccountsActions.empty())
-      })
-    )
-
-    const getFeesObservable = from(getFeesPromise).pipe(
-      switchMap(fees => {
-        const feesMap = fees.reduce((previous, fee, index) =>(
-          { ...previous, [symbols[index]]: fee }
-        ), {})
-        return of(ResDexAccountsActions.gotCurrencyFees(feesMap))
-      }),
-      catchError(err => {
-        log.error(`Failed to get currencies fees`, err)
-
-        return of(toastrActions.add({
-          type: 'error',
-          title: t(`Error getting currencies fees`),
-        }))
-      })
-    )
-
-    const sendPassphraseColdPromise = defer(
-      () => from(
-        api.sendWalletPassphrase(
-          'RES',
-          action.payload.walletPassword,
-          AUTH.sessionTimeoutSeconds
-        )
-      )
-    )
-
-    const sendPassphraseObservable = sendPassphraseColdPromise.pipe(
-      switchMap(() => of(ResDexAccountsActions.empty())),
-      catchError(err => {
-        log.error(`Failed to send Resistance wallet passphrase`, err)
-
-        return of(toastrActions.add({
-          type: 'error',
-          title: t(`Error sending wallet password`),
-        }))
-      })
-    )
-
-    const enableCurrenciesObservable = from(enableCurrenciesPromise).pipe(
-      switchMap(() => concat(
-        sendPassphraseObservable,
-        getFeesObservable,
-        setConfirmationsObservable
-      )),
-      catchError(err => of(toastrActions.add({
-        type: 'error',
-        title: t(`Error enabling currencies`),
-        message: err.message,
-      })))
-    )
-
-    return enableCurrenciesObservable
-  })
-)
-
-const getCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexAccountsActions.getCurrencies),
   switchMap(() => (
     from(api.getPortfolio()).pipe(
       switchMap(response => {
-        const { currencies: previousCurrencies } = state$.value.resDex.accounts
-
         const currencies = response.portfolio.reduce((accumulator, currency) => ({
           ...accumulator,
           [currency.coin]: {
@@ -124,10 +37,6 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>, state$) => action
         }), {})
 
         const actions = [ResDexAccountsActions.gotCurrencies(currencies)]
-
-        if (Object.keys(previousCurrencies).length === 0) {
-          actions.push(ResDexAccountsActions.getTransactions())
-        }
 
         return of(...actions)
       }),
@@ -337,7 +246,6 @@ const closeAddCurrencyModalEpic = (action$: ActionsObservable<any>) => action$.p
 )
 
 export const ResDexAccountsEpic = (action$, state$) => merge(
-  initCurrenciesEpic(action$, state$),
   getCurrenciesEpic(action$, state$),
   getCurrenciesFailedEpic(action$, state$),
   getTransactionsEpic(action$, state$),

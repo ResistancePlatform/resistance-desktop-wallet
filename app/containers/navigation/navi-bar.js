@@ -76,13 +76,17 @@ class NaviBar extends Component<Props> {
             {t(`ResDEX`)}
 
             {!this.props.resDex.login.isRequired &&
-              <span
-                className={cn(statusStyles[childProcess.getChildProcessStatusColor(resDexStatus)], {
-                  [styles.hasOrders]: resDexStatus  === 'RUNNING' && Boolean(pendingOrdersNumber),
-                })}
+              <div
+                className={cn(
+                  styles.resDexStatus,
+                  statusStyles[childProcess.getChildProcessStatusColor(resDexStatus)],
+                  { [styles.hasOrders]: resDexStatus  === 'RUNNING' && Boolean(pendingOrdersNumber) }
+                )}
               >
-                {pendingOrdersNumber || false}
-              </span>
+                <div className={styles.number}>
+                  {pendingOrdersNumber || false}
+                </div>
+              </div>
             }
           </NavLink>
 				</div>

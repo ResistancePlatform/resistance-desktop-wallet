@@ -20,7 +20,6 @@ import {
 } from '~/components/rounded-form'
 import OrderSummary from './OrderSummary'
 
-import animatedSpinner from '~/assets/images/animated-spinner.svg'
 import styles from './BuySell.scss'
 
 const validationSchema = Joi.object().keys({
