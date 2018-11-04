@@ -318,7 +318,7 @@ function spawnProcess(processName, args, spawnOptions) {
     case 'linux':
       options.env = {
         ...process.env,
-        'LD_LIBRARY_PATH': this.getBinariesPath()
+        'LD_LIBRARY_PATH': getBinariesPath()
       }
       break
 
