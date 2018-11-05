@@ -5,9 +5,10 @@
   border: 1px solid $BASE_COLOR_PURPLE;
   font-size: 0.8rem;
   font-weight: 500;
-  background: #433a71;
+  background: $BASE_COLOR_BACKGROUND_PURPLE;
   padding: 1rem;
   margin-bottom: 1.15rem;
+  height: 5rem;
 
   .buttonsContainer {
     margin-top: 0.8rem;
@@ -93,19 +94,5 @@
         text-decoration: none;
       }
     }
-  }
-}
-
-.buttonsContainer {
-  display: flex;
-  justify-content: center;
-
-  .button {
-    &:first-child {
-      margin-right: 0.75rem;
-    }
-
-    padding-left: 1.7rem;
-    padding-right: 1.7rem;
   }
 }

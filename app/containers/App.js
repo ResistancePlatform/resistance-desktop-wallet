@@ -24,11 +24,11 @@ import OwnAddress from './own-addresses/own-addresses'
 import SendCash from './send-cash/send-cash'
 import Settings from './settings/settings'
 import ResDexPage from './ResDexPage'
+import ResDexStart from '~/components/resdex/Start'
 import ResDexLogin from '~/components/resdex/Login'
-import ResDexRestorePortfolio from '~/components/resdex/RestorePortfolio'
 import ResDexCreatePortfolio from '~/components/resdex/CreatePortfolio'
 import ResDexSaveSeed from '~/components/resdex/SaveSeed'
-import ResDexConfirmSeed from '~/components/resdex/ConfirmSeed'
+import ResDexEnterSeed from '~/components/resdex/EnterSeed'
 import ResDexForgotPassword from '~/components/resdex/ForgotPassword'
 
 import AddressBookPage from './AddressBookPage'
@@ -118,12 +118,13 @@ class App extends React.Component<Props> {
                   ? '/resdex/login'
                   : '/resdex/assets'
               } />)} />
+              <Route exact path="/resdex/start" component={ResDexStart} />
               <Route exact path="/resdex/login" component={ResDexLogin} />
               <Route exact path="/resdex/assets" component={ResDexPage} />
-              <Route exact path="/resdex/restore-portfolio" component={ResDexRestorePortfolio} />
+              <Route exact path="/resdex/restore-portfolio" render={() => (<ResDexEnterSeed isRestorin />)} />
               <Route exact path="/resdex/create-portfolio" component={ResDexCreatePortfolio} />
               <Route exact path="/resdex/save-seed" component={ResDexSaveSeed} />
-              <Route exact path="/resdex/confirm-seed" component={ResDexConfirmSeed} />
+              <Route exact path="/resdex/confirm-seed" component={ResDexEnterSeed} />
               <Route exact path="/resdex/forgot-password" component={ResDexForgotPassword} />
 							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
 						</Switch>

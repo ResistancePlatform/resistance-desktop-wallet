@@ -6,11 +6,13 @@ export const ResDexLoginActions = createActions(
   {
     EMPTY: undefined,
 
-    START_PORTFOLIO_CREATION: undefined,
-    SAVE_SEED: undefined,
-    CREATE_PORTFOLIO: undefined,
     GET_PORTFOLIOS: undefined,
     GOT_PORTFOLIOS: portfolios => ({ portfolios }),
+    COPY_SEED_PHRASE: undefined,
+    GENERATE_SEED_PHRASE: undefined,
+    LEARN_ABOUT_SEED_PHRASE: undefined,
+    SEED_PHRASE_GENERATED: (seedPhrase: string) => ({ seedPhrase }),
+    CREATE_PORTFOLIO: undefined,
 
     LOGIN: undefined,
     LOGIN_SUCCEEDED: undefined,
@@ -37,6 +39,10 @@ export const ResDexLoginReducer = handleActions(
     [ResDexLoginActions.gotPortfolios]: (state, action) => ({
       ...state,
       portfolios: action.payload.portfolios
+    }),
+    [ResDexLoginActions.seedPhraseGenerated]: (state, action) => ({
+      ...state,
+      generatedSeedPhrase: action.payload.seedPhrase
     }),
     [ResDexLoginActions.login]: state => ({
       ...state,

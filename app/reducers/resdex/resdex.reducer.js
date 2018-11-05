@@ -36,7 +36,8 @@ export type ResDexState = {
     isRequired: boolean,
     isInProgress: boolean,
     defaultPortfolioId: string | null,
-    portfolios: Portfolio[]
+    portfolios: Portfolio[],
+    generatedSeedPhrase: string | null
   },
   assets: {
     resolution: CurrencyHistoryResolution,

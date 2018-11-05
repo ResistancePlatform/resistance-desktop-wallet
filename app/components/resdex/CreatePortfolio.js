@@ -22,7 +22,7 @@ import styles from './Login.scss'
 
 const getValidationSchema = t => (
   Joi.object().keys({
-    portfolioName: Joi.string().required().max(32).label(t(`Portfolio name`)),
+    name: Joi.string().required().max(32).label(t(`Portfolio name`)),
     resDexPassword: getPasswordValidationSchema().label(`ResDEX password`),
     confirmResDexPassword: (
       Joi.string().required().valid(Joi.ref('resDexPassword'))
@@ -63,7 +63,7 @@ class CreatePortfolio extends Component<Props> {
 
           <RoundedForm id="resDexCreatePortfolio" schema={getValidationSchema(t)} className={styles.form}>
             <RoundedInput
-              name="portfolioName"
+              name="name"
               placeholder={t(`Portfolio name`)}
               large
             />
@@ -89,15 +89,18 @@ class CreatePortfolio extends Component<Props> {
               large
             />
 
-            <div className={styles.buttons}>
+            <div className={styles.buttonsContainer}>
               <RoundedButton
-                onClick={() => this.props.routerActions('/resdex/login')}
+                className={styles.button}
+                onClick={() => this.props.routerActions.goBack()}
+                large
               >
                 {t(`Back`)}
               </RoundedButton>
 
               <RoundedButton
                 type="submit"
+                className={styles.button}
                 onClick={() => this.props.routerActions.push('/resdex/save-seed')}
                 important
                 large

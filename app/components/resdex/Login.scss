@@ -1,30 +1,19 @@
-@import "~/assets/styles/vars.scss";
+@import "./Bootstrapping.scss";
 
 .container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-
-  a {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    color: $BASE_COLOR_PURPLE;
-    cursor: pointer;
-  }
-
+    width: 14rem;
 }
 
 .form {
-  width: 14rem;
-
-  .buttons {
-  }
-
   margin-bottom: 1.8rem;
 }
 
 .forgotPassword {
+  font-size: 0.7rem;
+  color: $BASE_COLOR_PURPLE;
+
+  cursor: pointer;
   outline: none;
+
+  text-transform: uppercase;
 }

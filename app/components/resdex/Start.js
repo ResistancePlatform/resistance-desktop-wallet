@@ -3,68 +3,36 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import { translate } from 'react-i18next'
-import * as Joi from 'joi'
 import cn from 'classnames'
+import { routerActions } from 'react-router-redux'
 
-import { getPasswordValidationSchema } from '~/utils/auth'
-import { SettingsState } from '~/reducers/settings/settings.reducer'
-import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 import {
-  RoundedForm,
   RoundedButton,
-  RoundedInput,
-  ChoosePortfolioInput
 } from '~/components/rounded-form'
+import Logo from './Logo'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
-import styles from './Login.scss'
+import resDexStyles from './ResDex.scss'
+import styles from './Start.scss'
 
-const getValidationSchema = (t, isCreatingPortfolio: boolean) => {
-  const keys = {
-    portfolioId: Joi.string().required().label(t(`Portfolio`)),
-    resDexPassword: getPasswordValidationSchema().label(`ResDEX password`),
-    walletPassword: getPasswordValidationSchema().label(`Wallet password`),
-  }
-
-  if (isCreatingPortfolio) {
-    const confirmResDexPassword = (
-      Joi.string().required().valid(Joi.ref('resDexPassword'))
-      .label(t(`Confirm ResDEX password`))
-      .options({
-        language: {
-          any: { allowOnly: `!!${t('Passwords do not match')}`, }
-        }
-      })
-    )
-
-    Object.assign(keys, {
-      portfolioName: Joi.string().required().max(32).label(t(`Portfolio name`)),
-      confirmResDexPassword,
-    })
-
-  }
-
-  return Joi.object().keys(keys)
-}
 
 type Props = {
   t: any,
-  resDex: ResDexState,
-  settings: SettingsState,
-  actions: object
+  actions: object,
+  routerActions: object
 }
 
 /**
- * @class ResDexLogin
+ * @class Start
  * @extends {Component<Props>}
  */
-class ResDexLogin extends Component<Props> {
+class Start extends Component<Props> {
 	props: Props
 
 	/**
-	 * @memberof ResDexLogin
+	 * @memberof Start
 	 */
 	componentDidMount() {
     this.props.actions.getPortfolios()
@@ -72,85 +40,46 @@ class ResDexLogin extends Component<Props> {
 
 	/**
 	 * @returns
-   * @memberof ResDexLogin
+   * @memberof Start
 	 */
 	render() {
     const { t } = this.props
-    const { isCreatingPortfolio } = this.props.resDex.login
-
-    const isNodeRunning = this.props.settings.childProcessesStatus.NODE === 'RUNNING'
-    const isDisabled = !isNodeRunning || this.props.resDex.login.isInProgress
 
     return (
-      <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
-        <div className={cn(styles.header)}>
-          <img src="assets/images/resdex/logo.svg" alt="ResDEX" />
-          ResDEX
+      <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, resDexStyles.resDexContainer)}>
+        <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
+          <Logo />
+
+          <div className={styles.header}>
+            {t(`Would you like to create a new portfolio or restore an existing one?`)}
+          </div>
+
+          <div className={styles.explanation}>
+            {t(`Create a new one if you don't have a seed phrase yet.`)}
+          </div>
+
+          <div className={styles.buttonsContainer}>
+            <RoundedButton
+              className={styles.button}
+              onClick={() => this.props.routerActions.push('/resdex/restore-portfolio')}
+              large
+            >
+              {t(`Restore portfolio`)}
+            </RoundedButton>
+
+            <RoundedButton
+              type="submit"
+              className={styles.button}
+              onClick={() => this.props.routerActions.push('/resdex/create-portfolio')}
+              important
+              large
+            >
+              {t(`Create new portfolio`)}
+            </RoundedButton>
+
+          </div>
+
         </div>
-
-        <RoundedForm id="resDexLogin" schema={getValidationSchema(t, isCreatingPortfolio)} className={styles.form}>
-          {isCreatingPortfolio &&
-            <RoundedInput
-              name="portfolioName"
-              placeholder={t(`Portfolio name`)}
-              large
-            />
-          }
-
-          {!isCreatingPortfolio &&
-            <ChoosePortfolioInput
-              name="portfolioId"
-              defaultValue="testfolio"
-              onCreatePortfolioClick={this.props.actions.startPortfolioCreation}
-              portfolios={this.props.resDex.login.portfolios}
-              readOnly
-              large
-            />
-          }
-
-          <RoundedInput
-            name="resDexPassword"
-            type="password"
-            placeholder={t(`ResDEX password`)}
-            large
-          />
-
-          {isCreatingPortfolio &&
-            <RoundedInput
-              name="confirmResDexPassword"
-              type="password"
-              placeholder={t(`Confirm password`)}
-              large
-            />
-          }
-
-          <RoundedInput
-            name="walletPassword"
-            type="password"
-            placeholder={t(`Wallet password`)}
-            large
-          />
-
-          <RoundedButton
-            type="submit"
-            className={styles.loginButton}
-            onClick={isCreatingPortfolio ? this.props.actions.saveSeed : this.props.actions.login}
-            spinner={isDisabled}
-            disabled={isDisabled}
-            important
-            large
-          >
-            {isCreatingPortfolio ? t(`Next`) : t(`Login`)}
-          </RoundedButton>
-
-        </RoundedForm>
-
-        <a role="button"
-          className={styles.forgotPassword}
-          tabIndex={0}
-          onClick={this.props.actions.forgotPassword}
-          onKeyDown={ () => false }
-        >{t(`Forgot password`)}</a>
 
       </div>
     )
@@ -165,7 +94,8 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(ResDexLoginActions, dispatch)
+  actions: bindActionCreators(ResDexLoginActions, dispatch),
+  routerActions: bindActionCreators(routerActions, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexLogin))
+export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(Start))

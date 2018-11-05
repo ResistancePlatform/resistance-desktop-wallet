@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux';
 import { translate } from 'react-i18next'
 import * as Joi from 'joi'
 import cn from 'classnames'
+import { routerActions } from 'react-router-redux'
 
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
@@ -19,7 +20,7 @@ import Logo from './Logo'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 import resDexStyles from './ResDex.scss'
-import styles from './ConfirmSeed.scss'
+import styles from './EnterSeed.scss'
 
 const getValidationSchema = t => (
   Joi.object().keys({
@@ -29,20 +30,22 @@ const getValidationSchema = t => (
 
 type Props = {
   t: any,
+  isRestoring?: boolean,
   resDex: ResDexState,
   settings: SettingsState,
-  actions: object
+  actions: object,
+  routerActions: object
 }
 
 /**
- * @class ConfirmSeed
+ * @class EnterSeed
  * @extends {Component<Props>}
  */
-class ConfirmSeed extends Component<Props> {
+class EnterSeed extends Component<Props> {
 	props: Props
 
 	/**
-	 * @memberof ConfirmSeed
+	 * @memberof EnterSeed
 	 */
 	componentDidMount() {
     this.props.actions.getPortfolios()
@@ -50,7 +53,7 @@ class ConfirmSeed extends Component<Props> {
 
 	/**
 	 * @returns
-   * @memberof ConfirmSeed
+   * @memberof EnterSeed
 	 */
 	render() {
     const { t } = this.props
@@ -64,27 +67,36 @@ class ConfirmSeed extends Component<Props> {
         <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
           <Logo />
 
-          <div className={styles.hint}>
-            {t(`Enter your seed phrase`)}
+          <div className={styles.header}>
+            {this.props.isRestoring ? t(`Enter your seed phrase`) : t(`Confirm your seed phrase`)}
           </div>
 
-          <RoundedForm id="resDexSeedPhrase" schema={getValidationSchema(t, isCreatingPortfolio)} className={styles.form}>
+          <RoundedForm
+            id="resDexEnterSeedPhrase"
+            schema={getValidationSchema(t, isCreatingPortfolio)}
+            className={styles.form}
+          >
 
             <RoundedTextArea
+              name="seedPhrase"
               rows={4}
               placeholder={t(`Example: advanced generous profound...`)}
             />
 
             <RoundedButton
               type="submit"
-              className={styles.loginButton}
-              onClick={this.props.actions.createPortfolio}
+              className={styles.submitButton}
+              onClick={
+                this.props.isRestoring
+                ? this.props.routerActions.push('/resdex/create-portfolio')
+                : this.props.actions.createPortfolio
+              }
               spinner={isDisabled}
               disabled={isDisabled}
               important
               large
             >
-              {t(`Submit`)}
+              {this.props.isRestoring ? t(`Next`) : t(`Submit`)}
             </RoundedButton>
 
           </RoundedForm>
@@ -103,7 +115,8 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(ResDexLoginActions, dispatch)
+  actions: bindActionCreators(ResDexLoginActions, dispatch),
+  routerActions: bindActionCreators(routerActions, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ConfirmSeed))
+export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(EnterSeed))

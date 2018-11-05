@@ -13,3 +13,17 @@
   font-size: 1.4rem;
   margin-bottom: 1.6rem;
 }
+
+.buttonsContainer {
+  display: flex;
+  justify-content: center;
+
+  .button {
+    &:first-child {
+      margin-right: 0.75rem;
+    }
+
+    padding-left: 1.7rem;
+    padding-right: 1.7rem;
+  }
+}

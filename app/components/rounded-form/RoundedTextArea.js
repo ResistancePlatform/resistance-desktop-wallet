@@ -13,6 +13,7 @@ export type RoundedTextAreaProps = {
 
 export default class RoundedTextArea extends RoundedInput {
   props: RoundedTextAreaProps
+  customContainerClassName = styles.container
 
   renderInput() {
     return (
@@ -29,6 +30,7 @@ export default class RoundedTextArea extends RoundedInput {
         onFocus={event => this.onFocusHandler(event)}
         onBlur={event => this.onBlurHandler(event)}
         value={this.state.value}
+        placeholder={this.props.placeholder}
         readOnly={this.props.readOnly}
       />
     )

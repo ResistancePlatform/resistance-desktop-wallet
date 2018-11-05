@@ -28,6 +28,8 @@ export default class GenericInput extends GenericControl {
 	props: GenericInputProps
   state: GenericInputState
 
+  customContainerClassName: string | null = null
+
 	/**
 	 * @param {*} props
 	 * @memberof GenericInput
@@ -88,6 +90,7 @@ export default class GenericInput extends GenericControl {
           className={cn(
             this.props.className,
             genericStyles.container,
+            this.customContainerClassName,
             {
               [genericStyles.hasError]: Boolean(this.props.error),
               [genericStyles.large]: this.props.large

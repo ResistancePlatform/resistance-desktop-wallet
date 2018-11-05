@@ -72,7 +72,7 @@ class ResDexLogin extends Component<Props> {
             <ChoosePortfolioInput
               name="portfolioId"
               defaultValue="testfolio"
-              onCreatePortfolioClick={() => this.props.routerActions.push('/resdex/create-portfolio')}
+              onCreatePortfolioClick={() => this.props.routerActions.push('/resdex/start')}
               portfolios={this.props.resDex.login.portfolios}
               readOnly
               large

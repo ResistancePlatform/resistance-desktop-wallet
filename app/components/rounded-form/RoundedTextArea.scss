@@ -1,5 +1,11 @@
 @import "~/assets/styles/vars.scss";
 
+.container {
+  height: auto;
+  border-radius: 1.1rem;
+  padding: 0.6rem;
+}
+
 .textarea {
   font-size: 0.75rem;
   color: $BASE_COLOR_WHITE;
@@ -11,8 +17,8 @@
 
   &::placeholder {
     color: $BASE_COLOR_FONT_GRAY_2;
-    font-size: 0.62rem;
+    font-size: 0.66rem;
     font-family: $BASE_FONT_FAMILY;
-    font-weight: 100;
+    font-weight: 300;
   }
 }

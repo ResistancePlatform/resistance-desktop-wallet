@@ -6,6 +6,7 @@ import { translate } from 'react-i18next'
 import cn from 'classnames'
 import { routerActions } from 'react-router-redux'
 
+import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 import {
   RoundedButton,
@@ -20,6 +21,7 @@ import styles from './SaveSeed.scss'
 
 type Props = {
   t: any,
+  resDex: ResDexState,
   actions: object,
   routerActions: object
 }
@@ -35,7 +37,7 @@ class SaveSeed extends Component<Props> {
 	 * @memberof SaveSeed
 	 */
 	componentDidMount() {
-    this.props.actions.getPortfolios()
+    this.props.actions.generateSeedPhrase()
   }
 
 	/**
@@ -55,7 +57,7 @@ class SaveSeed extends Component<Props> {
           </div>
 
           <div className={styles.seedPhraseContainer}>
-            {'advanced generate blip knowledge seed'}
+            {this.props.resDex.login.generatedSeedPhrase}
 
             <div className={styles.buttonsContainer}>
               <RoundedButton
@@ -68,7 +70,7 @@ class SaveSeed extends Component<Props> {
 
               <RoundedButton
                 className={cn(styles.button, styles.generate)}
-                onClick={this.props.actions.generateSeed}
+                onClick={this.props.actions.generateSeedPhrase}
                 important>
                 <div className={cn('icon', styles.icon, styles.generate)} />
                 {t(`Generate new`)}
@@ -88,7 +90,12 @@ class SaveSeed extends Component<Props> {
               <div className={styles.recommendation}>
                 {t(`We recommend storing it offline.`)} &nbsp;
 
-                <a href="https://resistance.io/resdex/seed-phrase">
+                <a
+                  role="link"
+                  tabIndex={0}
+                  onClick={this.props.actions.learnAboutSeedPhrase}
+                  onKeyDown={() => false}
+                >
                   {t(`Learn more about it`)}
                 </a>
 
@@ -128,7 +135,6 @@ class SaveSeed extends Component<Props> {
 const mapStateToProps = state => ({
   resDex: state.resDex,
   settings: state.settings,
-  form: state.roundedForm.authLogin
 })
 
 const mapDispatchToProps = dispatch => ({
