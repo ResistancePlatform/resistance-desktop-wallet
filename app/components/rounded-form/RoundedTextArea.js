@@ -1,85 +1,36 @@
-// @flow
-import React, { Component } from 'react'
-import classNames from 'classnames'
+import React from 'react'
+import cn from 'classnames'
 
-import styles from './RoundedInput.scss'
+import RoundedInput, { RoundedInputProps } from './NewRoundedInput'
+import styles from './RoundedTextArea.scss'
 
-type Props = {
-	name?: string,
+
+export type RoundedTextAreaProps = {
+  ...RoundedInputProps,
   rows?: number,
-  cols?: number,
-  defaultValue?: string | null,
-	onChange?: value => void,
-	disabled?: boolean,
-  important?: boolean,
-  error?: string | null,
-  readOnly?: boolean
+  cols?: number
 }
 
-type State = {
-  isFocused: boolean
-}
+export default class RoundedTextArea extends RoundedInput {
+  props: RoundedTextAreaProps
 
-export default class RoundedTextArea extends Component<Props> {
-	props: Props
-  state: State
-
-  static get displayName() { return 'RoundedTextArea' }
-
-	/**
-	 * @param {*} props
-	 * @memberof RoundedTextArea
-	 */
-	constructor(props) {
-		super(props)
-    this.state = {
-      isFocused: false
-    }
-	}
-
-	onFocusHandler() {
-		this.setState({ isFocused: true })
-	}
-
-	onBlurHandler() {
-		this.setState({ isFocused: false })
-	}
-
-	onChangeHandler(event) {
-		event.stopPropagation()
-
-		if (this.props.onChange) {
-			this.props.onChange(event.target.value)
-		}
-	}
-
-	render() {
-		return (
-      <div>
-        <div
-          className={classNames(
-            styles.container,
-            {
-              [styles.important]: this.props.important,
-              [styles.error]: Boolean(this.props.error)
-            }
-          )}
-          name={this.props.name}
-          disabled={this.props.disabled}
-        >
-          <textarea
-            rows={this.props.rows}
-            cols={this.props.cols}
-            disabled={this.props.disabled}
-            onChange={event => this.onChangeHandler(event)}
-            onFocus={(event) => this.onFocusHandler(event)}
-            onBlur={(event) => this.onBlurHandler(event)}
-            value={this.props.defaultValue || ''}
-            readOnly={this.props.readOnly}
-          />
-        </div>
-        <div className={styles.errorMessage}>{this.props.error && !this.state.isFocused && this.props.error}</div>
-      </div>
-		)
-	}
+  renderInput() {
+    return (
+      <textarea
+        className={cn(
+          styles.textarea,
+          { [styles.withPlaceholder]: Boolean(this.props.placeholder) }
+        )}
+        name={this.props.name}
+        rows={this.props.rows}
+        cols={this.props.cols}
+        disabled={this.props.disabled}
+        onChange={event => this.onChangeHandler(event)}
+        onFocus={event => this.onFocusHandler(event)}
+        onBlur={event => this.onBlurHandler(event)}
+        value={this.state.value}
+        readOnly={this.props.readOnly}
+      />
+    )
+  }
 }

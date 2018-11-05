@@ -4,6 +4,7 @@ import config from 'electron-settings'
 import { of, from, merge, concat, defer } from 'rxjs'
 import { switchMap, map, mapTo, catchError, delay } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
+import { routerActions } from 'react-router-redux'
 import { actions as toastrActions } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
@@ -144,7 +145,8 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
     const sendPassphraseObservable = sendPassphraseColdPromise.pipe(
       switchMap(() => of(
         ResDexLoginActions.loginSucceeded(),
-        RoundedFormActions.clear('resDexLogin')
+        RoundedFormActions.clear('resDexLogin'),
+        routerActions.push('/resdex/assets')
       )),
       catchError(err => {
         log.error(`Failed to send Resistance wallet passphrase`, JSON.stringify(err))

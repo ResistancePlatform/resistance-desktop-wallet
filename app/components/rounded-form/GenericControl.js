@@ -24,7 +24,7 @@ export default class GenericControl extends Component<Props> {
 	render() {
 		return (
       <div
-        className={cn(genericStyles.control, this.props.className, {
+        className={cn(genericStyles.control, {
           [genericStyles.disabled]: this.props.disabled,
         })}
         title={this.props.tooltip}

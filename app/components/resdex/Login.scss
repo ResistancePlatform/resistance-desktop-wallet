@@ -16,27 +16,12 @@
 
 }
 
-.header {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1.4rem;
-
-  img {
-    width: 4rem;
-    height: 4rem;
-    margin-right: 0.5rem;
-  }
-  font-size: 1.3rem;
-  line-height: 4rem;
-}
-
 .form {
   width: 14rem;
-  button {
-    margin-top: 0.5rem;
-    padding-left: 3rem;
-    padding-right: 3rem;
+
+  .buttons {
   }
+
   margin-bottom: 1.8rem;
 }
 

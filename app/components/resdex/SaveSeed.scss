@@ -1,0 +1,111 @@
+@import "./Bootstrapping.scss";
+
+.seedPhraseContainer {
+  border-radius: 1.2rem;
+  border: 1px solid $BASE_COLOR_PURPLE;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: #433a71;
+  padding: 1rem;
+  margin-bottom: 1.15rem;
+
+  .buttonsContainer {
+    margin-top: 0.8rem;
+    margin-bottom: 0.4rem;
+    display: flex;
+    justify-content: center;
+
+    .button {
+      padding-left: 2rem;
+      padding-right: 1rem;
+      position: relative;
+
+      &.copy {
+        color: $BASE_COLOR_WHITE !important;
+        border: 1px solid $BASE_COLOR_PURPLE;
+        font-weight: 600;
+        margin-right: 0.7rem;
+      }
+
+    }
+
+    .icon {
+      position: absolute;
+      top: 50%;
+      left: 0.45rem;
+      font-weight: 100;
+      transform: translateY(-50%);
+
+      &.copy {
+        left: 0.45rem;
+        font-size: 1.3rem;
+
+        &:before {
+          content: '\e905';
+        }
+      }
+
+      &.generate {
+        font-size: 1rem;
+
+        &:before {
+          content: '\ea2e';
+        }
+      }
+    }
+  }
+}
+
+.warningContainer {
+  display: flex;
+  height: 1.85rem;
+  margin-bottom: 2rem;
+
+  .exclamation {
+    width: 1.85rem;
+    border-radius: 50%;
+    background: $BASE_COLOR_LIGHT_RED;
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding-top: 0.15rem;
+
+    &:before {
+      content: '!';
+    }
+  }
+
+  .warning {
+    margin-left: 1rem;
+    text-align: left;
+
+    .important {
+      font-size: 0.78rem;
+      font-weight: 500;
+      margin-bottom: 0.17rem;
+    }
+
+    .recommendation {
+      color: $BASE_COLOR_FONT_GRAY_2;
+      font-size: 0.62rem;
+
+      a {
+        color: $BASE_COLOR_LIGHT_BLUE;
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+.buttonsContainer {
+  display: flex;
+  justify-content: center;
+
+  .button {
+    &:first-child {
+      margin-right: 0.75rem;
+    }
+
+    padding-left: 1.7rem;
+    padding-right: 1.7rem;
+  }
+}

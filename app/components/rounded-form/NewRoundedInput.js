@@ -53,8 +53,8 @@ export default class RoundedInput extends GenericInput {
         value={this.state.value}
         disabled={this.props.disabled}
         onChange={event => this.onChangeHandler(event)}
-        onFocus={(event) => this.onFocusHandler(event)}
-        onBlur={(event) => this.onBlurHandler(event)}
+        onFocus={event => this.onFocusHandler(event)}
+        onBlur={event => this.onBlurHandler(event)}
         placeholder={this.props.placeholder}
         readOnly={this.props.readOnly}
       />

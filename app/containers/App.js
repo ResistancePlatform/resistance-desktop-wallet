@@ -24,14 +24,22 @@ import OwnAddress from './own-addresses/own-addresses'
 import SendCash from './send-cash/send-cash'
 import Settings from './settings/settings'
 import ResDexPage from './ResDexPage'
+import ResDexLogin from '~/components/resdex/Login'
+import ResDexRestorePortfolio from '~/components/resdex/RestorePortfolio'
+import ResDexCreatePortfolio from '~/components/resdex/CreatePortfolio'
+import ResDexSaveSeed from '~/components/resdex/SaveSeed'
+import ResDexConfirmSeed from '~/components/resdex/ConfirmSeed'
+import ResDexForgotPassword from '~/components/resdex/ForgotPassword'
+
 import AddressBookPage from './AddressBookPage'
 
-import { appStore } from '../store/configureStore'
+import { getStore } from '../store/configureStore'
 import FetchParametersDialog from '~/components/fetch-parameters/FetchParametersDialog'
 import { FetchParametersState, FetchParametersActions } from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import { AuthState } from '~/reducers/auth/auth.reducer'
 import { GetStartedState } from '~/reducers/get-started/get-started.reducer'
 import { SettingsActions } from '~/reducers/settings/settings.reducer'
+import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 
 import styles from './App.scss'
 import HLayout from '../assets/styles/h-box-layout.scss'
@@ -41,7 +49,8 @@ import VLayout from '../assets/styles/v-box-layout.scss'
 type Props = {
   auth: AuthState,
   fetchParameters: FetchParametersState,
-  getStarted: GetStartedState
+  getStarted: GetStartedState,
+  resDex: ResDexState
 }
 
 /**
@@ -60,9 +69,9 @@ class App extends React.Component<Props> {
 	 */
   componentDidMount() {
     if (!this.props.fetchParameters.isDownloadComplete) {
-      appStore.dispatch(FetchParametersActions.fetch())
+      getStore().dispatch(FetchParametersActions.fetch())
     } else if (!this.props.getStarted.isInProgress) {
-      appStore.dispatch(SettingsActions.kickOffChildProcesses())
+      getStore().dispatch(SettingsActions.kickOffChildProcesses())
     }
   }
 
@@ -104,7 +113,18 @@ class App extends React.Component<Props> {
 							<Route exact path="/send-cash" component={SendCash} />
 							<Route exact path="/settings" component={Settings} />
 							<Route exact path="/address-book" component={AddressBookPage} />
-							<Route exact path="/resdex" component={ResDexPage} />
+              <Route exact path="/resdex" render={() => (<Redirect to={
+                this.props.resDex.login.isRequired
+                  ? '/resdex/login'
+                  : '/resdex/assets'
+              } />)} />
+              <Route exact path="/resdex/login" component={ResDexLogin} />
+              <Route exact path="/resdex/assets" component={ResDexPage} />
+              <Route exact path="/resdex/restore-portfolio" component={ResDexRestorePortfolio} />
+              <Route exact path="/resdex/create-portfolio" component={ResDexCreatePortfolio} />
+              <Route exact path="/resdex/save-seed" component={ResDexSaveSeed} />
+              <Route exact path="/resdex/confirm-seed" component={ResDexConfirmSeed} />
+              <Route exact path="/resdex/forgot-password" component={ResDexForgotPassword} />
 							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
 						</Switch>
 					</div>
