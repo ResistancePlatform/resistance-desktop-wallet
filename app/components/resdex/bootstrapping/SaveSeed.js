@@ -7,15 +7,14 @@ import cn from 'classnames'
 import { routerActions } from 'react-router-redux'
 
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
-import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
+import { ResDexBootstrappingActions } from '~/reducers/resdex/bootstrapping/reducer'
 import {
   RoundedButton,
 } from '~/components/rounded-form'
-import Logo from './Logo'
+import Logo from '../Logo'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
-import resDexStyles from './ResDex.scss'
 import styles from './SaveSeed.scss'
 
 
@@ -37,7 +36,10 @@ class SaveSeed extends Component<Props> {
 	 * @memberof SaveSeed
 	 */
 	componentDidMount() {
-    this.props.actions.generateSeedPhrase()
+    const { generatedSeedPhrase } = this.props.resDex.bootstrapping
+    if (generatedSeedPhrase === null) {
+      this.props.actions.generateSeedPhrase()
+    }
   }
 
 	/**
@@ -48,7 +50,7 @@ class SaveSeed extends Component<Props> {
     const { t } = this.props
 
     return (
-      <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, resDexStyles.resDexContainer)}>
+      <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapper)}>
         <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
           <Logo />
 
@@ -57,7 +59,7 @@ class SaveSeed extends Component<Props> {
           </div>
 
           <div className={styles.seedPhraseContainer}>
-            {this.props.resDex.login.generatedSeedPhrase}
+            {this.props.resDex.bootstrapping.generatedSeedPhrase}
 
             <div className={styles.buttonsContainer}>
               <RoundedButton
@@ -138,7 +140,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(ResDexLoginActions, dispatch),
+  actions: bindActionCreators(ResDexBootstrappingActions, dispatch),
   routerActions: bindActionCreators(routerActions, dispatch),
 })
 

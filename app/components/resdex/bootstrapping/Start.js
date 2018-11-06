@@ -4,24 +4,21 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import { translate } from 'react-i18next'
 import cn from 'classnames'
-import { routerActions } from 'react-router-redux'
 
-import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
+import { ResDexBootstrappingActions } from '~/reducers/resdex/bootstrapping/reducer'
 import {
   RoundedButton,
 } from '~/components/rounded-form'
-import Logo from './Logo'
+import Logo from '../Logo'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
-import resDexStyles from './ResDex.scss'
 import styles from './Start.scss'
 
 
 type Props = {
   t: any,
-  actions: object,
-  routerActions: object
+  actions: object
 }
 
 /**
@@ -32,13 +29,6 @@ class Start extends Component<Props> {
 	props: Props
 
 	/**
-	 * @memberof Start
-	 */
-	componentDidMount() {
-    this.props.actions.getPortfolios()
-  }
-
-	/**
 	 * @returns
    * @memberof Start
 	 */
@@ -46,7 +36,7 @@ class Start extends Component<Props> {
     const { t } = this.props
 
     return (
-      <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, resDexStyles.resDexContainer)}>
+      <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapper)}>
         <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
           <Logo />
 
@@ -61,16 +51,15 @@ class Start extends Component<Props> {
           <div className={styles.buttonsContainer}>
             <RoundedButton
               className={styles.button}
-              onClick={() => this.props.routerActions.push('/resdex/restore-portfolio')}
+              onClick={this.props.actions.startRestoringPortfolio}
               large
             >
               {t(`Restore portfolio`)}
             </RoundedButton>
 
             <RoundedButton
-              type="submit"
               className={styles.button}
-              onClick={() => this.props.routerActions.push('/resdex/create-portfolio')}
+              onClick={this.props.actions.startCreatingPortfolio}
               important
               large
             >
@@ -94,8 +83,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(ResDexLoginActions, dispatch),
-  routerActions: bindActionCreators(routerActions, dispatch),
+  actions: bindActionCreators(ResDexBootstrappingActions, dispatch),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(Start))

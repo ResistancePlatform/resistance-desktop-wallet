@@ -1,6 +1,5 @@
 // @flow
 
-import log from 'electron-log'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
@@ -24,12 +23,11 @@ import OwnAddress from './own-addresses/own-addresses'
 import SendCash from './send-cash/send-cash'
 import Settings from './settings/settings'
 import ResDexPage from './ResDexPage'
-import ResDexStart from '~/components/resdex/Start'
-import ResDexLogin from '~/components/resdex/Login'
-import ResDexCreatePortfolio from '~/components/resdex/CreatePortfolio'
-import ResDexSaveSeed from '~/components/resdex/SaveSeed'
-import ResDexEnterSeed from '~/components/resdex/EnterSeed'
-import ResDexForgotPassword from '~/components/resdex/ForgotPassword'
+import ResDexStart from '~/components/resdex/bootstrapping/Start'
+import ResDexCreatePortfolio from '~/components/resdex/bootstrapping/CreatePortfolio'
+import ResDexSaveSeed from '~/components/resdex/bootstrapping/SaveSeed'
+import ResDexEnterSeed from '~/components/resdex/bootstrapping/EnterSeed'
+import ResDexForgotPassword from '~/components/resdex/bootstrapping/ForgotPassword'
 
 import AddressBookPage from './AddressBookPage'
 
@@ -108,25 +106,26 @@ class App extends React.Component<Props> {
 					{ /* Route content container */}
 					<div className={cn(styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer)}>
 						<Switch>
+							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
+
 							<Route exact path="/overview" component={Overview} />
 							<Route exact path="/own-addresses" component={OwnAddress} />
 							<Route exact path="/send-cash" component={SendCash} />
 							<Route exact path="/settings" component={Settings} />
 							<Route exact path="/address-book" component={AddressBookPage} />
-              <Route exact path="/resdex" render={() => (<Redirect to={
-                this.props.resDex.login.isRequired
-                  ? '/resdex/login'
-                  : '/resdex/assets'
-              } />)} />
+
+              <Route exact path="/resdex" render={() => (
+                this.props.resDex.bootstrapping.isInProgress
+                  ? (<ResDexStart />)
+                  : (<ResDexPage />)
+              )} />
+
               <Route exact path="/resdex/start" component={ResDexStart} />
-              <Route exact path="/resdex/login" component={ResDexLogin} />
-              <Route exact path="/resdex/assets" component={ResDexPage} />
-              <Route exact path="/resdex/restore-portfolio" render={() => (<ResDexEnterSeed isRestorin />)} />
+              <Route exact path="/resdex/restore-portfolio" component={ResDexEnterSeed} />
               <Route exact path="/resdex/create-portfolio" component={ResDexCreatePortfolio} />
               <Route exact path="/resdex/save-seed" component={ResDexSaveSeed} />
               <Route exact path="/resdex/confirm-seed" component={ResDexEnterSeed} />
               <Route exact path="/resdex/forgot-password" component={ResDexForgotPassword} />
-							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
 						</Switch>
 					</div>
 				</div>

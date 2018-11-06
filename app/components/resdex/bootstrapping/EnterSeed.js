@@ -7,19 +7,18 @@ import * as Joi from 'joi'
 import cn from 'classnames'
 import { routerActions } from 'react-router-redux'
 
-import { SettingsState } from '~/reducers/settings/settings.reducer'
+import { getIsLoginDisabled } from '~/utils/resdex'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
-import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
+import { ResDexBootstrappingActions } from '~/reducers/resdex/bootstrapping/reducer'
 import {
   RoundedForm,
   RoundedButton,
   RoundedTextArea,
 } from '~/components/rounded-form'
-import Logo from './Logo'
+import Logo from '../Logo'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
-import resDexStyles from './ResDex.scss'
 import styles from './EnterSeed.scss'
 
 const getValidationSchema = t => (
@@ -30,9 +29,7 @@ const getValidationSchema = t => (
 
 type Props = {
   t: any,
-  isRestoring?: boolean,
   resDex: ResDexState,
-  settings: SettingsState,
   actions: object,
   routerActions: object
 }
@@ -45,35 +42,26 @@ class EnterSeed extends Component<Props> {
 	props: Props
 
 	/**
-	 * @memberof EnterSeed
-	 */
-	componentDidMount() {
-    this.props.actions.getPortfolios()
-  }
-
-	/**
 	 * @returns
    * @memberof EnterSeed
 	 */
 	render() {
     const { t } = this.props
-    const { isCreatingPortfolio } = this.props.resDex.login
-
-    const isNodeRunning = this.props.settings.childProcessesStatus.NODE === 'RUNNING'
-    const isDisabled = !isNodeRunning || this.props.resDex.login.isInProgress
+    const isDisabled = getIsLoginDisabled(this.props)
+    const { isRestoring } = this.props.resDex.bootstrapping
 
     return (
-      <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, resDexStyles.resDexContainer)}>
+      <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapper)}>
         <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
           <Logo />
 
           <div className={styles.header}>
-            {this.props.isRestoring ? t(`Enter your seed phrase`) : t(`Confirm your seed phrase`)}
+            {isRestoring ? t(`Enter your seed phrase`) : t(`Confirm your seed phrase`)}
           </div>
 
           <RoundedForm
             id="resDexEnterSeedPhrase"
-            schema={getValidationSchema(t, isCreatingPortfolio)}
+            schema={getValidationSchema(t)}
             className={styles.form}
           >
 
@@ -83,21 +71,35 @@ class EnterSeed extends Component<Props> {
               placeholder={t(`Example: advanced generous profound...`)}
             />
 
-            <RoundedButton
-              type="submit"
-              className={styles.submitButton}
-              onClick={
-                this.props.isRestoring
-                ? this.props.routerActions.push('/resdex/create-portfolio')
-                : this.props.actions.createPortfolio
-              }
-              spinner={isDisabled}
-              disabled={isDisabled}
-              important
-              large
-            >
-              {this.props.isRestoring ? t(`Next`) : t(`Submit`)}
-            </RoundedButton>
+            <div className={styles.buttonsContainer}>
+              <RoundedButton
+                className={styles.button}
+                onClick={() => (
+                  isRestoring
+                    ? this.props.routerActions.push('/resdex/start')
+                    : this.props.routerActions.push('/resdex/save-seed')
+                )}
+                large
+              >
+                {t(`Back`)}
+              </RoundedButton>
+              <RoundedButton
+                type="submit"
+                className={styles.submitButton}
+                onClick={() => (
+                  isRestoring
+                    ? this.props.routerActions.push('/resdex/create-portfolio')
+                    : this.props.actions.createPortfolio()
+                )}
+                spinner={isDisabled}
+                disabled={isDisabled}
+                important
+                large
+              >
+                {isRestoring ? t(`Next`) : t(`Submit`)}
+              </RoundedButton>
+
+              </div>
 
           </RoundedForm>
 
@@ -110,12 +112,11 @@ class EnterSeed extends Component<Props> {
 
 const mapStateToProps = state => ({
   resDex: state.resDex,
-  settings: state.settings,
-  form: state.roundedForm.authLogin
+  settings: state.settings
 })
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(ResDexLoginActions, dispatch),
+  actions: bindActionCreators(ResDexBootstrappingActions, dispatch),
   routerActions: bindActionCreators(routerActions, dispatch),
 })
 

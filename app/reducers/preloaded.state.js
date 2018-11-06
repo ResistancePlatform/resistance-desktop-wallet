@@ -112,12 +112,16 @@ export const preloadedState: State = {
     common: {
       selectedTabIndex: 0,
     },
+    bootstrapping: {
+      isInProgress: false,
+      isRestoring: false,
+      generatedSeedPhrase: null,
+    },
     login: {
       isRequired: true,
       isInProgress: false,
       defaultPortfolioId: null,
       portfolios: [],
-      generatedSeedPhrase: null,
     },
     assets: {
       resolution: 'month',
@@ -187,6 +191,10 @@ Object.assign(preloadedState.settings, {
 
 Object.assign(preloadedState.resDex.login, {
   defaultPortfolioId: config.get('resDex.defaultPortfolioId', null)
+})
+
+Object.assign(preloadedState.resDex.bootstrapping, {
+  isInProgress: config.get('resDex.bootstrappingInProgress', true)
 })
 
 const enabledCurrencies = config.get('resDex.enabledCurrencies', RESDEX.alwaysEnabledCurrencies)

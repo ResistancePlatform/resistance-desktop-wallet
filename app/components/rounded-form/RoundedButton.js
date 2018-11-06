@@ -23,8 +23,6 @@ export type Props = {
 export default class RoundedButton extends GenericControl {
   props: Props
 
-  static get displayName() { return 'RoundedButton' }
-
   onClickHandler(event) {
     event.stopPropagation()
     if (this.props.onClick) {

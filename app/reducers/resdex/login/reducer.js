@@ -1,6 +1,9 @@
 // @flow
 import { createActions, handleActions } from 'redux-actions'
+
 import { preloadedState } from '~/reducers/preloaded.state'
+import { ResDexBootstrappingActions } from '~/reducers/resdex/bootstrapping/reducer'
+
 
 export const ResDexLoginActions = createActions(
   {
@@ -8,11 +11,6 @@ export const ResDexLoginActions = createActions(
 
     GET_PORTFOLIOS: undefined,
     GOT_PORTFOLIOS: portfolios => ({ portfolios }),
-    COPY_SEED_PHRASE: undefined,
-    GENERATE_SEED_PHRASE: undefined,
-    LEARN_ABOUT_SEED_PHRASE: undefined,
-    SEED_PHRASE_GENERATED: (seedPhrase: string) => ({ seedPhrase }),
-    CREATE_PORTFOLIO: undefined,
 
     LOGIN: undefined,
     LOGIN_SUCCEEDED: undefined,
@@ -22,8 +20,6 @@ export const ResDexLoginActions = createActions(
     START_RESDEX: (seedPhrase: string, walletPassword: string) => ({ seedPhrase, walletPassword }),
     INIT_RESDEX: (walletPassword: string) => ({ walletPassword }),
     STOP_RESDEX: undefined,
-
-    FORGOT_PASSWORD: undefined,
   },
   {
     prefix: 'APP/RESDEX/LOGIN'
@@ -32,17 +28,9 @@ export const ResDexLoginActions = createActions(
 
 export const ResDexLoginReducer = handleActions(
   {
-    [ResDexLoginActions.startPortfolioCreation]: state => ({
-      ...state,
-      isCreatingPortfolio: true,
-    }),
     [ResDexLoginActions.gotPortfolios]: (state, action) => ({
       ...state,
       portfolios: action.payload.portfolios
-    }),
-    [ResDexLoginActions.seedPhraseGenerated]: (state, action) => ({
-      ...state,
-      generatedSeedPhrase: action.payload.seedPhrase
     }),
     [ResDexLoginActions.login]: state => ({
       ...state,
@@ -61,5 +49,9 @@ export const ResDexLoginReducer = handleActions(
     [ResDexLoginActions.showDialog]: state => ({
       ...state,
       isRequired: true,
+    }),
+    [ResDexBootstrappingActions.createPortfolio]: state => ({
+      ...state,
+      isInProgress: true,
     }),
   }, preloadedState)

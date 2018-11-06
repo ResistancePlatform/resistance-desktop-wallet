@@ -1,4 +1,4 @@
-@import "./Bootstrapping.scss";
+@import "./bootstrapping/Bootstrapping.scss";
 
 .container {
     width: 14rem;
@@ -14,6 +14,7 @@
 
   cursor: pointer;
   outline: none;
+  user-select: none;
 
   text-transform: uppercase;
 }

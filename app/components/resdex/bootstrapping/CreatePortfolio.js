@@ -8,17 +8,18 @@ import cn from 'classnames'
 import { routerActions } from 'react-router-redux'
 
 import { getPasswordValidationSchema } from '~/utils/auth'
+import { getIsLoginDisabled } from '~/utils/resdex'
 import {
   RoundedForm,
   RoundedButton,
   RoundedInput,
 } from '~/components/rounded-form'
-import Logo from './Logo'
+import Logo from '../Logo'
+import { ResDexBootstrappingActions } from '~/reducers/resdex/bootstrapping/reducer'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
-import resDexStyles from './ResDex.scss'
-import styles from './Login.scss'
+import styles from '../Login.scss'
 
 const getValidationSchema = t => (
   Joi.object().keys({
@@ -39,6 +40,8 @@ const getValidationSchema = t => (
 
 type Props = {
   t: any,
+  resDex: object,
+  actions: object,
   routerActions: object
 }
 
@@ -55,9 +58,11 @@ class CreatePortfolio extends Component<Props> {
 	 */
 	render() {
     const { t } = this.props
+    const { isRestoring } = this.props.resDex.bootstrapping
+    const isDisabled = getIsLoginDisabled(this.props)
 
     return (
-      <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, resDexStyles.resDexContainer)}>
+      <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapper)}>
         <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
           <Logo />
 
@@ -92,21 +97,39 @@ class CreatePortfolio extends Component<Props> {
             <div className={styles.buttonsContainer}>
               <RoundedButton
                 className={styles.button}
-                onClick={() => this.props.routerActions.goBack()}
+                onClick={() => (
+                  isRestoring
+                  ? this.props.routerActions.push('/resdex/restore-portfolio')
+                  : this.props.routerActions.push('/resdex/start')
+                )}
                 large
               >
                 {t(`Back`)}
               </RoundedButton>
 
-              <RoundedButton
-                type="submit"
-                className={styles.button}
-                onClick={() => this.props.routerActions.push('/resdex/save-seed')}
-                important
-                large
-              >
-                {t(`Next`)}
-              </RoundedButton>
+              {isRestoring
+                ? (
+                 <RoundedButton
+                    type="submit"
+                    onClick={this.props.actions.createPortfolio}
+                    spinner={isDisabled}
+                    disabled={isDisabled}
+                    important
+                    large
+                  >
+                    {t(`Submit`)}
+                  </RoundedButton>
+                ) : (
+                  <RoundedButton
+                    className={styles.button}
+                    onClick={() => this.props.routerActions.push('/resdex/save-seed')}
+                    important
+                    large
+                  >
+                    {t(`Next`)}
+                  </RoundedButton>
+                )
+              }
             </div>
 
           </RoundedForm>
@@ -127,11 +150,11 @@ class CreatePortfolio extends Component<Props> {
 
 const mapStateToProps = state => ({
   resDex: state.resDex,
-  settings: state.settings,
-  form: state.roundedForm.authLogin
+  settings: state.settings
 })
 
 const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(ResDexBootstrappingActions, dispatch),
   routerActions: bindActionCreators(routerActions, dispatch),
 })
 

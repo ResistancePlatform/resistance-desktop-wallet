@@ -15,6 +15,12 @@ const t = translate('resdex')
 // 		.value()
 // )
 
+function getIsLoginDisabled(props: object) {
+  const isNodeRunning = props.settings.childProcessesStatus.NODE === 'RUNNING'
+  const isDisabled = !isNodeRunning || props.resDex.login.isInProgress
+  return isDisabled
+}
+
 const getOrderStatusName = (status: string) => ({
   pending: t(`Pending`),
   completed: t(`Completed`),
@@ -53,6 +59,7 @@ const isEtomic = symbol => {
 
 
 export {
+  getIsLoginDisabled,
 	// getCurrencySymbols,
   getOrderStatusName,
   getSortedCurrencies,
