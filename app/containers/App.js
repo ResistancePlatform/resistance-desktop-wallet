@@ -1,6 +1,5 @@
 // @flow
 
-import log from 'electron-log'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
@@ -24,14 +23,21 @@ import OwnAddress from './own-addresses/own-addresses'
 import SendCash from './send-cash/send-cash'
 import Settings from './settings/settings'
 import ResDexPage from './ResDexPage'
+import ResDexStart from '~/components/resdex/bootstrapping/Start'
+import ResDexCreatePortfolio from '~/components/resdex/bootstrapping/CreatePortfolio'
+import ResDexSaveSeed from '~/components/resdex/bootstrapping/SaveSeed'
+import ResDexEnterSeed from '~/components/resdex/bootstrapping/EnterSeed'
+import ResDexForgotPassword from '~/components/resdex/bootstrapping/ForgotPassword'
+
 import AddressBookPage from './AddressBookPage'
 
-import { appStore } from '../store/configureStore'
+import { getStore } from '../store/configureStore'
 import FetchParametersDialog from '~/components/fetch-parameters/FetchParametersDialog'
 import { FetchParametersState, FetchParametersActions } from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import { AuthState } from '~/reducers/auth/auth.reducer'
 import { GetStartedState } from '~/reducers/get-started/get-started.reducer'
 import { SettingsActions } from '~/reducers/settings/settings.reducer'
+import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 
 import styles from './App.scss'
 import HLayout from '../assets/styles/h-box-layout.scss'
@@ -41,7 +47,8 @@ import VLayout from '../assets/styles/v-box-layout.scss'
 type Props = {
   auth: AuthState,
   fetchParameters: FetchParametersState,
-  getStarted: GetStartedState
+  getStarted: GetStartedState,
+  resDex: ResDexState
 }
 
 /**
@@ -60,9 +67,9 @@ class App extends React.Component<Props> {
 	 */
   componentDidMount() {
     if (!this.props.fetchParameters.isDownloadComplete) {
-      appStore.dispatch(FetchParametersActions.fetch())
+      getStore().dispatch(FetchParametersActions.fetch())
     } else if (!this.props.getStarted.isInProgress) {
-      appStore.dispatch(SettingsActions.kickOffChildProcesses())
+      getStore().dispatch(SettingsActions.kickOffChildProcesses())
     }
   }
 
@@ -99,13 +106,26 @@ class App extends React.Component<Props> {
 					{ /* Route content container */}
 					<div className={cn(styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer)}>
 						<Switch>
+							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
+
 							<Route exact path="/overview" component={Overview} />
 							<Route exact path="/own-addresses" component={OwnAddress} />
 							<Route exact path="/send-cash" component={SendCash} />
 							<Route exact path="/settings" component={Settings} />
 							<Route exact path="/address-book" component={AddressBookPage} />
-							<Route exact path="/resdex" component={ResDexPage} />
-							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
+
+              <Route exact path="/resdex" render={() => (
+                this.props.resDex.bootstrapping.isInProgress
+                  ? (<ResDexStart />)
+                  : (<ResDexPage />)
+              )} />
+
+              <Route exact path="/resdex/start" component={ResDexStart} />
+              <Route exact path="/resdex/restore-portfolio" component={ResDexEnterSeed} />
+              <Route exact path="/resdex/create-portfolio" component={ResDexCreatePortfolio} />
+              <Route exact path="/resdex/save-seed" component={ResDexSaveSeed} />
+              <Route exact path="/resdex/confirm-seed" component={ResDexEnterSeed} />
+              <Route exact path="/resdex/forgot-password" component={ResDexForgotPassword} />
 						</Switch>
 					</div>
 				</div>

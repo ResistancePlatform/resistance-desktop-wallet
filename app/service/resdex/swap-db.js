@@ -34,9 +34,6 @@ export class SwapDBService {
    */
   constructor() {
     if (!instance) {
-      // TODO: Remove after bringing back the login
-      this.init('testfolio', `treat board tree once reduce reduce expose coil guilt fish flat boil`)
-
       instance = this
     }
 

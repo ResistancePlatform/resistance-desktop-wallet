@@ -13,7 +13,6 @@ import { i18n, translate } from '~/i18next.config'
 import { getEnsureLoginObservable } from '~/utils/auth'
 import { Action } from '../types'
 import { AuthActions } from '../auth/auth.reducer'
-import { ResDexActions } from '../resdex/resdex.reducer'
 import { SettingsActions } from './settings.reducer'
 import { RpcService } from '~/service/rpc-service'
 import { ChildProcessService } from '~/service/child-process-service'
@@ -60,7 +59,7 @@ const kickOffChildProcessesEpic = (action$: ActionsObservable<Action>, state$) =
       )
     }
 
-    return concat(observables, of(ResDexActions.startResdex()))
+    return observables
   })
 )
 

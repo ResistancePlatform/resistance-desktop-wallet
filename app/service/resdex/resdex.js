@@ -3,7 +3,6 @@ import log from 'electron-log'
 import os from 'os'
 import path from 'path'
 import rp from 'request-promise-native'
-import { remote } from 'electron'
 
 import { resDexUri } from '~/service/resdex/api'
 import { getStore } from '~/store/configureStore'
@@ -64,7 +63,7 @@ export class ResDexService {
       canbind: 0,
       seednode: seedNodeAddress,
       userhome: os.homedir(),
-      passphrase: seedPhrase || remote.getGlobal('resDex').seedPhrase,
+      passphrase: seedPhrase,
       coins: currenciesWithoutElectrum,
     }
 

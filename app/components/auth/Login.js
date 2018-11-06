@@ -11,10 +11,8 @@ import { RoundedFormRoot } from '~/reducers/rounded-form/rounded-form.reducer'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { AuthState, AuthActions } from '~/reducers/auth/auth.reducer'
 import TitleBarButtons, { DragBar } from '~/components/title-bar-buttons/TitleBarButtons'
-import RoundedInput from '~/components/rounded-form/RoundedInput'
-import RoundedForm from '~/components/rounded-form/RoundedForm'
+import { RoundedForm, RoundedButton, RoundedInput } from '~/components/rounded-form'
 
-import animatedSpinner from '~/assets/images/animated-spinner.svg'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 import resistanceLogo from '~/assets/images/logo.svg'
@@ -66,20 +64,25 @@ class Login extends Component<Props> {
         }
 
         <RoundedForm id="authLogin" schema={getValidationSchema()} className={styles.form}>
-          <RoundedInput name="password" password label={t(`Password`)} />
+          <RoundedInput
+            name="password"
+            type="password"
+            placeholder={t(`Password`)}
+            large
+          />
 
-          <button
+          <RoundedButton
             type="submit"
             className={styles.loginButton}
             onClick={this.props.actions.submitPassword}
-            onKeyDown={this.props.actions.submitPassword}
+            tooltip={isNodeRunning ? null : t(`Waiting for the daemon...`)}
+            spinner={!isNodeRunning}
             disabled={!isNodeRunning}
+            important
+            large
           >
-            {!isNodeRunning &&
-              <img src={animatedSpinner} alt={t(`Loading`)} title={t(`Waiting for the daemon...`)}/>
-            }
             {t(`Login`)}
-          </button>
+          </RoundedButton>
         </RoundedForm>
       </div>
     )

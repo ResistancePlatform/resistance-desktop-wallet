@@ -9,7 +9,7 @@
   text-align: left;
 
   border: 1px solid $BASE_COLOR_BORDER_GRAY;
-  border-radius: 1rem;
+  border-radius: 5rem;
 
   > div {
     display: flex;
@@ -17,12 +17,16 @@
     flex-direction: column;
   }
 
-  padding-left: 0.9rem;
+  padding-left: 0.55rem;
   padding-right: 0.55rem;
 
   &.hasError {
     border: 1px solid $BASE_COLOR_LIGHT_RED;
     box-shadow: 0 0 0.4rem $BASE_COLOR_LIGHT_RED;
+  }
+
+  &.large {
+    padding: 0.24rem 1.9rem;
   }
 
 }
@@ -38,6 +42,7 @@
   font-size: 0.61rem;
   font-weight: 100;
 
+  padding-left: 0.4rem;
   padding-right: 0.67rem;
   border-right: 1px solid $BASE_COLOR_BORDER_GRAY;
 

@@ -17,11 +17,11 @@
     width: 25%;
     border-right: 1px solid $BASE_COLOR_BORDER_BLUE;
     padding: 0 1rem;
-    color: $BASE_COLOR_INACTIVE_ICON;
+    color: $BASE_COLOR_FONT_GRAY;
     font-size: 1.1rem;
 
     &.active {
-      color: $BASE_COLOR_ACTIVE_ICON;
+      color: $BASE_COLOR_LIGHT_GREEN;
     }
   }
 

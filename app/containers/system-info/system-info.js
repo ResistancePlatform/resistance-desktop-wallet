@@ -17,8 +17,9 @@ import { getStore } from '~/store/configureStore'
 import { State } from '~/reducers/types'
 import humanizeOperationName from '~/components/system-info/humanize-operation'
 
-import styles from './system-info.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
+import statusStyles from '~/assets/styles/status-colors.scss'
+import styles from './system-info.scss'
 
 const childProcess = new ChildProcessService()
 
@@ -120,7 +121,7 @@ class SystemInfo extends Component<Props> {
     const color = childProcess.getChildProcessStatusColor(processStatus)
 
     if (color) {
-      statusClassNames.push(styles[color])
+      statusClassNames.push(statusStyles[color])
     }
 
     return statusClassNames.join(' ')
@@ -187,12 +188,14 @@ class SystemInfo extends Component<Props> {
 
         <RpcPolling
           interval={2.0 * 60}
+          criticalChildProcess="RESDEX"
           actions={{
             polling: ResDexOrdersActions.cleanupPendingSwaps,
             success: ResDexOrdersActions.gotPendingSwaps,
             failure: ResDexOrdersActions.cleanupPendingSwapsFailed
           }}
         />
+
         <RpcPolling
           interval={10.0 * 60 * 60}
           actions={{

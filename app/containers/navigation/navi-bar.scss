@@ -88,20 +88,42 @@
 }
 
 .resdex {
+  position: relative;
+
   i:before {
     content: "\e916";
     font-size: 1.41rem;
     margin-left: -0.1rem;
   }
 
-  span {
-    margin-left: 0.7rem;
-    color: $BASE_COLOR_WHITE;
-    padding: 0.25rem 0.55rem;
-    border-radius: 2rem;
-    background: $BASE_COLOR_PURPLE;
+  .resDexStatus {
+    position: absolute;
+    display: inline-block;
+
+    top: 1.1rem;
+    left: 48%;
+
+    color: $BASE_COLOR_DARK_BLUE_2 !important;
+
     font-size: 0.55rem;
     font-weight: 400;
-    text-transform: uppercase;
+
+    padding: 0.25rem;
+    border-radius: 50%;
+
+    &.hasOrders {
+      position: relative;
+      width: 0.9rem;
+      height: 0.9rem;
+      left: 0.8rem;
+      top: 0.4rem;
+
+      .number {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
   }
 }
