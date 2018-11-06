@@ -5,7 +5,7 @@ import { of, from, merge, concat, defer } from 'rxjs'
 import { switchMap, map, catchError, delay } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { routerActions } from 'react-router-redux'
-import { actions as toastrActions } from 'react-redux-toastr'
+import { toastr, actions as toastrActions } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { getStore } from '~/store/configureStore'
@@ -53,12 +53,22 @@ const login = (action$: ActionsObservable<Action>, state$) => action$.pipe(
     const decryptObservable = from(portfolio.decryptSeedPhrase(encryptedSeedPhrase, loginFields.resDexPassword))
 
     return decryptObservable.pipe(
-      switchMap((seedPhrase: string) => {
-        config.set('resDex.defaultPortfolioId', loginFields.portfolioId)
-        return of(ResDexLoginActions.startResdex(seedPhrase, loginFields.walletPassword))
-      }),
+      switchMap((seedPhrase: string) => (
+        of(
+          ResDexLoginActions.startResdex(seedPhrase, loginFields.walletPassword),
+          ResDexLoginActions.setDefaultPortfolio(loginFields.portfolioId),
+        )
+      )),
       catchError(err => of(ResDexLoginActions.loginFailed(err.message)))
     )
+  })
+)
+
+const setDefaultPortfolioEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(ResDexLoginActions.setDefaultPortfolio),
+  map(action => {
+    config.set('resDex.defaultPortfolioId', action.payload.id)
+    return ResDexLoginActions.empty()
   })
 )
 
@@ -174,15 +184,17 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
 
 const loginFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexLoginActions.loginFailed),
-  map(action => (
-    toastrActions.add({ type: 'error', title: action.payload.errorMessage })
-  ))
+  map(action => {
+    toastr.error(action.payload.errorMessage)
+    return routerActions.push('/resdex')
+  })
 )
 
 export const ResDexLoginEpic = (action$, state$) => merge(
   getPortfolios(action$, state$),
   login(action$, state$),
   loginFailedEpic(action$, state$),
+  setDefaultPortfolioEpic(action$, state$),
   startResdexEpic(action$, state$),
   initResdexEpic(action$, state$),
 )

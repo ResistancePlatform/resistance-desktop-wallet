@@ -79,12 +79,14 @@ const createPortfolioEpic = (action$: ActionsObservable<Action>, state$) => acti
 
     return createObservable.pipe(
       switchMap((portfolioId: string) =>  {
-        config.set('resDex.defaultPortfolioId', portfolioId)
         config.set('resDex.bootstrappingInProgress', false)
         toastr.success(t(`Portfolio {{name}} created`, { name: fields.name }))
         return of(
           ResDexBootstrappingActions.bootstrappingCompleted(),
-          ResDexLoginActions.startResdex(seedPhrase, fields.walletPassword)
+          ResDexLoginActions.startResdex(seedPhrase, fields.walletPassword),
+          ResDexLoginActions.setDefaultPortfolio(portfolioId),
+          // Reset default portfolio in case of ResDex start failure
+          RoundedFormActions.clear('resDexLogin'),
         )
       }),
       catchError(err => {

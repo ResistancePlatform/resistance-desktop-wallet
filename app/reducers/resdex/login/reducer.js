@@ -17,6 +17,8 @@ export const ResDexLoginActions = createActions(
     LOGIN_FAILED: (errorMessage: string) => ({ errorMessage }),
     SHOW_DIALOG: undefined,
 
+    SET_DEFAULT_PORTFOLIO: (id: string) => ({ id }),
+
     START_RESDEX: (seedPhrase: string, walletPassword: string) => ({ seedPhrase, walletPassword }),
     INIT_RESDEX: (walletPassword: string) => ({ walletPassword }),
     STOP_RESDEX: undefined,
@@ -49,6 +51,10 @@ export const ResDexLoginReducer = handleActions(
     [ResDexLoginActions.showDialog]: state => ({
       ...state,
       isRequired: true,
+    }),
+    [ResDexLoginActions.setDefaultPortfolio]: (state, action) => ({
+      ...state,
+      defaultPortfolioId: action.payload.id,
     }),
     [ResDexBootstrappingActions.createPortfolio]: state => ({
       ...state,
