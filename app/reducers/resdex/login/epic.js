@@ -170,7 +170,8 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
       switchMap(() => concat(
         sendPassphraseObservable,
         getFeesObservable,
-        setConfirmationsObservable
+        setConfirmationsObservable,
+        of(ResDexOrdersActions.getSwapHistory()),
       )),
       catchError(err => {
         log.error(`Can't enable currencies`, err)
