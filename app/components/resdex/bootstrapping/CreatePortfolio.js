@@ -121,6 +121,7 @@ class CreatePortfolio extends Component<Props> {
                   </RoundedButton>
                 ) : (
                   <RoundedButton
+                    type="submit"
                     className={styles.button}
                     onClick={() => this.props.routerActions.push('/resdex/save-seed')}
                     important
