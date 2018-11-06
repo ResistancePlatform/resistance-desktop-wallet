@@ -11,14 +11,14 @@ import styles from './RoundedInputWithUseMax.scss'
 
 const t = translate('other')
 
-type Props = {
+type RoundedInputWithUseMaxProps = {
   ...RoundedInputProps,
   maxAmount: any,
   symbol: string
 }
 
 export default class RoundedInputWithUseMax extends RoundedInput {
-  props: Props
+  props: RoundedInputWithUseMaxProps
 
   renderLabel() {
     return (

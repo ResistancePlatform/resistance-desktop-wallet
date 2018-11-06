@@ -1,4 +1,5 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import * as Joi from 'joi'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -8,10 +9,15 @@ import cn from 'classnames'
 
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
-import RoundedInput from '~/components/rounded-form/RoundedInput'
-import ChooseWallet from '~/components/rounded-form/ChooseWallet'
-import RoundedTextArea from '~/components/rounded-form/RoundedTextArea'
-import RoundedForm from '~/components/rounded-form/RoundedForm'
+import {
+  RoundedForm,
+  RoundedButton,
+  RoundedInput,
+  RoundedInputWithPaste,
+  RoundedInputWithMaxAmount,
+  RoundedTextArea,
+  ChooseWallet,
+} from '~/components/rounded-form'
 
 import styles from './WithdrawModal.scss'
 
@@ -38,6 +44,7 @@ class WithdrawModal extends Component<Props> {
 
 	render() {
     const { t } = this.props
+    const { symbol } = this.props.accounts.withdrawModal
 
     return (
       <div className={styles.overlay}>
@@ -60,27 +67,30 @@ class WithdrawModal extends Component<Props> {
           schema={getValidationSchema(t)}
         >
 
-        <RoundedInput
+        <RoundedInputWithPaste
           name="recipientAddress"
           label={t(`Recipient wallet`)}
-          addon={{ enable: true, type: 'PASTE' }}
         />
 
         <ChooseWallet
           name="withdrawFrom"
           label={t(`Withdraw from`)}
-          defaultValue={this.props.accounts.withdrawModal.symbol}
+          defaultValue={symbol}
           currencies={this.props.accounts.currencies}
         />
 
         <div className={styles.inputsRow}>
           <div>
             <div className={styles.caption}>{t(`Amount`)}</div>
-            <RoundedInput className={styles.amount} name="amount" number />
+            <RoundedInputWithMaxAmount
+              className={styles.amount} name="amount"
+              symbol={symbol}
+              maxAmount={Decimal(100)}
+            />
           </div>
           <div>
             <div className={styles.caption} />
-            <RoundedInput name="equity" readOnly number />
+            <RoundedInput type="number" name="equity" readOnly />
           </div>
         </div>
 
@@ -88,11 +98,21 @@ class WithdrawModal extends Component<Props> {
           {t(`Note`)}
         </div>
 
-        <RoundedTextArea name="note" rows={4} >
-          {t(`Write an optional message`)}
-        </RoundedTextArea>
+        <RoundedTextArea
+          name="note"
+          rows={4}
+          placeholder={t(`Write an optional message`)}
+        />
 
-        <button type="submit" onClick={this.props.actions.withdraw}>{t(`Withdraw`)}</button>
+        <RoundedButton
+          type="submit"
+          className={styles.button}
+          onClick={this.props.actions.withdraw}
+          important
+        >
+          {t(`Withdraw`)}
+        </RoundedButton>
+
     </RoundedForm>
 
   </div>

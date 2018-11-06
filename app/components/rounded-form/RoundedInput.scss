@@ -186,8 +186,8 @@
 .chooseWallet {
   display: flex !important;
   width: 100%;
-  font-size: 0.65rem;
   color: $BASE_COLOR_WHITE;
+  font-size: 0.65rem;
 
   .currencyIcon {
     padding: 0.25rem;
@@ -206,7 +206,7 @@
     min-width: 6.25rem;
     white-space: nowrap;
     margin-right: 0.4rem;
-    font-weight: 300;
+    font-weight: 500;
   }
 
   .balance {
@@ -214,7 +214,7 @@
     display: inline-block;
     text-align: right;
     margin-right: 0.4rem;
-    font-weight: 300;
+    font-weight: 500;
     overflow-x: hidden;
   }
 

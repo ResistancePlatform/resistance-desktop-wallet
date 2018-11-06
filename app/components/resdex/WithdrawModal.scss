@@ -4,7 +4,8 @@ $withdrawModalWidth: 26.25rem;
 
 .withdraw {
   padding: 2rem;
-  width: $withdrawModalWidth;
+  padding-bottom: 1rem;
+  width: $withdrawModalWidth - 4rem;
 
   .inputsRow {
     display: flex;
@@ -24,7 +25,7 @@ $withdrawModalWidth: 26.25rem;
     cursor: default;
   }
 
-  button[type='submit'] {
+  .button {
     margin-top: 0.75rem;
     float: right;
   }
