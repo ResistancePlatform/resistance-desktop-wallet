@@ -38,7 +38,7 @@ export const ResDexAccountsActions = createActions(
     DELETE_CURRENCY: (symbol: string) => ({ symbol }),
     SHOW_DEPOSIT_MODAL: (symbol: string) => ({ symbol }),
     SHOW_WITHDRAW_MODAL: (symbol: string) => ({ symbol }),
-    SHOW_EDIT_CURRENCY_MODAL: (symbol: string) => ({ symbol }),
+    SHOW_EDIT_CURRENCY_MODAL: (currency: object) => currency,
     SHOW_ADD_CURRENCY_MODAL: undefined,
     CLOSE_DEPOSIT_MODAL: undefined,
     CLOSE_WITHDRAW_MODAL: undefined,
@@ -46,7 +46,7 @@ export const ResDexAccountsActions = createActions(
 
     SELECT_CURRENCY: symbol => ({ symbol }),
     GET_TRANSACTIONS: undefined,
-    GOT_TRANSACTIONS: transactions => ({ transactions }),
+    GOT_CURRENCY_TRANSACTIONS: (symbol: string, transactions: object[] | null) => ({ symbol, transactions }),
     GET_TRANSACTIONS_FAILED: (errorMessage: string) => ({ errorMessage }),
   },
   {
@@ -60,9 +60,12 @@ export const ResDexAccountsReducer = handleActions(
       ...state,
       selectedSymbol: action.payload.symbol,
     }),
-    [ResDexAccountsActions.gotTransactions]: (state, action) => ({
+    [ResDexAccountsActions.gotCurrencyTransactions]: (state, action) => ({
       ...state,
-      transactions: action.payload.transactions,
+      transactions: {
+        ...state.transactions,
+        [action.payload.symbol]: action.payload.transactions,
+      }
     }),
     [ResDexAccountsActions.gotCurrencyFees]: (state, action) => ({
       ...state,
@@ -88,9 +91,10 @@ export const ResDexAccountsReducer = handleActions(
     }),
     [ResDexAccountsActions.showEditCurrencyModal]: (state, action) => ({
       ...state,
+      selectedSymbol: action.payload.symbol,
       addCurrencyModal: {
         isInEditMode: true,
-        symbol: action.payload.symbol,
+        defaultValues: action.payload,
         isVisible: true
       }
     }),
@@ -98,7 +102,11 @@ export const ResDexAccountsReducer = handleActions(
       ...state,
       addCurrencyModal: {
         isInEditMode: false,
-        symbol: null,
+        defaultValues: {
+          symbol: null,
+          rpcPort: null,
+          useElectrum: true
+        },
         isVisible: true
       }
     }),
@@ -116,6 +124,14 @@ export const ResDexAccountsReducer = handleActions(
     }),
     [ResDexAccountsActions.closeAddCurrencyModal]: state => ({
       ...state,
-      addCurrencyModal: { isInEditMode: false, isVisible: false, symbol: null }
+      addCurrencyModal: {
+        isInEditMode: false,
+        isVisible: false,
+        defaultValues: {
+          symbol: null,
+          rpcPort: null,
+          useElectrum: true
+        },
+      }
     }),
   }, preloadedState)

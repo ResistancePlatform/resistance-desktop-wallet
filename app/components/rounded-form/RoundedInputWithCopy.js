@@ -13,7 +13,7 @@ const t = translate('other')
 export default class RoundedInputWithCopy extends RoundedInput {
   copyValue() {
     clipboard.writeText(this.state.value)
-    toastr.success(t(`The value has been copied`))
+    toastr.success(t(`Copied to clipboard`))
   }
 
   renderAddon() {

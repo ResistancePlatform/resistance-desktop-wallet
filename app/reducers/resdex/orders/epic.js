@@ -85,6 +85,7 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
           }
         })
 
+        // Track pending activities to ask user for a quit confirmation
         remote.getGlobal('pendingActivities').orders = Boolean(
           swapHistory.find(swap => !['completed', 'failed'].includes(swap.status))
         )

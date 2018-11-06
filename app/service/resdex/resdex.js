@@ -14,9 +14,9 @@ import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 const netId = 2045
 const rpcPort = 17445
 
-// const seedNodeAddress = '34.201.64.15'
+const seedNodeAddress = '34.201.64.15'
 // const seedNodeAddress = '34.207.111.158'
-const seedNodeAddress = '35.174.118.206'
+// const seedNodeAddress = '35.174.118.206'
 
 
 /**

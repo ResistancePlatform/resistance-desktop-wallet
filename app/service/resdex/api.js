@@ -5,6 +5,7 @@ import rp from 'request-promise-native'
 import log from 'electron-log'
 import { remote } from 'electron'
 import getPort from 'get-port'
+import pMap from 'p-map'
 
 import { getStore } from '~/store/configureStore'
 import { translate } from '~/i18next.config'
@@ -98,26 +99,35 @@ export class ResDexApiService {
     })
   }
 
+  async getRawTransaction(coin: string, txid: string) {
+    return this.query({
+      method: 'getrawtransaction',
+      coin,
+      txid,
+    })
+  }
+
   async listTransactions(coin: string, address: string) {
-    let response
+    const response = await this.query({
+      method: 'listtransactions',
+      coin,
+      address
+    })
 
-    try {
-      response = await this.query({
-        method: 'listtransactions',
-        coin,
-        address
-      })
-    } catch (err) {
-      return []
-    }
-
-
-    // TODO: check if it's possible to get rawtransaction for Electrum currencies
     if (response.length && response[0].tx_hash) {
       return []
-    }
 
-    log.debug('listTransactions', coin, response.slice(0, 1))
+      /*
+       * Commented out for now,
+       * see https://github.com/ResistancePlatform/resistance-desktop-wallet/issues/213
+       *
+
+      const txids = response.map(item => item.tx_hash)
+      const rawTransactions = await this::fetchTransactionsForAddress(coin, address, txids)
+      return rawTransactions
+
+      */
+    }
 
     const result = response.map(transaction => ({
       ...response,
@@ -141,7 +151,7 @@ export class ResDexApiService {
     return this.query({ method: 'portfolio' })
   }
 
-  async enableCurrency(symbol: string) {
+  async enableCurrency(symbol: string, useElectrum: boolean = true) {
 		const currency = getCurrency(symbol)
 
 		if (!currency) {
@@ -149,7 +159,7 @@ export class ResDexApiService {
       return
 		}
 
-		if (currency.electrumServers) {
+		if (useElectrum && currency.electrumServers) {
 			const queries = currency.electrumServers.map(server => this.query({
 				method: 'electrum',
 				coin: symbol,
@@ -171,6 +181,13 @@ export class ResDexApiService {
 		const response = await this.query({ method: 'enable', coin: symbol })
 		return response.status === 'active'
   }
+
+  disableCurrency(coin: string) {
+		return this.query({
+			method: 'disable',
+			coin,
+		})
+	}
 
 	async getOrderBook(base, rel) {
 		const response = await this.query({
@@ -255,3 +272,36 @@ export class ResDexApiService {
   }
 
 }
+
+/**
+ * Private method. Fetches raw transactions, filters out and calculates amount values for a given address.
+ *
+ */
+async function fetchTransactionsForAddress(coin: string, address: string, txids: string[]) {
+  const rawTransactions = await pMap(
+    txids,
+    txid => this.getRawTransaction(coin, txid), { concurrency: 2 }
+  )
+
+  const transactions = rawTransactions.map(rawTransaction => {
+    const amount = rawTransaction.vout.reduce((previousValue, vout) => {
+      const { scriptPubKey } = vout
+
+      if (!scriptPubKey) {
+        return previousValue
+      }
+
+      const hasAddress = scriptPubKey.addresses.find(voutAddress => voutAddress === address)
+      return hasAddress ? previousValue.plus(Decimal(vout.value)) : previousValue
+
+    }, Decimal(0))
+
+    return {
+      txid: rawTransaction.txid,
+      amount,
+    }
+  })
+
+  return transactions
+}
+

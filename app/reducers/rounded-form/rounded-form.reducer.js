@@ -27,14 +27,14 @@ export const RoundedFormActions = createActions(
 )
 
 export const RoundedFormReducer = handleActions({
-  [RoundedFormActions.clear]: (state, action) => ({
-    ...state,
-    [action.payload.formId]: {
-      fields: {},
-      errors: {},
-      isValid: false
+  [RoundedFormActions.clear]: (state, action) => {
+    const newState = {...state}
+    const { formId } = action.payload
+    if (formId in newState) {
+      delete newState[formId]
     }
-  }),
+    return newState
+  },
   [RoundedFormActions.updateFields]: (state, action) => ({
     ...state,
     [action.payload.formId]: {
