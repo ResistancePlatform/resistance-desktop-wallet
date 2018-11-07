@@ -30,6 +30,9 @@ export const ResDexAccountsActions = createActions(
     UPDATE_ENABLED_CURRENCIES: (enabledCurrencies: EnabledCurrency[]) => ({ enabledCurrencies }),
 
     WITHDRAW: undefined,
+    UPDATE_WITHDRAWAL_SYMBOL: (symbol: string) => ({ symbol }),
+    WITHDRAWAL_FAILED: undefined,
+
     ADD_CURRENCY: undefined,
     UPDATE_CURRENCY: undefined,
     COPY_SMART_ADDRESS: (symbol: string) => ({ symbol }),
@@ -42,8 +45,6 @@ export const ResDexAccountsActions = createActions(
     CLOSE_DEPOSIT_MODAL: undefined,
     CLOSE_WITHDRAW_MODAL: undefined,
     CLOSE_ADD_CURRENCY_MODAL: undefined,
-
-    UPDATE_WITHDRAWAL_SYMBOL: (symbol: string) => ({ symbol }),
 
     SELECT_CURRENCY: symbol => ({ symbol }),
     GET_TRANSACTIONS: undefined,
@@ -87,6 +88,7 @@ export const ResDexAccountsReducer = handleActions(
       ...state,
       withdrawModal: {
         isVisible: true,
+        isInProgress: false,
         symbol: action.payload.symbol
       }
     }),
@@ -122,13 +124,27 @@ export const ResDexAccountsReducer = handleActions(
       ...state,
       enabledCurrencies: action.payload.enabledCurrencies
     }),
+    [ResDexAccountsActions.withdraw]: (state) => ({
+      ...state,
+      withdrawModal: {
+        ...state.withdrawModal,
+        isInProgress: true
+      }
+    }),
     [ResDexAccountsActions.closeDepositModal]: state => ({
       ...state,
       depositModal: { isVisible: false, symbol: null }
     }),
+    [ResDexAccountsActions.withdrawalFailed]: (state) => ({
+      ...state,
+      withdrawModal: {
+        ...state.withdrawModal,
+        isInProgress: false
+      }
+    }),
     [ResDexAccountsActions.closeWithdrawModal]: (state) => ({
       ...state,
-      withdrawModal: { isVisible: false, symbol: null }
+      withdrawModal: { isVisible: false, isInProgress: false, symbol: null }
     }),
     [ResDexAccountsActions.closeAddCurrencyModal]: state => ({
       ...state,

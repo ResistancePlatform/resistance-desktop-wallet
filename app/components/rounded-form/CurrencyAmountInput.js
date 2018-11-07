@@ -28,6 +28,17 @@ export default class CurrencyAmountInput extends RoundedInput {
     )
   }
 
+  getTruncatedMaxAmount() {
+    const { maxAmount } = this.props
+
+    if (maxAmount) {
+      const decimalPlaces = this.props.symbol === 'USD' ? 2 : 8
+      return maxAmount.toDP(decimalPlaces, Decimal.ROUND_FLOOR).toString()
+    }
+
+    return maxAmount
+  }
+
   renderInput() {
     return (
       <div className={styles.inputContainer}>
@@ -35,8 +46,9 @@ export default class CurrencyAmountInput extends RoundedInput {
           className={cn(parentStyles.input, styles.input)}
           name={this.props.name}
           type="number"
-          step={this.props.step}
+          step={this.props.step || '0.1'}
           min="0"
+          max={this.getTruncatedMaxAmount()}
           value={this.state.value}
           disabled={this.props.disabled}
           onChange={event => this.onChangeHandler(event)}
@@ -55,15 +67,12 @@ export default class CurrencyAmountInput extends RoundedInput {
       return null
     }
 
-    const decimalPlaces = this.props.symbol === 'USD' ? 2 : 8
-    const maxValue = this.props.maxAmount.toDP(decimalPlaces, Decimal.ROUND_FLOOR)
-
     return (
       <div className={styles.buttonWrapper}>
         <button
           type="button"
           className={styles.maxButton}
-          onClick={() => this.changeValue(maxValue.toString())}
+          onClick={() => this.changeValue(this.getTruncatedMaxAmount())}
           onKeyDown={() => false}
         >
           {this.props.buttonLabel || t(`Max`)}

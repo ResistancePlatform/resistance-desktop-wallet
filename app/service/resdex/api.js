@@ -18,9 +18,9 @@ export const resDexUri = 'http://127.0.0.1:17445'
 const t = translate('service')
 
 class ResDexApiError extends Error {
-  constructor(response) {
+  constructor(response, message) {
     const { error } = response
-    super(error)
+    super(error || message)
     this.response = response
     this.code = error && error.code
   }
@@ -81,8 +81,14 @@ export class ResDexApiService {
       pending: 1
     })
 
-    log.debug('swapstatus', JSON.stringify(response))
     return response.swaps
+  }
+
+  withdraw(opts) {
+    const currency = getCurrency(opts.symbol)
+    return currency.etomic
+      ? this::withdrawEth(opts)
+      : this::withdrawBtcFork(opts)
   }
 
 	kickstart(requestId: number, quoteId: number) {
@@ -242,7 +248,7 @@ export class ResDexApiService {
    *
 	 * @memberof ResDexApiService
 	 */
-  query(data: object) {
+  query(data: object, errorMessage?: string) {
     const token = remote.getGlobal('resDex').apiToken
 
     log.debug(`Calling ResDEX API method ${data.method}`, JSON.stringify(data))
@@ -266,7 +272,7 @@ export class ResDexApiService {
 
     return rp(options).then(response => {
       if (response.error) {
-        throw new ResDexApiError(response)
+        throw new ResDexApiError(response, errorMessage)
       }
       return response
     })
@@ -306,3 +312,105 @@ async function fetchTransactionsForAddress(coin: string, address: string, txids:
   return transactions
 }
 
+async function withdrawBtcFork(opts) {
+  const {
+    hex: rawTransaction,
+    txfee: txFeeSatoshis,
+    txid,
+    amount,
+    symbol,
+    address,
+  } = await this::createTransaction(opts)
+
+  // Convert from satoshis
+  const SATOSHIS = 100000000
+  const txFee = txFeeSatoshis / SATOSHIS
+
+  const broadcast = async () => {
+    await this::broadcastTransaction(opts.symbol, rawTransaction)
+
+    return {txid, amount, symbol, address}
+  }
+
+  return {
+    txFee,
+    broadcast,
+  }
+}
+
+async function withdrawEth(opts) {
+  const {
+    eth_fee: txFee,
+    gas_price: gasPrice,
+    gas,
+  } = await this.query({
+    method: 'eth_withdraw',
+    coin: opts.symbol,
+    to: opts.address,
+    amount: opts.amount,
+    broadcast: 0,
+  })
+
+  let hasBroadcast = false
+
+  const broadcast = async () => {
+    if (hasBroadcast) {
+      throw new Error(t(`Transaction has already been broadcasted`))
+    }
+    hasBroadcast = true
+
+    const response = await this.query({
+      method: 'eth_withdraw',
+      gas,
+      gas_price: gasPrice,
+      coin: opts.symbol,
+      to: opts.address,
+      amount: opts.amount,
+      broadcast: 1,
+    }, t(`Couldn't create withdrawal transaction`))
+
+    return {
+      txid: response.tx_id,
+      symbol: opts.symbol,
+      amount: opts.amount,
+      address: opts.address,
+    }
+  }
+
+  return {
+    txFee,
+    broadcast,
+  }
+}
+
+async function createTransaction(opts) {
+  const response = await this.query({
+    method: 'withdraw',
+    coin: opts.symbol,
+    outputs: [{[opts.address]: opts.amount.toString()}],
+    broadcast: 0,
+  })
+
+  if (!response.complete) {
+    throw new ResDexApiError(response, t(`Couldn't create withdrawal transaction`))
+  }
+
+  return {
+    ...opts,
+    ...response,
+  }
+}
+
+async function broadcastTransaction(symbol, rawTransaction) {
+  const response = await this.query({
+    method: 'sendrawtransaction',
+    coin: symbol,
+    signedtx: rawTransaction,
+  })
+
+  if (!response.result === 'success') {
+    throw new ResDexApiError(response, t(`Couldn't broadcast transaction`))
+  }
+
+  return response.txid
+}

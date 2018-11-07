@@ -30,7 +30,7 @@ $withdrawModalWidth: 26.25rem;
   .caption {
     color: $BASE_COLOR_FONT_GRAY_2;
     height: 0.65rem;
-    margin-left: 2rem;
+    margin-left: 1.1rem;
     margin-bottom: 0.85rem;
     font-size: 0.65rem;
     text-transform: uppercase;
@@ -40,6 +40,8 @@ $withdrawModalWidth: 26.25rem;
 
   .button {
     margin-top: 0.75rem;
+    padding-left: 2.2rem;
+    padding-right: 2.2rem;
     float: right;
   }
 

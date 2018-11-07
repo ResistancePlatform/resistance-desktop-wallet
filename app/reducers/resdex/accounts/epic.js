@@ -132,6 +132,32 @@ const updateCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.
   })
 )
 
+const withdrawEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+  ofType(ResDexAccountsActions.withdraw),
+  switchMap(() => {
+    const { recipientAddress, amount } = state$.value.roundedForm.resDexAccountsWithdrawModal.fields
+    const { symbol } = state$.value.resDex.accounts.withdrawModal
+
+    const observable = from(api.withdraw({
+      symbol,
+      address: recipientAddress,
+      amount,
+    }))
+
+    return observable.pipe(
+      switchMap(() => {
+        toastr.info(t(`Withdrawal of ${amount.toString()} ${symbol} succeeded`))
+        return of(ResDexAccountsActions.closeWithdrawModal())
+      }),
+      catchError(err => {
+        log.error(`Can't withdraw ${symbol}`, err, err.response)
+        toastr.error(t(`Error withdrawing ${symbol}`, err.message))
+        return of(ResDexAccountsActions.withdrawalFailed())
+      })
+    )
+  })
+)
+
 const addCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(ResDexAccountsActions.addCurrency),
   switchMap(() => {
@@ -260,6 +286,7 @@ export const ResDexAccountsEpic = (action$, state$) => merge(
   updateCurrencyEpic(action$, state$),
   deleteCurrencyEpic(action$, state$),
   confirmCurrencyDeletionEpic(action$, state$),
+  withdrawEpic(action$, state$),
   closeAddCurrencyModalEpic(action$, state$),
   closeWithdrawModalEpic(action$, state$),
 )

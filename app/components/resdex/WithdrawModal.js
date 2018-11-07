@@ -23,7 +23,7 @@ import styles from './WithdrawModal.scss'
 const getValidationSchema = t => Joi.object().keys({
   recipientAddress: Joi.string().required().label(t(`Recipient address`)),
   withdrawFrom: Joi.string().required(),
-  amount: Joi.number().required().label(t(`Amount`)),
+  amount: Joi.number().min(0).required().label(t(`Amount`)),
   equity: Joi.number(),
   note: Joi.string().optional().label(t(`Note`)),
 })
@@ -63,6 +63,8 @@ class WithdrawModal extends Component<Props> {
     const { symbol } = this.props.accounts.withdrawModal
     const currency = this.props.accounts.currencies[symbol]
 
+    const { isInProgress } = this.props.accounts.withdrawModal
+
     return (
       <div className={styles.overlay}>
         <div className={cn(styles.container, styles.withdraw)}>
@@ -71,7 +73,7 @@ class WithdrawModal extends Component<Props> {
             tabIndex={0}
             className={cn('icon', styles.closeButton)}
             onClick={this.props.actions.closeWithdrawModal}
-            onKeyDown={() => {}}
+            onKeyDown={() => false}
           />
 
           {/* Title */}
@@ -139,6 +141,8 @@ class WithdrawModal extends Component<Props> {
             type="submit"
             className={styles.button}
             onClick={this.props.actions.withdraw}
+            spinner={isInProgress}
+            disabled={isInProgress}
             important
           >
             {t(`Withdraw`)}
