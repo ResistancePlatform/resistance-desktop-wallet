@@ -6,19 +6,21 @@ import { translate } from '~/i18next.config'
 import RoundedInput, { RoundedInputProps } from './NewRoundedInput'
 
 import parentStyles from './NewRoundedInput.scss'
-import styles from './RoundedInputWithUseMax.scss'
+import styles from './CurrencyAmountInput.scss'
 
 
 const t = translate('other')
 
-type RoundedInputWithUseMaxProps = {
+type CurrencyAmountInputProps = {
   ...RoundedInputProps,
-  maxAmount: any,
-  symbol: string
+  maxAmount?: object,
+  buttonLabel?: string,
+  symbol: string,
+  step?: string
 }
 
-export default class RoundedInputWithUseMax extends RoundedInput {
-  props: RoundedInputWithUseMaxProps
+export default class CurrencyAmountInput extends RoundedInput {
+  props: CurrencyAmountInputProps
 
   renderLabel() {
     return (
@@ -33,31 +35,38 @@ export default class RoundedInputWithUseMax extends RoundedInput {
           className={cn(parentStyles.input, styles.input)}
           name={this.props.name}
           type="number"
-          step="0.1"
+          step={this.props.step}
           min="0"
           value={this.state.value}
           disabled={this.props.disabled}
           onChange={event => this.onChangeHandler(event)}
           onFocus={(event) => this.onFocusHandler(event)}
           onBlur={(event) => this.onBlurHandler(event)}
+          placeholder={this.props.placeholder}
           readOnly={this.props.readOnly}
         />
         {this.props.symbol}
       </div>
     )
   }
+
   renderAddon() {
-    const maxValue = this.props.maxAmount.toDP(8, Decimal.ROUND_FLOOR).toString()
+    if (!this.props.maxAmount) {
+      return null
+    }
+
+    const decimalPlaces = this.props.symbol === 'USD' ? 2 : 8
+    const maxValue = this.props.maxAmount.toDP(decimalPlaces, Decimal.ROUND_FLOOR)
 
     return (
       <div className={styles.buttonWrapper}>
         <button
           type="button"
-          className={styles.useMaxButton}
-          onClick={() => this.changeValue(maxValue)}
+          className={styles.maxButton}
+          onClick={() => this.changeValue(maxValue.toString())}
           onKeyDown={() => false}
         >
-          {t(`Use max`)}
+          {this.props.buttonLabel || t(`Max`)}
         </button>
       </div>
     )

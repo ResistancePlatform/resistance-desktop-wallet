@@ -9,8 +9,21 @@ $withdrawModalWidth: 26.25rem;
 
   .inputsRow {
     display: flex;
+
     .amount {
       text-align: left;
+    }
+
+    .exchangeIcon {
+      color: $BASE_COLOR_LIGHT_BLUE;
+      font-size: 1.37rem;
+      margin-left: 0.4rem;
+      margin-right: 0.4rem;
+      margin-top: 1.7rem;
+
+      &:before {
+        content: '\e916';
+      }
     }
   }
 

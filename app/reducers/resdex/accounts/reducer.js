@@ -43,6 +43,8 @@ export const ResDexAccountsActions = createActions(
     CLOSE_WITHDRAW_MODAL: undefined,
     CLOSE_ADD_CURRENCY_MODAL: undefined,
 
+    UPDATE_WITHDRAWAL_SYMBOL: (symbol: string) => ({ symbol }),
+
     SELECT_CURRENCY: symbol => ({ symbol }),
     GET_TRANSACTIONS: undefined,
     GOT_CURRENCY_TRANSACTIONS: (symbol: string, transactions: object[] | null) => ({ symbol, transactions }),
@@ -107,6 +109,13 @@ export const ResDexAccountsReducer = handleActions(
           useElectrum: true
         },
         isVisible: true
+      }
+    }),
+    [ResDexAccountsActions.updateWithdrawalSymbol]: (state, action) => ({
+      ...state,
+      withdrawModal: {
+        ...state.withdrawModal,
+        symbol: action.payload.symbol,
       }
     }),
     [ResDexAccountsActions.updateEnabledCurrencies]: (state, action) => ({

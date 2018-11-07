@@ -15,7 +15,7 @@ import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import {
   RoundedForm,
   RoundedButton,
-  RoundedInputWithUseMax,
+  CurrencyAmountInput,
   ChooseWallet
 } from '~/components/rounded-form'
 import OrderSummary from './OrderSummary'
@@ -139,14 +139,15 @@ class ResDexBuySell extends Component<Props> {
                   currencies={this.props.accounts.currencies}
                 />
 
-                <RoundedInputWithUseMax
+                <CurrencyAmountInput
                   name="maxRel"
-                  className={styles.maxRel}
                   labelClassName={styles.inputLabel}
+                  addonClassName={styles.maxRelAddon}
                   label={t(`Max. {{quoteCurrency}}`, { quoteCurrency })}
+                  buttonLabel={t(`Use max`)}
                   maxAmount={this.getMaxQuoteAmount()}
                   symbol={quoteCurrency}
-                  number />
+                />
 
                 <div className={styles.enhancedPrivacy}>
                   <label htmlFor="input-resdex-enhanced-privacy-id">
@@ -159,6 +160,7 @@ class ResDexBuySell extends Component<Props> {
 
                 <RoundedButton
                   type="submit"
+                  className={styles.exchangeButton}
                   onClick={this.props.actions.createMarketOrder}
                   disabled={txFee && this.getSubmitButtonDisabledAttribute()}
                   spinner={this.props.buySell.isSendingOrder}

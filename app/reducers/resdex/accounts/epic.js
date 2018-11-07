@@ -245,6 +245,12 @@ const closeAddCurrencyModalEpic = (action$: ActionsObservable<any>) => action$.p
   mapTo(RoundedFormActions.clear('resDexAccountsAddCurrencyModal'))
 )
 
+
+const closeWithdrawModalEpic = (action$: ActionsObservable<any>) => action$.pipe(
+	ofType(ResDexAccountsActions.closeWithdrawModal),
+  mapTo(RoundedFormActions.clear('resDexAccountsWithdrawModal'))
+)
+
 export const ResDexAccountsEpic = (action$, state$) => merge(
   getCurrenciesEpic(action$, state$),
   getCurrenciesFailedEpic(action$, state$),
@@ -255,4 +261,5 @@ export const ResDexAccountsEpic = (action$, state$) => merge(
   deleteCurrencyEpic(action$, state$),
   confirmCurrencyDeletionEpic(action$, state$),
   closeAddCurrencyModalEpic(action$, state$),
+  closeWithdrawModalEpic(action$, state$),
 )
