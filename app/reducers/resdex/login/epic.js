@@ -5,7 +5,7 @@ import { of, from, merge, concat, defer } from 'rxjs'
 import { switchMap, map, catchError, delay } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { routerActions } from 'react-router-redux'
-import { toastr, actions as toastrActions } from 'react-redux-toastr'
+import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { getStore } from '~/store/configureStore'
@@ -36,7 +36,10 @@ const getPortfolios = (action$: ActionsObservable<Action>) => action$.pipe(
       switchMap(portfolios => (
         of(ResDexLoginActions.gotPortfolios(portfolios))
       )),
-      catchError(err => of(toastrActions.add({ type: 'error', title: err.message })))
+      catchError(err => {
+        toastr.error(err.message)
+        return ResDexLoginActions.empty()
+      })
     )
   ))
 )
@@ -133,11 +136,8 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
       }),
       catchError(err => {
         log.error(`Failed to get currencies fees`, err)
-
-        return of(toastrActions.add({
-          type: 'error',
-          title: t(`Error getting currencies fees`),
-        }))
+        toastr.error(t(`Error getting currencies fees`))
+        return of(ResDexLoginActions.empty())
       })
     )
 

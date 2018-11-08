@@ -6,7 +6,7 @@ import log from 'electron-log'
 import { of, from, merge } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
-import { actions as toastrActions } from 'react-redux-toastr'
+import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { SwapDBService } from '~/service/resdex/swap-db'
@@ -43,13 +43,8 @@ const kickStartStuckSwapsEpic = (action$: ActionsObservable<Action>, state$) => 
       }),
       catchError(err => {
         log.error(`Error kick starting stuck swaps`, err)
-        return of(
-          toastrActions.add({
-            type: 'error',
-            title: t(`Can't kick start stuck swaps, check the application log for details`)
-          }),
-          ResDexOrdersActions.kickStartStuckSwapsFailed()
-        )
+        toastr.error(t(`Can't kick start stuck swaps, check the application log for details`))
+        return of(ResDexOrdersActions.kickStartStuckSwapsFailed())
       })
     )
 
@@ -79,11 +74,8 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
       }),
       catchError(err => {
         log.error(`Error getting swap history`, err)
-
-        return of(toastrActions.add({
-          type: 'error',
-          title: t(`Error getting swap history`)
-        }))
+        toastr.error(t(`Error getting swap history`))
+        return of(ResDexOrdersActions.empty())
       })
     )
 
@@ -115,14 +107,8 @@ const cleanupPendingSwapsEpic = (action$: ActionsObservable<Action>, state$) => 
       }),
       catchError(err => {
         log.error(`Can't get pending swaps`, err)
-
-        return of(
-          ResDexOrdersActions.cleanupPendingSwapsFailed(),
-          toastrActions.add({
-            type: 'error',
-            title: t(`Error updating swap statuses`)
-          })
-        )
+        toastr.error(t(`Error updating swap statuses`))
+        return of(ResDexOrdersActions.cleanupPendingSwapsFailed())
       })
     )
 
