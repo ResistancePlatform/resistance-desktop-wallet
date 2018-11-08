@@ -111,18 +111,6 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
     )))
 
     const getFeesPromise = Promise.all(symbols.map(symbol => api.getFee(symbol)))
-    const getConfirmationsPromise = () => Promise.all(symbols.map(symbol => api.setConfirmationsNumber(symbol, 0)))
-
-    const setConfirmationsObservable = defer(() => from(getConfirmationsPromise())).pipe(
-      switchMap(() => {
-        log.info(`Confirmations number set to 0 for all the currencies`)
-        return of(ResDexLoginActions.empty())
-      }),
-      catchError(err => {
-        log.error(`Failed to set zero confirmations number`, err)
-        return of(ResDexLoginActions.empty())
-      })
-    )
 
     const getFeesObservable = from(getFeesPromise).pipe(
       switchMap(fees => {
@@ -170,7 +158,6 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
       switchMap(() => concat(
         sendPassphraseObservable,
         getFeesObservable,
-        setConfirmationsObservable,
         of(ResDexOrdersActions.getSwapHistory()),
       )),
       catchError(err => {

@@ -4,19 +4,47 @@ import os from 'os'
 import path from 'path'
 import rp from 'request-promise-native'
 
-import { resDexUri } from '~/service/resdex/api'
 import { getStore } from '~/store/configureStore'
 import { getAppDataPath, verifyDirectoryExistence } from '~/utils/os'
 import { ChildProcessService } from '../child-process-service'
 import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 
-const netId = 2045
-const rpcPort = 17445
 
+const netId = 2045
 const seedNodeAddress = '34.201.64.15'
-// const seedNodeAddress = '34.207.111.158'
 // const seedNodeAddress = '35.174.118.206'
 
+const processSettings = {
+  RESDEX: {
+    folderName: 'Main',
+    rpcPort: 17445,
+  },
+  RESDEX_PRIVACY1: {
+    folderName: 'Privacy 1',
+    rpcPort: 27445,
+  },
+  RESDEX_PRIVACY2: {
+    folderName: 'Privacy 2',
+    rpcPort: 37445,
+  }
+}
+
+export function getProcessSettingsForPrivacy(privacy?: number): string {
+  let processName = 'RESDEX'
+
+  if (privacy === 1) {
+    processName = privacy === 1 ? 'RESDEX_PRIVACY1' : 'RESDEX_PRIVACY2'
+  }
+
+  const { folderName, rpcPort } = processSettings[processName]
+
+  return {
+    processName,
+    folderName,
+    rpcPort,
+    uri:  `http://127.0.0.1:${rpcPort}`,
+  }
+}
 
 /**
  * ES6 singleton
@@ -48,12 +76,14 @@ export class ResDexService {
    *
 	 * @memberof ResDexService
 	 */
-  async start(seedPhrase) {
+  async start(seedPhrase, privacy?: number) {
     const currenciesWithoutElectrum = supportedCurrencies.map(currency => {
       const result = {...currency}
       delete result.electrumServers
       return result
     })
+
+    const { uri, rpcPort, folderName, processName } = getProcessSettingsForPrivacy(privacy)
 
     const options = {
       gui: 'resdex',
@@ -67,21 +97,27 @@ export class ResDexService {
       coins: currenciesWithoutElectrum,
     }
 
-    const resDexDir = path.join(getAppDataPath(), 'ResDEX')
+    if (privacy) {
+      options.privacy = privacy
+    }
+
+    const resDexParentDir = path.join(getAppDataPath(), 'ResDEX')
+    const resDexDir = path.join(resDexParentDir, folderName)
 
     try {
+      await verifyDirectoryExistence(resDexParentDir)
       await verifyDirectoryExistence(resDexDir)
     } catch(err) {
       log.error(`Can't create ResDEX directory`, err)
       const actions = childProcess.getSettingsActions()
-      getStore().dispatch(actions.childProcessFailed('RESDEX', err.message))
+      getStore().dispatch(actions.childProcessFailed(processName, err.message))
       return
     }
 
     await childProcess.execProcess({
-      processName: 'RESDEX',
+      processName,
       args: [JSON.stringify(options)],
-      waitUntilReady: childProcess.createReadinessWaiter(this::checkApiAvailability),
+      waitUntilReady: childProcess.createReadinessWaiter(this::checkApiAvailability(uri)),
       spawnOptions: { cwd: resDexDir }
     })
 
@@ -92,23 +128,27 @@ export class ResDexService {
    *
 	 * @memberof ResDexService
 	 */
-	async stop() {
-    await childProcess.killProcess('RESDEX')
+	async stop(privacy?: number) {
+    const { processName } = getProcessSettingsForPrivacy(privacy)
+    await childProcess.killProcess(processName)
 	}
 
 }
 
-async function checkApiAvailability() {
-  log.debug(`Checking if resdex API is ready`)
+async function checkApiAvailability(uri) {
+  const checker = async () => {
+    log.debug(`Querying ${uri} to check if ResDEX is ready...`)
 
-  try {
-    const response = await rp({
-      uri: resDexUri,
-      resolveWithFullResponse: true,
-    })
-    return response.statusCode === 200
-  } catch (err) {
-    return false
+    try {
+      const response = await rp({
+        uri,
+        resolveWithFullResponse: true,
+      })
+      return response.statusCode === 200
+    } catch (err) {
+      return false
+    }
   }
 
+  return checker
 }

@@ -114,7 +114,7 @@ global.childProcesses = getChildProcessesGlobal()
 
 // Propagate Resistance node config for the RPC service
 global.resistanceNodeConfig = resistance.checkAndCreateConfig()
-global.resDex = { apiToken: '' }
+global.resDex = { apiTokens: [] }
 
 checkAndCreateWalletAppFolder()
 

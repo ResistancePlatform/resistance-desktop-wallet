@@ -100,51 +100,6 @@
     }
   }
 
-  .enhancedPrivacy {
-    margin-left: 1rem;
-    margin-right: 1rem;
-    margin-bottom: 1.3rem;
-    font-size: 0.65rem;
-    color: $BASE_COLOR_FONT_GRAY;
-    text-align: justify;
-
-    label {
-      color: $BASE_COLOR_WHITE;
-      display: block;
-      margin-bottom: 0.5rem;
-      user-select: none;
-    }
-
-    strong {
-      font-weight: normal;
-      color: $BASE_COLOR_FONT_GRAY_2;
-    }
-  }
-
-  input[type=checkbox] {
-    margin: 0;
-    margin-right: 0.9rem;
-    visibility: hidden;
-  }
-
-  input[type=checkbox]:before {
-    position: relative;
-    content: '\0020';
-    display: inline-block;
-    background: #151a35;
-    font-size: 0.8rem;
-    border-radius: 0.2rem;
-    color: $BASE_COLOR_PURPLE;
-    width: 0.8rem;
-    height: 0.8rem;
-    visibility: visible;
-    top: 0;
-  }
-
-  input[type=checkbox]:checked:before {
-    content: '\2713';
-  }
-
   .exchangeButton {
     position: relative;
     left: 50%;
@@ -154,5 +109,3 @@
   }
 
 }
-
-

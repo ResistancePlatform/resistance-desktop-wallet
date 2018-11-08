@@ -22,14 +22,16 @@ const t = translate('service')
  */
 let instance = null
 
-export type ChildProcessName = 'NODE' | 'TOR' | 'MINER' | 'RESDEX'
+export type ChildProcessName = 'NODE' | 'TOR' | 'MINER' | 'RESDEX' | 'RESDEX_PRIVACY1' | 'RESDEX_PRIVACY2'
 export type ChildProcessStatus = 'RUNNING' | 'STARTING' | 'RESTARTING' | 'FAILED' | 'STOPPING' | 'MURDER FAILED' | 'NOT RUNNING'
 
 const childProcessCommands = {
   NODE: 'resistanced',
   MINER: 'minerd',
   TOR: 'tor-proxy',
-  RESDEX: 'resdex'
+  RESDEX: 'resdex',
+  RESDEX_PRIVACY1: 'resdex',
+  RESDEX_PRIVACY2: 'resdex',
 }
 
 /**

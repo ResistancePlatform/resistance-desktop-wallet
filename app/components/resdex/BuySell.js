@@ -15,6 +15,7 @@ import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import {
   RoundedForm,
   RoundedButton,
+  CheckBox,
   CurrencyAmountInput,
   ChooseWallet
 } from '~/components/rounded-form'
@@ -30,7 +31,7 @@ const validationSchema = Joi.object().keys({
 
 type Props = {
   t: any,
-  roundedForm: object,
+  form: object,
   accounts: ResDexState.accounts,
   buySell: ResDexState.buySell,
   actions: object
@@ -64,13 +65,13 @@ class ResDexBuySell extends Component<Props> {
   }
 
   getOrder() {
-    const form = this.props.roundedForm.resDexBuySell
+    const { form } = this.props
     const quoteCurrencyAmount = Decimal(form && form.fields.maxRel || '0')
 
     const { baseCurrency, quoteCurrency, orderBook } = this.props.buySell
     const { price } = orderBook.asks.length && orderBook.asks[0]
 
-    const { enhancedPrivacy } = this.props.buySell
+    const enhancedPrivacy = form && form.fields.enhancedPrivacy
 
     const order = {
       orderType: 'buy',
@@ -149,14 +150,11 @@ class ResDexBuySell extends Component<Props> {
                   symbol={quoteCurrency}
                 />
 
-                <div className={styles.enhancedPrivacy}>
-                  <label htmlFor="input-resdex-enhanced-privacy-id">
-                    <input id="input-resdex-enhanced-privacy-id" type="checkbox" name="enhancedPrivacy" />
-                    {t(`Enhanced privacy`)}
-                    <i className={styles.info} data-tip={t('enhanced-privacy')} data-for="tooltip-resdex-enhanced-privacy-id" data-offset="{'left': 16}"/>
-                    <ReactTooltip id="tooltip-resdex-enhanced-privacy-id" className={cn(styles.tooltip, styles.enhancedPrivacy)}/>
-                  </label>
-                </div>
+                <CheckBox name="enhancedPrivacy" defaultValue={false}>
+                  {t(`Enhanced privacy`)}
+                  <i className={styles.info} data-tip={t('enhanced-privacy')} data-for="tooltip-resdex-enhanced-privacy-id" data-offset="{'left': 16}"/>
+                  <ReactTooltip id="tooltip-resdex-enhanced-privacy-id" className={cn(styles.tooltip, styles.enhancedPrivacy)}/>
+                </CheckBox>
 
                 <RoundedButton
                   type="submit"
@@ -187,7 +185,7 @@ class ResDexBuySell extends Component<Props> {
 }
 
 const mapStateToProps = (state) => ({
-	roundedForm: state.roundedForm,
+  form: state.roundedForm.resDexBuySell,
 	buySell: state.resDex.buySell,
 	accounts: state.resDex.accounts,
 })

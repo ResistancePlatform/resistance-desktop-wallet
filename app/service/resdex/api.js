@@ -7,13 +7,12 @@ import { remote } from 'electron'
 import getPort from 'get-port'
 import pMap from 'p-map'
 
+import { getProcessSettingsForPrivacy } from '~/service/resdex/resdex'
 import { getStore } from '~/store/configureStore'
 import { translate } from '~/i18next.config'
 import MarketmakerSocket from './marketmaker-socket'
 import { getCurrency } from '~/utils/resdex'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
-
-export const resDexUri = 'http://127.0.0.1:17445'
 
 const t = translate('service')
 
@@ -258,8 +257,10 @@ export class ResDexApiService {
       return Promise.reject(new Error(t(`Authentication failed`)))
     }
 
+    const { uri } = getProcessSettingsForPrivacy(data.privacy)
+
     const options = {
-      uri: resDexUri,
+      uri,
       method: 'POST',
       body: {
         ...data,
