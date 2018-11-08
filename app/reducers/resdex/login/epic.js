@@ -16,7 +16,7 @@ import { ResDexService } from '~/service/resdex/resdex'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import { ResDexPortfolioService } from '~/service/resdex/portfolio'
-import { ResDexApiService } from '~/service/resdex/api'
+import { resDexApiFactory } from '~/service/resdex/api'
 import { ResDexLoginActions } from './reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 
@@ -25,7 +25,6 @@ const t = translate('resdex')
 const childProcess = new ChildProcessService()
 const swapDB = new SwapDBService()
 const resDex = new ResDexService()
-const api = new ResDexApiService()
 const portfolio = new ResDexPortfolioService()
 
 
@@ -80,29 +79,39 @@ const startResdexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   switchMap(action => {
     const { seedPhrase, walletPassword } = action.payload
 
-    api.setToken(seedPhrase)
-
     swapDB.init(seedPhrase)
 
     swapDB.on('change', () => {
       getStore().dispatch(ResDexOrdersActions.getSwapHistory())
     })
 
-    const resDexStartedObservable = childProcess.getObservable({
-      processName: 'RESDEX',
-      onSuccess: of(ResDexLoginActions.initResdex(walletPassword)).pipe(delay(400)),  // Give marketmaker some time just in case
-      onFailure: of(ResDexLoginActions.loginFailed(t(`Unable to start ResDEX, check the log for details`))),
-      action$
+    // Start 3 ResDEX processes, one for transparent and two for private trades
+    const observables = ['RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2'].map(processName => {
+      const api = resDexApiFactory(processName)
+      api.setToken(seedPhrase)
+      resDex.start(processName, seedPhrase)
+
+      const resDexStartedObservable = childProcess.getObservable({
+        processName,
+        onSuccess: of(ResDexLoginActions.initResdex(processName, walletPassword)).pipe(delay(400)),  // Give marketmaker some time just in case
+        onFailure: of(ResDexLoginActions.loginFailed(t(`Unable to start ResDEX, check the log for details`))),
+        action$
+      })
+
+      return resDexStartedObservable
     })
 
-		resDex.start(seedPhrase)
-    return resDexStartedObservable
+    return concat(...observables)
   })
 )
 
 const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexLoginActions.initResdex),
   switchMap(action => {
+    const { processName, walletPassword } = action.payload
+
+    const api = resDexApiFactory(processName)
+
     api.enableSocket()
 
     const { enabledCurrencies } = state$.value.resDex.accounts
@@ -133,7 +142,7 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
       () => from(
         api.sendWalletPassphrase(
           'RES',
-          action.payload.walletPassword,
+          walletPassword,
           AUTH.sessionTimeoutSeconds
         )
       )

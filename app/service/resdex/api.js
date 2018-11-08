@@ -3,18 +3,38 @@ import { Decimal } from 'decimal.js'
 import crypto from 'crypto'
 import rp from 'request-promise-native'
 import log from 'electron-log'
-import { remote } from 'electron'
 import getPort from 'get-port'
-import pMap from 'p-map'
 
-import { getProcessSettingsForPrivacy } from '~/service/resdex/resdex'
+import { getProcessSettings } from '~/service/resdex/resdex'
 import { getStore } from '~/store/configureStore'
 import { translate } from '~/i18next.config'
 import MarketmakerSocket from './marketmaker-socket'
 import { getCurrency } from '~/utils/resdex'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 
+
 const t = translate('service')
+
+/**
+ * ResDEX is using 3 processes, 1 for transparent and 2 for private trades.
+ * Every API instance is a singleton corresponding to a specific process identified by its name.
+ *
+ */
+const apiInstances = {}
+
+/*
+ * Returns ResDEX API instance for a process specified.
+ *
+ */
+export function resDexApiFactory(processName: string) {
+  if (processName in apiInstances) {
+    return apiInstances[processName]
+  }
+
+  const api = new ResDexApiService(processName)
+  apiInstances[processName] = api
+  return api
+}
 
 class ResDexApiError extends Error {
   constructor(response, message) {
@@ -26,15 +46,12 @@ class ResDexApiError extends Error {
 }
 
 /**
- * ES6 singleton
- */
-let instance = null
-
-/**
  * @export
  * @class ResDexApiService
  */
-export class ResDexApiService {
+class ResDexApiService {
+  token = null
+  processName = null
   socket = false
 	useQueue = false
 	currentQueueId = 0
@@ -42,17 +59,19 @@ export class ResDexApiService {
 	/**
 	 * @memberof ResDexApiService
 	 */
-	constructor() {
-    if (!instance) {
-      instance = this
-    }
-
-		return instance
+	constructor(processName: string) {
+    this.processName = processName
 	}
 
   setToken(seedPhrase: string) {
-    const token = crypto.createHash('sha256').update(seedPhrase).digest('hex')
-    remote.getGlobal('resDex').apiToken = token
+    let actualSeedPhrase = seedPhrase
+
+    // Private ResDEX processes use a mangled but unique seed phrase
+    if (this.processName !== 'RESDEX') {
+      actualSeedPhrase = `${seedPhrase} ${this.processName}`
+    }
+
+    this.token = crypto.createHash('sha256').update(actualSeedPhrase).digest('hex')
   }
 
 	async enableSocket() {
@@ -248,23 +267,21 @@ export class ResDexApiService {
 	 * @memberof ResDexApiService
 	 */
   query(data: object, errorMessage?: string) {
-    const token = remote.getGlobal('resDex').apiToken
+    log.debug(`Calling ${this.processName} API method ${data.method}`, JSON.stringify(data))
 
-    log.debug(`Calling ResDEX API method ${data.method}`, JSON.stringify(data))
-
-    if (!token) {
+    if (!this.token) {
       getStore().dispatch(ResDexLoginActions.showDialog())
       return Promise.reject(new Error(t(`Authentication failed`)))
     }
 
-    const { uri } = getProcessSettingsForPrivacy(data.privacy)
+    const { uri } = getProcessSettings(this.processName)
 
     const options = {
       uri,
       method: 'POST',
       body: {
         ...data,
-        userpass: token,
+        userpass: this.token,
         queueid: 0,
         needjson: 1,
       },
@@ -281,37 +298,7 @@ export class ResDexApiService {
 
 }
 
-/**
- * Private method. Fetches raw transactions, filters out and calculates amount values for a given address.
- *
- */
-async function fetchTransactionsForAddress(coin: string, address: string, txids: string[]) {
-  const rawTransactions = await pMap(
-    txids,
-    txid => this.getRawTransaction(coin, txid), { concurrency: 2 }
-  )
-
-  const transactions = rawTransactions.map(rawTransaction => {
-    const amount = rawTransaction.vout.reduce((previousValue, vout) => {
-      const { scriptPubKey } = vout
-
-      if (!scriptPubKey) {
-        return previousValue
-      }
-
-      const hasAddress = scriptPubKey.addresses.find(voutAddress => voutAddress === address)
-      return hasAddress ? previousValue.plus(Decimal(vout.value)) : previousValue
-
-    }, Decimal(0))
-
-    return {
-      txid: rawTransaction.txid,
-      amount,
-    }
-  })
-
-  return transactions
-}
+/* Private methods */
 
 async function withdrawBtcFork(opts) {
   const {

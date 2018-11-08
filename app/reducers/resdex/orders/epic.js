@@ -10,13 +10,13 @@ import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { SwapDBService } from '~/service/resdex/swap-db'
-import { ResDexApiService } from '~/service/resdex/api'
+import { resDexApiFactory } from '~/service/resdex/api'
 import { ResDexOrdersActions } from './reducer'
 
 
 const t = translate('resdex')
 const swapDB = new SwapDBService()
-const api = new ResDexApiService()
+const api = resDexApiFactory('RESDEX')
 
 const kickStartStuckSwapsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexOrdersActions.kickStartStuckSwaps),

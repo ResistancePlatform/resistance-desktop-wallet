@@ -11,13 +11,13 @@ import { toastr } from 'react-redux-toastr'
 import { translate } from '~/i18next.config'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { getSortedCurrencies, getCurrencyName } from '~/utils/resdex'
-import { ResDexApiService } from '~/service/resdex/api'
+import { resDexApiFactory } from '~/service/resdex/api'
 import { ResDexAssetsActions } from '~/reducers/resdex/assets/reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
 
 const t = translate('resdex')
-const api = new ResDexApiService()
+const api = resDexApiFactory('RESDEX')
 
 const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexAccountsActions.getCurrencies),

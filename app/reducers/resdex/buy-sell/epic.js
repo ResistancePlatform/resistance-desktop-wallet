@@ -10,19 +10,19 @@ import { translate } from '~/i18next.config'
 import { RESDEX } from '~/constants/resdex'
 import { flattenDecimals } from '~/utils/decimal'
 import { SwapDBService } from '~/service/resdex/swap-db'
-import { ResDexApiService } from '~/service/resdex/api'
+import { resDexApiFactory } from '~/service/resdex/api'
 import { ResDexBuySellActions } from './reducer'
 
 
 const t = translate('resdex')
 const swapDB = new SwapDBService()
-const api = new ResDexApiService()
+const transparentApi = resDexApiFactory('RESDEX')
 
 const getOrderBookEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexBuySellActions.getOrderBook),
   switchMap(() => {
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
-    const observable = from(api.getOrderBook(baseCurrency, quoteCurrency)).pipe(
+    const observable = from(transparentApi.getOrderBook(baseCurrency, quoteCurrency)).pipe(
       switchMap(orderBook => of(ResDexBuySellActions.gotOrderBook(orderBook))),
       catchError(err => of(ResDexBuySellActions.getOrderBookFailed(err.toString())))
     )
@@ -62,7 +62,7 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
 
     log.debug(`Submitting a swap`, requestOpts)
 
-    const orderObservable = from(api.createMarketOrder(requestOpts)).pipe(
+    const orderObservable = from(transparentApi.createMarketOrder(requestOpts)).pipe(
       switchMap(result => {
         if (!result.pending) {
           const message = t(`Something unexpected happened. Are you sure you have enough UTXO?`)

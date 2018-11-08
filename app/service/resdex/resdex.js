@@ -29,15 +29,8 @@ const processSettings = {
   }
 }
 
-export function getProcessSettingsForPrivacy(privacy?: number): string {
-  let processName = 'RESDEX'
-
-  if (privacy === 1) {
-    processName = privacy === 1 ? 'RESDEX_PRIVACY1' : 'RESDEX_PRIVACY2'
-  }
-
+export function getProcessSettings(processName: string): object {
   const { folderName, rpcPort } = processSettings[processName]
-
   return {
     processName,
     folderName,
@@ -76,14 +69,14 @@ export class ResDexService {
    *
 	 * @memberof ResDexService
 	 */
-  async start(seedPhrase, privacy?: number) {
+  async start(processName: string, seedPhrase) {
     const currenciesWithoutElectrum = supportedCurrencies.map(currency => {
       const result = {...currency}
       delete result.electrumServers
       return result
     })
 
-    const { uri, rpcPort, folderName, processName } = getProcessSettingsForPrivacy(privacy)
+    const { uri, rpcPort, folderName } = getProcessSettings(processName)
 
     const options = {
       gui: 'resdex',
@@ -97,8 +90,8 @@ export class ResDexService {
       coins: currenciesWithoutElectrum,
     }
 
-    if (privacy) {
-      options.privacy = privacy
+    if (processName !== 'RESDEX') {
+      options.privacy = processName === 'RESDEX_PRIVACY1' ? 1 : 2
     }
 
     const resDexParentDir = path.join(getAppDataPath(), 'ResDEX')
@@ -128,8 +121,7 @@ export class ResDexService {
    *
 	 * @memberof ResDexService
 	 */
-	async stop(privacy?: number) {
-    const { processName } = getProcessSettingsForPrivacy(privacy)
+	async stop(processName: string) {
     await childProcess.killProcess(processName)
 	}
 
