@@ -2,9 +2,9 @@
 import { Decimal } from 'decimal.js'
 import log from 'electron-log'
 import { of, from, merge } from 'rxjs'
-import { switchMap, catchError } from 'rxjs/operators'
+import { map, switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
-import { actions as toastrActions } from 'react-redux-toastr'
+import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { RESDEX } from '~/constants/resdex'
@@ -33,14 +33,10 @@ const getOrderBookEpic = (action$: ActionsObservable<Action>, state$) => action$
 
 const getOrderBookFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.getOrderBookFailed),
-  switchMap(action => of(
-    toastrActions.add({
-      type: 'error',
-      title: t(`Error getting the order book`),
-      message: action.payload.errorMessage,
-    }),
-    ResDexBuySellActions.empty()
-  ))
+  map(action => {
+    toastr.error(t(`Error getting the order book`), action.payload.errorMessage)
+    return ResDexBuySellActions.empty()
+  })
 )
 
 const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
@@ -98,25 +94,18 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
 
 const createMarketOrderSucceededEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.createMarketOrderSucceeded),
-  switchMap(() => of(
-    toastrActions.add({
-      type: 'success',
-      title: t(`Market order created successfully`),
-    }),
-    ResDexBuySellActions.empty()
-  ))
+  map(() => {
+    toastr.success(t(`Market order created successfully`))
+    return ResDexBuySellActions.empty()
+  })
 )
 
 const createMarketOrderFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.createMarketOrderFailed),
-  switchMap(action => of(
-    toastrActions.add({
-      type: 'error',
-      title: t(`Error creating a market order`),
-      message: action.payload.errorMessage,
-    }),
-    ResDexBuySellActions.empty()
-  ))
+  map(action => {
+    toastr.error(t(`Error creating a market order`), action.payload.errorMessage)
+    return ResDexBuySellActions.empty()
+  })
 )
 
 export const ResDexBuySellEpic = (action$, state$) => merge(

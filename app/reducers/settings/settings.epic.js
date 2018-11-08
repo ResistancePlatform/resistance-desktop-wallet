@@ -5,9 +5,9 @@ import * as fs from 'fs'
 import { promisify } from 'util'
 import { remote, ipcRenderer } from 'electron'
 import { tap, filter, delay, mergeMap, flatMap, switchMap, map, mapTo, catchError } from 'rxjs/operators'
-import { of, from, bindCallback, concat, merge } from 'rxjs'
+import { of, from, bindCallback, concat, merge, defer } from 'rxjs'
 import { ofType } from 'redux-observable'
-import { toastr, actions as toastrActions } from 'react-redux-toastr'
+import { toastr } from 'react-redux-toastr'
 
 import { i18n, translate } from '~/i18next.config'
 import { getEnsureLoginObservable } from '~/utils/auth'
@@ -193,10 +193,7 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
       processName: 'NODE',
       onSuccess: concat(
         of(AuthActions.ensureLogin(t(`Your restored wallet password is required`), true)),
-        of(toastrActions.add({
-          type: 'success',
-          title: t(`Wallet restored successfully.`)
-        }))
+        of(defer(() => toastr.success(t(`Wallet restored successfully.`)))),
       ),
       onFailure: of(SettingsActions.restoringWalletFailed()),
       action$
@@ -210,10 +207,7 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
         const walletName = path.basename(walletFileName, path.extname(walletFileName))
         config.set('wallet.name', walletName)
         return concat(
-          of(toastrActions.add({
-            type: 'info',
-            title: t(`Restarting the local node with the new wallet...`)
-          })),
+          of(defer(() => toastr.info(t(`Restarting the local node with the new wallet...`)))),
           of(SettingsActions.restartLocalNode()),
           startLocalNodeObservable
         )

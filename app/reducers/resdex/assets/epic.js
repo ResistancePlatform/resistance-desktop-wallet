@@ -3,7 +3,7 @@ import log from 'electron-log'
 import { of, from, merge } from 'rxjs'
 import { switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
-import { actions as toastrActions } from 'react-redux-toastr'
+import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { CurrencyHistoryService } from '~/service/resdex/currency-history'
@@ -26,14 +26,8 @@ const getCurrencyHistoryEpic = (action$: ActionsObservable<Action>, state$) => a
       }),
       catchError(err => {
         log.error(`Error getting currency history`, err)
-
-        return of(
-          toastrActions.add({
-            type: 'error',
-            title: t(`Error getting currency history`)
-          }),
-          ResDexAssetsActions.getCurrencyHistoryFailed()
-        )
+        toastr.error(t(`Error getting currency history`))
+        return of(ResDexAssetsActions.getCurrencyHistoryFailed())
       })
     )
 

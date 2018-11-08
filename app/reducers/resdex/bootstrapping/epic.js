@@ -7,7 +7,7 @@ import { of, merge, defer } from 'rxjs'
 import { switchMap, map, mapTo, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { routerActions } from 'react-router-redux'
-import { toastr, actions as toastrActions } from 'react-redux-toastr'
+import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { ResDexPortfolioService } from '~/service/resdex/portfolio'
@@ -91,10 +91,8 @@ const createPortfolioEpic = (action$: ActionsObservable<Action>, state$) => acti
       }),
       catchError(err => {
         log.error(`Can't create portfolio`, err)
-        return of(toastrActions.add({
-          type: 'error',
-          title: t(`Error creating portfolio, check the application log for details`),
-        }))
+        toastr.error(t(`Error creating portfolio, check the application log for details`))
+        return of(ResDexBootstrappingActions.empty())
       })
     )
 
@@ -103,10 +101,10 @@ const createPortfolioEpic = (action$: ActionsObservable<Action>, state$) => acti
 
 const forgotPassword = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexBootstrappingActions.forgotPassword),
-  mapTo(toastrActions.add({
-    type: 'warning',
-    title: `Forgot password not implemented yet.`
-  }))
+  map(() => {
+    toastr.warning(`Forgot password not implemented yet.`)
+    return ResDexBootstrappingActions.empty()
+  })
 )
 
 export const ResDexBootstrappingEpic = (action$, state$) => merge(
