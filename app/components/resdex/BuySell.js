@@ -93,6 +93,7 @@ class ResDexBuySell extends Component<Props> {
     const { t } = this.props
     const { baseCurrency, quoteCurrency } = this.props.buySell
     const txFee = this.props.accounts.currencyFees[quoteCurrency]
+    const order = this.getOrder()
 
 		return (
       <div className={cn(styles.container)}>
@@ -159,7 +160,11 @@ class ResDexBuySell extends Component<Props> {
                 <RoundedButton
                   type="submit"
                   className={styles.exchangeButton}
-                  onClick={this.props.actions.createMarketOrder}
+                  onClick={
+                    order.enhancedPrivacy
+                    ? this.props.actions.createPrivateMarketOrder
+                    : this.props.actions.createMarketOrder
+                  }
                   disabled={txFee && this.getSubmitButtonDisabledAttribute()}
                   spinner={this.props.buySell.isSendingOrder}
                   spinnerTooltip={t(`Sending the order...`)}
@@ -177,7 +182,7 @@ class ResDexBuySell extends Component<Props> {
 
         </div>
 
-        <OrderSummary order={this.getOrder()} />
+        <OrderSummary order={order} />
 
       </div>
     )

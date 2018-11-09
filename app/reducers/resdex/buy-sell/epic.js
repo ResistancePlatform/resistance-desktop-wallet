@@ -92,6 +92,26 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
   })
 )
 
+const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(ResDexBuySellActions.createPrivateMarketOrder),
+  switchMap(() => {
+    // 1. Create order Rel -> RES on process1
+    // 2. Poll for the process1 RES balance
+    // 3. Withdraw from process1 to process2
+    // 4. Poll for process3 balance
+    // 5. Create order RES -> Base on process3
+
+    // const relBaseOrderObservable = of()
+    // const pollPrivacy3BalanceObservable = of()
+    // const withdrawFromMainToPrivacy1Observable = of()
+    // const pollMainProcessBalanceObservable = of()
+
+    // const relResOrderObservable = getRelResOrderObservable(pollMainProcessBalanceObservable, action$, state$)
+
+    return null
+  })
+)
+
 const createMarketOrderSucceededEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.createMarketOrderSucceeded),
   map(() => {
