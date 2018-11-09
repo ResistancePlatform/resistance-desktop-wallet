@@ -5,7 +5,7 @@ import rp from 'request-promise-native'
 import log from 'electron-log'
 import getPort from 'get-port'
 
-import { getProcessSettings } from '~/service/resdex/resdex'
+import { getActualSeedPhrase, getProcessSettings } from '~/service/resdex/resdex'
 import { getStore } from '~/store/configureStore'
 import { translate } from '~/i18next.config'
 import MarketmakerSocket from './marketmaker-socket'
@@ -64,13 +64,7 @@ class ResDexApiService {
 	}
 
   setToken(seedPhrase: string) {
-    let actualSeedPhrase = seedPhrase
-
-    // Private ResDEX processes use a mangled but unique seed phrase
-    if (this.processName !== 'RESDEX') {
-      actualSeedPhrase = `${seedPhrase} ${this.processName}`
-    }
-
+    const actualSeedPhrase = getActualSeedPhrase(this.processName, seedPhrase)
     this.token = crypto.createHash('sha256').update(actualSeedPhrase).digest('hex')
   }
 

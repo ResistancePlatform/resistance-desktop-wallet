@@ -6,7 +6,7 @@ import log from 'electron-log'
 import { spawn } from 'child_process'
 import { remote } from 'electron'
 import ps from 'ps-node'
-import { take, filter, switchMap } from 'rxjs/operators'
+import { take, filter, switchMap, mergeMap } from 'rxjs/operators'
 import { race } from 'rxjs'
 import { ofType } from 'redux-observable'
 
@@ -71,13 +71,13 @@ export class ChildProcessService {
       action$.pipe(
         ofType(actions.childProcessStarted),
         filter(action => action.payload.processName === processName),
-          take(1),
-        switchMap(() => onSuccess)
+        take(1),
+        mergeMap(() => onSuccess)
       ),
       action$.pipe(
         ofType(actions.childProcessFailed),
         filter(action => action.payload.processName === processName),
-          take(1),
+        take(1),
         switchMap(() => onFailure)
       )
     )
@@ -180,6 +180,7 @@ export class ChildProcessService {
       }
     }
 
+    log.debug(`Child process ${processName} started`)
     getStore().dispatch(actions.childProcessStarted(processName))
     childProcessInfo.pid = await this.getPid(childProcessCommands[processName])
 
@@ -196,23 +197,23 @@ export class ChildProcessService {
 	 */
   async killProcess(processName: ChildProcessName) {
     const actions = this.getSettingsActions()
+    const childProcessInfo = remote.getGlobal('childProcesses')[processName]
 
-    try {
-      const pid = await this.getPid(childProcessCommands[processName])
+    if (childProcessInfo.pid) {
+      childProcessInfo.isGettingKilled = true
 
-      if (pid) {
-        const childProcessInfo = remote.getGlobal('childProcesses')[processName]
-        childProcessInfo.isGettingKilled = true
-        await this.killPid(pid)
-      } else {
-        log.warn(`Process ${processName} isn't running`)
+      try {
+        await this.killPid(childProcessInfo.pid)
+      } catch(err) {
+        log.error(`Process murder failed`, err)
+        getStore().dispatch(actions.childProcessMurderFailed(processName, err.message))
       }
 
-      getStore().dispatch(actions.childProcessMurdered(processName))
-    } catch(err) {
-      log.error(`Process murder failed`, err)
-      getStore().dispatch(actions.childProcessMurderFailed(processName, err.message))
+    } else {
+      log.warn(`Process ${processName} isn't running`)
     }
+
+    getStore().dispatch(actions.childProcessMurdered(processName))
   }
 
 	/**

@@ -105,6 +105,8 @@ export const preloadedState: State = {
 			MINER: 'NOT RUNNING',
       TOR: 'NOT RUNNING',
       RESDEX: 'NOT RUNNING',
+      RESDEX_PRIVACY1: 'NOT RUNNING',
+      RESDEX_PRIVACY2: 'NOT RUNNING',
     },
     language: 'en',
 	},

@@ -29,6 +29,19 @@ const processSettings = {
   }
 }
 
+/* Privacy 1 and Privacy 2 processes use mangled seeds generated here.
+*/
+export function getActualSeedPhrase(processName: string, seedPhrase: string) {
+  let actualSeedPhrase = seedPhrase
+
+  // Private ResDEX processes use a mangled but unique seed phrase
+  if (processName !== 'RESDEX') {
+    actualSeedPhrase = `${seedPhrase} ${processName}`
+  }
+
+  return actualSeedPhrase
+}
+
 export function getProcessSettings(processName: string): object {
   const { folderName, rpcPort } = processSettings[processName]
   return {
@@ -86,7 +99,7 @@ export class ResDexService {
       canbind: 0,
       seednode: seedNodeAddress,
       userhome: os.homedir(),
-      passphrase: seedPhrase,
+      passphrase: getActualSeedPhrase(processName, seedPhrase),
       coins: currenciesWithoutElectrum,
     }
 
@@ -127,7 +140,7 @@ export class ResDexService {
 
 }
 
-async function checkApiAvailability(uri) {
+function checkApiAvailability(uri) {
   const checker = async () => {
     log.debug(`Querying ${uri} to check if ResDEX is ready...`)
 
@@ -136,7 +149,13 @@ async function checkApiAvailability(uri) {
         uri,
         resolveWithFullResponse: true,
       })
-      return response.statusCode === 200
+
+      const result = response.statusCode === 200
+      if (result) {
+        log.debug(`ResDEX process on ${uri} is ready!`)
+      }
+
+      return result
     } catch (err) {
       return false
     }

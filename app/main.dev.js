@@ -11,7 +11,6 @@
  * @flow
  */
 import * as fs from 'fs'
-import crypto from 'crypto'
 import path from 'path'
 import config from 'electron-settings'
 import { app, ipcMain, BrowserWindow } from 'electron'

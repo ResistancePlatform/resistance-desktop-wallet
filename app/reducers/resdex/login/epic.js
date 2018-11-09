@@ -91,17 +91,17 @@ const startResdexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
       api.setToken(seedPhrase)
       resDex.start(processName, seedPhrase)
 
-      const resDexStartedObservable = childProcess.getObservable({
+      const resDexStartedObservable = defer(() => childProcess.getObservable({
         processName,
         onSuccess: of(ResDexLoginActions.initResdex(processName, walletPassword)).pipe(delay(400)),  // Give marketmaker some time just in case
         onFailure: of(ResDexLoginActions.loginFailed(t(`Unable to start ResDEX, check the log for details`))),
         action$
-      })
+      }))
 
       return resDexStartedObservable
     })
 
-    return concat(...observables)
+    return merge(...observables)
   })
 )
 
@@ -109,10 +109,13 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
 	ofType(ResDexLoginActions.initResdex),
   switchMap(action => {
     const { processName, walletPassword } = action.payload
+    log.debug('INITRESDEXEPIC()', processName)
 
     const api = resDexApiFactory(processName)
 
-    api.enableSocket()
+    if (processName === 'RESDEX') {
+      api.enableSocket()
+    }
 
     const { enabledCurrencies } = state$.value.resDex.accounts
 

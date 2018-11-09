@@ -7,7 +7,7 @@ import { app, dialog, remote } from 'electron'
 import { translate } from '../i18next.config'
 
 
-const childProcessNames = ['NODE', 'MINER', 'TOR', 'RESDEX']
+const childProcessNames = ['NODE', 'MINER', 'TOR', 'RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
 
 
 function getIsExitForbidden(mainWindow) {
