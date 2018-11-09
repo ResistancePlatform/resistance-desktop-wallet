@@ -22,7 +22,7 @@ type Props = {
 	onRowContextMenu: (event: SyntheticEvent<any>, transactionId: string) => void
 }
 
-class TransactionList extends Component<Props> {
+class TransactionsList extends Component<Props> {
 	props: Props
 
   getListHeaderRenderer() {
@@ -67,10 +67,10 @@ class TransactionList extends Component<Props> {
         items={this.props.items}
         headerRenderer={transaction => this.getListHeaderRenderer(transaction)}
         rowRenderer={transaction => this.getListRowRenderer(transaction)}
-        emptyMessage={t(`No transactions to display.`)}
+        emptyMessage={t(`You have no transactions yet`)}
       />
 		)
 	}
 }
 
-export default translate('overview')(TransactionList)
+export default translate('overview')(TransactionsList)

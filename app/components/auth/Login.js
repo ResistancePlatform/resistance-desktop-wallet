@@ -54,7 +54,7 @@ class Login extends Component<Props> {
 
         <div className={cn(styles.header, { [styles.ready]: this.props.form && this.props.form.isValid })}>
           <img src={resistanceLogo} alt="Resistance" />
-          {this.props.auth.enter ? t(`Enter Resistance`) : t(`Confirm your login`)}
+          {t(`Resistance`)}
         </div>
 
         {this.props.auth.reason &&
@@ -67,7 +67,7 @@ class Login extends Component<Props> {
           <RoundedInput
             name="password"
             type="password"
-            placeholder={t(`Password`)}
+            placeholder={t(`Enter your password`)}
             large
           />
 

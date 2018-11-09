@@ -8,11 +8,11 @@ import { Action } from '../types'
 import { OverviewActions } from './overview.reducer'
 import { RpcService } from '~/service/rpc-service'
 
-const rpcService = new RpcService()
+const rpc = new RpcService()
 
 const getWalletInfoEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OverviewActions.getWalletInfo),
-  tap(() => rpcService.requestWalletInfo()),
+  tap(() => rpc.requestWalletInfo()),
   map(() => OverviewActions.empty())
 )
 
@@ -24,7 +24,7 @@ const getWalletInfoFailureEpic = (action$: ActionsObservable<Action>) => action$
 
 const getTransactionDataFromWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OverviewActions.getTransactionDataFromWallet),
-  tap(() => rpcService.requestTransactionsDataFromWallet()),
+  tap(() => rpc.requestTransactionsDataFromWallet()),
   mapTo(OverviewActions.empty())
 )
 
@@ -34,13 +34,17 @@ const getTransactionDataDromWalletFailureEpic = (action$: ActionsObservable<Acti
   mapTo(OverviewActions.empty())
 )
 
-const showTransactionDetailEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-  ofType(OverviewActions.showTransactionDetail),
-  switchMap(() => {
+const showTransactionDetailsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+  ofType(OverviewActions.showTransactionDetails),
+  switchMap(action => {
     const overviewState = state$.value.overview
-    return rpcService.getTransactionDetail(overviewState.popupMenu.popupTransactionId)
+    return rpc.getTransactionDetails(action.payload.transactionId)
   }),
-  map(result => typeof result === 'object' ? OverviewActions.showTransactionDetailSuccess(result) : OverviewActions.showTransactionDetailFail(result))
+  map(
+    result => typeof result === 'object'
+      ? OverviewActions.showTransactionDetailsSucceeded(result)
+      : OverviewActions.showTransactionDetailsFailed(result)
+  )
 )
 
 export const OverviewEpics = (action$, state$) => merge(
@@ -48,5 +52,5 @@ export const OverviewEpics = (action$, state$) => merge(
     getWalletInfoFailureEpic(action$, state$),
     getTransactionDataFromWalletEpic(action$, state$),
     getTransactionDataDromWalletFailureEpic(action$, state$),
-    showTransactionDetailEpic(action$, state$)
+    showTransactionDetailsEpic(action$, state$)
 )

@@ -4,13 +4,13 @@ import { translate } from 'react-i18next'
 
 import { TransactionDetail } from '~/reducers/overview/overview.reducer'
 
-import styles from './transaction-detail.scss'
+import styles from './TransactionDetails.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 
 type Props = {
   t: any,
-	transactionDetail: TransactionDetail,
+	transactionDetails: TransactionDetail,
 	onBackToTransactionListClick: () => void
 }
 
@@ -42,22 +42,23 @@ class TransactionDetailList extends Component<Props> {
 	getDetailTable() {
     const { t } = this.props
 
-		if (!this.props.transactionDetail) {
+		if (!this.props.transactionDetails) {
 			return (<div className={styles.hasNoDetail}>{t(`No Transaction Detail.`)}</div>)
     }
 
-    if (typeof this.props.transactionDetail === 'string') {
-			return (<div className={styles.error}>{t(`Error occurred:`)} {this.props.transactionDetail}</div>)
+    if (typeof this.props.transactionDetails === 'string') {
+			return (<div className={styles.error}>{t(`Error occurred:`)} {this.props.transactionDetails}</div>)
 		}
 
-		const sortedKeys = Object.keys(this.props.transactionDetail).sort()
+		const sortedKeys = Object.keys(this.props.transactionDetails).sort()
+
 		const tableBody = sortedKeys.map((key, index) => (
 			<div
 				className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')}
 				key={index}
 			>
 				<div className={styles.tableBodyRowColumnName} >{key}</div>
-				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnValue].join(' ')}>{this.props.transactionDetail[key].toString()}</div>
+				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnValue].join(' ')}>{this.props.transactionDetails[key].toString()}</div>
 			</div>
 		))
 
@@ -82,7 +83,7 @@ class TransactionDetailList extends Component<Props> {
     const { t } = this.props
 
 		return (
-			<div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.transactionDetailListContainer].join(' ')}>
+			<div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.transactionDetailsListContainer].join(' ')}>
 				<div
           role="button"
           tabIndex={0}

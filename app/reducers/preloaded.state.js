@@ -62,13 +62,7 @@ export const preloadedState: State = {
 			totalUnconfirmedBalance: Decimal('0')
 		},
 		transactions: [],
-		popupMenu: {
-			show: false,
-			posX: -1,
-			posY: -1,
-			popupTransactionId: ''
-		},
-		transactionDetail: null
+		transactionDetails: null
 	},
 	ownAddresses: {
 		addresses: [],

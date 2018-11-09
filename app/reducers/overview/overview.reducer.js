@@ -25,13 +25,7 @@ export type Balances = {
 export type OverviewState = {
 	balances?: Balances,
 	transactions?: Array<Transaction>,
-	popupMenu?: {
-		show: boolean,
-		posX: number,
-		posY: number,
-		popupTransactionId: string
-	},
-	transactionDetail?: object | null | string
+	transactionDetails?: object | null | string
 }
 
 export const OverviewActions = createActions(
@@ -50,11 +44,9 @@ export const OverviewActions = createActions(
 		MAIN_WINDOW_MINIMIZE: undefined,
 		MAIN_WINDOW_MAXIMIZE: undefined,
 
-		UPDATE_POPUP_MENU_VISIBILITY: (show: boolean, posX: number, posY: number, popupTransactionId: string) => ({ show, posX, posY, popupTransactionId }),
-
-		SHOW_TRANSACTION_DETAIL: undefined,
-		SHOW_TRANSACTION_DETAIL_SUCCESS: (transactionDetail: TransactionDetail) => transactionDetail,
-		SHOW_TRANSACTION_DETAIL_FAIL: (errorMessage: string) => errorMessage,
+    SHOW_TRANSACTION_DETAILS: (transactionId: string) => ({ transactionId }),
+		SHOW_TRANSACTION_DETAILS_SUCCEEDED: (transactionDetails: object) => transactionDetails,
+		SHOW_TRANSACTION_DETAILS_FAILED: (errorMessage: string) => errorMessage,
 		BACK_TO_TRANSACTION_LIST: undefined
 	},
 	{
@@ -65,16 +57,7 @@ export const OverviewActions = createActions(
 export const OverviewReducer = handleActions({
 	[OverviewActions.gotWalletInfo]: (state, action) => ({ ...state, balances: action.payload }),
 	[OverviewActions.gotTransactionDataFromWallet]: (state, action) => ({ ...state, transactions: action.payload }),
-	[OverviewActions.updatePopupMenuVisibility]: (state, action) => ({
-		...state,
-		popupMenu: {
-			show: action.payload.show,
-			posX: action.payload.posX,
-			posY: action.payload.posY,
-			popupTransactionId: action.payload.popupTransactionId
-		}
-	}),
-	[OverviewActions.showTransactionDetailSuccess]: (state, action) => ({ ...state, transactionDetail: action.payload }),
-	[OverviewActions.showTransactionDetailFail]: (state, action) => ({ ...state, transactionDetail: action.payload }),
-	[OverviewActions.backToTransactionList]: (state) => ({ ...state, transactionDetail: null })
+	[OverviewActions.showTransactionDetailsSucceeded]: (state, action) => ({ ...state, transactionDetails: action.payload }),
+	[OverviewActions.showTransactionDetailsFailed]: (state, action) => ({ ...state, transactionDetails: action.payload }),
+	[OverviewActions.backToTransactionsList]: (state) => ({ ...state, transactionDetails: null })
 }, preloadedState)
