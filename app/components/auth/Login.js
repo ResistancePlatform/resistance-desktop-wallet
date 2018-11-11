@@ -15,7 +15,7 @@ import { RoundedForm, RoundedButton, RoundedInput } from '~/components/rounded-f
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
-import resistanceLogo from '~/assets/images/logo.svg'
+import resistanceLogo from '~/assets/images/logo-full.svg'
 import styles from './Login.scss'
 
 const getValidationSchema = () => Joi.object().keys({
@@ -52,9 +52,8 @@ class Login extends Component<Props> {
 
         <div className={styles.dragBar} />
 
-        <div className={cn(styles.header, { [styles.ready]: this.props.form && this.props.form.isValid })}>
+        <div className={cn(styles.header)}>
           <img src={resistanceLogo} alt="Resistance" />
-          {t(`Resistance`)}
         </div>
 
         {this.props.auth.reason &&

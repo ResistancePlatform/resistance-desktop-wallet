@@ -107,16 +107,9 @@ class OwnAddresses extends Component<Props> {
 						{ /* Top bar */}
 						<div className={cn(styles.topBar, HLayout.hBoxContainer)}>
 
-							<div className={styles.topBarTitle}>{t(`Own Addresses`)}</div>
+							<div className={styles.topBarTitle}>{t(`My Addresses`)}</div>
 
 							<div className={cn(styles.topBarButtonContainer, HLayout.hBoxChild)}>
-                <button
-                  type="button"
-                  onClick={() => false}
-                  onKeyDown={() => false}>
-                  {t(`Show private key`)}
-                </button>
-
                 <div role="none" className={styles.addAddressButtonContainer}>
                   <PopupMenu id={createAddressPopupMenuId} relative>
                     <PopupMenuItem onClick={() => this.props.actions.createAddress(false)}>
@@ -131,6 +124,9 @@ class OwnAddresses extends Component<Props> {
                     <PopupMenuItem onClick={this.props.actions.initiatePrivateKeysImport}>
                       {t(`Import private keys form file`)}
                     </PopupMenuItem>
+                    <PopupMenuItem onClick={this.props.actions.showPrivateKey} disabled>
+                      {t(`Show private key`)}
+                    </PopupMenuItem>
                     <PopupMenuItem onClick={this.props.actions.initiatePrivateKeysExport}>
                       {t(`Export private keys`)}
                     </PopupMenuItem>
@@ -143,7 +139,7 @@ class OwnAddresses extends Component<Props> {
                     onKeyDown={() => this.props.popupMenu.show(createAddressPopupMenuId)}
                     disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
                   >
-                    + {t(`Add new address`)}
+                    + {t(`Menu`)}
 										<span className={cn('icon', styles.arrowDownIcon)} />
 									</button>
 

@@ -14,14 +14,10 @@
   line-height: 4rem;
 
   img {
-    width: 4rem;
     height: 4rem;
     margin-right: 0.5rem;
   }
 
-  &.ready {
-    text-shadow: 0 0 0.6rem $BASE_COLOR_WHITE;
-  }
 }
 
 .reason {

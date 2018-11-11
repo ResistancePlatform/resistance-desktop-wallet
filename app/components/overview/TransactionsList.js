@@ -2,10 +2,13 @@
 import moment from 'moment'
 import React, { Component } from 'react'
 import { translate } from 'react-i18next'
+import cn from 'classnames'
 
 import { truncateAmount } from '~/utils/decimal'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 import { Transaction } from '~/reducers/overview/overview.reducer'
+
+import styles from './TransactionsList.scss'
 
 const transactionDirectionMap = t => ({
   receive: t(`In`),
@@ -45,12 +48,16 @@ class TransactionsList extends Component<Props> {
 
     return (
       <UniformListRow
+        className={styles.row}
         key={transaction.transactionId}
-        onClick={e => this.props.onRowClick(e)}
+        onClick={e => this.props.onRowClick(e, transaction.transactionId)}
         onContextMenu={e => this.props.onRowContextMenu(e, transaction.transactionId)}
       >
         <UniformListColumn>{transaction.type}</UniformListColumn>
-        <UniformListColumn>{transactionDirectionMap(t)[transaction.category] || transaction.category}</UniformListColumn>
+        <UniformListColumn className={styles.categoryColumn}>
+          <div className={cn('icon', styles.categoryIcon, styles[transaction.category])} />
+          {transactionDirectionMap(t)[transaction.category] || transaction.category}
+        </UniformListColumn>
         <UniformListColumn>{transaction.confirmations !== 0 ? t('Yes') : t('No')}</UniformListColumn>
         <UniformListColumn>{truncateAmount(transaction.amount)}</UniformListColumn>
         <UniformListColumn>{moment.unix(transaction.timestamp).locale(i18n.language).format('L kk:mm:ss')}</UniformListColumn>

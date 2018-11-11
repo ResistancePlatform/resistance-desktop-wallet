@@ -59,6 +59,7 @@ class Overview extends Component<Props> {
 
             <TransactionsList
               items={this.props.overview.transactions}
+              onRowClick={(e, transactionId) => this.props.actions.showTransactionDetails(transactionId)}
               onRowContextMenu={(e, transactionId) => this.props.popupMenu.show(overviewPopupMenuId, transactionId, e.clientY, e.clientX)}
             />
           </div>
