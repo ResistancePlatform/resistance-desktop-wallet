@@ -17,7 +17,6 @@ import styles from './AddressBookList.scss'
 type Props = {
   t: any,
 	items: AddressBookRecord[],
-	onRowClick?: () => void,
 	onRowContextMenu: (event: SyntheticEvent<any>, transactionId: string) => void
 }
 

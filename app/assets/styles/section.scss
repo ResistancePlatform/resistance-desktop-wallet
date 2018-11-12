@@ -18,6 +18,8 @@ $headerHeight: 5rem;
   .title {
     font-size: 1.25rem;
     font-weight: 100;
+    user-select: none;
+    cursor: default;
   }
 
   .buttonsContainer {
@@ -28,3 +30,11 @@ $headerHeight: 5rem;
   }
 }
 
+.moreButton {
+  position: absolute;
+  right: 0;
+  top: 0.2rem;
+
+  // Avoid vertical scrolling
+  height: 0;
+}

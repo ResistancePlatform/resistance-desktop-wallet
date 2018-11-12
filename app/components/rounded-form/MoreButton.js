@@ -1,27 +1,12 @@
 import React from 'react'
 import cn from 'classnames'
 
-import GenericControl, { GenericProps } from './GenericControl'
+import GenericButton from './GenericButton'
 
 import styles from './MoreButton.scss'
 
 
-export type Props = {
-  ...GenericProps,
-  onClick?: () => boolean
-}
-
-export default class MoreButton extends GenericControl {
-  props: Props
-
-  onClickHandler(event) {
-    event.stopPropagation()
-    if (this.props.onClick) {
-      this.props.onClick(event)
-    }
-    return false
-  }
-
+export default class MoreButton extends GenericButton {
   renderControl() {
     return (
       <div className={cn(styles.more, this.props.className)}>

@@ -1,9 +1,12 @@
 // @flow
 import React, { Component } from 'react'
 import { translate } from 'react-i18next'
+import cn from 'classnames'
 
 import { truncateAmount } from '~/utils/decimal'
+import { CopyButton, MoreButton } from '~/components/rounded-form'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
+import { Address } from '~/components/address/Address'
 import { AddressRow } from '~/reducers/own-addresses/own-addresses.reducer'
 
 import styles from './own-address-list.scss'
@@ -21,9 +24,10 @@ class OwnAddressList extends Component<Props> {
   getListHeaderRenderer(t) {
     return (
       <UniformListHeader>
-        <UniformListColumn width="15%">{t(`Balance`)}</UniformListColumn>
-        <UniformListColumn width="10%">{t(`Confirmed`)}</UniformListColumn>
-        <UniformListColumn width="75%">{t(`Address`)}</UniformListColumn>
+        <UniformListColumn width="6.875rem">{t(`Balance`)}</UniformListColumn>
+        <UniformListColumn width="7.25rem">{t(`Confirmed`)}</UniformListColumn>
+        <UniformListColumn width="16rem">{t(`Address`)}</UniformListColumn>
+        <UniformListColumn />
       </UniformListHeader>
     )
   }
@@ -36,15 +40,29 @@ class OwnAddressList extends Component<Props> {
     return (
       <UniformListRow
         key={address.address}
-        className={frozenBalance ? styles.mergingContainer : ''}
+        className={cn(styles.row, [styles.mergingContainer]: frozenBalance)}
         onContextMenu={e => this.props.onRowClick(e, address.address)}
       >
-        {Boolean(frozenBalance) &&
-          <div className={styles.merging}><span>{t(`merging`)}</span></div>
-        }
         <UniformListColumn>{displayBalance}</UniformListColumn>
         <UniformListColumn>{address.confirmed ? t('Yes') : address.balance && t('No') || ''}</UniformListColumn>
-        <UniformListColumn>{address.address}</UniformListColumn>
+        <UniformListColumn>
+          {address.address.startsWith('z') &&
+            <div className={cn('icon', styles.privacyIcon)} />
+          }
+          <Address value={address.address} />
+        </UniformListColumn>
+        <UniformListColumn className={styles.controlsColumn}>
+          <CopyButton className={styles.copyButton} valueToCopy={address.address} />
+          &nbsp;
+          <MoreButton
+            className={styles.moreButton}
+            onClick={e => this.props.onRowClick(e, address.address)}
+          />
+
+          {Boolean(frozenBalance) &&
+            <div className={styles.merging}>{t(`Merging`)}</div>
+          }
+        </UniformListColumn>
       </UniformListRow>
     )
   }

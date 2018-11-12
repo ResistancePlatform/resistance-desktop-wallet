@@ -1,6 +1,10 @@
 @import "~/assets/styles/vars.scss";
 
 .button {
+  color: $BASE_COLOR_PURPLE;
+  font-size: 0.62rem;
+  font-weight: 100;
+
   display: flex;
   cursor: pointer;
   user-select: none;
@@ -11,6 +15,8 @@
     flex-direction: column;
     justify-content: center;
   }
+
+  text-transform: uppercase;
 }
 
 .icon {

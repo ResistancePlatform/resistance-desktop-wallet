@@ -2,7 +2,7 @@ import React from 'react'
 import cn from 'classnames'
 
 import { translate } from '~/i18next.config'
-import GenericControl, { GenericProps } from './GenericControl'
+import GenericButton, { GenericButtonProps } from './GenericButton'
 
 import animatedSpinner from '~/assets/images/animated-spinner.svg'
 import styles from './RoundedButton.scss'
@@ -11,26 +11,16 @@ import styles from './RoundedButton.scss'
 const t = translate('resdex')
 
 export type RoundedButtonProps = {
-  ...GenericProps,
+  ...GenericButtonProps,
   type?: string,
-  onClick?: () => boolean,
   important?: boolean,
   spinner?: boolean,
   spinnerTooltip?: string,
-  glyph?: string,
-  disabled?: boolean
+  glyph?: string
 }
 
-export default class RoundedButton extends GenericControl {
+export default class RoundedButton extends GenericButton {
   props: RoundedButtonProps
-
-  onClickHandler(event) {
-    event.stopPropagation()
-    if (this.props.onClick) {
-      this.props.onClick(event)
-    }
-    return false
-  }
 
   renderAddon() {
     return null
