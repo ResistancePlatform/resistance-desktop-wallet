@@ -42,9 +42,13 @@
   }
 }
 
-.controlsColumn {
-  position: relative;
-  border: 1px dotted fuchsia;
+.addressColumn {
+  overflow-x: hidden;
+  padding-right: 7rem;
+
+  .address {
+    width: calc(100% - 7rem);
+  }
 
   .copyButton {
     visibility: hidden;

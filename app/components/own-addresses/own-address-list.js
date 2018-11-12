@@ -26,8 +26,7 @@ class OwnAddressList extends Component<Props> {
       <UniformListHeader>
         <UniformListColumn width="6.875rem">{t(`Balance`)}</UniformListColumn>
         <UniformListColumn width="7.25rem">{t(`Confirmed`)}</UniformListColumn>
-        <UniformListColumn width="16rem">{t(`Address`)}</UniformListColumn>
-        <UniformListColumn />
+        <UniformListColumn>{t(`Address`)}</UniformListColumn>
       </UniformListHeader>
     )
   }
@@ -45,15 +44,13 @@ class OwnAddressList extends Component<Props> {
       >
         <UniformListColumn>{displayBalance}</UniformListColumn>
         <UniformListColumn>{address.confirmed ? t('Yes') : address.balance && t('No') || ''}</UniformListColumn>
-        <UniformListColumn>
+        <UniformListColumn className={styles.addressColumn}>
           {address.address.startsWith('z') &&
             <div className={cn('icon', styles.privacyIcon)} />
           }
-          <Address value={address.address} />
-        </UniformListColumn>
-        <UniformListColumn className={styles.controlsColumn}>
+          <Address className={styles.address} value={address.address} />
+
           <CopyButton className={styles.copyButton} valueToCopy={address.address} />
-          &nbsp;
           <MoreButton
             className={styles.moreButton}
             onClick={e => this.props.onRowClick(e, address.address)}
@@ -63,6 +60,7 @@ class OwnAddressList extends Component<Props> {
             <div className={styles.merging}>{t(`Merging`)}</div>
           }
         </UniformListColumn>
+
       </UniformListRow>
     )
   }

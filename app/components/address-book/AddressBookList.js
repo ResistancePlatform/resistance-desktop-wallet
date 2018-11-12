@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { translate } from 'react-i18next'
 
 import { AddressBookRecord } from '~/reducers/address-book/address-book.reducer'
+import { Address } from '~/components/address/Address'
 import { MoreButton } from '~/components/rounded-form'
 import {
   UniformList,
@@ -46,8 +47,9 @@ class AddressBookList extends Component<Props> {
         onContextMenu={e => this.props.onRowContextMenu(e, record)}
       >
         <UniformListColumn>{record.name}</UniformListColumn>
-        <UniformListColumn>
-          {record.address}
+        <UniformListColumn className={styles.addressColumn}>
+          <Address className={styles.address} value={record.address} />
+
           <MoreButton
             className={styles.moreButton}
             onClick={e => this.props.onRowContextMenu(e, record)}

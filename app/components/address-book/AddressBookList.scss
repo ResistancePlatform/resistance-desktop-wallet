@@ -1,1 +1,10 @@
 @import "~/assets/styles/section.scss";
+
+.addressColumn {
+  overflow-x: hidden;
+  padding-right: 3rem;
+
+  .address {
+    width: calc(100% - 3rem);
+  }
+}

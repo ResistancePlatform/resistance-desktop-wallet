@@ -1,6 +1,9 @@
 // @flow
-import log from 'electron-log'
 import React, { Component } from 'react'
+import cn from 'classnames'
+
+import styles from './Address.scss'
+
 
 type Props = {
   className?: string,
@@ -9,14 +12,8 @@ type Props = {
 
 export class Address extends Component<Props> {
 	props: Props
-  value: string
 
-  constructor(props) {
-    super(props)
-    this.value = this.props.value
-  }
-
-  componentDidMount() {
+  getValue() {
     const { value } = this.props
 
     if (!this.element) {
@@ -36,19 +33,18 @@ export class Address extends Component<Props> {
     const left = value.slice(0, (value.length - charsToCut) / 2)
     const right = value.slice((value.length + charsToCut) / 2)
 
-    log.debug('Address', scrollWidth, clientWidth, charsToCut, left.length, right.length)
-
-    this.value = `${left}…${right}`
-	}
+    return `${left}…${right}`
+  }
 
 	render() {
 		return (
-      <div
-        className={this.props.className}
-        style={{ whiteSpace: 'nowrap', userSelect: null }}
-        ref={el => {this.element = el}}
-      >
-        {this.value}
+      <div className={cn(styles.address, this.props.className)}>
+        {this.getValue()}
+
+        <div ref={el => {this.element = el}} style={{visibility: 'hidden', height: 0, overflowY: 'hidden'}}>
+          {this.props.value}
+        </div>
+
       </div>
     )
   }
