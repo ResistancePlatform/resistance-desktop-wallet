@@ -3,7 +3,16 @@ import React, { Component } from 'react'
 import { translate } from 'react-i18next'
 
 import { AddressBookRecord } from '~/reducers/address-book/address-book.reducer'
-import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
+import { MoreButton } from '~/components/rounded-form'
+import {
+  UniformList,
+  UniformListHeader,
+  UniformListRow,
+  UniformListColumn
+} from '~/components/uniform-list'
+
+import styles from './AddressBookList.scss'
+
 
 type Props = {
   t: any,
@@ -35,11 +44,16 @@ class AddressBookList extends Component<Props> {
     return (
       <UniformListRow
         key={record.address}
-        onClick={e => this.props.onRowClick(e)}
         onContextMenu={e => this.props.onRowContextMenu(e, record)}
       >
         <UniformListColumn>{record.name}</UniformListColumn>
-        <UniformListColumn>{record.address}</UniformListColumn>
+        <UniformListColumn>
+          {record.address}
+          <MoreButton
+            className={styles.moreButton}
+            onClick={e => this.props.onRowContextMenu(e, record)}
+          />
+        </UniformListColumn>
       </UniformListRow>
     )
   }

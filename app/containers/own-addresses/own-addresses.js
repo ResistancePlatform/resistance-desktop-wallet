@@ -12,6 +12,7 @@ import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { OwnAddressesActions, OwnAddressesState } from '~/reducers/own-addresses/own-addresses.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
+import { RoundedButtonWithDropdown } from '~/components/rounded-form'
 
 import styles from './own-addresses.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
@@ -100,17 +101,25 @@ class OwnAddresses extends Component<Props> {
         />
 
 				{ /* Route content */}
-				<div className={cn(styles.ownAddressesContainer, VLayout.vBoxChild, HLayout.hBoxContainer)}>
+				<div className={cn(styles.container, VLayout.vBoxChild, HLayout.hBoxContainer)}>
 
 					<div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer)}>
 
 						{ /* Top bar */}
-						<div className={cn(styles.topBar, HLayout.hBoxContainer)}>
+						<div className={cn(styles.header, HLayout.hBoxContainer)}>
 
-							<div className={styles.topBarTitle}>{t(`My Addresses`)}</div>
+							<div className={styles.title}>{t(`My Addresses`)}</div>
 
-							<div className={cn(styles.topBarButtonContainer, HLayout.hBoxChild)}>
-                <div role="none" className={styles.addAddressButtonContainer}>
+              <div className={styles.buttonsContainer}>
+                <RoundedButtonWithDropdown
+                  className={styles.menuButton}
+                  onDropdownClick={() => this.props.popupMenu.show(createAddressPopupMenuId)}
+                  disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
+                  glyph="add"
+                  important
+                >
+                  {t(`Add new address`)}
+
                   <PopupMenu id={createAddressPopupMenuId} relative>
                     <PopupMenuItem onClick={() => this.props.actions.createAddress(false)}>
                       {t(`New transparent (R) address`)}
@@ -132,19 +141,10 @@ class OwnAddresses extends Component<Props> {
                     </PopupMenuItem>
                   </PopupMenu>
 
-                  <button
-                    type="button"
-                    className={styles.addNewAddressButton}
-                    onClick={() => this.props.popupMenu.show(createAddressPopupMenuId)}
-                    onKeyDown={() => this.props.popupMenu.show(createAddressPopupMenuId)}
-                    disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
-                  >
-                    + {t(`Menu`)}
-										<span className={cn('icon', styles.arrowDownIcon)} />
-									</button>
+                </RoundedButtonWithDropdown>
 
-								</div>
-							</div>
+              </div>
+
 						</div>
 
             <OwnAddressList

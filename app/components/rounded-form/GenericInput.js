@@ -79,7 +79,7 @@ export default class GenericInput extends GenericControl {
     return null
   }
 
-  renderAddon(){
+  renderAddon() {
     return null
   }
 

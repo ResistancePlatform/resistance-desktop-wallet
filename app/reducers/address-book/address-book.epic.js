@@ -6,6 +6,7 @@ import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
 import { i18n } from '~/i18next.config'
+import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { AddressBookActions } from './address-book.reducer'
 import { AddressBookService } from '~/service/address-book-service'
 
@@ -19,32 +20,35 @@ const loadAddressBookEpic = (action$: ActionsObservable<any>) => action$.pipe(
 )
 
 const addAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
-	ofType(AddressBookActions.newAddressDialog.addAddress),
+	ofType(AddressBookActions.newAddressModal.addAddress),
   mergeMap(() => {
-    const newAddressRecord = state$.value.roundedForm.addressBookNewAddressDialog.fields
+    const newAddressRecord = state$.value.roundedForm.addressBookNewAddressModal.fields
     return addressBook.addAddress(newAddressRecord).pipe(
-      mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.close())),
-      catchError(err => of(AddressBookActions.newAddressDialog.error(err.toString())))
+      mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressModal.close())),
+      catchError(err => of(AddressBookActions.newAddressModal.error(err.toString())))
     )
   })
 )
 
 const updateAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
-	ofType(AddressBookActions.newAddressDialog.updateAddress),
+	ofType(AddressBookActions.newAddressModal.updateAddress),
   mergeMap(() => {
-    const dialogState = state$.value.addressBook.newAddressDialog
-    const addressRecord = state$.value.roundedForm.addressBookNewAddressDialog.fields
+    const dialogState = state$.value.addressBook.newAddressModal
+    const addressRecord = state$.value.roundedForm.addressBookNewAddressModal.fields
     return addressBook.updateAddress(dialogState.originalName, addressRecord).pipe(
-      mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressDialog.close())),
-      catchError(err => of(AddressBookActions.newAddressDialog.error(err.toString())))
+      mergeMap(result => of(AddressBookActions.gotAddressBook(result), AddressBookActions.newAddressModal.close())),
+      catchError(err => of(AddressBookActions.newAddressModal.error(err.toString())))
     )
   })
 )
 
 const copyAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(AddressBookActions.copyAddress),
-	tap(action => clipboard.writeText(action.payload.record.address)),
-	mapTo(AddressBookActions.empty())
+  map(action => {
+    clipboard.writeText(action.payload.record.address)
+    toastr.success(t(`Copied to clipboard`))
+    return AddressBookActions.empty()
+  })
 )
 
 const confirmAddressRemovalEpic = (action$: ActionsObservable<any>) => action$.pipe(
@@ -73,14 +77,19 @@ const removeAddressEpic = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(AddressBookActions.removeAddress),
   mergeMap(action => addressBook.removeAddress(action.payload.record.name).pipe(
     map(result => AddressBookActions.gotAddressBook(result)),
-    catchError(err => of(AddressBookActions.newAddressDialog.error(err.toString())))
+    catchError(err => of(AddressBookActions.newAddressModal.error(err.toString())))
   ))
 )
 
 const errorEpic = (action$: ActionsObservable<any>) => action$.pipe(
-	ofType(AddressBookActions.newAddressDialog.error),
+	ofType(AddressBookActions.newAddressModal.error),
   tap(action => { toastr.error(action.payload.errorMessage) }),
   mapTo(AddressBookActions.empty())
+)
+
+const closeEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(AddressBookActions.newAddressModal.close),
+  mapTo(RoundedFormActions.clear('addressBookNewAddressModal'))
 )
 
 export const AddressBookEpics = (action$, state$) => merge(
@@ -91,4 +100,5 @@ export const AddressBookEpics = (action$, state$) => merge(
   confirmAddressRemovalEpic (action$, state$),
 	removeAddressEpic(action$, state$),
 	errorEpic(action$, state$),
+	closeEpic(action$, state$),
 )

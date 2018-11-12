@@ -6,9 +6,7 @@
   text-align: left;
   white-space: nowrap;
   z-index: 1000;
-  left: 100%;
-  top: 2.2rem;
-  transform: translateX(-100%);
+  top: 2.1rem;
 }
 
 .menu {
@@ -29,11 +27,12 @@
   border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
   user-select: none;
 
-  color: $POPUP_MENU_FONT_COLOR;
+  color: $POPUP_MENU_FONT_COLOR !important;
   font-size: 0.65rem;
+  font-weight: 100;
 
   &:hover {
-    color: $BASE_COLOR_PURPLE;
+    color: $BASE_COLOR_PURPLE !important;
   }
 
   &.disabled {

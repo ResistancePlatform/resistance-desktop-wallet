@@ -10,18 +10,19 @@ import styles from './RoundedButton.scss'
 
 const t = translate('resdex')
 
-export type Props = {
+export type RoundedButtonProps = {
   ...GenericProps,
   type?: string,
   onClick?: () => boolean,
   important?: boolean,
   spinner?: boolean,
   spinnerTooltip?: string,
+  glyph?: string,
   disabled?: boolean
 }
 
 export default class RoundedButton extends GenericControl {
-  props: Props
+  props: RoundedButtonProps
 
   onClickHandler(event) {
     event.stopPropagation()
@@ -29,6 +30,10 @@ export default class RoundedButton extends GenericControl {
       this.props.onClick(event)
     }
     return false
+  }
+
+  renderAddon() {
+    return null
   }
 
   renderControl() {
@@ -44,6 +49,10 @@ export default class RoundedButton extends GenericControl {
         onKeyDown={e => [13, 32].includes(e.keyCode) ? this.onClickHandler(e) : false}
         disabled={this.props.disabled}
       >
+        {this.props.glyph &&
+          <div className={cn('icon', styles.glyph, styles[this.props.glyph])} />
+        }
+
         {this.props.spinner &&
           <img
             className={styles.spinner}
@@ -52,7 +61,10 @@ export default class RoundedButton extends GenericControl {
             title={this.props.spinnerTooltip}
           />
         }
+
         {this.props.children && this.props.children}
+
+        {this.renderAddon()}
       </button>
     )
   }

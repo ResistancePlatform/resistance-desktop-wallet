@@ -36,4 +36,24 @@
     top: 50%;
     transform: translateY(-50%);
   }
+
+  .glyph {
+    top: 50%;
+    transform: translateY(-50%);
+    color: $BASE_COLOR_WHITE;
+    position: absolute;
+    left: 0;
+
+    &.add {
+      &:before {
+        position: absolute;
+        left: 0.6rem;
+        top: -0.42rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        content: '\e900';
+      }
+    }
+  }
 }
+

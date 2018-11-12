@@ -1,6 +1,8 @@
 export { default as RoundedForm } from './RoundedForm'
 export { default as RoundedButton } from './RoundedButton'
+export { default as RoundedButtonWithDropdown } from './RoundedButtonWithDropdown'
 export { default as ToggleButton } from './ToggleButton'
+export { default as MoreButton } from './MoreButton'
 export { default as RoundedInput } from './NewRoundedInput'
 export { default as RoundedInputWithCopy } from './RoundedInputWithCopy'
 export { default as RoundedInputWithPaste } from './RoundedInputWithPaste'

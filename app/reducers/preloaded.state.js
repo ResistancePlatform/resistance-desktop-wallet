@@ -85,7 +85,7 @@ export const preloadedState: State = {
 	},
 	addressBook: {
 		records: [],
-    newAddressDialog: {
+    newAddressModal: {
       defaultValues: {},
       isVisible: false
     }
