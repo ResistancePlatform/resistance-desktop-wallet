@@ -1,3 +1,5 @@
+@import "~/assets/styles/vars.scss";
+
 .layoutContainer {
 }
 
@@ -8,7 +10,7 @@
   margin-top: 7.875rem;
   padding: 2rem;
   height: 100%;
-  overflow-x: scroll;
+  overflow-x: visible;
   overflow-y: scroll;
 
   .title {
@@ -17,6 +19,25 @@
     font-size: 1.25rem;
     font-weight: 100;
     font-style: normal;
+    display: flex;
+    position: relative;
+  }
+
+  .exportButton {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+
+    .glyph {
+      font-size: 1rem;
+      margin-top: 0.1rem;
+      margin-right: 0.4rem;
+
+      &:before {
+        content: '\e917';
+      }
+    }
   }
 }
 

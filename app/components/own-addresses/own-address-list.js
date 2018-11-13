@@ -51,6 +51,7 @@ class OwnAddressList extends Component<Props> {
           <Address className={styles.address} value={address.address} />
 
           <CopyButton className={styles.copyButton} valueToCopy={address.address} />
+
           <MoreButton
             className={styles.moreButton}
             onClick={e => this.props.onRowClick(e, address.address)}

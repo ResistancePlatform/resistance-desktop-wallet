@@ -1,8 +1,10 @@
 // @flow
+import log from 'electron-log'
 import { tap, map, switchMap, mapTo } from 'rxjs/operators'
-import { merge } from 'rxjs'
+import { of, concat, merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
+import { routerActions } from 'react-router-redux'
 
 import { Action } from '../types'
 import { OverviewActions } from './overview.reducer'
@@ -34,17 +36,22 @@ const getTransactionDataDromWalletFailureEpic = (action$: ActionsObservable<Acti
   mapTo(OverviewActions.empty())
 )
 
-const showTransactionDetailsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-  ofType(OverviewActions.showTransactionDetails),
-  switchMap(action => {
-    const overviewState = state$.value.overview
-    return rpc.getTransactionDetails(action.payload.transactionId)
-  }),
-  map(
-    result => typeof result === 'object'
-      ? OverviewActions.showTransactionDetailsSucceeded(result)
-      : OverviewActions.showTransactionDetailsFailed(result)
-  )
+const getTransactionDetailsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(OverviewActions.getTransactionDetails),
+  switchMap(action => rpc.getTransactionDetails(action.payload.transactionId)),
+  switchMap(transactionDetails => {
+    if (typeof transactionDetails !== 'object') {
+      log.error(`Can't get transaction details`, transactionDetails)
+      toastr.error(`Error getting transaction details`)
+      return of(OverviewActions.getTransactionDetailsFailed())
+    }
+
+    log.debug(`Got transaction details`, transactionDetails)
+    return concat(
+      of(OverviewActions.gotTransactionDetails(transactionDetails)),
+      of(routerActions.push('/overview/transaction-details'))
+    )
+  })
 )
 
 export const OverviewEpics = (action$, state$) => merge(
@@ -52,5 +59,5 @@ export const OverviewEpics = (action$, state$) => merge(
     getWalletInfoFailureEpic(action$, state$),
     getTransactionDataFromWalletEpic(action$, state$),
     getTransactionDataDromWalletFailureEpic(action$, state$),
-    showTransactionDetailsEpic(action$, state$)
+    getTransactionDetailsEpic(action$, state$)
 )

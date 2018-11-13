@@ -1,8 +1,20 @@
 // @flow
+import log from 'electron-log'
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux';
 import { translate } from 'react-i18next'
+import cn from 'classnames'
+import { routerActions } from 'react-router-redux'
 
-import { TransactionDetail } from '~/reducers/overview/overview.reducer'
+import { BorderlessButton } from '~/components/rounded-form'
+import {
+  UniformList,
+  UniformListHeader,
+  UniformListRow,
+  UniformListColumn
+} from '~/components/uniform-list'
+import { OverviewState } from '~/reducers/overview/overview.reducer'
 
 import styles from './TransactionDetails.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
@@ -10,94 +22,98 @@ import VLayout from '~/assets/styles/v-box-layout.scss'
 
 type Props = {
   t: any,
-	transactionDetails: TransactionDetail,
-	onBackToTransactionListClick: () => void
+  overview: OverviewState,
+  routerActions: object
 }
+
+const getNameTranslation = (t, name) => ({
+  amount: t(`Amount`),
+  blockhash: t(`Block hash`),
+  blockindex: t(`Block index`),
+  blocktime: t(`Block time`),
+  confirmations: t(`Confirmations`),
+  expiryheight: t(`Expiry height`),
+  generated: t(`Generated`),
+  hex: t(`Hex`),
+  time: t(`Time`),
+  timereceived: t(`Time received`),
+  txid: t(`Transaction ID`),
+})[name] || name
 
 /**
  * @export
- * @class TransactionDetailList
+ * @class TransactionDetails
  * @extends {Component<Props>}
  */
-class TransactionDetailList extends Component<Props> {
+class TransactionDetails extends Component<Props> {
 	props: Props
 
-	/**
-	 * @param {*} event
-	 * @memberof TransactionDetailList
-	 */
-	backToTransactionList(event: any) {
-		event.preventDefault()
-		event.stopPropagation()
-
-		if (this.props.onBackToTransactionListClick) {
-			this.props.onBackToTransactionListClick()
-		}
-	}
-
-	/**
-	 * @returns
-	 * @memberof TransactionDetailList
-	 */
-	getDetailTable() {
+  getListHeaderRenderer() {
     const { t } = this.props
 
-		if (!this.props.transactionDetails) {
-			return (<div className={styles.hasNoDetail}>{t(`No Transaction Detail.`)}</div>)
-    }
+    return(
+      <UniformListHeader>
+        <UniformListColumn width="10rem">{t(`Name`)}</UniformListColumn>
+        <UniformListColumn>{t(`Value`)}</UniformListColumn>
+      </UniformListHeader>
+    )
+  }
 
-    if (typeof this.props.transactionDetails === 'string') {
-			return (<div className={styles.error}>{t(`Error occurred:`)} {this.props.transactionDetails}</div>)
-		}
+  getListRowRenderer(item: object) {
+    const { t } = this.props
 
-		const sortedKeys = Object.keys(this.props.transactionDetails).sort()
-
-		const tableBody = sortedKeys.map((key, index) => (
-			<div
-				className={[HLayout.hBoxContainer, styles.tableBodyRow].join(' ')}
-				key={index}
-			>
-				<div className={styles.tableBodyRowColumnName} >{key}</div>
-				<div className={[HLayout.hBoxChild, styles.tableBodyRowColumnValue].join(' ')}>{this.props.transactionDetails[key].toString()}</div>
-			</div>
-		))
-
-		return (
-			<div className={[styles.tableContainer].join(' ')}>
-
-				<div className={[HLayout.hBoxContainer, styles.tableHeader].join(' ')}>
-					<div className={styles.tableHeaderColumnName}>{t(`Name`)}</div>
-					<div className={[HLayout.hBoxChild, styles.tableHeaderColumnValue].join(' ')}>{t(`Value`)}</div>
-				</div>
-
-				{tableBody}
-			</div>
-		)
-	}
+    return (
+      <UniformListRow key={item.name}>
+        <UniformListColumn>{getNameTranslation(t, item.name)}</UniformListColumn>
+        <UniformListColumn>{item.value.toString()}</UniformListColumn>
+      </UniformListRow>
+    )
+  }
 
 	/**
 	 * @returns
-	 * @memberof TransactionDetailList
+	 * @memberof TransactionDetails
 	 */
 	render() {
     const { t } = this.props
 
+    const { transactionDetails } = this.props.overview
+
+    log.debug(`transactionDetails`, transactionDetails, this.props.overview.transactionDetails)
+    const items = Object.keys(transactionDetails).map(key => ({
+      name: key,
+      value: transactionDetails[key]
+    }))
+
 		return (
-			<div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.transactionDetailsListContainer].join(' ')}>
-				<div
-          role="button"
-          tabIndex={0}
-					className={styles.backToTransactionList}
-					onClick={(event) => this.backToTransactionList(event)}
-					onKeyDown={() => { }}
-				>
-					<span className={styles.arrow}>←</span><span className={styles.text}>{t(`Back to transaction list`)}</span>
-				</div>
-				<div className={styles.title}>{t(`Transaction Details`)}</div>
-				{this.getDetailTable()}
+			<div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.container)}>
+        <BorderlessButton
+          className={styles.backButton}
+          onClick={() => this.props.routerActions.push('/overview')}
+          glyphClassName={styles.glyph}
+        >
+          {t(`Back to transactions list`)}
+        </BorderlessButton>
+
+				<div className={styles.title}>{t(`Transaction details`)}</div>
+
+        <UniformList
+          items={items}
+          sortKeys={['name']}
+          headerRenderer={() => this.getListHeaderRenderer()}
+          rowRenderer={record => this.getListRowRenderer(record)}
+        />
 			</div>
 		)
 	}
 }
 
-export default translate('overview')(TransactionDetailList)
+const mapStateToProps = state => ({
+  overview: state.overview,
+})
+
+const mapDispatchToProps = dispatch => ({
+  routerActions: bindActionCreators(routerActions, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(translate('overview')(TransactionDetails))

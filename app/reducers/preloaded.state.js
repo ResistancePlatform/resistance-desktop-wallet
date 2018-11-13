@@ -62,7 +62,7 @@ export const preloadedState: State = {
 			totalUnconfirmedBalance: Decimal('0')
 		},
 		transactions: [],
-		transactionDetails: null
+		transactionDetails: {}
 	},
 	ownAddresses: {
 		addresses: [],

@@ -633,7 +633,7 @@ async function getPublicTransactionsPromise(client: Client) {
   ]
 
   const noAddressMessage = t(`Z address is not listed in the wallet`)
-  const publicAddressMessage = t(`R (public)`)
+  const publicAddressMessage = t(`R (Public)`)
 
   return client.command(command)
     .then(result => result[0])
@@ -691,7 +691,7 @@ async function getPrivateTransactionsPromise(client: Client) {
     }
 
     const tempTransactionsList = queryResultWithAddressArr.map(result => ({
-      type: `\u2605 T (Private)`,
+      type: t(`T (Private)`),
       category: 'receive',
       confirmations: 0,
       amount: Decimal(result.amount),

@@ -18,12 +18,12 @@ export class Address extends Component<Props> {
     const { value } = this.props
     const minLength = 35
 
+    // Calculate how many chars have to be cut out
     if (!this.element) {
       charsToCut = value.length - minLength
     } else {
       const { scrollWidth, clientWidth } = this.element
 
-      // Calculate how many chars have to be cut out
       const averageCharWidth = scrollWidth / value.length
       charsToCut = 1 + (scrollWidth - clientWidth) / averageCharWidth
     }

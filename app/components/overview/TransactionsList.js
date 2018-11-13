@@ -6,6 +6,7 @@ import cn from 'classnames'
 
 import { truncateAmount } from '~/utils/decimal'
 import { Address } from '~/components/address/Address'
+import { MoreButton } from '~/components/rounded-form'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 import { Transaction } from '~/reducers/overview/overview.reducer'
 
@@ -34,11 +35,11 @@ class TransactionsList extends Component<Props> {
 
     return (
       <UniformListHeader>
-        <UniformListColumn width="6rem">{t(`Type`)}</UniformListColumn>
+        <UniformListColumn width="4rem">{t(`Type`)}</UniformListColumn>
         <UniformListColumn width="5rem">{t(`Direction`)}</UniformListColumn>
         <UniformListColumn width="4rem">{t(`Confirmed`)}</UniformListColumn>
         <UniformListColumn width="5rem">{t(`Amount`)}</UniformListColumn>
-        <UniformListColumn width="7.6rem">{t(`Date`)}</UniformListColumn>
+        <UniformListColumn width="6.6rem">{t(`Date`)}</UniformListColumn>
         <UniformListColumn>{t(`Destination address`)}</UniformListColumn>
       </UniformListHeader>
     )
@@ -66,6 +67,11 @@ class TransactionsList extends Component<Props> {
         <UniformListColumn>{moment.unix(transaction.timestamp).locale(i18n.language).format('L kk:mm:ss')}</UniformListColumn>
         <UniformListColumn>
           <Address className={styles.address} value={transaction.destinationAddress} />
+
+          <MoreButton
+            className={styles.moreButton}
+            onClick={e => this.props.onRowContextMenu(e, transaction.transactionId)}
+          />
         </UniformListColumn>
       </UniformListRow>
     )
