@@ -38,13 +38,18 @@ export class Address extends Component<Props> {
 
 	render() {
 		return (
-      <div className={cn(styles.address, this.props.className)}>
+      <div className={cn(styles.container, this.props.className)}>
+      <div className={styles.address}>
         {this.getValue()}
 
-        <div ref={el => {this.element = el}} style={{visibility: 'hidden', height: 0, overflowY: 'hidden'}}>
+        <div
+          className={styles.widthMeasurer}
+          ref={el => {this.element = el}}
+        >
           {this.props.value}
         </div>
 
+      </div>
       </div>
     )
   }

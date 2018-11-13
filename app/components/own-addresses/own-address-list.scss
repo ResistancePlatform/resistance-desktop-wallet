@@ -43,11 +43,8 @@
 }
 
 .addressColumn {
-  overflow-x: hidden;
-  padding-right: 7rem;
-
   .address {
-    width: calc(100% - 7rem);
+    margin-right: 8rem;
   }
 
   .copyButton {
