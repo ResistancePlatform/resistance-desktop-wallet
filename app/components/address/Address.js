@@ -14,21 +14,25 @@ export class Address extends Component<Props> {
 	props: Props
 
   getValue() {
+    let charsToCut
     const { value } = this.props
+    const minLength = 35
 
     if (!this.element) {
-      return
+      charsToCut = value.length - minLength
+    } else {
+      const { scrollWidth, clientWidth } = this.element
+
+      // Calculate how many chars have to be cut out
+      const averageCharWidth = scrollWidth / value.length
+      charsToCut = 1 + (scrollWidth - clientWidth) / averageCharWidth
     }
 
-    const { scrollWidth, clientWidth } = this.element
+    charsToCut = Math.max(0, Math.min(charsToCut, value.length - minLength))
 
-    if (scrollWidth <= clientWidth) {
+    if (charsToCut < 2) {
       return value
     }
-
-    // Calculate how many chars have to be cut out
-    const averageCharWidth = scrollWidth / value.length
-    const charsToCut = 1 + (scrollWidth - clientWidth) / averageCharWidth
 
     const left = value.slice(0, (value.length - charsToCut) / 2)
     const right = value.slice((value.length + charsToCut) / 2)

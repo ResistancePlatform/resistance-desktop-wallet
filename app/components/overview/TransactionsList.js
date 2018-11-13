@@ -5,6 +5,7 @@ import { translate } from 'react-i18next'
 import cn from 'classnames'
 
 import { truncateAmount } from '~/utils/decimal'
+import { Address } from '~/components/address/Address'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 import { Transaction } from '~/reducers/overview/overview.reducer'
 
@@ -59,9 +60,13 @@ class TransactionsList extends Component<Props> {
           {transactionDirectionMap(t)[transaction.category] || transaction.category}
         </UniformListColumn>
         <UniformListColumn>{transaction.confirmations !== 0 ? t('Yes') : t('No')}</UniformListColumn>
-        <UniformListColumn>{truncateAmount(transaction.amount)}</UniformListColumn>
+        <UniformListColumn>
+          {truncateAmount(transaction.amount)}
+        </UniformListColumn>
         <UniformListColumn>{moment.unix(transaction.timestamp).locale(i18n.language).format('L kk:mm:ss')}</UniformListColumn>
-        <UniformListColumn>{transaction.destinationAddress}</UniformListColumn>
+        <UniformListColumn>
+          <Address className={styles.address} value={transaction.destinationAddress} />
+        </UniformListColumn>
       </UniformListRow>
     )
   }
