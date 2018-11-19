@@ -7,7 +7,6 @@ import * as Joi from 'joi'
 import cn from 'classnames'
 
 import { getPasswordValidationSchema } from '~/utils/auth'
-import { RoundedFormRoot } from '~/reducers/rounded-form/rounded-form.reducer'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { AuthState, AuthActions } from '~/reducers/auth/auth.reducer'
 import TitleBarButtons, { DragBar } from '~/components/title-bar-buttons/TitleBarButtons'
@@ -26,7 +25,6 @@ type Props = {
   t: any,
   auth: AuthState,
   settings: SettingsState,
-  form: RoundedFormRoot | undefined,
   actions: object
 }
 
