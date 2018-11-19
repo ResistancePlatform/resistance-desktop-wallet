@@ -30,6 +30,7 @@ export const SettingsActions = createActions(
     ENABLE_MINER: undefined,
     DISABLE_MINER: undefined,
 
+    TOGGLE_TOR: undefined,
     ENABLE_TOR: undefined,
     DISABLE_TOR: undefined,
 

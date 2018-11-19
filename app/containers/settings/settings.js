@@ -16,6 +16,7 @@ import {
   RoundedButton,
   ToggleButton,
   RoundedInput,
+  RoundedInputWithDropdown,
 } from '~/components/rounded-form'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import styles from './settings.scss'
@@ -172,18 +173,21 @@ class Settings extends Component<Props> {
                 {/* Wallet Password */}
                 <div className={cn(styles.body)}>
                   <RoundedForm
+                    className={styles.form}
                     id=""
                     schema={getValidationSchema(t)}
                   >
 
                     <RoundedInput
                       type="password"
+                      labelClassName={styles.inputLabel}
                       name="oldPassword"
                       label={t(`Old password`)}
                     />
 
                     <RoundedInput
                       type="password"
+                      labelClassName={styles.inputLabel}
                       name="newPassword"
                       label={t(`New password`)}
                     />
@@ -197,7 +201,7 @@ class Settings extends Component<Props> {
                     <RoundedButton
                       type="submit"
                       onClick={this.props.actions.savePassword}
-                      disabled={this.getSavePasswordButtonDisabledAttribute()}
+                      important
                     >
                       {t(`Save password`)}
                     </RoundedButton>
@@ -210,39 +214,35 @@ class Settings extends Component<Props> {
 
               <TabPanel>
                 {/* Manage wallet */}
-                <div className={cn(styles.body, styles.buttonsRow)}>
-                  <button
-                    type="button"
-                    className={styles.walletNodeButton}
+                <div className={styles.buttonsRow}>
+                  <RoundedButton
                     onClick={this.props.actions.initiateWalletBackup}
-                    onKeyDown={() => undefined}
                     disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
+                    important
                   >
                     {t(`Backup`)}
-                  </button>
+                  </RoundedButton>
 
-                  <button
-                    type="button"
+                  <RoundedButton
                     className={styles.walletNodeButton}
                     onClick={this.props.actions.initiateWalletRestore}
-                    onKeyDown={() => undefined}
                     disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
+                    important
                   >
                     {t(`Restore`)}
-                  </button>
+                  </RoundedButton>
                 </div>
                 </TabPanel>
 
               <TabPanel>
-                {/* Manage daemon */}
+                {/* Manage daemons */}
 
-                <div className={styles.title}>{t(`Manage daemon`)}</div>
-
-                <div className={cn(styles.body, styles.buttonsRow)}>
+                <div className={styles.buttonsRow}>
                   <RoundedButton
                     className={styles.stopLocalNodeButton}
                     onClick={this.props.actions.toggleLocalNode}
                     disabled={this.getIsChildProcessUpdating('NODE') || this.checkPendingOperations()}
+                    important
                   >
                     {this.getStartStopLocalNodeButtonLabel()}
                   </RoundedButton>
@@ -252,15 +252,16 @@ class Settings extends Component<Props> {
                   </RoundedButton>
 
                   <ToggleButton
-                    captions={[t(`Enable mining`)]}
                     defaultValue={this.props.settings.isMinerEnabled}
+                    className={styles.enableMiningToggle}
+                    label={t(`Enable mining`)}
                     onChange={this.props.actions.toggleMiner}
                     disabled={this.getMiningDisabledAttribute()}
                   />
 
                   <ToggleButton
-                    captions={[t(`Enable Tor`)]}
                     defaultValue={this.props.settings.isTorEnabled}
+                    label={t(`Enable Tor`)}
                     onChange={this.props.actions.toggleTor}
                     disabled={this.getTorDisabledAttribute()}
                   />
@@ -271,17 +272,21 @@ class Settings extends Component<Props> {
 
               <TabPanel>
                 {/* Language */}
-                <div className={styles.languageContainer}>
-                  <PopupMenu id={languagePopupMenuId} relative>
-                    {this.getLanguageMenuItems()}
-                  </PopupMenu>
+                <div className={styles.form}>
 
-                  <RoundedInput
+                  <RoundedInputWithDropdown
                     name="language"
                     defaultValue={Iso6391.getNativeName(this.props.settings.language)}
                     label={t(`Language`)}
+                    onDropdownClick={() => this.props.popupMenu.show(languagePopupMenuId)}
                     readOnly
-                  />
+                  >
+                    <PopupMenu id={languagePopupMenuId} relative>
+                      {this.getLanguageMenuItems()}
+                    </PopupMenu>
+
+                  </RoundedInputWithDropdown>
+
                 </div>
 
               </TabPanel>

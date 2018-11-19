@@ -10,6 +10,7 @@ export type Props = {
   ...GenericProps,
 	onChange?: value => void,
   defaultValue?: boolean,
+  label?: string,
   captions?: string[]
 }
 
@@ -50,6 +51,13 @@ export default class ToggleButton extends GenericControl {
     const [onCaption, offCaption] = this.props.captions || []
 
     return (
+      <div className={cn(styles.wrapper, this.props.className)}>
+        {this.props.label &&
+          <div className={styles.label}>
+            {this.props.label}
+          </div>
+        }
+
         <div
           role="button"
           tabIndex={0}
@@ -62,7 +70,10 @@ export default class ToggleButton extends GenericControl {
           <div className={styles.caption}>
             {(this.state.value ? onCaption : offCaption) || ''}
           </div>
+
         </div>
+
+      </div>
     )
   }
 }
