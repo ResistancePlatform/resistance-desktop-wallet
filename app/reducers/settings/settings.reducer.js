@@ -21,10 +21,12 @@ export const SettingsActions = createActions(
     OPEN_STATUS_MODAL: undefined,
     CLOSE_STATUS_MODAL: undefined,
 
+    TOGGLE_LOCAL_NODE: undefined,
     START_LOCAL_NODE: undefined,
     RESTART_LOCAL_NODE: undefined,
     STOP_LOCAL_NODE: undefined,
 
+    TOGGLE_MINER: undefined,
     ENABLE_MINER: undefined,
     DISABLE_MINER: undefined,
 

@@ -63,6 +63,23 @@ const kickOffChildProcessesEpic = (action$: ActionsObservable<Action>, state$) =
   })
 )
 
+const toggleLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(SettingsActions.toggleLocalNode),
+  map(() => {
+    const { childProcessesStatus } = state$.value.settings
+		switch (childProcessesStatus.NODE) {
+			case 'RUNNING':
+			case 'MURDER FAILED':
+				return SettingsActions.stopLocalNode()
+			case 'NOT RUNNING':
+			case 'FAILED':
+				return SettingsActions.startLocalNode()
+			default:
+		}
+    return SettingsActions.empty()
+	})
+)
+
 const startLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.startLocalNode),
   map(() => {
@@ -88,6 +105,17 @@ const stopLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action
   mapTo(SettingsActions.disableMiner())
 )
 
+const toggleMinerEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(SettingsActions.toggleMiner),
+  map(() => {
+    const { isMinerEnabled } = state$.value.settings
+    const nextAction = isMinerEnabled
+      ? SettingsActions.disableMiner()
+      : SettingsActions.enableMiner()
+		return nextAction
+  })
+)
+
 const enableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.enableMiner),
 	tap(() => { minerService.start() }),
@@ -98,6 +126,17 @@ const disableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.disableMiner),
 	tap(() => { minerService.stop() }),
   mapTo(SettingsActions.empty())
+)
+
+const toggleTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(SettingsActions.toggleTor),
+  map(() => {
+    const { isTorEnabled } = state$.value.settings
+    const nextAction = isTorEnabled
+      ? SettingsActions.disableTor()
+      : SettingsActions.enableTor()
+		return nextAction
+  })
 )
 
 const enableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
@@ -271,11 +310,14 @@ const childProcessMurderFailedEpic = (action$: ActionsObservable<Action>) => act
 export const SettingsEpics = (action$, state$) => merge(
   updateLanguageEpic(action$, state$),
 	kickOffChildProcessesEpic(action$, state$),
+  toggleLocalNodeEpic(action$, state$),
 	startLocalNodeEpic(action$, state$),
   restartLocalNodeEpic(action$, state$),
 	stopLocalNodeEpic(action$, state$),
+  toggleMinerEpic(action$, state$),
   enableMinerEpic(action$, state$),
 	disableMinerEpic(action$, state$),
+  toggleTorEpic(action$, state$),
 	enableTorEpic(action$, state$),
 	disableTorEpic(action$, state$),
   initiateWalletBackupEpic(action$, state$),
