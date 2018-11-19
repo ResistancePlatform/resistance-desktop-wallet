@@ -171,28 +171,28 @@ class StatusModal extends Component<Props> {
                     className={this.getChildProcessStatusClassNames('NODE')}
                     title={childProcess.getStatusName(this.props.settings.childProcessesStatus.NODE)}
                   />
-                  {t(`Node Log`)}
+                  {t(`Node`)}
                 </Tab>
                 <Tab className={styles.tab}>
                   <i
                     className={this.getChildProcessStatusClassNames('MINER')}
                     title={childProcess.getStatusName(this.props.settings.childProcessesStatus.MINER)}
                   />
-                  {t(`Miner Log`)}
+                  {t(`Miner`)}
                 </Tab>
                 <Tab className={styles.tab}>
                   <i
                     className={this.getChildProcessStatusClassNames('TOR')}
                     title={childProcess.getStatusName(this.props.settings.childProcessesStatus.TOR)}
                   />
-                  {t(`Tor Log`)}
+                  {t(`Tor`)}
                   </Tab>
                   <Tab className={styles.tab}>
                   <i
                     className={this.getChildProcessStatusClassNames('RESDEX')}
                     title={childProcess.getStatusName(this.props.settings.childProcessesStatus.RESDEX)}
                   />
-                  {t(`ResDEX Log`)}
+                  {t(`ResDEX`)}
                 </Tab>
               </TabList>
 
