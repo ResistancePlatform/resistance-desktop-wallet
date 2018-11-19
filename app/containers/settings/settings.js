@@ -150,7 +150,9 @@ class Settings extends Component<Props> {
 				{/* Route content */}
 				<div className={cn(styles.settingsContainer, VLayout.vBoxChild, HLayout.hBoxContainer)}>
 					<div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapperContainer)}>
-            <StatusModal />
+            {this.props.settings.isStatusModalOpen &&
+              <StatusModal />
+            }
 
 						{/* Title bar */}
             <div className={styles.titleBar}>{t(`Settings`)}</div>
@@ -237,7 +239,7 @@ class Settings extends Component<Props> {
               <TabPanel>
                 {/* Manage daemons */}
 
-                <div className={styles.buttonsRow}>
+                <div className={cn(styles.localNodeButtons, styles.buttonsRow)}>
                   <RoundedButton
                     className={styles.stopLocalNodeButton}
                     onClick={this.props.actions.toggleLocalNode}
@@ -251,17 +253,23 @@ class Settings extends Component<Props> {
                     {t(`Show status`)}
                   </RoundedButton>
 
+                </div>
+
+                <div className={styles.buttonsRow}>
                   <ToggleButton
                     defaultValue={this.props.settings.isMinerEnabled}
-                    className={styles.enableMiningToggle}
+                    labelClassName={styles.toggleLabel}
                     label={t(`Enable mining`)}
                     onChange={this.props.actions.toggleMiner}
                     disabled={this.getMiningDisabledAttribute()}
                   />
+                </div>
 
+                <div className={styles.buttonsRow}>
                   <ToggleButton
                     defaultValue={this.props.settings.isTorEnabled}
                     label={t(`Enable Tor`)}
+                    labelClassName={styles.toggleLabel}
                     onChange={this.props.actions.toggleTor}
                     disabled={this.getTorDisabledAttribute()}
                   />

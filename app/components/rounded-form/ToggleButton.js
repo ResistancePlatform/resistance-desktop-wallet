@@ -9,6 +9,7 @@ import styles from './ToggleButton.scss'
 export type Props = {
   ...GenericProps,
 	onChange?: value => void,
+  labelClassName?: string,
   defaultValue?: boolean,
   label?: string,
   captions?: string[]
@@ -53,7 +54,7 @@ export default class ToggleButton extends GenericControl {
     return (
       <div className={cn(styles.wrapper, this.props.className)}>
         {this.props.label &&
-          <div className={styles.label}>
+          <div className={cn(styles.label, this.props.labelClassName)}>
             {this.props.label}
           </div>
         }
