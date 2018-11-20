@@ -9,6 +9,7 @@ import { i18n } from '~/i18next.config'
 import FetchParametersProgressText from '~/components/fetch-parameters/FetchParametersProgressText'
 import FetchParametersState from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import { ResistanceService } from '~/service/resistance-service'
+import { RoundedButton } from '~/components/rounded-form'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
@@ -104,6 +105,9 @@ export class Welcome extends Component<Props> {
 	render() {
     const { t } = this.props
 
+    const isApplyConfigurationDisabled = (!this.props.fetchParameters.isDownloadComplete ||
+                                          this.props.welcome.isBootstrapping)
+
 		return (
       <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.getStartedContainer)}>
         <div className={styles.title}>{t(`Welcome to Resistance!`)}</div>
@@ -143,24 +147,21 @@ export class Welcome extends Component<Props> {
 
         <div className={styles.buttons}>
           {!this.props.welcome.isReadyToUse &&
-            <button
-              type="button"
+            <RoundedButton
+              className={styles.applyConfiguration}
               onClick={this.props.actions.applyConfiguration}
-              onKeyDown={this.props.actions.applyConfiguration}
-              disabled={!this.props.fetchParameters.isDownloadComplete || this.props.welcome.isBootstrapping}
+              spinner={isApplyConfigurationDisabled}
+              disabled={isApplyConfigurationDisabled}
+              important
             >
               {t(`Apply configuration`)}
-            </button>
+            </RoundedButton>
           }
 
           {this.props.welcome.isReadyToUse &&
-            <button
-              type="button"
-              onClick={this.props.actions.useResistance}
-              onKeyDown={this.props.actions.useResistance}
-            >
+            <RoundedButton onClick={this.props.actions.useResistance} important>
               {t(`Use Resistance`)}
-            </button>
+            </RoundedButton>
           }
         </div>
 

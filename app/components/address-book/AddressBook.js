@@ -4,7 +4,8 @@ import cn from 'classnames'
 
 import { AddressBookState } from '~/reducers/address-book/address-book.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
-import NewAddressDialog from './NewAddressDialog'
+import { RoundedButton } from '~/components/rounded-form'
+import NewAddressModal from './NewAddressModal'
 import AddressBookList from './AddressBookList'
 
 import styles from './AddressBook.scss'
@@ -41,25 +42,28 @@ export class AddressBook extends Component<Props> {
       /* Layout container */
 			<div
         role="none"
-				className={cn(styles.AddressBookContainer, HLayout.hBoxChild, VLayout.vBoxContainer)}
+				className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}
 				onKeyDown={() => {}}
 			>
 
 				{/* Top bar */}
-				<div className={cn(styles.topBar, HLayout.hBoxContainer)}>
-					<div className={styles.topBarTitle}>{t(`Address Book`)}</div>
-					<div className={cn(styles.topBarButtonContainer, HLayout.hBoxChild)}>
-						<button
-              type="button"
-              onClick={() => this.props.actions.openNewAddressDialog()}
-							onKeyDown={() => {}}
-						>
-							<span className={styles.addIcon}>&#43;</span><span>{t(`Add new address`)}</span>
-						</button>
-					</div>
+				<div className={cn(styles.header, HLayout.hBoxContainer)}>
+					<div className={styles.title}>{t(`Address Book`)}</div>
+
+          <div className={styles.buttonsContainer}>
+            <RoundedButton
+              className={styles.addAddressButton}
+              onClick={() => this.props.actions.openNewAddressModal()}
+              glyph="add"
+              important
+            >
+              {t(`Add new address`)}
+            </RoundedButton>
+          </div>
+
 				</div>
 
-        <NewAddressDialog />
+        <NewAddressModal />
 
         <AddressBookList
           items={this.props.addressBook.records}
@@ -67,7 +71,7 @@ export class AddressBook extends Component<Props> {
         />
 
 				<PopupMenu id={addressBookPopupMenuId}>
-          <PopupMenuItem onClick={(e, record) => this.props.actions.openNewAddressDialog(record)}>
+          <PopupMenuItem onClick={(e, record) => this.props.actions.openNewAddressModal(record)}>
             {t(`Edit address`)}
           </PopupMenuItem>
           <PopupMenuItem onClick={(e, record) => this.props.actions.copyAddress(record)}>

@@ -217,7 +217,7 @@
     "electron-settings": "^3.2.0",
     "emittery": "^0.4.1",
     "font-awesome": "^4.7.0",
-    "generate-password": "^1.4.0",
+    "generate-password": "^1.4.1",
     "get-port": "^4.0.0",
     "history": "^4.7.2",
     "i18next": "^11.9.0",
@@ -261,7 +261,6 @@
     "request-promise-native": "^1.0.5",
     "round-to": "^3.0.0",
     "rxjs": "^6.2.1",
-    "scrypt-js": "^2.0.3",
     "source-map-support": "^0.5.6",
     "write-json-file": "^3.0.2"
   },

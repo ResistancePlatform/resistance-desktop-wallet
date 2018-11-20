@@ -1,76 +1,54 @@
 @import "~/assets/styles/vars.scss";
-@import "~/assets/styles/generic-component.scss";
-@import "~/assets/styles/toggle-button.scss";
+@import "~/assets/styles/tabs.scss";
 
-@mixin settingButton() {
-    @include roundedButton(true);
-    margin-left: 0;
+.tabs {
+  margin: 0 -2rem;
+}
+
+.tab {
+  margin: 0 1.7rem;
+}
+
+.selectedTabPanel {
+  margin: 2rem;
 }
 
 .settingsContainer {
-    padding: 3rem 2rem;
-    min-width: 30rem;
+  padding: 3rem 2rem;
+  min-width: 30rem;
 }
 
 .wrapperContainer {
-    justify-content: flex-start;
-    align-items: flex-start;
+  justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .titleBar {
   font-size: 1.25rem;
   font-weight: 100;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
-.languageContainer {
-  position: relative;
+.form {
+  max-width: 23.75rem;
 }
 
-.savePasswordButton {
-    @include settingButton();
+.inputLabel {
+  min-width: 5rem;
 }
 
-.sectionContainer {
-  width: 100%;
-  display: block;
-  padding: 1.3rem 0;
-  font-size: 0.7rem;
-  font-weight: 300;
-  border-top: 1px solid $BASE_COLOR_BORDER_GRAY;
+.buttonsRow {
+  display: flex;
 
-  .title {
-    margin-bottom: 1.2rem;
-    text-transform: uppercase;
+  > * {
+    margin-right: 0.8rem;
   }
-
-  .body {
-    display: inline-block;
-    &.buttonsRow {
-      div, button {
-        display: inline-block;
-      }
-    }
-  }
-
-  &.walletPassword {
-    // border-top: 0;
-    // padding-top: 0.5rem;
-  }
-
 }
 
-.stopLocalNodeButton {
-    @include settingButton();
+.localNodeButtons {
+  margin-bottom: 1rem;
 }
 
-.showStatusButton {
-    @include settingButton();
-
-    margin-left: 1.5rem;
-}
-
-.walletNodeButton {
-    @include settingButton();
-    margin-right: 1.5rem;
+.toggleLabel {
+  min-width: 6rem;
 }

@@ -4,7 +4,7 @@ import cn from 'classnames'
 
 import { translate } from '~/i18next.config'
 import RoundedInput from './NewRoundedInput'
-import styles from './RoundedInputWithButton.scss'
+import styles from './BorderlessButton.scss'
 
 
 const t = translate('other')

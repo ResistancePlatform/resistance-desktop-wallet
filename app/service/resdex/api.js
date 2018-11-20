@@ -180,25 +180,21 @@ class ResDexApiService {
 		}
 
 		if (useElectrum && currency.electrumServers) {
-			const queries = currency.electrumServers.map(server => this.query({
-				method: 'electrum',
-				coin: symbol,
-				ipaddr: server.host,
-				port: server.port,
-			}))
-
-			const responses = await Promise.all(queries)
-			const success = responses.filter(response => response.result === 'success').length > 0
-
-			if (!success) {
-        throw new Error(t(`Could not connect to {{symbol}} Electrum server`, { symbol }))
-			}
-
-			return success
+      return this::enableElectrumServers(symbol)
 		}
 
-		const response = await this.query({ method: 'enable', coin: symbol })
-		return response.status === 'active'
+    let response
+
+    try {
+      response = await this.query({ method: 'enable', coin: symbol })
+    } catch(err) {
+      if (err.message.includes('couldnt find coin locally installed')) {
+        log.error(`Can't enable a currency that's not installed locally, re-trying in Electrum mode`)
+        return this::enableElectrumServers(symbol)
+      }
+    }
+
+    return response.status === 'active'
   }
 
   disableCurrency(coin: string) {
@@ -293,6 +289,26 @@ class ResDexApiService {
 }
 
 /* Private methods */
+
+async function enableElectrumServers(symbol) {
+  const currency = getCurrency(symbol)
+
+  const queries = currency.electrumServers.map(server => this.query({
+    method: 'electrum',
+    coin: symbol,
+    ipaddr: server.host,
+    port: server.port,
+  }))
+
+  const responses = await Promise.all(queries)
+  const success = responses.filter(response => response.result === 'success').length > 0
+
+  if (!success) {
+    throw new Error(t(`Could not connect to {{symbol}} Electrum server`, { symbol }))
+  }
+
+  return success
+}
 
 async function withdrawBtcFork(opts) {
   const {

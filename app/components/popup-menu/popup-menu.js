@@ -1,4 +1,5 @@
 // @flow
+import { remote } from 'electron'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux'
@@ -71,6 +72,26 @@ class PopupMenu extends Component<Props> {
     }))
   }
 
+  getCoords(props) {
+    const approximateWidthInPixels = 192
+    const { top, left } = props
+    let transform = {}
+
+    const bounds = (
+      remote
+      .getCurrentWindow()
+      .webContents
+      .getOwnerBrowserWindow()
+      .getBounds()
+    )
+
+    if (left + approximateWidthInPixels > bounds.width) {
+      transform = { transform: 'translateX(-100%)' }
+    }
+
+    return { ...transform, left, top }
+  }
+
 	/**
 	 * @memberof PopupMenu
 	 */
@@ -85,15 +106,17 @@ class PopupMenu extends Component<Props> {
 			display: props.isVisible ? 'block' : 'none'
 		}
 
-    if (!this.props.relative) {
+    if (this.props.relative) {
+      Object.assign(containerStyles, {
+        left: '100%',
+        transform: 'translateX(-100%)',
+      })
+    } else {
       Object.assign(containerStyles, {
         position: 'fixed',
-        top: props.top,
-        left: props.left,
         transform: 'none'
-      })
+      }, this.getCoords(props))
     }
-
 
 		return (
 			<div

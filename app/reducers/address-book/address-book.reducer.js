@@ -9,7 +9,7 @@ export type AddressBookRecord = {
 
 export type AddressBookState = {
   records: AddressBookRecord[],
-  newAddressDialog: {
+  newAddressModal: {
     originalName?: string,
     defaultValues: {
       name?: string,
@@ -32,9 +32,9 @@ export const AddressBookActions = createActions(
     CONFIRM_ADDRESS_REMOVAL: (record: AddressBookRecord) => ({ record }),
     REMOVE_ADDRESS: (record: AddressBookRecord) => ({ record }),
 
-    OPEN_NEW_ADDRESS_DIALOG: (record: AddressBookRecord | undefined) => ({ record }),
+    OPEN_NEW_ADDRESS_MODAL: (record: AddressBookRecord | undefined) => ({ record }),
 
-    NEW_ADDRESS_DIALOG: {
+    NEW_ADDRESS_MODAL: {
       ERROR: (errorMessage: string) => ({ errorMessage }),
 
       ADD_ADDRESS: undefined,
@@ -54,17 +54,17 @@ export const AddressBookReducer = handleActions(
       ...state,
       records: action.payload.records
     }),
-    [AddressBookActions.openNewAddressDialog]: (state, action) => ({
+    [AddressBookActions.openNewAddressModal]: (state, action) => ({
       ...state,
-      newAddressDialog: {
+      newAddressModal: {
         originalName: action.payload.record && action.payload.record.name,
         defaultValues: Object.assign({}, action.payload.record || {}),
         isInEditMode: action.payload.record !== undefined,
         isVisible: true
       }
     }),
-    [AddressBookActions.newAddressDialog.close]: state => ({
+    [AddressBookActions.newAddressModal.close]: state => ({
       ...state,
-      newAddressDialog: { defaultValues: {}, isVisible: false }
+      newAddressModal: { defaultValues: {}, isVisible: false }
     }),
   }, preloadedState)
