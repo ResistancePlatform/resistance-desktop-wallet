@@ -3,6 +3,7 @@
 .button {
   display: flex;
   cursor: pointer;
+  user-select: none;
   outline: none;
 
   > div {

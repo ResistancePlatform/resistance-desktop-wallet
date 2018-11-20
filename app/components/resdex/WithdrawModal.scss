@@ -4,19 +4,33 @@ $withdrawModalWidth: 26.25rem;
 
 .withdraw {
   padding: 2rem;
-  width: $withdrawModalWidth;
+  padding-bottom: 1rem;
+  width: $withdrawModalWidth - 4rem;
 
   .inputsRow {
     display: flex;
+
     .amount {
       text-align: left;
+    }
+
+    .exchangeIcon {
+      color: $BASE_COLOR_LIGHT_BLUE;
+      font-size: 1.37rem;
+      margin-left: 0.4rem;
+      margin-right: 0.4rem;
+      margin-top: 1.7rem;
+
+      &:before {
+        content: '\e916';
+      }
     }
   }
 
   .caption {
     color: $BASE_COLOR_FONT_GRAY_2;
     height: 0.65rem;
-    margin-left: 2rem;
+    margin-left: 1.1rem;
     margin-bottom: 0.85rem;
     font-size: 0.65rem;
     text-transform: uppercase;
@@ -24,8 +38,10 @@ $withdrawModalWidth: 26.25rem;
     cursor: default;
   }
 
-  button[type='submit'] {
+  .button {
     margin-top: 0.75rem;
+    padding-left: 2.2rem;
+    padding-right: 2.2rem;
     float: right;
   }
 

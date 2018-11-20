@@ -88,6 +88,18 @@
   width: 100%;
   padding: 0;
 
+  .maxRelAddon {
+    width: 5.2rem;
+    border-left: 1px solid $BASE_COLOR_BORDER_GRAY;
+    padding-left: 0.3rem;
+
+    button {
+      color: $BASE_COLOR_WHITE;
+      background-color: $BASE_COLOR_PURPLE;
+      border: 0;
+    }
+  }
+
   .enhancedPrivacy {
     margin-left: 1rem;
     margin-right: 1rem;
@@ -133,12 +145,14 @@
     content: '\2713';
   }
 
-  button {
+  .exchangeButton {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
     padding-left: 3rem;
     padding-right: 3rem;
   }
+
 }
+
 

@@ -15,24 +15,22 @@
 }
 
 .buttonWrapper {
-  width: 3.8rem;
-  border-left: 1px solid $BASE_COLOR_BORDER_GRAY;
-  height: 100%;
+  display: flex;
   position: relative;
+  width: 2rem;
 
-  .useMaxButton {
+  .maxButton {
     position: absolute;
-    color: $BASE_COLOR_WHITE;
-    background-color: $BASE_COLOR_PURPLE;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: $BASE_COLOR_PURPLE;
+    background-color: transparent;
     border-radius: 5rem;
-    border: 0;
+    border: 1px solid $BASE_COLOR_PURPLE;
     font-size: 0.5rem;
     padding: 0.1rem 0.5rem;
     white-space: nowrap;
-    vertical-align: middle;
-    top: 50%;
-    left: 0.5rem;
-    transform: translateY(-50%);
     text-transform: uppercase;
     outline: none;
   }

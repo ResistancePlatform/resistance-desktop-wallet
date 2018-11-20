@@ -6,24 +6,37 @@ import { translate } from '~/i18next.config'
 import RoundedInput, { RoundedInputProps } from './NewRoundedInput'
 
 import parentStyles from './NewRoundedInput.scss'
-import styles from './RoundedInputWithUseMax.scss'
+import styles from './CurrencyAmountInput.scss'
 
 
 const t = translate('other')
 
-type Props = {
+type CurrencyAmountInputProps = {
   ...RoundedInputProps,
-  maxAmount: any,
-  symbol: string
+  maxAmount?: object,
+  buttonLabel?: string,
+  symbol: string,
+  step?: string
 }
 
-export default class RoundedInputWithUseMax extends RoundedInput {
-  props: Props
+export default class CurrencyAmountInput extends RoundedInput {
+  props: CurrencyAmountInputProps
 
   renderLabel() {
     return (
       this.props.label
     )
+  }
+
+  getTruncatedMaxAmount() {
+    const { maxAmount } = this.props
+
+    if (maxAmount) {
+      const decimalPlaces = this.props.symbol === 'USD' ? 2 : 8
+      return maxAmount.toDP(decimalPlaces, Decimal.ROUND_FLOOR).toString()
+    }
+
+    return maxAmount
   }
 
   renderInput() {
@@ -33,31 +46,36 @@ export default class RoundedInputWithUseMax extends RoundedInput {
           className={cn(parentStyles.input, styles.input)}
           name={this.props.name}
           type="number"
-          step="0.1"
+          step={this.props.step || '0.1'}
           min="0"
+          max={this.getTruncatedMaxAmount()}
           value={this.state.value}
           disabled={this.props.disabled}
           onChange={event => this.onChangeHandler(event)}
           onFocus={(event) => this.onFocusHandler(event)}
           onBlur={(event) => this.onBlurHandler(event)}
+          placeholder={this.props.placeholder}
           readOnly={this.props.readOnly}
         />
         {this.props.symbol}
       </div>
     )
   }
+
   renderAddon() {
-    const maxValue = this.props.maxAmount.toDP(8, Decimal.ROUND_FLOOR).toString()
+    if (!this.props.maxAmount) {
+      return null
+    }
 
     return (
       <div className={styles.buttonWrapper}>
         <button
           type="button"
-          className={styles.useMaxButton}
-          onClick={() => this.changeValue(maxValue)}
+          className={styles.maxButton}
+          onClick={() => this.changeValue(this.getTruncatedMaxAmount())}
           onKeyDown={() => false}
         >
-          {t(`Use max`)}
+          {this.props.buttonLabel || t(`Max`)}
         </button>
       </div>
     )

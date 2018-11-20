@@ -1,4 +1,5 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import * as Joi from 'joi'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -8,24 +9,30 @@ import cn from 'classnames'
 
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
-import RoundedInput from '~/components/rounded-form/RoundedInput'
-import ChooseWallet from '~/components/rounded-form/ChooseWallet'
-import RoundedTextArea from '~/components/rounded-form/RoundedTextArea'
-import RoundedForm from '~/components/rounded-form/RoundedForm'
+import {
+  RoundedForm,
+  RoundedButton,
+  RoundedInputWithPaste,
+  CurrencyAmountInput,
+  RoundedTextArea,
+  ChooseWallet,
+} from '~/components/rounded-form'
 
 import styles from './WithdrawModal.scss'
 
 const getValidationSchema = t => Joi.object().keys({
   recipientAddress: Joi.string().required().label(t(`Recipient address`)),
   withdrawFrom: Joi.string().required(),
-  amount: Joi.number().required().label(t(`Amount`)),
+  amount: Joi.number().min(0).required().label(t(`Amount`)),
   equity: Joi.number(),
   note: Joi.string().optional().label(t(`Note`)),
 })
 
 type Props = {
   t: any,
+  assets: ResDexState.assets,
   accounts: ResDexState.accounts,
+  form: object,
   actions: object
 }
 
@@ -36,8 +43,27 @@ type Props = {
 class WithdrawModal extends Component<Props> {
 	props: Props
 
+  getEquity(symbol) {
+    if (!this.props.form) {
+      return null
+    }
+
+    const { amount } = this.props.form.fields
+
+    const { currencyHistory } = this.props.assets
+    const hourHistory = currencyHistory.hour && currencyHistory.hour[symbol]
+
+    const price = hourHistory && hourHistory.slice(-1)[0].value
+
+    return amount && price && Decimal(amount).mul(price).toDP(2, Decimal.ROUND_FLOOR)
+  }
+
 	render() {
     const { t } = this.props
+    const { symbol } = this.props.accounts.withdrawModal
+    const currency = this.props.accounts.currencies[symbol]
+
+    const { isInProgress } = this.props.accounts.withdrawModal
 
     return (
       <div className={styles.overlay}>
@@ -47,62 +73,92 @@ class WithdrawModal extends Component<Props> {
             tabIndex={0}
             className={cn('icon', styles.closeButton)}
             onClick={this.props.actions.closeWithdrawModal}
-            onKeyDown={() => {}}
+            onKeyDown={() => false}
           />
 
-        {/* Title */}
-        <div className={styles.title}>
-          {t(`Withdraw`)}
-        </div>
-
-        <RoundedForm
-          id="addressBookNewAddressDialog"
-          schema={getValidationSchema(t)}
-        >
-
-        <RoundedInput
-          name="recipientAddress"
-          label={t(`Recipient wallet`)}
-          addon={{ enable: true, type: 'PASTE' }}
-        />
-
-        <ChooseWallet
-          name="withdrawFrom"
-          label={t(`Withdraw from`)}
-          defaultValue={this.props.accounts.withdrawModal.symbol}
-          currencies={this.props.accounts.currencies}
-        />
-
-        <div className={styles.inputsRow}>
-          <div>
-            <div className={styles.caption}>{t(`Amount`)}</div>
-            <RoundedInput className={styles.amount} name="amount" number />
+          {/* Title */}
+          <div className={styles.title}>
+            {t(`Withdraw`)} {symbol}
           </div>
-          <div>
-            <div className={styles.caption} />
-            <RoundedInput name="equity" readOnly number />
+
+          <RoundedForm
+            id="resDexAccountsWithdrawModal"
+            schema={getValidationSchema(t)}
+          >
+
+          <RoundedInputWithPaste
+            name="recipientAddress"
+            label={t(`Recipient wallet`)}
+          />
+
+          <ChooseWallet
+            name="withdrawFrom"
+            label={t(`Withdraw from`)}
+            defaultValue={symbol}
+            currencies={this.props.accounts.currencies}
+            onChange={this.props.actions.updateWithdrawalSymbol}
+          />
+
+          <div className={styles.inputsRow}>
+            <div>
+              <div className={styles.caption}>{t(`Amount`)}</div>
+
+              <CurrencyAmountInput
+                className={styles.amount}
+                defaultValue={0}
+                name="amount"
+                symbol={symbol}
+                maxAmount={currency && currency.balance}
+              />
+            </div>
+
+            <div className={cn('icon', styles.exchangeIcon)} />
+
+            <div>
+              <div className={styles.caption} />
+
+              <CurrencyAmountInput
+                name="equity"
+                symbol="USD"
+                defaultValue={this.getEquity(symbol)}
+                readOnly
+              />
+            </div>
+
           </div>
-        </div>
 
-        <div className={styles.caption}>
-          {t(`Note`)}
-        </div>
+          <div className={styles.caption}>
+            {t(`Note`)}
+          </div>
 
-        <RoundedTextArea name="note" rows={4} >
-          {t(`Write an optional message`)}
-        </RoundedTextArea>
+          <RoundedTextArea
+            name="note"
+            rows={4}
+            placeholder={t(`Write an optional message`)}
+          />
 
-        <button type="submit" onClick={this.props.actions.withdraw}>{t(`Withdraw`)}</button>
-    </RoundedForm>
+          <RoundedButton
+            type="submit"
+            className={styles.button}
+            onClick={this.props.actions.withdraw}
+            spinner={isInProgress}
+            disabled={isInProgress}
+            important
+          >
+            {t(`Withdraw`)}
+          </RoundedButton>
 
-  </div>
+        </RoundedForm>
+      </div>
     </div>
     )
   }
 }
 
-const mapStateToProps = (state) => ({
-	accounts: state.resDex.accounts
+const mapStateToProps = state => ({
+	assets: state.resDex.assets,
+	accounts: state.resDex.accounts,
+  form: state.roundedForm.resDexAccountsWithdrawModal,
 })
 
 const mapDispatchToProps = dispatch => ({
