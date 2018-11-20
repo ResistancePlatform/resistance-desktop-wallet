@@ -19,8 +19,10 @@ const t = translate('service')
 
 class ResDexApiError extends Error {
   constructor(response) {
-    super(response.error)
+    const { error } = response
+    super(error)
     this.response = response
+    this.code = error && error.code
   }
 }
 
@@ -171,7 +173,6 @@ export class ResDexApiService {
 			const success = responses.filter(response => response.result === 'success').length > 0
 
 			if (!success) {
-        log.error(`Could not connect to ${symbol} Electrum server`)
         throw new Error(t(`Could not connect to {{symbol}} Electrum server`, { symbol }))
 			}
 

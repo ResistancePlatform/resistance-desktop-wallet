@@ -1,23 +1,32 @@
 @import "./GenericControl.scss";
 
 .button {
-  padding: 0.52rem 1.4rem;
+  cursor: pointer;
+
+  padding: 0.54rem 1.625rem;
 
   background-color: transparent;
   border: 1px solid $BASE_COLOR_BORDER_GRAY;
   color: $BASE_COLOR_BUTTON_FONT_GRAY;
 
   border-radius: 5rem;
+  outline: none;
 
   font-size: 0.6rem;
   font-weight: 300;
+  text-transform: uppercase;
 
   position: relative;
 
   &.important {
     background-color: $BASE_COLOR_PURPLE;
     border: 1px solid $BASE_COLOR_PURPLE;
+    font-weight: 500;
     color: $BASE_COLOR_WHITE;
+  }
+
+  &.large {
+    padding: 0.7rem 3rem;
   }
 
   .spinner {

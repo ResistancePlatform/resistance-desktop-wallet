@@ -72,7 +72,7 @@ class OrderSummary extends Component<Props> {
       return t(`No liquidity available yet`)
     }
 
-    return t(`@ {{price}} {{baseCurrency}} per {{quoteCurrency}}`, {
+    return t(`@ {{price}} {{quoteCurrency}} per {{baseCurrency}}`, {
       price: truncateAmount(Decimal(price)),
       baseCurrency,
       quoteCurrency

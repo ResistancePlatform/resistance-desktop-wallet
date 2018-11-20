@@ -5,7 +5,7 @@ import { promisify } from 'util'
 import path from 'path'
 import config from 'electron-settings'
 import { of, concat, from, merge, defer } from 'rxjs'
-import { filter, switchMap, take, map, mergeMap, catchError, delay } from 'rxjs/operators'
+import { filter, switchMap, take, map, mergeMap, catchError } from 'rxjs/operators'
 import { remote, ipcRenderer } from 'electron'
 import { ofType } from 'redux-observable'
 import { push } from 'react-router-redux'
@@ -20,7 +20,6 @@ import { ResistanceService } from '~/service/resistance-service'
 import { RpcService } from '~/service/rpc-service'
 import { Bip39Service } from '~/service/bip39-service'
 import { AuthActions } from '../auth/auth.reducer'
-import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
 import { GetStartedActions } from './get-started.reducer'
 import { RoundedFormActions } from '../rounded-form/rounded-form.reducer'
 import { SettingsActions } from '../settings/settings.reducer'
@@ -89,22 +88,9 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
       return of(WelcomeActions.restoreWallet())
     }
 
-    const nextAction = WelcomeActions.encryptWallet()
-
-    const resDexStartedObservable = childProcess.getObservable({
-      processName: 'RESDEX',
-      onSuccess: of(nextAction).pipe(delay(20000)),
-      onFailure: of(WelcomeActions.walletBootstrappingFailed(t(`Unable to start ResDEX`))),
-      action$
-    })
-
     const nodeStartedObservable = childProcess.getObservable({
       processName: 'NODE',
-      onSuccess: concat(
-        of(WelcomeActions.displayHint(t(`Initializing ResDEX...`))),
-        of(ResDexActions.startResdex()),
-        resDexStartedObservable,
-      ),
+      onSuccess: of(WelcomeActions.encryptWallet()),
       onFailure: of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
       action$
     })

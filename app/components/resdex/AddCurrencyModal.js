@@ -103,15 +103,15 @@ class AddCurrencyModal extends Component<Props> {
 
           {isInEditMode ? (
             <div className={styles.buttonsRow}>
-              <RoundedButton type="submit" onClick={this.props.actions.updateCurrency} important>
+              <RoundedButton className={styles.button} type="submit" onClick={this.props.actions.updateCurrency} important>
                 {t(`Save`)}
               </RoundedButton>
-              <RoundedButton onClick={this.props.actions.closeAddCurrencyModal}>
+              <RoundedButton className={styles.button} onClick={this.props.actions.closeAddCurrencyModal}>
                 {t(`Cancel`)}
               </RoundedButton>
             </div>
           ) : (
-            <RoundedButton type="submit" onClick={this.props.actions.addCurrency} important >
+            <RoundedButton className={styles.button} type="submit" onClick={this.props.actions.addCurrency} important >
               {t(`Add coin`)}
             </RoundedButton>
           )}

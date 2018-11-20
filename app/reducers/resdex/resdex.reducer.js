@@ -3,6 +3,7 @@ import { createActions, handleActions } from 'redux-actions'
 import { combineReducers } from 'redux'
 
 import { preloadedState } from '~/reducers/preloaded.state'
+import { ResDexBootstrappingReducer } from './bootstrapping/reducer'
 import { ResDexLoginReducer } from './login/reducer'
 import { ResDexAssetsReducer } from './assets/reducer'
 import { ResDexBuySellReducer } from './buy-sell/reducer'
@@ -32,8 +33,15 @@ export type ResDexState = {
   common: {
     selectedTabIndex: number
   },
+  bootstrapping: {
+    isInProgress: boolean,
+    isRestoring: boolean,
+    generatedSeedPhrase: string | null
+  },
   login: {
     isRequired: boolean,
+    isInProgress: boolean,
+    defaultPortfolioId: string | null,
     portfolios: Portfolio[]
   },
   assets: {
@@ -96,10 +104,6 @@ export type ResDexState = {
 export const ResDexActions = createActions(
   {
     EMPTY: undefined,
-
-    START_RESDEX: undefined,
-    STOP_RESDEX: undefined,
-
     SELECT_TAB: index => ({ index }),
   },
   {
@@ -117,6 +121,7 @@ export const ResDexCommonReducer = handleActions(
 
 export const ResDexReducer = combineReducers({
   common: ResDexCommonReducer,
+  bootstrapping: ResDexBootstrappingReducer,
   login: ResDexLoginReducer,
   assets: ResDexAssetsReducer,
   buySell: ResDexBuySellReducer,

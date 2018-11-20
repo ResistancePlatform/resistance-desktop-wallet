@@ -5,17 +5,35 @@ import { NavLink } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 
+import { SettingsState } from '~/reducers/settings/settings.reducer'
+import { ResDexState } from '~/reducers/resdex/resdex.reducer'
+import { ChildProcessService } from '~/service/child-process-service'
 import { NaviState } from '~/reducers/navi/navi.reducer'
+
 import HLayout from '~/assets/styles/h-box-layout.scss'
+import statusStyles from '~/assets/styles/status-colors.scss'
 import styles from './navi-bar.scss'
+
+
+const childProcess = new ChildProcessService()
 
 type Props = {
   t: any,
-	navi: NaviState
+	navi: NaviState,
+	settings: SettingsState,
+  resDex: ResDexState
 }
 
 class NaviBar extends Component<Props> {
 	props: Props
+
+  getPendingOrdersNumber(): number {
+    const { swapHistory } = this.props.resDex.orders
+    const pendingSwaps = swapHistory.filter(swap => (
+      !['completed', 'failed'].includes(swap.status)
+    ))
+    return pendingSwaps.length
+  }
 
 	render() {
     const { t } = this.props
@@ -25,6 +43,9 @@ class NaviBar extends Component<Props> {
       [styles.item]: true,
       [styles.active]: this.props.navi.currentNaviPath.startsWith(path)
     })
+
+    const pendingOrdersNumber = this.getPendingOrdersNumber()
+    const resDexStatus = this.props.settings.childProcessesStatus.RESDEX
 
 		return (
 			<div className={cn(styles.container)} data-tid="navi-bar-container">
@@ -53,7 +74,20 @@ class NaviBar extends Component<Props> {
 					<i />
           <NavLink to="/resdex">
             {t(`ResDEX`)}
-            <span>{t(`Coming soon`)}</span>
+
+            {!this.props.resDex.login.isRequired &&
+              <div
+                className={cn(
+                  styles.resDexStatus,
+                  statusStyles[childProcess.getChildProcessStatusColor(resDexStatus)],
+                  { [styles.hasOrders]: resDexStatus  === 'RUNNING' && Boolean(pendingOrdersNumber) }
+                )}
+              >
+                <div className={styles.number}>
+                  {pendingOrdersNumber || false}
+                </div>
+              </div>
+            }
           </NavLink>
 				</div>
 
@@ -62,8 +96,10 @@ class NaviBar extends Component<Props> {
 	}
 }
 
-const mapStateToProps = (state) => ({
-	navi: state.navi
+const mapStateToProps = state => ({
+	navi: state.navi,
+	settings: state.settings,
+  resDex: state.resDex
 })
 
 export default connect(mapStateToProps, null)(translate('other')(NaviBar))

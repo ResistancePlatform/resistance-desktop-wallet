@@ -21,14 +21,19 @@
   position: relative;
 
   .useMaxButton {
-    font-size: 0.52rem;
-    padding: 0 0.4rem 0 0.4rem;
-    white-space: nowrap;
-    margin-right: 0.5rem;
-    vertical-align: middle;
     position: absolute;
+    color: $BASE_COLOR_WHITE;
+    background-color: $BASE_COLOR_PURPLE;
+    border-radius: 5rem;
+    border: 0;
+    font-size: 0.5rem;
+    padding: 0.1rem 0.5rem;
+    white-space: nowrap;
+    vertical-align: middle;
     top: 50%;
-    left: 0;
+    left: 0.5rem;
     transform: translateY(-50%);
+    text-transform: uppercase;
+    outline: none;
   }
 }

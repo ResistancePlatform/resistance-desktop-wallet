@@ -150,6 +150,14 @@
         padding-left: 0.75rem;
         padding-right: 0.75rem;
         color: $BASE_COLOR_PURPLE;
+        text-transform: uppercase;
+        outline: none;
+        cursor: pointer;
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: default;
+        }
       }
 
       button:first-child {

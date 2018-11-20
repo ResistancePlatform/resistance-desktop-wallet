@@ -1,0 +1,21 @@
+$resDexLogoWidth: 3.8rem;
+
+.container {
+  display: flex;
+
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: $resDexLogoWidth;
+
+  justify-content: center;
+  margin-bottom: 1rem;
+
+  cursor: default;
+  user-select: none;
+
+  img {
+    width: $resDexLogoWidth;
+    height: $resDexLogoWidth;
+    margin-right: 0.5rem;
+  }
+}

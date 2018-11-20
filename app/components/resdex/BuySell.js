@@ -12,12 +12,14 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
-import RoundedForm from '~/components/rounded-form/RoundedForm'
-import RoundedInputWithUseMax from '~/components/rounded-form/RoundedInputWithUseMax'
-import ChooseWallet from '~/components/rounded-form/ChooseWallet'
+import {
+  RoundedForm,
+  RoundedButton,
+  RoundedInputWithUseMax,
+  ChooseWallet
+} from '~/components/rounded-form'
 import OrderSummary from './OrderSummary'
 
-import animatedSpinner from '~/assets/images/animated-spinner.svg'
 import styles from './BuySell.scss'
 
 const validationSchema = Joi.object().keys({
@@ -155,16 +157,17 @@ class ResDexBuySell extends Component<Props> {
                   </label>
                 </div>
 
-                <button
+                <RoundedButton
                   type="submit"
                   onClick={this.props.actions.createMarketOrder}
                   disabled={txFee && this.getSubmitButtonDisabledAttribute()}
+                  spinner={this.props.buySell.isSendingOrder}
+                  spinnerTooltip={t(`Sending the order...`)}
+                  important
+                  large
                 >
-                  {this.props.buySell.isSendingOrder &&
-                    <img src={animatedSpinner} alt={t(`Sending the order...`)} />
-                  }
                   {t(`Exchange`)}
-                </button>
+                </RoundedButton>
               </RoundedForm>
             </TabPanel>
 

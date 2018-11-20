@@ -1,4 +1,6 @@
 import React from 'react'
+import cn from 'classnames'
+
 import GenericInput, { GenericInputProps, GenericInputState  } from './GenericInput'
 
 import styles from './NewRoundedInput.scss'
@@ -8,6 +10,7 @@ export type RoundedInputProps = {
   ...GenericInputProps,
 	name: string,
   defaultValue?: string,
+  placeholder?: string,
   type: 'text' | 'number' | 'password',
   readOnly?: boolean
 }
@@ -41,14 +44,18 @@ export default class RoundedInput extends GenericInput {
   renderInput() {
     return (
       <input
-        className={styles.input}
+        className={cn(
+          styles.input,
+          { [styles.withPlaceholder]: Boolean(this.props.placeholder) }
+        )}
         name={this.props.name}
         type={this.props.type}
         value={this.state.value}
         disabled={this.props.disabled}
         onChange={event => this.onChangeHandler(event)}
-        onFocus={(event) => this.onFocusHandler(event)}
-        onBlur={(event) => this.onBlurHandler(event)}
+        onFocus={event => this.onFocusHandler(event)}
+        onBlur={event => this.onBlurHandler(event)}
+        placeholder={this.props.placeholder}
         readOnly={this.props.readOnly}
       />
     )

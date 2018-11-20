@@ -43,16 +43,8 @@
 }
 
 .nodeStatusContainer {
-  .green {
-    color: $BASE_COLOR_ACTIVE_ICON;
-  }
-
-  .yellow {
-    color: yellow;
-  }
-
-  .red {
-    color: $BASE_COLOR_FAILURE_ICON;
+  .nodeStatusIcon {
+    background: transparent !important;
   }
 }
 
