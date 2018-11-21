@@ -91,13 +91,14 @@ export class SwapDBService {
     })
   }
 
-  insertSwapData(swap, requestOpts) {
+  insertSwapData(swap, requestOpts, privateOrderOpts = null) {
     return this.queue(() => this.db.post({
       uuid: swap.uuid,
       timeStarted: Date.now(),
       request: requestOpts,
       response: swap,
       messages: [],
+      privacy: privateOrderOpts
     }))
   }
 
@@ -215,7 +216,7 @@ function formatSwap(data) {
   const MATCHED_STEP = 1
   const TOTAL_PROGRESS_STEPS = swapTransactions.length + MATCHED_STEP
 
-  const {uuid, timeStarted, request, response, messages} = data
+  const {uuid, timeStarted, request, response, messages, privacy} = data
 
   // If we place a sell order marketmaker just inverts the values and places a buy
   // on the opposite pair. We need to normalise this otherwise we'll show the
@@ -235,6 +236,9 @@ function formatSwap(data) {
     get isActive() {
       return !['completed', 'failed'].includes(this.status)
     },
+    isPrivate: privacy !== null,
+    isHidden: privacy && privacy.processName === 'RESDEX_PRIVACY2',
+    privacy,
     error: false,
     progress: 0,
     baseCurrency: request.baseCurrency,

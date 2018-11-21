@@ -36,14 +36,19 @@ export const ResDexBuySellReducer = handleActions(
     [ResDexBuySellActions.getOrderBookFailed]: state => ({
       ...state,
       orderBook: {
+        ...state.orderBook,
+        baseQuote: {
+          bids: [],
+          asks: [],
+        },
+        resQuote: {
+          bids: [],
+          asks: [],
+        },
         baseRes: {
           bids: [],
           asks: [],
-        },
-        quoteRes: {
-          bids: [],
-          asks: [],
-        },
+        }
       }
     }),
     [ResDexBuySellActions.updateBaseCurrency]: (state, action) => ({

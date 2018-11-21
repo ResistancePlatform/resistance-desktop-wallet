@@ -134,14 +134,14 @@ export const preloadedState: State = {
           bids: [],
           asks: [],
         },
+        resQuote: {
+          bids: [],
+          asks: [],
+        },
         baseRes: {
           bids: [],
           asks: [],
-        },
-        quoteRes: {
-          bids: [],
-          asks: [],
-        },
+        }
       },
       enhancedPrivacy: false,
     },

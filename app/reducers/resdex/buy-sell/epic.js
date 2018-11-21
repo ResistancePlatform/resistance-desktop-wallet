@@ -24,12 +24,12 @@ const getOrderBookEpic = (action$: ActionsObservable<Action>, state$) => action$
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
     const getOrderBookPromise = Promise.all(
       from(mainApi.getOrderBook(baseCurrency, quoteCurrency)),
+      from(mainApi.getOrderBook('RES', quoteCurrency)),
       from(mainApi.getOrderBook(baseCurrency, 'RES')),
-      from(mainApi.getOrderBook(quoteCurrency, 'RES')),
     )
     const observable = from(getOrderBookPromise).pipe(
-      switchMap(([baseQuote,  baseRes, quoteRes]) => {
-        const orderBook = { baseQuote,  baseRes, quoteRes }
+      switchMap(([baseQuote,  resQuote, baseRes]) => {
+        const orderBook = { baseQuote,  resQuote, baseRes }
         return of(ResDexBuySellActions.gotOrderBook(orderBook))
       }),
       catchError(err => {
@@ -134,9 +134,8 @@ const getRelResOrderObservable = (options, pollMainProcessBalanceObservable, sta
       baseCurrency: 'RES',
       quoteCurrency,
       quoteAmount,
-      price: orderBook.quoteRes.asks[0]
+      price: orderBook.resQuote.asks[0]
     }
-
     log.debug(`Private market order stage 1, ${quoteCurrency} -> RES`, orderOptions)
 
     return getCreateMarketOrderObservable(

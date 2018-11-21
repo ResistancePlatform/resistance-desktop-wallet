@@ -52,26 +52,32 @@ class ResDexBuySell extends Component<Props> {
   }
 
   // Can't create a market order if there's no liquidity or when sending an order
-  getSubmitButtonDisabledAttribute() {
+  getSubmitButtonDisabledAttribute(order) {
     const { baseCurrency, quoteCurrency, orderBook, isSendingOrder } = this.props.buySell
+
+    const areAllAsksPresent = order.isPrivate
+      ? orderBook.resQuote.asks.length && orderBook.baseRes.asks.length
+      : orderBook.baseQuote.asks.length
 
     return (
       isSendingOrder
       || orderBook.baseCurrency !== baseCurrency
       || orderBook.quoteCurrency !== quoteCurrency
-      || orderBook.asks.length === 0
+      || !areAllAsksPresent
     )
 
   }
 
   getOrder() {
+    // TODO: Update for private orders
     const { form } = this.props
     const quoteCurrencyAmount = Decimal(form && form.fields.maxRel || '0')
 
     const { baseCurrency, quoteCurrency, orderBook } = this.props.buySell
-    const { price } = orderBook.asks.length && orderBook.asks[0]
+    const { asks } = orderBook.baseQuote
+    const { price } = asks.length && asks[0]
 
-    const enhancedPrivacy = form && form.fields.enhancedPrivacy
+    const isPrivate = form && form.fields.enhancedPrivacy
 
     const order = {
       orderType: 'buy',
@@ -79,7 +85,7 @@ class ResDexBuySell extends Component<Props> {
       price: price || null,
       baseCurrency,
       quoteCurrency,
-      enhancedPrivacy,
+      isPrivate,
     }
 
     return order
@@ -161,11 +167,11 @@ class ResDexBuySell extends Component<Props> {
                   type="submit"
                   className={styles.exchangeButton}
                   onClick={
-                    order.enhancedPrivacy
+                    order.isPrivate
                     ? this.props.actions.createPrivateMarketOrder
                     : this.props.actions.createMarketOrder
                   }
-                  disabled={txFee && this.getSubmitButtonDisabledAttribute()}
+                  disabled={txFee && this.getSubmitButtonDisabledAttribute(order)}
                   spinner={this.props.buySell.isSendingOrder}
                   spinnerTooltip={t(`Sending the order...`)}
                   important
