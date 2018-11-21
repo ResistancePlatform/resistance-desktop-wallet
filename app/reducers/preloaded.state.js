@@ -130,8 +130,18 @@ export const preloadedState: State = {
       orderBook: {
         baseCurrency: 'RES',
         quoteCurrency: 'DGB',
-        bids: [],
-        asks: []
+        baseQuote: {
+          bids: [],
+          asks: [],
+        },
+        baseRes: {
+          bids: [],
+          asks: [],
+        },
+        quoteRes: {
+          bids: [],
+          asks: [],
+        },
       },
       enhancedPrivacy: false,
     },

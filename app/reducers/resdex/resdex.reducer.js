@@ -62,7 +62,15 @@ export type ResDexState = {
     orderBook: {
       baseCurrency?: string,
       quoteCurrency?: string,
-      ['bids' | 'asks']: Order[]
+      baseQuote: {
+        ['bids' | 'asks']: Order[]
+      },
+      baseRes: {
+        ['bids' | 'asks']: Order[]
+      },
+      quoteRes: {
+        ['bids' | 'asks']: Order[]
+      }
     },
     enhancedPrivacy: boolean
   },

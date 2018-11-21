@@ -109,7 +109,6 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
 	ofType(ResDexLoginActions.initResdex),
   switchMap(action => {
     const { processName, walletPassword } = action.payload
-    log.debug('INITRESDEXEPIC()', processName)
 
     const api = resDexApiFactory(processName)
 

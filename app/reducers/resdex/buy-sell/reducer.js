@@ -17,6 +17,9 @@ export const ResDexBuySellActions = createActions(
     CREATE_MARKET_ORDER_SUCCEEDED: undefined,
     CREATE_MARKET_ORDER_FAILED: (errorMessage: string) => ({ errorMessage }),
 
+    CREATE_PRIVATE_ORDER: undefined,
+    CREATE_PRIVATE_ORDER_FAILED: (errorMessage: string) => ({ errorMessage }),
+
     CREATE_LIMIT_ORDER: undefined,
   },
   {
@@ -33,8 +36,14 @@ export const ResDexBuySellReducer = handleActions(
     [ResDexBuySellActions.getOrderBookFailed]: state => ({
       ...state,
       orderBook: {
-        asks: [],
-        bids: [],
+        baseRes: {
+          bids: [],
+          asks: [],
+        },
+        quoteRes: {
+          bids: [],
+          asks: [],
+        },
       }
     }),
     [ResDexBuySellActions.updateBaseCurrency]: (state, action) => ({
@@ -54,6 +63,18 @@ export const ResDexBuySellReducer = handleActions(
       isSendingOrder: false,
     }),
     [ResDexBuySellActions.createMarketOrderFailed]: state => ({
+      ...state,
+      isSendingOrder: false,
+    }),
+    [ResDexBuySellActions.createPrivateOrder]: state => ({
+      ...state,
+      isSendingOrder: true,
+    }),
+    [ResDexBuySellActions.createPrivateOrderSucceeded]: state => ({
+      ...state,
+      isSendingOrder: false,
+    }),
+    [ResDexBuySellActions.createPrivateOrderFailed]: state => ({
       ...state,
       isSendingOrder: false,
     }),
