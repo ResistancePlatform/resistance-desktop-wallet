@@ -17,32 +17,41 @@ import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
 
 const t = translate('resdex')
-const api = resDexApiFactory('RESDEX')
+const mainApi = resDexApiFactory('RESDEX')
 
 const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexAccountsActions.getCurrencies),
-  switchMap(() => (
-    from(api.getPortfolio()).pipe(
-      switchMap(response => {
-        const currencies = response.portfolio.reduce((accumulator, currency) => ({
-          ...accumulator,
-          [currency.coin]: {
-            symbol: currency.coin,
-            name: getCurrencyName(currency.coin),
-            address: currency.address,
-            balance: Decimal(currency.balance),
-            price: Decimal(currency.price),
-            amount: Decimal(currency.amount),
-          }
+  switchMap(() => {
+    const processNames = ['RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
+
+    const getPortfoliosPromise = Promise.all(processNames.map(processName => {
+      const api = resDexApiFactory(processName)
+      return api.getPortfolio()
+    }))
+
+    const responseToCurrencies = response => response.portfolio.reduce((accumulator, currency) => ({
+      ...accumulator,
+      [currency.coin]: {
+        symbol: currency.coin,
+        name: getCurrencyName(currency.coin),
+        address: currency.address,
+        balance: Decimal(currency.balance),
+        price: Decimal(currency.price),
+        amount: Decimal(currency.amount),
+      }
+    }), {})
+
+    return from(getPortfoliosPromise).pipe(
+      switchMap(result => {
+        const currencies = processNames.reduce((previous, processName, index) => ({
+          ...previous,
+          [processName]: responseToCurrencies(result[index])
         }), {})
-
-        const actions = [ResDexAccountsActions.gotCurrencies(currencies)]
-
-        return of(...actions)
+        return of(ResDexAccountsActions.gotCurrencies(currencies))
       }),
       catchError(err => of(ResDexAccountsActions.getCurrenciesFailed(err.message)))
     )
-  ))
+  })
 )
 
 const getCurrenciesFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
@@ -67,7 +76,7 @@ const getTransactionsEpic = (action$: ActionsObservable<Action>, state$) => acti
     const observables = getSortedCurrencies(enabledCurrencies).map(currency => {
       const { symbol } = currency
 
-      const observable = from(api.listTransactions(symbol, currencies[symbol].address)).pipe(
+      const observable = from(mainApi.listTransactions(symbol, currencies[symbol].address)).pipe(
         switchMap(transactions => {
           log.debug(`Got ${transactions.length} transactions for ${symbol}`)
           return of(ResDexAccountsActions.gotCurrencyTransactions(symbol, transactions.reverse()))
@@ -98,9 +107,9 @@ const updateCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.
     enabledCurrencies[index] = fields
     config.set('resDex.enabledCurrencies', enabledCurrencies)
 
-    const restartCurrencyPromise = api.disableCurrency(symbol).finally(() => {
+    const restartCurrencyPromise = mainApi.disableCurrency(symbol).finally(() => {
       log.debug(`Disabled ${symbol} now re-enabling it`)
-      return api.enableCurrency(symbol, fields.useElectrum)
+      return mainApi.enableCurrency(symbol, fields.useElectrum)
     })
 
     const restartCurrencyObservable = from(restartCurrencyPromise).pipe(
@@ -132,7 +141,7 @@ const withdrawEpic = (action$: ActionsObservable<Action>, state$) => action$.pip
     const { recipientAddress, amount } = state$.value.roundedForm.resDexAccountsWithdrawModal.fields
     const { symbol } = state$.value.resDex.accounts.withdrawModal
 
-    const observable = from(api.withdraw({
+    const observable = from(mainApi.withdraw({
       symbol,
       address: recipientAddress,
       amount,
@@ -163,7 +172,7 @@ const addCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.pip
     enabledCurrencies.push(fields)
     config.set('resDex.enabledCurrencies', enabledCurrencies)
 
-    const enableCurrencyPromise = api.enableCurrency(symbol, fields.useElectrum)
+    const enableCurrencyPromise = mainApi.enableCurrency(symbol, fields.useElectrum)
 
     const enableCurrencyObservable = from(enableCurrencyPromise).pipe(
       switchMap(() => of(ResDexAccountsActions.getCurrencies())),
@@ -208,7 +217,7 @@ const deleteCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.
     const { symbol } = action.payload
     const currencyName = getCurrencyName(symbol)
 
-    const disableCurrencyObservable = from(api.disableCurrency(symbol)).pipe(
+    const disableCurrencyObservable = from(mainApi.disableCurrency(symbol)).pipe(
       switchMap(() => of(ResDexAccountsActions.empty())),
       catchError(err => {
         log.error(`Can't disable currency ${symbol}`, err)

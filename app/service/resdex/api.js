@@ -224,8 +224,6 @@ class ResDexApiService {
 			}))
 
 		const formattedResponse = {
-			baseCurrency: response.base,
-			quoteCurrency: response.rel,
 			asks: formatOrders(response.asks),
 			bids: formatOrders(response.bids),
 		}

@@ -3,6 +3,7 @@ import { createActions, handleActions } from 'redux-actions'
 import { combineReducers } from 'redux'
 
 import { preloadedState } from '~/reducers/preloaded.state'
+import { ChildProcessName } from '~/service/child-process-service'
 import { ResDexBootstrappingReducer } from './bootstrapping/reducer'
 import { ResDexLoginReducer } from './login/reducer'
 import { ResDexAssetsReducer } from './assets/reducer'
@@ -65,10 +66,10 @@ export type ResDexState = {
       baseQuote: {
         ['bids' | 'asks']: Order[]
       },
-      baseRes: {
+      resQuote: {
         ['bids' | 'asks']: Order[]
       },
-      quoteRes: {
+      baseRes: {
         ['bids' | 'asks']: Order[]
       }
     },
@@ -86,7 +87,7 @@ export type ResDexState = {
   accounts: {
     selectedSymbol: string,
     transactions: { [string]: any },
-    currencies: { [string]: Currency },
+    currencies: { [ChildProcessName]: { [string]: Currency } },
     enabledCurrencies: EnabledCurrency[],
     currencyFees: { [string]: any },
     addCurrencyModal: {

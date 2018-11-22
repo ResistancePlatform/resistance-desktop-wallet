@@ -27,6 +27,7 @@ const validationSchema = Joi.object().keys({
   sendFrom: Joi.string().required().label(`Send from`),
   receiveTo: Joi.string().required().label(`Receive to`),
   maxRel: Joi.string().required().label(`Max. amount`),
+  enhancedPrivacy: Joi.boolean().required().label(`Enhanced privacy`),
 })
 
 type Props = {
@@ -168,7 +169,7 @@ class ResDexBuySell extends Component<Props> {
                   className={styles.exchangeButton}
                   onClick={
                     order.isPrivate
-                    ? this.props.actions.createPrivateMarketOrder
+                    ? this.props.actions.createPrivateOrder
                     : this.props.actions.createMarketOrder
                   }
                   disabled={txFee && this.getSubmitButtonDisabledAttribute(order)}

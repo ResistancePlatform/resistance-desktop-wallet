@@ -22,14 +22,20 @@ const getOrderBookEpic = (action$: ActionsObservable<Action>, state$) => action$
 	ofType(ResDexBuySellActions.getOrderBook),
   switchMap(() => {
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
-    const getOrderBookPromise = Promise.all(
-      from(mainApi.getOrderBook(baseCurrency, quoteCurrency)),
-      from(mainApi.getOrderBook('RES', quoteCurrency)),
-      from(mainApi.getOrderBook(baseCurrency, 'RES')),
-    )
+    const getOrderBookPromise = Promise.all([
+      mainApi.getOrderBook(baseCurrency, quoteCurrency),
+      mainApi.getOrderBook('RES', quoteCurrency),
+      mainApi.getOrderBook(baseCurrency, 'RES'),
+    ])
     const observable = from(getOrderBookPromise).pipe(
       switchMap(([baseQuote,  resQuote, baseRes]) => {
-        const orderBook = { baseQuote,  resQuote, baseRes }
+        const orderBook = {
+          baseCurrency,
+          quoteCurrency,
+          baseQuote,
+          resQuote,
+          baseRes
+        }
         return of(ResDexBuySellActions.gotOrderBook(orderBook))
       }),
       catchError(err => {
@@ -142,7 +148,7 @@ const getRelResOrderObservable = (options, pollMainProcessBalanceObservable, sta
       'RESDEX',
       orderOptions,
       pollMainProcessBalanceObservable,
-      ResDexBuySellActions.createPrivateMarketOrderFailed,
+      ResDexBuySellActions.createPrivateOrderFailed,
       state$
     )
 
@@ -178,7 +184,7 @@ const getWithdrawFromMainToPrivacy1Observable = (options, pollPrivacy2BalanceObs
     switchMap(() => pollPrivacy2BalanceObservable),
     catchError(err => {
       log.error(`Can't withdraw from main to Privacy 1 process`, err)
-      return ResDexBuySellActions.createPrivateMarketOrderFailed(t(`Error performing Resistance withdrawal to a privatizer address`))
+      return ResDexBuySellActions.createPrivateOrderFailed(t(`Error performing Resistance withdrawal to a privatizer address`))
     })
   )
 
@@ -218,13 +224,13 @@ const getResBaseOrderObservable = (options, state$) => {
     'RESDEX_PRIVACY2',
     orderOptions,
     of(ResDexBuySellActions.empty),
-    ResDexBuySellActions.createPrivateMarketOrderFailed,
+    ResDexBuySellActions.createPrivateOrderFailed,
     state$
   )
 }
 
 const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(ResDexBuySellActions.createPrivateMarketOrder),
+	ofType(ResDexBuySellActions.createPrivateOrder),
   switchMap(() => {
     const { currencies } = state$.value.resDex.accounts
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell

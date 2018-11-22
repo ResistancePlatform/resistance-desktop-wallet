@@ -29,7 +29,7 @@ class DepositModal extends Component<Props> {
     const { t } = this.props
 
     const { symbol } = this.props.accounts.depositModal
-    const { address } = this.props.accounts.currencies[symbol]
+    const { address } = this.props.accounts.currencies.RESDEX[symbol]
 
     return (
       <div className={styles.overlay}>

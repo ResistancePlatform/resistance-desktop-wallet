@@ -24,7 +24,7 @@ export const ResDexAccountsActions = createActions(
     GOT_CURRENCY_FEES: fees => ({ fees }),
 
     GET_CURRENCIES: undefined,
-    GOT_CURRENCIES: (currencies: { [string]: Currency }) => ({ currencies }),
+    GOT_CURRENCIES: (currencies: { [ChildProcessName]: { [string]: Currency } }) => ({ currencies }),
     GET_CURRENCIES_FAILED: (errorMessage: string) => ({ errorMessage }),
 
     UPDATE_ENABLED_CURRENCIES: (enabledCurrencies: EnabledCurrency[]) => ({ enabledCurrencies }),
