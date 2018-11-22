@@ -61,7 +61,7 @@ class WithdrawModal extends Component<Props> {
 	render() {
     const { t } = this.props
     const { symbol } = this.props.accounts.withdrawModal
-    const currency = this.props.accounts.currencies[symbol]
+    const currency = this.props.accounts.currencies.RESDEX[symbol]
 
     const { isInProgress } = this.props.accounts.withdrawModal
 
@@ -95,7 +95,7 @@ class WithdrawModal extends Component<Props> {
             name="withdrawFrom"
             label={t(`Withdraw from`)}
             defaultValue={symbol}
-            currencies={this.props.accounts.currencies}
+            currencies={this.props.accounts.currencies.RESDEX}
             onChange={this.props.actions.updateWithdrawalSymbol}
           />
 

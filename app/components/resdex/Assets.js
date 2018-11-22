@@ -86,7 +86,7 @@ class ResDexAssets extends Component<Props> {
   }
 
   getWalletContents(t, symbol: string) {
-    const currency = this.props.accounts.currencies[symbol]
+    const currency = this.props.accounts.currencies.RESDEX[symbol]
     const { currencyHistory } = this.props.assets
     const hourHistory = currencyHistory.hour && currencyHistory.hour[symbol]
     const price = hourHistory && hourHistory.slice(-1)[0].value
@@ -184,7 +184,7 @@ class ResDexAssets extends Component<Props> {
         <Chart
           language={i18n.language}
           resolution={this.props.assets.resolution}
-          currencies={this.props.accounts.currencies}
+          currencies={this.props.accounts.currencies.RESDEX}
           currencyHistory={this.props.assets.currencyHistory}
         />
 

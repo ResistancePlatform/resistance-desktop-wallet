@@ -91,14 +91,14 @@ export class SwapDBService {
     })
   }
 
-  insertSwapData(swap, requestOpts, privateOrderOpts = null) {
+  insertSwapData(swap, requestOpts, privacy = null) {
     return this.queue(() => this.db.post({
       uuid: swap.uuid,
       timeStarted: Date.now(),
       request: requestOpts,
       response: swap,
       messages: [],
-      privacy: privateOrderOpts
+      privacy,
     }))
   }
 
@@ -276,6 +276,10 @@ function formatSwap(data) {
     }
     if (message.quoteid) {
       swap.quoteId = message.quoteid
+    }
+
+    if (message.method === 'set_private_order_status' && swap.isPrivate) {
+      swap.privacy.status = message.status
     }
 
     if (message.method === 'connected') {

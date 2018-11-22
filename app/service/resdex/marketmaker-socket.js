@@ -38,7 +38,7 @@ async function handleMessage(event) {
     this.ee.emit(`id_${queueId}`, message)
   }
 
-  log.debug('Handling websocket message', queueId, message)
+  log.debug('Handling websocket message', queueId)
 
   const uuids = getStore().getState().resDex.orders.swapHistory.map(swap => swap.uuid)
 

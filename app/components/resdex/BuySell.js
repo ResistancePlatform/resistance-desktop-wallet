@@ -48,7 +48,7 @@ class ResDexBuySell extends Component<Props> {
 
   getMaxQuoteAmount() {
     const { quoteCurrency } = this.props.buySell
-    const currency = this.props.accounts.currencies[quoteCurrency]
+    const currency = this.props.accounts.currencies.RESDEX[quoteCurrency]
     return currency && currency.balance || Decimal(0)
   }
 
@@ -136,7 +136,7 @@ class ResDexBuySell extends Component<Props> {
                   defaultValue={quoteCurrency}
                   label={t(`Send from`)}
                   onChange={this.props.actions.updateQuoteCurrency}
-                  currencies={this.props.accounts.currencies}
+                  currencies={this.props.accounts.currencies.RESDEX}
                 />
 
                 <ChooseWallet
@@ -145,7 +145,7 @@ class ResDexBuySell extends Component<Props> {
                   defaultValue={baseCurrency}
                   label={t(`Receive to`)}
                   onChange={this.props.actions.updateBaseCurrency}
-                  currencies={this.props.accounts.currencies}
+                  currencies={this.props.accounts.currencies.RESDEX}
                 />
 
                 <CurrencyAmountInput

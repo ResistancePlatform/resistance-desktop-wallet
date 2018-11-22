@@ -1,7 +1,7 @@
 // @flow
 import { Decimal } from 'decimal.js'
 import log from 'electron-log'
-import { of, from, merge, timer } from 'rxjs'
+import { of, from, merge, timer, defer } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
@@ -61,16 +61,18 @@ const createMarketOrderEpic = (action$: ActionsObservable<Action>, state$) => ac
   switchMap(() => {
     const { maxRel } = state$.value.roundedForm.resDexBuySell.fields
     const { baseCurrency, quoteCurrency, orderBook } = state$.value.resDex.buySell
+    const { price } = orderBook.baseQuote.asks[0]
 
     const options = {
       baseCurrency,
       quoteCurrency,
       quoteAmount: maxRel,
-      price: orderBook.baseQuote.asks[0]
+      price,
     }
 
-    return getCreateMarketOrderObservable(
+    return getCreateOrderObservable(
       options,
+      null,
       of(ResDexBuySellActions.createMarketOrderSucceeded()),
       ResDexBuySellActions.createMarketOrderFailed,
       state$
@@ -78,7 +80,7 @@ const createMarketOrderEpic = (action$: ActionsObservable<Action>, state$) => ac
   })
 )
 
-const getCreateMarketOrderObservable = (processName, options, successObservable, failureAction, state$) => {
+const getCreateOrderObservable = (processName, options, privacy, successObservable, failureAction, state$) => {
   const {
     baseCurrency,
     quoteCurrency,
@@ -113,7 +115,7 @@ const getCreateMarketOrderObservable = (processName, options, successObservable,
       const swap = result.pending
       const flattenedOptions = flattenDecimals(requestOpts)
       log.debug(`Inserting a swap`, result.swaps, swap, flattenedOptions)
-      swapDB.insertSwapData(swap, flattenedOptions)
+      swapDB.insertSwapData(swap, flattenedOptions, flattenDecimals(privacy))
 
       return successObservable
     }),
@@ -132,21 +134,23 @@ const getCreateMarketOrderObservable = (processName, options, successObservable,
   return orderObservable
 }
 
-const getRelResOrderObservable = (options, pollMainProcessBalanceObservable, state$) => {
+const getRelResOrderObservable = (privacy, pollMainProcessBalanceObservable, state$) => {
     const { quoteCurrency, orderBook } = state$.value.resDex.buySell
-    const { quoteAmount } = options
+    const { quoteAmount } = privacy
+    const { price } = orderBook.resQuote.asks[0]
 
     const orderOptions = {
       baseCurrency: 'RES',
       quoteCurrency,
       quoteAmount,
-      price: orderBook.resQuote.asks[0]
+      price,
     }
     log.debug(`Private market order stage 1, ${quoteCurrency} -> RES`, orderOptions)
 
-    return getCreateMarketOrderObservable(
+    return getCreateOrderObservable(
       'RESDEX',
       orderOptions,
+      privacy,
       pollMainProcessBalanceObservable,
       ResDexBuySellActions.createPrivateOrderFailed,
       state$
@@ -154,32 +158,34 @@ const getRelResOrderObservable = (options, pollMainProcessBalanceObservable, sta
 
 }
 
-const getPollMainProcessBalanceObservable = (options, withdrawFromMainToPrivacy1Observable, state$) => {
+const getPollMainProcessBalanceObservable = (privacy, withdrawFromMainToPrivacy1Observable, state$) => {
+  log.debug(`Private market order stage 2, polling the main ResDEX process for RES balance`, privacy)
+
   const pollingObservable = timer(0, 1000).pipe(
     switchMap(() => {
-      log.debug(`Private market order stage 2, polling the main ResDEX process for RES balance`, options)
+      const { balance } = state$.value.resDex.accounts.currencies.RESDEX.RES
+      log.debug(`Private market order stage 2`, balance)
 
-      const balance = state$.value.resDex.accounts.currencies.RES
-      if (balance.greaterThan(options.initialMainResBalance)) {
+      if (balance.greaterThan(privacy.initialMainResBalance)) {
         return withdrawFromMainToPrivacy1Observable
       }
-      return ResDexBuySellActions.empty()
+      return of(ResDexBuySellActions.empty())
     })
   )
   return pollingObservable
 }
 
-const getWithdrawFromMainToPrivacy1Observable = (options, pollPrivacy2BalanceObservable, state$) => {
+const getWithdrawFromMainToPrivacy1Observable = (privacy, pollPrivacy2BalanceObservable, state$) => {
   const { currencies } = state$.value.resDex.accounts
-  const { address } = currencies.PRIVACY1.RES
+  const { address } = currencies.RESDEX_PRIVACY1.RES
   const { balance } = currencies.RESDEX.RES
 
-  log.debug(`Private market order stage 3, withdrawing from the main ResDEX process to Privacy 1`, options)
+  log.debug(`Private market order stage 3, withdrawing from the main ResDEX process to Privacy 1`, privacy)
 
   const observable = from(mainApi.withdraw({
     symbol: 'RES',
     address,
-    amount: balance.minus(options.initialMainResBalance),
+    amount: balance.minus(privacy.initialMainResBalance),
   })).pipe(
     switchMap(() => pollPrivacy2BalanceObservable),
     catchError(err => {
@@ -191,13 +197,13 @@ const getWithdrawFromMainToPrivacy1Observable = (options, pollPrivacy2BalanceObs
   return observable
 }
 
-const getPollPrivacy2BalanceObservable = (options, relBaseOrderObservable, state$) => {
+const getPollPrivacy2BalanceObservable = (privacy, relBaseOrderObservable, state$) => {
   const pollingObservable = timer(0, 1000).pipe(
     switchMap(() => {
-      log.debug(`Private market order stage 4, polling the Privacy 2 ResDEX process for RES balance`, options)
+      log.debug(`Private market order stage 4, polling the Privacy 2 ResDEX process for RES balance`, privacy)
 
-      const balance = state$.value.resDex.accounts.currencies.PRIVACY2.RES
-      if (balance.greaterThan(options.initialMainResBalance)) {
+      const { balance } = state$.value.resDex.accounts.currencies.RESDEX_PRIVACY2.RES
+      if (balance.greaterThan(privacy.initialMainResBalance)) {
         return relBaseOrderObservable
       }
       return ResDexBuySellActions.empty()
@@ -206,23 +212,25 @@ const getPollPrivacy2BalanceObservable = (options, relBaseOrderObservable, state
   return pollingObservable
 }
 
-const getResBaseOrderObservable = (options, state$) => {
-  const { balance } = state$.value.resDex.accounts.currencies.PRIVACY2
+const getResBaseOrderObservable = (privacy, state$) => {
+  const { balance } = state$.value.resDex.accounts.currencies.RESDEX_PRIVACY2.RES
   const { orderBook } = state$.value.resDex.buySell
-  const { baseCurrency, initialPrivacy2ResBalance } = options
+  const { baseCurrency, initialPrivacy2ResBalance } = privacy
+  const { price } = orderBook.baseRes.asks[0]
 
   const orderOptions = {
     baseCurrency,
     quoteCurrency: 'RES',
     quoteAmount: balance.minus(initialPrivacy2ResBalance),
-    price: orderBook.baseRes.asks[0]
+    price,
   }
 
   log.debug(`Private market order stage 5, RES -> ${baseCurrency}`, orderOptions)
 
-  return getCreateMarketOrderObservable(
+  return getCreateOrderObservable(
     'RESDEX_PRIVACY2',
     orderOptions,
+    privacy,
     of(ResDexBuySellActions.empty),
     ResDexBuySellActions.createPrivateOrderFailed,
     state$
@@ -236,12 +244,12 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
     const { maxRel } = state$.value.roundedForm.resDexBuySell.fields
 
-    const options = {
+    const privacy = {
       baseCurrency,
       quoteCurrency,
       quoteAmount: maxRel,
-      initialMainResBalance: currencies.RESDEX.RES,
-      initialPrivacy2ResBalance: currencies.PRIVACY2.RES,
+      initialMainResBalance: currencies.RESDEX.RES.balance,
+      initialPrivacy2ResBalance: currencies.RESDEX_PRIVACY2.RES.balance,
     }
 
     // 1. Create order Rel -> RES on process1
@@ -250,13 +258,14 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
     // 4. Poll for process3 balance
     // 5. Create order RES -> Base on process3
 
-    const resBaseOrderObservable = getResBaseOrderObservable(options, state$)
-    const pollPrivacy2BalanceObservable = getPollPrivacy2BalanceObservable(options, resBaseOrderObservable, state$)
+    const resBaseOrderObservable = defer(() => getResBaseOrderObservable(privacy, state$))
+    const pollPrivacy2BalanceObservable = defer(() => getPollPrivacy2BalanceObservable(privacy, resBaseOrderObservable, state$))
 
-    const withdrawFromMainToPrivacy1Observable = getWithdrawFromMainToPrivacy1Observable(options, pollPrivacy2BalanceObservable, state$)
-    const pollMainProcessBalanceObservable = getPollMainProcessBalanceObservable(options, withdrawFromMainToPrivacy1Observable, state$)
+    const withdrawFromMainToPrivacy1Observable = defer(() => getWithdrawFromMainToPrivacy1Observable(privacy, pollPrivacy2BalanceObservable, state$))
+    const pollMainProcessBalanceObservable = defer(() => getPollMainProcessBalanceObservable(privacy, withdrawFromMainToPrivacy1Observable, state$))
 
-    const relResOrderObservable = getRelResOrderObservable(pollMainProcessBalanceObservable, state$)
+    const createOrderSuccessObservable = merge(pollMainProcessBalanceObservable, of(ResDexBuySellActions.createPrivateOrderSucceeded()))
+    const relResOrderObservable = getRelResOrderObservable(privacy, createOrderSuccessObservable, state$)
 
     return relResOrderObservable
   })
@@ -270,6 +279,14 @@ const createMarketOrderSucceededEpic = (action$: ActionsObservable<Action>) => a
   })
 )
 
+const createPrivateOrderSucceededEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexBuySellActions.createPrivateOrderSucceeded),
+  map(() => {
+    toastr.success(t(`Private order created successfully`))
+    return ResDexBuySellActions.empty()
+  })
+)
+
 const createMarketOrderFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.createMarketOrderFailed),
   map(action => {
@@ -278,12 +295,26 @@ const createMarketOrderFailedEpic = (action$: ActionsObservable<Action>) => acti
   })
 )
 
+const setPrivateOrderStatusEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexBuySellActions.setPrivateOrderStatus),
+  map(action => {
+    swapDB.updateSwapData({
+      uuid: action.payload.uuid,
+      method: 'set_private_order_status',
+      status: action.payload.status,
+    })
+    return ResDexBuySellActions.empty()
+  })
+)
+
 export const ResDexBuySellEpic = (action$, state$) => merge(
   createMarketOrderEpic(action$, state$),
   createPrivateOrderEpic(action$, state$),
   createMarketOrderSucceededEpic(action$, state$),
+  createPrivateOrderSucceededEpic(action$, state$),
   createMarketOrderFailedEpic(action$, state$),
   getOrderBookEpic(action$, state$),
   getOrderBookFailedEpic(action$, state$),
+  setPrivateOrderStatusEpic(action$, state$),
 )
 

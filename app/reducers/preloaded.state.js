@@ -156,7 +156,11 @@ export const preloadedState: State = {
     },
     accounts: {
       transactions: {},
-      currencies: {},
+      currencies: {
+        RESDEX: {},
+        RESDEX_PRIVACY1: {},
+        RESDEX_PRIVACY2: {},
+      },
       enabledCurrencies: [],
       currencyFees: {},
       addCurrencyModal: {

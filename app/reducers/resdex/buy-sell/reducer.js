@@ -2,6 +2,8 @@
 import { createActions, handleActions } from 'redux-actions'
 import { preloadedState } from '~/reducers/preloaded.state'
 
+export type PrivateOrderStatus = 'swapping_rel_res' | 'privatizing' | 'swapping_res_base'
+
 export const ResDexBuySellActions = createActions(
   {
     EMPTY: undefined,
@@ -18,7 +20,10 @@ export const ResDexBuySellActions = createActions(
     CREATE_MARKET_ORDER_FAILED: (errorMessage: string) => ({ errorMessage }),
 
     CREATE_PRIVATE_ORDER: undefined,
+    CREATE_PRIVATE_ORDER_SUCCEEDED: undefined,
     CREATE_PRIVATE_ORDER_FAILED: (errorMessage: string) => ({ errorMessage }),
+
+    SET_PRIVATE_ORDER_STATUS: (uuid: string, status: PrivateOrderStatus) => ({uuid, status}),
 
     CREATE_LIMIT_ORDER: undefined,
   },

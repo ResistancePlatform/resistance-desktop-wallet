@@ -255,7 +255,7 @@ class ResDexApiService {
 	 * @memberof ResDexApiService
 	 */
   query(data: object, errorMessage?: string) {
-    log.debug(`Calling ${this.processName} API method ${data.method}`, JSON.stringify(data))
+    // log.debug(`Calling ${this.processName} API method ${data.method}`, JSON.stringify(data))
 
     if (!this.token) {
       getStore().dispatch(ResDexLoginActions.showDialog())

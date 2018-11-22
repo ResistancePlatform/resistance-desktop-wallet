@@ -59,12 +59,6 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
       switchMap(swapHistory => {
         log.debug(`Swap history changed, got ${swapHistory.length} swaps`)
 
-        swapHistory.forEach(swap => {
-          if (swap.status === 'pending') {
-            log.debug(JSON.stringify(swap))
-          }
-        })
-
         // Track pending activities to ask user for a quit confirmation
         remote.getGlobal('pendingActivities').orders = Boolean(
           swapHistory.find(swap => !['completed', 'failed'].includes(swap.status))
