@@ -2,7 +2,7 @@
 import { createActions, handleActions } from 'redux-actions'
 import { preloadedState } from '~/reducers/preloaded.state'
 
-export type PrivateOrderStatus = 'swapping_rel_res' | 'privatizing' | 'swapping_res_base'
+export type PrivateOrderStatus = 'swapping_rel_res' | 'privatizing' | 'swapping_res_base' | 'completed' | 'failed' | 'cancelled'
 
 export const ResDexBuySellActions = createActions(
   {
