@@ -23,7 +23,7 @@
     -webkit-font-smoothing: antialiased;
     font-size: 1.5rem;
     color: $NAVI_BAR_ITEM_ICON_COLOR;
-    width: 2.3rem;
+    width: 2.1rem;
   }
 
   i:before {
@@ -76,6 +76,7 @@
     content: "\e908";
     font-size: 1.08rem;
     margin-left: 0.1rem;
+    top: -0.15rem;
   }
 }
 
@@ -84,6 +85,30 @@
     content: "\e907";
     font-size: 1.6rem;
     margin-left: -0.2rem;
+  }
+}
+
+.simplex {
+  position: relative;
+
+  i:before {
+    content: "\e907";
+    font-size: 1.6rem;
+    margin-left: -0.2rem;
+  }
+
+  .visa {
+    position: absolute;
+    width: 1.729rem;
+    top: 1.06rem;
+    right: 2.1rem;
+  }
+
+  .mastercard {
+    position: absolute;
+    width: 1.29rem;
+    top: 0.9rem;
+    right: 0.6rem;
   }
 }
 

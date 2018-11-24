@@ -10,6 +10,9 @@ import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ChildProcessService } from '~/service/child-process-service'
 import { NaviState } from '~/reducers/navi/navi.reducer'
 
+import visaLogo from '~/assets/images/visa-logo.svg'
+import mastercardLogo from '~/assets/images/mastercard-logo.svg'
+
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import statusStyles from '~/assets/styles/status-colors.scss'
 import styles from './navi-bar.scss'
@@ -70,6 +73,14 @@ class NaviBar extends Component<Props> {
           <i />
 					<NavLink to="/settings">{t(`Settings`)}</NavLink>
 				</div>
+        <div className={cn(styles.simplex, getItemClasses('/simplex'))}>
+          <i />
+          <NavLink to="/simplex">
+            {t(`Buy Bitcoin with`)}
+            <img className={styles.visa} src={visaLogo} alt="VISA" />
+            <img className={styles.mastercard} src={mastercardLogo} alt="Mastercard" />
+          </NavLink>
+        </div>
 				<div className={cn(styles.resdex, getItemClasses('/resdex'))}>
 					<i />
           <NavLink to="/resdex">

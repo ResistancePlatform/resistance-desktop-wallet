@@ -1,0 +1,144 @@
+@import "~/assets/styles/vars.scss";
+
+.container {
+  position: relative;
+
+  hr {
+    border: none;
+    border-bottom: 1px solid $BASE_COLOR_BORDER_BLUE;
+  }
+
+  &:before {
+    content: '';
+    background: url('~/assets/images/earth.jpeg');
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    opacity: 0.1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    display: block;
+    z-index: 1;
+  }
+}
+
+.header {
+  position: absolute;
+  width: calc(100% - 29.1rem);
+  margin-top: 6rem;
+  margin-left: 3rem;
+
+  .buyBitcoin {
+    font-size: 1.97rem;
+    font-weight: 400;
+    width: 14rem;
+    margin-bottom: 2.2rem;
+  }
+
+  .poweredBy {
+    margin-top: 1.8rem;
+    display: flex;
+    align-items: center;
+    font-size: 0.72rem;
+    color: $BASE_COLOR_WHITE;
+
+    .simplex {
+      margin-left: 0.8rem;
+      width: 7rem;
+    }
+  }
+
+  .accepted {
+    font-size: 0.7rem;
+    margin-top: 0.5rem;
+
+    .visa {
+      position: relative;
+      width: 2.1rem;
+      left: 0.6rem;
+      top: 0.1rem;
+    }
+
+    .mastercard {
+      position: relative;
+      width: 1.67rem;
+      left: 1.17rem;
+      top: 0.27rem;
+    }
+  }
+}
+
+.box {
+  opacity: 1;
+  border-radius: 0.3rem;
+  border: 1px solid $BASE_COLOR_BORDER_BLUE;
+  background: $BASE_COLOR_DARK_BLUE_3;
+  padding: 0;
+  z-index: 10;
+}
+
+.formContainer {
+  opacity: 1;
+  background: $BASE_COLOR_DARK_BLUE_3;
+  position: absolute;
+  right: 1.1rem;
+  top: 3.8rem;
+  width: 23.4375rem;
+  min-height: 18.125rem;
+  z-index: 10;
+
+  .stages {
+    list-style: none;
+    display: flex;
+    text-transform: uppercase;
+  }
+
+  iframe {
+    margin: 0;
+    border: none;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.specs {
+  list-style: none;
+  position: absolute;
+  left: 1.2rem;
+  right: 1.1rem;
+  height: 6.25rem;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 1.5rem;
+  padding-right: 3.2rem;
+
+  li {
+    display: flex;
+    align-items: center;
+  }
+
+  .bullet {
+    min-width: 2.7rem;
+    height: 2.7rem;
+    line-height: 2.7rem;
+    text-align: center;
+    font-size: 1.2rem;
+    border-radius: 50%;
+    background: $BALANCE_BACKGROUND_IMAGE;
+    margin-right: 1rem;
+  }
+
+  .subject {
+    font-size: 0.72rem;
+    margin-right: 1rem;
+  }
+
+  .value {
+    font-size: 0.97rem;
+    color: $BASE_COLOR_PURPLE;
+  }
+}
