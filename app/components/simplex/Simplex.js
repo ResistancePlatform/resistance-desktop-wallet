@@ -53,13 +53,27 @@ export class Simplex extends Component<Props> {
         </div>
 
         <div className={cn(styles.formContainer)}>
-          <ul className={styles.stages}>
-            <li>{t(`Quote`)}</li>
-            <li>{t(`Send to`)}</li>
-            <li>{t(`Card payment`)}</li>
-            <li>{t(`Finished`)}</li>
-          </ul>
-          <iframe title={t(`Payment form`)} src="https://payments.resistance.io/" />
+          <div className={styles.stages}>
+            <ul>
+              <li>{t(`Quote`)}</li>
+              <li>{t(`Send to`)}</li>
+              <li className={styles.disabled}>{t(`Card payment`)}</li>
+              <li className={styles.disabled}>{t(`Finished`)}</li>
+            </ul>
+
+            <div className={styles.separator}>
+              <div className={styles.progress} />
+            </div>
+
+          </div>
+
+          <webview
+            title={t(`Payment form`)}
+            className={styles.webview}
+            src="https://payments.resistance.io/"
+            allowTransparency
+          />
+
         </div>
 
         <ul className={cn(styles.box, styles.specs)}>

@@ -80,26 +80,84 @@
 }
 
 .formContainer {
-  opacity: 1;
-  background: $BASE_COLOR_DARK_BLUE_3;
   position: absolute;
-  right: 1.1rem;
-  top: 3.8rem;
-  width: 23.4375rem;
+  right: 0.55rem;
+  top: 3.5rem;
+  width: 24.6rem;
   min-height: 18.125rem;
   z-index: 10;
 
+  padding: 0;
+  margin: 0;
+
   .stages {
-    list-style: none;
-    display: flex;
-    text-transform: uppercase;
+    margin-left: 0.5rem;
+    margin-right: 0.48rem;
+    z-index: 11;
+
+    ul {
+      border-radius: 0.3rem 0.3rem 0 0;
+      border: 1px solid $BASE_COLOR_BORDER_BLUE;
+      border-bottom: none;
+      background: $BASE_COLOR_DARK_BLUE_3;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      margin: 0;
+      padding: 0;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      height: 3.5rem;
+    }
+
+    .disabled {
+      color: $BASE_COLOR_FONT_GRAY;
+    }
+
+    .separator {
+      position: relative;
+      height: 0px;
+      background: $BASE_COLOR_BORDER_GRAY;
+      z-index: 11;
+
+      .progress {
+        position: absolute;
+        width: 42%;
+        height: 1px;
+        top: 0;
+        background: $BALANCE_BACKGROUND_IMAGE;
+      }
+    }
+
   }
 
-  iframe {
+  .webview {
+    z-index: 10;
+    position: relative;
+    top: -0.525rem;
     margin: 0;
+    padding: 0;
     border: none;
-    width: 100%;
-    height: 100%;
+    width: 24.7rem;
+    min-height: 16rem;
+    background-color: transparent;
+
+    &:before {
+      content: '';
+      position: absolute;
+      background: $BASE_COLOR_DARK_BLUE_3;
+      left: 0.5rem;
+      width: calc(100% - 1.2rem);
+      height: calc(100% - 0.47rem);
+
+      border-radius: 0 0 0.3rem 0.3rem;
+      border: 1px solid $BASE_COLOR_BORDER_BLUE;
+      border-top: none;
+      z-index: -1;
+    }
   }
 }
 
