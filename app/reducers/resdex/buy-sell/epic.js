@@ -2,7 +2,7 @@
 import { Decimal } from 'decimal.js'
 import log from 'electron-log'
 import { of, from, merge, interval, defer } from 'rxjs'
-import { map, filter, take, flatMap, switchMap, catchError } from 'rxjs/operators'
+import { map, switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
@@ -73,14 +73,14 @@ const createMarketOrderEpic = (action$: ActionsObservable<Action>, state$) => ac
     return getCreateOrderObservable(
       options,
       null,
-      of(ResDexBuySellActions.createMarketOrderSucceeded()),
+      () => of(ResDexBuySellActions.createMarketOrderSucceeded()),
       ResDexBuySellActions.createMarketOrderFailed,
       state$
     )
   })
 )
 
-const getCreateOrderObservable = (processName, options, privacy, successObservable, failureAction, state$) => {
+const getCreateOrderObservable = (processName, options, privacy, getSuccessObservable, failureAction, state$) => {
   const {
     baseCurrency,
     quoteCurrency,
@@ -117,7 +117,7 @@ const getCreateOrderObservable = (processName, options, privacy, successObservab
       log.debug(`Inserting a swap`, result.swaps, swap, flattenedOptions)
       swapDB.insertSwapData(swap, flattenedOptions, flattenDecimals(privacy))
 
-      return successObservable
+      return getSuccessObservable(swap.uuid)
     }),
     catchError(err => {
       let { message } = err
@@ -134,7 +134,7 @@ const getCreateOrderObservable = (processName, options, privacy, successObservab
   return orderObservable
 }
 
-const getRelResOrderObservable = (privacy, pollMainProcessBalanceObservable, state$) => {
+const getRelResOrderObservable = (privacy, getSuccessObservable, state$) => {
     const { quoteCurrency, orderBook } = state$.value.resDex.buySell
     const { quoteAmount } = privacy
     const { price } = orderBook.resQuote.asks[0]
@@ -151,7 +151,7 @@ const getRelResOrderObservable = (privacy, pollMainProcessBalanceObservable, sta
       'RESDEX',
       orderOptions,
       privacy,
-      pollMainProcessBalanceObservable,
+      getSuccessObservable,
       ResDexBuySellActions.createPrivateOrderFailed,
       state$
     )
@@ -214,7 +214,7 @@ const getPollPrivacy2BalanceObservable = (privacy, relBaseOrderObservable, state
   return pollingObservable
 }
 
-const getResBaseOrderObservable = (privacy, state$) => {
+const getResBaseOrderObservable = (privacy, getSuccessObservable, state$) => {
   const { balance } = state$.value.resDex.accounts.currencies.RESDEX_PRIVACY2.RES
   const { orderBook } = state$.value.resDex.buySell
   const { baseCurrency, initialPrivacy2ResBalance } = privacy
@@ -233,7 +233,7 @@ const getResBaseOrderObservable = (privacy, state$) => {
     'RESDEX_PRIVACY2',
     orderOptions,
     privacy,
-    of(ResDexBuySellActions.empty),
+    getSuccessObservable,
     ResDexBuySellActions.createPrivateOrderFailed,
     state$
   )

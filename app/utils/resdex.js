@@ -30,6 +30,15 @@ const getOrderStatusName = (status: string) => ({
   failed: t(`Failed`),
 }[status] || status)
 
+const getPrivateOrderStatusName = (order) => ({
+  pending: t(`Pending`),
+  completed: t(`Completed`),
+  matched: t(`Matched`),
+  swapping: t(`Swapping`),
+  unmatched: t(`Unmatched`),
+  failed: t(`Failed`),
+}[order.privacy.status] || order.privacy.status)
+
 const getSortedCurrencies = currencies => {
   const sortedCurrencies = currencies.slice().sort(
     (currency1, currency2) => [currency1.symbol, currency2.symbol].includes('RES')
