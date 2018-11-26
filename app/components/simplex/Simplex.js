@@ -1,10 +1,7 @@
 // @flow
 import React, { Component } from 'react'
+import { shell } from 'electron'
 import cn from 'classnames'
-
-import simplexLogo from '~/assets/images/simplex-logo.png'
-import visaLogo from '~/assets/images/visa-logo.svg'
-import mastercardLogo from '~/assets/images/mastercard-logo.svg'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
@@ -21,6 +18,20 @@ type Props = {
  */
 export class Simplex extends Component<Props> {
 	props: Props
+  webviewElement: any
+
+  /**
+   * @memberof Simplex
+   */
+  componentDidMount() {
+    if (!this.webviewElement) {
+      return
+    }
+
+    this.webviewElement.addEventListener('new-window', event => {
+      shell.openExternal(event.url)
+    })
+  }
 
 	/**
 	 * @returns
@@ -31,80 +42,12 @@ export class Simplex extends Component<Props> {
 
     return (
       <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
-        <div className={styles.header}>
-          <div className={styles.buyBitcoin}>
-            {t(`Buy Bitcoin with credit card`)}
-          </div>
-
-          <hr />
-
-          <div className={styles.poweredBy}>
-            {t(`Powered by`)}
-            <img className={styles.simplex} src={simplexLogo} alt="Simplex" />
-          </div>
-
-          <div className={styles.accepted}>
-            {t(`Visa and Mastercard accepted here`)}
-
-            <img className={styles.visa} src={visaLogo} alt="VISA" />
-            <img className={styles.mastercard} src={mastercardLogo} alt="Mastercard" />
-          </div>
-
-        </div>
-
-        <div className={cn(styles.formContainer)}>
-          <div className={styles.stages}>
-            <ul>
-              <li>{t(`Quote`)}</li>
-              <li>{t(`Send to`)}</li>
-              <li className={styles.disabled}>{t(`Card payment`)}</li>
-              <li className={styles.disabled}>{t(`Finished`)}</li>
-            </ul>
-
-            <div className={styles.separator}>
-              <div className={styles.progress} />
-            </div>
-
-          </div>
-
-          <webview
-            title={t(`Payment form`)}
-            className={styles.webview}
-            src="https://payments.resistance.io/"
-            allowTransparency
-          />
-
-        </div>
-
-        <ul className={cn(styles.box, styles.specs)}>
-          <li>
-            <div className={styles.bullet}>1</div>
-            <div className={styles.subject}>
-              {t(`First transaction`)}
-              <div className={styles.value}>
-                {t(`from \${{from}} to \${{to}}`, {from: 50, to: 10000})}
-              </div>
-            </div>
-          </li>
-          <li>
-            <div className={styles.bullet}>2</div>
-            <div className={styles.subject}>
-              {t(`Daily limit`)}
-              <div className={styles.value}>
-                {t(`up to \${{upTo}}`, {upTo: 20000})}
-              </div>
-            </div>
-          </li>
-          <li>
-            <div className={styles.bullet}>3</div>
-            <div className={styles.subject}>
-              {t(`Monthly limit`)}
-              <div className={styles.value}>
-                {t(`up to \${{upTo}}`, {upTo: 50000})}
-              </div>
-            </div>
-          </li>
-        </ul>
+        <webview
+          title={t(`Buy Bitcoin with credit card`)}
+          ref={el => {this.webviewElement = el}}
+          className={styles.webview}
+          src="http://payments.resistance.io:8000/simplex.html"
+        />
 
       </div>
     )
