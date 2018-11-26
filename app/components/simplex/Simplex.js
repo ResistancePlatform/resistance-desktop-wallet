@@ -46,7 +46,7 @@ export class Simplex extends Component<Props> {
           title={t(`Buy Bitcoin with credit card`)}
           ref={el => {this.webviewElement = el}}
           className={styles.webview}
-          src="http://payments.resistance.io:8000/simplex.html"
+          src="https://payments.resistance.io/wallet.html"
         />
 
       </div>
