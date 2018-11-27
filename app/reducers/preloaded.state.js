@@ -179,7 +179,8 @@ export const preloadedState: State = {
       withdrawModal: {
         isInProgress: false,
         isVisible: false,
-        symbol: null
+        symbol: null,
+        secretFunds: false
       }
     }
   }

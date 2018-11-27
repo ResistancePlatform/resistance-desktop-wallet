@@ -85,11 +85,16 @@ class ResDexAssets extends Component<Props> {
     return result
   }
 
-  getWalletContents(t, symbol: string) {
-    const currency = this.props.accounts.currencies.RESDEX[symbol]
+  getLastPrice(symbol: string): object | null {
     const { currencyHistory } = this.props.assets
     const hourHistory = currencyHistory.hour && currencyHistory.hour[symbol]
     const price = hourHistory && hourHistory.slice(-1)[0].value
+    return price || null
+  }
+
+  getWalletContents(t, symbol: string) {
+    const currency = this.props.accounts.currencies.RESDEX[symbol]
+    const price = this.getLastPrice(symbol)
 
     return (
       <div className={styles.coin} key={symbol}>
@@ -126,6 +131,45 @@ class ResDexAssets extends Component<Props> {
     )
   }
 
+  getSymbolsWithSecretFundsCaption(): string | null {
+    const { t } = this.props
+    const currencies = Object.values(this.props.accounts.currencies.RESDEX_PRIVACY2)
+    const symbols = (
+      currencies
+      .filter(currency => !currency.balance.isZero())
+      .map(currency => currency.symbol)
+    )
+
+    if (currencies.length === 0) {
+      return null
+    }
+
+    if (symbols.length === 0) {
+      return t(`No assets`)
+    }
+
+    if (symbols.length < 4) {
+      return symbols.join(', ')
+    }
+
+    return t(`{{symbols}} and {{number}} more`, {
+      symbols: symbols.slice(0, 2),
+      number: symbols.length - 2
+    })
+  }
+
+  getSecretFundsEquity() {
+    const currencies = Object.values(this.props.accounts.currencies.RESDEX_PRIVACY2)
+    const totalEquity = currencies.reduce((previousEquity, currency) => {
+      const price = this.getLastPrice(currency.symbol)
+      if (price === null) {
+        return previousEquity
+      }
+      return previousEquity.plus(currency.balance.times(price))
+    }, Decimal(0))
+
+    return totalEquity
+  }
 
 	/**
 	 * @returns
@@ -139,6 +183,7 @@ class ResDexAssets extends Component<Props> {
     const totalPortfolioValue = this.getTotalPortfolioValue()
     const sinceLastHour = this.getSinceLastHour()
     const sortedCurrencies = getSortedCurrencies(enabledCurrencies)
+    const secretFundsEquity = this.getSecretFundsEquity()
 
 		return (
       <div className={cn(styles.container)}>
@@ -190,6 +235,31 @@ class ResDexAssets extends Component<Props> {
 
       <div className={styles.coins}>
         {sortedCurrencies.map(currency => this.getWalletContents(t, currency.symbol))}
+
+        <div className={styles.coin}>
+          <div className={styles.secretFundsIcon} />
+
+          {t(`Secret funds`)}
+
+          <div className={styles.amount}>
+            {this.getSymbolsWithSecretFundsCaption() || t(`N/A`)}
+          </div>
+
+          <div className={styles.equity}>
+            <sub>$</sub>{secretFundsEquity && secretFundsEquity.toString() || t(`N/A`)}
+          </div>
+
+          <div className={cn(styles.buttons, styles.secretFunds)}>
+            <button
+              type="button"
+              onClick={() => this.props.accountsActions.showWithdrawModal(null, true)}
+              disabled={!secretFundsEquity}
+            >
+              {t(`Withdraw`)}
+            </button>
+          </div>
+
+        </div>
       </div>
 
       </div>

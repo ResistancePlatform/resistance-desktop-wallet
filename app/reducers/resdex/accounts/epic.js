@@ -139,9 +139,11 @@ const withdrawEpic = (action$: ActionsObservable<Action>, state$) => action$.pip
   ofType(ResDexAccountsActions.withdraw),
   switchMap(() => {
     const { recipientAddress, amount } = state$.value.roundedForm.resDexAccountsWithdrawModal.fields
-    const { symbol } = state$.value.resDex.accounts.withdrawModal
+    const { symbol, secretFunds } = state$.value.resDex.accounts.withdrawModal
 
-    const observable = from(mainApi.withdraw({
+    const api = resDexApiFactory(secretFunds ? 'RESDEX_PRIVACY2' : 'RESDEX')
+
+    const observable = from(api.withdraw({
       symbol,
       address: recipientAddress,
       amount,

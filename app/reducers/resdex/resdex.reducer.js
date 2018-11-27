@@ -106,7 +106,8 @@ export type ResDexState = {
     withdrawModal: {
       isInProgress: boolean,
       isVisible: boolean,
-      symbol: string | null
+      symbol: string | null,
+      secretFunds: boolean
     }
   }
 }

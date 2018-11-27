@@ -6,6 +6,10 @@ $withdrawModalWidth: 26.25rem;
   padding: 2rem;
   padding-bottom: 1rem;
   width: $withdrawModalWidth - 4rem;
+  position: relative;
+
+  .secretFundsIcon {
+  }
 
   .inputsRow {
     display: flex;
@@ -38,11 +42,32 @@ $withdrawModalWidth: 26.25rem;
     cursor: default;
   }
 
+  .noteTextArea {
+    max-height: 4rem;
+  }
+
+  .memo {
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.7rem;
+
+    hr {
+      border: none;
+      border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+      margin-bottom: 1rem;
+    }
+
+    strong {
+      color: $BASE_COLOR_WHITE;
+    }
+  }
+
   .button {
+    position: absolute;
     margin-top: 0.75rem;
     padding-left: 2.2rem;
     padding-right: 2.2rem;
-    float: right;
+    right: 2rem;
+    bottom: 3rem;
   }
 
 }

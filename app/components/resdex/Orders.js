@@ -44,8 +44,8 @@ class ResDexOrders extends Component<Props> {
         <UniformListColumn width="17%">{t(`Pair`)}</UniformListColumn>
         <UniformListColumn width="17%">{t(`Amount out`)}</UniformListColumn>
         <UniformListColumn width="17%">{t(`Amount in`)}</UniformListColumn>
-        <UniformListColumn width="14%">{t(`Private`)}</UniformListColumn>
-        <UniformListColumn width="17%">{t(`Status`)}</UniformListColumn>
+        <UniformListColumn width="10%">{t(`Private`)}</UniformListColumn>
+        <UniformListColumn width="21%">{t(`Status`)}</UniformListColumn>
       </UniformListHeader>
     )
   }
@@ -55,6 +55,8 @@ class ResDexOrders extends Component<Props> {
 	 */
   getListRowRenderer(order) {
     const { i18n } = this.props
+
+    const { baseCurrency, quoteCurrency } = order.isPrivate ? order.privacy : order
 
     return (
       <UniformListRow
@@ -66,20 +68,20 @@ class ResDexOrders extends Component<Props> {
           {moment(order.timeStarted).locale(i18n.language).format('kk:mm L')}
         </UniformListColumn>
         <UniformListColumn>
-          {order.baseCurrency}/{order.quoteCurrency}
+          {baseCurrency}/{quoteCurrency}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.lesser)}>
-          -{toDecimalPlaces(Decimal(order.quoteCurrencyAmount))} {order.quoteCurrency}
+          -{toDecimalPlaces(Decimal(order.quoteCurrencyAmount))} {quoteCurrency}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.greater)}>
-          {toDecimalPlaces(Decimal(order.baseCurrencyAmount))} {order.baseCurrency}
+          {toDecimalPlaces(Decimal(order.baseCurrencyAmount))} {baseCurrency}
         </UniformListColumn>
         <UniformListColumn>
           <i className={cn('icon', styles.private, { [styles.enabled]: order.isPrivate })} />
         </UniformListColumn>
         <UniformListColumn>
-          <span className={cn(styles.status, styles[order.status])}>
-            {getOrderStatusName(order.status)}
+          <span className={cn(styles.status, styles[order.isPrivate ? order.privacy.status : order.status])}>
+            {getOrderStatusName(order)}
           </span>
         </UniformListColumn>
       </UniformListRow>
@@ -94,9 +96,11 @@ class ResDexOrders extends Component<Props> {
     const { t } = this.props
     const { swapHistory } = this.props.orders
 
-    const completed = status => ['completed', 'failed'].includes(status)
-    const openOrders = swapHistory.filter(swap => !completed(swap.status))
-    const completedOrders = swapHistory.filter(swap => completed(swap.status))
+    const status = swap => swap.isPrivate ? swap.privacy.status : swap.status
+    const completed = swap => ['completed', 'failed'].includes(status(swap))
+
+    const openOrders = swapHistory.filter(swap => !completed(swap))
+    const completedOrders = swapHistory.filter(swap => completed(swap))
 
 		return (
       <div className={cn(styles.container)}>

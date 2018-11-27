@@ -60,8 +60,10 @@ class WithdrawModal extends Component<Props> {
 
 	render() {
     const { t } = this.props
-    const { symbol } = this.props.accounts.withdrawModal
-    const currency = this.props.accounts.currencies.RESDEX[symbol]
+    const { symbol, secretFunds } = this.props.accounts.withdrawModal
+    const { currencies } = this.props.accounts
+    const processCurrencies = secretFunds ? currencies.RESDEX_PRIVACY2 : currencies.RESDEX
+    const currency = processCurrencies[symbol]
 
     const { isInProgress } = this.props.accounts.withdrawModal
 
@@ -78,7 +80,13 @@ class WithdrawModal extends Component<Props> {
 
           {/* Title */}
           <div className={styles.title}>
-            {t(`Withdraw`)} {symbol}
+            {secretFunds &&
+              <div className={styles.secretFundsIcon} />
+            }
+            {secretFunds
+              ? t(`Withdraw secret funds`)
+              : t(`Withdraw {{symbol}}`, { symbol })
+            }
           </div>
 
           <RoundedForm
@@ -95,7 +103,7 @@ class WithdrawModal extends Component<Props> {
             name="withdrawFrom"
             label={t(`Withdraw from`)}
             defaultValue={symbol}
-            currencies={this.props.accounts.currencies.RESDEX}
+            currencies={processCurrencies}
             onChange={this.props.actions.updateWithdrawalSymbol}
           />
 
@@ -127,15 +135,26 @@ class WithdrawModal extends Component<Props> {
 
           </div>
 
-          <div className={styles.caption}>
-            {t(`Note`)}
-          </div>
+          {secretFunds ? (
+            <div className={styles.memo}>
+              <hr />
+              <strong>{t(`Memo:`)}</strong>&nbsp;
+              {t(`withdraw-modal-memo`)}
+            </div>
+          ) : (
+            <div className={styles.note}>
+              <div className={styles.caption}>
+                {t(`Note`)}
+              </div>
 
-          <RoundedTextArea
-            name="note"
-            rows={4}
-            placeholder={t(`Write an optional message`)}
-          />
+              <RoundedTextArea
+                className={styles.noteTextArea}
+                name="note"
+                rows={4}
+                placeholder={t(`Write an optional message`)}
+              />
+            </div>
+          )}
 
           <RoundedButton
             type="submit"

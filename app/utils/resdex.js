@@ -21,23 +21,24 @@ function getIsLoginDisabled(props: object) {
   return isDisabled
 }
 
-const getOrderStatusName = (status: string) => ({
-  pending: t(`Pending`),
-  completed: t(`Completed`),
-  matched: t(`Matched`),
-  swapping: t(`Swapping`),
-  unmatched: t(`Unmatched`),
-  failed: t(`Failed`),
-}[status] || status)
+const getOrderStatusName = order => {
+  const names = {
+    pending: t(`Pending`),
+    completed: t(`Completed`),
+    matched: t(`Matched`),
+    swapping: t(`Swapping`),
+    unmatched: t(`Unmatched`),
+    failed: t(`Failed`),
+    cancelled: t(`Cancelled`),
+    swapping_rel_res: t(`Swapping {{pair}}`, { pair: `${order.quoteCurrency}/RES` }),
+    privatizing: t(`Privatizing`),
+    swapping_res_base: t(`Swapping {{pair}}`, { pair: `RES/${order.baseCurrency}` }),
+  }
 
-const getPrivateOrderStatusName = (order) => ({
-  pending: t(`Pending`),
-  completed: t(`Completed`),
-  matched: t(`Matched`),
-  swapping: t(`Swapping`),
-  unmatched: t(`Unmatched`),
-  failed: t(`Failed`),
-}[order.privacy.status] || order.privacy.status)
+  const status = order.isPrivate ? order.privacy.status : order.status
+
+  return names[status] || status
+}
 
 const getSortedCurrencies = currencies => {
   const sortedCurrencies = currencies.slice().sort(

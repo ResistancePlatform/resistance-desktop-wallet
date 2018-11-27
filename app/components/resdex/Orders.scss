@@ -71,15 +71,21 @@
   border-radius: 1rem;
   padding: 0.2rem 0.6rem;
   font-weight: 400;
+  white-space: nowrap;
 
   &.pending {
     color: $BASE_COLOR_WHITE;
     background: $BASE_COLOR_GRAY_3;
   }
 
-  &.matched, &.swapping {
+  &.matched, &.swapping, &.swapping_rel_res, &.swapping_res_base {
     color: $BASE_COLOR_DARK_BLUE_3;
     background: $BASE_COLOR_LIGHT_BLUE;
+  }
+
+  &.privatizing {
+    color: $BASE_COLOR_WHITE;
+    background: $BASE_COLOR_PURPLE;
   }
 
   &.completed {
