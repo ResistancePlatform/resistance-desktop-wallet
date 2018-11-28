@@ -158,9 +158,18 @@ class ResDexAssets extends Component<Props> {
     })
   }
 
-  getSecretFundsEquity() {
+  getSecretFundsAmounts(): {equity?: object, balance?: object} {
     const currencies = Object.values(this.props.accounts.currencies.RESDEX_PRIVACY2)
-    const totalEquity = currencies.reduce((previousEquity, currency) => {
+
+    if (currencies.length === 0) {
+      return {}
+    }
+
+    let balance = Decimal(0)
+
+    const equity = currencies.reduce((previousEquity, currency) => {
+      balance = balance.plus(currency.balance)
+
       const price = this.getLastPrice(currency.symbol)
       if (price === null) {
         return previousEquity
@@ -168,7 +177,7 @@ class ResDexAssets extends Component<Props> {
       return previousEquity.plus(currency.balance.times(price))
     }, Decimal(0))
 
-    return totalEquity
+    return {equity, balance}
   }
 
 	/**
@@ -183,7 +192,7 @@ class ResDexAssets extends Component<Props> {
     const totalPortfolioValue = this.getTotalPortfolioValue()
     const sinceLastHour = this.getSinceLastHour()
     const sortedCurrencies = getSortedCurrencies(enabledCurrencies)
-    const secretFundsEquity = this.getSecretFundsEquity()
+    const {equity: secretFundsEquity, balance: secretFundsBalance} = this.getSecretFundsAmounts()
 
 		return (
       <div className={cn(styles.container)}>
@@ -253,7 +262,7 @@ class ResDexAssets extends Component<Props> {
             <button
               type="button"
               onClick={() => this.props.accountsActions.showWithdrawModal(null, true)}
-              disabled={!secretFundsEquity}
+              disabled={!secretFundsBalance || secretFundsBalance.isZero()}
             >
               {t(`Withdraw`)}
             </button>

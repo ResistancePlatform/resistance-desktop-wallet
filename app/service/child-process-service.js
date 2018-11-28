@@ -119,8 +119,8 @@ export class ChildProcessService {
   }
 
   getLogFilePath(processName: string) {
-    const command = childProcessCommands[processName]
-    return  path.join(getAppDataPath(), `${command}.log`)
+    const logFileName = `${processName.toLowerCase()}.log`
+    return  path.join(getAppDataPath(), logFileName)
   }
 
 	/**

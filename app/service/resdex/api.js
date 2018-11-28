@@ -255,7 +255,7 @@ class ResDexApiService {
 	 * @memberof ResDexApiService
 	 */
   query(data: object, errorMessage?: string) {
-    // log.debug(`Calling ${this.processName} API method ${data.method}`, JSON.stringify(data))
+    log.debug(`Calling ${this.processName} API method ${data.method}`, JSON.stringify(data))
 
     if (!this.token) {
       getStore().dispatch(ResDexLoginActions.showDialog())
@@ -310,7 +310,6 @@ async function enableElectrumServers(symbol) {
 
 async function withdrawBtcFork(opts) {
   const {
-    hex: rawTransaction,
     txfee: txFeeSatoshis,
     txid,
     amount,
@@ -322,16 +321,9 @@ async function withdrawBtcFork(opts) {
   const SATOSHIS = 100000000
   const txFee = txFeeSatoshis / SATOSHIS
 
-  const broadcast = async () => {
-    await this::broadcastTransaction(opts.symbol, rawTransaction)
+  log.debug(`Withdrawal params`, JSON.stringify({txFee, txid, amount, symbol, address}))
 
-    return {txid, amount, symbol, address}
-  }
-
-  return {
-    txFee,
-    broadcast,
-  }
+  return { txFee, txid, amount, symbol, address }
 }
 
 async function withdrawEth(opts) {
@@ -383,8 +375,8 @@ async function createTransaction(opts) {
   const response = await this.query({
     method: 'withdraw',
     coin: opts.symbol,
-    outputs: [{[opts.address]: opts.amount.toString()}],
-    broadcast: 0,
+    outputs: [{[opts.address]: opts.amount.toNumber()}],
+    broadcast: 1,
   })
 
   if (!response.complete) {
@@ -395,18 +387,4 @@ async function createTransaction(opts) {
     ...opts,
     ...response,
   }
-}
-
-async function broadcastTransaction(symbol, rawTransaction) {
-  const response = await this.query({
-    method: 'sendrawtransaction',
-    coin: symbol,
-    signedtx: rawTransaction,
-  })
-
-  if (!response.result === 'success') {
-    throw new ResDexApiError(response, t(`Couldn't broadcast transaction`))
-  }
-
-  return response.txid
 }

@@ -14,7 +14,7 @@
 }
 
 .tab {
-  margin: 0 1.7rem;
+  margin: 0 0.98rem;
 
   .statusIcon {
     position: relative;
@@ -32,6 +32,10 @@
 
   .red {
     color: $BASE_COLOR_LIGHT_RED;
+  }
+
+  &:first-child {
+    margin-left: 1.7rem;
   }
 }
 

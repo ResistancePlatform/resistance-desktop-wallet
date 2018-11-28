@@ -185,11 +185,11 @@ const getWithdrawFromMainToPrivacy1Observable = (privacy, pollPrivacy2BalanceObs
   const observable = from(mainApi.withdraw({
     symbol: 'RES',
     address,
-    amount: Decimal(2), // balance.minus(privacy.initialMainResBalance),
+    amount: Decimal(10), // balance.minus(privacy.initialMainResBalance),
   })).pipe(
     switchMap(() => pollPrivacy2BalanceObservable),
     catchError(err => {
-      log.error(`Can't withdraw from main to Privacy 1 process`, err)
+      log.error(`Can't withdraw from main to Privacy 1 process`, JSON.stringify(err))
       return ResDexBuySellActions.createPrivateOrderFailed(t(`Error performing Resistance withdrawal to a privatizer address`))
     })
   )
@@ -290,7 +290,7 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
     const pollPrivacy2BalanceObservable = defer(() => getPollPrivacy2BalanceObservable(privacy, resBaseOrderObservable, state$))
 
     const withdrawFromMainToPrivacy1Observable = defer(() => merge(
-      of(ResDexBuySellActions.setPrivateOrderStatus(relResOrderUuid, 'privatizing')),
+      // of(ResDexBuySellActions.setPrivateOrderStatus(relResOrderUuid, 'privatizing')),
       getWithdrawFromMainToPrivacy1Observable(privacy, pollPrivacy2BalanceObservable, state$),
     ))
 
