@@ -255,7 +255,7 @@ class ResDexAssets extends Component<Props> {
           </div>
 
           <div className={styles.equity}>
-            <sub>$</sub>{secretFundsEquity && secretFundsEquity.toString() || t(`N/A`)}
+            <sub>$</sub>{secretFundsEquity && toDecimalPlaces(secretFundsEquity, 2) || t(`N/A`)}
           </div>
 
           <div className={cn(styles.buttons, styles.secretFunds)}>
