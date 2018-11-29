@@ -51,7 +51,6 @@
       "package.json"
     ],
     "extraResources": [
-      "bin",
       "locales"
     ],
     "dmg": {
@@ -69,9 +68,17 @@
         }
       ]
     },
+    "mac": {
+      "extraResources": [
+        "bin/macos"
+      ]
+    },
     "win": {
       "target": [
         "nsis"
+      ],
+      "extraResources": [
+        "bin/windows"
       ]
     },
     "linux": {
@@ -79,7 +86,10 @@
         "deb",
         "AppImage"
       ],
-      "category": "Development"
+      "category": "Development",
+      "extraResources": [
+        "bin/linux"
+      ]
     },
     "directories": {
       "buildResources": "resources",

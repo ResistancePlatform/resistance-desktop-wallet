@@ -49,7 +49,7 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
     const { price } = orderBook.asks[0]
 
     const dexFee = RESDEX.dexFee.div(Decimal('100'))
-    const divider = price.plus(price.times(dexFee)).plus(txFee).plus(txFee)
+    const divider = price.times(Decimal('1.1')).plus(price.times(dexFee)).plus(txFee)
 
 		const requestOpts = {
 			type: 'buy',
