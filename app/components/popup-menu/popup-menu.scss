@@ -6,9 +6,7 @@
   text-align: left;
   white-space: nowrap;
   z-index: 1000;
-  left: 100%;
-  top: 2.2rem;
-  transform: translateX(-100%);
+  top: 2.1rem;
 }
 
 .menu {
@@ -20,7 +18,7 @@
 
   border-radius: 0.35rem;
 
-  box-shadow: 5px 5px 59px -2px $POPUP_MENU_SHADOW_COLOR;
+  box-shadow: 0.3125rem 0.3125rem 3.6875rem -0.125rem $BASE_COLOR_SHADOW;
 }
 
 .menuItem {
@@ -29,11 +27,12 @@
   border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
   user-select: none;
 
-  color: $POPUP_MENU_FONT_COLOR;
+  color: $POPUP_MENU_FONT_COLOR !important;
   font-size: 0.65rem;
+  font-weight: 100;
 
   &:hover {
-    color: $BASE_COLOR_PURPLE;
+    color: $BASE_COLOR_PURPLE !important;
   }
 
   &.disabled {
@@ -44,7 +43,6 @@
   &.disabled:hover {
     color: $BASE_COLOR_FONT_GRAY;
   }
-
 
   text-transform: uppercase;
 }

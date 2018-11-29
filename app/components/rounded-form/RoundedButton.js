@@ -2,7 +2,7 @@ import React from 'react'
 import cn from 'classnames'
 
 import { translate } from '~/i18next.config'
-import GenericControl, { GenericProps } from './GenericControl'
+import GenericButton, { GenericButtonProps } from './GenericButton'
 
 import animatedSpinner from '~/assets/images/animated-spinner.svg'
 import styles from './RoundedButton.scss'
@@ -10,25 +10,20 @@ import styles from './RoundedButton.scss'
 
 const t = translate('resdex')
 
-export type Props = {
-  ...GenericProps,
+export type RoundedButtonProps = {
+  ...GenericButtonProps,
   type?: string,
-  onClick?: () => boolean,
   important?: boolean,
   spinner?: boolean,
   spinnerTooltip?: string,
-  disabled?: boolean
+  glyph?: string
 }
 
-export default class RoundedButton extends GenericControl {
-  props: Props
+export default class RoundedButton extends GenericButton {
+  props: RoundedButtonProps
 
-  onClickHandler(event) {
-    event.stopPropagation()
-    if (this.props.onClick) {
-      this.props.onClick(event)
-    }
-    return false
+  renderAddon() {
+    return null
   }
 
   renderControl() {
@@ -44,6 +39,10 @@ export default class RoundedButton extends GenericControl {
         onKeyDown={e => [13, 32].includes(e.keyCode) ? this.onClickHandler(e) : false}
         disabled={this.props.disabled}
       >
+        {this.props.glyph &&
+          <div className={cn('icon', styles.glyph, styles[this.props.glyph])} />
+        }
+
         {this.props.spinner &&
           <img
             className={styles.spinner}
@@ -52,7 +51,10 @@ export default class RoundedButton extends GenericControl {
             title={this.props.spinnerTooltip}
           />
         }
+
         {this.props.children && this.props.children}
+
+        {this.renderAddon()}
       </button>
     )
   }

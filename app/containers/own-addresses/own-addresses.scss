@@ -1,62 +1,11 @@
 @import "~/assets/styles/vars.scss";
+@import "~/assets/styles/section.scss";
 @import "~/assets/styles/generic-component.scss";
 
-$TOP_BAR_HEIGHT: 5rem;
-
-.ownAddressesContainer {
-    padding: 2rem;
-    min-width: 30rem;
-}
-
-.topBar {
-    min-height: $TOP_BAR_HEIGHT;
-    height: $TOP_BAR_HEIGHT;
-
-    align-items: center;
-    overflow: visible;
-}
-
-.topBarTitle {
-  font-size: 1.25rem;
-  font-weight: 100;
-}
-
-.topBarButtonContainer {
-  text-align: right;
-
-  button {
-    margin-left: 0.5rem;
-    @include roundedButton();
-    cursor: pointer;
-  }
-
-}
-
-.addAddressButtonContainer {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-
-    .arrowDownIcon:before {
-      content: "\e90e";
-      font-size: 1.2rem;
-      position: absolute;
-      right: 0.5rem;
-      top: 0.5rem;
-    }
-}
-
-.addNewAddressButton {
-    position: relative;
-    @include roundedButton(true);
-    padding-right: 2rem;
-}
-
-
 .dropdownMenu {
-    position: relative;
-    white-space: nowrap;
-    z-index: 1000;
+  position: relative;
+  white-space: nowrap;
+  z-index: 1000;
 }
 
 .merging {

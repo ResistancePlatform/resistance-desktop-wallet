@@ -7,31 +7,6 @@
   display: block;
 }
 
-.tabList {
-  color: $BASE_COLOR_FONT_GRAY;
-  font-weight: 200;
-  font-size: 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid $BASE_COLOR_BORDER_BLUE;
-}
-
-.tab {
-  padding: 0.8rem 0.3rem;
-  margin: 0 1.2rem;
-  text-align: left;
-}
-
-.selectedTab {
-  background: transparent;
-  color: $BASE_COLOR_WHITE;
-  border-bottom: 1px solid $BASE_COLOR_LIGHT_BLUE;
-}
-
-.selectedTabPanel {
-  padding: 0;
-  margin: 0;
-}
-
 .resDexContainer {
   justify-content: start;
   display: inline;

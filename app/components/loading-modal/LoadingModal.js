@@ -36,7 +36,7 @@ class LoadingModal extends Component<Props> {
 }
 
 const mapStateToProps = (state) => ({
-	newAddressDialog: state.addressBook.newAddressDialog
+	newAddressModal: state.addressBook.newAddressModal
 })
 
 export default connect(mapStateToProps, null)(translate('other')(LoadingModal))

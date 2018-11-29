@@ -168,25 +168,21 @@ export class ResDexApiService {
 		}
 
 		if (useElectrum && currency.electrumServers) {
-			const queries = currency.electrumServers.map(server => this.query({
-				method: 'electrum',
-				coin: symbol,
-				ipaddr: server.host,
-				port: server.port,
-			}))
-
-			const responses = await Promise.all(queries)
-			const success = responses.filter(response => response.result === 'success').length > 0
-
-			if (!success) {
-        throw new Error(t(`Could not connect to {{symbol}} Electrum server`, { symbol }))
-			}
-
-			return success
+      return this::enableElectrumServers(symbol)
 		}
 
-		const response = await this.query({ method: 'enable', coin: symbol })
-		return response.status === 'active'
+    let response
+
+    try {
+      response = await this.query({ method: 'enable', coin: symbol })
+    } catch(err) {
+      if (err.message.includes('couldnt find coin locally installed')) {
+        log.error(`Can't enable a currency that's not installed locally, re-trying in Electrum mode`)
+        return this::enableElectrumServers(symbol)
+      }
+    }
+
+    return response.status === 'active'
   }
 
   disableCurrency(coin: string) {
@@ -280,36 +276,24 @@ export class ResDexApiService {
 
 }
 
-/**
- * Private method. Fetches raw transactions, filters out and calculates amount values for a given address.
- *
- */
-async function fetchTransactionsForAddress(coin: string, address: string, txids: string[]) {
-  const rawTransactions = await pMap(
-    txids,
-    txid => this.getRawTransaction(coin, txid), { concurrency: 2 }
-  )
+async function enableElectrumServers(symbol) {
+  const currency = getCurrency(symbol)
 
-  const transactions = rawTransactions.map(rawTransaction => {
-    const amount = rawTransaction.vout.reduce((previousValue, vout) => {
-      const { scriptPubKey } = vout
+  const queries = currency.electrumServers.map(server => this.query({
+    method: 'electrum',
+    coin: symbol,
+    ipaddr: server.host,
+    port: server.port,
+  }))
 
-      if (!scriptPubKey) {
-        return previousValue
-      }
+  const responses = await Promise.all(queries)
+  const success = responses.filter(response => response.result === 'success').length > 0
 
-      const hasAddress = scriptPubKey.addresses.find(voutAddress => voutAddress === address)
-      return hasAddress ? previousValue.plus(Decimal(vout.value)) : previousValue
+  if (!success) {
+    throw new Error(t(`Could not connect to {{symbol}} Electrum server`, { symbol }))
+  }
 
-    }, Decimal(0))
-
-    return {
-      txid: rawTransaction.txid,
-      amount,
-    }
-  })
-
-  return transactions
+  return success
 }
 
 async function withdrawBtcFork(opts) {

@@ -30,7 +30,7 @@ const RESDEX = {
     },
     {
       symbol: 'HODLC',
-      useElectrum: false
+      useElectrum: true
     },
   ]
 }

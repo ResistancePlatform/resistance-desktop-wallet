@@ -52,20 +52,20 @@ class NaviBar extends Component<Props> {
 				{/* Route items */}
 				<div className={cn(styles.overview, getItemClasses('/overview'))}>
           <i />
-					<NavLink to="/">{t(`Overview`)}</NavLink>
+					<NavLink to="/">{t(`Home`)}</NavLink>
 				</div>
+        <div className={cn(styles.sendCash, getItemClasses('/send-cash'))}>
+          <i />
+          <NavLink to="/send-cash">{t(`Send Cash`)}</NavLink>
+        </div>
 				<div className={cn(styles.ownAddresses, getItemClasses('/own-addresses'))}>
           <i />
-					<NavLink to="/own-addresses">{t(`Own Addresses`)}</NavLink>
+					<NavLink to="/own-addresses">{t(`My Addresses`)}</NavLink>
 				</div>
-				<div className={cn(styles.sendCash, getItemClasses('/send-cash'))}>
+        <div className={cn(styles.addressBook, getItemClasses('/address-book'))}>
           <i />
-					<NavLink to="/send-cash">{t(`Send Cash`)}</NavLink>
-				</div>
-				<div className={cn(styles.addressBook, getItemClasses('/address-book'))}>
-          <i />
-					<NavLink to="/address-book">{t(`Address Book`)}</NavLink>
-				</div>
+          <NavLink to="/address-book">{t(`Address Book`)}</NavLink>
+        </div>
 				<div className={cn(styles.settings, getItemClasses('/settings'))}>
           <i />
 					<NavLink to="/settings">{t(`Settings`)}</NavLink>

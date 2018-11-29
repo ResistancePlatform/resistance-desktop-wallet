@@ -5,11 +5,14 @@
 }
 
 .tabList {
-  font-size: 0.7rem;
+  color: $BASE_COLOR_FONT_GRAY;
   margin: 0;
   padding: 0;
-  text-align: center;
   user-select: none;
+  font-weight: 200;
+  font-size: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid $BASE_COLOR_BORDER_BLUE;
 }
 
 .tab {
@@ -19,18 +22,22 @@
   bottom: -1px;
   position: relative;
   list-style: none;
-  padding: 4px 12px;
   cursor: pointer;
   text-transform: uppercase;
   border-radius: 5px 5px 0 0;
-  margin-right: 2px;
   white-space: nowrap;
+  outline: none;
+
+  padding: 0.8rem 0.3rem;
+  margin: 0 1.2rem;
+  text-align: left;
 }
 
 .selectedTab {
-  border-bottom: none;
   z-index: 3;
-  background-color: $BASE_COLOR_PURPLE;
+  background: transparent;
+  color: $BASE_COLOR_WHITE;
+  border-bottom: 1px solid $BASE_COLOR_LIGHT_BLUE;
 }
 
 .tabPanel {
@@ -43,6 +50,7 @@
   display: block;
   border-radius: 6px;
   background-color: transparent;
-  padding: 6px;
   height: 100%;
+  padding: 0;
+  margin: 0;
 }

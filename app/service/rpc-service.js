@@ -179,8 +179,8 @@ export class RpcService {
 
     const combineQueryPromise = Promise.all(queryPromiseArr)
       .then(result => {
-        const combinedTransactionList = [...result[0], ...result[1]]
-        const sortedByDateTransactions = combinedTransactionList.sort((trans1, trans2) => (
+        const combinedTransactionsList = [...result[0], ...result[1]]
+        const sortedByDateTransactions = combinedTransactionsList.sort((trans1, trans2) => (
           new Date(trans2.timestamp) - new Date(trans1.timestamp)
         ))
         return { transactions: sortedByDateTransactions }
@@ -507,7 +507,7 @@ export class RpcService {
 	 * @param {string} transactionId
 	 * @memberof RpcService
 	 */
-	getTransactionDetail(transactionId: string) {
+	getTransactionDetails(transactionId: string) {
 		const client = getClientInstance()
 		const queryPromise = client.command([{ method: 'gettransaction', parameters: [transactionId] }])
 
@@ -633,7 +633,7 @@ async function getPublicTransactionsPromise(client: Client) {
   ]
 
   const noAddressMessage = t(`Z address is not listed in the wallet`)
-  const publicAddressMessage = t(`R (public)`)
+  const publicAddressMessage = t(`R (Public)`)
 
   return client.command(command)
     .then(result => result[0])
@@ -641,7 +641,7 @@ async function getPublicTransactionsPromise(client: Client) {
       if (Array.isArray(result)) {
         return result.map(
           originalTransaction => ({
-            type: `\u2605 ${publicAddressMessage}`,
+            type: `${publicAddressMessage}`,
             category: originalTransaction.category,
             confirmations: originalTransaction.confirmations,
             amount: Decimal(originalTransaction.amount),
@@ -690,8 +690,8 @@ async function getPrivateTransactionsPromise(client: Client) {
       }
     }
 
-    const tempTransactionList = queryResultWithAddressArr.map(result => ({
-      type: `\u2605 T (Private)`,
+    const tempTransactionsList = queryResultWithAddressArr.map(result => ({
+      type: t(`T (Private)`),
       category: 'receive',
       confirmations: 0,
       amount: Decimal(result.amount),
@@ -702,15 +702,15 @@ async function getPrivateTransactionsPromise(client: Client) {
 
     // At this moment, we got all transactions for each private address, but each one of them is missing the `confirmations` and `time`,
     // we need to get that info by viewing the detail of the transaction, and then put it back !
-    for (let index = 0; index < tempTransactionList.length; index += 1) {
-      const tempTransaction = tempTransactionList[index];
+    for (let index = 0; index < tempTransactionsList.length; index += 1) {
+      const tempTransaction = tempTransactionsList[index];
       /* eslint-disable-next-line no-await-in-loop */
-      const transactionDetail = await client.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
-      tempTransaction.confirmations = transactionDetail.confirmations
-      tempTransaction.timestamp = transactionDetail.time
+      const transactionDetails = await client.command(getWalletTransactionCmd(tempTransaction.transactionId)).then(tempResult => tempResult[0])
+      tempTransaction.confirmations = transactionDetails.confirmations
+      tempTransaction.timestamp = transactionDetails.time
     }
 
-    return tempTransactionList
+    return tempTransactionsList
   }
 
   return []

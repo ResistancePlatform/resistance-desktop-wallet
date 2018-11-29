@@ -6,7 +6,7 @@ import { Decimal } from 'decimal.js'
 import { Observable, of, from, concat, merge } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { switchMap, map, mapTo, catchError } from 'rxjs/operators'
-import { toastr, actions as toastrActions } from 'react-redux-toastr'
+import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
@@ -47,11 +47,10 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 
 const getCurrenciesFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexAccountsActions.getCurrenciesFailed),
-  map(action => (toastrActions.add({
-    type: 'error',
-    title: t(`Error getting currencies from ResDEX`),
-    message: action.payload.errorMessage
-  })))
+  map(action => {
+    toastr.error(t(`Error getting currencies from ResDEX`), action.payload.errorMessage)
+    return ResDexAccountsActions.empty()
+  })
 )
 
 
@@ -111,21 +110,16 @@ const updateCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.
       }),
       catchError(err => {
         log.error(`Can't restart currency ${symbol}`, err)
-        return of(toastrActions.add({
-          type: 'error',
-          title: t(`Error enabling ${currencyName}, check the application log for details`),
-        }))
+        toastr.error(t(`Error enabling {{currencyName}}, check the application log for details`, { currencyName }))
+        return of(ResDexAccountsActions.empty())
       })
     )
 
+    toastr.success(
+      t(`Currency {{currencyName}} ({{symbol}}) updated`, { currencyName, symbol })
+    )
+
     return concat(
-      of(toastrActions.add({
-        type: 'success',
-        title: t(`Currency {{currencyName}} ({{symbol}}) updated`, {
-          currencyName,
-          symbol,
-        }),
-      })),
       of(ResDexAccountsActions.closeAddCurrencyModal()),
       restartCurrencyObservable
     )
@@ -175,22 +169,15 @@ const addCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.pip
       switchMap(() => of(ResDexAccountsActions.getCurrencies())),
       catchError(err => {
         log.error(`Can't enable currency ${symbol}`, err)
-        return of(toastrActions.add({
-          type: 'error',
-          title: t(`Error enabling ${currencyName}, check the application log for details`),
-        }))
+        toastr.error(t(`Error enabling {{currencyName}}, check the application log for details`, { currencyName }))
+        return of(ResDexAccountsActions.empty())
       })
     )
 
+    toastr.success(t(`Currency {{currency}} ({{symbol}}) added`, { currencyName, symbol }))
+
     return concat(
       of(ResDexAccountsActions.updateEnabledCurrencies(enabledCurrencies)),
-      of(toastrActions.add({
-        type: 'success',
-        title: t(`Currency {{currency}} ({{symbol}}) added`, {
-          currencyName,
-          symbol,
-        }),
-      })),
       of(ResDexAssetsActions.getCurrencyHistory()),
       of(ResDexAccountsActions.selectCurrency(symbol)),
       of(ResDexAccountsActions.closeAddCurrencyModal()),
@@ -205,11 +192,9 @@ const copySmartAddressEpic = (action$: ActionsObservable<any>, state$) => action
     const { currencies } = state$.value.resDex.accounts
     const currency = currencies[action.payload.symbol]
     clipboard.writeText(currency.address)
-
-    return toastrActions.add({
-      type: 'success',
-      title: t(`{{currency}} smart address copied to clipboard`, { currency: getCurrencyName(action.payload.symbol) })
-    })
+    toastr.success(t(`{{currency}} smart address copied to clipboard`,
+                     { currency: getCurrencyName(action.payload.symbol) }))
+    return ResDexAccountsActions.empty()
   })
 )
 
@@ -227,19 +212,14 @@ const deleteCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.
       switchMap(() => of(ResDexAccountsActions.empty())),
       catchError(err => {
         log.error(`Can't disable currency ${symbol}`, err)
-        return of(toastrActions.add({
-          type: 'error',
-          title: t(`Error disabling ${currencyName}, check the application log for details`),
-        }))
+        toastr.error(t(`Error disabling {{currencyName}}, check the application log for details`, { currencyName }))
+        return of(ResDexAccountsActions.empty())
       })
     )
 
+    toastr.success(t(`Currency {{currencyName}} ({{symbol}}) deleted`, { currencyName, symbol }))
     return concat(
       of(ResDexAccountsActions.updateEnabledCurrencies(filteredCurrencies)),
-      of(toastrActions.add({
-        type: 'success',
-        title: t(`Currency {{currencyName}} ({{symbol}}) deleted`, { currencyName, symbol }),
-      })),
       of(ResDexAccountsActions.selectCurrency('RES')),
       disableCurrencyObservable
     )

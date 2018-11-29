@@ -1,11 +1,25 @@
 @import "~/assets/styles/vars.scss";
 
+.wrapper {
+  display: flex;
+
+  .label {
+    color: $BASE_COLOR_GRAY;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    user-select: none;
+    align-self: center;
+  }
+
+  margin-bottom: 0.75rem;
+}
+
 .container {
   display: inline-block;
 
   width: 2.8rem;
   height: 1.4rem;
-  margin: 0 0.6rem 0.75rem 0.6rem;
+  margin: 0 0.6rem;
   padding: 0.2rem;
 
   cursor: pointer;

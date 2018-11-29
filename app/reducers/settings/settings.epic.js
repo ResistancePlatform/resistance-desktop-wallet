@@ -5,9 +5,9 @@ import * as fs from 'fs'
 import { promisify } from 'util'
 import { remote, ipcRenderer } from 'electron'
 import { tap, filter, delay, mergeMap, flatMap, switchMap, map, mapTo, catchError } from 'rxjs/operators'
-import { of, from, bindCallback, concat, merge } from 'rxjs'
+import { of, from, bindCallback, concat, merge, defer } from 'rxjs'
 import { ofType } from 'redux-observable'
-import { toastr, actions as toastrActions } from 'react-redux-toastr'
+import { toastr } from 'react-redux-toastr'
 
 import { i18n, translate } from '~/i18next.config'
 import { getEnsureLoginObservable } from '~/utils/auth'
@@ -63,6 +63,23 @@ const kickOffChildProcessesEpic = (action$: ActionsObservable<Action>, state$) =
   })
 )
 
+const toggleLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(SettingsActions.toggleLocalNode),
+  map(() => {
+    const { childProcessesStatus } = state$.value.settings
+		switch (childProcessesStatus.NODE) {
+			case 'RUNNING':
+			case 'MURDER FAILED':
+				return SettingsActions.stopLocalNode()
+			case 'NOT RUNNING':
+			case 'FAILED':
+				return SettingsActions.startLocalNode()
+			default:
+		}
+    return SettingsActions.empty()
+	})
+)
+
 const startLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.startLocalNode),
   map(() => {
@@ -88,6 +105,17 @@ const stopLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action
   mapTo(SettingsActions.disableMiner())
 )
 
+const toggleMinerEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(SettingsActions.toggleMiner),
+  map(() => {
+    const { isMinerEnabled } = state$.value.settings
+    const nextAction = isMinerEnabled
+      ? SettingsActions.disableMiner()
+      : SettingsActions.enableMiner()
+		return nextAction
+  })
+)
+
 const enableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.enableMiner),
 	tap(() => { minerService.start() }),
@@ -98,6 +126,17 @@ const disableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.disableMiner),
 	tap(() => { minerService.stop() }),
   mapTo(SettingsActions.empty())
+)
+
+const toggleTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(SettingsActions.toggleTor),
+  map(() => {
+    const { isTorEnabled } = state$.value.settings
+    const nextAction = isTorEnabled
+      ? SettingsActions.disableTor()
+      : SettingsActions.enableTor()
+		return nextAction
+  })
 )
 
 const enableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
@@ -193,10 +232,7 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
       processName: 'NODE',
       onSuccess: concat(
         of(AuthActions.ensureLogin(t(`Your restored wallet password is required`), true)),
-        of(toastrActions.add({
-          type: 'success',
-          title: t(`Wallet restored successfully.`)
-        }))
+        of(defer(() => toastr.success(t(`Wallet restored successfully.`)))),
       ),
       onFailure: of(SettingsActions.restoringWalletFailed()),
       action$
@@ -210,10 +246,7 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
         const walletName = path.basename(walletFileName, path.extname(walletFileName))
         config.set('wallet.name', walletName)
         return concat(
-          of(toastrActions.add({
-            type: 'info',
-            title: t(`Restarting the local node with the new wallet...`)
-          })),
+          of(defer(() => toastr.info(t(`Restarting the local node with the new wallet...`)))),
           of(SettingsActions.restartLocalNode()),
           startLocalNodeObservable
         )
@@ -277,11 +310,14 @@ const childProcessMurderFailedEpic = (action$: ActionsObservable<Action>) => act
 export const SettingsEpics = (action$, state$) => merge(
   updateLanguageEpic(action$, state$),
 	kickOffChildProcessesEpic(action$, state$),
+  toggleLocalNodeEpic(action$, state$),
 	startLocalNodeEpic(action$, state$),
   restartLocalNodeEpic(action$, state$),
 	stopLocalNodeEpic(action$, state$),
+  toggleMinerEpic(action$, state$),
   enableMinerEpic(action$, state$),
 	disableMinerEpic(action$, state$),
+  toggleTorEpic(action$, state$),
 	enableTorEpic(action$, state$),
 	disableTorEpic(action$, state$),
   initiateWalletBackupEpic(action$, state$),

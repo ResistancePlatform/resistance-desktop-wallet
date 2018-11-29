@@ -1,0 +1,44 @@
+@import "~/assets/styles/vars.scss";
+@import "~/assets/styles/section.scss";
+
+.row {
+  cursor: pointer;
+
+  .categoryColumn {
+    display: flex;
+  }
+
+  .categoryIcon {
+    width: 1.2rem;
+    border: none;
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.9rem;
+    position: relative;
+    padding: 0;
+
+    &:before {
+      position: absolute;
+      top: 0.02rem;
+    }
+  }
+
+  .receive:before {
+    content: '\e919';
+  }
+
+  .send:before {
+    content: '\e91b';
+  }
+
+  .generate:before {
+    content: '\e91a';
+  }
+
+  .immature:before {
+    content: '\e918';
+  }
+
+  .address {
+    margin-right: 3rem;
+  }
+}
