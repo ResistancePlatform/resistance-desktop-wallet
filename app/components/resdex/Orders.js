@@ -50,13 +50,31 @@ class ResDexOrders extends Component<Props> {
     )
   }
 
+  getBaseCurrencyAmount(order) {
+    let baseCurrencyAmount = null
+
+    if (!order.isPrivate) {
+      ({ baseCurrencyAmount } = order)
+    } else if (order.privacy.baseResOrderUuid) {
+      const { swapHistory } = this.props.orders
+      const baseResOrder = swapHistory[order.privacy.baseResOrderUuid]
+      ({ baseCurrencyAmount } = baseResOrder || {})
+    }
+
+    if (!baseCurrencyAmount) {
+      baseCurrencyAmount = order.privacy.expectedBaseCurrencyAmount
+    }
+
+    return baseCurrencyAmount
+  }
+
 	/**
    * @memberof ResDexOrders
 	 */
   getListRowRenderer(order) {
     const { i18n } = this.props
 
-    const { baseCurrency, quoteCurrency } = order.isPrivate ? order.privacy : order
+    const { baseCurrency, quoteCurrency, status } = order.isPrivate ? order.privacy : order
 
     return (
       <UniformListRow
@@ -74,13 +92,13 @@ class ResDexOrders extends Component<Props> {
           -{toDecimalPlaces(Decimal(order.quoteCurrencyAmount))} {quoteCurrency}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.greater)}>
-          {toDecimalPlaces(Decimal(order.baseCurrencyAmount))} {baseCurrency}
+          {toDecimalPlaces(this.getBaseCurrencyAmount())} {baseCurrency}
         </UniformListColumn>
         <UniformListColumn>
           <i className={cn('icon', styles.private, { [styles.enabled]: order.isPrivate })} />
         </UniformListColumn>
         <UniformListColumn>
-          <span className={cn(styles.status, styles[order.isPrivate ? order.privacy.status : order.status])}>
+          <span className={cn(styles.status, styles[status])}>
             {getOrderStatusName(order)}
           </span>
         </UniformListColumn>

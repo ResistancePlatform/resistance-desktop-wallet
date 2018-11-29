@@ -254,6 +254,10 @@ function formatSwap(data) {
       swap.privacy.status = message.status
     }
 
+    if (message.method === 'set_private_order_base_res_uuid' && swap.isPrivate) {
+      swap.privacy.baseResOrderUuid = message.uuid
+    }
+
     if (message.method === 'connected') {
       swap.status = 'matched'
       swap.progress = MATCHED_STEP / TOTAL_PROGRESS_STEPS

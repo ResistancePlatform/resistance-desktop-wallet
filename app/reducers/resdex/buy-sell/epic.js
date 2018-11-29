@@ -66,7 +66,7 @@ const createMarketOrderEpic = (action$: ActionsObservable<Action>, state$) => ac
     const orderOptions = {
       baseCurrency,
       quoteCurrency,
-      quoteAmount: maxRel,
+      quoteCurrencyAmount: maxRel,
       price,
     }
 
@@ -85,7 +85,7 @@ const getCreateOrderObservable = (processName, options, privacy, getSuccessObser
   const {
     baseCurrency,
     quoteCurrency,
-    quoteAmount,
+    quoteCurrencyAmount,
     price
   } = options
 
@@ -100,8 +100,8 @@ const getCreateOrderObservable = (processName, options, privacy, getSuccessObser
     baseCurrency,
     quoteCurrency,
     price: divider,
-    amount: Decimal(quoteAmount).dividedBy(price).toDP(8, Decimal.ROUND_FLOOR),
-    total: Decimal(quoteAmount).toDP(8, Decimal.ROUND_FLOOR)
+    amount: Decimal(quoteCurrencyAmount).dividedBy(price).toDP(8, Decimal.ROUND_FLOOR),
+    total: Decimal(quoteCurrencyAmount).toDP(8, Decimal.ROUND_FLOOR)
   }
 
   log.debug(`Submitting a swap`, requestOpts)
@@ -137,13 +137,13 @@ const getCreateOrderObservable = (processName, options, privacy, getSuccessObser
 
 const getRelResOrderObservable = (privacy, getSuccessObservable, state$) => {
     const { quoteCurrency, orderBook } = state$.value.resDex.buySell
-    const { quoteAmount } = privacy
+    const { quoteCurrencyAmount } = privacy
     const { price } = orderBook.resQuote.asks[0]
 
     const orderOptions = {
       baseCurrency: 'RES',
       quoteCurrency,
-      quoteAmount,
+      quoteCurrencyAmount,
       price,
     }
     log.debug(`Private market order stage 1, ${quoteCurrency} -> RES`, orderOptions)
@@ -223,7 +223,7 @@ const getResBaseOrderObservable = (privacy, getSuccessObservable, state$) => {
   const orderOptions = {
     baseCurrency,
     quoteCurrency: 'RES',
-    quoteAmount: balance.minus(initialPrivacy2ResBalance),
+    quoteCurrencyAmount: balance.minus(initialPrivacy2ResBalance),
     price,
   }
 
@@ -258,16 +258,29 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
 	ofType(ResDexBuySellActions.createPrivateOrder),
   switchMap(() => {
     const { currencies } = state$.value.resDex.accounts
-    const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
+    const { baseCurrency, quoteCurrency, orderBook } = state$.value.resDex.buySell
     const { maxRel } = state$.value.roundedForm.resDexBuySell.fields
+
+    // Calculate expected amount to receive to display in the orders list
+    const { baseResPrice } = orderBook.baseRes.asks[0]
+    const { resQuotePrice } = orderBook.resQuote.asks[0]
+    const dexFee = RESDEX.dexFee.div(Decimal('100'))
+    const expectedBaseCurrencyAmount = (
+      maxRel
+      .dividedBy(resQuotePrice)
+      .plus(resQuotePrice.times(dexFee))
+      .times(baseResPrice).minus()
+    )
 
     const privacy = {
       baseCurrency,
       quoteCurrency,
-      quoteAmount: maxRel,
+      quoteCurrencyAmount: maxRel,
+      expectedBaseCurrencyAmount,
       initialMainResBalance: currencies.RESDEX.RES.balance,
       // initialPrivacy2ResBalance: currencies.RESDEX_PRIVACY2.RES.balance,
-      initialPrivacy2ResBalance: Decimal(53.33624763)
+      initialPrivacy2ResBalance: Decimal(53.33624763),
+      baseResOrderUuid: null
     }
 
     // 1. Create order Rel -> RES on process1
@@ -283,7 +296,8 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
       resBaseOrderUuid = uuid
 
       return merge(
-        of(ResDexBuySellActions.setPrivateOrderStatus(resBaseOrderUuid , 'swapping_res_base')),
+        of(ResDexBuySellActions.setPrivateOrderStatus(uuid, 'swapping_res_base')),
+        of(ResDexBuySellActions.linkPrivateOrderToBaseResOrder(uuid, resBaseOrderUuid)),
         getPollResBaseOrderObservable(privacy, state$),
       )
     }
@@ -340,6 +354,18 @@ const createMarketOrderFailedEpic = (action$: ActionsObservable<Action>) => acti
   })
 )
 
+const linkPrivateOrderToBaseResOrderEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexBuySellActions.linkPrivateOrderToBaseResOrder),
+  map(action => {
+    swapDB.updateSwapData({
+      uuid: action.payload.uuid,
+      method: 'set_private_order_base_res_uuid',
+      baseResOrderUuid: action.payload.baseResOrderUuid,
+    })
+    return ResDexBuySellActions.empty()
+  })
+)
+
 const setPrivateOrderStatusEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.setPrivateOrderStatus),
   map(action => {
@@ -361,5 +387,6 @@ export const ResDexBuySellEpic = (action$, state$) => merge(
   getOrderBookEpic(action$, state$),
   getOrderBookFailedEpic(action$, state$),
   setPrivateOrderStatusEpic(action$, state$),
+  linkPrivateOrderToBaseResOrderEpic(action$, state$),
 )
 

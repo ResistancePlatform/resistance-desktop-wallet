@@ -24,6 +24,7 @@ export const ResDexBuySellActions = createActions(
     CREATE_PRIVATE_ORDER_FAILED: (errorMessage: string) => ({ errorMessage }),
 
     SET_PRIVATE_ORDER_STATUS: (uuid: string, status: PrivateOrderStatus) => ({uuid, status}),
+    LINK_PRIVATE_ORDER_TO_BASE_RES_ORDER: (uuid: string, baseResOrderUuid: string) => ({uuid, baseResOrderUuid}),
 
     CREATE_LIMIT_ORDER: undefined,
   },

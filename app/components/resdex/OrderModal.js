@@ -45,10 +45,8 @@ class OrderModal extends Component<Props> {
 	render() {
     const { t } = this.props
 
-    const order = {
-      ...this.getOrder(),
-      enhancedPrivacy: false,
-    }
+    const order = this.getOrder()
+    const status = order.isPrivate ? order.privacy.status : order.status
 
     return (
       <div className={styles.overlay}>
@@ -67,7 +65,7 @@ class OrderModal extends Component<Props> {
 
               {order.status &&
                 <div className={styles.statusContainer}>
-                  <div className={cn(orderStyles.status, orderStyles[order.status])}>
+                  <div className={cn(orderStyles.status, orderStyles[status])}>
                     {getOrderStatusName(order)}
                   </div>
                 </div>
@@ -76,7 +74,7 @@ class OrderModal extends Component<Props> {
 
           </div>
 
-          <ul className={styles.stagesContainer}>
+          <ul className={cn(styles.stagesContainer, styles.slider, {[styles.close]: status === 'privatizing'})}>
             <li className={cn({ [styles.active]: this.getIsStageComplete('myfee') })}>
               {t(`My fee`)}
             </li>

@@ -39,6 +39,19 @@ $orderModalWidth: 28.3125rem;
   margin: 0;
   margin-bottom: 2rem;
 
+  &.slider {
+    overflow-y: hidden;
+    max-height: 2rem;
+
+    transition-property: all;
+    transition-duration: .1s;
+    transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+
+    &.close {
+      max-height: 0;
+    }
+  }
+
   li {
     width: 20%;
     text-align: center;
