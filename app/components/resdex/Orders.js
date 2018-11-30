@@ -65,7 +65,7 @@ class ResDexOrders extends Component<Props> {
       baseCurrencyAmount = order.privacy.expectedBaseCurrencyAmount
     }
 
-    return baseCurrencyAmount
+    return Decimal(baseCurrencyAmount)
   }
 
 	/**
@@ -92,7 +92,7 @@ class ResDexOrders extends Component<Props> {
           -{toDecimalPlaces(Decimal(order.quoteCurrencyAmount))} {quoteCurrency}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.greater)}>
-          {toDecimalPlaces(this.getBaseCurrencyAmount())} {baseCurrency}
+          {toDecimalPlaces(this.getBaseCurrencyAmount(order))} {baseCurrency}
         </UniformListColumn>
         <UniformListColumn>
           <i className={cn('icon', styles.private, { [styles.enabled]: order.isPrivate })} />

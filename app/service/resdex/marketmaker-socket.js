@@ -22,7 +22,7 @@ class MarketmakerSocket {
 		this.once = ee.once.bind(ee)
 
 		this.ws.addEventListener('message', this::handleMessage)
-    log.debug('Websocket initialized')
+    log.debug('Websocket initialized on endpoint', endpoint)
 	}
 
 	getResponse = queueId => this.ee.once(`id_${queueId}`)
@@ -38,7 +38,7 @@ async function handleMessage(event) {
     this.ee.emit(`id_${queueId}`, message)
   }
 
-  log.debug('Handling websocket message', queueId)
+  log.debug('Handling websocket message', JSON.stringify(message))
 
   const uuids = getStore().getState().resDex.orders.swapHistory.map(swap => swap.uuid)
 

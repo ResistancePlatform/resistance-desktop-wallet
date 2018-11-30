@@ -9,5 +9,8 @@
   "You don't have any address records yet.": "You don't have any address records yet.",
   "New address": "New address",
   "Edit": "Edit",
-  "Add": "Add"
+  "Add": "Add",
+  "Cancel": "Cancel",
+  "Copied to clipboard": "Copied to clipboard",
+  "Are you sure want to remove the address for \"{{addressName}}\"?": "Are you sure want to remove the address for \"{{addressName}}\"?"
 }

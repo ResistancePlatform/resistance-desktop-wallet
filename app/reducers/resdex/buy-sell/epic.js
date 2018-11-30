@@ -66,7 +66,7 @@ const createMarketOrderEpic = (action$: ActionsObservable<Action>, state$) => ac
     const orderOptions = {
       baseCurrency,
       quoteCurrency,
-      quoteCurrencyAmount: maxRel,
+      quoteCurrencyAmount: Decimal(maxRel),
       price,
     }
 
@@ -243,8 +243,17 @@ const getPollResBaseOrderObservable = (uuid, state$) => {
   const pollingObservable = interval(1000).pipe(
     map(() => {
       log.debug(`Polling RES base order to complete or fail...`)
+
       const { swapHistory } = state$.value.resDex.orders
-      return swapHistory.filter(swap => swap.uuid === uuid).pop()
+      const order = swapHistory.filter(swap => swap.uuid === uuid).pop()
+
+      if (order) {
+        log.debug(`Order status`, order.status, order.privacy.status)
+      } else {
+        log.debug(`Order not found`, uuid)
+      }
+
+      return order
     }),
     filter(order => order && ['completed', 'failed'].includes(order.status)),
     take(1),
@@ -262,26 +271,28 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
     const { maxRel } = state$.value.roundedForm.resDexBuySell.fields
 
     // Calculate expected amount to receive to display in the orders list
-    const { baseResPrice } = orderBook.baseRes.asks[0]
-    const { resQuotePrice } = orderBook.resQuote.asks[0]
+    const { price: baseResPrice } = orderBook.baseRes.asks[0]
+    const { price: resQuotePrice } = orderBook.resQuote.asks[0]
     const dexFee = RESDEX.dexFee.div(Decimal('100'))
     const expectedBaseCurrencyAmount = (
-      maxRel
+      Decimal(maxRel)
       .dividedBy(resQuotePrice)
       .plus(resQuotePrice.times(dexFee))
-      .times(baseResPrice).minus()
+      .times(baseResPrice)
     )
 
     const privacy = {
       baseCurrency,
       quoteCurrency,
-      quoteCurrencyAmount: maxRel,
+      quoteCurrencyAmount: Decimal(maxRel),
       expectedBaseCurrencyAmount,
       initialMainResBalance: currencies.RESDEX.RES.balance,
       // initialPrivacy2ResBalance: currencies.RESDEX_PRIVACY2.RES.balance,
-      initialPrivacy2ResBalance: Decimal(53.33624763),
+      initialPrivacy2ResBalance: Decimal(0),
       baseResOrderUuid: null
     }
+
+    log.debug(`Privacy`, privacy)
 
     // 1. Create order Rel -> RES on process1
     // 2. Poll for the process1 RES balance
@@ -298,7 +309,7 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
       return merge(
         of(ResDexBuySellActions.setPrivateOrderStatus(uuid, 'swapping_res_base')),
         of(ResDexBuySellActions.linkPrivateOrderToBaseResOrder(uuid, resBaseOrderUuid)),
-        getPollResBaseOrderObservable(privacy, state$),
+        getPollResBaseOrderObservable(uuid, state$),
       )
     }
 

@@ -47,8 +47,9 @@ $withdrawModalWidth: 26.25rem;
   }
 
   .memo {
-    color: $BASE_COLOR_FONT_GRAY;
+    color: $BASE_COLOR_FONT_GRAY_2;
     font-size: 0.7rem;
+    text-align: justify;
 
     hr {
       border: none;

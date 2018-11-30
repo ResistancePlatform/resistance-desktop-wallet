@@ -52,5 +52,9 @@
   "Unable to start ResDEX": "Unable to start ResDEX",
   "Initializing ResDEX...": "Initializing ResDEX...",
   "Starting the local node...": "Starting the local node...",
-  "Starting the local node with the encrypted wallet...": "Starting the local node with the encrypted wallet..."
+  "Starting the local node with the encrypted wallet...": "Starting the local node with the encrypted wallet...",
+  "Invalid backup wallet password, please go back and change it.": "Invalid backup wallet password, please go back and change it.",
+  "Can't change the backup wallet password, check the application log for details.": "Can't change the backup wallet password, check the application log for details.",
+  "Changing the wallet password...": "Changing the wallet password...",
+  "Error setting the wallet password, check the application log for details.": "Error setting the wallet password, check the application log for details."
 }

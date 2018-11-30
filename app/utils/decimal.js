@@ -17,7 +17,7 @@ function flattenDecimals(object) {
   Object.keys(object).forEach(key => {
     const value = object[key]
 
-    result[key] = typeof value === typeof Decimal(0)
+    result[key] = value && typeof value === typeof Decimal(0)
       ? Number(value.toString())
       : value
   })

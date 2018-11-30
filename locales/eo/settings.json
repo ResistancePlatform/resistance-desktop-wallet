@@ -77,5 +77,16 @@
   "Restarting the local node with the new wallet...": "Restarting the local node with the new wallet...",
   "Wallet file \"{{walletFileName}}\" already exists.": "Wallet file \"{{walletFileName}}\" already exists.",
   "Failed to restore the wallet": "Failed to restore the wallet",
-  "ResDEX Log": "ResDEX Log"
+  "ResDEX Log": "ResDEX Log",
+  "Services status": "Services status",
+  "Get Info": "Get Info",
+  "Node": "Node",
+  "Miner": "Miner",
+  "Tor": "Tor",
+  "ResDEX 1": "ResDEX 1",
+  "ResDEX 2": "ResDEX 2",
+  "ResDEX 3": "ResDEX 3",
+  "Repeat password": "Repeat password",
+  "Passwords do not match": "Passwords do not match",
+  "Manage daemons": "Manage daemons"
 }
