@@ -36,6 +36,16 @@ const getOrderBookEpic = (action$: ActionsObservable<Action>, state$) => action$
           resQuote,
           baseRes
         }
+        log.debug('Order book prices')
+        if (baseQuote.asks.length) {
+          log.debug('baseQuote', baseQuote.asks[0].price.toString())
+        }
+        if (resQuote.asks.length) {
+          log.debug('resQuote', resQuote.asks[0].price.toString())
+        }
+        if (baseRes.asks.length) {
+          log.debug('baseRes', baseRes.asks[0].price.toString())
+        }
         return of(ResDexBuySellActions.gotOrderBook(orderBook))
       }),
       catchError(err => {
@@ -116,7 +126,9 @@ const getCreateOrderObservable = (processName, options, privacy, getSuccessObser
       const swap = result.pending
       const flattenedOptions = flattenDecimals(requestOpts)
       log.debug(`Inserting a swap`, result.swaps, swap, flattenedOptions)
-      swapDB.insertSwapData(swap, flattenedOptions, flattenDecimals(privacy))
+
+      const flattenedPrivacy = privacy ? flattenDecimals({...privacy, processName}) : null
+      swapDB.insertSwapData(swap, flattenedOptions, flattenedPrivacy)
 
       return getSuccessObservable(swap.uuid)
     }),
@@ -186,7 +198,7 @@ const getWithdrawFromMainToPrivacy1Observable = (privacy, pollPrivacy2BalanceObs
   const observable = from(mainApi.withdraw({
     symbol: 'RES',
     address,
-    amount: Decimal(2), // balance.minus(privacy.initialMainResBalance),
+    amount: balance.minus(privacy.initialMainResBalance),
   })).pipe(
     switchMap(() => pollPrivacy2BalanceObservable),
     catchError(err => {
@@ -204,7 +216,7 @@ const getPollPrivacy2BalanceObservable = (privacy, resBaseOrderObservable, state
   const pollingObservable = interval(1000).pipe(
     map(() => {
       const { balance } = state$.value.resDex.accounts.currencies.RESDEX_PRIVACY2.RES
-      log.debug(`Polling ResDEX Privacy 2 for RES balance:`, balance.toString())
+      log.debug(`Polling ResDEX Privacy 2 for RES balance:`, balance.toString(), privacy.initialPrivacy2ResBalance.toString())
       return balance
     }),
     filter(balance => balance.greaterThan(privacy.initialPrivacy2ResBalance)),
@@ -276,9 +288,8 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
     const dexFee = RESDEX.dexFee.div(Decimal('100'))
     const expectedBaseCurrencyAmount = (
       Decimal(maxRel)
-      .dividedBy(resQuotePrice)
-      .plus(resQuotePrice.times(dexFee))
-      .times(baseResPrice)
+      .dividedBy(resQuotePrice.plus(resQuotePrice.times(dexFee)))
+      .dividedBy(baseResPrice)
     )
 
     const privacy = {
@@ -287,9 +298,8 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
       quoteCurrencyAmount: Decimal(maxRel),
       expectedBaseCurrencyAmount,
       initialMainResBalance: currencies.RESDEX.RES.balance,
-      // initialPrivacy2ResBalance: currencies.RESDEX_PRIVACY2.RES.balance,
-      initialPrivacy2ResBalance: Decimal(0),
-      baseResOrderUuid: null
+      initialPrivacy2ResBalance: currencies.RESDEX_PRIVACY2.RES.balance,
+      baseResOrderUuid: null,
     }
 
     log.debug(`Privacy`, privacy)
@@ -307,7 +317,7 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
       resBaseOrderUuid = uuid
 
       return merge(
-        of(ResDexBuySellActions.setPrivateOrderStatus(uuid, 'swapping_res_base')),
+        of(ResDexBuySellActions.setPrivateOrderStatus(relResOrderUuid, 'swapping_res_base')),
         of(ResDexBuySellActions.linkPrivateOrderToBaseResOrder(uuid, resBaseOrderUuid)),
         getPollResBaseOrderObservable(uuid, state$),
       )
@@ -316,28 +326,26 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
     const resBaseOrderObservable = defer(() => getResBaseOrderObservable(privacy, createResBaseOrderSuccessObservable, state$))
     const pollPrivacy2BalanceObservable = defer(() => getPollPrivacy2BalanceObservable(privacy, resBaseOrderObservable, state$))
 
-    // const withdrawFromMainToPrivacy1Observable = defer(() => merge(
-    //   // of(ResDexBuySellActions.setPrivateOrderStatus(relResOrderUuid, 'privatizing')),
-    //   getWithdrawFromMainToPrivacy1Observable(privacy, pollPrivacy2BalanceObservable, state$),
-    // ))
+    const withdrawFromMainToPrivacy1Observable = defer(() => merge(
+      of(ResDexBuySellActions.setPrivateOrderStatus(relResOrderUuid, 'privatizing')),
+      getWithdrawFromMainToPrivacy1Observable(privacy, pollPrivacy2BalanceObservable, state$),
+    ))
 
-    return pollPrivacy2BalanceObservable
+    const pollMainProcessBalanceObservable = defer(() => getPollMainProcessBalanceObservable(privacy, withdrawFromMainToPrivacy1Observable, state$))
 
-    // const pollMainProcessBalanceObservable = defer(() => getPollMainProcessBalanceObservable(privacy, withdrawFromMainToPrivacy1Observable, state$))
-    //
-    // const createRelResOrderSuccessObservable = uuid => {
-    //   relResOrderUuid = uuid
-    //
-    //   return merge(
-    //     pollMainProcessBalanceObservable,
-    //     of(ResDexBuySellActions.setPrivateOrderStatus(uuid, 'swapping_rel_res')),
-    //     of(ResDexBuySellActions.createPrivateOrderSucceeded()),
-    //   )
-    // }
-    //
-    // const relResOrderObservable = getRelResOrderObservable(privacy, createRelResOrderSuccessObservable, state$)
-    //
-    // return relResOrderObservable
+    const createRelResOrderSuccessObservable = uuid => {
+      relResOrderUuid = uuid
+
+      return merge(
+        pollMainProcessBalanceObservable,
+        of(ResDexBuySellActions.setPrivateOrderStatus(relResOrderUuid, 'swapping_rel_res')),
+        of(ResDexBuySellActions.createPrivateOrderSucceeded()),
+      )
+    }
+
+    const relResOrderObservable = getRelResOrderObservable(privacy, createRelResOrderSuccessObservable, state$)
+
+    return relResOrderObservable
   })
 )
 

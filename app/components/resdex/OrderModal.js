@@ -68,7 +68,6 @@ class OrderModal extends Component<Props> {
                   <div className={cn(orderStyles.status, orderStyles[status])}>
                     {getOrderStatusName(order)}
                   </div>
-                  {order.status}
                 </div>
               }
             </div>
