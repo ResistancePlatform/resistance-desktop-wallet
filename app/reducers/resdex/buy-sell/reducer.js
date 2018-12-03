@@ -8,6 +8,8 @@ export const ResDexBuySellActions = createActions(
   {
     EMPTY: undefined,
 
+    SELECT_TAB: index => ({ index }),
+
     GET_ORDER_BOOK: undefined,
     GOT_ORDER_BOOK: orderBook => ({ orderBook }),
     GET_ORDER_BOOK_FAILED: (errorMessage: string) => ({ errorMessage }),
@@ -35,6 +37,11 @@ export const ResDexBuySellActions = createActions(
 
 export const ResDexBuySellReducer = handleActions(
   {
+    [ResDexBuySellActions.selectTab]: (state, action) => ({
+      ...state,
+      selectedTabIndex: action.payload.index,
+      isAdvanced: action.payload.index === 1,
+    }),
     [ResDexBuySellActions.gotOrderBook]: (state, action) => ({
       ...state,
       orderBook: action.payload.orderBook

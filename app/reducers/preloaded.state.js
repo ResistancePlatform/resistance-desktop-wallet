@@ -124,6 +124,8 @@ export const preloadedState: State = {
       currencyHistory: {},
     },
     buySell: {
+      selectedTabIndex: 0,
+      isAdvanced: false,
       isSendingOrder: false,
       baseCurrency: 'RES',
       quoteCurrency: 'DGB',

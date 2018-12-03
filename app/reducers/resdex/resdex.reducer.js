@@ -57,6 +57,8 @@ export type ResDexState = {
     }
   },
   buySell: {
+    selectedTabIndex: number,
+    isAdvanced: boolean,
     baseCurrency: string,
     quoteCurrency: string,
     isSendingOrder: boolean,

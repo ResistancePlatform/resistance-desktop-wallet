@@ -21,6 +21,7 @@ import {
   ChooseWallet
 } from '~/components/rounded-form'
 import OrderSummary from './OrderSummary'
+import OrderBook from './OrderBook'
 
 import styles from './BuySell.scss'
 
@@ -196,6 +197,7 @@ class ResDexBuySell extends Component<Props> {
 	render() {
     const { t } = this.props
     const order = this.getOrder()
+    const { baseCurrency, quoteCurrency } = this.props.buySell
 
 		return (
       <div className={cn(styles.container)}>
@@ -212,6 +214,8 @@ class ResDexBuySell extends Component<Props> {
         <div className={styles.actionContainer}>
           <Tabs
             className={styles.tabs}
+            selectedIndex={this.props.buySell.selectedTabIndex}
+            onSelect={tabIndex => this.props.actions.selectTab(tabIndex)}
             selectedTabClassName={styles.selectedTab}
             selectedTabPanelClassName={styles.selectedTabPanel}
           >
@@ -227,12 +231,20 @@ class ResDexBuySell extends Component<Props> {
             <TabPanel className={styles.tabPanel}>
               {this.getForm(true, order)}
             </TabPanel>
-          </Tabs>
 
+          </Tabs>
 
         </div>
 
         <OrderSummary order={order} />
+
+        {this.props.buySell.isAdvanced &&
+          <OrderBook
+            baseCurrency={baseCurrency}
+            quoteCurrency={quoteCurrency}
+            orderBook={this.props.buySell.orderBook.baseQuote}
+          />
+        }
 
       </div>
     )
