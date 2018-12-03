@@ -45,10 +45,16 @@ export class Simplex extends Component<Props> {
       return
     }
 
+    if (this.webviewElement === element) {
+      return
+    }
+
     this.webviewElement = element
 
     this.webviewElement.addEventListener('new-window', event => {
+      event.stopPropagation()
       shell.openExternal(event.url)
+      return false
     })
 
     const navigateHandler = event => {
