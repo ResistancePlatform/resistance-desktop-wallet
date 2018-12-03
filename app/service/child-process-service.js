@@ -182,7 +182,7 @@ export class ChildProcessService {
 
     log.debug(`Child process ${processName} started`)
     getStore().dispatch(actions.childProcessStarted(processName))
-    childProcessInfo.pid = await this.getPid(processName)
+    childProcessInfo.pid = childProcess.pid
   }
 
 	/**
@@ -240,11 +240,10 @@ export class ChildProcessService {
 	async getPid(processName: string) {
 		return new Promise((resolve, reject) => {
 			let process
+      const command = childProcessCommands[processName]
 
 			ps.lookup(
-				{
-					command: processName
-				},
+				{ command },
 				(err, resultList) => {
 					if (err) {
 						reject(err)
@@ -262,7 +261,6 @@ export class ChildProcessService {
 			)
 		})
 	}
-
 
   /**
    * Returns a polling function calling checker until it returns true

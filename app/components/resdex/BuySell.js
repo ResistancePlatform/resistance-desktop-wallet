@@ -1,4 +1,5 @@
 // @flow
+import log from 'electron-log'
 import { Decimal } from 'decimal.js'
 import * as Joi from 'joi'
 import React, { Component } from 'react'
@@ -33,8 +34,9 @@ const validationSchema = Joi.object().keys({
 type Props = {
   t: any,
   form: object,
-  accounts: ResDexState.accounts,
   buySell: ResDexState.buySell,
+  orders: ResDexState.orders,
+  accounts: ResDexState.accounts,
   actions: object
 }
 
@@ -54,7 +56,15 @@ class ResDexBuySell extends Component<Props> {
 
   // Can't create a market order if there's no liquidity or when sending an order
   getSubmitButtonDisabledAttribute(order) {
+    const { swapHistory } = this.props.orders
     const { baseCurrency, quoteCurrency, orderBook, isSendingOrder } = this.props.buySell
+
+    const arePendingPrivateOrdersPresent = swapHistory.filter(
+      swap => swap.isPrivate &&
+      !['completed', 'failed'].includes(swap.privacy.status)
+    )
+
+    log.debug('arePendingPrivateOrdersPresent', arePendingPrivateOrdersPresent)
 
     const areAllAsksPresent = order.isPrivate
       ? orderBook.resQuote.asks.length && orderBook.baseRes.asks.length
@@ -65,6 +75,7 @@ class ResDexBuySell extends Component<Props> {
       || orderBook.baseCurrency !== baseCurrency
       || orderBook.quoteCurrency !== quoteCurrency
       || !areAllAsksPresent
+      || arePendingPrivateOrdersPresent
     )
 
   }
@@ -199,6 +210,7 @@ class ResDexBuySell extends Component<Props> {
 const mapStateToProps = (state) => ({
   form: state.roundedForm.resDexBuySell,
 	buySell: state.resDex.buySell,
+	orders: state.resDex.orders,
 	accounts: state.resDex.accounts,
 })
 
