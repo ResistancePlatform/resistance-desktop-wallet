@@ -74,24 +74,25 @@ class OrderModal extends Component<Props> {
 
           </div>
 
-          <ul className={cn(styles.stagesContainer, styles.slider, {[styles.close]: status === 'privatizing'})}>
-            <li className={cn({ [styles.active]: this.getIsStageComplete('myfee') })}>
-              {t(`My fee`)}
-            </li>
-            <li className={cn({ [styles.active]: this.getIsStageComplete('bobdeposit') })}>
-              {t(`My deposit`)}
-            </li>
-            <li className={cn({ [styles.active]: this.getIsStageComplete('alicepayment') })}>
-              {t(`Their deposit`)}
-            </li>
-            <li className={cn({ [styles.active]: this.getIsStageComplete('bobpayment') })}>
-              {t(`My payment`)}
-            </li>
-            <li className={cn({ [styles.active]: this.getIsStageComplete('alicespend') })}>
-              {t(`Their spend`)}
-            </li>
-          </ul>
-
+          <div className={cn(styles.stagesContainer, styles.slider, {[styles.close]: status === 'privatizing'})}>
+            <ul>
+              <li className={cn({ [styles.active]: this.getIsStageComplete('myfee') })}>
+                {t(`My fee`)}
+              </li>
+              <li className={cn({ [styles.active]: this.getIsStageComplete('bobdeposit') })}>
+                {t(`My deposit`)}
+              </li>
+              <li className={cn({ [styles.active]: this.getIsStageComplete('alicepayment') })}>
+                {t(`Their deposit`)}
+              </li>
+              <li className={cn({ [styles.active]: this.getIsStageComplete('bobpayment') })}>
+                {t(`My payment`)}
+              </li>
+              <li className={cn({ [styles.active]: this.getIsStageComplete('alicespend') })}>
+                {t(`Their spend`)}
+              </li>
+            </ul>
+          </div>
           <div className={styles.summaryContainer}>
             <OrderSummary className={styles.summary} order={order} />
           </div>

@@ -147,7 +147,7 @@ const withdrawEpic = (action$: ActionsObservable<Action>, state$) => action$.pip
     const observable = from(api.withdraw({
       symbol,
       address: recipientAddress,
-      amount,
+      amount: Decimal(amount),
     }))
 
     return observable.pipe(

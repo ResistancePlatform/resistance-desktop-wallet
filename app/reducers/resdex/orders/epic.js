@@ -24,8 +24,9 @@ const kickStartStuckSwapsEpic = (action$: ActionsObservable<Action>, state$) => 
     const { isInitialKickStartDone, swapHistory } = state$.value.resDex.orders
 
     const stuckSwaps = swapHistory.filter(swap => (
-      swap.status === 'swapping' &&
-        (!isInitialKickStartDone || moment(swap.timeStarted).isBefore(moment().subtract(4, 'hours')))
+      !swap.isPrivate
+      && swap.status === 'swapping'
+      && (!isInitialKickStartDone || moment(swap.timeStarted).isBefore(moment().subtract(4, 'hours')))
     ))
 
     log.info(`Kick starting ${stuckSwaps.length} stuck orders`)

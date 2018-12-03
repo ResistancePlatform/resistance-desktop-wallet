@@ -22,7 +22,6 @@ import styles from './WithdrawModal.scss'
 
 const getValidationSchema = t => Joi.object().keys({
   recipientAddress: Joi.string().required().label(t(`Recipient address`)),
-  withdrawFrom: Joi.string().required(),
   amount: Joi.number().min(0).required().label(t(`Amount`)),
   equity: Joi.number(),
   note: Joi.string().optional().label(t(`Note`)),

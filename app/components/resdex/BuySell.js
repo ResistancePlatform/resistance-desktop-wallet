@@ -62,7 +62,7 @@ class ResDexBuySell extends Component<Props> {
     const arePendingPrivateOrdersPresent = swapHistory.filter(
       swap => swap.isPrivate &&
       !['completed', 'failed'].includes(swap.privacy.status)
-    )
+    ).length
 
     log.debug('arePendingPrivateOrdersPresent', arePendingPrivateOrdersPresent)
 

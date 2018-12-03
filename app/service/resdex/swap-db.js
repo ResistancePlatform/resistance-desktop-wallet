@@ -346,6 +346,16 @@ function formatSwap(data) {
     }
   }
 
+  const privateCancelled = (
+    swap.isPrivate
+    && !['completed', 'failed'].includes(swap.privacy.status)
+    && isAfter(appTimeStarted, swap.timeStarted)
+  )
+
+  if (privateCancelled) {
+    swap.privacy.status = 'failed'
+  }
+
   swap.statusFormatted = t(`status.${swap.status}`).toLowerCase()
   if (swap.status === 'swapping') {
     const swapProgress = swap.transactions

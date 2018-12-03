@@ -116,7 +116,7 @@ const getCreateOrderObservable = (processName, options, privacy, getSuccessObser
 
   log.debug(`Submitting a swap`, requestOpts)
 
-  const orderObservable = from(api.createOrder(requestOpts)).pipe(
+  const orderObservable = from(api.createMarketOrder(requestOpts)).pipe(
     switchMap(result => {
       if (!result.pending) {
         const message = t(`Something unexpected happened. Are you sure you have enough UTXO?`)
