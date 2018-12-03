@@ -1,5 +1,4 @@
 @import "~/assets/styles/vars.scss";
-@import "~/assets/styles/tooltip.scss";
 @import "./ResDex.scss";
 
 .container {
@@ -7,10 +6,8 @@
   margin: 1.5rem;
 }
 
-.tooltip {
-  &.enhancedPrivacy {
-    width: 22rem !important;
-  }
+.enhancedPrivacyTooltip {
+  width: 22rem !important;
 }
 
 .inputLabel {
@@ -19,29 +16,6 @@
 
 .oldInputLabel {
   width: 5.2rem;
-}
-
-.info {
-  display: inline-block;
-  margin-left: 0.4rem;
-  border-radius: 50%;
-  border: 1px solid $BASE_COLOR_LIGHT_BLUE;
-  width: 0.65rem;
-  height: 0.65rem;
-  position: relative;
-  top: 0;
-}
-
-.info:after {
-  position: absolute;
-  content: 'i';
-  font-style: normal;
-  font-size: 0.55rem;
-  color: $BASE_COLOR_LIGHT_BLUE;
-  text-transform: lowercase;
-  left: 48%;
-  top: 48%;
-  transform: translate(-50%, -50%);
 }
 
 .tabList {

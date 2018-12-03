@@ -7,13 +7,13 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
-import ReactTooltip from 'react-tooltip'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import {
+  Info,
   RoundedForm,
   RoundedButton,
   CheckBox,
@@ -103,14 +103,93 @@ class ResDexBuySell extends Component<Props> {
     return order
   }
 
+  getForm(isAdvanced: boolean, order: object) {
+    const { t } = this.props
+    const { baseCurrency, quoteCurrency } = this.props.buySell
+    const txFee = this.props.accounts.currencyFees[quoteCurrency]
+
+    return (
+      <RoundedForm
+              id={isAdvanced ? 'resDexBuySellAdvanced' : 'resDexBuySellSimple'}
+              schema={validationSchema}
+            >
+        <ChooseWallet
+          name="sendFrom"
+          labelClassName={styles.oldInputLabel}
+          defaultValue={quoteCurrency}
+          label={t(`Send from`)}
+          onChange={this.props.actions.updateQuoteCurrency}
+          currencies={this.props.accounts.currencies.RESDEX}
+        />
+
+        <ChooseWallet
+          name="receiveTo"
+          labelClassName={styles.oldInputLabel}
+          defaultValue={baseCurrency}
+          label={t(`Receive to`)}
+          onChange={this.props.actions.updateBaseCurrency}
+          currencies={this.props.accounts.currencies.RESDEX}
+        />
+
+        {isAdvanced ? (
+            <div className={styles.advanced}>
+              <CurrencyAmountInput
+                name="maxRel"
+                addonClassName={styles.maxRelAddon}
+                buttonLabel={t(`Use max`)}
+                maxAmount={this.getMaxQuoteAmount()}
+                symbol={quoteCurrency}
+              />
+
+            </div>
+          ) : (
+            <div className={styles.simple}>
+              <CurrencyAmountInput
+                name="maxRel"
+                labelClassName={styles.inputLabel}
+                addonClassName={styles.maxRelAddon}
+                label={t(`Max. {{quoteCurrency}}`, { quoteCurrency })}
+                buttonLabel={t(`Use max`)}
+                maxAmount={this.getMaxQuoteAmount()}
+                symbol={quoteCurrency}
+              />
+
+              <CheckBox name="enhancedPrivacy" defaultValue={false}>
+                {t(`Enhanced privacy`)}
+                <Info tooltip={t('enhanced-privacy')} />
+              </CheckBox>
+
+            </div>
+          )
+        }
+
+        <RoundedButton
+          type="submit"
+          className={styles.exchangeButton}
+          onClick={
+            order.isPrivate
+            ? this.props.actions.createPrivateOrder
+            : this.props.actions.createOrder
+          }
+          disabled={txFee && this.getSubmitButtonDisabledAttribute(order)}
+          spinner={this.props.buySell.isSendingOrder}
+          spinnerTooltip={t(`Sending the order...`)}
+          important
+          large
+        >
+          {isAdvanced ? t(`Add to order book`) : t(`Exchange`)}
+        </RoundedButton>
+      </RoundedForm>
+    )
+
+  }
+
 	/**
 	 * @returns
    * @memberof ResDexBuySell
 	 */
 	render() {
     const { t } = this.props
-    const { baseCurrency, quoteCurrency } = this.props.buySell
-    const txFee = this.props.accounts.currencyFees[quoteCurrency]
     const order = this.getOrder()
 
 		return (
@@ -133,68 +212,16 @@ class ResDexBuySell extends Component<Props> {
           >
             <TabList className={styles.tabList}>
               <Tab className={styles.tab}>{t(`Simple`)}</Tab>
-              <Tab className={styles.tab} disabled>{t(`Advanced`)}</Tab>
+              <Tab className={styles.tab}>{t(`Advanced`)}</Tab>
             </TabList>
 
             <TabPanel className={styles.tabPanel}>
-              <RoundedForm
-                id="resDexBuySell"
-                schema={validationSchema}
-              >
-                <ChooseWallet
-                  name="sendFrom"
-                  labelClassName={styles.oldInputLabel}
-                  defaultValue={quoteCurrency}
-                  label={t(`Send from`)}
-                  onChange={this.props.actions.updateQuoteCurrency}
-                  currencies={this.props.accounts.currencies.RESDEX}
-                />
-
-                <ChooseWallet
-                  name="receiveTo"
-                  labelClassName={styles.oldInputLabel}
-                  defaultValue={baseCurrency}
-                  label={t(`Receive to`)}
-                  onChange={this.props.actions.updateBaseCurrency}
-                  currencies={this.props.accounts.currencies.RESDEX}
-                />
-
-                <CurrencyAmountInput
-                  name="maxRel"
-                  labelClassName={styles.inputLabel}
-                  addonClassName={styles.maxRelAddon}
-                  label={t(`Max. {{quoteCurrency}}`, { quoteCurrency })}
-                  buttonLabel={t(`Use max`)}
-                  maxAmount={this.getMaxQuoteAmount()}
-                  symbol={quoteCurrency}
-                />
-
-                <CheckBox name="enhancedPrivacy" defaultValue={false}>
-                  {t(`Enhanced privacy`)}
-                  <i className={styles.info} data-tip={t('enhanced-privacy')} data-for="tooltip-resdex-enhanced-privacy-id" data-offset="{'left': 16}"/>
-                  <ReactTooltip id="tooltip-resdex-enhanced-privacy-id" className={cn(styles.tooltip, styles.enhancedPrivacy)}/>
-                </CheckBox>
-
-                <RoundedButton
-                  type="submit"
-                  className={styles.exchangeButton}
-                  onClick={
-                    order.isPrivate
-                    ? this.props.actions.createPrivateOrder
-                    : this.props.actions.createOrder
-                  }
-                  disabled={txFee && this.getSubmitButtonDisabledAttribute(order)}
-                  spinner={this.props.buySell.isSendingOrder}
-                  spinnerTooltip={t(`Sending the order...`)}
-                  important
-                  large
-                >
-                  {t(`Exchange`)}
-                </RoundedButton>
-              </RoundedForm>
+              {this.getForm(false, order)}
             </TabPanel>
 
-            <TabPanel className={styles.tabPanel} />
+            <TabPanel className={styles.tabPanel}>
+              {this.getForm(true, order)}
+            </TabPanel>
           </Tabs>
 
 
