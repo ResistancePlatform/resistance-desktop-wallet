@@ -1,3 +1,4 @@
+export { default as Info } from './Info'
 export { default as RoundedForm } from './RoundedForm'
 export { default as RoundedButton } from './RoundedButton'
 export { default as CheckBox } from './CheckBox'

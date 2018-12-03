@@ -156,7 +156,12 @@ class ResDexBuySell extends Component<Props> {
 
               <CheckBox name="enhancedPrivacy" defaultValue={false}>
                 {t(`Enhanced privacy`)}
-                <Info tooltip={t('enhanced-privacy')} />
+
+                <Info
+                  tooltipClassName={styles.enhancedPrivacyTooltip}
+                  tooltip={t('enhanced-privacy')}
+                />
+
               </CheckBox>
 
             </div>

@@ -1,9 +1,13 @@
 @import "~/assets/styles/tooltip.scss";
 @import "~/assets/styles/vars.scss";
 
+.container {
+  margin-left: 0.4rem;
+  display: inline-block;
+}
+
 .info {
   display: inline-block;
-  margin-left: 0.4rem;
   border-radius: 50%;
   border: 1px solid $BASE_COLOR_LIGHT_BLUE;
   width: 0.65rem;
