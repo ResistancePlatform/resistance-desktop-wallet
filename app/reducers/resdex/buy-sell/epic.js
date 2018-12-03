@@ -360,7 +360,7 @@ const createOrderSucceededEpic = (action$: ActionsObservable<Action>) => action$
 const createPrivateOrderSucceededEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.createPrivateOrderSucceeded),
   map(() => {
-    toastr.success(t(`Private order created successfully`))
+    toastr.success(t(`Private order created successfully`), t(`New orders creation locked until the trade complete`))
     return ResDexBuySellActions.empty()
   })
 )

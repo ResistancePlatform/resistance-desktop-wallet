@@ -51,9 +51,17 @@ class ResDexAssets extends Component<Props> {
       value = Object.keys(currencyHistory.hour).reduce((previousValue, symbol) => {
         const prices = currencyHistory.hour[symbol]
 
-        if (symbol in currencies && prices) {
+        if (symbol in currencies.RESDEX && prices) {
           const price = prices.slice(-hoursNumber - 1)[0].value
-          return previousValue.plus(price.times(currencies[symbol].balance))
+
+          let privateBalance = Decimal(0)
+          const transparentBalance = currencies.RESDEX[symbol].balance
+
+          if (symbol in currencies.RESDEX_PRIVACY2) {
+            privateBalance = currencies.RESDEX_PRIVACY2[symbol].balance
+          }
+
+          return previousValue.plus(price.times(transparentBalance.plus(privateBalance)))
         }
 
         return previousValue
