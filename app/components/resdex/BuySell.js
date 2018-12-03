@@ -170,7 +170,7 @@ class ResDexBuySell extends Component<Props> {
                   onClick={
                     order.isPrivate
                     ? this.props.actions.createPrivateOrder
-                    : this.props.actions.createMarketOrder
+                    : this.props.actions.createOrder
                   }
                   disabled={txFee && this.getSubmitButtonDisabledAttribute(order)}
                   spinner={this.props.buySell.isSendingOrder}

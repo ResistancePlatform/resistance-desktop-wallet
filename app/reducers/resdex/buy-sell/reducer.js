@@ -15,9 +15,9 @@ export const ResDexBuySellActions = createActions(
     UPDATE_BASE_CURRENCY: (symbol: string) => ({ symbol }),
     UPDATE_QUOTE_CURRENCY: (symbol: string) => ({ symbol }),
 
-    CREATE_MARKET_ORDER: undefined,
-    CREATE_MARKET_ORDER_SUCCEEDED: undefined,
-    CREATE_MARKET_ORDER_FAILED: (errorMessage: string) => ({ errorMessage }),
+    CREATE_ORDER: undefined,
+    CREATE_ORDER_SUCCEEDED: undefined,
+    CREATE_ORDER_FAILED: (errorMessage: string) => ({ errorMessage }),
 
     CREATE_PRIVATE_ORDER: undefined,
     CREATE_PRIVATE_ORDER_SUCCEEDED: undefined,
@@ -65,15 +65,15 @@ export const ResDexBuySellReducer = handleActions(
       ...state,
       quoteCurrency: action.payload.symbol,
     }),
-    [ResDexBuySellActions.createMarketOrder]: state => ({
+    [ResDexBuySellActions.createOrder]: state => ({
       ...state,
       isSendingOrder: true,
     }),
-    [ResDexBuySellActions.createMarketOrderSucceeded]: state => ({
+    [ResDexBuySellActions.createOrderSucceeded]: state => ({
       ...state,
       isSendingOrder: false,
     }),
-    [ResDexBuySellActions.createMarketOrderFailed]: state => ({
+    [ResDexBuySellActions.createOrderFailed]: state => ({
       ...state,
       isSendingOrder: false,
     }),

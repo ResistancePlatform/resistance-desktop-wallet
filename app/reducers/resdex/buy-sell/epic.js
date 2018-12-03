@@ -66,8 +66,8 @@ const getOrderBookFailedEpic = (action$: ActionsObservable<Action>) => action$.p
   })
 )
 
-const createMarketOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(ResDexBuySellActions.createMarketOrder),
+const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(ResDexBuySellActions.createOrder),
   switchMap(() => {
     const { maxRel } = state$.value.roundedForm.resDexBuySell.fields
     const { baseCurrency, quoteCurrency, orderBook } = state$.value.resDex.buySell
@@ -84,8 +84,8 @@ const createMarketOrderEpic = (action$: ActionsObservable<Action>, state$) => ac
       'RESDEX',
       orderOptions,
       null,
-      () => of(ResDexBuySellActions.createMarketOrderSucceeded()),
-      ResDexBuySellActions.createMarketOrderFailed,
+      () => of(ResDexBuySellActions.createOrderSucceeded()),
+      ResDexBuySellActions.createOrderFailed,
       state$
     )
   })
@@ -116,7 +116,7 @@ const getCreateOrderObservable = (processName, options, privacy, getSuccessObser
 
   log.debug(`Submitting a swap`, requestOpts)
 
-  const orderObservable = from(api.createMarketOrder(requestOpts)).pipe(
+  const orderObservable = from(api.createOrder(requestOpts)).pipe(
     switchMap(result => {
       if (!result.pending) {
         const message = t(`Something unexpected happened. Are you sure you have enough UTXO?`)
@@ -349,8 +349,8 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
   })
 )
 
-const createMarketOrderSucceededEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-  ofType(ResDexBuySellActions.createMarketOrderSucceeded),
+const createOrderSucceededEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexBuySellActions.createOrderSucceeded),
   map(() => {
     toastr.success(t(`Market order created successfully`))
     return ResDexBuySellActions.empty()
@@ -365,8 +365,8 @@ const createPrivateOrderSucceededEpic = (action$: ActionsObservable<Action>) => 
   })
 )
 
-const createMarketOrderFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-  ofType(ResDexBuySellActions.createMarketOrderFailed),
+const createOrderFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexBuySellActions.createOrderFailed),
   map(action => {
     toastr.error(t(`Error creating a market order`), action.payload.errorMessage)
     return ResDexBuySellActions.empty()
@@ -398,11 +398,11 @@ const setPrivateOrderStatusEpic = (action$: ActionsObservable<Action>) => action
 )
 
 export const ResDexBuySellEpic = (action$, state$) => merge(
-  createMarketOrderEpic(action$, state$),
+  createOrderEpic(action$, state$),
   createPrivateOrderEpic(action$, state$),
-  createMarketOrderSucceededEpic(action$, state$),
+  createOrderSucceededEpic(action$, state$),
   createPrivateOrderSucceededEpic(action$, state$),
-  createMarketOrderFailedEpic(action$, state$),
+  createOrderFailedEpic(action$, state$),
   getOrderBookEpic(action$, state$),
   getOrderBookFailedEpic(action$, state$),
   setPrivateOrderStatusEpic(action$, state$),
