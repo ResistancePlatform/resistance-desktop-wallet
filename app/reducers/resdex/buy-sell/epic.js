@@ -251,25 +251,25 @@ const getResBaseOrderObservable = (privacy, getSuccessObservable, state$) => {
   )
 }
 
-const getPollResBaseOrderObservable = (uuid, state$) => {
+const getPollResBaseOrderObservable = (relResOrderUuid, resBaseOrderUuid, state$) => {
   const pollingObservable = interval(1000).pipe(
     map(() => {
       log.debug(`Polling RES base order to complete or fail...`)
 
       const { swapHistory } = state$.value.resDex.orders
-      const order = swapHistory.filter(swap => swap.uuid === uuid).pop()
+      const order = swapHistory.filter(swap => swap.uuid === resBaseOrderUuid).pop()
 
       if (order) {
         log.debug(`Order status`, order.status, order.privacy.status)
       } else {
-        log.debug(`Order not found`, uuid)
+        log.debug(`Order not found`, resBaseOrderUuid)
       }
 
       return order
     }),
     filter(order => order && ['completed', 'failed'].includes(order.status)),
     take(1),
-    map(order => ResDexBuySellActions.setPrivateOrderStatus(uuid, order.status)),
+    map(order => ResDexBuySellActions.setPrivateOrderStatus(relResOrderUuid, order.status)),
   )
 
   return pollingObservable
@@ -319,7 +319,7 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
       return merge(
         of(ResDexBuySellActions.setPrivateOrderStatus(relResOrderUuid, 'swapping_res_base')),
         of(ResDexBuySellActions.linkPrivateOrderToBaseResOrder(uuid, resBaseOrderUuid)),
-        getPollResBaseOrderObservable(uuid, state$),
+        getPollResBaseOrderObservable(relResOrderUuid, resBaseOrderUuid, state$),
       )
     }
 
