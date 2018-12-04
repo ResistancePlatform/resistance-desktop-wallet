@@ -42,6 +42,8 @@ export default class CurrencyAmountInput extends RoundedInput {
   renderInput() {
     return (
       <div className={styles.inputContainer}>
+        {this.renderInputPrefix()}
+
         <input
           className={cn(parentStyles.input, styles.input)}
           name={this.props.name}
@@ -57,9 +59,17 @@ export default class CurrencyAmountInput extends RoundedInput {
           placeholder={this.props.placeholder}
           readOnly={this.props.readOnly}
         />
-        {this.props.symbol}
+        {this.renderCurrency()}
       </div>
     )
+  }
+
+  renderInputPrefix() {
+    return null
+  }
+
+  renderCurrency() {
+    return this.props.symbol
   }
 
   renderAddon() {

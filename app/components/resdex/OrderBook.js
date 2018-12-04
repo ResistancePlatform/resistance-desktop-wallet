@@ -17,7 +17,8 @@ type Props = {
   t: any,
   baseCurrency: string,
   quoteCurrency: string,
-  orderBook: object
+  orderBook: object,
+  onPickPrice: () => void
 }
 
 /**
@@ -41,20 +42,29 @@ class OrderBook extends Component<Props> {
     )
   }
 
+  onRowClick(event, price) {
+    event.stopPropagation()
+    this.props.onPickPrice(price)
+    return false
+  }
+
   getListRowRenderer(order) {
     return (
-      <UniformListRow>
+      <UniformListRow
+        className={styles.row}
+        onClick={e => this.onRowClick(e, order.price)}
+      >
         <UniformListColumn>
-          {toDecimalPlaces(order.price, 8)}
+          {toDecimalPlaces(order.price, 4)}
         </UniformListColumn>
         <UniformListColumn>
-          {toDecimalPlaces(order.maxVolume, 8)}
+          {toDecimalPlaces(order.maxVolume, 4)}
         </UniformListColumn>
         <UniformListColumn>
-          {toDecimalPlaces(order.maxVolume.times(order.price), 8)}
+          {toDecimalPlaces(order.maxVolume.times(order.price), 4)}
         </UniformListColumn>
         <UniformListColumn>
-          {toDecimalPlaces(order.depth, 8)}
+          {toDecimalPlaces(order.depth, 4)}
         </UniformListColumn>
       </UniformListRow>
     )
@@ -77,7 +87,7 @@ class OrderBook extends Component<Props> {
             items={asks}
             headerRenderer={() => this.getListHeaderRenderer()}
             rowRenderer={item => this.getListRowRenderer(item)}
-            emptyMessage={t(`No liquidity available`)}
+            emptyMessage={t(`No liquidity available yet`)}
           />
 
         </div>
@@ -92,7 +102,7 @@ class OrderBook extends Component<Props> {
             items={bids}
             headerRenderer={() => this.getListHeaderRenderer()}
             rowRenderer={item => this.getListRowRenderer(item)}
-            emptyMessage={t(`No liquidity available`)}
+            emptyMessage={t(`No liquidity available yet`)}
           />
 
         </div>

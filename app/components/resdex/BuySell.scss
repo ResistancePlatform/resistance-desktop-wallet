@@ -42,13 +42,21 @@
 .form {
   .orderType {
     display: flex;
+    align-items: center;
+    margin-bottom: 0.7rem;
   }
 
   .caption {
-    color: $BASE_COLOR_FONT_GRAY;
+    color: $BASE_COLOR_FONT_GRAY_2;
     font-size: 0.67rem;
     font-weight: 300;
     text-transform: uppercase;
+    margin-left: 1rem;
+    white-space: nowrap;
+
+    > * {
+      text-transform: none;
+    }
   }
 
   .enhancedPrivacyTooltip {
@@ -63,6 +71,34 @@
     width: 5.2rem;
   }
 
+  .advancedInputs {
+    display: flex;
+
+    .box {
+      width: 50%;
+
+      &:first-child {
+        margin-right: 0.3rem;
+      }
+
+      &:last-child {
+        margin-left: 0.3rem;
+      }
+
+      .caption {
+        margin-bottom: 0.8rem;
+      }
+    }
+
+  }
+
+}
+
+.orderSummaryContainer {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .actionContainer {

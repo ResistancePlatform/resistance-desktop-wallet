@@ -1,4 +1,5 @@
 // @flow
+import log from 'electron-log'
 import React from 'react'
 import cn from 'classnames'
 import { v4 as uuid } from 'uuid'
@@ -11,7 +12,7 @@ import styles from './RadioButton.scss'
 export type RadioButtonProps = {
   ...GenericProps,
   name?: string,
-  defaultValue?: any,
+  defaultChecked?: boolean,
   value: any,
 	onChange?: value => void
 }
@@ -33,7 +34,7 @@ export default class RadioButton extends GenericControl  {
 		super(props)
 
     this.state = {
-      value: props.defaultValue
+      value: props.value
     }
 
     this.radioId = `radio-${uuid()}`
@@ -45,6 +46,7 @@ export default class RadioButton extends GenericControl  {
     const { value } = event.target
     this.setState({ value })
 
+    log.debug('onChange', this.props.onChange, event.target.value)
 		if (this.props.onChange) {
 			this.props.onChange(value)
 		}
@@ -60,9 +62,9 @@ export default class RadioButton extends GenericControl  {
             id={this.radioId}
             type="radio"
             name={this.props.name}
-            checked={this.state.value === this.props.value}
             value={this.props.value}
-            onChange={e => this.onClickHandler(e)}
+            defaultChecked={this.props.defaultChecked}
+            onClick={e => this.onClickHandler(e)}
             onKeyDown={e => [13, 32].includes(e.keyCode) ? this.onClickHandler(e) : false}
           />
           {this.props.children && this.props.children}

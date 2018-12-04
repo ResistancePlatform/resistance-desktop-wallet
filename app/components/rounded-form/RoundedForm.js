@@ -171,7 +171,7 @@ class RoundedForm extends Component<Props> {
       if (child.type.isRoundedFormComponent || inputChildComponentNames.includes(child.type.displayName)) {
         const formState = this::getFormState()
 
-        const onChange = (value) => (
+        const onChange = value => (
           this.props.actions.updateField(this.props.id, child.props.name, value)
         )
 

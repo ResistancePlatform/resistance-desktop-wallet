@@ -12,6 +12,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
+import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import {
   Info,
   RoundedForm,
@@ -19,6 +20,7 @@ import {
   CheckBox,
   RadioButton,
   CurrencyAmountInput,
+  PriceInput,
   ChooseWallet
 } from '~/components/rounded-form'
 import OrderSummary from './OrderSummary'
@@ -27,9 +29,11 @@ import OrderBook from './OrderBook'
 import styles from './BuySell.scss'
 
 const validationSchema = Joi.object().keys({
+  isMarketOrder: Joi.boolean().default(true),
   sendFrom: Joi.string().required().label(`Send from`),
   receiveTo: Joi.string().required().label(`Receive to`),
   maxRel: Joi.string().required().label(`Max. amount`),
+  price: Joi.string().optional().label(`Price`),
   enhancedPrivacy: Joi.boolean().required().label(`Enhanced privacy`),
 })
 
@@ -39,7 +43,8 @@ type Props = {
   buySell: ResDexState.buySell,
   orders: ResDexState.orders,
   accounts: ResDexState.accounts,
-  actions: object
+  actions: object,
+  formActions: object
 }
 
 
@@ -54,6 +59,12 @@ class ResDexBuySell extends Component<Props> {
     const { quoteCurrency } = this.props.buySell
     const currency = this.props.accounts.currencies.RESDEX[quoteCurrency]
     return currency && currency.balance || Decimal(0)
+  }
+
+  getBestPrice(): object | null {
+    const { orderBook } = this.props.buySell
+    const { asks  } = orderBook.baseQuote
+    return asks.length ? asks[0].price : null
   }
 
   // Can't create a market order if there's no liquidity or when sending an order
@@ -109,13 +120,16 @@ class ResDexBuySell extends Component<Props> {
     const { t } = this.props
     const { baseCurrency, quoteCurrency } = this.props.buySell
     const txFee = this.props.accounts.currencyFees[quoteCurrency]
+    const { form } = this.props
+    const isMarketOrder = form && form.fields.isMarketOrder
+    log.info('isMarketOrder', isMarketOrder, form && form.fields)
 
     return (
       <RoundedForm
-              id={isAdvanced ? 'resDexBuySellAdvanced' : 'resDexBuySellSimple'}
-              className={styles.form}
-              schema={validationSchema}
-            >
+        id="resDexBuySell"
+        className={styles.form}
+        schema={validationSchema}
+      >
 
         {isAdvanced &&
           <div className={styles.orderType}>
@@ -125,7 +139,6 @@ class ResDexBuySell extends Component<Props> {
 
             <RadioButton
               name="isMarketOrder"
-              defaultValue
               value
             >
               {t(`Market Order`)}
@@ -133,8 +146,8 @@ class ResDexBuySell extends Component<Props> {
 
             <RadioButton
               name="isMarketOrder"
-              defaultValue={false}
               value={false}
+              defaultChecked
             >
               {t(`Limit Order`)}
             </RadioButton>
@@ -159,14 +172,37 @@ class ResDexBuySell extends Component<Props> {
         />
 
         {isAdvanced ? (
-            <div className={styles.advanced}>
-              <CurrencyAmountInput
-                name="maxRel"
-                addonClassName={styles.maxRelAddon}
-                buttonLabel={t(`Use max`)}
-                maxAmount={this.getMaxQuoteAmount()}
-                symbol={quoteCurrency}
-              />
+            <div className={styles.advancedInputs}>
+              <div className={styles.box}>
+                <div className={styles.caption}>
+                  {t(`Max. {{symbol}}`, {symbol: quoteCurrency})}
+                  <Info tooltip={t(`Lorem ipsum`)} />
+                </div>
+
+                <CurrencyAmountInput
+                  name="maxRel"
+                  buttonLabel={t(`Use max`)}
+                  addonClassName={styles.maxRelAddon}
+                  maxAmount={this.getMaxQuoteAmount()}
+                  symbol={quoteCurrency}
+                />
+
+              </div>
+
+              <div className={styles.box}>
+                <div className={styles.caption}>
+                  {t(`Price {{symbol}}`, {symbol: quoteCurrency})}
+                  <Info tooltip={t(`Lorem ipsum`)} />
+                </div>
+
+                <PriceInput
+                  name="price"
+                  bestPrice={this.getBestPrice()}
+                  baseCurrency={baseCurrency}
+                  quoteCurrency={quoteCurrency}
+                />
+
+              </div>
 
             </div>
           ) : (
@@ -174,25 +210,27 @@ class ResDexBuySell extends Component<Props> {
               <CurrencyAmountInput
                 name="maxRel"
                 labelClassName={styles.inputLabel}
-                addonClassName={styles.maxRelAddon}
                 label={t(`Max. {{quoteCurrency}}`, { quoteCurrency })}
+                addonClassName={styles.maxRelAddon}
                 buttonLabel={t(`Use max`)}
                 maxAmount={this.getMaxQuoteAmount()}
                 symbol={quoteCurrency}
               />
 
-              <CheckBox name="enhancedPrivacy" defaultValue={false}>
-                {t(`Enhanced privacy`)}
-
-                <Info
-                  tooltipClassName={styles.enhancedPrivacyTooltip}
-                  tooltip={t('enhanced-privacy')}
-                />
-
-              </CheckBox>
-
             </div>
           )
+        }
+
+        {(!isAdvanced || isMarketOrder) &&
+          <CheckBox name="enhancedPrivacy" defaultValue={false}>
+            {t(`Enhanced privacy`)}
+
+            <Info
+              tooltipClassName={styles.enhancedPrivacyTooltip}
+              tooltip={t('enhanced-privacy')}
+            />
+
+          </CheckBox>
         }
 
         <RoundedButton
@@ -274,6 +312,7 @@ class ResDexBuySell extends Component<Props> {
             className={styles.orderBook}
             baseCurrency={baseCurrency}
             quoteCurrency={quoteCurrency}
+            onPickPrice={price => this.props.formActions.updateField('resDexBuySell', 'price', price.toString())}
             orderBook={this.props.buySell.orderBook.baseQuote}
           />
         }
@@ -291,7 +330,8 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(ResDexBuySellActions, dispatch)
+  actions: bindActionCreators(ResDexBuySellActions, dispatch),
+  formActions: bindActionCreators(RoundedFormActions, dispatch),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexBuySell))
