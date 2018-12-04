@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 
-import { truncateAmount, toDecimalPlaces } from '~/utils/decimal'
+import { toDecimalPlaces } from '~/utils/decimal'
 import {
   UniformList,
   UniformListHeader,
@@ -41,6 +41,25 @@ class OrderBook extends Component<Props> {
     )
   }
 
+  getListRowRenderer(order) {
+    return (
+      <UniformListRow>
+        <UniformListColumn>
+          {toDecimalPlaces(order.price, 8)}
+        </UniformListColumn>
+        <UniformListColumn>
+          {toDecimalPlaces(order.maxVolume, 8)}
+        </UniformListColumn>
+        <UniformListColumn>
+          {toDecimalPlaces(order.maxVolume.times(order.price), 8)}
+        </UniformListColumn>
+        <UniformListColumn>
+          {toDecimalPlaces(order.depth, 8)}
+        </UniformListColumn>
+      </UniformListRow>
+    )
+  }
+
 	render() {
     const { t } = this.props
     const { asks, bids } = this.props.orderBook
@@ -49,13 +68,31 @@ class OrderBook extends Component<Props> {
       <div className={styles.orderBook}>
         <div className={styles.asks}>
           <div className={styles.title}>
+            <div className={cn('icon', styles.asksIcon)} />
             {t(`Asks`)}
           </div>
 
           <UniformList
+            className={styles.list}
             items={asks}
             headerRenderer={() => this.getListHeaderRenderer()}
             rowRenderer={item => this.getListRowRenderer(item)}
+            emptyMessage={t(`No liquidity available`)}
+          />
+
+        </div>
+        <div className={styles.bids}>
+          <div className={styles.title}>
+            <div className={cn('icon', styles.bidsIcon)} />
+            {t(`Bids`)}
+          </div>
+
+          <UniformList
+            className={styles.list}
+            items={bids}
+            headerRenderer={() => this.getListHeaderRenderer()}
+            rowRenderer={item => this.getListRowRenderer(item)}
+            emptyMessage={t(`No liquidity available`)}
           />
 
         </div>

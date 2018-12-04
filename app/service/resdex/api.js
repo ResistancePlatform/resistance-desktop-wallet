@@ -215,7 +215,7 @@ class ResDexApiService {
 			.filter(order => order.numutxos > 0)
 			.map(order => ({
 				address: order.address,
-				depth: order.depth,
+				depth: Decimal(order.depth),
 				price: Decimal(order.price),
 				utxoCount: order.numutxos,
 				averageVolume: Decimal(order.avevolume),

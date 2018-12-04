@@ -66,11 +66,16 @@ function stopChildProcesses() {
       log.info(`Killing child process ${processName} with PID ${item.instance.pid}`)
 
       // childProcess.kill() doesn't work for an unknown reason
+      // item.pid is not always initialized, trying all options to be sure
+
       if (item.pid) {
         ps.kill(item.pid)
-      } else {
+      }
+
+      if (item.instance.pid && item.pid !== item.instance.pid) {
         ps.kill(item.instance.pid)
       }
+
     }
   })
 }

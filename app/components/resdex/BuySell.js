@@ -17,6 +17,7 @@ import {
   RoundedForm,
   RoundedButton,
   CheckBox,
+  RadioButton,
   CurrencyAmountInput,
   ChooseWallet
 } from '~/components/rounded-form'
@@ -112,8 +113,33 @@ class ResDexBuySell extends Component<Props> {
     return (
       <RoundedForm
               id={isAdvanced ? 'resDexBuySellAdvanced' : 'resDexBuySellSimple'}
+              className={styles.form}
               schema={validationSchema}
             >
+
+        {isAdvanced &&
+          <div className={styles.orderType}>
+            <div className={styles.caption}>
+              {t(`Order type`)}
+            </div>
+
+            <RadioButton
+              name="isMarketOrder"
+              defaultValue
+              value
+            >
+              {t(`Market Order`)}
+            </RadioButton>
+
+            <RadioButton
+              name="isMarketOrder"
+              defaultValue={false}
+              value={false}
+            >
+              {t(`Limit Order`)}
+            </RadioButton>
+          </div>
+        }
         <ChooseWallet
           name="sendFrom"
           labelClassName={styles.oldInputLabel}
@@ -201,45 +227,51 @@ class ResDexBuySell extends Component<Props> {
 
 		return (
       <div className={cn(styles.container)}>
-        <RpcPolling
-          criticalChildProcess="RESDEX"
-          interval={1.0}
-          actions={{
-            polling: ResDexBuySellActions.getOrderBook,
-            success: ResDexBuySellActions.gotOrderBook,
-            failure: ResDexBuySellActions.getOrderBookFailed
-          }}
-        />
 
-        <div className={styles.actionContainer}>
-          <Tabs
-            className={styles.tabs}
-            selectedIndex={this.props.buySell.selectedTabIndex}
-            onSelect={tabIndex => this.props.actions.selectTab(tabIndex)}
-            selectedTabClassName={styles.selectedTab}
-            selectedTabPanelClassName={styles.selectedTabPanel}
-          >
-            <TabList className={styles.tabList}>
-              <Tab className={styles.tab}>{t(`Simple`)}</Tab>
-              <Tab className={styles.tab}>{t(`Advanced`)}</Tab>
-            </TabList>
+        <div className={styles.topContainer}>
+          <RpcPolling
+            criticalChildProcess="RESDEX"
+            interval={1.0}
+            actions={{
+              polling: ResDexBuySellActions.getOrderBook,
+              success: ResDexBuySellActions.gotOrderBook,
+              failure: ResDexBuySellActions.getOrderBookFailed
+            }}
+          />
 
-            <TabPanel className={styles.tabPanel}>
-              {this.getForm(false, order)}
-            </TabPanel>
+          <div className={styles.actionContainer}>
+            <Tabs
+              className={styles.tabs}
+              selectedIndex={this.props.buySell.selectedTabIndex}
+              onSelect={tabIndex => this.props.actions.selectTab(tabIndex)}
+              selectedTabClassName={styles.selectedTab}
+              selectedTabPanelClassName={styles.selectedTabPanel}
+            >
+              <TabList className={styles.tabList}>
+                <Tab className={styles.tab}>{t(`Simple`)}</Tab>
+                <Tab className={styles.tab}>{t(`Advanced`)}</Tab>
+              </TabList>
 
-            <TabPanel className={styles.tabPanel}>
-              {this.getForm(true, order)}
-            </TabPanel>
+              <TabPanel className={styles.tabPanel}>
+                {this.getForm(false, order)}
+              </TabPanel>
 
-          </Tabs>
+              <TabPanel className={styles.tabPanel}>
+                {this.getForm(true, order)}
+              </TabPanel>
 
+            </Tabs>
+
+          </div>
+
+          <div className={styles.orderSummaryContainer}>
+            <OrderSummary order={order} />
+          </div>
         </div>
-
-        <OrderSummary order={order} />
 
         {this.props.buySell.isAdvanced &&
           <OrderBook
+            className={styles.orderBook}
             baseCurrency={baseCurrency}
             quoteCurrency={quoteCurrency}
             orderBook={this.props.buySell.orderBook.baseQuote}

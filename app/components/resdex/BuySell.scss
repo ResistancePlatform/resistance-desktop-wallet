@@ -4,18 +4,12 @@
 .container {
   display: flex;
   margin: 1.5rem;
+  flex-direction: column;
 }
 
-.enhancedPrivacyTooltip {
-  width: 22rem !important;
-}
-
-.inputLabel {
-  min-width: 4.3rem;
-}
-
-.oldInputLabel {
-  width: 5.2rem;
+.topContainer {
+  display: flex;
+  flex-direction: row;
 }
 
 .tabList {
@@ -43,6 +37,32 @@
 
 .selectedTabPanel {
   padding: 1rem;
+}
+
+.form {
+  .orderType {
+    display: flex;
+  }
+
+  .caption {
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.67rem;
+    font-weight: 300;
+    text-transform: uppercase;
+  }
+
+  .enhancedPrivacyTooltip {
+    width: 22rem !important;
+  }
+
+  .inputLabel {
+    min-width: 4.3rem;
+  }
+
+  .oldInputLabel {
+    width: 5.2rem;
+  }
+
 }
 
 .actionContainer {

@@ -97,7 +97,11 @@ class UniformList extends Component<Props> {
 
         {this.props.items.length
           ? this.getSortedItems().map((item, index) => this.applyColumnWidths(this.props.rowRenderer(item, index)))
-          : emptyMessage
+          : (
+            <div className={styles.emptyMessage}>
+              {emptyMessage}
+            </div>
+          )
         }
       </div>
     )

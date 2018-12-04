@@ -182,7 +182,7 @@ export class ChildProcessService {
 
     log.debug(`Child process ${processName} started`)
     getStore().dispatch(actions.childProcessStarted(processName))
-    childProcessInfo.pid = childProcess.pid
+    childProcessInfo.pid = childProcess.pid || await this.getPid(processName)
   }
 
 	/**
