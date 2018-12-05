@@ -232,7 +232,7 @@ class ResDexApiService {
 	}
 
 	/**
-	 * Creates an order.
+	 * Creates a market order.
    *
 	 * @memberof ResDexApiService
 	 */
@@ -244,6 +244,21 @@ class ResDexApiService {
       base: opts.baseCurrency,
       rel: opts.quoteCurrency,
       basevolume: opts.amount.toNumber(),
+      relvolume: opts.total.toNumber(),
+      price: opts.price.toNumber(),
+    })
+  }
+
+	/**
+	 * Creates a limit order.
+   *
+	 * @memberof ResDexApiService
+	 */
+  createLimitOrder(opts) {
+    return this.query({
+      method: 'setprice',
+      base: opts.baseCurrency,
+      rel: opts.quoteCurrency,
       relvolume: opts.total.toNumber(),
       price: opts.price.toNumber(),
     })

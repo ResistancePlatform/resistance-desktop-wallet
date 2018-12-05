@@ -195,6 +195,7 @@ class ResDexBuySell extends Component<Props> {
                   bestPrice={this.getBestPrice()}
                   baseCurrency={baseCurrency}
                   quoteCurrency={quoteCurrency}
+                  disabled={order.isMarket}
                 />
 
               </div>
@@ -241,7 +242,7 @@ class ResDexBuySell extends Component<Props> {
           important
           large
         >
-          {isAdvanced ? t(`Add to order book`) : t(`Exchange`)}
+          {order.isMarket ? t(`Exchange`) : t(`Add to order book`)}
         </RoundedButton>
       </RoundedForm>
     )

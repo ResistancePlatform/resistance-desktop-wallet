@@ -69,18 +69,25 @@ const getOrderBookFailedEpic = (action$: ActionsObservable<Action>) => action$.p
 const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexBuySellActions.createOrder),
   switchMap(() => {
-    const { maxRel } = state$.value.roundedForm.resDexBuySell.fields
+    const { fields } = state$.value.roundedForm.resDexBuySell
+    let { price } = fields
+    const { isMarketOrder, maxRel } = fields
     const { baseCurrency, quoteCurrency, orderBook } = state$.value.resDex.buySell
-    const { price } = orderBook.baseQuote.asks[0]
+
+    if (isMarketOrder && !price) {
+      const { price: askPrice } = orderBook.baseQuote.asks[0]
+      price = askPrice.times(Decimal('1.2'))
+    }
 
     const orderOptions = {
       baseCurrency,
       quoteCurrency,
       quoteCurrencyAmount: Decimal(maxRel),
-      price,
+      price: Decimal(price),
+      isMarketOrder
     }
 
-    return getCreateOrderObservable(
+    return getCreateMarketOrderObservable(
       'RESDEX',
       orderOptions,
       null,
@@ -91,7 +98,7 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
   })
 )
 
-const getCreateOrderObservable = (processName, options, privacy, getSuccessObservable, failureAction, state$) => {
+const getCreateMarketOrderObservable = (processName, options, privacy, getSuccessObservable, failureAction, state$) => {
   const {
     baseCurrency,
     quoteCurrency,
@@ -103,7 +110,7 @@ const getCreateOrderObservable = (processName, options, privacy, getSuccessObser
   const txFee = state$.value.resDex.accounts.currencyFees[quoteCurrency]
 
   const dexFee = RESDEX.dexFee.div(Decimal('100'))
-  const divider = price.times(Decimal('1.2')).plus(price.times(dexFee)).plus(txFee)
+  const divider = price.plus(price.times(dexFee)).plus(txFee)
 
   const requestOpts = {
     type: 'buy',
@@ -150,17 +157,17 @@ const getCreateOrderObservable = (processName, options, privacy, getSuccessObser
 const getRelResOrderObservable = (privacy, getSuccessObservable, state$) => {
     const { quoteCurrency, orderBook } = state$.value.resDex.buySell
     const { quoteCurrencyAmount } = privacy
-    const { price } = orderBook.resQuote.asks[0]
+    const { price: askPrice } = orderBook.resQuote.asks[0]
 
     const orderOptions = {
       baseCurrency: 'RES',
       quoteCurrency,
       quoteCurrencyAmount,
-      price,
+      price: askPrice.times(Decimal('1.2')),
     }
     log.debug(`Private market order stage 1, ${quoteCurrency} -> RES`, orderOptions)
 
-    return getCreateOrderObservable(
+    return getCreateMarketOrderObservable(
       'RESDEX',
       orderOptions,
       privacy,
@@ -230,18 +237,18 @@ const getResBaseOrderObservable = (privacy, getSuccessObservable, state$) => {
   const { balance } = state$.value.resDex.accounts.currencies.RESDEX_PRIVACY2.RES
   const { orderBook } = state$.value.resDex.buySell
   const { baseCurrency, initialPrivacy2ResBalance } = privacy
-  const { price } = orderBook.baseRes.asks[0]
+  const { price: askPrice } = orderBook.baseRes.asks[0]
 
   const orderOptions = {
     baseCurrency,
     quoteCurrency: 'RES',
     quoteCurrencyAmount: balance.minus(initialPrivacy2ResBalance),
-    price,
+    price: askPrice.times(Decimal('1.2')),
   }
 
   log.debug(`Private market order stage 5, RES -> ${baseCurrency}`, orderOptions)
 
-  return getCreateOrderObservable(
+  return getCreateMarketOrderObservable(
     'RESDEX_PRIVACY2',
     orderOptions,
     privacy,
