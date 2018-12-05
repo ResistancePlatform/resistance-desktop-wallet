@@ -43,10 +43,16 @@ export default class RadioButton extends GenericControl  {
 	onClickHandler(event) {
 		event.stopPropagation()
 
-    const { value } = event.target
+    let value
+
+    if (typeof this.props.value === 'boolean') {
+      value = event.target.value === 'true'
+    } else {
+      ({ value } = event.target)
+    }
+
     this.setState({ value })
 
-    log.debug('onChange', this.props.onChange, event.target.value)
 		if (this.props.onChange) {
 			this.props.onChange(value)
 		}

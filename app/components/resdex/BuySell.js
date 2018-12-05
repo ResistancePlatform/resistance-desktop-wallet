@@ -1,5 +1,4 @@
 // @flow
-import log from 'electron-log'
 import { Decimal } from 'decimal.js'
 import * as Joi from 'joi'
 import React, { Component } from 'react'
@@ -77,8 +76,6 @@ class ResDexBuySell extends Component<Props> {
       !['completed', 'failed'].includes(swap.privacy.status)
     ).length
 
-    log.debug('arePendingPrivateOrdersPresent', arePendingPrivateOrdersPresent)
-
     const areAllAsksPresent = order.isPrivate
       ? orderBook.resQuote.asks.length && orderBook.baseRes.asks.length
       : orderBook.baseQuote.asks.length
@@ -94,7 +91,6 @@ class ResDexBuySell extends Component<Props> {
   }
 
   getOrder() {
-    // TODO: Update for private orders
     const { form } = this.props
     const quoteCurrencyAmount = Decimal(form && form.fields.maxRel || '0')
 
@@ -103,6 +99,7 @@ class ResDexBuySell extends Component<Props> {
     const { price } = asks.length && asks[0]
 
     const isPrivate = form && form.fields.enhancedPrivacy
+    const isMarket = form && form.fields.isMarketOrder
 
     const order = {
       orderType: 'buy',
@@ -110,6 +107,7 @@ class ResDexBuySell extends Component<Props> {
       price: price || null,
       baseCurrency,
       quoteCurrency,
+      isMarket,
       isPrivate,
     }
 
@@ -120,9 +118,6 @@ class ResDexBuySell extends Component<Props> {
     const { t } = this.props
     const { baseCurrency, quoteCurrency } = this.props.buySell
     const txFee = this.props.accounts.currencyFees[quoteCurrency]
-    const { form } = this.props
-    const isMarketOrder = form && form.fields.isMarketOrder
-    log.info('isMarketOrder', isMarketOrder, form && form.fields)
 
     return (
       <RoundedForm
@@ -220,8 +215,7 @@ class ResDexBuySell extends Component<Props> {
             </div>
           )
         }
-
-        {(!isAdvanced || isMarketOrder) &&
+        {order.isMarket &&
           <CheckBox name="enhancedPrivacy" defaultValue={false}>
             {t(`Enhanced privacy`)}
 
