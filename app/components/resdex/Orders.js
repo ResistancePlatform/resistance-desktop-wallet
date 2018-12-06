@@ -61,7 +61,7 @@ class ResDexOrders extends Component<Props> {
       ({ baseCurrencyAmount } = baseResOrder || {})
     }
 
-    if (!baseCurrencyAmount) {
+    if (order.isPrivate && !baseCurrencyAmount) {
       baseCurrencyAmount = order.privacy.expectedBaseCurrencyAmount
     }
 

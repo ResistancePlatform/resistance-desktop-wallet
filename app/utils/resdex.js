@@ -30,9 +30,14 @@ const getOrderStatusName = order => {
     unmatched: t(`Unmatched`),
     failed: t(`Failed`),
     cancelled: t(`Cancelled`),
-    swapping_rel_res: t(`Swapping {{pair}}`, { pair: `${order.privacy.quoteCurrency}/RES` }),
-    privatizing: t(`Privatizing`),
-    swapping_res_base: t(`Swapping {{pair}}`, { pair: `RES/${order.privacy.baseCurrency}` }),
+  }
+
+  if (order.isPrivate) {
+    Object.assign(names, {
+      swapping_rel_res: t(`Swapping {{pair}}`, { pair: `${order.privacy.quoteCurrency}/RES` }),
+      swapping_res_base: t(`Swapping {{pair}}`, { pair: `RES/${order.privacy.baseCurrency}` }),
+      privatizing: t(`Privatizing`),
+    })
   }
 
   const status = order.isPrivate ? order.privacy.status : order.status

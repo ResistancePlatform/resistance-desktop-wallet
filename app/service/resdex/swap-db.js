@@ -209,7 +209,7 @@ function formatSwap(data) {
       return !['completed', 'failed'].includes(this.status)
     },
     isPrivate: privacy !== null,
-    isHidden: privacy && privacy.processName === 'RESDEX_PRIVACY2',
+    isHidden: privacy && privacy.processName === 'RESDEX_PRIVACY2' || false,
     privacy,
     error: false,
     progress: 0,

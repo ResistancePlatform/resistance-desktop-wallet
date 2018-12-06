@@ -259,7 +259,6 @@ class ResDexApiService {
       method: 'setprice',
       base: opts.baseCurrency,
       rel: opts.quoteCurrency,
-      relvolume: opts.total.toNumber(),
       price: opts.price.toNumber(),
     })
   }

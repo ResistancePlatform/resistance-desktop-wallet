@@ -1,5 +1,6 @@
 // @flow
 import { Decimal } from 'decimal.js'
+import { v4 as createUuid } from 'uuid'
 import log from 'electron-log'
 import { of, from, merge, interval, defer } from 'rxjs'
 import { map, take, filter, switchMap, catchError } from 'rxjs/operators'
@@ -87,13 +88,21 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
       isMarketOrder
     }
 
-    return getCreateMarketOrderObservable(
-      'RESDEX',
+    if (isMarketOrder) {
+      return getCreateMarketOrderObservable(
+        'RESDEX',
+        orderOptions,
+        null,
+        () => of(ResDexBuySellActions.createOrderSucceeded()),
+        ResDexBuySellActions.createOrderFailed,
+        state$
+      )
+    }
+
+    return getCreateLimitOrderObservable(
       orderOptions,
-      null,
-      () => of(ResDexBuySellActions.createOrderSucceeded()),
+      of(ResDexBuySellActions.createOrderSucceeded()),
       ResDexBuySellActions.createOrderFailed,
-      state$
     )
   })
 )
@@ -121,7 +130,7 @@ const getCreateMarketOrderObservable = (processName, options, privacy, getSucces
     total: Decimal(quoteCurrencyAmount).toDP(8, Decimal.ROUND_FLOOR)
   }
 
-  log.debug(`Submitting a swap`, requestOpts)
+  log.debug(`Submitting a swap (market order)`, requestOpts)
 
   const orderObservable = from(api.createMarketOrder(requestOpts)).pipe(
     switchMap(result => {
@@ -148,6 +157,55 @@ const getCreateMarketOrderObservable = (processName, options, privacy, getSucces
       }
 
       return of(failureAction(message))
+    })
+  )
+
+  return orderObservable
+}
+
+const getCreateLimitOrderObservable = (options, successObservable, failureAction) => {
+  const {
+    baseCurrency,
+    quoteCurrency,
+    price
+  } = options
+
+  const requestOpts = {
+    baseCurrency,
+    quoteCurrency,
+    price,
+  }
+
+  log.debug(`Submitting a swap (limit order)`, requestOpts)
+
+  const orderObservable = from(mainApi.createLimitOrder(requestOpts)).pipe(
+    switchMap(response => {
+      if (response.result !== 'success') {
+        const message = t(`Something unexpected happened. Are you sure you have enough UTXO?`)
+        return of(failureAction(message))
+      }
+
+      const swap = {
+        uuid: createUuid(),
+        base: baseCurrency,
+        rel: quoteCurrency,
+        basevalue: 0,
+        relvalue: 0,
+      }
+
+      const flattenedOptions = flattenDecimals({
+        ...requestOpts,
+        amount: Decimal(0),
+        total: Decimal(0),
+      })
+      log.debug(`Inserting a swap`, swap, flattenedOptions)
+      swapDB.insertSwapData(swap, flattenedOptions)
+
+      return successObservable
+    }),
+    catchError(err => {
+      log.error(`Swap error`, err)
+      return of(failureAction(t(`Can't create a limit order, check the log for details`)))
     })
   )
 

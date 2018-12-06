@@ -33,7 +33,7 @@ const validationSchema = Joi.object().keys({
   receiveTo: Joi.string().required().label(`Receive to`),
   maxRel: Joi.string().required().label(`Max. amount`),
   price: Joi.string().optional().label(`Price`),
-  enhancedPrivacy: Joi.boolean().required().label(`Enhanced privacy`),
+  enhancedPrivacy: Joi.boolean().default(false).label(`Enhanced privacy`),
 })
 
 type Props = {
@@ -70,6 +70,10 @@ class ResDexBuySell extends Component<Props> {
   getSubmitButtonDisabledAttribute(order) {
     const { swapHistory } = this.props.orders
     const { baseCurrency, quoteCurrency, orderBook, isSendingOrder } = this.props.buySell
+
+    if (!order.isMarket) {
+      return isSendingOrder
+    }
 
     const arePendingPrivateOrdersPresent = swapHistory.filter(
       swap => swap.isPrivate &&
