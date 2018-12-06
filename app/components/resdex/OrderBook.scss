@@ -43,4 +43,9 @@
 
 .row {
   cursor: pointer;
+
+  &.myAddress {
+    color: $BASE_COLOR_LIGHT_BLUE;
+  }
+
 }

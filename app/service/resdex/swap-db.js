@@ -90,7 +90,7 @@ export class SwapDBService {
     })
   }
 
-  insertSwapData(swap, requestOpts, privacy = null) {
+  insertSwapData(swap, requestOpts, isMarket: boolean, privacy = null) {
     return this.queue(() => this.db.post({
       uuid: swap.uuid,
       timeStarted: Date.now(),
@@ -98,6 +98,7 @@ export class SwapDBService {
       response: swap,
       messages: [],
       privacy,
+      isMarket
     }))
   }
 
@@ -112,17 +113,15 @@ export class SwapDBService {
   }
 
   /**
-   * Marks a swap as 'failed'.
-   * This is a temporary workaround to failed orders that don't get the failed update on the websocket
-   * and thus are stuck as 'pending'
+   * Sets a swap status forcedly.
    *
    */
-  forceSwapFailure(uuid) {
+  forceSwapStatus(uuid, status: 'failed' | 'cancelled') {
     return this.queue(async () => {
       const swap = await this::getSwapData(uuid)
       const message = {
-        method: 'failed',
-        error: -1,
+        method: 'set_order_status',
+        status,
       }
       swap.messages.push(message)
       return this.db.put(swap)
@@ -188,7 +187,15 @@ function formatSwap(data) {
   const MATCHED_STEP = 1
   const TOTAL_PROGRESS_STEPS = swapTransactions.length + MATCHED_STEP
 
-  const {uuid, timeStarted, request, response, messages, privacy} = data
+  const {
+    uuid,
+    timeStarted,
+    request,
+    response,
+    messages,
+    isMarket,
+    privacy
+  } = data
 
   // If we place a sell order marketmaker just inverts the values and places a buy
   // on the opposite pair. We need to normalise this otherwise we'll show the
@@ -210,6 +217,7 @@ function formatSwap(data) {
     },
     isPrivate: privacy !== null,
     isHidden: privacy && privacy.processName === 'RESDEX_PRIVACY2' || false,
+    isMarket,
     privacy,
     error: false,
     progress: 0,
@@ -248,6 +256,10 @@ function formatSwap(data) {
     }
     if (message.quoteid) {
       swap.quoteId = message.quoteid
+    }
+
+    if (message.method === 'set_order_status' && !swap.isPrivate) {
+      swap.status = message.status
     }
 
     if (message.method === 'set_private_order_status' && swap.isPrivate) {

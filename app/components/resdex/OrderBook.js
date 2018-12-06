@@ -17,6 +17,8 @@ type Props = {
   t: any,
   baseCurrency: string,
   quoteCurrency: string,
+  baseSmartAddress: string,
+  quoteSmartAddress: string,
   orderBook: object,
   onPickPrice: () => void
 }
@@ -48,10 +50,10 @@ class OrderBook extends Component<Props> {
     return false
   }
 
-  getListRowRenderer(order) {
+  getListRowRenderer(order, smartAddress) {
     return (
       <UniformListRow
-        className={styles.row}
+        className={cn(styles.row, { [styles.myOrder]: order.address === smartAddress })}
         onClick={e => this.onRowClick(e, order.price)}
       >
         <UniformListColumn>
@@ -86,7 +88,7 @@ class OrderBook extends Component<Props> {
             className={styles.list}
             items={asks}
             headerRenderer={() => this.getListHeaderRenderer()}
-            rowRenderer={item => this.getListRowRenderer(item)}
+            rowRenderer={item => this.getListRowRenderer(item, this.props.baseSmartAddress)}
             emptyMessage={t(`No liquidity available yet`)}
           />
 
@@ -101,7 +103,7 @@ class OrderBook extends Component<Props> {
             className={styles.list}
             items={bids}
             headerRenderer={() => this.getListHeaderRenderer()}
-            rowRenderer={item => this.getListRowRenderer(item)}
+            rowRenderer={item => this.getListRowRenderer(item, this.props.quoteSmartAddress)}
             emptyMessage={t(`No liquidity available yet`)}
           />
 

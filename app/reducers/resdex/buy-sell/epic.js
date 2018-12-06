@@ -103,6 +103,7 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
       orderOptions,
       of(ResDexBuySellActions.createOrderSucceeded()),
       ResDexBuySellActions.createOrderFailed,
+      state$
     )
   })
 )
@@ -144,7 +145,7 @@ const getCreateMarketOrderObservable = (processName, options, privacy, getSucces
       log.debug(`Inserting a swap`, result.swaps, swap, flattenedOptions)
 
       const flattenedPrivacy = privacy ? flattenDecimals({...privacy, processName}) : null
-      swapDB.insertSwapData(swap, flattenedOptions, flattenedPrivacy)
+      swapDB.insertSwapData(swap, flattenedOptions, true, flattenedPrivacy)
 
       return getSuccessObservable(swap.uuid)
     }),
@@ -163,7 +164,7 @@ const getCreateMarketOrderObservable = (processName, options, privacy, getSucces
   return orderObservable
 }
 
-const getCreateLimitOrderObservable = (options, successObservable, failureAction) => {
+const getCreateLimitOrderObservable = (options, successObservable, failureAction, state$) => {
   const {
     baseCurrency,
     quoteCurrency,
@@ -193,13 +194,27 @@ const getCreateLimitOrderObservable = (options, successObservable, failureAction
         relvalue: 0,
       }
 
+      const { swapHistory } = state$.value.resDex.orders
+
+      const previousSwaps = swapHistory.filter(order => (
+        !order.isMarket
+        && order.baseCurrency === baseCurrency
+        && order.quoteCurrency === quoteCurrency
+      ))
+
+      if (previousSwaps.length) {
+        log.debug(`Cancelling the existing limit order(s)`)
+        previousSwaps.forEach(order => swapDB.forceSwapStatus(order.uuid, 'cancelled'))
+      }
+
       const flattenedOptions = flattenDecimals({
         ...requestOpts,
         amount: Decimal(0),
         total: Decimal(0),
+        isMarket: false,
       })
       log.debug(`Inserting a swap`, swap, flattenedOptions)
-      swapDB.insertSwapData(swap, flattenedOptions)
+      swapDB.insertSwapData(swap, flattenedOptions, false)
 
       return successObservable
     }),

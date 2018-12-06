@@ -93,9 +93,9 @@ const cleanupPendingSwapsEpic = (action$: ActionsObservable<Action>, state$) => 
         pendingOrders.forEach(order => {
           const isPendingForAWhile = moment(order.timeStarted).isBefore(moment().subtract(5, 'minutes'))
 
-          if (!(order.uuid in swapsByUuid) && isPendingForAWhile) {
+          if (!(order.uuid in swapsByUuid) && isPendingForAWhile && order.isMarket) {
             log.warn(`Order ${order.uuid} not found in ResDEX pendings`)
-            swapDB.forceSwapFailure(order.uuid)
+            swapDB.forceSwapStatus(order.uuid, 'failed')
           }
         })
 
