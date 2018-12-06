@@ -17,8 +17,8 @@ type Props = {
   t: any,
   baseCurrency: string,
   quoteCurrency: string,
-  baseSmartAddress: string,
-  quoteSmartAddress: string,
+  baseSmartAddress: string | null,
+  quoteSmartAddress: string | null,
   orderBook: object,
   onPickPrice: () => void
 }

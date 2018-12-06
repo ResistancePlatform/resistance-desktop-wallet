@@ -63,7 +63,7 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 
         // Track pending activities to ask user for a quit confirmation
         remote.getGlobal('pendingActivities').orders = Boolean(
-          swapHistory.find(swap => !['completed', 'failed'].includes(swap.status))
+          swapHistory.find(swap => !['completed', 'failed', 'cancelled'].includes(swap.status))
         )
 
         return of(ResDexOrdersActions.gotSwapHistory(swapHistory))
@@ -93,7 +93,7 @@ const cleanupPendingSwapsEpic = (action$: ActionsObservable<Action>, state$) => 
         pendingOrders.forEach(order => {
           const isPendingForAWhile = moment(order.timeStarted).isBefore(moment().subtract(5, 'minutes'))
 
-          if (!(order.uuid in swapsByUuid) && isPendingForAWhile && order.isMarket) {
+          if (!(order.uuid in swapsByUuid) && isPendingForAWhile) {
             log.warn(`Order ${order.uuid} not found in ResDEX pendings`)
             swapDB.forceSwapStatus(order.uuid, 'failed')
           }

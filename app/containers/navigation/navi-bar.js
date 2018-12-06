@@ -32,7 +32,7 @@ class NaviBar extends Component<Props> {
 
   getPendingOrdersNumber(): number {
     const { swapHistory } = this.props.resDex.orders
-    const completed = status => ['completed', 'failed'].includes(status)
+    const completed = status => ['completed', 'failed', 'cancelled'].includes(status)
 
     const pendingSwaps = swapHistory.filter(swap => (
       !swap.isHidden

@@ -39,13 +39,13 @@ const getOrderBookEpic = (action$: ActionsObservable<Action>, state$) => action$
         }
         log.debug('Order book prices')
         if (baseQuote.asks.length) {
-          log.debug('baseQuote', baseQuote.asks[0].price.toString())
+          log.debug('baseQuote', baseQuote.asks[0])
         }
         if (resQuote.asks.length) {
-          log.debug('resQuote', resQuote.asks[0].price.toString())
+          log.debug('resQuote', resQuote.asks[0])
         }
         if (baseRes.asks.length) {
-          log.debug('baseRes', baseRes.asks[0].price.toString())
+          log.debug('baseRes', baseRes.asks[0])
         }
         return of(ResDexBuySellActions.gotOrderBook(orderBook))
       }),

@@ -213,7 +213,7 @@ function formatSwap(data) {
     status: 'pending',
     statusFormatted: t('status.pending').toLowerCase(),
     get isActive() {
-      return !['completed', 'failed'].includes(this.status)
+      return !['completed', 'failed', 'cancelled'].includes(this.status)
     },
     isPrivate: privacy !== null,
     isHidden: privacy && privacy.processName === 'RESDEX_PRIVACY2' || false,

@@ -39,6 +39,11 @@ class OrderModal extends Component<Props> {
       return false
     }
 
+    // A hack to address Komodo limit order status updates ambiguity
+    if (stage === 'myfee' && order.transactions.length) {
+      return true
+    }
+
     return Boolean(order.transactions.find(chainStage => chainStage.stage === stage))
   }
 

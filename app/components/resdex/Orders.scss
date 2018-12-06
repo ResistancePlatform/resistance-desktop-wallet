@@ -97,4 +97,9 @@
     color: $BASE_COLOR_DARK_BLUE_3;
     background: $BASE_COLOR_LIGHT_RED;
   }
+
+  &.cancelled {
+    color: $BASE_COLOR_WHITE;
+    background: $BASE_COLOR_GRAY_2;
+  }
 }

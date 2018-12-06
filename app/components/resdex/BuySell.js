@@ -263,6 +263,10 @@ class ResDexBuySell extends Component<Props> {
     const { t } = this.props
     const order = this.getOrder()
     const { baseCurrency, quoteCurrency } = this.props.buySell
+    const { RESDEX: currencies } = this.props.accounts.currencies
+
+    const baseSmartAddress = baseCurrency in currencies ? currencies[baseCurrency].address : null
+    const quoteSmartAddress = quoteCurrency in currencies ? currencies[quoteCurrency].address : null
 
 		return (
       <div className={cn(styles.container)}>
@@ -313,6 +317,8 @@ class ResDexBuySell extends Component<Props> {
             className={styles.orderBook}
             baseCurrency={baseCurrency}
             quoteCurrency={quoteCurrency}
+            baseSmartAddress={baseSmartAddress}
+            quoteSmartAddress={quoteSmartAddress}
             onPickPrice={price => this.props.formActions.updateField('resDexBuySell', 'price', price.toString())}
             orderBook={this.props.buySell.orderBook.baseQuote}
           />

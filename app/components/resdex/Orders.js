@@ -115,7 +115,7 @@ class ResDexOrders extends Component<Props> {
     const { swapHistory } = this.props.orders
 
     const status = swap => swap.isPrivate ? swap.privacy.status : swap.status
-    const completed = swap => ['completed', 'failed'].includes(status(swap))
+    const completed = swap => ['completed', 'failed', 'cancelled'].includes(status(swap))
 
     const visibleSwapHistory = swapHistory.filter(swap => swap.isHidden === false)
     const openOrders = visibleSwapHistory.filter(swap => !completed(swap))
