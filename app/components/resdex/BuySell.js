@@ -28,7 +28,7 @@ import OrderBook from './OrderBook'
 import styles from './BuySell.scss'
 
 const validationSchema = Joi.object().keys({
-  isMarketOrder: Joi.boolean().default(true),
+  isMarketOrder: Joi.boolean().default(false),
   sendFrom: Joi.string().required().label(`Send from`),
   receiveTo: Joi.string().required().label(`Receive to`),
   maxRel: Joi.string().required().label(`Max. amount`),
@@ -101,9 +101,10 @@ class ResDexBuySell extends Component<Props> {
     const { baseCurrency, quoteCurrency, orderBook } = this.props.buySell
     const { asks } = orderBook.baseQuote
     const { price } = asks.length && asks[0]
+    const { isAdvanced } = this.props.buySell
 
     const isPrivate = form && form.fields.enhancedPrivacy
-    const isMarket = form && form.fields.isMarketOrder
+    const isMarket = form && form.fields.isMarketOrder || !isAdvanced
 
     const order = {
       orderType: 'buy',
@@ -139,6 +140,7 @@ class ResDexBuySell extends Component<Props> {
             <RadioButton
               name="isMarketOrder"
               value
+              defaultValue={false}
             >
               {t(`Market Order`)}
             </RadioButton>
@@ -147,6 +149,7 @@ class ResDexBuySell extends Component<Props> {
               name="isMarketOrder"
               value={false}
               defaultChecked
+              defaultValue={false}
             >
               {t(`Limit Order`)}
             </RadioButton>
@@ -199,7 +202,6 @@ class ResDexBuySell extends Component<Props> {
                   bestPrice={this.getBestPrice()}
                   baseCurrency={baseCurrency}
                   quoteCurrency={quoteCurrency}
-                  disabled={order.isMarket}
                 />
 
               </div>
