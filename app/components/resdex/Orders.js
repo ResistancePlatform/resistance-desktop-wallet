@@ -54,7 +54,7 @@ class ResDexOrders extends Component<Props> {
     let baseCurrencyAmount = null
 
     if (!order.isPrivate) {
-      ({ baseCurrencyAmount } = order)
+      ({ baseCurrencyAmount } = order.isMarket ? order : order.requested)
     } else if (order.privacy.baseResOrderUuid) {
       const { swapHistory } = this.props.orders
       const baseResOrder = swapHistory[order.privacy.baseResOrderUuid]
@@ -89,7 +89,7 @@ class ResDexOrders extends Component<Props> {
           {baseCurrency}/{quoteCurrency}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.lesser)}>
-          -{toDecimalPlaces(Decimal(order.quoteCurrencyAmount))} {quoteCurrency}
+          -{toDecimalPlaces(Decimal(order.isMarket ? order.quoteCurrencyAmount : order.requested.quoteCurrencyAmount ))} {quoteCurrency}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.greater)}>
           {toDecimalPlaces(this.getBaseCurrencyAmount(order))} {baseCurrency}

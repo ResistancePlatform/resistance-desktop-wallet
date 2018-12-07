@@ -3,7 +3,7 @@ import { Decimal } from 'decimal.js'
 import { v4 as createUuid } from 'uuid'
 import log from 'electron-log'
 import { of, from, merge, interval, defer } from 'rxjs'
-import { map, take, filter, switchMap, catchError } from 'rxjs/operators'
+import { map, mapTo, take, filter, switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
@@ -12,6 +12,7 @@ import { RESDEX } from '~/constants/resdex'
 import { flattenDecimals } from '~/utils/decimal'
 import { SwapDBService } from '~/service/resdex/swap-db'
 import { resDexApiFactory } from '~/service/resdex/api'
+import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { ResDexBuySellActions } from './reducer'
 
 
@@ -168,6 +169,7 @@ const getCreateLimitOrderObservable = (options, successObservable, failureAction
   const {
     baseCurrency,
     quoteCurrency,
+    quoteCurrencyAmount,
     price
   } = options
 
@@ -196,21 +198,23 @@ const getCreateLimitOrderObservable = (options, successObservable, failureAction
 
       const { swapHistory } = state$.value.resDex.orders
 
-      const previousSwaps = swapHistory.filter(order => (
+      const previousSwap = swapHistory.find(order => (
         !order.isMarket
+        && order.isActive
         && order.baseCurrency === baseCurrency
         && order.quoteCurrency === quoteCurrency
       ))
 
-      if (previousSwaps.length) {
+      if (previousSwap) {
         log.debug(`Cancelling the existing limit order(s)`)
-        previousSwaps.forEach(order => swapDB.forceSwapStatus(order.uuid, 'cancelled'))
+        swapDB.forceSwapStatus(previousSwap.uuid, 'cancelled')
       }
 
+      // Amount and total are just for the display
       const flattenedOptions = flattenDecimals({
         ...requestOpts,
-        amount: Decimal(0),
-        total: Decimal(0),
+        amount: Decimal(quoteCurrencyAmount).dividedBy(price).toDP(8, Decimal.ROUND_FLOOR),
+        total: Decimal(quoteCurrencyAmount).toDP(8, Decimal.ROUND_FLOOR),
         isMarket: false,
       })
       log.debug(`Inserting a swap`, swap, flattenedOptions)
@@ -477,6 +481,12 @@ const setPrivateOrderStatusEpic = (action$: ActionsObservable<Action>) => action
   })
 )
 
+const selectTabEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexBuySellActions.selectTab),
+  mapTo(RoundedFormActions.clear('resDexBuySell'))
+)
+
+
 export const ResDexBuySellEpic = (action$, state$) => merge(
   createOrderEpic(action$, state$),
   createPrivateOrderEpic(action$, state$),
@@ -487,5 +497,6 @@ export const ResDexBuySellEpic = (action$, state$) => merge(
   getOrderBookFailedEpic(action$, state$),
   setPrivateOrderStatusEpic(action$, state$),
   linkPrivateOrderToBaseResOrderEpic(action$, state$),
+  selectTabEpic(action$, state$),
 )
 

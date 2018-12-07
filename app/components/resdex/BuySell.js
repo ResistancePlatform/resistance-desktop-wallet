@@ -27,14 +27,18 @@ import OrderBook from './OrderBook'
 
 import styles from './BuySell.scss'
 
-const validationSchema = Joi.object().keys({
-  isMarketOrder: Joi.boolean().default(false),
-  sendFrom: Joi.string().required().label(`Send from`),
-  receiveTo: Joi.string().required().label(`Receive to`),
-  maxRel: Joi.string().required().label(`Max. amount`),
-  price: Joi.string().optional().label(`Price`),
-  enhancedPrivacy: Joi.boolean().default(false).label(`Enhanced privacy`),
-})
+function getValidationSchema(t, isAdvanced) {
+  return Joi.object().keys({
+    isMarketOrder: Joi.boolean().default(!isAdvanced),
+    sendFrom: Joi.string().required().label(t(`Send from`)),
+    receiveTo: Joi.string().required().label(t(`Receive to`)),
+    maxRel: Joi.string().required().label(t(`Max. amount`)),
+    price: Joi.string().when('isMarketOrder', {
+      is: false, then: Joi.string().required().label(t(`Price`))
+    }),
+    enhancedPrivacy: Joi.boolean().default(false).label(t(`Enhanced privacy`)),
+  })
+}
 
 type Props = {
   t: any,
@@ -103,8 +107,8 @@ class ResDexBuySell extends Component<Props> {
     const { price } = asks.length && asks[0]
     const { isAdvanced } = this.props.buySell
 
-    const isPrivate = form && form.fields.enhancedPrivacy
     const isMarket = form && form.fields.isMarketOrder || !isAdvanced
+    const isPrivate = form && form.fields.enhancedPrivacy && isMarket
 
     const order = {
       orderType: 'buy',
@@ -128,7 +132,7 @@ class ResDexBuySell extends Component<Props> {
       <RoundedForm
         id="resDexBuySell"
         className={styles.form}
-        schema={validationSchema}
+        schema={getValidationSchema(t, isAdvanced)}
       >
 
         {isAdvanced &&
@@ -202,6 +206,7 @@ class ResDexBuySell extends Component<Props> {
                   bestPrice={this.getBestPrice()}
                   baseCurrency={baseCurrency}
                   quoteCurrency={quoteCurrency}
+                  disabled={order.isMarket && order.isPrivate}
                 />
 
               </div>

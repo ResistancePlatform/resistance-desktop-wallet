@@ -60,10 +60,10 @@ class OrderBook extends Component<Props> {
           {toDecimalPlaces(order.price, 4)}
         </UniformListColumn>
         <UniformListColumn>
-          {toDecimalPlaces(order.maxVolume, 4)}
+          {toDecimalPlaces(order.maxVolume.times(order.price), 4)}
         </UniformListColumn>
         <UniformListColumn>
-          {toDecimalPlaces(order.maxVolume.times(order.price), 4)}
+          {toDecimalPlaces(order.maxVolume, 4)}
         </UniformListColumn>
         <UniformListColumn>
           {toDecimalPlaces(order.depth, 4)}
