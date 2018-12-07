@@ -188,6 +188,8 @@ async function startOrRestart(isTorEnabled: boolean, start: boolean) {
 
   const exportDir = getExportDir()
 
+  log.info(`Export Dir: ${exportDir}`)
+
   try {
     await verifyDirectoryExistence(exportDir)
   } catch (err) {
