@@ -9,6 +9,7 @@ import { getStore } from '~/store/configureStore'
 import { getAppDataPath, verifyDirectoryExistence } from '~/utils/os'
 import { ChildProcessService } from '../child-process-service'
 import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
+import { getOS } from '~/utils/os'
 
 const netId = 2045
 const rpcPort = 17445
@@ -55,6 +56,9 @@ export class ResDexService {
       return result
     })
 
+    var homedir = (getOS() == "windows") ? (os.homedir() + "\\AppData\\Roaming\\") : os.homedir()
+    log.debug(`Home Directory: ${homedir}`)
+
     const options = {
       gui: 'resdex',
       client: 1,
@@ -62,7 +66,7 @@ export class ResDexService {
       rpcport: rpcPort,
       canbind: 0,
       seednode: seedNodeAddress,
-      userhome: os.homedir(),
+      userhome: homedir,
       passphrase: seedPhrase,
       coins: currenciesWithoutElectrum,
     }
