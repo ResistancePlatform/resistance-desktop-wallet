@@ -5,7 +5,6 @@ import rp from 'request-promise-native'
 import log from 'electron-log'
 import { remote } from 'electron'
 import getPort from 'get-port'
-import pMap from 'p-map'
 
 import { getStore } from '~/store/configureStore'
 import { translate } from '~/i18next.config'
@@ -237,6 +236,10 @@ export class ResDexApiService {
       relvolume: opts.total.toNumber(),
       price: opts.price.toNumber(),
     })
+  }
+
+  async stop() {
+    return this.query({ method: 'stop' })
   }
 
 	/**

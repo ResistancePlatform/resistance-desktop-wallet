@@ -38,7 +38,8 @@
     @include titleBarButton();
     background-color: $TITLE_BAR_BUTTONS_MAXIMIZE_COLOR;
   }
-  z-index: 10;
+
+  z-index: 998;
 }
 
 .dragBar {

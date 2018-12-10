@@ -4,7 +4,7 @@ import os from 'os'
 import path from 'path'
 import rp from 'request-promise-native'
 
-import { resDexUri } from '~/service/resdex/api'
+import { ResDexApiService, resDexUri } from '~/service/resdex/api'
 import { getStore } from '~/store/configureStore'
 import { getAppDataPath, verifyDirectoryExistence } from '~/utils/os'
 import { ChildProcessService } from '../child-process-service'
@@ -93,7 +93,8 @@ export class ResDexService {
 	 * @memberof ResDexService
 	 */
 	async stop() {
-    await childProcess.killProcess('RESDEX')
+    const api = ResDexApiService()
+    return api.stop()
 	}
 
 }

@@ -1,6 +1,7 @@
 // @flow
 
 import log from 'electron-log'
+import { ipcRenderer } from 'electron'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
@@ -70,21 +71,19 @@ class App extends React.Component<Props> {
    * @memberof App
 	 */
   componentDidMount() {
-    window.addEventListener('beforeunload', () => this.cleanup())
-
     if (!this.props.fetchParameters.isDownloadComplete) {
       getStore().dispatch(FetchParametersActions.fetch())
     } else if (!this.props.getStarted.isInProgress) {
       getStore().dispatch(SettingsActions.kickOffChildProcesses())
     }
+
+    ipcRenderer.on('cleanup', () => this.cleanup())
   }
 
   cleanup() {
     log.debug(`Cleanup bloody cleanup, nothing more to do,`)
     log.debug(`Living just for dying, dying just for you!`)
-
-    const rpc = new RpcService()
-    rpc.stop()
+    getStore().dispatch(SettingsActions.stopChildProcesses())
   }
 
   getGetStartedContent() {

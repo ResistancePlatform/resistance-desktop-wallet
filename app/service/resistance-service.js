@@ -8,7 +8,7 @@ import PropertiesReader from 'properties-reader'
 import config from 'electron-settings'
 import { app, remote } from 'electron'
 
-import { getClientInstance } from '~/service/rpc-service'
+import { RpcService, getClientInstance } from '~/service/rpc-service'
 import { getStore } from '~/store/configureStore'
 import { getOS, getExportDir, verifyDirectoryExistence } from '~/utils/os'
 import { ChildProcessService } from './child-process-service'
@@ -147,7 +147,10 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
 	async stop() {
-    await childProcess.killProcess('NODE')
+    log.debug('Stopping node')
+    const rpc = new RpcService()
+    const result = await rpc.stop()
+    log.debug('Stop result', result)
 	}
 
 	/**

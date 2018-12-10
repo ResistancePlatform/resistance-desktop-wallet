@@ -1,10 +1,11 @@
 // @flow
+import log from 'electron-log'
 import config from 'electron-settings'
 import path from 'path'
 import * as fs from 'fs'
 import { promisify } from 'util'
 import { remote, ipcRenderer } from 'electron'
-import { tap, filter, delay, mergeMap, flatMap, switchMap, map, mapTo, catchError } from 'rxjs/operators'
+import { tap, filter, delay, mergeMap, flatMap, switchMap, map, mapTo, take, catchError } from 'rxjs/operators'
 import { of, from, bindCallback, concat, merge, defer } from 'rxjs'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
@@ -19,6 +20,7 @@ import { ChildProcessService } from '~/service/child-process-service'
 import { ResistanceService } from '~/service/resistance-service'
 import { MinerService } from '~/service/miner-service'
 import { TorService } from '~/service/tor-service'
+import { ResDexService } from '~/service/resdex/resdex'
 
 const t = translate('settings')
 const rpc = new RpcService()
@@ -26,6 +28,7 @@ const resistanceService = new ResistanceService()
 const minerService = new MinerService()
 const childProcess = new ChildProcessService()
 const torService = new TorService()
+const resDex = new ResDexService()
 
 const updateLanguageEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.updateLanguage),
@@ -307,6 +310,55 @@ const childProcessMurderFailedEpic = (action$: ActionsObservable<Action>) => act
   mapTo(SettingsActions.empty())
 )
 
+const stopChildProcessesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(SettingsActions.stopChildProcesses),
+  switchMap(() => {
+    const { childProcessesStatus } = state$.value.settings
+
+    log.debug(`Gracefully stopping all running processes`)
+
+    Object.entries(childProcessesStatus).forEach(([name, status]) => {
+      if (status === 'NOT RUNNING') {
+        return
+      }
+
+      log.debug(`Stopping ${name}`)
+
+      switch (name) {
+        case 'NODE':
+          resistanceService.stop()
+          break
+        case 'TOR':
+          torService.stop()
+          break
+        case 'MINER':
+          minerService.stop()
+          break
+        case 'RESDEX':
+          resDex.stop()
+          break
+        default:
+      }
+
+    })
+
+    return of(childProcessesStatus).pipe(
+      filter(statuses => {
+        log.debug(statuses)
+        return Object.values(statuses).every(status => status === 'NOT RUNNING')
+      }),
+      take(1),
+      switchMap(() => {
+        log.debug(`Cleanup complete, informing the main process`)
+        ipcRenderer.send('cleanup-complete')
+        return of(SettingsActions.empty())
+      })
+    )
+
+  })
+)
+
+
 export const SettingsEpics = (action$, state$) => merge(
   updateLanguageEpic(action$, state$),
 	kickOffChildProcessesEpic(action$, state$),
@@ -326,5 +378,6 @@ export const SettingsEpics = (action$, state$) => merge(
   restoreWalletEpic(action$, state$),
   restoringWalletFailedEpic(action$, state$),
 	childProcessFailedEpic(action$, state$),
-	childProcessMurderFailedEpic(action$, state$)
+	childProcessMurderFailedEpic(action$, state$),
+  stopChildProcessesEpic(action$, state$),
 )

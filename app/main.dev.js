@@ -11,20 +11,20 @@
  * @flow
  */
 import * as fs from 'fs'
-import crypto from 'crypto'
 import path from 'path'
 import config from 'electron-settings'
 import { app, ipcMain, BrowserWindow } from 'electron'
 import log from 'electron-log'
 
 import { i18n } from './i18next.config'
-import { getOS, getIsExitForbidden, getAppDataPath, getInstallationPath, getChildProcessesGlobal, stopChildProcesses } from './utils/os'
+import { getOS, getIsExitForbidden, getAppDataPath, getInstallationPath, getChildProcessesGlobal } from './utils/os'
 import { ResistanceService } from './service/resistance-service-main'
 import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
 
 
 let isExiting = false
+let preventCleanup = false
 
 // For the module to be imported in main, dirty, remove
 const resistance = new ResistanceService()
@@ -140,21 +140,21 @@ app.on('ready', async () => {
   })
 
   app.on('before-quit', async event => {
+    if (preventCleanup) {
+      return
+    }
+
     isExiting = true
+
+    event.preventDefault()
 
     // Closing a window just hides it on Macs
     if (getOS() === 'macos' && getIsExitForbidden(mainWindow)) {
-      event.preventDefault()
+      return
     }
 
-    // log.info(`Killing all child processes...`)
-    //
-    // const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-    // await sleep(100)
-    //
-    // // Kill processes
-    // stopChildProcesses()
-    // log.info(`Done`)
+    log.debug(`Going to close the application, asking the renderer for the cleanup`)
+    mainWindow.webContents.send('cleanup')
   })
 
   if (
@@ -201,6 +201,12 @@ app.on('ready', async () => {
 
   ipcMain.on('fetch-parameters', async () => {
     await fetchParameters.fetch(mainWindow)
+  })
+
+  ipcMain.on('cleanup-complete', () => {
+    log.info(`Quiting...`)
+    preventCleanup = true
+    app.quit()
   })
 
   // Disabling eval for security reasons,

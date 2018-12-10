@@ -49,7 +49,9 @@ export const SettingsActions = createActions(
     CHILD_PROCESS_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
     CHILD_PROCESS_RESTART_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
     CHILD_PROCESS_MURDERED: processName => ({ processName }),
-    CHILD_PROCESS_MURDER_FAILED: (processName, errorMessage) => ({ processName, errorMessage })
+    CHILD_PROCESS_MURDER_FAILED: (processName, errorMessage) => ({ processName, errorMessage }),
+
+    STOP_CHILD_PROCESSES: undefined,
   },
   {
     prefix: 'APP/SETTINGS'
