@@ -139,18 +139,22 @@ app.on('ready', async () => {
     }
   })
 
-  app.on('before-quit', event => {
+  app.on('before-quit', async event => {
     isExiting = true
 
     // Closing a window just hides it on Macs
     if (getOS() === 'macos' && getIsExitForbidden(mainWindow)) {
       event.preventDefault()
-      return
     }
 
-    log.info(`Killing all child processes...`)
-    stopChildProcesses()
-    log.info(`Done`)
+    // log.info(`Killing all child processes...`)
+    //
+    // const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+    // await sleep(100)
+    //
+    // // Kill processes
+    // stopChildProcesses()
+    // log.info(`Done`)
   })
 
   if (

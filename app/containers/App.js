@@ -1,5 +1,6 @@
 // @flow
 
+import log from 'electron-log'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
@@ -35,6 +36,7 @@ import AddressBookPage from './AddressBookPage'
 
 import { getStore } from '../store/configureStore'
 import FetchParametersDialog from '~/components/fetch-parameters/FetchParametersDialog'
+import { RpcService } from '~/service/rpc-service'
 import { FetchParametersState, FetchParametersActions } from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import { AuthState } from '~/reducers/auth/auth.reducer'
 import { GetStartedState } from '~/reducers/get-started/get-started.reducer'
@@ -68,11 +70,21 @@ class App extends React.Component<Props> {
    * @memberof App
 	 */
   componentDidMount() {
+    window.addEventListener('beforeunload', () => this.cleanup())
+
     if (!this.props.fetchParameters.isDownloadComplete) {
       getStore().dispatch(FetchParametersActions.fetch())
     } else if (!this.props.getStarted.isInProgress) {
       getStore().dispatch(SettingsActions.kickOffChildProcesses())
     }
+  }
+
+  cleanup() {
+    log.debug(`Cleanup bloody cleanup, nothing more to do,`)
+    log.debug(`Living just for dying, dying just for you!`)
+
+    const rpc = new RpcService()
+    rpc.stop()
   }
 
   getGetStartedContent() {
