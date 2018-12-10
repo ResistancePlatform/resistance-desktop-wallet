@@ -57,7 +57,6 @@ export class ResDexService {
     })
 
     var homedir = (getOS() == "windows") ? (os.homedir() + "\\AppData\\Roaming\\") : os.homedir()
-    log.debug(`Home Directory: ${homedir}`)
 
     const options = {
       gui: 'resdex',
