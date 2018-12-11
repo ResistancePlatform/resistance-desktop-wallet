@@ -264,7 +264,9 @@ app.on('ready', async () => {
   })
 
   mainWindow.on('close', event => {
-    if (getOS() === 'macos') {
+    const platform = getOS()
+
+    if (platform === 'macos') {
 
       if (!isExiting) {
         event.preventDefault()
@@ -273,7 +275,14 @@ app.on('ready', async () => {
 
     } else if (getIsExitForbidden(mainWindow)) {
       event.preventDefault()
+
+    } else if (platform === 'windows' && !isExiting) {
+      log.debug(`Starting the cleanup, Windows detected`)
+      event.preventDefault()
+      isExiting = true
+      mainWindow.webContents.send('cleanup')
     }
+
   })
 
   mainWindow.on('closed', () => {
