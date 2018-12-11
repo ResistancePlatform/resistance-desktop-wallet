@@ -1,5 +1,7 @@
 // @flow
 
+// TODO: Refactor this file
+
 import log from 'electron-log'
 import { ipcRenderer } from 'electron'
 import React from 'react'

@@ -51,56 +51,58 @@ class NaviBar extends Component<Props> {
     const resDexStatus = this.props.settings.childProcessesStatus.RESDEX
 
 		return (
-			<div className={cn(styles.container)} data-tid="navi-bar-container">
-				{/* Route items */}
-				<div className={cn(styles.overview, getItemClasses('/overview'))}>
-          <i />
-					<NavLink to="/">{t(`Home`)}</NavLink>
-				</div>
-        <div className={cn(styles.sendCash, getItemClasses('/send-cash'))}>
-          <i />
-          <NavLink to="/send-cash">{t(`Send Cash`)}</NavLink>
-        </div>
-				<div className={cn(styles.ownAddresses, getItemClasses('/own-addresses'))}>
-          <i />
-					<NavLink to="/own-addresses">{t(`My Addresses`)}</NavLink>
-				</div>
-        <div className={cn(styles.addressBook, getItemClasses('/address-book'))}>
-          <i />
-          <NavLink to="/address-book">{t(`Address Book`)}</NavLink>
-        </div>
-				<div className={cn(styles.settings, getItemClasses('/settings'))}>
-          <i />
-					<NavLink to="/settings">{t(`Settings`)}</NavLink>
-				</div>
-        <div className={cn(styles.simplex, getItemClasses('/simplex'))}>
-          <i />
-          <NavLink to="/simplex">
-            {t(`Buy Bitcoin with`)}
-            <img className={styles.visa} src={visaLogo} alt="VISA" />
-            <img className={styles.mastercard} src={mastercardLogo} alt="Mastercard" />
-          </NavLink>
-        </div>
-				<div className={cn(styles.resdex, getItemClasses('/resdex'))}>
-					<i />
-          <NavLink to="/resdex">
-            {t(`ResDEX`)}
+      <div className={cn(styles.container)} data-tid="navi-bar-container">
+        <div className={styles.draggableContainer}>
+          {/* Route items */}
+          <div className={cn(styles.overview, getItemClasses('/overview'))}>
+            <i />
+            <NavLink to="/">{t(`Home`)}</NavLink>
+          </div>
+          <div className={cn(styles.sendCash, getItemClasses('/send-cash'))}>
+            <i />
+            <NavLink to="/send-cash">{t(`Send Cash`)}</NavLink>
+          </div>
+          <div className={cn(styles.ownAddresses, getItemClasses('/own-addresses'))}>
+            <i />
+            <NavLink to="/own-addresses">{t(`My Addresses`)}</NavLink>
+          </div>
+          <div className={cn(styles.addressBook, getItemClasses('/address-book'))}>
+            <i />
+            <NavLink to="/address-book">{t(`Address Book`)}</NavLink>
+          </div>
+          <div className={cn(styles.settings, getItemClasses('/settings'))}>
+            <i />
+            <NavLink to="/settings">{t(`Settings`)}</NavLink>
+          </div>
+          <div className={cn(styles.simplex, getItemClasses('/simplex'))}>
+            <i />
+            <NavLink to="/simplex">
+              {t(`Buy Bitcoin with`)}
+              <img className={styles.visa} src={visaLogo} alt="VISA" />
+              <img className={styles.mastercard} src={mastercardLogo} alt="Mastercard" />
+            </NavLink>
+          </div>
+          <div className={cn(styles.resdex, getItemClasses('/resdex'))}>
+            <i />
+            <NavLink to="/resdex">
+              {t(`ResDEX`)}
 
-            {!this.props.resDex.login.isRequired &&
-              <div
-                className={cn(
-                  styles.resDexStatus,
-                  statusStyles[childProcess.getChildProcessStatusColor(resDexStatus)],
-                  { [styles.hasOrders]: resDexStatus  === 'RUNNING' && Boolean(pendingOrdersNumber) }
-                )}
-              >
-                <div className={styles.number}>
-                  {pendingOrdersNumber || false}
+              {!this.props.resDex.login.isRequired &&
+                <div
+                  className={cn(
+                    styles.resDexStatus,
+                    statusStyles[childProcess.getChildProcessStatusColor(resDexStatus)],
+                    { [styles.hasOrders]: resDexStatus  === 'RUNNING' && Boolean(pendingOrdersNumber) }
+                  )}
+                >
+                  <div className={styles.number}>
+                    {pendingOrdersNumber || false}
+                  </div>
                 </div>
-              </div>
-            }
-          </NavLink>
-				</div>
+              }
+            </NavLink>
+          </div>
+        </div>
 
 			</div>
 		)

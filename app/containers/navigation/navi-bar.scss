@@ -1,13 +1,18 @@
 @import "~/assets/styles/vars.scss";
 
 .container {
-  padding-top: 3.6rem;
+  padding-top: 1.6rem;
   padding-left: 1.35rem;
-  -webkit-app-region: drag;
   background-color: $NAVI_BAR_BACKGROUND_COLOR;
   min-width: $NAVI_BAR_CONTAINER_WIDTH;
   width: $NAVI_BAR_CONTAINER_WIDTH;
   user-select: none;
+  cursor: pointer;
+}
+
+.draggableContainer {
+  padding-top: 2rem;
+  -webkit-app-region: drag;
 }
 
 .item {

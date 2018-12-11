@@ -2,6 +2,7 @@
 import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import cn from 'classnames'
 
 // TODO: move from Navi actions to here #114
 import { NaviActions } from '~/reducers/navi/navi.reducer'
@@ -20,22 +21,25 @@ class TitleBarButtons extends Component<Props> {
 
 	render() {
 		return (
-      <div className={[styles.titleBarButtonsContainer]}>
+      <div className={styles.container}>
         <div
-          role="none"
-          className={styles.closeButton}
+          role="button"
+          tabIndex={0}
+          className={cn(styles.button, styles.close)}
           onClick={this.props.navi.mainWindowClose}
           onKeyDown={this.props.navi.mainWindowClose}
         />
         <div
-          role="none"
-          className={styles.minimizeButton}
+          role="button"
+          tabIndex={1}
+          className={cn(styles.button, styles.minimize)}
           onClick={this.props.navi.mainWindowMinimize}
           onKeyDown={this.props.navi.mainWindowMinimize}
         />
         <div
-          role="none"
-          className={styles.maximizeButton}
+          role="button"
+          tabIndex={2}
+          className={cn(styles.button, styles.maximize)}
           onClick={this.props.navi.mainWindowMaximize}
           onKeyDown={this.props.navi.mainWindowMaximize}
         />
