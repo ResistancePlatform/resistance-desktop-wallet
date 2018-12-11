@@ -147,10 +147,8 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
 	async stop() {
-    log.debug('Stopping node')
     const rpc = new RpcService()
-    const result = await rpc.stop()
-    log.debug('Stop result', result)
+    return rpc.stop()
 	}
 
 	/**
@@ -209,6 +207,7 @@ async function startOrRestart(isTorEnabled: boolean, start: boolean) {
   await caller.bind(childProcess)({
     processName: 'NODE',
     args,
+    shutdownFunction: async () => this.stop(),
     outputHandler: this::handleOutput,
     waitUntilReady: childProcess.createReadinessWaiter(this::checkRpcAvailability)
   })

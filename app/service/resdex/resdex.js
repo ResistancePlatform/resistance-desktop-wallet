@@ -6,10 +6,9 @@ import rp from 'request-promise-native'
 
 import { ResDexApiService, resDexUri } from '~/service/resdex/api'
 import { getStore } from '~/store/configureStore'
-import { getAppDataPath, verifyDirectoryExistence } from '~/utils/os'
+import { getOS, getAppDataPath, verifyDirectoryExistence } from '~/utils/os'
 import { ChildProcessService } from '../child-process-service'
 import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
-import { getOS } from '~/utils/os'
 
 const netId = 2045
 const rpcPort = 17445
@@ -56,7 +55,9 @@ export class ResDexService {
       return result
     })
 
-    var homedir = (getOS() == "windows") ? (os.homedir() + "\\AppData\\Roaming\\") : os.homedir()
+    const userhome = getOS() === 'windows'
+      ? path.join(os.homedir(), 'AppData', 'Roaming')
+      : os.homedir()
 
     const options = {
       gui: 'resdex',
@@ -65,7 +66,7 @@ export class ResDexService {
       rpcport: rpcPort,
       canbind: 0,
       seednode: seedNodeAddress,
-      userhome: homedir,
+      userhome,
       passphrase: seedPhrase,
       coins: currenciesWithoutElectrum,
     }
@@ -84,6 +85,7 @@ export class ResDexService {
     await childProcess.execProcess({
       processName: 'RESDEX',
       args: [JSON.stringify(options)],
+      shutdownFunction: async () => this.stop(),
       waitUntilReady: childProcess.createReadinessWaiter(this::checkApiAvailability),
       spawnOptions: { cwd: resDexDir }
     })
@@ -96,7 +98,7 @@ export class ResDexService {
 	 * @memberof ResDexService
 	 */
 	async stop() {
-    const api = ResDexApiService()
+    const api = new ResDexApiService()
     return api.stop()
 	}
 

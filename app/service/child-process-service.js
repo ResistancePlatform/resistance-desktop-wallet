@@ -142,7 +142,7 @@ export class ChildProcessService {
 	 * @param {function} outputHandler If returns true the process is considered started.
 	 * @memberof ChildProcessService
 	 */
-  async execProcess({processName, args = [], outputHandler, spawnOptions = {}, waitUntilReady}) {
+  async execProcess({processName, args = [], outputHandler, shutdownFunction = null, spawnOptions = {}, waitUntilReady}) {
     const childProcessInfo = remote.getGlobal('childProcesses')[processName]
     const actions = this.getSettingsActions()
 
@@ -151,6 +151,7 @@ export class ChildProcessService {
     const childProcess = this::spawnProcess(processName, args, spawnOptions)
 
     childProcessInfo.instance = childProcess
+    childProcessInfo.shutdown = shutdownFunction
 
     this::initLogging(childProcess, processName)
 
@@ -160,7 +161,10 @@ export class ChildProcessService {
     })
 
     childProcess.on('close', code => {
-      if (!childProcessInfo.isGettingKilled) {
+      if (childProcessInfo.isGettingKilled) {
+        log.debug(`Sending process murdered action for ${processName}`)
+        getStore().dispatch(actions.childProcessMurdered(processName))
+      } else {
         const errorMessage =  t(`Process {{processName}} unexpectedly exited with code {{code}}.`, { processName, code })
         getStore().dispatch(actions.childProcessFailed(processName, errorMessage))
       }
@@ -183,6 +187,32 @@ export class ChildProcessService {
 
   }
 
+  markProcessAsGettingKilled(processName: ChildProcessName) {
+    const childProcessInfo = remote.getGlobal('childProcesses')[processName]
+    childProcessInfo.isGettingKilled = true
+  }
+
+  async stopProcess(processName: ChildProcessName) {
+    const childProcessInfo = remote.getGlobal('childProcesses')[processName]
+
+    if (childProcessInfo.shutdown === null) {
+      return this.killProcess(processName)
+    }
+
+    let result = null
+
+    this.markProcessAsGettingKilled(processName)
+
+    try {
+      result = await childProcessInfo.shutdown()
+    } catch(err) {
+      log.error(`Can't shutdown child process ${processName}`, err)
+      return this.killProcess(processName)
+    }
+
+    return result
+  }
+
 	/**
    * Kills a child process by name and sends status update messages.
    * Provide customSuccessHandler to suppress CHILD_PROCESS_MURDERED message.
@@ -199,14 +229,11 @@ export class ChildProcessService {
       const pid = await this.getPid(childProcessCommands[processName])
 
       if (pid) {
-        const childProcessInfo = remote.getGlobal('childProcesses')[processName]
-        childProcessInfo.isGettingKilled = true
+        this.markProcessAsGettingKilled(processName)
         await this.killPid(pid)
       } else {
         log.warn(`Process ${processName} isn't running`)
       }
-
-      getStore().dispatch(actions.childProcessMurdered(processName))
     } catch(err) {
       log.error(`Process murder failed`, err)
       getStore().dispatch(actions.childProcessMurderFailed(processName, err.message))

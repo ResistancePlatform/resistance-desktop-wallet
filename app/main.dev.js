@@ -17,7 +17,14 @@ import { app, ipcMain, BrowserWindow } from 'electron'
 import log from 'electron-log'
 
 import { i18n } from './i18next.config'
-import { getOS, getIsExitForbidden, getAppDataPath, getInstallationPath, getChildProcessesGlobal } from './utils/os'
+import {
+  getOS,
+  getIsExitForbidden,
+  getAppDataPath,
+  getInstallationPath,
+  getChildProcessesGlobal,
+  killChildProcesses,
+} from './utils/os'
 import { ResistanceService } from './service/resistance-service-main'
 import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
@@ -206,6 +213,10 @@ app.on('ready', async () => {
   ipcMain.on('cleanup-complete', () => {
     log.info(`Quiting...`)
     preventCleanup = true
+
+    log.debug(`Killing left over processes just in case`)
+    killChildProcesses()
+
     app.quit()
   })
 
