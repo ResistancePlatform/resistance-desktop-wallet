@@ -8,7 +8,7 @@ import PropertiesReader from 'properties-reader'
 import config from 'electron-settings'
 import { app, remote } from 'electron'
 
-import { getClientInstance } from '~/service/rpc-service'
+import { RpcService, getClientInstance } from '~/service/rpc-service'
 import { getStore } from '~/store/configureStore'
 import { getOS, getExportDir, verifyDirectoryExistence } from '~/utils/os'
 import { ChildProcessService } from './child-process-service'
@@ -147,7 +147,8 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
 	async stop() {
-    await childProcess.killProcess('NODE')
+    const rpc = new RpcService()
+    return rpc.stop()
 	}
 
 	/**
@@ -188,6 +189,8 @@ async function startOrRestart(isTorEnabled: boolean, start: boolean) {
 
   const exportDir = getExportDir()
 
+  log.info(`Export Dir: ${exportDir}`)
+
   try {
     await verifyDirectoryExistence(exportDir)
   } catch (err) {
@@ -204,6 +207,7 @@ async function startOrRestart(isTorEnabled: boolean, start: boolean) {
   await caller.bind(childProcess)({
     processName: 'NODE',
     args,
+    shutdownFunction: async () => this.stop(),
     outputHandler: this::handleOutput,
     waitUntilReady: childProcess.createReadinessWaiter(this::checkRpcAvailability)
   })

@@ -589,6 +589,17 @@ export class RpcService {
     return this::exportFileWithMethod('backupwallet', filePath)
   }
 
+
+	/**
+	 * Stops the Resistance daemon
+   *
+	 * @memberof RpcService
+	 */
+  stop() {
+    const client = getClientInstance()
+    return client.command('stop')
+  }
+
 }
 
 /* RPC Service private methods */

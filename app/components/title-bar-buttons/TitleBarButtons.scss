@@ -1,47 +1,46 @@
 @import "~/assets/styles/vars.scss";
 
-@mixin titleBarButton {
-  -webkit-app-region: no-drag;
+.button {
+  content: '';
   display: inline-block;
 
   width: 0.8rem;
   height: 0.8rem;
 
   margin-right: 1rem;
-  border-radius: 20rem;
+  border-radius: 50%;
 
   cursor: pointer;
+  outline: 0;
+
+  &.close {
+    background-color: $TITLE_BAR_BUTTONS_CLOSE_COLOR;
+  }
+
+  &.minimize {
+    background-color: $TITLE_BAR_BUTTONS_MINIMIZE_COLOR;
+  }
+
+  &.maximize {
+    background-color: $TITLE_BAR_BUTTONS_MAXIMIZE_COLOR;
+  }
 
   &:hover {
     opacity: 0.8;
   }
 }
 
-.titleBarButtonsContainer {
-  -webkit-app-region: drag;
-  margin-bottom: 2rem;
-  position: absolute;
+.container {
+  -webkit-app-region: no-drag;
+  width: 10rem;
+  height: 1.5rem;
+  position: fixed;
   top: 0.8rem;
   left: 0.8rem;
-
-  .closeButton {
-    @include titleBarButton();
-    background-color: $TITLE_BAR_BUTTONS_CLOSE_COLOR;
-  }
-
-  .minimizeButton {
-    @include titleBarButton();
-    background-color: $TITLE_BAR_BUTTONS_MINIMIZE_COLOR;
-  }
-
-  .maximizeButton {
-    @include titleBarButton();
-    background-color: $TITLE_BAR_BUTTONS_MAXIMIZE_COLOR;
-  }
-  z-index: 10;
 }
 
 .dragBar {
+  margin-left: 6rem;
   -webkit-app-region: drag;
   height: 3.5rem;
   display: block;

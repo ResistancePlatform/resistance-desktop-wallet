@@ -238,6 +238,10 @@ export class ResDexApiService {
     })
   }
 
+  async stop() {
+    return this.query({ method: 'stop' })
+  }
+
 	/**
 	 * Creates an instance of ResDexApiService.
    *

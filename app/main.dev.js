@@ -11,20 +11,27 @@
  * @flow
  */
 import * as fs from 'fs'
-import crypto from 'crypto'
 import path from 'path'
 import config from 'electron-settings'
 import { app, ipcMain, BrowserWindow } from 'electron'
 import log from 'electron-log'
 
 import { i18n } from './i18next.config'
-import { getOS, getIsExitForbidden, getAppDataPath, getInstallationPath, getChildProcessesGlobal, stopChildProcesses } from './utils/os'
+import {
+  getOS,
+  getIsExitForbidden,
+  getAppDataPath,
+  getInstallationPath,
+  getChildProcessesGlobal,
+  killChildProcesses,
+} from './utils/os'
 import { ResistanceService } from './service/resistance-service-main'
 import { FetchParametersService } from './service/fetch-parameters-service'
 import MenuBuilder from './menu'
 
 
 let isExiting = false
+let preventCleanup = false
 
 // For the module to be imported in main, dirty, remove
 const resistance = new ResistanceService()
@@ -139,18 +146,22 @@ app.on('ready', async () => {
     }
   })
 
-  app.on('before-quit', event => {
-    isExiting = true
-
-    // Closing a window just hides it on Macs
-    if (getOS() === 'macos' && getIsExitForbidden(mainWindow)) {
-      event.preventDefault()
+  app.on('before-quit', async event => {
+    if (preventCleanup) {
       return
     }
 
-    log.info(`Killing all child processes...`)
-    stopChildProcesses()
-    log.info(`Done`)
+    isExiting = true
+
+    event.preventDefault()
+
+    // Closing a window just hides it on Macs
+    if (getOS() === 'macos' && getIsExitForbidden(mainWindow)) {
+      return
+    }
+
+    log.debug(`Going to close the application, asking the renderer for the cleanup`)
+    mainWindow.webContents.send('cleanup')
   })
 
   if (
@@ -199,6 +210,16 @@ app.on('ready', async () => {
     await fetchParameters.fetch(mainWindow)
   })
 
+  ipcMain.on('cleanup-complete', () => {
+    log.info(`Quiting...`)
+    preventCleanup = true
+
+    log.debug(`Killing left over processes just in case`)
+    killChildProcesses()
+
+    app.quit()
+  })
+
   // Disabling eval for security reasons,
   // https://github.com/ResistancePlatform/resistance-desktop-wallet/issues/155
   // eslint-disable-next-line
@@ -243,7 +264,9 @@ app.on('ready', async () => {
   })
 
   mainWindow.on('close', event => {
-    if (getOS() === 'macos') {
+    const platform = getOS()
+
+    if (platform === 'macos') {
 
       if (!isExiting) {
         event.preventDefault()
@@ -252,7 +275,14 @@ app.on('ready', async () => {
 
     } else if (getIsExitForbidden(mainWindow)) {
       event.preventDefault()
+
+    } else if (platform === 'windows' && !isExiting) {
+      log.debug(`Starting the cleanup, Windows detected`)
+      event.preventDefault()
+      isExiting = true
+      mainWindow.webContents.send('cleanup')
     }
+
   })
 
   mainWindow.on('closed', () => {

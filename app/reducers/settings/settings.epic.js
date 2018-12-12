@@ -1,11 +1,32 @@
 // @flow
+import log from 'electron-log'
 import config from 'electron-settings'
 import path from 'path'
 import * as fs from 'fs'
 import { promisify } from 'util'
 import { remote, ipcRenderer } from 'electron'
-import { tap, filter, delay, mergeMap, flatMap, switchMap, map, mapTo, catchError } from 'rxjs/operators'
-import { of, from, bindCallback, concat, merge, defer } from 'rxjs'
+import {
+  tap,
+  filter,
+  delay,
+  mergeMap,
+  flatMap,
+  switchMap,
+  map,
+  mapTo,
+  take,
+  catchError,
+  timeout
+} from 'rxjs/operators'
+import {
+  of,
+  ofObjectChanges,
+  from,
+  bindCallback,
+  concat,
+  merge,
+  defer
+} from 'rxjs'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
@@ -307,6 +328,48 @@ const childProcessMurderFailedEpic = (action$: ActionsObservable<Action>) => act
   mapTo(SettingsActions.empty())
 )
 
+const stopChildProcessesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(SettingsActions.stopChildProcesses),
+  switchMap(() => {
+    const { childProcessesStatus } = state$.value.settings
+
+    log.debug(`Gracefully stopping all running processes`)
+
+    const notRunningStatuses = ['NOT RUNNING', 'FAILED']
+    let runningProcesses = []
+
+    Object.entries(childProcessesStatus).forEach(([name, status]) => {
+      if (notRunningStatuses.includes(status)) {
+        return
+      }
+      log.debug(`Stopping ${name}`)
+      runningProcesses.push(name)
+      childProcess.stopProcess(name)
+    })
+
+    return action$.pipe(
+      timeout(10000),
+      ofType(SettingsActions.childProcessMurdered),
+      switchMap(action => {
+        runningProcesses = runningProcesses.filter(name => name !== action.payload.processName)
+        log.debug('running processes', runningProcesses)
+        if (runningProcesses.length === 0) {
+          log.debug(`Cleanup complete, informing the main process`)
+          ipcRenderer.send('cleanup-complete')
+        }
+        return of(SettingsActions.empty())
+      }),
+      catchError(() => {
+        log.error(`Stopping child processes timed out`)
+        ipcRenderer.send('cleanup-complete')
+        return of(SettingsActions.empty())
+      })
+    )
+
+  })
+)
+
+
 export const SettingsEpics = (action$, state$) => merge(
   updateLanguageEpic(action$, state$),
 	kickOffChildProcessesEpic(action$, state$),
@@ -326,5 +389,6 @@ export const SettingsEpics = (action$, state$) => merge(
   restoreWalletEpic(action$, state$),
   restoringWalletFailedEpic(action$, state$),
 	childProcessFailedEpic(action$, state$),
-	childProcessMurderFailedEpic(action$, state$)
+	childProcessMurderFailedEpic(action$, state$),
+  stopChildProcessesEpic(action$, state$),
 )

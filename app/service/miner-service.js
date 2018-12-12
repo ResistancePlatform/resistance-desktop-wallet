@@ -43,10 +43,6 @@ export class MinerService {
     // RPC credentials
     args.push(`--user=${nodeConfig.rpcuser}`, `--pass=${nodeConfig.rpcpassword}`)
 
-    if (getOS() === 'windows') {
-      args.push('--background')
-    }
-
     await childProcess.execProcess({processName: 'MINER', args, outputHandler: this.handleOutput})
 	}
 

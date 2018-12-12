@@ -58,7 +58,7 @@ function getChildProcessesGlobal() {
  *
  * @memberof ChildProcessService
  */
-function stopChildProcesses() {
+function killChildProcesses() {
   Object.entries(global.childProcesses).forEach(([processName, item]) => {
     if (item.instance !== null && !item.instance.killed) {
       global.childProcesses[processName].isGettingKilled = true
@@ -197,7 +197,7 @@ export {
   getIsExitForbidden,
   getExportDir,
   getChildProcessesGlobal,
-  stopChildProcesses,
+  killChildProcesses,
   getAppDataPath,
   getBinariesPath,
   getInstallationPath,
