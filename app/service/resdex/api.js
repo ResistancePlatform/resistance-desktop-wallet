@@ -301,7 +301,6 @@ async function enableElectrumServers(symbol) {
 
 async function withdrawBtcFork(opts) {
   const {
-    hex: rawTransaction,
     txfee: txFeeSatoshis,
     txid,
     amount,
@@ -313,15 +312,12 @@ async function withdrawBtcFork(opts) {
   const SATOSHIS = 100000000
   const txFee = txFeeSatoshis / SATOSHIS
 
-  const broadcast = async () => {
-    await this::broadcastTransaction(opts.symbol, rawTransaction)
-
-    return {txid, amount, symbol, address}
-  }
-
   return {
     txFee,
-    broadcast,
+    txid,
+    amount,
+    symbol,
+    address,
   }
 }
 
@@ -375,7 +371,7 @@ async function createTransaction(opts) {
     method: 'withdraw',
     coin: opts.symbol,
     outputs: [{[opts.address]: opts.amount.toString()}],
-    broadcast: 0,
+    broadcast: 1,
   })
 
   if (!response.complete) {
@@ -386,18 +382,4 @@ async function createTransaction(opts) {
     ...opts,
     ...response,
   }
-}
-
-async function broadcastTransaction(symbol, rawTransaction) {
-  const response = await this.query({
-    method: 'sendrawtransaction',
-    coin: symbol,
-    signedtx: rawTransaction,
-  })
-
-  if (!response.result === 'success') {
-    throw new ResDexApiError(response, t(`Couldn't broadcast transaction`))
-  }
-
-  return response.txid
 }

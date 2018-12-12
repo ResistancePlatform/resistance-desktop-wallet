@@ -140,7 +140,7 @@ const withdrawEpic = (action$: ActionsObservable<Action>, state$) => action$.pip
 
     return observable.pipe(
       switchMap(() => {
-        toastr.info(t(`Withdrawal of ${amount.toString()} ${symbol} succeeded`))
+        toastr.success(t(`Withdrawal of ${amount.toString()} ${symbol} succeeded`))
         return of(ResDexAccountsActions.closeWithdrawModal())
       }),
       catchError(err => {
