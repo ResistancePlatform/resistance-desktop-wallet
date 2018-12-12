@@ -127,8 +127,8 @@ export class ResistanceService {
    * @param {boolean} isTorEnabled
 	 * @memberof ResistanceService
 	 */
-	async start(isTorEnabled: boolean) {
-    await this::startOrRestart(isTorEnabled, true)
+	async start(isTorEnabled: boolean, isEtomic: boolean = false) {
+    await this::startOrRestart({isTorEnabled, isEtomic, start: true})
 	}
 
 	/**
@@ -138,7 +138,7 @@ export class ResistanceService {
 	 * @memberof ResistanceService
 	 */
 	async restart(isTorEnabled: boolean) {
-    await this::startOrRestart(isTorEnabled, false)
+    await this::startOrRestart({isTorEnabled, isEtomic: false, start: false})
 	}
 
 	/**
@@ -178,7 +178,7 @@ export class ResistanceService {
  * @param {boolean} start Starts if true, restarts otherwise
  * @memberof ResistanceService
  */
-async function startOrRestart(isTorEnabled: boolean, start: boolean) {
+async function startOrRestart({isTorEnabled, start, isEtomic}) {
   const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
   // TODO: support system wide wallet paths, stored in config.get('wallet.path')
   // https://github.com/ResistancePlatform/resistance-core/issues/84

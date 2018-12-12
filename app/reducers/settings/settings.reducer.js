@@ -26,6 +26,9 @@ export const SettingsActions = createActions(
     RESTART_LOCAL_NODE: undefined,
     STOP_LOCAL_NODE: undefined,
 
+    START_ETOMIC_NODE: undefined,
+    STOP_ETOMIC_NODE: undefined,
+
     TOGGLE_MINER: undefined,
     ENABLE_MINER: undefined,
     DISABLE_MINER: undefined,
