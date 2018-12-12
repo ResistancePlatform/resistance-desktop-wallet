@@ -130,7 +130,7 @@ export class ChildProcessService {
   async restartProcess(options) {
     log.info(`Restarting ${options.processName} process.`)
 
-    await this.killProcess(options.processName)
+    await this.stopProcess(options.processName)
     await this.execProcess(options)
   }
 

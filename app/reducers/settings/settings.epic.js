@@ -352,7 +352,6 @@ const stopChildProcessesEpic = (action$: ActionsObservable<Action>, state$) => a
       ofType(SettingsActions.childProcessMurdered),
       switchMap(action => {
         runningProcesses = runningProcesses.filter(name => name !== action.payload.processName)
-        log.debug('running processes', runningProcesses)
         if (runningProcesses.length === 0) {
           log.debug(`Cleanup complete, informing the main process`)
           ipcRenderer.send('cleanup-complete')
