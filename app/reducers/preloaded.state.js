@@ -99,6 +99,8 @@ export const preloadedState: State = {
 			MINER: 'NOT RUNNING',
       TOR: 'NOT RUNNING',
       RESDEX: 'NOT RUNNING',
+      RESDEX_PRIVACY1: 'NOT RUNNING',
+      RESDEX_PRIVACY2: 'NOT RUNNING',
     },
     language: 'en',
 	},
@@ -122,14 +124,26 @@ export const preloadedState: State = {
       currencyHistory: {},
     },
     buySell: {
+      selectedTabIndex: 0,
+      isAdvanced: false,
       isSendingOrder: false,
       baseCurrency: 'RES',
       quoteCurrency: 'DGB',
       orderBook: {
         baseCurrency: 'RES',
         quoteCurrency: 'DGB',
-        bids: [],
-        asks: []
+        baseQuote: {
+          bids: [],
+          asks: [],
+        },
+        resQuote: {
+          bids: [],
+          asks: [],
+        },
+        baseRes: {
+          bids: [],
+          asks: [],
+        }
       },
       enhancedPrivacy: false,
     },
@@ -144,7 +158,11 @@ export const preloadedState: State = {
     },
     accounts: {
       transactions: {},
-      currencies: {},
+      currencies: {
+        RESDEX: {},
+        RESDEX_PRIVACY1: {},
+        RESDEX_PRIVACY2: {},
+      },
       enabledCurrencies: [],
       currencyFees: {},
       addCurrencyModal: {
@@ -163,7 +181,8 @@ export const preloadedState: State = {
       withdrawModal: {
         isInProgress: false,
         isVisible: false,
-        symbol: null
+        symbol: null,
+        secretFunds: false
       }
     }
   }

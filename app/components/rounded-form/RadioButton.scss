@@ -1,0 +1,60 @@
+@import "~/assets/styles/vars.scss";
+
+.radio {
+  margin-left: 1rem;
+  font-size: 0.65rem;
+  color: $BASE_COLOR_FONT_GRAY;
+  text-align: justify;
+  display: flex;
+  align-items: center;
+  height: 1.6rem;
+
+  label {
+    position: relative;
+    color: $BASE_COLOR_WHITE;
+    font-weight: 500;
+    display: block;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  input[type=radio] {
+    opacity: 1;
+    margin: 0;
+    margin-right: 0.5rem;
+    visibility: hidden;
+    position: relative;
+    width: 0.8rem;
+    height: 0.8rem;
+
+    &:before {
+      content: '';
+      position: absolute;
+      display: inline-block;
+      background: #151a35;
+      border-radius: 50%;
+      color: $BASE_COLOR_PURPLE;
+      visibility: visible;
+      width: 0.8rem;
+      height: 0.8rem;
+    }
+
+    &:checked:after {
+      content: '';
+      position: absolute;
+      visibility: visible;
+      display: inline-block;
+      width: 0.4rem;
+      height: 0.4rem;
+      border-radius: 50%;
+      background: $BASE_COLOR_PURPLE;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+  }
+
+}

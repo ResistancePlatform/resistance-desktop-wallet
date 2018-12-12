@@ -108,12 +108,21 @@
     margin-bottom: 1.4rem;
     border: 0.5px solid $BASE_COLOR_BORDER_BLUE;
 
-    img {
+    img, .secretFundsIcon {
       position: absolute;
       width: 1.3rem;
       top: 0;
       left: 50%;
       transform: translate(-50%, -50%);
+    }
+
+    .secretFundsIcon {
+      width: 1.3rem;
+      height: 1.3rem;
+      background: #272f4e;
+      content: '';
+      border: 1px solid $BASE_COLOR_BORDER_GRAY;
+      border-radius: 50%;
     }
 
     .amount {
@@ -124,6 +133,7 @@
     }
 
     .equity {
+      overflow-x: hidden;
       font-size: 1.2rem;
       font-weight: 100;
 
@@ -158,11 +168,21 @@
           opacity: 0.6;
           cursor: default;
         }
+
+        &:first-child {
+          border-right: 1px solid $BASE_COLOR_BORDER_GRAY;
+        }
+
       }
 
-      button:first-child {
-        border-right: 1px solid $BASE_COLOR_BORDER_GRAY;
+      &.secretFunds {
+        justify-content: center;
+
+        button:first-child {
+          border-right: none;
+        }
       }
+
     }
   }
 

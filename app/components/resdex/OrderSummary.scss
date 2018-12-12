@@ -7,6 +7,18 @@
   max-width: 17.125rem;
   width: 17.125rem;
   margin-left: 1.8rem;
+  position: relative;
+}
+
+.container:before {
+  content: '';
+  position: absolute;
+  border: none;
+  border-bottom: 1px solid $BASE_COLOR_BORDER_BLUE;
+  width: 100vw;
+  top: 9.02rem;
+  left: -100vw;
+  height: 0;
 }
 
 .briefContainer {

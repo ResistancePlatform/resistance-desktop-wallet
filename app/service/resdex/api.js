@@ -3,18 +3,38 @@ import { Decimal } from 'decimal.js'
 import crypto from 'crypto'
 import rp from 'request-promise-native'
 import log from 'electron-log'
-import { remote } from 'electron'
 import getPort from 'get-port'
 
+import { getActualSeedPhrase, getProcessSettings } from '~/service/resdex/resdex'
 import { getStore } from '~/store/configureStore'
 import { translate } from '~/i18next.config'
 import MarketmakerSocket from './marketmaker-socket'
 import { getCurrency } from '~/utils/resdex'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 
-export const resDexUri = 'http://127.0.0.1:17445'
 
 const t = translate('service')
+
+/**
+ * ResDEX is using 3 processes, 1 for transparent and 2 for private trades.
+ * Every API instance is a singleton corresponding to a specific process identified by its name.
+ *
+ */
+const apiInstances = {}
+
+/*
+ * Returns ResDEX API instance for a process specified.
+ *
+ */
+export function resDexApiFactory(processName: string) {
+  if (processName in apiInstances) {
+    return apiInstances[processName]
+  }
+
+  const api = new ResDexApiService(processName)
+  apiInstances[processName] = api
+  return api
+}
 
 class ResDexApiError extends Error {
   constructor(response, message) {
@@ -26,15 +46,12 @@ class ResDexApiError extends Error {
 }
 
 /**
- * ES6 singleton
- */
-let instance = null
-
-/**
  * @export
  * @class ResDexApiService
  */
-export class ResDexApiService {
+class ResDexApiService {
+  token = null
+  processName = null
   socket = false
 	useQueue = false
 	currentQueueId = 0
@@ -42,17 +59,13 @@ export class ResDexApiService {
 	/**
 	 * @memberof ResDexApiService
 	 */
-	constructor() {
-    if (!instance) {
-      instance = this
-    }
-
-		return instance
+	constructor(processName: string) {
+    this.processName = processName
 	}
 
   setToken(seedPhrase: string) {
-    const token = crypto.createHash('sha256').update(seedPhrase).digest('hex')
-    remote.getGlobal('resDex').apiToken = token
+    const actualSeedPhrase = getActualSeedPhrase(this.processName, seedPhrase)
+    this.token = crypto.createHash('sha256').update(actualSeedPhrase).digest('hex')
   }
 
 	async enableSocket() {
@@ -202,7 +215,7 @@ export class ResDexApiService {
 			.filter(order => order.numutxos > 0)
 			.map(order => ({
 				address: order.address,
-				depth: order.depth,
+				depth: Decimal(order.depth),
 				price: Decimal(order.price),
 				utxoCount: order.numutxos,
 				averageVolume: Decimal(order.avevolume),
@@ -211,8 +224,6 @@ export class ResDexApiService {
 			}))
 
 		const formattedResponse = {
-			baseCurrency: response.base,
-			quoteCurrency: response.rel,
 			asks: formatOrders(response.asks),
 			bids: formatOrders(response.bids),
 		}
@@ -221,7 +232,7 @@ export class ResDexApiService {
 	}
 
 	/**
-	 * Creates an order.
+	 * Creates a market order.
    *
 	 * @memberof ResDexApiService
 	 */
@@ -243,26 +254,40 @@ export class ResDexApiService {
   }
 
 	/**
+	 * Creates a limit order.
+   *
+	 * @memberof ResDexApiService
+	 */
+  createLimitOrder(opts) {
+    return this.query({
+      method: 'setprice',
+      base: opts.baseCurrency,
+      rel: opts.quoteCurrency,
+      price: opts.price.toNumber(),
+    })
+  }
+
+	/**
 	 * Creates an instance of ResDexApiService.
    *
 	 * @memberof ResDexApiService
 	 */
   query(data: object, errorMessage?: string) {
-    const token = remote.getGlobal('resDex').apiToken
+    log.debug(`Calling ${this.processName} API method ${data.method}`, JSON.stringify(data))
 
-    log.debug(`Calling ResDEX API method ${data.method}`, JSON.stringify(data))
-
-    if (!token) {
+    if (!this.token) {
       getStore().dispatch(ResDexLoginActions.showDialog())
       return Promise.reject(new Error(t(`Authentication failed`)))
     }
 
+    const { uri } = getProcessSettings(this.processName)
+
     const options = {
-      uri: resDexUri,
+      uri,
       method: 'POST',
       body: {
         ...data,
-        userpass: token,
+        userpass: this.token,
         queueid: 0,
         needjson: 1,
       },
@@ -278,6 +303,8 @@ export class ResDexApiService {
   }
 
 }
+
+/* Private methods */
 
 async function enableElectrumServers(symbol) {
   const currency = getCurrency(symbol)

@@ -3,6 +3,7 @@ import { createActions, handleActions } from 'redux-actions'
 import { combineReducers } from 'redux'
 
 import { preloadedState } from '~/reducers/preloaded.state'
+import { ChildProcessName } from '~/service/child-process-service'
 import { ResDexBootstrappingReducer } from './bootstrapping/reducer'
 import { ResDexLoginReducer } from './login/reducer'
 import { ResDexAssetsReducer } from './assets/reducer'
@@ -56,13 +57,23 @@ export type ResDexState = {
     }
   },
   buySell: {
+    selectedTabIndex: number,
+    isAdvanced: boolean,
     baseCurrency: string,
     quoteCurrency: string,
     isSendingOrder: boolean,
     orderBook: {
       baseCurrency?: string,
       quoteCurrency?: string,
-      ['bids' | 'asks']: Order[]
+      baseQuote: {
+        ['bids' | 'asks']: Order[]
+      },
+      resQuote: {
+        ['bids' | 'asks']: Order[]
+      },
+      baseRes: {
+        ['bids' | 'asks']: Order[]
+      }
     },
     enhancedPrivacy: boolean
   },
@@ -78,7 +89,7 @@ export type ResDexState = {
   accounts: {
     selectedSymbol: string,
     transactions: { [string]: any },
-    currencies: { [string]: Currency },
+    currencies: { [ChildProcessName]: { [string]: Currency } },
     enabledCurrencies: EnabledCurrency[],
     currencyFees: { [string]: any },
     addCurrencyModal: {
@@ -97,7 +108,8 @@ export type ResDexState = {
     withdrawModal: {
       isInProgress: boolean,
       isVisible: boolean,
-      symbol: string | null
+      symbol: string | null,
+      secretFunds: boolean
     }
   }
 }

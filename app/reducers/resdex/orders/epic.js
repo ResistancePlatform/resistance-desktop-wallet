@@ -10,13 +10,13 @@ import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { SwapDBService } from '~/service/resdex/swap-db'
-import { ResDexApiService } from '~/service/resdex/api'
+import { resDexApiFactory } from '~/service/resdex/api'
 import { ResDexOrdersActions } from './reducer'
 
 
 const t = translate('resdex')
 const swapDB = new SwapDBService()
-const api = new ResDexApiService()
+const api = resDexApiFactory('RESDEX')
 
 const kickStartStuckSwapsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexOrdersActions.kickStartStuckSwaps),
@@ -24,8 +24,9 @@ const kickStartStuckSwapsEpic = (action$: ActionsObservable<Action>, state$) => 
     const { isInitialKickStartDone, swapHistory } = state$.value.resDex.orders
 
     const stuckSwaps = swapHistory.filter(swap => (
-      swap.status === 'swapping' &&
-        (!isInitialKickStartDone || moment(swap.timeStarted).isBefore(moment().subtract(4, 'hours')))
+      !swap.isPrivate
+      && swap.status === 'swapping'
+      && (!isInitialKickStartDone || moment(swap.timeStarted).isBefore(moment().subtract(4, 'hours')))
     ))
 
     log.info(`Kick starting ${stuckSwaps.length} stuck orders`)
@@ -58,16 +59,11 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     const observable = from(swapDB.getSwaps()).pipe(
       switchMap(swapHistory => {
         log.debug(`Swap history changed, got ${swapHistory.length} swaps`)
-
-        swapHistory.forEach(swap => {
-          if (swap.status === 'pending') {
-            log.debug(JSON.stringify(swap))
-          }
-        })
+        log.debug(`Swap history`, swapHistory)
 
         // Track pending activities to ask user for a quit confirmation
         remote.getGlobal('pendingActivities').orders = Boolean(
-          swapHistory.find(swap => !['completed', 'failed'].includes(swap.status))
+          swapHistory.find(swap => !['completed', 'failed', 'cancelled'].includes(swap.status))
         )
 
         return of(ResDexOrdersActions.gotSwapHistory(swapHistory))
@@ -99,7 +95,7 @@ const cleanupPendingSwapsEpic = (action$: ActionsObservable<Action>, state$) => 
 
           if (!(order.uuid in swapsByUuid) && isPendingForAWhile) {
             log.warn(`Order ${order.uuid} not found in ResDEX pendings`)
-            swapDB.forceSwapFailure(order.uuid)
+            swapDB.forceSwapStatus(order.uuid, 'failed')
           }
         })
 

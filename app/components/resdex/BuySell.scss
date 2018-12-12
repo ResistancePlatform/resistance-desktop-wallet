@@ -1,47 +1,15 @@
 @import "~/assets/styles/vars.scss";
-@import "~/assets/styles/tooltip.scss";
 @import "./ResDex.scss";
 
 .container {
   display: flex;
   margin: 1.5rem;
+  flex-direction: column;
 }
 
-.tooltip {
-  &.enhancedPrivacy {
-    width: 22rem !important;
-  }
-}
-
-.inputLabel {
-  min-width: 4.3rem;
-}
-
-.oldInputLabel {
-  width: 5.2rem;
-}
-
-.info {
-  display: inline-block;
-  margin-left: 0.4rem;
-  border-radius: 50%;
-  border: 1px solid $BASE_COLOR_LIGHT_BLUE;
-  width: 0.65rem;
-  height: 0.65rem;
-  position: relative;
-  top: 0;
-}
-
-.info:after {
-  position: absolute;
-  content: 'i';
-  font-style: normal;
-  font-size: 0.55rem;
-  color: $BASE_COLOR_LIGHT_BLUE;
-  text-transform: lowercase;
-  left: 48%;
-  top: 48%;
-  transform: translate(-50%, -50%);
+.topContainer {
+  display: flex;
+  flex-direction: row;
 }
 
 .tabList {
@@ -71,6 +39,68 @@
   padding: 1rem;
 }
 
+.form {
+  .orderType {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.7rem;
+  }
+
+  .caption {
+    color: $BASE_COLOR_FONT_GRAY_2;
+    font-size: 0.67rem;
+    font-weight: 300;
+    text-transform: uppercase;
+    margin-left: 1rem;
+    white-space: nowrap;
+
+    > * {
+      text-transform: none;
+    }
+  }
+
+  .enhancedPrivacyTooltip {
+    width: 22rem !important;
+  }
+
+  .inputLabel {
+    min-width: 4.3rem;
+  }
+
+  .oldInputLabel {
+    width: 5.2rem;
+  }
+
+  .advancedInputs {
+    display: flex;
+
+    .box {
+      width: 50%;
+
+      &:first-child {
+        margin-right: 0.3rem;
+      }
+
+      &:last-child {
+        margin-left: 0.3rem;
+      }
+
+      .caption {
+        margin-bottom: 0.8rem;
+      }
+    }
+
+  }
+
+}
+
+.orderSummaryContainer {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .actionContainer {
   @extend %smallContainer;
   min-width: 23.75rem;
@@ -89,51 +119,6 @@
     }
   }
 
-  .enhancedPrivacy {
-    margin-left: 1rem;
-    margin-right: 1rem;
-    margin-bottom: 1.3rem;
-    font-size: 0.65rem;
-    color: $BASE_COLOR_FONT_GRAY;
-    text-align: justify;
-
-    label {
-      color: $BASE_COLOR_WHITE;
-      display: block;
-      margin-bottom: 0.5rem;
-      user-select: none;
-    }
-
-    strong {
-      font-weight: normal;
-      color: $BASE_COLOR_FONT_GRAY_2;
-    }
-  }
-
-  input[type=checkbox] {
-    margin: 0;
-    margin-right: 0.9rem;
-    visibility: hidden;
-  }
-
-  input[type=checkbox]:before {
-    position: relative;
-    content: '\0020';
-    display: inline-block;
-    background: #151a35;
-    font-size: 0.8rem;
-    border-radius: 0.2rem;
-    color: $BASE_COLOR_PURPLE;
-    width: 0.8rem;
-    height: 0.8rem;
-    visibility: visible;
-    top: 0;
-  }
-
-  input[type=checkbox]:checked:before {
-    content: '\2713';
-  }
-
   .exchangeButton {
     position: relative;
     left: 50%;
@@ -143,5 +128,3 @@
   }
 
 }
-
-

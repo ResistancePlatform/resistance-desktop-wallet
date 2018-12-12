@@ -22,7 +22,7 @@ class MarketmakerSocket {
 		this.once = ee.once.bind(ee)
 
 		this.ws.addEventListener('message', this::handleMessage)
-    log.debug('Websocket initialized')
+    log.debug('Websocket initialized on endpoint', endpoint)
 	}
 
 	getResponse = queueId => this.ee.once(`id_${queueId}`)
@@ -38,11 +38,38 @@ async function handleMessage(event) {
     this.ee.emit(`id_${queueId}`, message)
   }
 
-  log.debug('Handling websocket message', queueId, message)
+  log.debug('Handling websocket message', JSON.stringify(message))
 
-  const uuids = getStore().getState().resDex.orders.swapHistory.map(swap => swap.uuid)
+  const { resDex } = getStore().getState()
+  const { currencies } = resDex.accounts
+  const { swapHistory } = resDex.orders
+  const uuids = swapHistory.map(swap => swap.uuid)
+
+  // Detect if the message is about our limit order
+  const limitOrder = swapHistory.find(swap => !swap.isMarket && swap.isActive)
+
+  let shouldUpdateSwapData = false
 
   if (uuids.includes(message.uuid)) {
+    shouldUpdateSwapData = true
+
+  } else if (limitOrder) {
+    const smartAddress = symbol => (
+      symbol in currencies.RESDEX ? currencies.RESDEX[symbol].address : ''
+    )
+
+    if (
+      message.iambob
+      || message.address === smartAddress(message.base)
+      || message.destaddr === smartAddress(message.rel)
+    ) {
+      message.uuid = limitOrder.uuid
+      shouldUpdateSwapData = true
+    }
+
+  }
+
+  if (shouldUpdateSwapData) {
     log.debug(`Updating swap data`)
     swapDB.updateSwapData(message)
   }

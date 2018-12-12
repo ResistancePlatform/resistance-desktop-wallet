@@ -20,7 +20,7 @@ export const ResDexLoginActions = createActions(
     SET_DEFAULT_PORTFOLIO: (id: string) => ({ id }),
 
     START_RESDEX: (seedPhrase: string, walletPassword: string) => ({ seedPhrase, walletPassword }),
-    INIT_RESDEX: (walletPassword: string) => ({ walletPassword }),
+    INIT_RESDEX: (processName: string, walletPassword: string) => ({ processName, walletPassword }),
     STOP_RESDEX: undefined,
   },
   {

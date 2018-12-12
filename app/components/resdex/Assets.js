@@ -51,9 +51,17 @@ class ResDexAssets extends Component<Props> {
       value = Object.keys(currencyHistory.hour).reduce((previousValue, symbol) => {
         const prices = currencyHistory.hour[symbol]
 
-        if (symbol in currencies && prices) {
+        if (symbol in currencies.RESDEX && prices) {
           const price = prices.slice(-hoursNumber - 1)[0].value
-          return previousValue.plus(price.times(currencies[symbol].balance))
+
+          let privateBalance = Decimal(0)
+          const transparentBalance = currencies.RESDEX[symbol].balance
+
+          if (symbol in currencies.RESDEX_PRIVACY2) {
+            privateBalance = currencies.RESDEX_PRIVACY2[symbol].balance
+          }
+
+          return previousValue.plus(price.times(transparentBalance.plus(privateBalance)))
         }
 
         return previousValue
@@ -85,11 +93,16 @@ class ResDexAssets extends Component<Props> {
     return result
   }
 
-  getWalletContents(t, symbol: string) {
-    const currency = this.props.accounts.currencies[symbol]
+  getLastPrice(symbol: string): object | null {
     const { currencyHistory } = this.props.assets
     const hourHistory = currencyHistory.hour && currencyHistory.hour[symbol]
     const price = hourHistory && hourHistory.slice(-1)[0].value
+    return price || null
+  }
+
+  getWalletContents(t, symbol: string) {
+    const currency = this.props.accounts.currencies.RESDEX[symbol]
+    const price = this.getLastPrice(symbol)
 
     return (
       <div className={styles.coin} key={symbol}>
@@ -126,6 +139,54 @@ class ResDexAssets extends Component<Props> {
     )
   }
 
+  getSymbolsWithSecretFundsCaption(): string | null {
+    const { t } = this.props
+    const currencies = Object.values(this.props.accounts.currencies.RESDEX_PRIVACY2)
+    const symbols = (
+      currencies
+      .filter(currency => !currency.balance.isZero())
+      .map(currency => currency.symbol)
+    )
+
+    if (currencies.length === 0) {
+      return null
+    }
+
+    if (symbols.length === 0) {
+      return t(`No assets`)
+    }
+
+    if (symbols.length < 4) {
+      return symbols.join(', ')
+    }
+
+    return t(`{{symbols}} and {{number}} more`, {
+      symbols: symbols.slice(0, 2),
+      number: symbols.length - 2
+    })
+  }
+
+  getSecretFundsAmounts(): {equity?: object, balance?: object} {
+    const currencies = Object.values(this.props.accounts.currencies.RESDEX_PRIVACY2)
+
+    if (currencies.length === 0) {
+      return {}
+    }
+
+    let balance = Decimal(0)
+
+    const equity = currencies.reduce((previousEquity, currency) => {
+      balance = balance.plus(currency.balance)
+
+      const price = this.getLastPrice(currency.symbol)
+      if (price === null) {
+        return previousEquity
+      }
+      return previousEquity.plus(currency.balance.times(price))
+    }, Decimal(0))
+
+    return {equity, balance}
+  }
 
 	/**
 	 * @returns
@@ -139,6 +200,7 @@ class ResDexAssets extends Component<Props> {
     const totalPortfolioValue = this.getTotalPortfolioValue()
     const sinceLastHour = this.getSinceLastHour()
     const sortedCurrencies = getSortedCurrencies(enabledCurrencies)
+    const {equity: secretFundsEquity, balance: secretFundsBalance} = this.getSecretFundsAmounts()
 
 		return (
       <div className={cn(styles.container)}>
@@ -184,12 +246,37 @@ class ResDexAssets extends Component<Props> {
         <Chart
           language={i18n.language}
           resolution={this.props.assets.resolution}
-          currencies={this.props.accounts.currencies}
+          currencies={this.props.accounts.currencies.RESDEX}
           currencyHistory={this.props.assets.currencyHistory}
         />
 
       <div className={styles.coins}>
         {sortedCurrencies.map(currency => this.getWalletContents(t, currency.symbol))}
+
+        <div className={styles.coin}>
+          <div className={styles.secretFundsIcon} />
+
+          {t(`Secret funds`)}
+
+          <div className={styles.amount}>
+            {this.getSymbolsWithSecretFundsCaption() || t(`N/A`)}
+          </div>
+
+          <div className={styles.equity}>
+            <sub>$</sub>{secretFundsEquity && toDecimalPlaces(secretFundsEquity, 2) || t(`N/A`)}
+          </div>
+
+          <div className={cn(styles.buttons, styles.secretFunds)}>
+            <button
+              type="button"
+              onClick={() => this.props.accountsActions.showWithdrawModal(null, true)}
+              disabled={!secretFundsBalance || secretFundsBalance.isZero()}
+            >
+              {t(`Withdraw`)}
+            </button>
+          </div>
+
+        </div>
       </div>
 
       </div>

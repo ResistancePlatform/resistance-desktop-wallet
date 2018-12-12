@@ -1,52 +1,19 @@
 import React from 'react'
 import cn from 'classnames'
 
-import GenericControl, { GenericProps } from './GenericControl'
+import CheckBox, { CheckBoxProps } from './CheckBox'
 
 import styles from './ToggleButton.scss'
 
 
 export type Props = {
-  ...GenericProps,
-	onChange?: value => void,
-  labelClassName?: string,
-  defaultValue?: boolean,
+  ...CheckBoxProps,
   label?: string,
   captions?: string[]
 }
 
-type State = {
-  value: boolean
-}
-
-export default class ToggleButton extends GenericControl {
+export default class ToggleButton extends CheckBox {
   props: Props
-  state: State
-
-	/**
-	 * @param {*} props
-	 * @memberof ToggleButton
-	 */
-	constructor(props) {
-		super(props)
-
-    this.state = {
-      value: props.defaultValue || false
-    }
-	}
-
-	onToggleHandler(event) {
-		event.stopPropagation()
-
-    const { value } = this.state
-    this.setState({ value: !value })
-
-		if (this.props.onChange) {
-			this.props.onChange(!value)
-		}
-
-    return false
-	}
 
   render() {
     const [onCaption, offCaption] = this.props.captions || []

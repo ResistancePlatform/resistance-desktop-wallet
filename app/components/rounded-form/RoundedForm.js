@@ -171,7 +171,7 @@ class RoundedForm extends Component<Props> {
       if (child.type.isRoundedFormComponent || inputChildComponentNames.includes(child.type.displayName)) {
         const formState = this::getFormState()
 
-        const onChange = (value) => (
+        const onChange = value => (
           this.props.actions.updateField(this.props.id, child.props.name, value)
         )
 
@@ -182,12 +182,18 @@ class RoundedForm extends Component<Props> {
           this.defaultValues[child.props.name] = child.props.defaultValue
         }
 
-        const defaultValue = formState.fields[child.props.name]
+        const getDefaultValue = () => {
+          const defaultValue = formState.fields[child.props.name]
+          if (defaultValue === null || defaultValue === undefined) {
+            return child.props.defaultValue
+          }
+          return typeof defaultValue === 'boolean' ? defaultValue : defaultValue.toString()
+        }
 
         return React.cloneElement(child, {
           onChange: child.props.onChange ? child.props.onChange : onChange,
           error: child.props.error ? child.props.error : error,
-          defaultValue: defaultValue !== null && defaultValue !== undefined ? defaultValue.toString() : child.props.defaultValue,
+          defaultValue: getDefaultValue(),
           important: child.props.important ? child.props.important : this.props.important
         })
       }

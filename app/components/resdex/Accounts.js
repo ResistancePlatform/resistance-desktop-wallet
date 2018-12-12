@@ -59,7 +59,7 @@ class ResDexAccounts extends Component<Props> {
 
   getPopupMenuCurrencyFetched(): boolean {
     const symbol = this.getPopupMenuSymbol()
-    return symbol in this.props.accounts.currencies
+    return symbol in this.props.accounts.currencies.RESDEX
   }
 
   getPopupMenuCurrencyAlwaysEnabled(): boolean {
@@ -80,7 +80,7 @@ class ResDexAccounts extends Component<Props> {
     const { currencies } = this.props.accounts
     const { currencyHistory } = this.props.assets
 
-    const totalEquity = Object.values(currencies).reduce((previousBalance, currency) => {
+    const totalEquity = Object.values(currencies.RESDEX).reduce((previousBalance, currency) => {
       const hourHistory = currencyHistory.hour && currencyHistory.hour[currency.symbol]
       const price = hourHistory && hourHistory.slice(-1)[0].value
 
@@ -103,7 +103,7 @@ class ResDexAccounts extends Component<Props> {
   }
 
   getEnabledCurrencyContents(t, symbol: string, totalEquity: object) {
-    const currency = this.props.accounts.currencies[symbol]
+    const currency = this.props.accounts.currencies.RESDEX[symbol]
     const { selectedSymbol } = this.props.accounts
     const { currencyHistory } = this.props.assets
     const hourHistory = currencyHistory.hour && currencyHistory.hour[symbol]

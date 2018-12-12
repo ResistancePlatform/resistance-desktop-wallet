@@ -21,7 +21,7 @@ type Props = {
     price: object | null,
     baseCurrency: string,
     quoteCurrency: string,
-    enhancedPrivacy: boolean
+    isPrivate: boolean
   },
   accounts: ResDexState.accounts
 }
@@ -120,7 +120,7 @@ class OrderSummary extends Component<Props> {
         </div>
 
         <ul className={styles.list}>
-          <li className={cn({ [styles.res]: order.enhancedPrivacy })}>
+          <li className={cn({ [styles.res]: order.isPrivate })}>
             {toDecimalPlaces(Decimal(order.quoteCurrencyAmount))}&nbsp;
             {order.quoteCurrency}
             <hr />

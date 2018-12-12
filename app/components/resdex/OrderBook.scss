@@ -1,0 +1,51 @@
+@import "~/assets/styles/vars.scss";
+@import "./ResDex.scss";
+
+.orderBook {
+  display: flex;
+  margin-top: 1.8rem;
+}
+
+.asks, .bids {
+  @extend %smallContainer;
+  width: 50%;
+  padding: 1.5rem;
+
+  .title {
+    color: $BASE_COLOR_WHITE;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.asks {
+  margin-right: 2rem;
+}
+
+.asksIcon, .bidsIcon {
+  color: $BASE_COLOR_FONT_GRAY;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-right: 0.6rem;
+
+  &:before {
+    content: '\e917';
+  }
+}
+
+.asksIcon {
+  transform: rotate(-180deg);
+}
+
+.row {
+  cursor: pointer;
+
+  &.myOrder {
+    color: $BASE_COLOR_LIGHT_BLUE;
+  }
+
+}

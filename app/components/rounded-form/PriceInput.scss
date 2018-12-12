@@ -1,0 +1,44 @@
+@import "~/assets/styles/vars.scss";
+
+.inputPrefix {
+  position: relative;
+  width: 1rem;
+  visibility: hidden;
+
+  &:before {
+    position: absolute;
+    height: 100%;
+    font-size: 0.7rem;
+    font-weight: 500;
+    content: '~';
+    color: $BASE_COLOR_WHITE;
+    left: 0.5rem;
+  }
+
+  &.visible {
+    visibility: visible;
+  }
+}
+
+.buttonWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 0.9rem;
+  border-left: 1px solid $BASE_COLOR_BORDER_GRAY;
+  height: 100%;
+
+  .setBestPriceButton {
+    outline: none;
+    cursor: pointer;
+
+    &:before {
+      position: relative;
+      content: '\e98a';
+      top: 0.05rem;
+      left: 0.35rem;
+    }
+
+  }
+
+}

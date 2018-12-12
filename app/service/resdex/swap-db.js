@@ -5,7 +5,6 @@ import Emittery from 'emittery'
 import PQueue from 'p-queue'
 import roundTo from 'round-to'
 import {subDays, isAfter} from 'date-fns'
-import { toastr } from 'react-redux-toastr'
 import appContainer from 'containers/App'
 
 import { translate } from '~/i18next.config'
@@ -91,13 +90,15 @@ export class SwapDBService {
     })
   }
 
-  insertSwapData(swap, requestOpts) {
+  insertSwapData(swap, requestOpts, isMarket: boolean, privacy = null) {
     return this.queue(() => this.db.post({
       uuid: swap.uuid,
       timeStarted: Date.now(),
       request: requestOpts,
       response: swap,
       messages: [],
+      privacy,
+      isMarket
     }))
   }
 
@@ -112,17 +113,15 @@ export class SwapDBService {
   }
 
   /**
-   * Marks a swap as 'failed'.
-   * This is a temporary workaround to failed orders that don't get the failed update on the websocket
-   * and thus are stuck as 'pending'
+   * Sets a swap status forcedly.
    *
    */
-  forceSwapFailure(uuid) {
+  forceSwapStatus(uuid, status: 'failed' | 'cancelled') {
     return this.queue(async () => {
       const swap = await this::getSwapData(uuid)
       const message = {
-        method: 'failed',
-        error: -1,
+        method: 'set_order_status',
+        status,
       }
       swap.messages.push(message)
       return this.db.put(swap)
@@ -183,39 +182,20 @@ async function getSwapData(uuid) {
   return docs[0]
 }
 
-function showMessageNotifications(swap, message) {
-    const pair = `${swap.baseCurrency}/${swap.quoteCurrency}`
-
-    if (message.method === 'connected') {
-      toastr.info(pair, `The order has been matched`)
-    }
-
-    if (message.method === 'update') {
-      toastr.info(pair, `Swapping in progress`)
-    }
-
-    if (message.method === 'tradestatus' && message.status === 'finished') {
-      toastr.success(pair, `The order has been completed`)
-    }
-
-      if (!(
-        message.sentflags.includes('alicespend') ||
-        message.sentflags.includes('aliceclaim')
-      )) {
-        toastr.error(pair, `The order has failed`)
-      }
-
-    if (message.method === 'failed') {
-        toastr.error(pair, `The order has failed`)
-    }
-}
-
 // TODO: We should refactor this into a seperate file
 function formatSwap(data) {
   const MATCHED_STEP = 1
   const TOTAL_PROGRESS_STEPS = swapTransactions.length + MATCHED_STEP
 
-  const {uuid, timeStarted, request, response, messages} = data
+  const {
+    uuid,
+    timeStarted,
+    request,
+    response,
+    messages,
+    isMarket,
+    privacy
+  } = data
 
   // If we place a sell order marketmaker just inverts the values and places a buy
   // on the opposite pair. We need to normalise this otherwise we'll show the
@@ -233,8 +213,12 @@ function formatSwap(data) {
     status: 'pending',
     statusFormatted: t('status.pending').toLowerCase(),
     get isActive() {
-      return !['completed', 'failed'].includes(this.status)
+      return !['completed', 'failed', 'cancelled'].includes(this.status)
     },
+    isPrivate: privacy !== null,
+    isHidden: privacy && privacy.processName === 'RESDEX_PRIVACY2' || false,
+    isMarket,
+    privacy,
     error: false,
     progress: 0,
     baseCurrency: request.baseCurrency,
@@ -272,6 +256,18 @@ function formatSwap(data) {
     }
     if (message.quoteid) {
       swap.quoteId = message.quoteid
+    }
+
+    if (message.method === 'set_order_status' && !swap.isPrivate) {
+      swap.status = message.status
+    }
+
+    if (message.method === 'set_private_order_status' && swap.isPrivate) {
+      swap.privacy.status = message.status
+    }
+
+    if (message.method === 'set_private_order_base_res_uuid' && swap.isPrivate) {
+      swap.privacy.baseResOrderUuid = message.uuid
     }
 
     if (message.method === 'connected') {
@@ -360,6 +356,16 @@ function formatSwap(data) {
       code: undefined,
       message: undefined,
     }
+  }
+
+  const privateCancelled = (
+    swap.isPrivate
+    && !['completed', 'failed'].includes(swap.privacy.status)
+    && isAfter(appTimeStarted, swap.timeStarted)
+  )
+
+  if (privateCancelled) {
+    swap.privacy.status = 'failed'
   }
 
   swap.statusFormatted = t(`status.${swap.status}`).toLowerCase()

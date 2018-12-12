@@ -24,7 +24,7 @@ export const ResDexAccountsActions = createActions(
     GOT_CURRENCY_FEES: fees => ({ fees }),
 
     GET_CURRENCIES: undefined,
-    GOT_CURRENCIES: (currencies: { [string]: Currency }) => ({ currencies }),
+    GOT_CURRENCIES: (currencies: { [ChildProcessName]: { [string]: Currency } }) => ({ currencies }),
     GET_CURRENCIES_FAILED: (errorMessage: string) => ({ errorMessage }),
 
     UPDATE_ENABLED_CURRENCIES: (enabledCurrencies: EnabledCurrency[]) => ({ enabledCurrencies }),
@@ -39,7 +39,7 @@ export const ResDexAccountsActions = createActions(
     CONFIRM_CURRENCY_DELETION: (symbol: string) => ({ symbol }),
     DELETE_CURRENCY: (symbol: string) => ({ symbol }),
     SHOW_DEPOSIT_MODAL: (symbol: string) => ({ symbol }),
-    SHOW_WITHDRAW_MODAL: (symbol: string) => ({ symbol }),
+    SHOW_WITHDRAW_MODAL: (symbol: string | null, secretFunds: boolean = false) => ({ symbol, secretFunds }),
     SHOW_EDIT_CURRENCY_MODAL: (currency: object) => currency,
     SHOW_ADD_CURRENCY_MODAL: undefined,
     CLOSE_DEPOSIT_MODAL: undefined,
@@ -89,7 +89,8 @@ export const ResDexAccountsReducer = handleActions(
       withdrawModal: {
         isVisible: true,
         isInProgress: false,
-        symbol: action.payload.symbol
+        symbol: action.payload.symbol,
+        secretFunds: action.payload.secretFunds
       }
     }),
     [ResDexAccountsActions.showEditCurrencyModal]: (state, action) => ({
@@ -144,7 +145,12 @@ export const ResDexAccountsReducer = handleActions(
     }),
     [ResDexAccountsActions.closeWithdrawModal]: (state) => ({
       ...state,
-      withdrawModal: { isVisible: false, isInProgress: false, symbol: null }
+      withdrawModal: {
+        isVisible: false,
+        isInProgress: false,
+        symbol: null,
+        secretFunds: false
+      }
     }),
     [ResDexAccountsActions.closeAddCurrencyModal]: state => ({
       ...state,

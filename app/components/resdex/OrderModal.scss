@@ -2,6 +2,10 @@
 
 $orderModalWidth: 28.3125rem;
 
+.container {
+  overflow: hidden;
+}
+
 .titleContainer {
   padding: 1.6rem;
 
@@ -27,17 +31,35 @@ $orderModalWidth: 28.3125rem;
 }
 
 .stagesContainer {
-  cursor: default;
-  list-style-type: none;
-  display: flex;
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  font-weight: 100;
-  color: $BASE_COLOR_FONT_GRAY;
-  white-space: nowrap;
-  padding: 0;
-  margin: 0;
-  margin-bottom: 2rem;
+  height: 2.5rem;
+  margin-bottom: 1rem;
+
+  &.slider {
+    overflow-y: hidden;
+    max-height: 2.5rem;
+
+    transition-property: all;
+    transition-duration: .1s;
+    transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+
+    &.close {
+      max-height: 0;
+    }
+  }
+
+  ul {
+    cursor: default;
+    list-style-type: none;
+    display: flex;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 100;
+    color: $BASE_COLOR_FONT_GRAY;
+    white-space: nowrap;
+    padding: 0;
+    margin: 0;
+    margin-bottom: 2rem;
+  }
 
   li {
     width: 20%;

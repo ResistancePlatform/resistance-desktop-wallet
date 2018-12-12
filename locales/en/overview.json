@@ -25,5 +25,20 @@
   "Export data to .CSV": "Export data to .CSV",
   "Show details": "Show details",
   "Show in Block Explorer": "Show in Block Explorer",
-  "Transactions": "Transactions"
+  "Transactions": "Transactions",
+  "Block hash": "Block hash",
+  "Block index": "Block index",
+  "Block time": "Block time",
+  "Confirmations": "Confirmations",
+  "Expiry height": "Expiry height",
+  "Generated": "Generated",
+  "Hex": "Hex",
+  "Time": "Time",
+  "Time received": "Time received",
+  "Transaction ID": "Transaction ID",
+  "Back to transactions list": "Back to transactions list",
+  "Transaction details": "Transaction details",
+  "You have no transactions yet": "You have no transactions yet",
+  "Export to .CSV": "Export to .CSV",
+  "Show transaction memo": "Show transaction memo"
 }

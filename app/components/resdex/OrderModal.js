@@ -39,16 +39,19 @@ class OrderModal extends Component<Props> {
       return false
     }
 
+    // A hack to address Komodo limit order status updates ambiguity
+    if (stage === 'myfee' && order.transactions.length) {
+      return true
+    }
+
     return Boolean(order.transactions.find(chainStage => chainStage.stage === stage))
   }
 
 	render() {
     const { t } = this.props
 
-    const order = {
-      ...this.getOrder(),
-      enhancedPrivacy: false,
-    }
+    const order = this.getOrder()
+    const status = order.isPrivate ? order.privacy.status : order.status
 
     return (
       <div className={styles.overlay}>
@@ -67,8 +70,8 @@ class OrderModal extends Component<Props> {
 
               {order.status &&
                 <div className={styles.statusContainer}>
-                  <div className={cn(orderStyles.status, orderStyles[order.status])}>
-                    {getOrderStatusName(order.status)}
+                  <div className={cn(orderStyles.status, orderStyles[status])}>
+                    {getOrderStatusName(order)}
                   </div>
                 </div>
               }
@@ -76,24 +79,25 @@ class OrderModal extends Component<Props> {
 
           </div>
 
-          <ul className={styles.stagesContainer}>
-            <li className={cn({ [styles.active]: this.getIsStageComplete('myfee') })}>
-              {t(`My fee`)}
-            </li>
-            <li className={cn({ [styles.active]: this.getIsStageComplete('bobdeposit') })}>
-              {t(`My deposit`)}
-            </li>
-            <li className={cn({ [styles.active]: this.getIsStageComplete('alicepayment') })}>
-              {t(`Their deposit`)}
-            </li>
-            <li className={cn({ [styles.active]: this.getIsStageComplete('bobpayment') })}>
-              {t(`My payment`)}
-            </li>
-            <li className={cn({ [styles.active]: this.getIsStageComplete('alicespend') })}>
-              {t(`Their spend`)}
-            </li>
-          </ul>
-
+          <div className={cn(styles.stagesContainer, styles.slider, {[styles.close]: status === 'privatizing'})}>
+            <ul>
+              <li className={cn({ [styles.active]: this.getIsStageComplete('myfee') })}>
+                {t(`My fee`)}
+              </li>
+              <li className={cn({ [styles.active]: this.getIsStageComplete('bobdeposit') })}>
+                {t(`My deposit`)}
+              </li>
+              <li className={cn({ [styles.active]: this.getIsStageComplete('alicepayment') })}>
+                {t(`Their deposit`)}
+              </li>
+              <li className={cn({ [styles.active]: this.getIsStageComplete('bobpayment') })}>
+                {t(`My payment`)}
+              </li>
+              <li className={cn({ [styles.active]: this.getIsStageComplete('alicespend') })}>
+                {t(`Their spend`)}
+              </li>
+            </ul>
+          </div>
           <div className={styles.summaryContainer}>
             <OrderSummary className={styles.summary} order={order} />
           </div>

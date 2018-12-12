@@ -7,7 +7,7 @@ import { app, dialog, remote } from 'electron'
 import { translate } from '../i18next.config'
 
 
-const childProcessNames = ['NODE', 'MINER', 'TOR', 'RESDEX']
+const childProcessNames = ['NODE', 'MINER', 'TOR', 'RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
 
 
 function getIsExitForbidden(mainWindow) {
@@ -66,11 +66,16 @@ function killChildProcesses() {
       log.info(`Killing child process ${processName} with PID ${item.instance.pid}`)
 
       // childProcess.kill() doesn't work for an unknown reason
+      // item.pid is not always initialized, trying all options to be sure
+
       if (item.pid) {
         ps.kill(item.pid)
-      } else {
+      }
+
+      if (item.instance.pid && item.pid !== item.instance.pid) {
         ps.kill(item.instance.pid)
       }
+
     }
   })
 }
