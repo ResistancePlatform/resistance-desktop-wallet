@@ -29,5 +29,19 @@
   "status.cancelled": "status.cancelled",
   "status.reverted": "status.reverted",
   "statusInformation.reverted": "statusInformation.reverted",
-  "status.open": "status.open"
+  "status.open": "status.open",
+  "Running": "Running",
+  "Starting": "Starting",
+  "Restarting": "Restarting",
+  "Failed": "Failed",
+  "Stopping": "Stopping",
+  "Murder failed": "Murder failed",
+  "Not running": "Not running",
+  "Unknown": "Unknown",
+  "Unexpected error occurred": "Unexpected error occurred",
+  "R (Public)": "R (Public)",
+  "T (Private)": "T (Private)",
+  "Transaction has already been broadcasted": "Transaction has already been broadcasted",
+  "Couldn't create withdrawal transaction": "Couldn't create withdrawal transaction",
+  "Incorrect ResDEX password": "Incorrect ResDEX password"
 }

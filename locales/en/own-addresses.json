@@ -34,5 +34,7 @@
   "Import Resistance addresses from private keys file": "Import Resistance addresses from private keys file",
   "Private keys imported successfully": "Private keys imported successfully",
   "It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.": "It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.",
-  "Unable to import private keys": "Unable to import private keys"
+  "Unable to import private keys": "Unable to import private keys",
+  "Merging": "Merging",
+  "My Addresses": "My Addresses"
 }
