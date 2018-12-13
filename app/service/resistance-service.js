@@ -185,7 +185,7 @@ async function startOrRestart({isTorEnabled, start, isEtomic}) {
 
   const walletName = config.get('wallet.name', 'wallet')
   args.push(`-wallet=${walletName}.dat`)
-  const caller = start ? childProcess.execProcess : childProcess.restartProcess
+  const caller = start ? childProcess.startProcess : childProcess.restartProcess
 
   const exportDir = getExportDir()
 
