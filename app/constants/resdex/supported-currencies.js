@@ -831,6 +831,7 @@ const supportedCurrencies = [
 	{
 		coin: 'ETH',
 		etomic: '0x0000000000000000000000000000000000000000',
+    node: 'mainnet.infura.io/v3/125e6ea342154b6bb962b180a15ae497',
 		rpcport: 80,
 	},
 	{
@@ -1814,7 +1815,7 @@ const supportedCurrencies = [
 		coin: 'RES',
 		name: 'Resistance',
 		asset: 'RES',
-		rpcport: 18232,
+		rpcport: 18132,
   },
 	{
 		coin: 'REVS',
@@ -2310,6 +2311,7 @@ const supportedCurrencies = [
 		coin: 'ZIL',
 		name: 'Zilliqa',
 		etomic: '0x05f4a42e251f2d52b8ed15e9fedaacfcef1fad27',
+    node: 'mainnet.infura.io/v3/125e6ea342154b6bb962b180a15ae497',
 		rpcport: 80,
 	},
 	{

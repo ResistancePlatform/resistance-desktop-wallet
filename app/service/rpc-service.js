@@ -31,32 +31,36 @@ const addressBookService = new AddressBookService()
  * ES6 singleton
  */
 let instance = null
-let clientInstance = null
+const clientInstance = {}
 
 /**
  * Create a new resistance client instance.
  */
 export const getClientInstance = (isEtomic: boolean = false) => {
-  if (!clientInstance) {
+  if (!clientInstance[isEtomic]) {
     const nodeConfig = remote.getGlobal('resistanceNodeConfig')
     let network
+    let defaultRpcPort
 
     if (nodeConfig.testnet) {
       network = 'testnet'
+      defaultRpcPort = 18132
     } else if (nodeConfig.regtest) {
       network = 'regtest'
+    } else {
+      defaultRpcPort = 8132
     }
 
-    clientInstance = new Client({
+    clientInstance[isEtomic] = new Client({
       network,
-      port: isEtomic ? 15672 : nodeConfig.rpcport,
+      port: isEtomic ? 15672 : (nodeConfig.rpcport || defaultRpcPort),
       username: nodeConfig.rpcuser,
       password: nodeConfig.rpcpassword,
       timeout: 10000
     })
   }
 
-	return clientInstance
+	return clientInstance[isEtomic]
 }
 
 /**

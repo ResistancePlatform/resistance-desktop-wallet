@@ -96,6 +96,7 @@ export const preloadedState: State = {
 		isStatusModalOpen: false,
 		childProcessesStatus: {
 			NODE: 'NOT RUNNING',
+			NODE_ETOMIC: 'NOT RUNNING',
 			MINER: 'NOT RUNNING',
       TOR: 'NOT RUNNING',
       RESDEX: 'NOT RUNNING',

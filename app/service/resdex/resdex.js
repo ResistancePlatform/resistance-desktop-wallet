@@ -141,8 +141,8 @@ export class ResDexService {
 	 * @memberof ResDexService
 	 */
 	async stop(processName: string) {
-    const api = resDexApiFactory()
-    return api.stop(processName)
+    const api = resDexApiFactory(processName)
+    return api.stop()
 	}
 
 }

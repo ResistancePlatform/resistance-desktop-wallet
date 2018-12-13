@@ -16,7 +16,7 @@ import styles from './status-modal.scss'
 
 const childProcess = new ChildProcessService()
 
-const processNames = ['NODE', 'MINER', 'TOR', 'RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
+const processNames = ['NODE', 'NODE_ETOMIC', 'MINER', 'TOR', 'RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
 
 type Props = {
   t: any,
@@ -172,6 +172,13 @@ class StatusModal extends Component<Props> {
                     title={childProcess.getStatusName(this.props.settings.childProcessesStatus.NODE)}
                   />
                   {t(`Node`)}
+                </Tab>
+                <Tab className={styles.tab}>
+                  <i
+                    className={this.getChildProcessStatusClassNames('NODE_ETOMIC')}
+                    title={childProcess.getStatusName(this.props.settings.childProcessesStatus.NODE_ETOMIC)}
+                  />
+                  {t(`Node (Etomic)`)}
                 </Tab>
                 <Tab className={styles.tab}>
                   <i

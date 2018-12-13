@@ -14,13 +14,11 @@ import {
   switchMap,
   map,
   mapTo,
-  take,
   catchError,
   timeout
 } from 'rxjs/operators'
 import {
   of,
-  ofObjectChanges,
   from,
   bindCallback,
   concat,
@@ -80,7 +78,7 @@ const kickOffChildProcessesEpic = (action$: ActionsObservable<Action>, state$) =
       )
     }
 
-    return observables
+    return concat(observables, of(SettingsActions.startEtomicNode()))
   })
 )
 
@@ -124,6 +122,22 @@ const stopLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action
 	tap(() => { resistanceService.stop() }),
   filter(() => state$.value.settings.isMinerEnabled),
   mapTo(SettingsActions.disableMiner())
+)
+
+const startEtomicNodeEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.startEtomicNode),
+  map(() => {
+		resistanceService.start(false, true)
+    return SettingsActions.empty()
+  })
+)
+
+const stopEtomicNodeEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.stopEtomicNode),
+  map(() => {
+		resistanceService.stop(true)
+    return SettingsActions.empty()
+  })
 )
 
 const toggleMinerEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
@@ -376,6 +390,8 @@ export const SettingsEpics = (action$, state$) => merge(
 	startLocalNodeEpic(action$, state$),
   restartLocalNodeEpic(action$, state$),
 	stopLocalNodeEpic(action$, state$),
+  startEtomicNodeEpic(action$, state$),
+  stopEtomicNodeEpic(action$, state$),
   toggleMinerEpic(action$, state$),
   enableMinerEpic(action$, state$),
 	disableMinerEpic(action$, state$),

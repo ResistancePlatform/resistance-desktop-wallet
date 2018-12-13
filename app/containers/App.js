@@ -39,7 +39,6 @@ import AddressBookPage from './AddressBookPage'
 
 import { getStore } from '../store/configureStore'
 import FetchParametersDialog from '~/components/fetch-parameters/FetchParametersDialog'
-import { RpcService } from '~/service/rpc-service'
 import { FetchParametersState, FetchParametersActions } from '~/reducers/fetch-parameters/fetch-parameters.reducer'
 import { AuthState } from '~/reducers/auth/auth.reducer'
 import { GetStartedState } from '~/reducers/get-started/get-started.reducer'

@@ -32,6 +32,10 @@ const RESDEX = {
       symbol: 'DGB',
       useElectrum: true
     },
+    {
+      symbol: 'ZIL',
+      useElectrum: true
+    },
   ]
 }
 

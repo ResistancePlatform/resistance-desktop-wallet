@@ -26,8 +26,6 @@ const configFolderName = 'Resistance'
 const configFileName = 'resistance.conf'
 const configFileContents = [
   `testnet=1`,
-  `port=18233`,
-  `rpcport=18232`,
   `rpcuser=resuser`,
   `rpcpassword=%generatedPassword%`,
   ``
@@ -183,7 +181,7 @@ async function startOrRestart({isTorEnabled, start, isEtomic}) {
   const caller = start ? childProcess.startProcess : childProcess.restartProcess
 
   if (isEtomic) {
-    args = ['-ac_name=ETOMIC']
+    args = ['-ac_name=ETOMIC', '-printtoconsole']
   } else {
     args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
     // TODO: support system wide wallet paths, stored in config.get('wallet.path')
@@ -201,7 +199,7 @@ async function startOrRestart({isTorEnabled, start, isEtomic}) {
     } catch (err) {
       log.error(`Can't create local node export directory`, err)
       const actions = childProcess.getSettingsActions()
-      getStore().dispatch(actions.childProcessFailed('NODE', err.message))
+      getStore().dispatch(actions.childProcessFailed(isEtomic ? 'NODE_ETOMIC' : 'NODE', err.message))
       return
     }
 
@@ -241,7 +239,7 @@ function getRpcAvailabilityChecker(isEtomic: boolean) {
 
     try {
       await client.getInfo()
-      log.debug(`The local node has successfully accepted an RPC call`)
+      log.debug(`The local node ${isEtomic ? '(etomic) ' : ''}has successfully accepted an RPC call`)
       return true
     } catch (err) {
       log.debug(`The local node hasn't accepted an RPC check call`)
