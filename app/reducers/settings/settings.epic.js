@@ -362,7 +362,7 @@ const stopChildProcessesEpic = (action$: ActionsObservable<Action>, state$) => a
     })
 
     return action$.pipe(
-      timeout(10000),
+      timeout(5000),
       ofType(SettingsActions.childProcessMurdered),
       switchMap(action => {
         runningProcesses = runningProcesses.filter(name => name !== action.payload.processName)

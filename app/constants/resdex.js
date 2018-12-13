@@ -33,6 +33,10 @@ const RESDEX = {
       useElectrum: true
     },
     {
+      symbol: 'NEXO',
+      useElectrum: true
+    },
+    {
       symbol: 'ZIL',
       useElectrum: true
     },

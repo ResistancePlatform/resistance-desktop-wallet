@@ -97,7 +97,7 @@ async function fetchSymbol(symbol, resolution) {
     log.error('Failed to get price history:', error)
   }
 
-  if (!json || json.Data.length === 0) {
+  if (!json || !Array.isArray(json.Data) || json.Data.length === 0) {
     log.warn('No price history for', querySymbol, resolution)
     // noPriceHistory.add(querySymbol)
     return
