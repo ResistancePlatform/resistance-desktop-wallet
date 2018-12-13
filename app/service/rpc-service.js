@@ -36,7 +36,7 @@ let clientInstance = null
 /**
  * Create a new resistance client instance.
  */
-export const getClientInstance = () => {
+export const getClientInstance = (isEtomic: boolean = false) => {
   if (!clientInstance) {
     const nodeConfig = remote.getGlobal('resistanceNodeConfig')
     let network
@@ -49,7 +49,7 @@ export const getClientInstance = () => {
 
     clientInstance = new Client({
       network,
-      port: nodeConfig.rpcport,
+      port: isEtomic ? 15672 : nodeConfig.rpcport,
       username: nodeConfig.rpcuser,
       password: nodeConfig.rpcpassword,
       timeout: 10000

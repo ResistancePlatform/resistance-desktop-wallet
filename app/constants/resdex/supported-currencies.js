@@ -843,7 +843,7 @@ const supportedCurrencies = [
 		coin: 'ETOMIC',
 		name: 'Etomic',
 		asset: 'ETOMIC',
-		rpcport: 10271,
+		rpcport: 15672,
 		electrumServers: [
 			{
 				host: 'electrum1.cipig.net',
@@ -1501,6 +1501,13 @@ const supportedCurrencies = [
 		etomic: '0xcfb98637bcae43C13323EAa1731cED2B716962fD',
 		rpcport: 80,
 	},
+  {
+    coin: 'NEXO',
+    name: 'nexo',
+    etomic: '0xb62132e35a6c13ee1ee0f84dc5d40bad8d815206',
+    node: 'mainnet.infura.io/v3/125e6ea342154b6bb962b180a15ae497',
+    rpcport: 80,
+  },
 	{
 		coin: 'NMC',
 		rpcport: 8336,

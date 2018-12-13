@@ -131,12 +131,13 @@ export class ChildProcessService {
 	 * @memberof ChildProcessService
 	 */
   async restartProcess(options) {
-    log.info(`Restarting ${options.processName} process.`)
+    const { processName } = options
+    log.info(`Restarting ${processName} process.`)
 
-    log.debug('Stopping it')
+    log.debug(`Stopping ${processName}`)
     await this.stopProcess(options.processName)
 
-    log.debug('Starting it')
+    log.debug(`Starting ${processName}`)
     await this.startProcess(options)
   }
 

@@ -17,19 +17,19 @@ const RESDEX = {
       useElectrum: false
     },
     {
+      symbol: 'ETOMIC',
+      useElectrum: false
+    },
+    {
+      symbol: 'ETH',
+      useElectrum: true
+    },
+    {
       symbol: 'BTC',
       useElectrum: true
     },
     {
-      symbol: 'LTC',
-      useElectrum: true
-    },
-    {
       symbol: 'DGB',
-      useElectrum: true
-    },
-    {
-      symbol: 'HODLC',
       useElectrum: true
     },
   ]

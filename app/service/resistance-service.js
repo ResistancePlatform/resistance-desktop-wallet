@@ -8,7 +8,7 @@ import PropertiesReader from 'properties-reader'
 import config from 'electron-settings'
 import { app, remote } from 'electron'
 
-import { RpcService, getClientInstance } from '~/service/rpc-service'
+import { getClientInstance } from '~/service/rpc-service'
 import { getStore } from '~/store/configureStore'
 import { getOS, getExportDir, verifyDirectoryExistence } from '~/utils/os'
 import { ChildProcessService } from './child-process-service'
@@ -146,9 +146,9 @@ export class ResistanceService {
    *
 	 * @memberof ResistanceService
 	 */
-	async stop() {
-    const rpc = new RpcService()
-    return rpc.stop()
+	async stop(isEtomic: boolean) {
+    const client = getClientInstance(isEtomic)
+    return client.stop()
 	}
 
 	/**
@@ -179,37 +179,43 @@ export class ResistanceService {
  * @memberof ResistanceService
  */
 async function startOrRestart({isTorEnabled, start, isEtomic}) {
-  const args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
-  // TODO: support system wide wallet paths, stored in config.get('wallet.path')
-  // https://github.com/ResistancePlatform/resistance-core/issues/84
-
-  const walletName = config.get('wallet.name', 'wallet')
-  args.push(`-wallet=${walletName}.dat`)
+  let args
   const caller = start ? childProcess.startProcess : childProcess.restartProcess
 
-  const exportDir = getExportDir()
+  if (isEtomic) {
+    args = ['-ac_name=ETOMIC']
+  } else {
+    args = isTorEnabled ? resistancedArgs.concat([torSwitch]) : resistancedArgs.slice()
+    // TODO: support system wide wallet paths, stored in config.get('wallet.path')
+    // https://github.com/ResistancePlatform/resistance-core/issues/84
 
-  log.info(`Export Dir: ${exportDir}`)
+    const walletName = config.get('wallet.name', 'wallet')
+    args.push(`-wallet=${walletName}.dat`)
 
-  try {
-    await verifyDirectoryExistence(exportDir)
-  } catch (err) {
-    log.error(`Can't create local node export directory`, err)
-    const actions = childProcess.getSettingsActions()
-    getStore().dispatch(actions.childProcessFailed('NODE', err.message))
-    return
+    const exportDir = getExportDir()
+
+    log.info(`Export Dir: ${exportDir}`)
+
+    try {
+      await verifyDirectoryExistence(exportDir)
+    } catch (err) {
+      log.error(`Can't create local node export directory`, err)
+      const actions = childProcess.getSettingsActions()
+      getStore().dispatch(actions.childProcessFailed('NODE', err.message))
+      return
+    }
+
+    args.push(`-exportdir=${exportDir}`)
   }
-
-  args.push(`-exportdir=${exportDir}`)
 
   this.isDoneLoading = false
 
   await caller.bind(childProcess)({
-    processName: 'NODE',
+    processName: isEtomic ? 'NODE_ETOMIC' : 'NODE',
     args,
-    shutdownFunction: async () => this.stop(),
+    shutdownFunction: async () => this.stop(isEtomic),
     outputHandler: this::handleOutput,
-    waitUntilReady: childProcess.createReadinessWaiter(this::checkRpcAvailability)
+    waitUntilReady: childProcess.createReadinessWaiter(this::getRpcAvailabilityChecker(isEtomic))
   })
 }
 
@@ -225,20 +231,23 @@ function handleOutput(data: Buffer) {
   }
 }
 
-async function checkRpcAvailability() {
-  const client = getClientInstance()
+function getRpcAvailabilityChecker(isEtomic: boolean) {
+  const checker = async () => {
+    const client = getClientInstance(isEtomic)
 
-  if (!this.isDoneLoading) {
-    return false
+    if (!this.isDoneLoading) {
+      return false
+    }
+
+    try {
+      await client.getInfo()
+      log.debug(`The local node has successfully accepted an RPC call`)
+      return true
+    } catch (err) {
+      log.debug(`The local node hasn't accepted an RPC check call`)
+      return false
+    }
   }
 
-  try {
-    await client.getInfo()
-    log.debug(`The local node has successfully accepted an RPC call`)
-    return true
-  } catch (err) {
-    log.debug(`The local node hasn't accepted an RPC check call`)
-    return false
-  }
-
+  return checker
 }
