@@ -83,10 +83,11 @@
   "Node": "Node",
   "Miner": "Miner",
   "Tor": "Tor",
-  "ResDEX 1": "ResDEX 1",
-  "ResDEX 2": "ResDEX 2",
-  "ResDEX 3": "ResDEX 3",
+  "ResDEX": "ResDEX",
   "Repeat password": "Repeat password",
   "Passwords do not match": "Passwords do not match",
-  "Manage daemons": "Manage daemons"
+  "Manage daemons": "Manage daemons",
+  "ResDEX 1": "ResDEX 1",
+  "ResDEX 2": "ResDEX 2",
+  "ResDEX 3": "ResDEX 3"
 }
