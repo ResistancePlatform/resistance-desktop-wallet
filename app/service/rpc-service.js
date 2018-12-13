@@ -40,20 +40,16 @@ export const getClientInstance = (isEtomic: boolean = false) => {
   if (!clientInstance[isEtomic]) {
     const nodeConfig = remote.getGlobal('resistanceNodeConfig')
     let network
-    let defaultRpcPort
 
     if (nodeConfig.testnet) {
       network = 'testnet'
-      defaultRpcPort = 18132
     } else if (nodeConfig.regtest) {
       network = 'regtest'
-    } else {
-      defaultRpcPort = 8132
     }
 
     clientInstance[isEtomic] = new Client({
       network,
-      port: isEtomic ? 15672 : (nodeConfig.rpcport || defaultRpcPort),
+      port: isEtomic ? 15672 : nodeConfig.rpcport,
       username: nodeConfig.rpcuser,
       password: nodeConfig.rpcpassword,
       timeout: 10000

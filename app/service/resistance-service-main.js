@@ -20,8 +20,6 @@ const configFolderName = 'Resistance'
 const configFileName = 'resistance.conf'
 const configFileContents = [
   `testnet=1`,
-  `port=18233`,
-  `rpcport=18232`,
   `rpcuser=resuser`,
   `rpcpassword=%generatedPassword%`,
   ``
@@ -80,6 +78,10 @@ export class ResistanceService {
     } else {
       resistanceNodeConfig = this.createConfig(configFile)
       log.info(`The Resistance config file ${configFile} was successfully created.`);
+    }
+
+    if (!resistanceNodeConfig.rpcport) {
+      resistanceNodeConfig.rpcport = resistanceNodeConfig.testnet ? 18132 : 8132
     }
 
     return resistanceNodeConfig

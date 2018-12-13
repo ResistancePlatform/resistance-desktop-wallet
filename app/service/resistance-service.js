@@ -116,6 +116,10 @@ export class ResistanceService {
       log.info(`The Resistance config file ${configFile} was successfully created.`)
     }
 
+    if (!resistanceNodeConfig.rpcport) {
+      resistanceNodeConfig.rpcport = resistanceNodeConfig.testnet ? 18132 : 8132
+    }
+
     return resistanceNodeConfig
   }
 
