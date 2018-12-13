@@ -32,7 +32,7 @@ export class TorService {
 	 * @memberof TorService
 	 */
   async start() {
-    await childProcess.execProcess({processName: 'TOR', args: torCommandArgs.slice()})
+    await childProcess.startProcess({processName: 'TOR', args: torCommandArgs.slice()})
   }
 
 	/**

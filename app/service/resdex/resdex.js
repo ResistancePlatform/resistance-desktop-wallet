@@ -82,7 +82,7 @@ export class ResDexService {
       return
     }
 
-    await childProcess.execProcess({
+    await childProcess.startProcess({
       processName: 'RESDEX',
       args: [JSON.stringify(options)],
       shutdownFunction: async () => this.stop(),
