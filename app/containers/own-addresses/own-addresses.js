@@ -59,22 +59,22 @@ class OwnAddresses extends Component<Props> {
 
   mergeAllMinedCoinsClicked(event, address, t) {
     const confirmOptions = { onOk: () => this.props.actions.mergeAllMinedCoins(address) }
-    toastr.confirm(t(`Are you sure want to merge all the mined coins?`), confirmOptions)
+    toastr.confirm(t(`Are you sure want to merge all mined coins?`), confirmOptions)
   }
 
   mergeAllTransparentAddressCoinsClicked(event, address, t) {
     const confirmOptions = { onOk: () => this.props.actions.mergeAllRAddressCoins(address) }
-    toastr.confirm(t(`Are you sure want to merge all the transparent address coins?`), confirmOptions)
+    toastr.confirm(t(`Are you sure want to merge all transparent address coins?`), confirmOptions)
   }
 
   mergeAllPrivateAddressCoinsClicked(event, address, t) {
     const confirmOptions = { onOk: () => this.props.actions.mergeAllZAddressCoins(address) }
-    toastr.confirm(t(`Are you sure want to merge all the private address coins?`), confirmOptions)
+    toastr.confirm(t(`Are you sure want to merge all private address coins?`), confirmOptions)
   }
 
   mergeAllCoinsClicked(event, address, t) {
     const confirmOptions = { onOk: () => this.props.actions.mergeAllCoins(address) }
-    toastr.confirm(t(`Are you sure want to merge all the coins?`), confirmOptions)
+    toastr.confirm(t(`Are you sure want to merge all coins?`), confirmOptions)
   }
 
 	/**

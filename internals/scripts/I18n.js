@@ -33,6 +33,8 @@ const scannerOptions = {
   },
   lngs: availableLanguages,
   ns: availableNamespaces,
+  // Be careful, validation.json might be overwritten!
+  removeUnusedKeys: false,
   defaultNs: 'other',
   defaultValue: (language, namespace, key) => key,
   resource: {

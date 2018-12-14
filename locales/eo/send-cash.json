@@ -1,5 +1,4 @@
 {
-  "Paste": "Elpoŝigi",
   "Send Cash": "Sendi Monon",
   "From address": "De la adreso",
   "Private Transactions": "Private Transactions",
@@ -17,12 +16,12 @@
   "\"FROM ADDRESS\" or \"DESTINATION ADDRESS\" is required.": "\"FROM ADDRESS\" or \"DESTINATION ADDRESS\" is required.",
   "\"FROM ADDRESS\" or \"DESTINATION ADDRESS\" cannot be the same.": "\"FROM ADDRESS\" or \"DESTINATION ADDRESS\" cannot be the same.",
   "\"AMOUNT\" is required.": "\"AMOUNT\" is required.",
-  "Send cash operation started.": "Send cash operation started.",
-  "Unable to start send cash operation": "Unable to start send cash operation",
-  "Sending cash from a transparent (R) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "Sending cash from a transparent (R) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.",
-  "Sending cash from a private (Z) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "Sending cash from a private (Z) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.",
-  "Sending cash from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled.": "Sending cash from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled.",
   "tip-r-to-z": "tip-r-to-z",
   "tip-z-to-z": "tip-z-to-z",
-  "tip-z-to-r": "tip-z-to-r"
+  "tip-z-to-r": "tip-z-to-r",
+  "Send currency operation started.": "Send currency operation started.",
+  "Unable to start send currency operation": "Unable to start send currency operation",
+  "Sending currency from a transparent (R) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "Sending currency from a transparent (R) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.",
+  "Sending currency from a private (Z) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "Sending currency from a private (Z) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.",
+  "Sending currency from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled.": "Sending currency from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled."
 }

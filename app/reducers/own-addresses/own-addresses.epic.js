@@ -98,7 +98,7 @@ const importPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pi
       switchMap(() => {
         toastr.success(
           t(`Private keys imported successfully`),
-          t(`It may take several minutes to rescan the block chain for transactions affecting the newly-added keys.`)
+          t(`It may take several minutes to rescan the blockchain for transactions affecting the newly-added keys.`)
         )
         return of(OwnAddressesActions.empty())
       }),

@@ -30,8 +30,8 @@ export default class ToggleButton extends CheckBox {
           role="button"
           tabIndex={0}
           className={cn(styles.container, { [styles.on]: this.state.value, [styles.disabled]: this.props.disabled })}
-          onClick={e => this.onToggleHandler(e)}
-          onKeyDown={e => [13, 32].includes(e.keyCode) ? this.onToggleHandler(e) : false}
+          onClick={e => this.onClickHandler(e)}
+          onKeyDown={e => [13, 32].includes(e.keyCode) ? this.onClickHandler(e) : false}
         >
           <div className={styles.switcher} />
 

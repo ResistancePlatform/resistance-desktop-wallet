@@ -293,6 +293,8 @@ export class RpcService {
   sendCash(fromAddress: string, toAddress: string, amountToSend: Decimal) {
     const client = getClientInstance()
 
+    log.debug('send cash', client.port)
+
     const commandParameters= [
       fromAddress,
       [{ address: toAddress, amount: amountToSend.sub(DECIMAL.transactionFee) }]

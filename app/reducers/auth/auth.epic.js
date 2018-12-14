@@ -39,7 +39,7 @@ const submitPasswordEpic = (action$: ActionsObservable<Action>, state$) => actio
           errorMessage = t(`The wallet password entered was incorrect.`)
         } else {
           log.error(`Authentication error`, err)
-          errorMessage = t(`An error has occurred when authenticating, please check the application log for details`)
+          errorMessage = t(`An error has occurred during authentication, please check the application log for details`)
         }
         return of(AuthActions.loginFailed(errorMessage))
       })

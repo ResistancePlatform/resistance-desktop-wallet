@@ -59,5 +59,6 @@
   "Process {{processName}} has failed.": "Process {{processName}} has failed.",
   "Child process failure": "Child process failure",
   "Failed to stop {{processName}}.": "Failed to stop {{processName}}.",
-  "Stop child process error": "Stop child process error"
+  "Stop child process error": "Stop child process error",
+  "Node (Etomic)": "Node (Etomic)"
 }

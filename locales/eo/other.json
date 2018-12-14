@@ -83,7 +83,6 @@
   "Installation folder": "Installation folder",
   "The session has expired": "The session has expired",
   "The wallet password entered was incorrect.": "The wallet password entered was incorrect.",
-  "An error has occurred when authenticating, please check the application log for details": "An error has occurred when authenticating, please check the application log for details",
   "Login failed": "Login failed",
   "Resistance parameters download failed": "Resistance parameters download failed",
   "Check your network connection and hit Retry": "Check your network connection and hit Retry",
@@ -91,5 +90,6 @@
   "Quit app": "Quit app",
   "Download in progress, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)": "Download in progress, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)",
   "Download complete": "Download complete",
-  "Download failed": "Download failed"
+  "Download failed": "Download failed",
+  "An error has occurred during authentication, please check the application log for details": "An error has occurred during authentication, please check the application log for details"
 }

@@ -3,7 +3,7 @@
   "tip-r-to-z": "You are sending money from a Transparent (R) Address to a Private (Z) Address. This transaction will be partially shielded.",
   "tip-z-to-z": "You are sending money from a Private (Z) Address to a Private (Z) Address. This transaction will be fully shielded and invisible to all users.",
   "tip-z-to-r": "You are sending money from a Private (Z) Address to a Transparent (R) Address. This transaction will be partially shielded.",
-  "memo": "When sending cash from a Transparent (R) address, the remaining balance is sent to another out-generated r address. When sending from a Private (Z) address, the remaining unsent balance remains with the Z address. In both cases the original sending address cannot be used for sending again until the transaction is confirmed. The address is temporarily removed from the list. Freshly mined coins may only be sent to a Private (Z) address.",
+  "memo": "When sending currency from a Transparent (R) address, the remaining balance is sent to another out-generated R address. When sending from a Private (Z) address, the remaining unsent balance remains with the Z address. In both cases the original sending address cannot be used for sending again until the transaction is confirmed. The address is temporarily removed from the list. Freshly mined coins may only be sent to a Private (Z) address.",
   "Have no any available address": "Have no any available address",
   "Error": "Error",
   "Send Cash": "Send Cash",
@@ -19,9 +19,9 @@
   "\"FROM ADDRESS\" or \"DESTINATION ADDRESS\" is required.": "\"FROM ADDRESS\" or \"DESTINATION ADDRESS\" is required.",
   "\"FROM ADDRESS\" or \"DESTINATION ADDRESS\" cannot be the same.": "\"FROM ADDRESS\" or \"DESTINATION ADDRESS\" cannot be the same.",
   "\"AMOUNT\" is required.": "\"AMOUNT\" is required.",
-  "Send cash operation started.": "Send cash operation started.",
-  "Unable to start send cash operation": "Unable to start send cash operation",
-  "Sending cash from a transparent (R) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "Sending cash from a transparent (R) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.",
-  "Sending cash from a private (Z) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "Sending cash from a private (Z) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.",
-  "Sending cash from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled.": "Sending cash from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled."
+  "Send currency operation started.": "Send currency operation started.",
+  "Unable to start send currency operation": "Unable to start send currency operation",
+  "Sending currency from a transparent (R) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "Sending currency from a transparent (R) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.",
+  "Sending currency from a private (Z) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "Sending currency from a private (Z) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.",
+  "Sending currency from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled.": "Sending currency from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled."
 }

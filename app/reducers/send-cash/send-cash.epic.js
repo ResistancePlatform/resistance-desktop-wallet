@@ -68,7 +68,7 @@ const sendCashEpic = (action$: ActionsObservable<Action>, state$) => action$.pip
 const sendCashOperationStartedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SendCashActions.sendCashOperationStarted),
 	tap(() => {
-		toastr.info(t(`Send cash operation started.`))
+		toastr.info(t(`Send currency operation started.`))
 	}),
 	mapTo(SendCashActions.empty())
 )
@@ -76,7 +76,7 @@ const sendCashOperationStartedEpic = (action$: ActionsObservable<Action>) => act
 const sendCashFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SendCashActions.sendCashFailure),
   tap((action: Action) => {
-    toastr.error(t(`Unable to start send cash operation`), action.payload.errorMessage)
+    toastr.error(t(`Unable to start send currency operation`), action.payload.errorMessage)
   }),
 	mapTo(SendCashActions.empty())
 )

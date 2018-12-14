@@ -67,13 +67,13 @@ export const checkPrivateTransactionRule = (tempState: SendCashState) => {
   }
 
 	if (isTransparentAddress(tempState.fromAddress) && isPrivateAddress(tempState.toAddress)) {
-    checkResult = t(`Sending cash from a transparent (R) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
+    checkResult = t(`Sending currency from a transparent (R) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
 	}
 	else if (isPrivateAddress(tempState.fromAddress) && isPrivateAddress(tempState.toAddress)) {
-    checkResult = t(`Sending cash from a private (Z) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
+    checkResult = t(`Sending currency from a private (Z) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
 	}
 	else if (isPrivateAddress(tempState.fromAddress) && isTransparentAddress(tempState.toAddress)) {
-    checkResult = t(`Sending cash from a private (Z) address to a transparent (R) address is forbidden when "Private Transactions" are disabled.`)
+    checkResult = t(`Sending currency from a private (Z) address to a transparent (R) address is forbidden when "Private Transactions" are disabled.`)
 	}
 
 	return checkResult
