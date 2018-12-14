@@ -1293,6 +1293,7 @@ const supportedCurrencies = [
 		wiftype: 176,
 		txfee: 100000,
 		electrumServers: [
+      /*
 			{
 				host: 'electrum1.cipig.net',
 				port: 10065,
@@ -1304,7 +1305,12 @@ const supportedCurrencies = [
 			{
 				host: 'electrum3.cipig.net',
 				port: 10065,
-			},
+      },
+      */
+      {
+        host: '34.205.81.68',
+        port: 10004,
+      }
 		],
 	},
 	{

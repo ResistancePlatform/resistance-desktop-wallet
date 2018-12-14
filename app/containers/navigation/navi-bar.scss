@@ -1,18 +1,20 @@
 @import "~/assets/styles/vars.scss";
 
 .container {
-  padding-top: 1.6rem;
-  padding-left: 1.35rem;
+  padding-top: 2rem;
+  padding-left: 0;
   background-color: $NAVI_BAR_BACKGROUND_COLOR;
   min-width: $NAVI_BAR_CONTAINER_WIDTH;
-  width: $NAVI_BAR_CONTAINER_WIDTH;
+  width: $NAVI_BAR_CONTAINER_WIDTH + 1.35rem;
   user-select: none;
   cursor: pointer;
 }
 
 .draggableContainer {
-  padding-top: 2rem;
+  padding-top: 2.4rem;
+  padding-left: 1.35rem;
   -webkit-app-region: drag;
+  height: 100%;
 }
 
 .item {
@@ -20,7 +22,7 @@
   font-size: 0.88rem;
   font-weight: 300;
   align-items: center !important;
-  padding: 0rem 0;
+  padding: 0.5rem 0;
 
   i {
     font-family: 'icomoon' !important;
@@ -105,7 +107,7 @@
   .visa {
     position: absolute;
     width: 1.729rem;
-    top: 0.52rem;
+    top: 1.06rem;
     right: 2.1rem;
   }
 
@@ -130,7 +132,7 @@
     position: absolute;
     display: inline-block;
 
-    top: 0.5rem;
+    top: 1.1rem;
     left: 48%;
 
     color: $BASE_COLOR_DARK_BLUE_2 !important;

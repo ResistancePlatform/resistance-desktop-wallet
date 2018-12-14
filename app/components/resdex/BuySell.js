@@ -108,7 +108,10 @@ class ResDexBuySell extends Component<Props> {
     const { isAdvanced } = this.props.buySell
 
     const isMarket = form && form.fields.isMarketOrder || !isAdvanced
-    const isPrivate = Boolean(form && form.fields.enhancedPrivacy && isMarket)
+    const isPrivate = false
+
+    // TODO: Uncomment after the demo
+    // const isPrivate = Boolean(form && form.fields.enhancedPrivacy && isMarket)
 
     const order = {
       orderType: 'buy',
@@ -228,7 +231,7 @@ class ResDexBuySell extends Component<Props> {
           )
         }
         {order.isMarket &&
-          <CheckBox name="enhancedPrivacy" className={styles.enhancedPrivacyCheckbox} defaultValue={false} disabled>
+          <CheckBox name="enhancedPrivacy" className={styles.enhancedPrivacyCheckbox} defaultValue={false}>
             {t(`Enhanced privacy`)}
 
             <Info

@@ -2,7 +2,6 @@
 
 // TODO: Refactor this file
 
-import log from 'electron-log'
 import { ipcRenderer } from 'electron'
 import React from 'react'
 import { connect } from 'react-redux'
@@ -82,8 +81,6 @@ class App extends React.Component<Props> {
   }
 
   cleanup() {
-    log.debug(`Cleanup bloody cleanup, nothing more to do,`)
-    log.debug(`Living just for dying, dying just for you!`)
     getStore().dispatch(SettingsActions.stopChildProcesses())
   }
 
@@ -112,7 +109,7 @@ class App extends React.Component<Props> {
     return (
       <div className={cn(styles.contentContainer, VLayout.vBoxContainer)}>
 				{ /* Content container */}
-				<div className={cn(VLayout.vBoxChild, HLayout.hBoxContainer)}>
+				<div className={cn(VLayout.vBoxChild, HLayout.hBoxContainer)} style={{overflowY: 'hidden', height: '100%'}}>
           <TitleBarButtons />
 					<NaviBar />
           <StatusIcons />

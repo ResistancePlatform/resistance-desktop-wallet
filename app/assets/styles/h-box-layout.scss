@@ -14,7 +14,8 @@
 
     // This flag control how the items align in `another direction`, same values with `align-items`
     justify-content: start;
-    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 .hBoxChild {

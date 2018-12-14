@@ -25,7 +25,7 @@ const RESDEX = {
       useElectrum: true
     },
     {
-      symbol: 'BTC',
+      symbol: 'LTC',
       useElectrum: true
     },
     {

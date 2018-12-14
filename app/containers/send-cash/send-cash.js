@@ -131,7 +131,7 @@ class SendCash extends Component<Props> {
 
 					<div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapperContainer].join(' ')}>
 						{/* Title bar */}
-						<div className={styles.titleBar}>{t(`Send Cash`)}</div>
+						<div className={styles.titleBar}>{t(`Send Currency`)}</div>
 
 						{/* From address */}
 						<div className={styles.fromAddressContainer}>
