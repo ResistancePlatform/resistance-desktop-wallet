@@ -362,7 +362,8 @@ const stopChildProcessesEpic = (action$: ActionsObservable<Action>, state$) => a
     })
 
     return action$.pipe(
-      timeout(5000),
+      // TODO: Increase and lock the window after the demo
+      timeout(500),
       ofType(SettingsActions.childProcessMurdered),
       switchMap(action => {
         runningProcesses = runningProcesses.filter(name => name !== action.payload.processName)

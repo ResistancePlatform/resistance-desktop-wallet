@@ -22,7 +22,9 @@ const mainApi = resDexApiFactory('RESDEX')
 const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexAccountsActions.getCurrencies),
   switchMap(() => {
-    const processNames = ['RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
+    // Commented out for the purposes of the demo
+    // const processNames = ['RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
+    const processNames = ['RESDEX']
 
     const getPortfoliosPromise = Promise.all(processNames.map(processName => {
       const api = resDexApiFactory(processName)
@@ -47,7 +49,13 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
           ...previous,
           [processName]: responseToCurrencies(result[index])
         }), {})
-        log.debug(`Process 2 RES balance:`, currencies.RESDEX_PRIVACY1.RES.balance.toString())
+
+        // TODO: Remove, added for the purposes of the demo
+        Object.assign(currencies, {
+          RESDEX_PRIVACY1: {},
+          RESDEX_PRIVACY2: {},
+        })
+
         return of(ResDexAccountsActions.gotCurrencies(currencies))
       }),
       catchError(err => of(ResDexAccountsActions.getCurrenciesFailed(err.message)))
@@ -67,7 +75,9 @@ const getCurrenciesFailedEpic = (action$: ActionsObservable<Action>) => action$.
 const getTransactionsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexAccountsActions.getTransactions),
   switchMap(() => {
-    const { currencies, enabledCurrencies } = state$.value.resDex.accounts
+    const { accounts } = state$.value.resDex
+    const { enabledCurrencies } = accounts
+    const { RESDEX: currencies } = accounts.currencies
 
     if (Object.keys(currencies).length === 0) {
       log.warn(`Portfolio hasn't been fetched yet, can't get transactions history.`)
@@ -201,7 +211,7 @@ const addCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.pip
 const copySmartAddressEpic = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(ResDexAccountsActions.copySmartAddress),
   map(action => {
-    const { currencies } = state$.value.resDex.accounts
+    const { RESDEX: currencies } = state$.value.resDex.accounts.currencies
     const currency = currencies[action.payload.symbol]
     clipboard.writeText(currency.address)
     toastr.success(t(`{{currency}} smart address copied to clipboard`,

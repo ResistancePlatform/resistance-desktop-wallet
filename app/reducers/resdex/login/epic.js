@@ -86,7 +86,12 @@ const startResdexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     })
 
     // Start 3 ResDEX processes, one for transparent and two for private trades
-    const observables = ['RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2'].map(processName => {
+    // Commented out for the purposes of the demo
+    // const processNames = ['RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
+
+    const processNames = ['RESDEX']
+
+    const observables = processNames.map(processName => {
       const api = resDexApiFactory(processName)
       api.setToken(seedPhrase)
       resDex.start(processName, seedPhrase)
@@ -126,7 +131,7 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
 
     const getFeesObservable = from(getFeesPromise).pipe(
       switchMap(fees => {
-        const feesMap = fees.reduce((previous, fee, index) =>(
+        const feesMap = fees.reduce((previous, fee, index) => (
           { ...previous, [symbols[index]]: fee }
         ), {})
         return of(ResDexAccountsActions.gotCurrencyFees(feesMap))

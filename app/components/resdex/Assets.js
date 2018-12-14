@@ -253,7 +253,7 @@ class ResDexAssets extends Component<Props> {
       <div className={styles.coins}>
         {sortedCurrencies.map(currency => this.getWalletContents(t, currency.symbol))}
 
-        <div className={styles.coin}>
+        <div className={cn(styles.coin, styles.secretFunds)}>
           <div className={styles.secretFundsIcon} />
 
           {t(`Secret funds`)}

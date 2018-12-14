@@ -212,7 +212,15 @@ Object.assign(preloadedState.resDex.bootstrapping, {
   isInProgress: config.get('resDex.bootstrappingInProgress', true)
 })
 
-const enabledCurrencies = config.get('resDex.enabledCurrencies', RESDEX.alwaysEnabledCurrencies)
+const enabledCurrencies = config.get('resDex.enabledCurrencies', [])
+
+// Merge with always enabled currencies
+RESDEX.alwaysEnabledCurrencies.forEach(currency => {
+  const index = enabledCurrencies.findIndex(c => c.symbol === currency.symbol)
+  if (index === -1) {
+    enabledCurrencies.push(currency)
+  }
+})
 
 Object.assign(preloadedState.resDex.accounts, {
   selectedSymbol: enabledCurrencies[0].symbol,
