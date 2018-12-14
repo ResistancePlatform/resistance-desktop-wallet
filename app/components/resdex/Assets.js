@@ -159,7 +159,7 @@ class ResDexAssets extends Component<Props> {
                 <i className={cn({ [styles.positive]: sinceLastHour.isPositive() })}>
                   {sinceLastHour.isPositive() ? '+' : '-'}
                 </i>
-                {sinceLastHour.abs().toFixed(2).replace('.', ',')}
+                {sinceLastHour.abs().toFixed(2)}
                 <sub>%</sub>
               </span>
             </div>

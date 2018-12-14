@@ -24,14 +24,6 @@ const RESDEX = {
       symbol: 'LTC',
       useElectrum: true
     },
-    {
-      symbol: 'DGB',
-      useElectrum: true
-    },
-    {
-      symbol: 'HODLC',
-      useElectrum: true
-    },
   ]
 }
 

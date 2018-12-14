@@ -43,6 +43,8 @@ export class MinerService {
     // RPC credentials
     args.push(`--user=${nodeConfig.rpcuser}`, `--pass=${nodeConfig.rpcpassword}`)
 
+    args.push(`--threads=1`)
+
     await childProcess.startProcess({processName: 'MINER', args, outputHandler: this.handleOutput})
 	}
 
