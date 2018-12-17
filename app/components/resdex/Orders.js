@@ -6,15 +6,20 @@ import { bindActionCreators } from 'redux'
 import React, { Component } from 'react'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
+import { toastr } from 'react-redux-toastr'
 
 import { getOrderStatusName } from '~/utils/resdex'
 import { toDecimalPlaces } from '~/utils/decimal'
 import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
-import { RoundedButton } from '~/components/rounded-form'
+import { RoundedButton, BorderlessButton } from '~/components/rounded-form'
+import { SwapDBService } from '~/service/resdex/swap-db'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 
 import styles from './Orders.scss'
+
+
+const swapDB = new SwapDBService()
 
 type Props = {
   t: any,
@@ -66,6 +71,13 @@ class ResDexOrders extends Component<Props> {
     }
 
     return Decimal(baseCurrencyAmount)
+  }
+
+  onClearHistoryClick() {
+    const { t } = this.props
+    const { swapHistory } = this.props.orders
+    swapHistory.filter(swap => !swap.isActive).forEach(swap => swapDB.removeSwap(swap.uuid))
+    toastr.success(t(`Swap history removed`))
   }
 
 	/**
@@ -143,7 +155,19 @@ class ResDexOrders extends Component<Props> {
           </div>
         }
 
-        <div className={styles.header}>{t(`Swap history`)}</div>
+        <div className={styles.header}>
+          {t(`Swap history`)}
+
+          {completedOrders.length !== 0 &&
+            <BorderlessButton
+              className={styles.clearHistoryButton}
+              onClick={() => this.onClearHistoryClick()}
+            >
+              {t(`Clear history`)}
+            </BorderlessButton>
+          }
+
+        </div>
 
         <UniformList
           className={styles.list}

@@ -83,6 +83,14 @@ export class SwapDBService {
     )).forEach(swap => this.db.remove(swap))
   }
 
+  async removeSwap(uuid) {
+    const swap = await this::getSwapData(uuid)
+
+    if (swap) {
+      return this.db.remove(swap)
+    }
+  }
+
   queue(fn) {
     this.pQueue.add(async () => {
       await this.ready
@@ -248,6 +256,8 @@ function formatSwap(data) {
       response,
       messages,
     },
+    txId: null,
+    destinationTxId: null
   }
 
   messages.forEach(message => {
@@ -273,6 +283,8 @@ function formatSwap(data) {
     if (message.method === 'connected') {
       swap.status = 'matched'
       swap.progress = MATCHED_STEP / TOTAL_PROGRESS_STEPS
+      swap.txId = message.txid
+      swap.destinationTxId = message.desttxid
     }
 
     if (message.method === 'update') {

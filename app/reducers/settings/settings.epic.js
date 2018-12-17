@@ -78,7 +78,8 @@ const kickOffChildProcessesEpic = (action$: ActionsObservable<Action>, state$) =
       )
     }
 
-    return concat(observables, of(SettingsActions.startEtomicNode()))
+    return observables
+    // return concat(observables, of(SettingsActions.startEtomicNode()))
   })
 )
 
@@ -363,7 +364,7 @@ const stopChildProcessesEpic = (action$: ActionsObservable<Action>, state$) => a
 
     return action$.pipe(
       // TODO: Increase and lock the window after the demo
-      timeout(500),
+      timeout(5000),
       ofType(SettingsActions.childProcessMurdered),
       switchMap(action => {
         runningProcesses = runningProcesses.filter(name => name !== action.payload.processName)

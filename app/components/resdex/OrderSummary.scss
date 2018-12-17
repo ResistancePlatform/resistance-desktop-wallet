@@ -112,6 +112,11 @@
     line-height: 1.65rem;
     overflow-x: hidden;
 
+    a {
+      color: $BASE_COLOR_PURPLE;
+      text-decoration: none;
+    }
+
     hr {
       width: 100%;
       margin: 0.77rem 0.5rem 0 0.5rem;
