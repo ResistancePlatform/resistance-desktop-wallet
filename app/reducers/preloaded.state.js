@@ -67,7 +67,13 @@ export const preloadedState: State = {
 	ownAddresses: {
 		addresses: [],
 		showDropdownMenu: false,
-    frozenAddresses: {}
+    frozenAddresses: {},
+    connectLedgerModal: {
+      isVisible: false,
+      isLedgerConnected: false,
+      isTransactionConfirmed: false,
+      isTransactionSent: false
+    }
 	},
 	sendCash: {
 		isPrivateTransactions: false,

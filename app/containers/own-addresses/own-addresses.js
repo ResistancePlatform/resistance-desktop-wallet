@@ -12,7 +12,8 @@ import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { OwnAddressesActions, OwnAddressesState } from '~/reducers/own-addresses/own-addresses.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
-import { RoundedButtonWithDropdown } from '~/components/rounded-form'
+import { RoundedButtonWithDropdown, MoreButton  } from '~/components/rounded-form'
+import ConnectLedgerModal from '~/components/own-addresses/ConnectLedgerModal'
 
 import styles from './own-addresses.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
@@ -21,6 +22,7 @@ import VLayout from '~/assets/styles/v-box-layout.scss'
 const pollingInterval = 5.0
 const addressRowPopupMenuId = 'own-addresses-address-row-popup-menu-id'
 const createAddressPopupMenuId = 'own-addresses-create-address-popup-menu-id'
+const privateKeysPopupMenuId = 'own-addresses-private-keys-popup-menu-id'
 
 type Props = {
   t: any,
@@ -100,6 +102,10 @@ class OwnAddresses extends Component<Props> {
           }}
         />
 
+        {this.props.ownAddresses.connectLedgerModal.isVisible &&
+          <ConnectLedgerModal />
+        }
+
 				{ /* Route content */}
 				<div className={cn(styles.container, VLayout.vBoxChild, HLayout.hBoxContainer)}>
 
@@ -127,21 +133,34 @@ class OwnAddresses extends Component<Props> {
                     <PopupMenuItem onClick={() => this.props.actions.createAddress(true)}>
                       {t(`New private (Z) address`)}
                     </PopupMenuItem>
-                    <PopupMenuItem onClick={this.props.actions.importPrivateKey}>
-                      {t(`Import private key`)}
-                    </PopupMenuItem>
-                    <PopupMenuItem onClick={this.props.actions.initiatePrivateKeysImport}>
-                      {t(`Import private keys form file`)}
-                    </PopupMenuItem>
-                    <PopupMenuItem onClick={this.props.actions.showPrivateKey} disabled>
-                      {t(`Show private key`)}
-                    </PopupMenuItem>
-                    <PopupMenuItem onClick={this.props.actions.initiatePrivateKeysExport}>
-                      {t(`Export private keys`)}
+                    <PopupMenuItem onClick={this.props.actions.showConnectLedgerModal}>
+                      {t(`Connect ledger`)}
                     </PopupMenuItem>
                   </PopupMenu>
 
                 </RoundedButtonWithDropdown>
+
+                <MoreButton
+                  className={styles.moreButton}
+                  onClick={e => this.props.popupMenu.show(privateKeysPopupMenuId, null, e.clientY, e.clientX)}
+                  disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
+                  large
+                />
+
+                <PopupMenu id={privateKeysPopupMenuId} relative>
+                  <PopupMenuItem onClick={this.props.actions.importPrivateKey}>
+                    {t(`Import private key`)}
+                  </PopupMenuItem>
+                  <PopupMenuItem onClick={this.props.actions.initiatePrivateKeysImport}>
+                    {t(`Import private keys form file`)}
+                  </PopupMenuItem>
+                  <PopupMenuItem onClick={this.props.actions.showPrivateKey} disabled>
+                    {t(`Show private key`)}
+                  </PopupMenuItem>
+                  <PopupMenuItem onClick={this.props.actions.initiatePrivateKeysExport}>
+                    {t(`Export private keys`)}
+                  </PopupMenuItem>
+                </PopupMenu>
 
               </div>
 

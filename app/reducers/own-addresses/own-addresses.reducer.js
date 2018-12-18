@@ -14,7 +14,13 @@ export type AddressRow = {
 export type OwnAddressesState = {
 	addresses?: AddressRow[],
   showDropdownMenu?: boolean,
-  frozenAddresses: { [string]: Decimal }
+  frozenAddresses: { [string]: Decimal },
+  connectLedgerModal: {
+    isVisible: boolean,
+    isLedgerConnected: boolean,
+    isTransactionConfirmed: boolean,
+    isTransactionSent: boolean
+  }
 }
 
 export const OwnAddressesActions = createActions(
@@ -26,6 +32,11 @@ export const OwnAddressesActions = createActions(
     GET_OWN_ADDRESSES_FAILURE:  (errorMessage: string) => ({ errorMessage }),
 
     CREATE_ADDRESS: (isPrivate: boolean) => ({ isPrivate }),
+
+    SHOW_CONNECT_LEDGER_MODAL: undefined,
+    CONTINUE_TO_CONFIRM_TRANSACTION: undefined,
+    CLOSE_CONNECT_LEDGER_MODAL: undefined,
+
     INITIATE_PRIVATE_KEYS_EXPORT: undefined,
     EXPORT_PRIVATE_KEYS: filePath => ({filePath}),
     INITIATE_PRIVATE_KEYS_IMPORT: undefined,
@@ -63,6 +74,29 @@ export const OwnAddressesReducer = handleActions(
     }),
     [OwnAddressesActions.getOwnAddressesFailure]: state => ({
       ...state, addresses: []
+    }),
+    [OwnAddressesActions.showConnectLedgerModal]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isVisible: true
+      }
+    }),
+    [OwnAddressesActions.continueToConfirmTransaction]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isLedgerConnected: true,
+        isTransactionConfirmed: true,
+        isTransactionSent: true
+      }
+    }),
+    [OwnAddressesActions.closeConnectLedgerModal]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isVisible: false
+      }
     }),
     [OwnAddressesActions.mergeAllMinedCoins]: (state, action) => ({
       ...state,
