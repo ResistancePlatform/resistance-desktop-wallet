@@ -8,7 +8,19 @@ $withdrawModalWidth: 26.25rem;
   width: $withdrawModalWidth - 4rem;
   position: relative;
 
-  .secretFundsIcon {
+  .title {
+    display: flex;
+    align-items: center;
+
+    .secretFundsIcon {
+      color: $BASE_COLOR_FONT_GRAY;
+      margin-right: 0.5rem;
+
+      &:before {
+        content: '\e922';
+        font-size: 1.37rem;
+      }
+    }
   }
 
   .inputsRow {

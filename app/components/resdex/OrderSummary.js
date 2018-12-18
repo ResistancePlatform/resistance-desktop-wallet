@@ -120,6 +120,9 @@ class OrderSummary extends Component<Props> {
     const { order, t } = this.props
     const txFee = this.getTxFee()
 
+    const quoteBlockExplorerUrl = this.getBlockExplorerUrl(order.quoteCurrency, order.destinationTxId)
+    const baseBlockExplorerUrl = this.getBlockExplorerUrl(order.baseCurrency, order.txId)
+
     return (
       <div className={cn(styles.container, this.props.className)}>
         <div className={styles.briefContainer}>
@@ -158,7 +161,8 @@ class OrderSummary extends Component<Props> {
         <ul className={styles.list}>
           <li className={cn({ [styles.res]: order.isPrivate })}>
             <a
-              href={this.getBlockExplorerUrl(order.quoteCurrency, order.destinationTxId)}
+              className={cn({[styles.activeLink]: Boolean(quoteBlockExplorerUrl)})}
+              href={quoteBlockExplorerUrl}
               onClick={e => this.onLinkClick(e)}
             >
               {toDecimalPlaces(Decimal(order.quoteCurrencyAmount))}&nbsp;
@@ -167,7 +171,8 @@ class OrderSummary extends Component<Props> {
             <hr />
             <span>
               <a
-                href={this.getBlockExplorerUrl(order.baseCurrency, order.txId)}
+                className={cn({[styles.activeLink]: Boolean(baseBlockExplorerUrl)})}
+                href={baseBlockExplorerUrl}
                 onClick={e => this.onLinkClick(e)}
               >
                 {this.getMaxPayoutCaption()}

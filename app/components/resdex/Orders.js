@@ -75,9 +75,15 @@ class ResDexOrders extends Component<Props> {
 
   onClearHistoryClick() {
     const { t } = this.props
-    const { swapHistory } = this.props.orders
-    swapHistory.filter(swap => !swap.isActive).forEach(swap => swapDB.removeSwap(swap.uuid))
-    toastr.success(t(`Swap history removed`))
+
+    const clearHistory = () => {
+      const { swapHistory } = this.props.orders
+      swapHistory.filter(swap => !swap.isActive).forEach(swap => swapDB.removeSwap(swap.uuid))
+      toastr.success(t(`Swap history removed`))
+    }
+
+    const confirmOptions = { onOk: () => clearHistory() }
+    toastr.confirm(t(`Are you sure want to clear the swap history?`), confirmOptions)
   }
 
 	/**

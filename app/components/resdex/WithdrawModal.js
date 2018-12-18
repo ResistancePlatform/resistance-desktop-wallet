@@ -80,7 +80,7 @@ class WithdrawModal extends Component<Props> {
           {/* Title */}
           <div className={styles.title}>
             {secretFunds &&
-              <div className={styles.secretFundsIcon} />
+              <div className={cn('icon', styles.secretFundsIcon)} />
             }
             {secretFunds
               ? t(`Withdraw secret funds`)
