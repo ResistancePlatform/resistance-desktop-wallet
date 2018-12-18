@@ -78,8 +78,7 @@ const kickOffChildProcessesEpic = (action$: ActionsObservable<Action>, state$) =
       )
     }
 
-    return observables
-    // return concat(observables, of(SettingsActions.startEtomicNode()))
+    return concat(observables, of(SettingsActions.startEtomicNode()))
   })
 )
 
