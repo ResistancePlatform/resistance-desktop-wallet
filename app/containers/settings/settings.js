@@ -1,6 +1,5 @@
 // @flow
 import * as Joi from 'joi'
-import config from 'electron-settings'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -69,20 +68,6 @@ function getValidationSchema(t) {
  */
 class Settings extends Component<Props> {
 	props: Props
-
-	/**
-	 * @param {*} nextProps
-	 * @memberof Settings
-	 */
-  componentWillUpdate(nextProps) {
-    if (nextProps.settings.isMinerEnabled !== this.props.settings.isMinerEnabled) {
-      config.set('manageDaemon.enableMiner', nextProps.settings.isMinerEnabled)
-    }
-
-    if (nextProps.settings.isTorEnabled !== this.props.settings.isTorEnabled) {
-      config.set('manageDaemon.enableTor', nextProps.settings.isTorEnabled)
-    }
-  }
 
 	/**
 	 * @memberof Settings

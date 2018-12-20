@@ -153,13 +153,19 @@ const toggleMinerEpic = (action$: ActionsObservable<Action>, state$) => action$.
 
 const enableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.enableMiner),
-	tap(() => { minerService.start() }),
+  tap(() => {
+    minerService.start()
+    config.set('manageDaemon.enableMiner', true)
+  }),
   mapTo(SettingsActions.empty())
 )
 
 const disableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.disableMiner),
-	tap(() => { minerService.stop() }),
+  tap(() => {
+    minerService.stop()
+    config.set('manageDaemon.enableMiner', false)
+  }),
   mapTo(SettingsActions.empty())
 )
 
@@ -176,7 +182,10 @@ const toggleTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pi
 
 const enableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.enableTor),
-	tap(() => { torService.start() }),
+  tap(() => {
+    torService.start()
+    config.set('manageDaemon.enableTor', true)
+  }),
   tap(() => { toastr.info(t(`Restarting the local node due to Tor activation.`)) }),
   filter(() => state$.value.settings.childProcessesStatus.NODE === 'RUNNING'),
   mapTo(SettingsActions.restartLocalNode())
@@ -184,7 +193,10 @@ const enableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pi
 
 const disableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.disableTor),
-	tap(() => { torService.stop() }),
+  tap(() => {
+    torService.stop()
+    config.set('manageDaemon.enableTor', false)
+  }),
   tap(() => { toastr.info(t(`Restarting the local node due to Tor shutdown.`)) }),
   filter(() => state$.value.settings.childProcessesStatus.NODE === 'RUNNING'),
   mapTo(SettingsActions.restartLocalNode())

@@ -9,7 +9,6 @@ import {
   getMiningDisabledAttribute,
   getTorDisabledAttribute,
 } from '~/utils/child-process'
-import { ChildProcessService } from '~/service/child-process-service'
 import StatusModal from '~/components/settings/status-modal'
 import OperationsModal from '~/components/system-info/OperationsModal'
 import { SendCashActions, SendCashState } from '~/reducers/send-cash/send-cash.reducer'
@@ -20,7 +19,6 @@ import { ToggleButton } from '~/components/rounded-form'
 import styles from './StatusIcons.scss'
 
 
-const childProcess = new ChildProcessService()
 const miningTooltipId = 'status-icons-mining-tooltip-id'
 const privateTransactionsTooltipId = 'status-icons-private-transactions-tooltip-id'
 const torTooltipId = 'status-icons-tor-tooltip-id'
@@ -31,7 +29,8 @@ type Props = {
   sendCash: SendCashState,
 	systemInfo: SystemInfoState,
   settingsActions: SettingsActions,
-  systemInfoActions: SystemInfoActions
+  systemInfoActions: SystemInfoActions,
+  sendCashActions: SendCashActions
 }
 
 /**
@@ -109,7 +108,11 @@ class StatusIcons extends Component<Props> {
 	 */
 	render() {
     const { t } = this.props
-    const { isMinerEnabled, childProcessesStatus } = this.props.settings
+    const {
+      isMinerEnabled,
+      isTorEnabled,
+      childProcessesStatus
+    } = this.props.settings
     const { isPrivateTransactions } = this.props.sendCash
     const miningDescription = this.getMiningStateDescription()
 
@@ -161,27 +164,58 @@ class StatusIcons extends Component<Props> {
             data-place="top"
             data-event="mouseover"
             data-event-off="click mouseout"
-          >
-            <ReactTooltip id={miningTooltipId} className={cn(styles.tooltip)}>
-              <div className={styles.title}>
-                {t(`Private transactions`)}
-              </div>
+          />
 
-              <div className={styles.toggleContainer}>
-                <div className={cn(styles.label, {[styles.active]: !isPrivateTransactions})}>{t(`Off`)}</div>
-                <ToggleButton
-                  defaultValue={isPrivateTransactions}
-                  onChange={this.props.sendCashActions.togglePrivateSend}
-                />
-                <div className={cn(styles.label, {[styles.active]: isPrivateTransactions})}>{t(`On`)}</div>
-              </div>
-            </ReactTooltip>
-          </div>
+          <ReactTooltip id={privateTransactionsTooltipId} className={cn(styles.tooltip)}>
+            <div className={styles.title}>
+              {t(`Private transactions`)}
+            </div>
+
+            <div className={styles.toggleContainer}>
+              <div className={cn(styles.label, {[styles.active]: !isPrivateTransactions})}>{t(`Off`)}</div>
+              <ToggleButton
+                defaultValue={isPrivateTransactions}
+                onChange={this.props.sendCashActions.togglePrivateSend}
+              />
+              <div className={cn(styles.label, {[styles.active]: isPrivateTransactions})}>{t(`On`)}</div>
+            </div>
+          </ReactTooltip>
 
           <div
-            className={cn('icon', styles.tor, { [styles.active]: this.props.settings.childProcessesStatus.TOR === 'RUNNING' })}
-            title={t(`Tor status: {{status}}`, { status: childProcess.getStatusName(this.props.settings.childProcessesStatus.TOR) })}
+            className={cn('icon', styles.tor, { [styles.active]: childProcessesStatus.TOR === 'RUNNING' })}
+            data-tip="tooltip"
+            data-for={torTooltipId}
+            data-place="top"
+            data-event="mouseover"
+            data-event-off="click mouseout"
           />
+
+          <ReactTooltip id={torTooltipId} className={cn(styles.tooltip)}>
+            <div className={styles.title}>
+              {t(`Tor status`)}
+            </div>
+
+            <div className={styles.toggleContainer}>
+              <div className={cn(styles.label, {[styles.active]: !isTorEnabled})}>{t(`Off`)}</div>
+              <ToggleButton
+                defaultValue={isTorEnabled}
+                onChange={this.props.settingsActions.toggleTor}
+                disabled={getTorDisabledAttribute(childProcessesStatus, this.props.systemInfo)}
+              />
+              <div className={cn(styles.label, {[styles.active]: isTorEnabled})}>{t(`On`)}</div>
+            </div>
+
+            <div
+              role="link"
+              tabIndex={0}
+              className={styles.description}
+              onClick={() => this.props.settingsActions.openStatusModal(4)}
+              onKeyDown={() => false}
+            >
+              {t(`Go to Tor logs`)}
+            </div>
+
+          </ReactTooltip>
 
           <div
             role="none"
