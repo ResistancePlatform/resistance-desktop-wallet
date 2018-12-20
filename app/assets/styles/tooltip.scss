@@ -8,8 +8,11 @@
   font-size: 0.6rem;
   font-family: inherit;
   font-weight: 100;
+  z-index: 1000;
+  pointer-events: all;
 }
 
 .tooltip:after {
-	border-top: 0.5rem solid $BASE_BACKGROUND_COLOR_DARK_BLUE !important;
+	// border-top: 0.5rem solid $BASE_BACKGROUND_COLOR_DARK_BLUE !important;
+	// border-right: 0.5rem solid $BASE_BACKGROUND_COLOR_DARK_BLUE !important;
 }

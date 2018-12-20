@@ -18,7 +18,7 @@ export const SettingsActions = createActions(
 
     UPDATE_LANGUAGE: (code: string) => ({ code }),
 
-    OPEN_STATUS_MODAL: undefined,
+    OPEN_STATUS_MODAL: (tabIndex?: number) => ({ tabIndex }),
     CLOSE_STATUS_MODAL: undefined,
 
     TOGGLE_LOCAL_NODE: undefined,

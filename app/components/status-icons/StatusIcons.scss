@@ -1,4 +1,54 @@
+@import "~/assets/styles/tooltip.scss";
 @import "~/assets/styles/vars.scss";
+
+.toggleContainer {
+  color: $BASE_COLOR_FONT_GRAY;
+  text-transform: uppercase;
+  font-size: 0.67rem;
+  font-weight: 500;
+  display: flex;
+
+  .active {
+    color: $BASE_COLOR_WHITE;
+  }
+
+  .label {
+    padding-top: 0.4rem;
+    cursor: default;
+    user-select: none;
+  }
+
+}
+
+.tooltip {
+  background-color: $BASE_COLOR_GRAY_2 !important;
+  box-shadow: 0.3125rem 0.3125rem 3.6875rem -0.125rem rgba(14, 17, 31, 1);
+  max-width: 7rem;
+
+  .title {
+    margin-top: 0.7rem;
+    margin-bottom: 0.5rem;
+    color: $BASE_COLOR_WHITE;
+    font-size: 0.69rem;
+    font-weight: 500;
+    cursor: default;
+    white-space: nowrap;
+  }
+
+  &:after {
+    // border-top: 0.5rem solid $BASE_COLOR_GRAY_2 !important;
+    border-right: 0.5rem solid $BASE_COLOR_GRAY_2 !important;
+  }
+
+  .description {
+    font-size: 0.6rem;
+    color: $BASE_COLOR_PURPLE;
+    white-space: pre;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    outline: none;
+  }
+}
 
 .container {
   -webkit-app-region: no-drag;

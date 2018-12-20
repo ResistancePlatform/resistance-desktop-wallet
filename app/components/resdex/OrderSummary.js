@@ -116,6 +116,24 @@ class OrderSummary extends Component<Props> {
     return false
   }
 
+  getBriefCaption(): string {
+    const { order, t } = this.props
+
+    if (order.isActive || !order.status) {
+      return t(`You are sending`)
+    }
+
+    if (['cancelled', 'failed'].includes(order.status)) {
+      return t(`You were sending`)
+    }
+
+    if (order.status === 'completed') {
+      return t(`You have sent`)
+    }
+
+    return t(`N/A`)
+  }
+
 	render() {
     const { order, t } = this.props
     const txFee = this.getTxFee()
@@ -126,7 +144,9 @@ class OrderSummary extends Component<Props> {
     return (
       <div className={cn(styles.container, this.props.className)}>
         <div className={styles.briefContainer}>
-          <div className={styles.brief}>{t(`You are sending`)}</div>
+          <div className={styles.brief}>
+            {this.getBriefCaption()}
+          </div>
 
           <div className={styles.amount}>
             {toDecimalPlaces(Decimal(order.quoteCurrencyAmount))}
