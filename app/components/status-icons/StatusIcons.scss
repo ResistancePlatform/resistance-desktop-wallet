@@ -21,8 +21,6 @@
 }
 
 .tooltip {
-  background-color: $BASE_COLOR_GRAY_2 !important;
-  box-shadow: 0.3125rem 0.3125rem 3.6875rem -0.125rem rgba(14, 17, 31, 1);
   max-width: 7rem;
 
   .title {
@@ -35,9 +33,8 @@
     white-space: nowrap;
   }
 
-  &:after {
-    // border-top: 0.5rem solid $BASE_COLOR_GRAY_2 !important;
-    border-right: 0.5rem solid $BASE_COLOR_GRAY_2 !important;
+  .text {
+    margin-bottom: 0.6rem;
   }
 
   .description {
@@ -50,6 +47,7 @@
     outline: none;
     text-align: center;
   }
+
 }
 
 .container {

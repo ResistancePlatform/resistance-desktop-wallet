@@ -22,6 +22,7 @@ import styles from './StatusIcons.scss'
 const miningTooltipId = 'status-icons-mining-tooltip-id'
 const privateTransactionsTooltipId = 'status-icons-private-transactions-tooltip-id'
 const torTooltipId = 'status-icons-tor-tooltip-id'
+const operationsTooltipId = 'status-icons-operations-tooltip-id'
 
 type Props = {
   t: () => string,
@@ -74,7 +75,6 @@ class StatusIcons extends Component<Props> {
         <span
           role="none"
           className={styles.operationsIconHint}
-          title={this.getOperationsIconTitle()}
           onClick={e => this.onOperationsIconClicked(e)}
           onKeyDown={e => this.onOperationsIconClicked(e)}
         >
@@ -85,20 +85,19 @@ class StatusIcons extends Component<Props> {
     return iconHint
   }
 
-  getOperationsIconTitle() {
+  getOperationsIconTooltip() {
     const { t } = this.props
 
     if (!this.props.systemInfo.operations.length) {
-      return t(`No pending operations.`)
+      return t(`No pending operations`)
     }
 
-    const titleKey = `{{pendingCoun}} pending, {{successCount}} complete, {{failed}} failed operations.`
-
     return t(
-      titleKey,
-      this.getOperationsCount('queued', 'executing'),
-      this.getOperationsCount('success'),
-      this.getOperationsCount('failed')
+      `{{pendingNumber}} pending, {{successNumber}} complete, {{failedNumber}} failed operations`, {
+        pendingNumber: this.getOperationsCount('queued', 'executing'),
+        successNumber: this.getOperationsCount('success'),
+        failedNumber: this.getOperationsCount('failed')
+      }
     )
   }
 
@@ -212,7 +211,7 @@ class StatusIcons extends Component<Props> {
               onClick={() => this.props.settingsActions.openStatusModal(4)}
               onKeyDown={() => false}
             >
-              {t(`Go to Tor logs`)}
+              {t(`Show Tor logs`)}
             </div>
 
           </ReactTooltip>
@@ -220,12 +219,36 @@ class StatusIcons extends Component<Props> {
           <div
             role="none"
             className={cn('icon', styles.operations, { [styles.active]: this.props.systemInfo.operations.length } )}
-            title={this.getOperationsIconTitle()}
             onClick={this.props.systemInfoActions.openOperationsModal}
-            onKeyDown={this.props.systemInfoActions.openOperationsModal}
+            onKeyDown={() => false}
+            data-tip="tooltip"
+            data-for={operationsTooltipId}
+            data-event="mouseover"
+            data-event-off="click mouseout"
           />
+
           {this.getOperationIconHint()}
 
+          <ReactTooltip id={operationsTooltipId} className={cn(styles.tooltip)}>
+            <div className={styles.title}>
+              {t(`Operations`)}
+            </div>
+
+            <div className={styles.text}>
+              {this.getOperationsIconTooltip()}
+            </div>
+
+            <div
+              role="link"
+              tabIndex={0}
+              className={styles.description}
+              onClick={this.props.systemInfoActions.openOperationsModal}
+              onKeyDown={() => false}
+            >
+              {t(`Show details`)}
+            </div>
+
+          </ReactTooltip>
         </div>
 
         {this.props.settings.isStatusModalOpen &&
