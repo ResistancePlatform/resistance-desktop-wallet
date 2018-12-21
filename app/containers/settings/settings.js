@@ -201,7 +201,7 @@ class Settings extends Component<Props> {
                     {this.getStartStopLocalNodeButtonLabel()}
                   </RoundedButton>
 
-                  <RoundedButton onClick={this.props.actions.openStatusModal}>
+                  <RoundedButton onClick={() => this.props.actions.openStatusModal()}>
                     {t(`Show status`)}
                   </RoundedButton>
 
