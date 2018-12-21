@@ -8,6 +8,7 @@ export type SettingsState = {
 	isTorEnabled: boolean,
 	isMinerEnabled: boolean,
   isStatusModalOpen: boolean,
+  statusModalTabIndex: number,
   childProcessesStatus: { [ChildProcessName]: ChildProcessStatus },
   language: string
 }
@@ -91,8 +92,10 @@ export const SettingsReducer = handleActions(
     }),
 
     // Status Modal
-    [SettingsActions.openStatusModal]: state => ({
-      ...state, isStatusModalOpen: true
+    [SettingsActions.openStatusModal]: (state, action) => ({
+      ...state,
+      isStatusModalOpen: true,
+      statusModalTabIndex: action.payload.tabIndex || 0
     }),
     [SettingsActions.closeStatusModal]: state => ({
       ...state, isStatusModalOpen: false

@@ -100,6 +100,7 @@ export const preloadedState: State = {
 		isTorEnabled: false,
 		isMinerEnabled: false,
 		isStatusModalOpen: false,
+    statusModalTabIndex: 0,
 		childProcessesStatus: {
 			NODE: 'NOT RUNNING',
 			NODE_ETOMIC: 'NOT RUNNING',

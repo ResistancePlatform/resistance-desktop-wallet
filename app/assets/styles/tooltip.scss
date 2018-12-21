@@ -12,24 +12,24 @@
   z-index: 1000;
   pointer-events: all;
 
-  &.place-top {
+  &:global(.place-top) {
     &:after {
-      border-top: 0.5rem solid $BASE_BACKGROUND_COLOR_DARK_BLUE !important;
+      border-top: 0.5rem solid $BASE_COLOR_GRAY_2 !important;
     }
   }
-  &.place-bottom {
+  &:global(.place-bottom) {
     &:after {
-      border-bottom: 0.5rem solid $BASE_BACKGROUND_COLOR_DARK_BLUE !important;
+      border-bottom: 0.5rem solid $BASE_COLOR_GRAY_2 !important;
     }
   }
-  &.place-left {
+  &:global(.place-left) {
     &:after {
-      border-left: 0.5rem solid $BASE_BACKGROUND_COLOR_DARK_BLUE !important;
+      border-left: 0.5rem solid $BASE_COLOR_GRAY_2 !important;
     }
   }
-  &.place-right {
+  &:global(.place-right) {
     &:after {
-      border-right: 0.5rem solid $BASE_BACKGROUND_COLOR_DARK_BLUE !important;
+      border-right: 0.5rem solid $BASE_COLOR_GRAY_2 !important;
     }
   }
 }
