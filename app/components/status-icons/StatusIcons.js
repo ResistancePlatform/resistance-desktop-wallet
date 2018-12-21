@@ -120,14 +120,18 @@ class StatusIcons extends Component<Props> {
         <div className={cn(styles.container)}>
           <div
             className={cn('icon', styles.mining, { [styles.active]: childProcessesStatus.MINER === 'RUNNING' })}
-            data-tip="tooltip"
+            data-tip
             data-for={miningTooltipId}
             data-place="bottom"
             data-event="mouseover"
-            data-event-off="click mouseout"
           />
 
-          <ReactTooltip id={miningTooltipId} className={cn(styles.tooltip)}>
+          <ReactTooltip
+            id={miningTooltipId}
+            globalEventOff="click"
+            className={cn(styles.tooltip)}
+          >
+
             <div className={styles.title}>
               {t(`Mining status`)}
             </div>
@@ -158,14 +162,17 @@ class StatusIcons extends Component<Props> {
 
           <div
             className={cn('icon', styles.privateTransactions, { [styles.active]: isPrivateTransactions })}
-            data-tip="tooltip"
+            data-tip
             data-for={privateTransactionsTooltipId}
             data-place="top"
             data-event="mouseover"
-            data-event-off="click mouseout"
           />
 
-          <ReactTooltip id={privateTransactionsTooltipId} className={cn(styles.tooltip)}>
+          <ReactTooltip
+            id={privateTransactionsTooltipId}
+            globalEventOff="click"
+            className={cn(styles.tooltip)}
+          >
             <div className={styles.title}>
               {t(`Private transactions`)}
             </div>
@@ -182,14 +189,17 @@ class StatusIcons extends Component<Props> {
 
           <div
             className={cn('icon', styles.tor, { [styles.active]: childProcessesStatus.TOR === 'RUNNING' })}
-            data-tip="tooltip"
+            data-tip
             data-for={torTooltipId}
             data-place="top"
             data-event="mouseover"
-            data-event-off="click mouseout"
           />
 
-          <ReactTooltip id={torTooltipId} className={cn(styles.tooltip)}>
+          <ReactTooltip
+            id={torTooltipId}
+            globalEventOff="click"
+            className={cn(styles.tooltip)}
+          >
             <div className={styles.title}>
               {t(`Tor status`)}
             </div>
@@ -221,15 +231,18 @@ class StatusIcons extends Component<Props> {
             className={cn('icon', styles.operations, { [styles.active]: this.props.systemInfo.operations.length } )}
             onClick={this.props.systemInfoActions.openOperationsModal}
             onKeyDown={() => false}
-            data-tip="tooltip"
+            data-tip
             data-for={operationsTooltipId}
             data-event="mouseover"
-            data-event-off="click mouseout"
           />
 
           {this.getOperationIconHint()}
 
-          <ReactTooltip id={operationsTooltipId} className={cn(styles.tooltip)}>
+          <ReactTooltip
+            id={operationsTooltipId}
+            globalEventOff="click"
+            className={cn(styles.tooltip)}
+          >
             <div className={styles.title}>
               {t(`Operations`)}
             </div>
