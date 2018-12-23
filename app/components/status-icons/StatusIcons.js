@@ -139,7 +139,7 @@ class StatusIcons extends Component<Props> {
             <div className={styles.toggleContainer}>
               <div className={cn(styles.label, {[styles.active]: !isMinerEnabled})}>{t(`Off`)}</div>
                 <ToggleButton
-                  defaultValue={isMinerEnabled}
+                  value={isMinerEnabled}
                   onChange={this.props.settingsActions.toggleMiner}
                   disabled={getMiningDisabledAttribute(childProcessesStatus)}
                 />
@@ -180,7 +180,7 @@ class StatusIcons extends Component<Props> {
             <div className={styles.toggleContainer}>
               <div className={cn(styles.label, {[styles.active]: !isPrivateTransactions})}>{t(`Off`)}</div>
               <ToggleButton
-                defaultValue={isPrivateTransactions}
+                value={isPrivateTransactions}
                 onChange={this.props.sendCashActions.togglePrivateSend}
               />
               <div className={cn(styles.label, {[styles.active]: isPrivateTransactions})}>{t(`On`)}</div>
@@ -207,7 +207,7 @@ class StatusIcons extends Component<Props> {
             <div className={styles.toggleContainer}>
               <div className={cn(styles.label, {[styles.active]: !isTorEnabled})}>{t(`Off`)}</div>
               <ToggleButton
-                defaultValue={isTorEnabled}
+                value={isTorEnabled}
                 onChange={this.props.settingsActions.toggleTor}
                 disabled={getTorDisabledAttribute(childProcessesStatus, this.props.systemInfo)}
               />

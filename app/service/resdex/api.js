@@ -96,6 +96,17 @@ class ResDexApiService {
     return response.swaps
   }
 
+  async instantDexDeposit(weeks: number, amount: object) {
+    const response = await this.query({
+      method: 'instantdex_deposit',
+      weeks,
+      amount: amount.toString(),
+      broadcast: 1
+    })
+    log.debug('instant dex response', response)
+    return response
+  }
+
   withdraw(opts) {
     const currency = getCurrency(opts.symbol)
     return currency.etomic

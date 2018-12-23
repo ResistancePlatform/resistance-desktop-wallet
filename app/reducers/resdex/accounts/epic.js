@@ -38,6 +38,7 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
         name: getCurrencyName(currency.coin),
         address: currency.address,
         balance: Decimal(currency.balance),
+        zcredits: Decimal(currency.zcredits || 0),
         price: Decimal(currency.price),
         amount: Decimal(currency.amount),
       }
@@ -142,6 +143,30 @@ const updateCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.
     return concat(
       of(ResDexAccountsActions.closeAddCurrencyModal()),
       restartCurrencyObservable
+    )
+  })
+)
+
+const instantDexDepositEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+  ofType(ResDexAccountsActions.instantDexDeposit),
+  switchMap(() => {
+    const { weeks, amount } = state$.value.roundedForm.resDexAccountsInstantDexDepositModal.fields
+
+    const observable = from(mainApi.instantDexDeposit({
+      weeks,
+      amount: Decimal(amount),
+    }))
+
+    return observable.pipe(
+      switchMap(() => {
+        toastr.success(t(`Instant DEX depositing of ${amount.toString()} RES succeeded`))
+        return of(ResDexAccountsActions.closeInstantDexDepositModal())
+      }),
+      catchError(err => {
+        log.error(`Can't perform instant DEX deposit`, err, err.response)
+        toastr.error(t(`Error performing instant DEX deposit`))
+        return of(ResDexAccountsActions.instantDexDepositFailed())
+      })
     )
   })
 )
@@ -288,6 +313,7 @@ export const ResDexAccountsEpic = (action$, state$) => merge(
   updateCurrencyEpic(action$, state$),
   deleteCurrencyEpic(action$, state$),
   confirmCurrencyDeletionEpic(action$, state$),
+  instantDexDepositEpic(action$, state$),
   withdrawEpic(action$, state$),
   closeAddCurrencyModalEpic(action$, state$),
   closeWithdrawModalEpic(action$, state$),

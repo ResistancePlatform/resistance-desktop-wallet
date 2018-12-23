@@ -157,7 +157,7 @@ class WithdrawModal extends Component<Props> {
 
           <RoundedButton
             type="submit"
-            className={styles.button}
+            className={styles.rightButton}
             onClick={this.props.actions.withdraw}
             spinner={isInProgress}
             disabled={isInProgress}

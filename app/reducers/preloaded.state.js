@@ -182,6 +182,9 @@ export const preloadedState: State = {
           rpcPort: null
         }
       },
+      instantDexDepositModal: {
+        isVisible: false,
+      },
       depositModal: {
         isVisible: false,
         symbol: null

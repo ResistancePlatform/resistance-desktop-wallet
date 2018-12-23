@@ -101,6 +101,9 @@ export type ResDexState = {
         useElectrum: boolean
       }
     },
+    instantDexDepositModal: {
+      isVisible: boolean
+    },
     depositModal: {
       isVisible: boolean,
       symbol: string | null

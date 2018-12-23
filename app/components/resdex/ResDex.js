@@ -8,6 +8,7 @@ import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import ResDexLogin from './Login'
+import InstantDexDepositModal from './InstantDexDepositModal'
 import DepositModal from './DepositModal'
 import WithdrawModal from './WithdrawModal'
 import AddCurrencyModal from './AddCurrencyModal'
@@ -61,6 +62,9 @@ export class ResDex extends Component<Props> {
           }}
         />
 
+        {this.props.resDex.accounts.instantDexDepositModal.isVisible &&
+          <InstantDexDepositModal />
+        }
         {this.props.resDex.accounts.depositModal.isVisible &&
           <DepositModal />
         }

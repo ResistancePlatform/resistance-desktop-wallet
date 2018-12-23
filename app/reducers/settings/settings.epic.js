@@ -114,7 +114,7 @@ const restartLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => act
 		const settingsState = state$.value.settings
 		resistanceService.restart(settingsState.isTorEnabled)
 	}),
-  mapTo(SettingsActions.empty())
+  mapTo(AuthActions.ensureLogin(t(`Wallet password is required due to the local node restart`), true))
 )
 
 const stopLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(

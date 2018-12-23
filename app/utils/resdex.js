@@ -1,3 +1,4 @@
+import { Decimal } from 'decimal.js'
 import coinlist from 'coinlist'
 
 import { translate } from '../i18next.config'
@@ -6,14 +7,14 @@ import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 
 const t = translate('resdex')
 
-// const getCurrencySymbols = () => (
-// 	_(supportedCurrencies)
-// 		.chain()
-// 		.map('coin')
-// 		.without(...hiddenCurrencies)
-// 		.orderBy()
-// 		.value()
-// )
+function getEquity(symbol, amount, currencyHistory) {
+  if (!amount) {
+    return null
+  }
+  const hourHistory = currencyHistory.hour && currencyHistory.hour[symbol]
+  const price = hourHistory && hourHistory.slice(-1)[0].value
+  return amount && price && Decimal(amount).mul(price).toDP(2, Decimal.ROUND_FLOOR)
+}
 
 function getIsLoginDisabled(props: object) {
   const isNodeRunning = props.settings.childProcessesStatus.NODE === 'RUNNING'
@@ -75,7 +76,7 @@ const isEtomic = symbol => {
 
 export {
   getIsLoginDisabled,
-	// getCurrencySymbols,
+  getEquity,
   getOrderStatusName,
   getSortedCurrencies,
 	getCurrencyName,
