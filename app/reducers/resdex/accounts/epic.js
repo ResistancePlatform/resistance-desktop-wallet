@@ -46,6 +46,7 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 
     return from(getPortfoliosPromise).pipe(
       switchMap(result => {
+
         const currencies = processNames.reduce((previous, processName, index) => ({
           ...previous,
           [processName]: responseToCurrencies(result[index])
@@ -72,6 +73,28 @@ const getCurrenciesFailedEpic = (action$: ActionsObservable<Action>) => action$.
   })
 )
 
+
+const getZCreditsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(ResDexAccountsActions.getZCredits),
+  switchMap(() => {
+    const { accounts } = state$.value.resDex
+    const { RESDEX: currencies } = accounts.currencies
+
+    if (!currencies.RES) {
+      return of(ResDexAccountsActions.gotZCredits(null))
+    }
+
+    const observable = from(mainApi.balance('RES', currencies.RES.address)).pipe(
+      switchMap(response => of(ResDexAccountsActions.gotZCredits(response.zCredits))),
+      catchError(err => {
+        log.error(`Can't get Instant DEX balance:`, err)
+        return of(ResDexAccountsActions.getZCreditsFailed(t(`Error getting Instant DEX balance, check the log for details`)))
+      })
+    )
+
+    return observable
+  })
+)
 
 const getTransactionsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexAccountsActions.getTransactions),
@@ -152,10 +175,7 @@ const instantDexDepositEpic = (action$: ActionsObservable<Action>, state$) => ac
   switchMap(() => {
     const { weeks, amount } = state$.value.roundedForm.resDexAccountsInstantDexDepositModal.fields
 
-    const observable = from(mainApi.instantDexDeposit({
-      weeks,
-      amount: Decimal(amount),
-    }))
+    const observable = from(mainApi.instantDexDeposit(Number(weeks), Decimal(amount)))
 
     return observable.pipe(
       switchMap(() => {
@@ -307,6 +327,7 @@ const closeWithdrawModalEpic = (action$: ActionsObservable<any>) => action$.pipe
 export const ResDexAccountsEpic = (action$, state$) => merge(
   getCurrenciesEpic(action$, state$),
   getCurrenciesFailedEpic(action$, state$),
+  getZCreditsEpic(action$, state$),
   getTransactionsEpic(action$, state$),
   copySmartAddressEpic(action$, state$),
   addCurrencyEpic(action$, state$),

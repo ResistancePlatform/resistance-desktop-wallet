@@ -21,7 +21,7 @@ import styles from './InstantDexDepositModal.scss'
 const getValidationSchema = t => Joi.object().keys({
   weeks: Joi.number().min(1).max(52).required().label(t(`Weeks`)),
   amount: Joi.number().min(10.0001).required().label(t(`Amount`)),
-  equity: Joi.number(),
+  equity: Joi.number().optional(),
 })
 
 type Props = {
@@ -73,10 +73,10 @@ class InstantDexDepositModal extends Component<Props> {
         >
           <RoundedInput
             name="weeks"
+            type="number"
             label={t(`Weeks`)}
             defaultValue={1}
             step={1}
-            number
           />
 
           <div className={styles.inputsRow}>
@@ -86,6 +86,8 @@ class InstantDexDepositModal extends Component<Props> {
               <CurrencyAmountInput
                 className={styles.amount}
                 defaultValue={10.0001}
+                min="10.0001"
+                step="1"
                 name="amount"
                 symbol={symbol}
                 maxAmount={resCurrency && resCurrency.balance}
@@ -101,7 +103,7 @@ class InstantDexDepositModal extends Component<Props> {
               <CurrencyAmountInput
                 name="equity"
                 symbol="USD"
-                defaultValue={getEquity('RES', amount, currencyHistory)}
+                defaultValue={getEquity('RES', amount, currencyHistory) || '0'}
                 readOnly
               />
             </div>

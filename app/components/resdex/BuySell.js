@@ -8,6 +8,7 @@ import cn from 'classnames'
 import { translate } from 'react-i18next'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
+import { toDecimalPlaces } from '~/utils/decimal'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
@@ -126,10 +127,69 @@ class ResDexBuySell extends Component<Props> {
     return order
   }
 
+  getZCreditsQuoteEquivalent() {
+    const { zCredits } = this.props.accounts
+
+    if (zCredits === null) {
+      return null
+    }
+
+    const { RESDEX: currencies } = this.props.accounts.currencies
+    const { quoteCurrency } = this.props.buySell
+
+    if (!(quoteCurrency in currencies)) {
+      return null
+    }
+
+    const { price } = currencies[quoteCurrency]
+
+    if (price.isZero()) {
+      return { amount: zCredits, symbol: 'RES' }
+    }
+
+    const amount = zCredits.dividedBy(price)
+    return { amount, symbol: quoteCurrency }
+  }
+
+  getZCreditsQuoteEquivalentCaption() {
+    const equivalent = this.getZCreditsQuoteEquivalent()
+
+    if (equivalent === null) {
+      return null
+    }
+
+    const { amount, symbol } = equivalent
+    return `${toDecimalPlaces(amount)} ${symbol}`
+  }
+
+  getIsInstanceSwapAllowed() {
+    const { zCredits } = this.props.accounts
+    const equivalent = this.getZCreditsQuoteEquivalent()
+
+    if (zCredits == null || equivalent === null || !this.props.form) {
+      return false
+    }
+
+    const { maxRel } = this.props.form.fields
+
+    if (!maxRel) {
+      return false
+    }
+
+    // Show instant swaps as allowed if the order book is empty and zCredits balance is present
+    if (equivalent.symbol === 'RES') {
+      return zCredits.greaterThan(Decimal(0))
+    }
+
+    return zCredits.greaterThanOrEqualTo(Decimal(maxRel))
+  }
+
   getForm(isAdvanced: boolean, order: object) {
     const { t } = this.props
     const { baseCurrency, quoteCurrency } = this.props.buySell
     const txFee = this.props.accounts.currencyFees[quoteCurrency]
+
+    const isInstantSwapAllowed = this.getIsInstanceSwapAllowed()
 
     return (
       <RoundedForm
@@ -230,7 +290,10 @@ class ResDexBuySell extends Component<Props> {
             </div>
           )
         }
+
         {order.isMarket &&
+        <div className={styles.bottomControls}>
+
           <CheckBox name="enhancedPrivacy" className={styles.enhancedPrivacyCheckbox} defaultValue={false}>
             {t(`Enhanced privacy`)}
 
@@ -240,6 +303,25 @@ class ResDexBuySell extends Component<Props> {
             />
 
           </CheckBox>
+
+          <div className={cn(styles.instantSwap, {[styles.allowed]: isInstantSwapAllowed})}>
+            {isInstantSwapAllowed
+              ? t(`Instant swap allowed`)
+              : t(`Instant swap disallowed`)
+            }
+
+            <Info tooltipClassName={styles.tooltip}>
+              <div className={styles.title}>
+                {t(`Instant swap`)}
+              </div>
+
+              <div className={styles.body}>
+                {this.getZCreditsQuoteEquivalentCaption() || t(`N/A`)}
+              </div>
+            </Info>
+          </div>
+
+        </div>
         }
 
         <RoundedButton

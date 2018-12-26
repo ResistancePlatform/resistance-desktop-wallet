@@ -27,6 +27,10 @@ export const ResDexAccountsActions = createActions(
     GOT_CURRENCIES: (currencies: { [ChildProcessName]: { [string]: Currency } }) => ({ currencies }),
     GET_CURRENCIES_FAILED: (errorMessage: string) => ({ errorMessage }),
 
+    GET_Z_CREDITS: undefined,
+    GOT_Z_CREDITS: (zCredits: object | null) => ({ zCredits }),
+    GET_Z_CREDITS_FAILED: undefined,
+
     UPDATE_ENABLED_CURRENCIES: (enabledCurrencies: EnabledCurrency[]) => ({ enabledCurrencies }),
 
     INSTANT_DEX_DEPOSIT: undefined,
@@ -81,6 +85,10 @@ export const ResDexAccountsReducer = handleActions(
     [ResDexAccountsActions.gotCurrencies]: (state, action) => ({
       ...state,
       currencies: action.payload.currencies
+    }),
+    [ResDexAccountsActions.gotZCredits]: (state, action) => ({
+      ...state,
+      zCredits: action.payload.zCredits
     }),
     [ResDexAccountsActions.showInstantDexDepositModal]: state => ({
       ...state,

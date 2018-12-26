@@ -260,6 +260,19 @@ class ResDexApiService {
     })
   }
 
+  async balance(coin: string, address: string) {
+    const response = await this.query({
+      method: 'balance',
+      coin,
+      address
+    })
+
+    return {
+      balance: Decimal(response.balance),
+      zCredits: Decimal(response.zcredits)
+    }
+  }
+
   async stop() {
     return this.query({ method: 'stop' })
   }

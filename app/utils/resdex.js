@@ -1,3 +1,4 @@
+import log from 'electron-log'
 import { Decimal } from 'decimal.js'
 import coinlist from 'coinlist'
 
@@ -13,6 +14,7 @@ function getEquity(symbol, amount, currencyHistory) {
   }
   const hourHistory = currencyHistory.hour && currencyHistory.hour[symbol]
   const price = hourHistory && hourHistory.slice(-1)[0].value
+  log.debug(symbol, amount, price && price.toString())
   return amount && price && Decimal(amount).mul(price).toDP(2, Decimal.ROUND_FLOOR)
 }
 

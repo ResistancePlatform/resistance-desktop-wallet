@@ -8,7 +8,8 @@ import styles from './Info.scss'
 
 export type InfoProps = {
   tooltipClassName?: string,
-  tooltip: string
+  tooltip?: string,
+	children: any
 }
 
 export default class Info extends Component<Props> {
@@ -23,8 +24,11 @@ export default class Info extends Component<Props> {
   render() {
     return (
       <div className={styles.container}>
-        <i className={styles.info} data-tip={this.props.tooltip} data-for={this.tooltipId} />
-        <ReactTooltip id={this.tooltipId} className={cn(styles.tooltip, this.props.tooltipClassName)}/>
+        <i className={styles.info} data-tip={this.props.tooltip || true} data-for={this.tooltipId} />
+
+        <ReactTooltip id={this.tooltipId} className={cn(styles.tooltip, this.props.tooltipClassName)}>
+          {this.props.children && this.props.children}
+        </ReactTooltip>
       </div>
     )
   }

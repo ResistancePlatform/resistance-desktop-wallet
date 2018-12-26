@@ -173,6 +173,7 @@ export const preloadedState: State = {
       },
       enabledCurrencies: [],
       currencyFees: {},
+      zCredits: null,
       addCurrencyModal: {
         isInEditMode: false,
         isVisible: false,

@@ -92,6 +92,7 @@ export type ResDexState = {
     currencies: { [ChildProcessName]: { [string]: Currency } },
     enabledCurrencies: EnabledCurrency[],
     currencyFees: { [string]: any },
+    zCredits: object | null,
     addCurrencyModal: {
       isInEditMode: boolean,
       isVisible: boolean,
