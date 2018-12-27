@@ -175,13 +175,8 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
         of(ResDexOrdersActions.getSwapHistory()),
       )),
       catchError(err => {
-        // log.error(`Can't enable currencies`, err)
-        // return of(ResDexLoginActions.loginFailed(t(`Error enabling currencies`)))
-        return concat(
-          sendPassphraseObservable,
-          getFeesObservable,
-          of(ResDexOrdersActions.getSwapHistory()),
-        )
+        log.error(`Can't enable currencies`, err)
+        return of(ResDexLoginActions.loginFailed(t(`Error enabling currencies`)))
       })
     )
 

@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react'
+import { Decimal } from 'decimal.js'
 import * as Joi from 'joi'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -100,6 +101,7 @@ class InstantDexDepositModal extends Component<Props> {
             <div>
               <div className={styles.caption} />
 
+              {(getEquity('RES', amount, currencyHistory) || Decimal(0)).toString()}
               <CurrencyAmountInput
                 name="equity"
                 symbol="USD"
