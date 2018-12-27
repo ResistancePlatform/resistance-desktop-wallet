@@ -1,5 +1,4 @@
 // @flow
-import log from 'electron-log'
 import { Decimal } from 'decimal.js'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -197,12 +196,13 @@ class ResDexAssets extends Component<Props> {
 	render() {
     const { t, i18n } = this.props
 
-    const { enabledCurrencies } = this.props.accounts
+    const { currencies, enabledCurrencies } = this.props.accounts
     const totalPortfolioValue = this.getTotalPortfolioValue()
     const sinceLastHour = this.getSinceLastHour()
     const sortedCurrencies = getSortedCurrencies(enabledCurrencies).filter(currency => currency.symbol !== 'ETOMIC')
     const {equity: secretFundsEquity, balance: secretFundsBalance} = this.getSecretFundsAmounts()
     const { zCredits } = this.props.accounts
+    const resPrice = this.getLastPrice('RES')
 
 		return (
       <div className={cn(styles.container)}>
@@ -265,7 +265,7 @@ class ResDexAssets extends Component<Props> {
           </div>
 
           <div className={styles.equity}>
-            <sub>$</sub>{null}
+            <sub>$</sub>{zCredits && resPrice ? toDecimalPlaces(resPrice.mul(zCredits), 2) : t(`N/A`)}
           </div>
 
           <div className={cn(styles.buttons, styles.singleButton)}>
