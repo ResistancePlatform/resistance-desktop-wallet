@@ -211,6 +211,7 @@
   },
   "dependencies": {
     "@sindresorhus/slugify": "^0.3.0",
+    "aws-sdk": "^2.384.0",
     "bip39": "^2.5.0",
     "bs58check": "^2.1.2",
     "classnames": "^2.2.6",
@@ -235,6 +236,7 @@
     "iocane": "^1.0.1",
     "iso-639-1": "^2.0.3",
     "joi": "^13.6.0",
+    "ledger-res": "git+ssh://git@github.com:ResistancePlatform/ledger-res-js.git",
     "momentjs": "^2.0.0",
     "node-dir": "^0.1.17",
     "node-uuid": "^1.4.8",

@@ -4,6 +4,7 @@ import { tap, map, mapTo, mergeMap, switchMap, catchError } from 'rxjs/operators
 import { of, bindCallback, merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
+import LedgerRes from 'ledger-res'
 
 import { i18n } from '~/i18next.config'
 import { getEnsureLoginObservable } from '~/utils/auth'
@@ -14,6 +15,19 @@ import { RpcService } from '~/service/rpc-service'
 
 const t = i18n.getFixedT(null, 'own-addresses')
 const rpc = new RpcService()
+const ledgerRes = new LedgerRes(rpc)
+
+/* ;(async () => {
+  try {
+
+    const ledgerRes = new LedgerRes(rpc)
+    await ledgerRes.init()
+
+  } catch (err) {
+    console.log(err)
+  }
+
+})(); */
 
 const getOwnAddressesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.getOwnAddresses),
@@ -158,6 +172,21 @@ const mergeCoinsFailureEpic = (action$: ActionsObservable<Action>) => action$.pi
   mapTo(SystemInfoActions.empty())
 )
 
+const isLedgerConnected = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(OwnAddressesActions.getLedgerConnected),
+  mergeMap(async () => {
+    try {
+      await ledgerRes.init()
+      const result = await ledgerRes.getPublicKey(0)
+      console.log(`success: ${result}`)
+      return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_CONNECTED" }
+    } catch (err) {
+      console.log(err)
+      return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
+    }
+  })
+)
+
 export const OwnAddressesEpics = (action$, state$) => merge(
   getOwnAddressesEpic(action$, state$),
   createAddressEpic(action$, state$),
@@ -170,5 +199,6 @@ export const OwnAddressesEpics = (action$, state$) => merge(
   mergeAllZAddressCoinsEpic(action$, state$),
   mergeAllCoinsEpic(action$, state$),
   mergeCoinsOperationStartedEpic(action$, state$),
-  mergeCoinsFailureEpic(action$, state$)
+  mergeCoinsFailureEpic(action$, state$),
+  isLedgerConnected(action$, state$)
 )

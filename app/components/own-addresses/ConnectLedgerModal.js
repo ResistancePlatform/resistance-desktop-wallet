@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 
+import { getStore } from '~/store/configureStore'
 import { RoundedButton } from '~/components/rounded-form'
 import { OwnAddressesActions } from '~/reducers/own-addresses/own-addresses.reducer'
 
@@ -24,6 +25,10 @@ type Props = {
 class ConnectLedgerModal extends Component<Props> {
 	props: Props
 
+  componentDidMount() {
+    getStore().dispatch(this.props.actions.getLedgerConnected())
+  }
+
   getConnectLedgerContent() {
     const { t } = this.props
 
@@ -39,7 +44,7 @@ class ConnectLedgerModal extends Component<Props> {
             <div className={styles.description}>
               {t(`Connect and unlock your Ledger device`)}
             </div>
-            <div className={cn('icon', styles.mark, {[styles.active]: true})} />
+            <div className={cn('icon', styles.mark, {[styles.active]: this.props.connectLedgerModal.isLedgerConnected})} />
           </li>
           <li>
             <div className={cn('icon', styles.icon, styles.navigateIcon)} />
@@ -117,11 +122,11 @@ class ConnectLedgerModal extends Component<Props> {
             onKeyDown={() => {}}
           />
 
-          { !isLedgerConnected && this.getConnectLedgerContent() }
+          { this.getConnectLedgerContent() }
 
-          { isLedgerConnected && !isTransactionConfirmed && this.getConfirmTransactionContent() }
+          /* { isLedgerConnected && !isTransactionConfirmed && this.getConfirmTransactionContent() }
 
-          { isTransactionSent && this.getTransactionSentContent() }
+          { isTransactionSent && this.getTransactionSentContent() } */
 
         </div>
       </div>

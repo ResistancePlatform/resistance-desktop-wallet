@@ -36,6 +36,9 @@ export const OwnAddressesActions = createActions(
     SHOW_CONNECT_LEDGER_MODAL: undefined,
     CONTINUE_TO_CONFIRM_TRANSACTION: undefined,
     CLOSE_CONNECT_LEDGER_MODAL: undefined,
+    GET_LEDGER_CONNECTED: undefined,
+    GOT_LEDGER_CONNECTED: undefined,
+    GET_LEDGER_CONNECTED_FAILURE: undefined,
 
     INITIATE_PRIVATE_KEYS_EXPORT: undefined,
     EXPORT_PRIVATE_KEYS: filePath => ({filePath}),
@@ -80,6 +83,20 @@ export const OwnAddressesReducer = handleActions(
       connectLedgerModal: {
         ...state.connectLedgerModal,
         isVisible: true
+      }
+    }),
+    [OwnAddressesActions.gotLedgerConnected]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isLedgerConnected: true
+      }
+    }),
+    [OwnAddressesActions.getLedgerConnectedFailure]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isLedgerConnected: false
       }
     }),
     [OwnAddressesActions.continueToConfirmTransaction]: state => ({
