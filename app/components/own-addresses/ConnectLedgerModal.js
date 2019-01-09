@@ -15,7 +15,7 @@ import styles from './ConnectLedgerModal.scss'
 type Props = {
   t: any,
   actions: object,
-  connectLedgerModal: object
+  connectLedgerModal: object,
 }
 
 /**
@@ -25,7 +25,7 @@ type Props = {
 class ConnectLedgerModal extends Component<Props> {
 	props: Props
 
-  componentDidMount() {
+  componentWillMount(){
     getStore().dispatch(this.props.actions.getLedgerConnected())
   }
 
@@ -51,13 +51,23 @@ class ConnectLedgerModal extends Component<Props> {
             <div className={styles.description}>
               {t(`Navigate to the Resistance app on your device`)}
             </div>
-            <div className={cn('icon', styles.mark, {[styles.active]: false})} />
+            <div className={cn('icon', styles.mark, {[styles.active]: this.props.connectLedgerModal.isLedgerResistanceAppOpen})} />
           </li>
         </ul>
 
         <RoundedButton
           className={styles.continueButton}
-          onClick={this.props.actions.continueToConfirmTransaction}
+          onClick={this.props.actions.getLedgerConnected}
+          important
+        >
+          {t(`Connect`)}
+        </RoundedButton>
+        
+        {t(` `)}
+
+        <RoundedButton
+          className={cn(styles.continueButton, {[styles.active]: this.props.connectLedgerModal.isLedgerConnected && this.props.connectLedgerModal.isLedgerResistanceAppOpen )}
+          onClick={this.props.actions.createTransaction}
           important
         >
           {t(`Continue`)}
@@ -73,6 +83,21 @@ class ConnectLedgerModal extends Component<Props> {
     return (
       <div className={styles.title}>
         {t(`Please confirm transaction on Ledger`)}
+      </div>
+    )
+  }
+
+  connectionSuccessful() {
+    const { t } = this.props
+
+    return (
+      <div>
+        <div className={styles.header}>
+          {t(`Ledger Successfully Connected`)}
+        </div>
+        <div className={styles.note}>
+          {t(`Your Ledger is now connected. Please note that if your Ledger is disconnected, or it times out you will need to reconnect it here.`)}
+        </div>
       </div>
     )
   }
@@ -108,7 +133,8 @@ class ConnectLedgerModal extends Component<Props> {
     const {
       isLedgerConnected,
       isTransactionConfirmed,
-      isTransactionSent
+      isTransactionSent,
+      isLedgerResistanceAppOpen
     } = this.props.connectLedgerModal
 
 		return (
@@ -124,9 +150,9 @@ class ConnectLedgerModal extends Component<Props> {
 
           { this.getConnectLedgerContent() }
 
-          /* { isLedgerConnected && !isTransactionConfirmed && this.getConfirmTransactionContent() }
+          { /*(isLedgerConnected && isLedgerResistanceAppOpen) && this.connectionSuccessful() */}
 
-          { isTransactionSent && this.getTransactionSentContent() } */
+          {/* isTransactionSent && this.getTransactionSentContent() } */}
 
         </div>
       </div>

@@ -72,7 +72,8 @@ export const preloadedState: State = {
       isVisible: false,
       isLedgerConnected: false,
       isTransactionConfirmed: false,
-      isTransactionSent: false
+      isTransactionSent: false,
+      isLedgerResistanceAppOpen: false,
     }
 	},
 	sendCash: {

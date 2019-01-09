@@ -18,6 +18,7 @@ export type OwnAddressesState = {
   connectLedgerModal: {
     isVisible: boolean,
     isLedgerConnected: boolean,
+    isLedgerResistanceAppOpen: boolean,
     isTransactionConfirmed: boolean,
     isTransactionSent: boolean
   }
@@ -38,6 +39,7 @@ export const OwnAddressesActions = createActions(
     CLOSE_CONNECT_LEDGER_MODAL: undefined,
     GET_LEDGER_CONNECTED: undefined,
     GOT_LEDGER_CONNECTED: undefined,
+    GOT_LEDGER_RESISTANCE_APP_OPEN: undefined,
     GET_LEDGER_CONNECTED_FAILURE: undefined,
 
     INITIATE_PRIVATE_KEYS_EXPORT: undefined,
@@ -89,17 +91,27 @@ export const OwnAddressesReducer = handleActions(
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
-        isLedgerConnected: true
+        isLedgerConnected: true,
+        isLedgerResistanceAppOpen: false
+      }
+    }),
+    [OwnAddressesActions.gotLedgerResistanceAppOpen]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isLedgerConnected: true,
+        isLedgerResistanceAppOpen: true
       }
     }),
     [OwnAddressesActions.getLedgerConnectedFailure]: state => ({
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
-        isLedgerConnected: false
+        isLedgerConnected: false,
+        isLedgerResistanceAppOpen: false
       }
     }),
-    [OwnAddressesActions.continueToConfirmTransaction]: state => ({
+    /* [OwnAddressesActions.continueToConfirmTransaction]: state => ({
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
@@ -107,12 +119,12 @@ export const OwnAddressesReducer = handleActions(
         isTransactionConfirmed: true,
         isTransactionSent: true
       }
-    }),
+    }),*/
     [OwnAddressesActions.closeConnectLedgerModal]: state => ({
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
-        isVisible: false
+        isVisible: false,
       }
     }),
     [OwnAddressesActions.mergeAllMinedCoins]: (state, action) => ({

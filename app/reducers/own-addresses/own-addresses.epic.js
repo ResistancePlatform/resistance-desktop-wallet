@@ -15,7 +15,7 @@ import { RpcService } from '~/service/rpc-service'
 
 const t = i18n.getFixedT(null, 'own-addresses')
 const rpc = new RpcService()
-const ledgerRes = new LedgerRes(rpc)
+var ledgerRes = new LedgerRes(rpc)
 
 /* ;(async () => {
   try {
@@ -176,12 +176,25 @@ const isLedgerConnected = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.getLedgerConnected),
   mergeMap(async () => {
     try {
-      await ledgerRes.init()
+
+      //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
+      const btcTransport = await ledgerRes.getBtcTransport()
+      //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
+      if(!btcTransport){
+        await ledgerRes.init()
+      }
       const result = await ledgerRes.getPublicKey(0)
-      console.log(`success: ${result}`)
-      return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_CONNECTED" }
+      console.log(result)
+      if(result.hasOwnProperty('publicKey')){
+        return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_RESISTANCE_APP_OPEN" }
+      }
+      return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
     } catch (err) {
-      console.log(err)
+      console.log(err.toString())
+      if(err.toString().includes("cannot open device with path")){
+        return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_CONNECTED" }
+      }
+      ledgerRes = new LedgerRes(rpc)
       return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
     }
   })
