@@ -186,7 +186,7 @@ const isLedgerConnected = (action$: ActionsObservable<Action>) => action$.pipe(
       const result = await ledgerRes.getPublicKey(0)
       console.log(result)
       if(result.hasOwnProperty('publicKey')){
-        return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_RESISTANCE_APP_OPEN" }
+        return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_RESISTANCE_APP_OPEN", payload: {address: result.bitcoinAddress} }
       }
       return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
     } catch (err) {

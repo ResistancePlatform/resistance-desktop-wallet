@@ -20,7 +20,10 @@ export type OwnAddressesState = {
     isLedgerConnected: boolean,
     isLedgerResistanceAppOpen: boolean,
     isTransactionConfirmed: boolean,
-    isTransactionSent: boolean
+    isTransactionSent: boolean,
+    ledgerAddress: string,
+    destinationAddress: string,
+    destinationAmount: Decimal
   }
 }
 
@@ -39,8 +42,15 @@ export const OwnAddressesActions = createActions(
     CLOSE_CONNECT_LEDGER_MODAL: undefined,
     GET_LEDGER_CONNECTED: undefined,
     GOT_LEDGER_CONNECTED: undefined,
-    GOT_LEDGER_RESISTANCE_APP_OPEN: undefined,
+    GOT_LEDGER_RESISTANCE_APP_OPEN: (address: string) => ({ address }),
     GET_LEDGER_CONNECTED_FAILURE: undefined,
+
+    UPDATE_DESTINATION_ADDRESS: (address: string) => ({address}),
+    UPDATE_DESTINATION_AMOUNT: (amount: Decimal) => ({amount}),
+
+    SEND_LEDGER_TRANSACTION: undefined,
+    SEND_LEDGER_TRANSACTION_SUCCESS: undefined,
+    SEND_LEDGER_TRANSACTION_FAILURE: undefined,
 
     INITIATE_PRIVATE_KEYS_EXPORT: undefined,
     EXPORT_PRIVATE_KEYS: filePath => ({filePath}),
@@ -95,12 +105,13 @@ export const OwnAddressesReducer = handleActions(
         isLedgerResistanceAppOpen: false
       }
     }),
-    [OwnAddressesActions.gotLedgerResistanceAppOpen]: state => ({
+    [OwnAddressesActions.gotLedgerResistanceAppOpen]: (state, action) => ({
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
         isLedgerConnected: true,
-        isLedgerResistanceAppOpen: true
+        isLedgerResistanceAppOpen: true,
+        ledgerAddress: action.payload.address
       }
     }),
     [OwnAddressesActions.getLedgerConnectedFailure]: state => ({
@@ -109,6 +120,20 @@ export const OwnAddressesReducer = handleActions(
         ...state.connectLedgerModal,
         isLedgerConnected: false,
         isLedgerResistanceAppOpen: false
+      }
+    }),
+    [OwnAddressesActions.updateDestinationAddress]: (state, action) => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        destinationAddress: action.payload.address
+      }
+    }),
+    [OwnAddressesActions.updateDestinationAmount]: (state, action) => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        destinationAmount: action.payload.amount
       }
     }),
     /* [OwnAddressesActions.continueToConfirmTransaction]: state => ({

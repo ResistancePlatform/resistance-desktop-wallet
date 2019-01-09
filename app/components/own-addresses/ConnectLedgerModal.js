@@ -7,9 +7,15 @@ import cn from 'classnames'
 
 import { getStore } from '~/store/configureStore'
 import { RoundedButton } from '~/components/rounded-form'
+import RoundedInput from '~/components/rounded-form/RoundedInput'
 import { OwnAddressesActions } from '~/reducers/own-addresses/own-addresses.reducer'
+import { DECIMAL } from '~/constants/decimal'
 
 import styles from './ConnectLedgerModal.scss'
+import HLayout from '~/assets/styles/h-box-layout.scss'
+import VLayout from '~/assets/styles/v-box-layout.scss'
+
+import { Decimal } from 'decimal.js'
 
 
 type Props = {
@@ -27,6 +33,20 @@ class ConnectLedgerModal extends Component<Props> {
 
   componentWillMount(){
     getStore().dispatch(this.props.actions.getLedgerConnected())
+  }
+
+  onDestAddressInputChanged(value) {
+    //getStore().dispatch(SendCashActions.checkAddressBookByName())
+    getStore().dispatch(this.props.actions.updateDestinationAddress(value))
+  }
+
+  onAmountAddressInputChanged(value) {
+    getStore().dispatch(this.props.actions.updateDestinationAmount(Decimal(value)))
+  }
+
+  onSendButtonClicked(event) {
+    this.eventConfirm(event)
+    getStore().dispatch(this.props.actions.sendCashFromLedger)
   }
 
   getConnectLedgerContent() {
@@ -62,17 +82,6 @@ class ConnectLedgerModal extends Component<Props> {
         >
           {t(`Connect`)}
         </RoundedButton>
-        
-        {t(` `)}
-
-        <RoundedButton
-          className={cn(styles.continueButton, {[styles.active]: this.props.connectLedgerModal.isLedgerConnected && this.props.connectLedgerModal.isLedgerResistanceAppOpen )}
-          onClick={this.props.actions.createTransaction}
-          important
-        >
-          {t(`Continue`)}
-        </RoundedButton>
-
       </div>
     )
   }
@@ -87,16 +96,64 @@ class ConnectLedgerModal extends Component<Props> {
     )
   }
 
-  connectionSuccessful() {
+  createTransaction() {
     const { t } = this.props
 
     return (
-      <div>
-        <div className={styles.header}>
-          {t(`Ledger Successfully Connected`)}
-        </div>
-        <div className={styles.note}>
-          {t(`Your Ledger is now connected. Please note that if your Ledger is disconnected, or it times out you will need to reconnect it here.`)}
+        <div className={[styles.sendCashContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
+
+          <div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapperContainer].join(' ')}>
+            {/* Title bar */}
+            <div className={styles.titleBar}>{t(`Send Currency from Ledger Nano S`)}</div>
+
+            {/* From address */}
+            <div>
+              <RoundedInput readOnly
+                name="from-address"
+                defaultValue={this.props.connectLedgerModal.ledgerAddress}
+                label={t(`From address`)}
+                labelClassName={styles.destinationAddressInput}
+              >
+              </RoundedInput>
+
+            {/* Destination address */}
+            <RoundedInput
+              name="destination-address"
+              className={styles.destinationAddressInput}
+              defaultValue=""
+              labelClassName={styles.inputLabel}
+              label={t(`Destination address`)}
+              onChange={value => this.onDestAddressInputChanged(value)}
+            />
+
+            {/* Amount */}
+            <div className={styles.amountContainer}>
+              <RoundedInput
+                name="amount"
+                defaultValue=""
+                label={t(`Amount`)}
+                labelClassName={styles.oldInputLabel}
+                number
+                onChange={value => this.onAmountAddressInputChanged(value)}
+              />
+            </div>
+
+           {/* <div className={styles.transactionFeeContainer}>
+              <span className={styles.part1}>{t(`Transaction fee:`)} </span>
+              <span className={styles.part2}>{DECIMAL.transactionFee.toString()}</span>
+              <span className={styles.part3}>RES</span>
+            </div>*/}
+
+            {/* Send button row */}
+            <div className={[styles.sendButtonContainer, HLayout.hBoxContainer].join(' ')}>
+              <button
+                type="button"
+                name="send-cash"
+              >
+                {t(`Send`)}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -148,9 +205,9 @@ class ConnectLedgerModal extends Component<Props> {
             onKeyDown={() => {}}
           />
 
-          { this.getConnectLedgerContent() }
+          { (!isLedgerConnected || !isLedgerResistanceAppOpen) && this.getConnectLedgerContent() }
 
-          { /*(isLedgerConnected && isLedgerResistanceAppOpen) && this.connectionSuccessful() */}
+          { (isLedgerConnected && isLedgerResistanceAppOpen) && this.createTransaction()}
 
           {/* isTransactionSent && this.getTransactionSentContent() } */}
 

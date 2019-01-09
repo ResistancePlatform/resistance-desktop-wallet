@@ -74,6 +74,9 @@ export const preloadedState: State = {
       isTransactionConfirmed: false,
       isTransactionSent: false,
       isLedgerResistanceAppOpen: false,
+      ledgerAddress: "",
+      destinationAddress: "",
+      destinationAmount: Decimal('0'),
     }
 	},
 	sendCash: {
