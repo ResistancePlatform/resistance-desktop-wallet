@@ -60,7 +60,7 @@ class ConnectLedgerModal extends Component<Props> {
     return (
       <div>
         <div className={styles.title}>
-          {t(`Connect Ledger`)}
+          {t(`Send RES from Ledger`)}
         </div>
 
         <ul className={styles.stepsList}>
@@ -100,16 +100,16 @@ class ConnectLedgerModal extends Component<Props> {
         <div className={styles.title}>
           {t(`Please confirm transaction on Ledger`)}
         </div>
-        <div>
+        <div className={styles.balanceContainer}>
           {t(`Your Ledger Address: ${this.props.connectLedgerModal.ledgerAddress}`)}
         </div>
-        <div>
+        <div className={styles.balanceContainer}>
           {t(`Destination Address: ${this.props.connectLedgerModal.destinationAddress}`)}
         </div>
-        <div>
+        <div className={styles.balanceContainer}>
           {t(`Destination Amount: ${this.props.connectLedgerModal.destinationAmount.toNumber()}`)}
         </div>
-        <div>
+        <div className={styles.balanceContainer}>
           {t(`Transaction Fee: 0.0001`)}
         </div>
       </div>
@@ -125,6 +125,10 @@ class ConnectLedgerModal extends Component<Props> {
           <div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapperContainer].join(' ')}>
             {/* Title bar */}
             <div className={styles.titleBar}>{t(`Send Currency from Ledger Nano S`)}</div>
+
+            <div className={styles.transactionDetailsContainer}>
+              {t(`Ledger Address Balance: ${this.props.connectLedgerModal.ledgerBalance}`)}
+            </div>
 
             {/* From address */}
             <div>

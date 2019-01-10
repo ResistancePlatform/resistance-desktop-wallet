@@ -22,6 +22,7 @@ export type OwnAddressesState = {
     isTransactionConfirmed: boolean,
     isTransactionSent: boolean,
     ledgerAddress: string,
+    ledgerBalance: string,
     destinationAddress: string,
     destinationAmount: Decimal,
     isTransactionPending: boolean,
@@ -43,7 +44,7 @@ export const OwnAddressesActions = createActions(
     CLOSE_CONNECT_LEDGER_MODAL: undefined,
     GET_LEDGER_CONNECTED: undefined,
     GOT_LEDGER_CONNECTED: undefined,
-    GOT_LEDGER_RESISTANCE_APP_OPEN: (address: string) => ({ address }),
+    GOT_LEDGER_RESISTANCE_APP_OPEN: (address: string, balance: string) => ({ address, balance }),
     GET_LEDGER_CONNECTED_FAILURE: undefined,
 
     UPDATE_DESTINATION_ADDRESS: (address: string) => ({address}),
@@ -112,7 +113,8 @@ export const OwnAddressesReducer = handleActions(
         ...state.connectLedgerModal,
         isLedgerConnected: true,
         isLedgerResistanceAppOpen: true,
-        ledgerAddress: action.payload.address
+        ledgerAddress: action.payload.address,
+        ledgerBalance: action.payload.balance
       }
     }),
     [OwnAddressesActions.getLedgerConnectedFailure]: state => ({
@@ -137,7 +139,8 @@ export const OwnAddressesReducer = handleActions(
         isTransactionPending: false,
         ledgerAddress: "",
         destinationAddress: "",
-        destinationAmount: Decimal("0")
+        destinationAmount: Decimal("0"),
+        isVisible: false,
       }
     }),
     [OwnAddressesActions.sendLedgerTransactionFailure]: state => ({
@@ -158,7 +161,7 @@ export const OwnAddressesReducer = handleActions(
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
-        destinationAmount: action.payload.amount
+        destinationAmount: action.payload.amount,
       }
     }),
     /* [OwnAddressesActions.continueToConfirmTransaction]: state => ({

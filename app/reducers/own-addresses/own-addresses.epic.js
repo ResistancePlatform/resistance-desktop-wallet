@@ -209,6 +209,7 @@ const isLedgerConnected = (action$: ActionsObservable<Action>) => action$.pipe(
     try {
 
       //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
+      let ledgerRes = new LedgerRes(ledgerRpcClient)
       const btcTransport = await ledgerRes.getBtcTransport()
       //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
       if(!btcTransport){
@@ -217,7 +218,8 @@ const isLedgerConnected = (action$: ActionsObservable<Action>) => action$.pipe(
       const result = await ledgerRes.getPublicKey(0)
       console.log(result)
       if(result.hasOwnProperty('publicKey')){
-        return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_RESISTANCE_APP_OPEN", payload: {address: result.bitcoinAddress} }
+        let balance = await ledgerRes.getLedgerAddressBalance(result.bitcoinAddress)
+        return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_RESISTANCE_APP_OPEN", payload: {address: result.bitcoinAddress, balance: balance.toString()} }
       }
       return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
     } catch (err) {
@@ -225,7 +227,6 @@ const isLedgerConnected = (action$: ActionsObservable<Action>) => action$.pipe(
       if(err.toString().includes("cannot open device with path")){
         return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_CONNECTED" }
       }
-      ledgerRes = new LedgerRes(ledgerRpcClient)
       return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
     }
   })
@@ -237,7 +238,7 @@ const sendLedgerTransaction = (action$: ActionsObservable<Action>, state$) => ac
     try {
 
       //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
-      //ledgerRes = new LedgerRes(ledgerRpcClient)
+      let ledgerRes = new LedgerRes(ledgerRpcClient)
       const btcTransport = await ledgerRes.getBtcTransport()
       //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
       if(!btcTransport){
@@ -255,7 +256,7 @@ const sendLedgerTransaction = (action$: ActionsObservable<Action>, state$) => ac
 
     } catch (err) {
       console.log(err.toString())
-      if(err.toString().includes("TransportError: Ledger Device is busy")){
+      if(err.toString().includes("TransportError: Ledger Device is busy") || err.toString().includes("Error: cannot open device with path")){
         return { type: "APP/OWN_ADDRESSES/EMPTY"}
       }
       return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
