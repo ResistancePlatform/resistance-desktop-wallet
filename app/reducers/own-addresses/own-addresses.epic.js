@@ -247,7 +247,7 @@ const sendLedgerTransaction = (action$: ActionsObservable<Action>, state$) => ac
       const state = state$.value.ownAddresses.connectLedgerModal
       console.log(state)
       //console.log(`Decimal: ${state.destinationAmount.toSignificantDigits()}`)
-      let signedTransaction = await ledgerRes.sendCoins(state.destinationAddress, 0, 0.0001, state.destinationAmount.toSignificantDigits())
+      let signedTransaction = await ledgerRes.sendCoins(state.destinationAddress, 0, 0.0001, state.destinationAmount.toNumber())
       console.log(signedTransaction)
       let sentTransaction = await ledgerRes.sendRawTransaction(signedTransaction)
       console.log(sentTransaction)
