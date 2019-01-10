@@ -100,16 +100,16 @@ class ConnectLedgerModal extends Component<Props> {
         <div className={styles.title}>
           {t(`Please confirm transaction on Ledger`)}
         </div>
-        <div className={styles.balanceContainer}>
+        <div className={styles.transactionDetailsContainer}>
           {t(`Your Ledger Address: ${this.props.connectLedgerModal.ledgerAddress}`)}
         </div>
-        <div className={styles.balanceContainer}>
+        <div className={styles.transactionDetailsContainer}>
           {t(`Destination Address: ${this.props.connectLedgerModal.destinationAddress}`)}
         </div>
-        <div className={styles.balanceContainer}>
+        <div className={styles.transactionDetailsContainer}>
           {t(`Destination Amount: ${this.props.connectLedgerModal.destinationAmount.toNumber()}`)}
         </div>
-        <div className={styles.balanceContainer}>
+        <div className={styles.transactionDetailsContainer}>
           {t(`Transaction Fee: 0.0001`)}
         </div>
       </div>
@@ -126,7 +126,7 @@ class ConnectLedgerModal extends Component<Props> {
             {/* Title bar */}
             <div className={styles.titleBar}>{t(`Send Currency from Ledger Nano S`)}</div>
 
-            <div className={styles.transactionDetailsContainer}>
+            <div className={styles.balanceContainer}>
               {t(`Ledger Address Balance: ${this.props.connectLedgerModal.ledgerBalance}`)}
             </div>
 

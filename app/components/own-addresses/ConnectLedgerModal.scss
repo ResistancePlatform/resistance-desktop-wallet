@@ -6,7 +6,7 @@ $connectLedgerModalWidth: 26.25rem;
 
 .connectLedger {
   width: $connectLedgerModalWidth * 1.5 - 2 * 2rem;
-  height: 15.5rem * 1.5 - 2 * 2rem;
+  height: 16rem * 1.5 - 2 * 2rem;
   padding: 2rem;
 }
 
@@ -299,13 +299,12 @@ div[name="amount"] {
 
 
 .sendButtonContainer {
-    margin-bottom: 2rem;
-
     button {
         @include roundedButton(true);
 
         margin-left: 0;
         margin-right: 2rem;
+        margin-bottom: 2rem;
         padding: 0.4rem 2rem;
     }
 
@@ -335,7 +334,7 @@ div[name="amount"] {
 }
 
 .balanceContainer {
-    padding-bottom: 1.2rem;
+    padding-bottom: 1rem;
 
     font-size: 0.85rem;
     font-weight: 300;
