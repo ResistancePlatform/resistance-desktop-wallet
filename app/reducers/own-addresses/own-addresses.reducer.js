@@ -26,6 +26,7 @@ export type OwnAddressesState = {
     destinationAddress: string,
     destinationAmount: Decimal,
     isTransactionPending: boolean,
+    txid: string,
   }
 }
 
@@ -51,7 +52,7 @@ export const OwnAddressesActions = createActions(
     UPDATE_DESTINATION_AMOUNT: (amount: Decimal) => ({amount}),
 
     SEND_LEDGER_TRANSACTION: undefined,
-    SEND_LEDGER_TRANSACTION_SUCCESS: undefined,
+    SEND_LEDGER_TRANSACTION_SUCCESS: (txid: string) => ({txid}),
     SEND_LEDGER_TRANSACTION_FAILURE: undefined,
 
     INITIATE_PRIVATE_KEYS_EXPORT: undefined,
@@ -132,7 +133,7 @@ export const OwnAddressesReducer = handleActions(
         isTransactionPending: true
       }
     }),
-    [OwnAddressesActions.sendLedgerTransactionSuccess]: state => ({
+    [OwnAddressesActions.sendLedgerTransactionSuccess]: (state, action) => ({
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
@@ -140,7 +141,8 @@ export const OwnAddressesReducer = handleActions(
         ledgerAddress: "",
         destinationAddress: "",
         destinationAmount: Decimal("0"),
-        isVisible: false,
+        isTransactionSent: true,
+        txid: action.payload.txid
       }
     }),
     [OwnAddressesActions.sendLedgerTransactionFailure]: state => ({
@@ -178,6 +180,12 @@ export const OwnAddressesReducer = handleActions(
       connectLedgerModal: {
         ...state.connectLedgerModal,
         isVisible: false,
+        isTransactionPending: false,
+        ledgerAddress: "",
+        destinationAddress: "",
+        destinationAmount: Decimal("0"),
+        isTransactionSent: false,
+        txid: ""
       }
     }),
     [OwnAddressesActions.mergeAllMinedCoins]: (state, action) => ({

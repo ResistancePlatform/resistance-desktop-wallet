@@ -252,7 +252,7 @@ const sendLedgerTransaction = (action$: ActionsObservable<Action>, state$) => ac
       console.log(signedTransaction)
       let sentTransaction = await ledgerRes.sendRawTransaction(signedTransaction)
       console.log(sentTransaction)
-      return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_SUCCESS"}
+      return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_SUCCESS", payload: {txid: sentTransaction}}
 
     } catch (err) {
       console.log(err.toString())

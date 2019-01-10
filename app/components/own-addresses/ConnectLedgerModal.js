@@ -1,9 +1,10 @@
 // @flow
-import React, { Component } from 'react'
+import React, { Component} from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
+import { shell } from 'electron';
 
 import { getStore } from '~/store/configureStore'
 import { RoundedButton } from '~/components/rounded-form'
@@ -31,6 +32,8 @@ type Props = {
 class ConnectLedgerModal extends Component<Props> {
 	props: Props
 
+  //blockchainExplorerIP: "http://54.91.60.116:3001"
+
   componentWillMount(){
     getStore().dispatch(this.props.actions.getLedgerConnected())
   }
@@ -52,6 +55,14 @@ class ConnectLedgerModal extends Component<Props> {
   onSendButtonClicked(event) {
     //this.eventConfirm(event)
     getStore().dispatch(this.props.actions.sendLedgerTransaction())
+  }
+
+  onViewTransactionDetails(){
+    //this.eventConfirm(event)
+    let url = "http://54.91.60.116:3001" + "/insight/tx/" + this.props.connectLedgerModal.txid
+    console.log(url)
+    shell.openExternal(url) //`${this.blockchainExplorerIP} + /insight/tx/ + ${this.props.connectLedgerModal.txid}`)
+    //getStore().dispatch(this.props.actions.closeConnectLedgerModal())
   }
 
   getConnectLedgerContent() {
@@ -196,7 +207,7 @@ class ConnectLedgerModal extends Component<Props> {
         <div className={styles.checkMark} />
 
         <div className={styles.header}>
-          {t(`Transaction sent`)}
+          {t(`Transaction sent! Transaction Id: ${this.props.connectLedgerModal.txid}`)}
         </div>
 
         <div className={styles.note}>
@@ -205,7 +216,7 @@ class ConnectLedgerModal extends Component<Props> {
 
         <RoundedButton
           className={styles.viewDetailsButton}
-          onClick={this.props.actions.closeConnectLedgerModal}
+          onClick={() => this.onViewTransactionDetails()}
           important
         >
           {t(`View details`)}
@@ -235,13 +246,13 @@ class ConnectLedgerModal extends Component<Props> {
             onKeyDown={() => {}}
           />
 
-          { (!isLedgerConnected || !isLedgerResistanceAppOpen) && this.getConnectLedgerContent() }
+          { (!isLedgerConnected || !isLedgerResistanceAppOpen) && (!isTransactionPending || !isTransactionSent) && this.getConnectLedgerContent() }
 
-          { (isLedgerConnected && isLedgerResistanceAppOpen && !isTransactionPending) && this.createTransaction()}
+          { (isLedgerConnected && isLedgerResistanceAppOpen && !isTransactionPending) && (!isTransactionPending && !isTransactionSent) && this.createTransaction()}
 
-          { isTransactionPending && this.getConfirmTransactionContent() }
+          { !isTransactionSent && isTransactionPending && this.getConfirmTransactionContent() }
 
-          {/* isTransactionSent && this.getTransactionSentContent() } */}
+          { !isTransactionPending && isTransactionSent && this.getTransactionSentContent() }
 
         </div>
       </div>

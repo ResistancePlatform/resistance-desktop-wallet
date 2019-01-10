@@ -79,6 +79,7 @@ export const preloadedState: State = {
       destinationAmount: Decimal('0'),
       isTransactionPending: false,
       ledgerBalance: "0",
+      txid: "",
     }
 	},
 	sendCash: {
