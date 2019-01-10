@@ -127,6 +127,21 @@ export class RpcService {
       })
   }
 
+  getInfo() {
+    const client = getClientInstance()
+
+    client.getInfo()
+      .then((info: DaemonInfo) => {
+        getStore().dispatch(SystemInfoActions.gotDaemonInfo(info))
+        return Promise.resolve()
+      })
+      .catch(err => {
+        // TODO: move the prefix to toastr error title in the epic #114
+        const errorPrefix = t(`Unable to get Resistance local node info`)
+        getStore().dispatch(SystemInfoActions.getDaemonInfoFailure(`${errorPrefix}: ${err}`, err.code))
+      })
+  }
+
   /**
    * Request the wallet information.
    *

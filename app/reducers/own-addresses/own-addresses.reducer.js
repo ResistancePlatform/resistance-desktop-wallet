@@ -122,6 +122,12 @@ export const OwnAddressesReducer = handleActions(
         isLedgerResistanceAppOpen: false
       }
     }),
+    [OwnAddressesActions.sendLedgerTransaction]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+      }
+    }),
     [OwnAddressesActions.updateDestinationAddress]: (state, action) => ({
       ...state,
       connectLedgerModal: {

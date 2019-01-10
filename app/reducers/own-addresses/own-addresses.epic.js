@@ -5,6 +5,8 @@ import { of, bindCallback, merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 import LedgerRes from 'ledger-res'
+import Client from 'bitcoin-core'
+import winston from 'winston'
 
 import { i18n } from '~/i18next.config'
 import { getEnsureLoginObservable } from '~/utils/auth'
@@ -15,19 +17,48 @@ import { RpcService } from '~/service/rpc-service'
 
 const t = i18n.getFixedT(null, 'own-addresses')
 const rpc = new RpcService()
-var ledgerRes = new LedgerRes(rpc)
+let ledgerRpcClient
+let ledgerRes
 
-/* ;(async () => {
+
+
+;(async () => {
   try {
 
-    const ledgerRes = new LedgerRes(rpc)
-    await ledgerRes.init()
+    const logger = winston.createLogger({
+      level: 'debug',
+      format: winston.format.json(),
+      transports: [
+        new winston.transports.Console({ format: winston.format.json() })
+      ]
+    });
+
+    const nodeConfig = remote.getGlobal('resistanceNodeConfig')
+
+    let network
+
+    if (nodeConfig.testnet) {
+      network = 'testnet'
+    } else if (nodeConfig.regtest) {
+      network = 'regtest'
+    }
+
+    ledgerRpcClient = new Client({
+      network: network,
+      host: '127.0.0.1',
+      port: nodeConfig.rpcport,
+      username: nodeConfig.rpcuser,
+      password: nodeConfig.rpcpassword,
+      logger: logger,
+      timeout: 10000
+    })
+
 
   } catch (err) {
     console.log(err)
   }
 
-})(); */
+})();
 
 const getOwnAddressesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.getOwnAddresses),
@@ -194,8 +225,37 @@ const isLedgerConnected = (action$: ActionsObservable<Action>) => action$.pipe(
       if(err.toString().includes("cannot open device with path")){
         return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_CONNECTED" }
       }
-      ledgerRes = new LedgerRes(rpc)
+      ledgerRes = new LedgerRes(ledgerRpcClient)
       return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
+    }
+  })
+)
+
+const sendLedgerTransaction = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+  ofType(OwnAddressesActions.sendLedgerTransaction),
+  mergeMap(async () => {
+    try {
+
+      //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
+      //ledgerRes = new LedgerRes(ledgerRpcClient)
+      const btcTransport = await ledgerRes.getBtcTransport()
+      //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
+      if(!btcTransport){
+        await ledgerRes.init()
+      }
+
+      const state = state$.value.ownAddresses.connectLedgerModal
+      console.log(state)
+      //console.log(`Decimal: ${state.destinationAmount.toSignificantDigits()}`)
+      let signedTransaction = await ledgerRes.sendCoins(state.destinationAddress, 0, 0.0001, state.destinationAmount.toSignificantDigits())
+      console.log(signedTransaction)
+      let sentTransaction = await ledgerRes.sendRawTransaction(signedTransaction)
+      console.log(sentTransaction)
+      return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_SUCCESS"}
+
+    } catch (err) {
+      console.log(err.toString())
+      return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
     }
   })
 )
@@ -213,5 +273,6 @@ export const OwnAddressesEpics = (action$, state$) => merge(
   mergeAllCoinsEpic(action$, state$),
   mergeCoinsOperationStartedEpic(action$, state$),
   mergeCoinsFailureEpic(action$, state$),
-  isLedgerConnected(action$, state$)
+  isLedgerConnected(action$, state$),
+  sendLedgerTransaction(action$, state$)
 )

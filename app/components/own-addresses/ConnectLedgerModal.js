@@ -44,9 +44,14 @@ class ConnectLedgerModal extends Component<Props> {
     getStore().dispatch(this.props.actions.updateDestinationAmount(Decimal(value)))
   }
 
+  eventConfirm(event) {
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
   onSendButtonClicked(event) {
-    this.eventConfirm(event)
-    getStore().dispatch(this.props.actions.sendCashFromLedger)
+    //this.eventConfirm(event)
+    getStore().dispatch(this.props.actions.sendLedgerTransaction())
   }
 
   getConnectLedgerContent() {
@@ -149,6 +154,7 @@ class ConnectLedgerModal extends Component<Props> {
               <button
                 type="button"
                 name="send-cash"
+                onClick={event => this.onSendButtonClicked(event)}
               >
                 {t(`Send`)}
               </button>
