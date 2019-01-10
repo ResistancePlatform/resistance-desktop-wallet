@@ -95,8 +95,23 @@ class ConnectLedgerModal extends Component<Props> {
     const { t } = this.props
 
     return (
-      <div className={styles.title}>
-        {t(`Please confirm transaction on Ledger`)}
+      <div>
+        <div className={styles.titleBar}>{t(`Send Currency from Ledger Nano S`)}</div>
+        <div className={styles.title}>
+          {t(`Please confirm transaction on Ledger`)}
+        </div>
+        <div>
+          {t(`Your Ledger Address: ${this.props.connectLedgerModal.ledgerAddress}`)}
+        </div>
+        <div>
+          {t(`Destination Address: ${this.props.connectLedgerModal.destinationAddress}`)}
+        </div>
+        <div>
+          {t(`Destination Amount: ${this.props.connectLedgerModal.destinationAmount.toNumber()}`)}
+        </div>
+        <div>
+          {t(`Transaction Fee: 0.0001`)}
+        </div>
       </div>
     )
   }
@@ -151,13 +166,17 @@ class ConnectLedgerModal extends Component<Props> {
 
             {/* Send button row */}
             <div className={[styles.sendButtonContainer, HLayout.hBoxContainer].join(' ')}>
-              <button
-                type="button"
+              <RoundedButton
+                type="submit"
                 name="send-cash"
+                spinner={this.props.connectLedgerModal.isTransactionPending}
+                disabled={this.props.connectLedgerModal.isTransactionPending}
                 onClick={event => this.onSendButtonClicked(event)}
+                important
+                large
               >
                 {t(`Send`)}
-              </button>
+              </RoundedButton>
             </div>
           </div>
         </div>
@@ -197,7 +216,8 @@ class ConnectLedgerModal extends Component<Props> {
       isLedgerConnected,
       isTransactionConfirmed,
       isTransactionSent,
-      isLedgerResistanceAppOpen
+      isLedgerResistanceAppOpen,
+      isTransactionPending
     } = this.props.connectLedgerModal
 
 		return (
@@ -213,7 +233,9 @@ class ConnectLedgerModal extends Component<Props> {
 
           { (!isLedgerConnected || !isLedgerResistanceAppOpen) && this.getConnectLedgerContent() }
 
-          { (isLedgerConnected && isLedgerResistanceAppOpen) && this.createTransaction()}
+          { (isLedgerConnected && isLedgerResistanceAppOpen && !isTransactionPending) && this.createTransaction()}
+
+          { isTransactionPending && this.getConfirmTransactionContent() }
 
           {/* isTransactionSent && this.getTransactionSentContent() } */}
 

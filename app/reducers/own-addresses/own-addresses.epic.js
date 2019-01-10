@@ -29,7 +29,7 @@ let ledgerRes
       level: 'debug',
       format: winston.format.json(),
       transports: [
-        new winston.transports.Console({ format: winston.format.json() })
+        new winston.transports.Console({ format: winston.format.simple() })
       ]
     });
 
@@ -255,6 +255,9 @@ const sendLedgerTransaction = (action$: ActionsObservable<Action>, state$) => ac
 
     } catch (err) {
       console.log(err.toString())
+      if(err.toString().includes("TransportError: Ledger Device is busy")){
+        return { type: "APP/OWN_ADDRESSES/EMPTY"}
+      }
       return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
     }
   })

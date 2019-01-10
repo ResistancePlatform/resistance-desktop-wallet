@@ -77,6 +77,7 @@ export const preloadedState: State = {
       ledgerAddress: "",
       destinationAddress: "",
       destinationAmount: Decimal('0'),
+      isTransactionPending: false,
     }
 	},
 	sendCash: {

@@ -23,7 +23,8 @@ export type OwnAddressesState = {
     isTransactionSent: boolean,
     ledgerAddress: string,
     destinationAddress: string,
-    destinationAmount: Decimal
+    destinationAmount: Decimal,
+    isTransactionPending: boolean,
   }
 }
 
@@ -126,6 +127,24 @@ export const OwnAddressesReducer = handleActions(
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
+        isTransactionPending: true
+      }
+    }),
+    [OwnAddressesActions.sendLedgerTransactionSuccess]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isTransactionPending: false,
+        ledgerAddress: "",
+        destinationAddress: "",
+        destinationAmount: Decimal("0")
+      }
+    }),
+    [OwnAddressesActions.sendLedgerTransactionFailure]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isTransactionPending: false
       }
     }),
     [OwnAddressesActions.updateDestinationAddress]: (state, action) => ({
