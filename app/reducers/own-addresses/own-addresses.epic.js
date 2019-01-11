@@ -224,9 +224,10 @@ const isLedgerConnected = (action$: ActionsObservable<Action>) => action$.pipe(
       return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
     } catch (err) {
       console.log(err.toString())
-      if(err.toString().includes("cannot open device with path")){
+      /*if(err.toString().includes("cannot open device with path")){
         return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_CONNECTED" }
-      }
+      }*/
+      toastr.error(t(`Could not communicate with Ledger Wallet. Please disconnect and reconnect you Ledger wallet and try again.`))
       return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
     }
   })

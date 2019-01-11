@@ -185,7 +185,9 @@ export const OwnAddressesReducer = handleActions(
         destinationAddress: "",
         destinationAmount: Decimal("0"),
         isTransactionSent: false,
-        txid: ""
+        txid: "",
+        isLedgerConnected: false,
+        isLedgerResistanceAppOpen: false
       }
     }),
     [OwnAddressesActions.mergeAllMinedCoins]: (state, action) => ({

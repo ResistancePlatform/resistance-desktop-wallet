@@ -10,6 +10,10 @@ $connectLedgerModalWidth: 26.25rem;
   padding: 2rem;
 }
 
+viewDetailsButton {
+  text-align: center !important;
+}
+
 .stepsList {
   list-style: none;
   margin: 0;
@@ -275,11 +279,11 @@ Start send Cash from Ledger
 .destinationAddressInput {
   width: 30rem;
 
-  // input {
-  //   min-width: 20rem !important;
-  //   max-width: 25rem !important;
-  //   width: 21rem !important;
-  // }
+  input {
+    min-width: 25rem !important;
+    max-width: 30rem !important;
+    width: 27rem !important;
+  }
 
   // span[class*="tooltips"] {
   //   left: 27% !important;
@@ -298,7 +302,7 @@ div[name="amount"] {
 }
 
 
-.sendButtonContainer {
+/*.ButtonContainer {
     button {
         @include roundedButton(true);
 
@@ -331,7 +335,7 @@ div[name="amount"] {
             font-size: 0.7rem;
         }
     }
-}
+}*/
 
 .balanceContainer {
     padding-bottom: 1rem;

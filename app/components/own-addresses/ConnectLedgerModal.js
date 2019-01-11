@@ -34,9 +34,9 @@ class ConnectLedgerModal extends Component<Props> {
 
   //blockchainExplorerIP: "http://54.91.60.116:3001"
 
-  componentWillMount(){
+  /*componentDidMount(){
     getStore().dispatch(this.props.actions.getLedgerConnected())
-  }
+  }*/
 
   onDestAddressInputChanged(value) {
     //getStore().dispatch(SendCashActions.checkAddressBookByName())
@@ -144,16 +144,17 @@ class ConnectLedgerModal extends Component<Props> {
             {/* From address */}
             <div>
               <RoundedInput readOnly
-                name="from-address"
+                name="from"
                 defaultValue={this.props.connectLedgerModal.ledgerAddress}
                 label={t(`From address`)}
-                labelClassName={styles.destinationAddressInput}
+                className={styles.destinationAddressInput}
+                labelClassName={styles.inputLabel}
               >
               </RoundedInput>
 
             {/* Destination address */}
             <RoundedInput
-              name="destination-address"
+              name="destination"
               className={styles.destinationAddressInput}
               defaultValue=""
               labelClassName={styles.inputLabel}
@@ -167,7 +168,7 @@ class ConnectLedgerModal extends Component<Props> {
                 name="amount"
                 defaultValue=""
                 label={t(`Amount`)}
-                labelClassName={styles.oldInputLabel}
+                labelClassName={styles.inputLabel}
                 number
                 onChange={value => this.onAmountAddressInputChanged(value)}
               />
@@ -178,22 +179,23 @@ class ConnectLedgerModal extends Component<Props> {
               <span className={styles.part2}>{DECIMAL.transactionFee.toString()}</span>
               <span className={styles.part3}>RES</span>
             </div>*/}
+          </div>
 
             {/* Send button row */}
-            <div className={[styles.sendButtonContainer, HLayout.hBoxContainer].join(' ')}>
-              <RoundedButton
-                type="submit"
-                name="send-cash"
-                spinner={this.props.connectLedgerModal.isTransactionPending}
-                disabled={this.props.connectLedgerModal.isTransactionPending}
-                onClick={event => this.onSendButtonClicked(event)}
-                important
-                large
-              >
-                {t(`Send`)}
-              </RoundedButton>
+              <div class={styles.viewDetailsButton}>
+                <RoundedButton
+                  type="submit"
+                  name="send-cash"
+                  class={styles.viewDetailsButton}
+                  spinner={this.props.connectLedgerModal.isTransactionPending}
+                  disabled={this.props.connectLedgerModal.isTransactionPending}
+                  onClick={event => this.onSendButtonClicked(event)}
+                  important
+                  large
+                >
+                  {t(`Send`)}
+                </RoundedButton>
             </div>
-          </div>
         </div>
       </div>
     )
@@ -237,7 +239,7 @@ class ConnectLedgerModal extends Component<Props> {
 
 		return (
       <div className={styles.overlay}>
-        <div className={cn(styles.container, styles.connectLedger)}>
+        <div key={location.pathname} className={cn(styles.container, styles.connectLedger)}>
           <div
             role="button"
             tabIndex={0}
