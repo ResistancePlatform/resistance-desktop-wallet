@@ -53,6 +53,8 @@ let ledgerRes
       timeout: 10000
     })
 
+     ledgerRes = new LedgerRes(ledgerRpcClient)
+
 
   } catch (err) {
     console.log(err)
@@ -209,7 +211,7 @@ const isLedgerConnected = (action$: ActionsObservable<Action>) => action$.pipe(
     try {
 
       //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
-      let ledgerRes = new LedgerRes(ledgerRpcClient)
+      //let ledgerRes = new LedgerRes(ledgerRpcClient)
       const btcTransport = await ledgerRes.getBtcTransport()
       //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
       if(!btcTransport){
@@ -239,7 +241,7 @@ const sendLedgerTransaction = (action$: ActionsObservable<Action>, state$) => ac
     try {
 
       //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
-      let ledgerRes = new LedgerRes(ledgerRpcClient)
+      //let ledgerRes = new LedgerRes(ledgerRpcClient)
       const btcTransport = await ledgerRes.getBtcTransport()
       //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
       if(!btcTransport){
