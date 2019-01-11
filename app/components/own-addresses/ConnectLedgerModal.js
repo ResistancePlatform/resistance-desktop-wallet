@@ -40,11 +40,11 @@ class ConnectLedgerModal extends Component<Props> {
 
   onDestAddressInputChanged(value) {
     //getStore().dispatch(SendCashActions.checkAddressBookByName())
-    getStore().dispatch(this.props.actions.updateDestinationAddress(value))
+    this.props.actions.updateDestinationAddress(value)
   }
 
   onAmountAddressInputChanged(value) {
-    getStore().dispatch(this.props.actions.updateDestinationAmount(Decimal(value)))
+    this.props.actions.updateDestinationAmount(Decimal(value))
   }
 
   eventConfirm(event) {
@@ -53,8 +53,15 @@ class ConnectLedgerModal extends Component<Props> {
   }
 
   onSendButtonClicked(event) {
-    //this.eventConfirm(event)
-    getStore().dispatch(this.props.actions.sendLedgerTransaction())
+    this.eventConfirm(event)
+    const state = this.props.connectLedgerModal
+    if(!state.destinationAddress || (state.destinationAddress.charAt(0) !== 'r') || (state.destinationAddress.length !== 35)){
+      this.props.actions.sendLedgerTransactionInvalidParams()
+    } else if(!state.destinationAmount || state.destinationAmount.isNaN() || state.destinationAmount.isZero()){
+      this.props.actions.sendLedgerTransactionInvalidParams()
+    } else {
+      this.props.actions.sendLedgerTransaction()
+    }
   }
 
   onViewTransactionDetails(){
@@ -179,7 +186,6 @@ class ConnectLedgerModal extends Component<Props> {
               <span className={styles.part2}>{DECIMAL.transactionFee.toString()}</span>
               <span className={styles.part3}>RES</span>
             </div>*/}
-          </div>
 
             {/* Send button row */}
               <div class={styles.viewDetailsButton}>
@@ -196,6 +202,7 @@ class ConnectLedgerModal extends Component<Props> {
                   {t(`Send`)}
                 </RoundedButton>
             </div>
+          </div>
         </div>
       </div>
     )

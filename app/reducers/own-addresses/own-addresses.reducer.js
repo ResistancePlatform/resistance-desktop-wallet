@@ -54,6 +54,7 @@ export const OwnAddressesActions = createActions(
     SEND_LEDGER_TRANSACTION: undefined,
     SEND_LEDGER_TRANSACTION_SUCCESS: (txid: string) => ({txid}),
     SEND_LEDGER_TRANSACTION_FAILURE: undefined,
+    SEND_LEDGER_TRANSACTION_INVALID_PARAMS: undefined,
 
     INITIATE_PRIVATE_KEYS_EXPORT: undefined,
     EXPORT_PRIVATE_KEYS: filePath => ({filePath}),
@@ -133,6 +134,13 @@ export const OwnAddressesReducer = handleActions(
         isTransactionPending: true
       }
     }),
+    /*[OwnAddressesActions.sendLedgerTransactionInvalidParams]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isTransactionPending: false,
+      }
+    }),*/
     [OwnAddressesActions.sendLedgerTransactionSuccess]: (state, action) => ({
       ...state,
       connectLedgerModal: {

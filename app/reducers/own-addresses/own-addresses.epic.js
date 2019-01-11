@@ -29,7 +29,7 @@ let ledgerRes
       level: 'debug',
       format: winston.format.json(),
       transports: [
-        new winston.transports.Console({ format: winston.format.simple() })
+        new winston.transports.Console({ format: winston.format.splat() })
       ]
     });
 
@@ -247,7 +247,7 @@ const sendLedgerTransaction = (action$: ActionsObservable<Action>, state$) => ac
       }
 
       const state = state$.value.ownAddresses.connectLedgerModal
-      console.log(state)
+
       //console.log(`Decimal: ${state.destinationAmount.toSignificantDigits()}`)
       let signedTransaction = await ledgerRes.sendCoins(state.destinationAddress, 0, 0.0001, state.destinationAmount.toNumber())
       console.log(signedTransaction)
@@ -257,12 +257,21 @@ const sendLedgerTransaction = (action$: ActionsObservable<Action>, state$) => ac
 
     } catch (err) {
       console.log(err.toString())
-      if(err.toString().includes("TransportError: Ledger Device is busy") || err.toString().includes("Error: cannot open device with path")){
+      /*if(err.toString().includes("TransportError: Ledger Device is busy") || err.toString().includes("Error: cannot open device with path")){
         return { type: "APP/OWN_ADDRESSES/EMPTY"}
-      }
+      }*/
+
       return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
     }
   })
+)
+
+const sendLedgerTransactionInvalidParams = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+  ofType(OwnAddressesActions.sendLedgerTransactionInvalidParams),
+  tap((action) => {
+    toastr.error(t(`Please make sure destination address and amount are valid.`))
+  }),
+  mapTo(OwnAddressesActions.empty())
 )
 
 export const OwnAddressesEpics = (action$, state$) => merge(
@@ -279,5 +288,6 @@ export const OwnAddressesEpics = (action$, state$) => merge(
   mergeCoinsOperationStartedEpic(action$, state$),
   mergeCoinsFailureEpic(action$, state$),
   isLedgerConnected(action$, state$),
-  sendLedgerTransaction(action$, state$)
+  sendLedgerTransaction(action$, state$),
+  sendLedgerTransactionInvalidParams(action$, state$)
 )
