@@ -48,6 +48,7 @@ export default class GenericInput extends GenericControl {
 	 */
   componentDidUpdate(prevProps) {
     if (prevProps.defaultValue !== this.props.defaultValue ) {
+
       /* eslint-disable-next-line react/no-did-update-set-state */
       this.setState({ value: this.props.defaultValue || '' })
     }

@@ -22,7 +22,6 @@ import styles from './InstantDexDepositModal.scss'
 const getValidationSchema = t => Joi.object().keys({
   weeks: Joi.number().min(1).max(52).required().label(t(`Weeks`)),
   amount: Joi.number().min(10.0001).required().label(t(`Amount`)),
-  equity: Joi.number().optional(),
 })
 
 type Props = {
@@ -52,6 +51,8 @@ class InstantDexDepositModal extends Component<Props> {
     const { amount } = this.props.form && this.props.form.fields || {}
     const { currencyHistory } = this.props.assets
 
+    const equity = getEquity('RES', amount, currencyHistory) || Decimal(0)
+
     return (
       <div className={styles.overlay}>
         <div className={cn(styles.container, styles.instantDexDeposit)}>
@@ -71,6 +72,7 @@ class InstantDexDepositModal extends Component<Props> {
         <RoundedForm
           id="resDexAccountsInstantDexDepositModal"
           schema={getValidationSchema(t)}
+          options={{stripUnknown: true}}
         >
           <RoundedInput
             name="weeks"
@@ -86,10 +88,10 @@ class InstantDexDepositModal extends Component<Props> {
 
               <CurrencyAmountInput
                 className={styles.amount}
+                name="amount"
                 defaultValue={10.0001}
                 min="10.0001"
                 step="1"
-                name="amount"
                 symbol={symbol}
                 maxAmount={resCurrency && resCurrency.balance}
               />
@@ -101,11 +103,10 @@ class InstantDexDepositModal extends Component<Props> {
             <div>
               <div className={styles.caption} />
 
-              {(getEquity('RES', amount, currencyHistory) || Decimal(0)).toString()}
               <CurrencyAmountInput
                 name="equity"
                 symbol="USD"
-                defaultValue={getEquity('RES', amount, currencyHistory) || '0'}
+                defaultValue={equity}
                 readOnly
               />
             </div>

@@ -196,7 +196,7 @@ class ResDexAssets extends Component<Props> {
 	render() {
     const { t, i18n } = this.props
 
-    const { currencies, enabledCurrencies } = this.props.accounts
+    const { enabledCurrencies } = this.props.accounts
     const totalPortfolioValue = this.getTotalPortfolioValue()
     const sinceLastHour = this.getSinceLastHour()
     const sortedCurrencies = getSortedCurrencies(enabledCurrencies).filter(currency => currency.symbol !== 'ETOMIC')
