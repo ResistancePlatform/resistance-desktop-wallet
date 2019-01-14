@@ -17,6 +17,7 @@
   "dependencies": {
     "bitcoin-core": "^2.0.0",
     "dtrace-provider": "^0.8.7",
-    "ledger-res": "git+ssh://git@github.com:ResistancePlatform/ledger-res-js.git"
+    "ledger-res": "git+ssh://git@github.com:ResistancePlatform/ledger-res-js.git",
+    "usb": "^1.5.0"
   }
 }
