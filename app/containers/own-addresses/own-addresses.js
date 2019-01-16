@@ -134,7 +134,7 @@ class OwnAddresses extends Component<Props> {
                       {t(`New private (Z) address`)}
                     </PopupMenuItem>
                     <PopupMenuItem onClick={this.props.actions.showConnectLedgerModal}>
-                      {t(`Send RES from Redger`)}
+                      {t(`Send RES from Ledger`)}
                     </PopupMenuItem>
                   </PopupMenu>
 
