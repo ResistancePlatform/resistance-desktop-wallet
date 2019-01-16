@@ -6,6 +6,7 @@ import { ChildProcessName, ChildProcessStatus } from '~/service/child-process-se
 
 export type SettingsState = {
 	isTorEnabled: boolean,
+  cpuCoresNumber: number,
 	isMinerEnabled: boolean,
   isStatusModalOpen: boolean,
   statusModalTabIndex: number,
@@ -33,6 +34,7 @@ export const SettingsActions = createActions(
     TOGGLE_MINER: undefined,
     ENABLE_MINER: undefined,
     DISABLE_MINER: undefined,
+    SET_CPU_CORES_NUMBER: (cpuCoresNumber: string) => ({ cpuCoresNumber }),
 
     TOGGLE_TOR: undefined,
     ENABLE_TOR: undefined,
@@ -125,6 +127,10 @@ export const SettingsReducer = handleActions(
       ...state,
       childProcessesStatus: { ...state.childProcessesStatus, MINER: 'STOPPING' },
       isMinerEnabled: false
+    }),
+    [SettingsActions.setCpuCoresNumber]: (state, action) => ({
+      ...state,
+      cpuCoresNumber: action.payload.cpuCoresNumber
     }),
 
     // Tor

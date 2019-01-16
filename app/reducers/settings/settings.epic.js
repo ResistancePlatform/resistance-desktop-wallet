@@ -169,6 +169,14 @@ const disableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   mapTo(SettingsActions.empty())
 )
 
+const setCpuCoresNumberEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.setCpuCoresNumber),
+  map(action => {
+    config.set('manageDaemon.cpuCoresNumber', parseInt(action.payload.cpuCoresNumber, 10))
+    return SettingsActions.empty()
+  })
+)
+
 const toggleTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.toggleTor),
   map(() => {
@@ -408,6 +416,7 @@ export const SettingsEpics = (action$, state$) => merge(
   toggleMinerEpic(action$, state$),
   enableMinerEpic(action$, state$),
 	disableMinerEpic(action$, state$),
+  setCpuCoresNumberEpic(action$, state$),
   toggleTorEpic(action$, state$),
 	enableTorEpic(action$, state$),
 	disableTorEpic(action$, state$),

@@ -1,4 +1,5 @@
 // @flow
+import os from 'os'
 import * as Joi from 'joi'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -99,6 +100,7 @@ class Settings extends Component<Props> {
 	render() {
     const { t } = this.props
     const { childProcessesStatus } = this.props.settings
+    const totalCpuCoresNumber = os.cpus().length
 
 		return (
 			// Layout container
@@ -215,6 +217,16 @@ class Settings extends Component<Props> {
                     onChange={this.props.actions.toggleMiner}
                     disabled={getMiningDisabledAttribute(childProcessesStatus)}
                   />
+
+                 <RoundedInput
+                   label={t(`Number of cores`)}
+                   defaultValue={this.props.settings.cpuCoresNumber}
+                   type="number"
+                   onChange={this.props.actions.setCpuCoresNumber}
+                   min={1}
+                   max={totalCpuCoresNumber}
+                 />
+
                 </div>
 
                 <div className={styles.buttonsRow}>

@@ -1,3 +1,4 @@
+import os from 'os'
 import { remote } from 'electron'
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
@@ -212,6 +213,7 @@ Object.assign(preloadedState.getStarted, {
 Object.assign(preloadedState.settings, {
 	isMinerEnabled: config.get('manageDaemon.enableMiner', false),
 	isTorEnabled: config.get('manageDaemon.enableTor', false),
+  cpuCoresNumber: config.get('manageDaemon.cpuCoresNumber', os.cpus().length),
 	language: config.get('language', 'en')
 })
 
