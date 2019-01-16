@@ -40,7 +40,7 @@ class ConnectLedgerModal extends Component<Props> {
 
   componentDidMount(){
     if(!this.props.connectLedgerModal.isLedgerResistanceAppOpen){
-      let timer = setInterval(() => {this.tick(this)}, 3000)
+      let timer = setInterval(() => {this.tick(this)}, 500)
       this.setState({timer})
     }
   }
