@@ -4,6 +4,8 @@
 
 $connectLedgerModalWidth: 26.25rem;
 
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
 .connectLedger {
   width: $connectLedgerModalWidth * 1.5 - 2 * 2rem;
   height: 16rem * 1.5 - 2 * 2rem;
@@ -52,6 +54,7 @@ viewDetailsButton {
   }
 
   .mark {
+    display:inline-block;
     flex: 1;
     text-align: right;
     padding-right: 0.6rem;

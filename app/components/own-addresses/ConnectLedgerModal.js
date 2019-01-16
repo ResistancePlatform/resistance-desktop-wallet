@@ -40,7 +40,7 @@ class ConnectLedgerModal extends Component<Props> {
 
   componentDidMount(){
     if(!this.props.connectLedgerModal.isLedgerResistanceAppOpen){
-      let timer = setInterval(() => {this.tick(this)}, 1000)
+      let timer = setInterval(() => {this.tick(this)}, 3000)
       this.setState({timer})
     }
   }
@@ -50,11 +50,9 @@ class ConnectLedgerModal extends Component<Props> {
   }
 
   tick() {
-    console.log(this)
     if(!this.props.connectLedgerModal.isLedgerResistanceAppOpen){
       this.props.actions.getLedgerConnected()
-    } 
-    else {
+    } else {
       clearInterval(this.state.timer)
     }
   }
@@ -79,7 +77,7 @@ class ConnectLedgerModal extends Component<Props> {
     const state = this.props.connectLedgerModal
     if(!state.destinationAddress || (state.destinationAddress.charAt(0) !== 'r') || (state.destinationAddress.length !== 35)){
       this.props.actions.sendLedgerTransactionInvalidParams()
-    } else if(!state.destinationAmount || state.destinationAmount.isNaN() || state.destinationAmount.isZero()){
+    } else if(!state.destinationAmount || state.destinationAmount.isNaN() || state.destinationAmount.isZero() || state.destinationAmount.isNegative()){
       this.props.actions.sendLedgerTransactionInvalidParams()
     } else {
       this.props.actions.sendLedgerTransaction()
@@ -120,13 +118,13 @@ class ConnectLedgerModal extends Component<Props> {
           </li>
         </ul>
 
-        <RoundedButton
+        {/*<RoundedButton
           className={styles.continueButton}
           onClick={this.props.actions.getLedgerConnected}
           important
         >
           {t(`Connect`)}
-        </RoundedButton>
+        </RoundedButton>*/}
       </div>
     )
   }
@@ -215,7 +213,6 @@ class ConnectLedgerModal extends Component<Props> {
                   type="submit"
                   name="send-cash"
                   className={styles.viewDetailsButton}
-                  spinner={this.props.connectLedgerModal.isTransactionPending}
                   disabled={this.props.connectLedgerModal.isTransactionPending}
                   onClick={event => this.onSendButtonClicked(event)}
                   important

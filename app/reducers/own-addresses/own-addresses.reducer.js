@@ -106,7 +106,7 @@ export const OwnAddressesReducer = handleActions(
       connectLedgerModal: {
         ...state.connectLedgerModal,
         isLedgerConnected: true,
-        isLedgerResistanceAppOpen: false
+        isLedgerResistanceAppOpen: false,
       }
     }),
     [OwnAddressesActions.gotLedgerResistanceAppOpen]: (state, action) => ({
@@ -124,7 +124,9 @@ export const OwnAddressesReducer = handleActions(
       connectLedgerModal: {
         ...state.connectLedgerModal,
         isLedgerConnected: false,
-        isLedgerResistanceAppOpen: false
+        isLedgerResistanceAppOpen: false,
+        isTransactionPending:false,
+        isTransactionSent:false
       }
     }),
     [OwnAddressesActions.sendLedgerTransaction]: state => ({

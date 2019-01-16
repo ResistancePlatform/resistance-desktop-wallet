@@ -218,7 +218,7 @@ const isLedgerConnected = (action$: ActionsObservable<Action>) => action$.pipe(
       return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
     } catch (err) {
       console.log(err.toString())
-      if(err.toString().includes("cannot open device with path")){
+      if(err.toString().includes("cannot open device with path") || err.toString().includes("TransportStatusError: Ledger device: Security not satisfied (dongle locked or have invalid access rights)")){
         return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_CONNECTED" }
       }
       //toastr.error(t(`Could not communicate with Ledger Wallet. Please disconnect and reconnect you Ledger wallet and try again.`))
@@ -240,7 +240,7 @@ const sendLedgerTransaction = (action$: ActionsObservable<Action>, state$) => ac
         console.log(sentTransaction)
         return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_SUCCESS", payload: {txid: sentTransaction}}
       }
-      
+
       return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
 
     } catch (err) {
