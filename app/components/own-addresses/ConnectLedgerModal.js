@@ -188,11 +188,11 @@ class ConnectLedgerModal extends Component<Props> {
             </div>*/}
 
             {/* Send button row */}
-              <div class={styles.viewDetailsButton}>
+              <div className={styles.viewDetailsButton}>
                 <RoundedButton
                   type="submit"
                   name="send-cash"
-                  class={styles.viewDetailsButton}
+                  className={styles.viewDetailsButton}
                   spinner={this.props.connectLedgerModal.isTransactionPending}
                   disabled={this.props.connectLedgerModal.isTransactionPending}
                   onClick={event => this.onSendButtonClicked(event)}

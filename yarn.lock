@@ -8428,7 +8428,7 @@ lead@^1.0.0:
 
 "ledger-res@git+ssh://git@github.com:ResistancePlatform/ledger-res-js.git":
   version "4.24.0"
-  resolved "git+ssh://git@github.com:ResistancePlatform/ledger-res-js.git#4590496bd85ee4a5b01a0775c3625a187a4c4d77"
+  resolved "git+ssh://git@github.com:ResistancePlatform/ledger-res-js.git#fd7a74d78139652e2bc6c7f6d589509d3792ba0e"
   dependencies:
     "@ledgerhq/hw-app-btc" "^4.30.0"
     "@ledgerhq/hw-transport" "^4.24.0"
