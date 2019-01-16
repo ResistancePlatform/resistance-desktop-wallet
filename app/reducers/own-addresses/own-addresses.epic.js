@@ -209,27 +209,19 @@ const isLedgerConnected = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.getLedgerConnected),
   mergeMap(async () => {
     try {
-
-      //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
-      //let ledgerRes = new LedgerRes(ledgerRpcClient)
-      const btcTransport = await ledgerRes.getBtcTransport()
-      //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
-      if(!btcTransport){
-        await ledgerRes.init()
-      }
-      const result = await ledgerRes.getPublicKey(0)
-      console.log(result)
-      if(result.hasOwnProperty('publicKey')){
+      
+      if(ledgerRes.isAvailable()){
+        const result = await ledgerRes.getPublicKey(0)
         let balance = await ledgerRes.getLedgerAddressBalance(result.bitcoinAddress)
         return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_RESISTANCE_APP_OPEN", payload: {address: result.bitcoinAddress, balance: balance.toString()} }
       }
       return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
     } catch (err) {
       console.log(err.toString())
-      /*if(err.toString().includes("cannot open device with path")){
+      if(err.toString().includes("cannot open device with path")){
         return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_CONNECTED" }
-      }*/
-      toastr.error(t(`Could not communicate with Ledger Wallet. Please disconnect and reconnect you Ledger wallet and try again.`))
+      }
+      //toastr.error(t(`Could not communicate with Ledger Wallet. Please disconnect and reconnect you Ledger wallet and try again.`))
       return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
     }
   })
@@ -239,23 +231,17 @@ const sendLedgerTransaction = (action$: ActionsObservable<Action>, state$) => ac
   ofType(OwnAddressesActions.sendLedgerTransaction),
   mergeMap(async () => {
     try {
+      if(ledgerRes.isAvailable()){
+        const state = state$.value.ownAddresses.connectLedgerModal
 
-      //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
-      //let ledgerRes = new LedgerRes(ledgerRpcClient)
-      const btcTransport = await ledgerRes.getBtcTransport()
-      //console.log(`BTCTransport: ${await ledgerRes.getBtcTransport()}`)
-      if(!btcTransport){
-        await ledgerRes.init()
+        let signedTransaction = await ledgerRes.sendCoins(state.destinationAddress, 0, 0.0001, state.destinationAmount.toNumber())
+        console.log(signedTransaction)
+        let sentTransaction = await ledgerRes.sendRawTransaction(signedTransaction)
+        console.log(sentTransaction)
+        return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_SUCCESS", payload: {txid: sentTransaction}}
       }
-
-      const state = state$.value.ownAddresses.connectLedgerModal
-
-      //console.log(`Decimal: ${state.destinationAmount.toSignificantDigits()}`)
-      let signedTransaction = await ledgerRes.sendCoins(state.destinationAddress, 0, 0.0001, state.destinationAmount.toNumber())
-      console.log(signedTransaction)
-      let sentTransaction = await ledgerRes.sendRawTransaction(signedTransaction)
-      console.log(sentTransaction)
-      return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_SUCCESS", payload: {txid: sentTransaction}}
+      
+      return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
 
     } catch (err) {
       console.log(err.toString())
