@@ -222,7 +222,7 @@ class Settings extends Component<Props> {
                    label={t(`Number of cores`)}
                    defaultValue={this.props.settings.cpuCoresNumber}
                    type="number"
-                   onChange={this.props.actions.setCpuCoresNumber}
+                   onChange={value => this.props.actions.setCpuCoresNumber(parseInt(value, 10))}
                    min={1}
                    max={totalCpuCoresNumber}
                  />

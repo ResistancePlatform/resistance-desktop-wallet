@@ -34,7 +34,7 @@ export const SettingsActions = createActions(
     TOGGLE_MINER: undefined,
     ENABLE_MINER: undefined,
     DISABLE_MINER: undefined,
-    SET_CPU_CORES_NUMBER: (cpuCoresNumber: string) => ({ cpuCoresNumber }),
+    SET_CPU_CORES_NUMBER: (cpuCoresNumber: number) => ({ cpuCoresNumber }),
 
     TOGGLE_TOR: undefined,
     ENABLE_TOR: undefined,

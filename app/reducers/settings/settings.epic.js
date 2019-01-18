@@ -172,7 +172,7 @@ const disableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 const setCpuCoresNumberEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.setCpuCoresNumber),
   map(action => {
-    config.set('manageDaemon.cpuCoresNumber', parseInt(action.payload.cpuCoresNumber, 10))
+    config.set('manageDaemon.cpuCoresNumber', action.payload.cpuCoresNumber)
     return SettingsActions.empty()
   })
 )
