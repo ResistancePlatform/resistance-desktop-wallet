@@ -12,6 +12,9 @@ export type RoundedInputProps = {
   defaultValue?: string,
   placeholder?: string,
   type: 'text' | 'number' | 'password',
+  min?: number,
+  max?: number,
+  step?: number,
   readOnly?: boolean
 }
 
@@ -57,6 +60,9 @@ export default class RoundedInput extends GenericInput {
         onBlur={event => this.onBlurHandler(event)}
         placeholder={this.props.placeholder}
         readOnly={this.props.readOnly}
+        min={this.props.min}
+        max={this.props.max}
+        step={this.props.step}
       />
     )
   }

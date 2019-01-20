@@ -43,6 +43,15 @@
   > * {
     margin-right: 0.8rem;
   }
+
+  .memo {
+    font-size: 0.67rem;
+    color: $BASE_COLOR_FONT_GRAY;
+
+    strong {
+      color: $BASE_COLOR_WHITE;
+    }
+  }
 }
 
 .localNodeButtons {

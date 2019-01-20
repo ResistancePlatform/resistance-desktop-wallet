@@ -227,6 +227,11 @@ class Settings extends Component<Props> {
                    max={totalCpuCoresNumber}
                  />
 
+                 <div className={styles.memo}>
+                   <strong>{t(`Note:`)}</strong>&nbsp;
+                   {t(`Changing amount of cores requires restarting of the Resistance app.`)}
+                 </div>
+
                 </div>
 
                 <div className={styles.buttonsRow}>

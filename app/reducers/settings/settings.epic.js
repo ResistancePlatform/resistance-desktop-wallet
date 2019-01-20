@@ -154,7 +154,8 @@ const toggleMinerEpic = (action$: ActionsObservable<Action>, state$) => action$.
 const enableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.enableMiner),
   tap(() => {
-    minerService.start()
+    const threadsNumber = config.get('manageDaemon.cpuCoresNumber')
+    minerService.start(threadsNumber)
     config.set('manageDaemon.enableMiner', true)
   }),
   mapTo(SettingsActions.empty())
