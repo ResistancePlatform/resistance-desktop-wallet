@@ -2,7 +2,6 @@
 import { remote } from 'electron'
 
 import { getStore } from '~/store/configureStore'
-import { getOS } from '~/utils/os'
 import { ChildProcessService } from './child-process-service'
 import { SystemInfoActions } from '../reducers/system-info/system-info.reducer'
 
@@ -33,7 +32,7 @@ export class MinerService {
 	/**
 	 * @memberof MinerService
 	 */
-	async start() {
+	async start(threadsNumber?: number) {
     const nodeConfig = remote.getGlobal('resistanceNodeConfig')
     const args = minerCommandExtraArgs.slice()
 
@@ -42,6 +41,10 @@ export class MinerService {
 
     // RPC credentials
     args.push(`--user=${nodeConfig.rpcuser}`, `--pass=${nodeConfig.rpcpassword}`)
+
+    if (threadsNumber) {
+      args.push(`--threads=${threadsNumber}`)
+    }
 
     await childProcess.startProcess({processName: 'MINER', args, outputHandler: this.handleOutput})
 	}

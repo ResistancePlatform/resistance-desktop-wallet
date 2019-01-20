@@ -1,5 +1,7 @@
 // @flow
 import { Decimal } from 'decimal.js'
+import log from 'electron-log'
+import { shell } from 'electron'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
@@ -80,14 +82,71 @@ class OrderSummary extends Component<Props> {
 
   }
 
+  // TODO: Cover all coins here or create a custom block explorer
+  getBlockExplorerUrl(symbol: string, txId?: string | null): string | null {
+    let blockExplorerUrl
+
+    if (!txId) {
+      return null
+    }
+
+    switch (symbol) {
+      case 'MONA':
+        blockExplorerUrl = `https://bchain.info/${symbol.toLowerCase()}/tx/${txId}`
+        break
+      default:
+        blockExplorerUrl = `https://chainz.cryptoid.info/${symbol.toLowerCase()}/tx.dws?${txId}.htm`
+    }
+
+    return blockExplorerUrl
+  }
+
+  onLinkClick(event) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    const { order } = this.props
+
+    log.debug('Link clicked', order.txId, order.destinationTxId, event.target.href)
+    if (!order.txId) {
+      return false
+    }
+
+    shell.openExternal(event.target.href)
+    return false
+  }
+
+  getBriefCaption(): string {
+    const { order, t } = this.props
+
+    if (order.isActive || !order.status) {
+      return t(`You are sending`)
+    }
+
+    if (['cancelled', 'failed'].includes(order.status)) {
+      return t(`You were sending`)
+    }
+
+    if (order.status === 'completed') {
+      return t(`You have sent`)
+    }
+
+    return t(`N/A`)
+  }
+
 	render() {
     const { order, t } = this.props
     const txFee = this.getTxFee()
 
+    const quoteBlockExplorerUrl = this.getBlockExplorerUrl(order.quoteCurrency, order.destinationTxId)
+    const baseBlockExplorerUrl = this.getBlockExplorerUrl(order.baseCurrency, order.txId)
+
     return (
       <div className={cn(styles.container, this.props.className)}>
         <div className={styles.briefContainer}>
-          <div className={styles.brief}>{t(`You are sending`)}</div>
+          <div className={styles.brief}>
+            {this.getBriefCaption()}
+          </div>
 
           <div className={styles.amount}>
             {toDecimalPlaces(Decimal(order.quoteCurrencyAmount))}
@@ -121,10 +180,24 @@ class OrderSummary extends Component<Props> {
 
         <ul className={styles.list}>
           <li className={cn({ [styles.res]: order.isPrivate })}>
-            {toDecimalPlaces(Decimal(order.quoteCurrencyAmount))}&nbsp;
-            {order.quoteCurrency}
+            <a
+              className={cn({[styles.activeLink]: Boolean(quoteBlockExplorerUrl)})}
+              href={quoteBlockExplorerUrl}
+              onClick={e => this.onLinkClick(e)}
+            >
+              {toDecimalPlaces(Decimal(order.quoteCurrencyAmount))}&nbsp;
+              {order.quoteCurrency}
+            </a>
             <hr />
-            <span>{this.getMaxPayoutCaption()}</span>
+            <span>
+              <a
+                className={cn({[styles.activeLink]: Boolean(baseBlockExplorerUrl)})}
+                href={baseBlockExplorerUrl}
+                onClick={e => this.onLinkClick(e)}
+              >
+                {this.getMaxPayoutCaption()}
+              </a>
+            </span>
           </li>
           <li>
             {t(`DEX Fee`)}

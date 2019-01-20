@@ -1,4 +1,54 @@
+@import "~/assets/styles/tooltip.scss";
 @import "~/assets/styles/vars.scss";
+
+.toggleContainer {
+  color: $BASE_COLOR_FONT_GRAY;
+  text-transform: uppercase;
+  font-size: 0.67rem;
+  font-weight: 500;
+  display: flex;
+
+  .active {
+    color: $BASE_COLOR_WHITE;
+  }
+
+  .label {
+    padding-top: 0.4rem;
+    cursor: default;
+    user-select: none;
+  }
+
+}
+
+.tooltip {
+  max-width: 7rem;
+
+  .title {
+    margin-top: 0.7rem;
+    margin-bottom: 0.5rem;
+    color: $BASE_COLOR_WHITE;
+    font-size: 0.69rem;
+    font-weight: 500;
+    cursor: default;
+    white-space: nowrap;
+  }
+
+  .text {
+    margin-bottom: 0.6rem;
+  }
+
+  .description {
+    font-size: 0.6rem;
+    color: $BASE_COLOR_PURPLE;
+    white-space: pre;
+    margin-bottom: 0.5rem;
+    margin-top: -0.3rem;
+    cursor: pointer;
+    outline: none;
+    text-align: center;
+  }
+
+}
 
 .container {
   -webkit-app-region: no-drag;

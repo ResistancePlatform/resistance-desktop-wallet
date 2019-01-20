@@ -160,6 +160,7 @@ class StatusModal extends Component<Props> {
 
             <Tabs
               className={styles.tabs}
+              defaultIndex={this.props.settings.statusModalTabIndex}
               selectedTabClassName={styles.selectedTab}
               selectedTabPanelClassName={styles.selectedTabPanel}
               onSelect={(index) => {this.onTabSelected(index)}}

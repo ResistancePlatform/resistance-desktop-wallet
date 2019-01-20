@@ -6,8 +6,10 @@ import { ChildProcessName, ChildProcessStatus } from '~/service/child-process-se
 
 export type SettingsState = {
 	isTorEnabled: boolean,
+  cpuCoresNumber: number,
 	isMinerEnabled: boolean,
   isStatusModalOpen: boolean,
+  statusModalTabIndex: number,
   childProcessesStatus: { [ChildProcessName]: ChildProcessStatus },
   language: string
 }
@@ -18,7 +20,7 @@ export const SettingsActions = createActions(
 
     UPDATE_LANGUAGE: (code: string) => ({ code }),
 
-    OPEN_STATUS_MODAL: undefined,
+    OPEN_STATUS_MODAL: (tabIndex?: number) => ({ tabIndex }),
     CLOSE_STATUS_MODAL: undefined,
 
     TOGGLE_LOCAL_NODE: undefined,
@@ -32,6 +34,7 @@ export const SettingsActions = createActions(
     TOGGLE_MINER: undefined,
     ENABLE_MINER: undefined,
     DISABLE_MINER: undefined,
+    SET_CPU_CORES_NUMBER: (cpuCoresNumber: number) => ({ cpuCoresNumber }),
 
     TOGGLE_TOR: undefined,
     ENABLE_TOR: undefined,
@@ -91,8 +94,10 @@ export const SettingsReducer = handleActions(
     }),
 
     // Status Modal
-    [SettingsActions.openStatusModal]: state => ({
-      ...state, isStatusModalOpen: true
+    [SettingsActions.openStatusModal]: (state, action) => ({
+      ...state,
+      isStatusModalOpen: true,
+      statusModalTabIndex: action.payload.tabIndex || 0
     }),
     [SettingsActions.closeStatusModal]: state => ({
       ...state, isStatusModalOpen: false
@@ -122,6 +127,10 @@ export const SettingsReducer = handleActions(
       ...state,
       childProcessesStatus: { ...state.childProcessesStatus, MINER: 'STOPPING' },
       isMinerEnabled: false
+    }),
+    [SettingsActions.setCpuCoresNumber]: (state, action) => ({
+      ...state,
+      cpuCoresNumber: action.payload.cpuCoresNumber
     }),
 
     // Tor

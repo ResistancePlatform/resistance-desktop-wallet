@@ -1,27 +1,37 @@
-import { EOL } from 'os'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
+import ReactTooltip from 'react-tooltip'
 
-import { ChildProcessService } from '~/service/child-process-service'
+import {
+  getMiningDisabledAttribute,
+  getTorDisabledAttribute,
+} from '~/utils/child-process'
+import StatusModal from '~/components/settings/status-modal'
 import OperationsModal from '~/components/system-info/OperationsModal'
-import { SendCashState } from '~/reducers/send-cash/send-cash.reducer'
-import { SettingsState } from '~/reducers/settings/settings.reducer'
+import { SendCashActions, SendCashState } from '~/reducers/send-cash/send-cash.reducer'
+import { SettingsActions, SettingsState } from '~/reducers/settings/settings.reducer'
 import { SystemInfoActions, SystemInfoState } from '~/reducers/system-info/system-info.reducer'
+import { ToggleButton } from '~/components/rounded-form'
 
 import styles from './StatusIcons.scss'
 
 
-const childProcess = new ChildProcessService()
+const miningTooltipId = 'status-icons-mining-tooltip-id'
+const privateTransactionsTooltipId = 'status-icons-private-transactions-tooltip-id'
+const torTooltipId = 'status-icons-tor-tooltip-id'
+const operationsTooltipId = 'status-icons-operations-tooltip-id'
 
 type Props = {
   t: () => string,
   settings: SettingsState,
   sendCash: SendCashState,
 	systemInfo: SystemInfoState,
-  systemInfoActions: SystemInfoActions
+  settingsActions: SettingsActions,
+  systemInfoActions: SystemInfoActions,
+  sendCashActions: SendCashActions
 }
 
 /**
@@ -31,24 +41,22 @@ type Props = {
 class StatusIcons extends Component<Props> {
 	props: Props
 
-  getMinerStatusIconTitle() {
+  getMiningStateDescription(): string | null {
     const { t } = this.props
-    const minerStatus = this.props.settings.childProcessesStatus.MINER
+    const { MINER: minerStatus } = this.props.settings.childProcessesStatus
 
     if (minerStatus !== 'RUNNING') {
-      const minerStatusName = childProcess.getStatusName(minerStatus)
-      return `${t('Miner status:')} ${minerStatusName}`
+      return null
     }
 
     const minerInfo = this.props.systemInfo.miner
 
-    const tooltip = [
-      t(`Mining in progress...`),
-      t(`Hashing power: {{hashingPower}} khash/s`, minerInfo.hashingPower),
-      `${t('Mined blocks number:')} ${minerInfo.minedBlocksNumber}`
-    ].join(EOL)
+    const description = t(`Got {{blocksNumber}} blocks at {{hashingPower}} khash/s`, {
+      blocksNumber: minerInfo.minedBlocksNumber,
+      hashingPower: minerInfo.hashingPower
+    })
 
-    return tooltip
+    return description
   }
 
   getOperationsCount(...args) {
@@ -67,7 +75,6 @@ class StatusIcons extends Component<Props> {
         <span
           role="none"
           className={styles.operationsIconHint}
-          title={this.getOperationsIconTitle()}
           onClick={e => this.onOperationsIconClicked(e)}
           onKeyDown={e => this.onOperationsIconClicked(e)}
         >
@@ -78,20 +85,19 @@ class StatusIcons extends Component<Props> {
     return iconHint
   }
 
-  getOperationsIconTitle() {
+  getOperationsIconTooltip() {
     const { t } = this.props
 
     if (!this.props.systemInfo.operations.length) {
-      return t(`No pending operations.`)
+      return t(`No pending operations`)
     }
 
-    const titleKey = `{{pendingCoun}} pending, {{successCount}} complete, {{failed}} failed operations.`
-
     return t(
-      titleKey,
-      this.getOperationsCount('queued', 'executing'),
-      this.getOperationsCount('success'),
-      this.getOperationsCount('failed')
+      `{{pendingNumber}} pending, {{successNumber}} complete, {{failedNumber}} failed operations`, {
+        pendingNumber: this.getOperationsCount('queued', 'executing'),
+        successNumber: this.getOperationsCount('success'),
+        failedNumber: this.getOperationsCount('failed')
+      }
     )
   }
 
@@ -101,39 +107,166 @@ class StatusIcons extends Component<Props> {
 	 */
 	render() {
     const { t } = this.props
+    const {
+      isMinerEnabled,
+      isTorEnabled,
+      childProcessesStatus
+    } = this.props.settings
+    const { isPrivateTransactions } = this.props.sendCash
+    const miningDescription = this.getMiningStateDescription()
 
     return (
       <div>
         <div className={cn(styles.container)}>
           <div
-            className={cn('icon', styles.mining, { [styles.active]: this.props.settings.childProcessesStatus.MINER === 'RUNNING' })}
-            title={this.getMinerStatusIconTitle()}
+            className={cn('icon', styles.mining, { [styles.active]: childProcessesStatus.MINER === 'RUNNING' })}
+            data-tip
+            data-for={miningTooltipId}
+            data-place="bottom"
+            data-event="mouseover"
           />
 
-          <div
-            className={cn('icon', styles.privateTransactions, { [styles.active]: this.props.sendCash.isPrivateTransactions  })}
-            title={
-              this.props.sendCash.isPrivateTransactions
-                ? t(`Private transactions are enabled`)
-                : t(`Private transactions are disabled`)
+          <ReactTooltip
+            id={miningTooltipId}
+            globalEventOff="click"
+            className={cn(styles.tooltip)}
+          >
+
+            <div className={styles.title}>
+              {t(`Mining status`)}
+            </div>
+
+            <div className={styles.toggleContainer}>
+              <div className={cn(styles.label, {[styles.active]: !isMinerEnabled})}>{t(`Off`)}</div>
+                <ToggleButton
+                  value={isMinerEnabled}
+                  onChange={this.props.settingsActions.toggleMiner}
+                  disabled={getMiningDisabledAttribute(childProcessesStatus)}
+                />
+              <div className={cn(styles.label, {[styles.active]: isMinerEnabled})}>{t(`On`)}</div>
+            </div>
+
+            {miningDescription &&
+              <div
+                role="link"
+                tabIndex={0}
+                className={styles.description}
+                onClick={() => this.props.settingsActions.openStatusModal(3)}
+                onKeyDown={() => false}
+              >
+                {miningDescription}
+              </div>
             }
-          />
+
+          </ReactTooltip>
 
           <div
-            className={cn('icon', styles.tor, { [styles.active]: this.props.settings.childProcessesStatus.TOR === 'RUNNING' })}
-            title={t(`Tor status: {{status}}`, { status: childProcess.getStatusName(this.props.settings.childProcessesStatus.TOR) })}
+            className={cn('icon', styles.privateTransactions, { [styles.active]: isPrivateTransactions })}
+            data-tip
+            data-for={privateTransactionsTooltipId}
+            data-place="top"
+            data-event="mouseover"
           />
+
+          <ReactTooltip
+            id={privateTransactionsTooltipId}
+            globalEventOff="click"
+            className={cn(styles.tooltip)}
+          >
+            <div className={styles.title}>
+              {t(`Private transactions`)}
+            </div>
+
+            <div className={styles.toggleContainer}>
+              <div className={cn(styles.label, {[styles.active]: !isPrivateTransactions})}>{t(`Off`)}</div>
+              <ToggleButton
+                value={isPrivateTransactions}
+                onChange={this.props.sendCashActions.togglePrivateSend}
+              />
+              <div className={cn(styles.label, {[styles.active]: isPrivateTransactions})}>{t(`On`)}</div>
+            </div>
+          </ReactTooltip>
+
+          <div
+            className={cn('icon', styles.tor, { [styles.active]: childProcessesStatus.TOR === 'RUNNING' })}
+            data-tip
+            data-for={torTooltipId}
+            data-place="top"
+            data-event="mouseover"
+          />
+
+          <ReactTooltip
+            id={torTooltipId}
+            globalEventOff="click"
+            className={cn(styles.tooltip)}
+          >
+            <div className={styles.title}>
+              {t(`Tor status`)}
+            </div>
+
+            <div className={styles.toggleContainer}>
+              <div className={cn(styles.label, {[styles.active]: !isTorEnabled})}>{t(`Off`)}</div>
+              <ToggleButton
+                value={isTorEnabled}
+                onChange={this.props.settingsActions.toggleTor}
+                disabled={getTorDisabledAttribute(childProcessesStatus, this.props.systemInfo)}
+              />
+              <div className={cn(styles.label, {[styles.active]: isTorEnabled})}>{t(`On`)}</div>
+            </div>
+
+            <div
+              role="link"
+              tabIndex={0}
+              className={styles.description}
+              onClick={() => this.props.settingsActions.openStatusModal(4)}
+              onKeyDown={() => false}
+            >
+              {t(`Show Tor logs`)}
+            </div>
+
+          </ReactTooltip>
 
           <div
             role="none"
             className={cn('icon', styles.operations, { [styles.active]: this.props.systemInfo.operations.length } )}
-            title={this.getOperationsIconTitle()}
             onClick={this.props.systemInfoActions.openOperationsModal}
-            onKeyDown={this.props.systemInfoActions.openOperationsModal}
+            onKeyDown={() => false}
+            data-tip
+            data-for={operationsTooltipId}
+            data-event="mouseover"
           />
+
           {this.getOperationIconHint()}
 
+          <ReactTooltip
+            id={operationsTooltipId}
+            globalEventOff="click"
+            className={cn(styles.tooltip)}
+          >
+            <div className={styles.title}>
+              {t(`Operations`)}
+            </div>
+
+            <div className={styles.text}>
+              {this.getOperationsIconTooltip()}
+            </div>
+
+            <div
+              role="link"
+              tabIndex={0}
+              className={styles.description}
+              onClick={this.props.systemInfoActions.openOperationsModal}
+              onKeyDown={() => false}
+            >
+              {t(`Show details`)}
+            </div>
+
+          </ReactTooltip>
         </div>
+
+        {this.props.settings.isStatusModalOpen &&
+          <StatusModal />
+        }
 
         {this.props.systemInfo.isOperationsModalOpen &&
           <OperationsModal />
@@ -150,7 +283,9 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  systemInfoActions: bindActionCreators(SystemInfoActions, dispatch)
+  settingsActions: bindActionCreators(SettingsActions, dispatch),
+  systemInfoActions: bindActionCreators(SystemInfoActions, dispatch),
+  sendCashActions: bindActionCreators(SendCashActions, dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate('other')(StatusIcons))

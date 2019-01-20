@@ -1,15 +1,35 @@
 @import "~/assets/styles/vars.scss";
 
 .tooltip {
-  background: $BASE_BACKGROUND_COLOR_DARK_BLUE !important;
+  background-color: $BASE_COLOR_GRAY_2 !important;
+  box-shadow: 0.3125rem 0.3125rem 3.6875rem -0.125rem rgba(14, 17, 31, 1);
   color: #a4abc7 !important;
   opacity: 1 !important;
   border-radius: 0.4rem;
-  font-size: 0.6rem;
+  font-size: 0.6rem !important;
   font-family: inherit;
   font-weight: 100;
-}
+  z-index: 1000;
+  pointer-events: auto;
 
-.tooltip:after {
-	border-top: 0.5rem solid $BASE_BACKGROUND_COLOR_DARK_BLUE !important;
+  &:global(.place-top) {
+    &:after {
+      border-top: 0.5rem solid $BASE_COLOR_GRAY_2 !important;
+    }
+  }
+  &:global(.place-bottom) {
+    &:after {
+      border-bottom: 0.5rem solid $BASE_COLOR_GRAY_2 !important;
+    }
+  }
+  &:global(.place-left) {
+    &:after {
+      border-left: 0.5rem solid $BASE_COLOR_GRAY_2 !important;
+    }
+  }
+  &:global(.place-right) {
+    &:after {
+      border-right: 0.5rem solid $BASE_COLOR_GRAY_2 !important;
+    }
+  }
 }

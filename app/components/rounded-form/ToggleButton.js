@@ -9,6 +9,7 @@ import styles from './ToggleButton.scss'
 export type Props = {
   ...CheckBoxProps,
   label?: string,
+  value?: string,
   captions?: string[]
 }
 
@@ -29,7 +30,10 @@ export default class ToggleButton extends CheckBox {
         <div
           role="button"
           tabIndex={0}
-          className={cn(styles.container, { [styles.on]: this.state.value, [styles.disabled]: this.props.disabled })}
+          className={cn(styles.container, {
+            [styles.on]: this.props.value !== undefined ? this.props.value : this.state.value,
+            [styles.disabled]: this.props.disabled
+          })}
           onClick={e => this.onClickHandler(e)}
           onKeyDown={e => [13, 32].includes(e.keyCode) ? this.onClickHandler(e) : false}
         >

@@ -1,6 +1,6 @@
 // @flow
+import os from 'os'
 import * as Joi from 'joi'
-import config from 'electron-settings'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -9,6 +9,12 @@ import cn from 'classnames'
 import Iso6391 from 'iso-639-1'
 
 import { getPasswordValidationSchema } from '~/utils/auth'
+import {
+  checkPendingOperations,
+  getIsUpdating,
+  getMiningDisabledAttribute,
+  getTorDisabledAttribute,
+} from '~/utils/child-process'
 import { availableLanguages } from '~/i18next.config'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import {
@@ -26,7 +32,6 @@ import VLayout from '~/assets/styles/v-box-layout.scss'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { SystemInfoState } from '~/reducers/system-info/system-info.reducer'
 import { SettingsActions, SettingsState } from '~/reducers/settings/settings.reducer'
-import StatusModal from '~/components/settings/status-modal'
 
 const languagePopupMenuId = 'settings-language-dropdown-id'
 
@@ -66,20 +71,6 @@ class Settings extends Component<Props> {
 	props: Props
 
 	/**
-	 * @param {*} nextProps
-	 * @memberof Settings
-	 */
-  componentWillUpdate(nextProps) {
-    if (nextProps.settings.isMinerEnabled !== this.props.settings.isMinerEnabled) {
-      config.set('manageDaemon.enableMiner', nextProps.settings.isMinerEnabled)
-    }
-
-    if (nextProps.settings.isTorEnabled !== this.props.settings.isTorEnabled) {
-      config.set('manageDaemon.enableTor', nextProps.settings.isTorEnabled)
-    }
-  }
-
-	/**
 	 * @memberof Settings
 	 */
   getLanguageMenuItems() {
@@ -90,25 +81,6 @@ class Settings extends Component<Props> {
         {language.nativeName}
       </PopupMenuItem>
     ))
-  }
-
-  getIsChildProcessUpdating(processName) {
-    const processStatus = this.props.settings.childProcessesStatus[processName]
-    const updateStatuses = ['STARTING', 'STOPPING', 'RESTARTING']
-    return updateStatuses.indexOf(processStatus) !== -1
-  }
-
-  getMiningDisabledAttribute() {
-    const isLocalNodeOffline = this.props.settings.childProcessesStatus.NODE !== 'RUNNING'
-    return isLocalNodeOffline || this.getIsChildProcessUpdating('MINER')
-  }
-
-  getTorDisabledAttribute() {
-    return (
-      this.getIsChildProcessUpdating('NODE')
-      || this.getIsChildProcessUpdating('TOR')
-      || this.checkPendingOperations()
-    )
   }
 
   getStartStopLocalNodeButtonLabel() {
@@ -122,27 +94,13 @@ class Settings extends Component<Props> {
   }
 
 	/**
-	 * @param {*} event
-	 * @memberof Settings
-	 */
-  checkPendingOperations() {
-    if (this.props.systemInfo.isNewOperationTriggered) {
-      return true
-    }
-
-    const result = this.props.systemInfo.operations.some(operation => (
-      ['queued', 'executing'].indexOf(operation.status) !== -1
-    ))
-
-    return result
-  }
-
-	/**
 	 * @returns
 	 * @memberof Settings
 	 */
 	render() {
     const { t } = this.props
+    const { childProcessesStatus } = this.props.settings
+    const totalCpuCoresNumber = os.cpus().length
 
 		return (
 			// Layout container
@@ -150,10 +108,6 @@ class Settings extends Component<Props> {
 				{/* Route content */}
 				<div className={cn(styles.settingsContainer, VLayout.vBoxChild, HLayout.hBoxContainer)}>
 					<div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapperContainer)}>
-            {this.props.settings.isStatusModalOpen &&
-              <StatusModal />
-            }
-
 						{/* Title bar */}
             <div className={styles.titleBar}>{t(`Settings`)}</div>
 
@@ -243,13 +197,13 @@ class Settings extends Component<Props> {
                   <RoundedButton
                     className={styles.stopLocalNodeButton}
                     onClick={this.props.actions.toggleLocalNode}
-                    disabled={this.getIsChildProcessUpdating('NODE') || this.checkPendingOperations()}
+                    disabled={getIsUpdating(childProcessesStatus.NODE) || checkPendingOperations(this.props.systemInfo)}
                     important
                   >
                     {this.getStartStopLocalNodeButtonLabel()}
                   </RoundedButton>
 
-                  <RoundedButton onClick={this.props.actions.openStatusModal}>
+                  <RoundedButton onClick={() => this.props.actions.openStatusModal()}>
                     {t(`Show status`)}
                   </RoundedButton>
 
@@ -261,8 +215,23 @@ class Settings extends Component<Props> {
                     labelClassName={styles.toggleLabel}
                     label={t(`Enable mining`)}
                     onChange={this.props.actions.toggleMiner}
-                    disabled={this.getMiningDisabledAttribute()}
+                    disabled={getMiningDisabledAttribute(childProcessesStatus)}
                   />
+
+                 <RoundedInput
+                   label={t(`Number of cores`)}
+                   defaultValue={this.props.settings.cpuCoresNumber}
+                   type="number"
+                   onChange={value => this.props.actions.setCpuCoresNumber(parseInt(value, 10))}
+                   min={1}
+                   max={totalCpuCoresNumber}
+                 />
+
+                 <div className={styles.memo}>
+                   <strong>{t(`Note:`)}</strong>&nbsp;
+                   {t(`Changing amount of cores requires restarting of the Resistance app.`)}
+                 </div>
+
                 </div>
 
                 <div className={styles.buttonsRow}>
@@ -271,7 +240,7 @@ class Settings extends Component<Props> {
                     label={t(`Enable Tor`)}
                     labelClassName={styles.toggleLabel}
                     onChange={this.props.actions.toggleTor}
-                    disabled={this.getTorDisabledAttribute()}
+                    disabled={getTorDisabledAttribute(childProcessesStatus, this.props.systemInfo)}
                   />
 
                 </div>

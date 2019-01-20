@@ -25,11 +25,19 @@ const RESDEX = {
       useElectrum: true
     },
     {
+      symbol: 'BTC',
+      useElectrum: true
+    },
+    {
       symbol: 'LTC',
       useElectrum: true
     },
     {
       symbol: 'DGB',
+      useElectrum: true
+    },
+    {
+      symbol: 'MONA',
       useElectrum: true
     },
     {

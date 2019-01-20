@@ -35,3 +35,14 @@
     color: inherit;
   }
 }
+
+.buttonsContainer {
+  display: flex;
+
+  .moreButton {
+    position: relative;
+    top: -0.2rem;
+    margin-left: 1rem;
+  }
+
+}

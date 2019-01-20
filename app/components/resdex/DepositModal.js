@@ -64,7 +64,7 @@ class DepositModal extends Component<Props> {
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
 	accounts: state.resDex.accounts
 })
 

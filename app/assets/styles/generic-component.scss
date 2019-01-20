@@ -5,6 +5,7 @@
 // ------------------------------------------------------------------------------------------------------
 @mixin roundedButton($activeStyle: false) {
   padding: 0.7rem 1.2rem;
+  cursor: pointer;
 
   @if $activeStyle {
     background-color: $BASE_COLOR_PURPLE;

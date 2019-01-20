@@ -27,7 +27,14 @@ export const ResDexAccountsActions = createActions(
     GOT_CURRENCIES: (currencies: { [ChildProcessName]: { [string]: Currency } }) => ({ currencies }),
     GET_CURRENCIES_FAILED: (errorMessage: string) => ({ errorMessage }),
 
+    GET_Z_CREDITS: undefined,
+    GOT_Z_CREDITS: (zCredits: object | null) => ({ zCredits }),
+    GET_Z_CREDITS_FAILED: undefined,
+
     UPDATE_ENABLED_CURRENCIES: (enabledCurrencies: EnabledCurrency[]) => ({ enabledCurrencies }),
+
+    INSTANT_DEX_DEPOSIT: undefined,
+    INSTANT_DEX_DEPOSIT_FAILED: undefined,
 
     WITHDRAW: undefined,
     UPDATE_WITHDRAWAL_SYMBOL: (symbol: string) => ({ symbol }),
@@ -38,10 +45,12 @@ export const ResDexAccountsActions = createActions(
     COPY_SMART_ADDRESS: (symbol: string) => ({ symbol }),
     CONFIRM_CURRENCY_DELETION: (symbol: string) => ({ symbol }),
     DELETE_CURRENCY: (symbol: string) => ({ symbol }),
+    SHOW_INSTANT_DEX_DEPOSIT_MODAL: undefined,
     SHOW_DEPOSIT_MODAL: (symbol: string) => ({ symbol }),
     SHOW_WITHDRAW_MODAL: (symbol: string | null, secretFunds: boolean = false) => ({ symbol, secretFunds }),
     SHOW_EDIT_CURRENCY_MODAL: (currency: object) => currency,
     SHOW_ADD_CURRENCY_MODAL: undefined,
+    CLOSE_INSTANT_DEX_DEPOSIT_MODAL: undefined,
     CLOSE_DEPOSIT_MODAL: undefined,
     CLOSE_WITHDRAW_MODAL: undefined,
     CLOSE_ADD_CURRENCY_MODAL: undefined,
@@ -76,6 +85,17 @@ export const ResDexAccountsReducer = handleActions(
     [ResDexAccountsActions.gotCurrencies]: (state, action) => ({
       ...state,
       currencies: action.payload.currencies
+    }),
+    [ResDexAccountsActions.gotZCredits]: (state, action) => ({
+      ...state,
+      zCredits: action.payload.zCredits
+    }),
+    [ResDexAccountsActions.showInstantDexDepositModal]: state => ({
+      ...state,
+      instantDexDepositModal: {
+        isVisible: true,
+        isInProgress: false
+      }
     }),
     [ResDexAccountsActions.showDepositModal]: (state, action) => ({
       ...state,
@@ -130,6 +150,13 @@ export const ResDexAccountsReducer = handleActions(
       withdrawModal: {
         ...state.withdrawModal,
         isInProgress: true
+      }
+    }),
+    [ResDexAccountsActions.closeInstantDexDepositModal]: state => ({
+      ...state,
+      instantDexDepositModal: {
+        isVisible: false,
+        isInProgress: false
       }
     }),
     [ResDexAccountsActions.closeDepositModal]: state => ({

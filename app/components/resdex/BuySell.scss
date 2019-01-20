@@ -128,3 +128,34 @@
   }
 
 }
+
+.bottomControls {
+  display: flex;
+
+  .instantSwap {
+    text-align: right;
+    flex: 1;
+
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.7rem;
+
+    &.allowed {
+      color: $BASE_COLOR_LIGHT_GREEN;
+    }
+
+    .tooltip {
+      text-align: left;
+      font-size: 0.7rem;
+
+      .title {
+        color: $BASE_COLOR_FONT_GRAY;
+        margin-bottom: 0.3rem;
+      }
+
+      .body {
+        color: $BASE_COLOR_WHITE;
+        font-weight: 500;
+      }
+    }
+  }
+}

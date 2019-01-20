@@ -5,15 +5,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
-import { translate } from '~/i18next.config'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import GenericInput, { GenericInputProps } from './GenericInput'
 
 import styles from './ChoosePortfolioInput.scss'
 
-
-const t = translate('resdex')
 
 export type ChoosePortfolioInputProps = {
   ...GenericInputProps,

@@ -114,7 +114,7 @@ const restartLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => act
 		const settingsState = state$.value.settings
 		resistanceService.restart(settingsState.isTorEnabled)
 	}),
-  mapTo(SettingsActions.empty())
+  mapTo(AuthActions.ensureLogin(t(`Wallet password is required due to the local node restart`), true))
 )
 
 const stopLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
@@ -153,14 +153,29 @@ const toggleMinerEpic = (action$: ActionsObservable<Action>, state$) => action$.
 
 const enableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.enableMiner),
-	tap(() => { minerService.start() }),
+  tap(() => {
+    const threadsNumber = config.get('manageDaemon.cpuCoresNumber')
+    minerService.start(threadsNumber)
+    config.set('manageDaemon.enableMiner', true)
+  }),
   mapTo(SettingsActions.empty())
 )
 
 const disableMinerEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.disableMiner),
-	tap(() => { minerService.stop() }),
+  tap(() => {
+    minerService.stop()
+    config.set('manageDaemon.enableMiner', false)
+  }),
   mapTo(SettingsActions.empty())
+)
+
+const setCpuCoresNumberEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.setCpuCoresNumber),
+  map(action => {
+    config.set('manageDaemon.cpuCoresNumber', action.payload.cpuCoresNumber)
+    return SettingsActions.empty()
+  })
 )
 
 const toggleTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
@@ -176,7 +191,10 @@ const toggleTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pi
 
 const enableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.enableTor),
-	tap(() => { torService.start() }),
+  tap(() => {
+    torService.start()
+    config.set('manageDaemon.enableTor', true)
+  }),
   tap(() => { toastr.info(t(`Restarting the local node due to Tor activation.`)) }),
   filter(() => state$.value.settings.childProcessesStatus.NODE === 'RUNNING'),
   mapTo(SettingsActions.restartLocalNode())
@@ -184,7 +202,10 @@ const enableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pi
 
 const disableTorEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.disableTor),
-	tap(() => { torService.stop() }),
+  tap(() => {
+    torService.stop()
+    config.set('manageDaemon.enableTor', false)
+  }),
   tap(() => { toastr.info(t(`Restarting the local node due to Tor shutdown.`)) }),
   filter(() => state$.value.settings.childProcessesStatus.NODE === 'RUNNING'),
   mapTo(SettingsActions.restartLocalNode())
@@ -363,7 +384,7 @@ const stopChildProcessesEpic = (action$: ActionsObservable<Action>, state$) => a
 
     return action$.pipe(
       // TODO: Increase and lock the window after the demo
-      timeout(500),
+      timeout(5000),
       ofType(SettingsActions.childProcessMurdered),
       switchMap(action => {
         runningProcesses = runningProcesses.filter(name => name !== action.payload.processName)
@@ -396,6 +417,7 @@ export const SettingsEpics = (action$, state$) => merge(
   toggleMinerEpic(action$, state$),
   enableMinerEpic(action$, state$),
 	disableMinerEpic(action$, state$),
+  setCpuCoresNumberEpic(action$, state$),
   toggleTorEpic(action$, state$),
 	enableTorEpic(action$, state$),
 	disableTorEpic(action$, state$),

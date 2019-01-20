@@ -1,3 +1,4 @@
+import os from 'os'
 import { remote } from 'electron'
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
@@ -67,7 +68,13 @@ export const preloadedState: State = {
 	ownAddresses: {
 		addresses: [],
 		showDropdownMenu: false,
-    frozenAddresses: {}
+    frozenAddresses: {},
+    connectLedgerModal: {
+      isVisible: false,
+      isLedgerConnected: false,
+      isTransactionConfirmed: false,
+      isTransactionSent: false
+    }
 	},
 	sendCash: {
 		isPrivateTransactions: false,
@@ -94,6 +101,7 @@ export const preloadedState: State = {
 		isTorEnabled: false,
 		isMinerEnabled: false,
 		isStatusModalOpen: false,
+    statusModalTabIndex: 0,
 		childProcessesStatus: {
 			NODE: 'NOT RUNNING',
 			NODE_ETOMIC: 'NOT RUNNING',
@@ -128,11 +136,11 @@ export const preloadedState: State = {
       selectedTabIndex: 0,
       isAdvanced: false,
       isSendingOrder: false,
-      baseCurrency: 'NEXO',
-      quoteCurrency: 'LTC',
+      baseCurrency: 'DGB',
+      quoteCurrency: 'MONA',
       orderBook: {
-        baseCurrency: 'NEXO',
-        quoteCurrency: 'LTC',
+        baseCurrency: 'DGB',
+        quoteCurrency: 'MONA',
         baseQuote: {
           bids: [],
           asks: [],
@@ -166,6 +174,7 @@ export const preloadedState: State = {
       },
       enabledCurrencies: [],
       currencyFees: {},
+      zCredits: null,
       addCurrencyModal: {
         isInEditMode: false,
         isVisible: false,
@@ -174,6 +183,9 @@ export const preloadedState: State = {
           useElectrum: true,
           rpcPort: null
         }
+      },
+      instantDexDepositModal: {
+        isVisible: false,
       },
       depositModal: {
         isVisible: false,
@@ -201,6 +213,7 @@ Object.assign(preloadedState.getStarted, {
 Object.assign(preloadedState.settings, {
 	isMinerEnabled: config.get('manageDaemon.enableMiner', false),
 	isTorEnabled: config.get('manageDaemon.enableTor', false),
+  cpuCoresNumber: config.get('manageDaemon.cpuCoresNumber', os.cpus().length),
 	language: config.get('language', 'en')
 })
 

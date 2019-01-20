@@ -1,0 +1,91 @@
+@import "~/assets/styles/modal.scss";
+
+$connectLedgerModalWidth: 26.25rem;
+
+.connectLedger {
+  width: $connectLedgerModalWidth - 2 * 2rem;
+  height: 15.5rem - 2 * 2rem;
+  padding: 2rem;
+}
+
+.stepsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    padding-bottom: 1.4rem;
+    border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+
+    &:last-child {
+      padding-top: 1.4rem;
+      border-bottom: none;
+    }
+
+  }
+
+  .icon {
+    background: $BASE_COLOR_GRAY;
+    border-radius: 50%;
+    content: '';
+    width: 1.4rem;
+    height: 1.4rem;
+    margin-right: 0.6rem;
+  }
+
+  .connectIcon {
+  }
+
+  .navigateIcon {
+  }
+
+  .description {
+  }
+
+  .mark {
+    flex: 1;
+    text-align: right;
+    padding-right: 0.6rem;
+
+    &:before {
+      position: relative;
+      top: 0.07rem;
+      font-family: 'icomoon' !important;
+      font-size: 0.93rem;
+      content: "\e90c";
+      color: $BASE_COLOR_FONT_GRAY;
+    }
+
+    &.active:before {
+      content: "\e90d";
+      font-size: 0.87rem;
+      color: $BASE_COLOR_SUCCESS;
+    }
+  }
+
+}
+
+.continueButton {
+  float: right;
+}
+
+.transactionSent {
+  text-align: center;
+
+  .checkMark {
+    margin-bottom: 3.6rem;
+  }
+
+  .header {
+    margin-bottom: 0.7rem;
+  }
+
+  .note {
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.77rem;
+    margin-bottom: 1.6rem;
+  }
+}

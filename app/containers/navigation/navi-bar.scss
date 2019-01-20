@@ -56,7 +56,7 @@
 
 .overview {
   i:before {
-    content: "\e91c";
+    content: '\e91c';
     font-size: 1.4rem;
     margin-left: -0.2rem;
   }
@@ -64,7 +64,7 @@
 
 .ownAddresses {
   i:before {
-    content: "\e90b";
+    content: '\e90b';
     font-size: 0.9rem;
     top: -0.1rem;
   }
@@ -72,7 +72,7 @@
 
 .sendCash {
   i:before {
-    content: "\e909";
+    content: '\e909';
     font-size: 1.5rem;
     margin-left: -0.2rem;
   }
@@ -80,7 +80,7 @@
 
 .addressBook {
   i:before {
-    content: "\e908";
+    content: '\e908';
     font-size: 1.08rem;
     margin-left: 0.1rem;
     top: -0.15rem;
@@ -89,7 +89,7 @@
 
 .settings {
   i:before {
-    content: "\e907";
+    content: '\e907';
     font-size: 1.6rem;
     margin-left: -0.2rem;
   }
@@ -99,9 +99,10 @@
   position: relative;
 
   i:before {
-    content: "\e91d";
-    font-size: 1.2rem;
+    content: '\e91e';
+    font-size: 1.6rem;
     top: -0.15rem;
+    left: -0.17rem;
   }
 
   .visa {
@@ -114,7 +115,7 @@
   .mastercard {
     position: absolute;
     width: 1.29rem;
-    top: 0.36rem;
+    top: 0.92rem;
     right: 0.6rem;
   }
 }
@@ -123,7 +124,7 @@
   position: relative;
 
   i:before {
-    content: "\e916";
+    content: '\e916';
     font-size: 1.41rem;
     margin-left: -0.1rem;
   }

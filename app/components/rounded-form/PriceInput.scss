@@ -31,12 +31,13 @@
   .setBestPriceButton {
     outline: none;
     cursor: pointer;
+    font-size: 0.8rem;
 
     &:before {
       position: relative;
-      content: '\e98a';
+      content: '\e921';
       top: 0.05rem;
-      left: 0.35rem;
+      left: 0.25rem;
     }
 
   }

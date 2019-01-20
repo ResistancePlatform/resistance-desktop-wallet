@@ -112,13 +112,22 @@
     line-height: 1.65rem;
     overflow-x: hidden;
 
+    a {
+      color: inherit;
+      text-decoration: none;
+
+      &.activeLink {
+        color: $BASE_COLOR_PURPLE;
+      }
+
+    }
+
     hr {
       width: 100%;
       margin: 0.77rem 0.5rem 0 0.5rem;
       height: 1px;
       display: inline-block;
       border: none;
-      // border-top: 1px dotted $BASE_COLOR_FONT_GRAY;
 
       // Border
       background-image: linear-gradient(to right, $BASE_COLOR_BORDER_GRAY 66%, rgba(255,255,255,0) 0%);

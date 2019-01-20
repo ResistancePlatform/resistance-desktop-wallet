@@ -201,6 +201,8 @@ class ResDexAssets extends Component<Props> {
     const sinceLastHour = this.getSinceLastHour()
     const sortedCurrencies = getSortedCurrencies(enabledCurrencies).filter(currency => currency.symbol !== 'ETOMIC')
     const {equity: secretFundsEquity, balance: secretFundsBalance} = this.getSecretFundsAmounts()
+    const { zCredits } = this.props.accounts
+    const resPrice = this.getLastPrice('RES')
 
 		return (
       <div className={cn(styles.container)}>
@@ -221,7 +223,7 @@ class ResDexAssets extends Component<Props> {
                 <i className={cn({ [styles.positive]: sinceLastHour.isPositive() })}>
                   {sinceLastHour.isPositive() ? '+' : '-'}
                 </i>
-                {sinceLastHour.abs().toFixed(2).replace('.', ',')}
+                {sinceLastHour.abs().toFixed(2)}
                 <sub>%</sub>
               </span>
             </div>
@@ -253,8 +255,32 @@ class ResDexAssets extends Component<Props> {
       <div className={styles.coins}>
         {sortedCurrencies.map(currency => this.getWalletContents(t, currency.symbol))}
 
+        <div className={cn(styles.coin)}>
+          <CurrencyIcon symbol="RES" size="1.6rem" />
+
+          {t(`Instant DEX`)}
+
+          <div className={styles.amount}>
+            {zCredits ? `${zCredits} RES` : t(`N/A`)}
+          </div>
+
+          <div className={styles.equity}>
+            <sub>$</sub>{zCredits && resPrice ? toDecimalPlaces(resPrice.mul(zCredits), 2) : t(`N/A`)}
+          </div>
+
+          <div className={cn(styles.buttons, styles.singleButton)}>
+            <button
+              type="button"
+              onClick={this.props.accountsActions.showInstantDexDepositModal}
+            >
+              {t(`Deposit`)}
+            </button>
+          </div>
+
+        </div>
+
         <div className={cn(styles.coin, styles.secretFunds)}>
-          <div className={styles.secretFundsIcon} />
+          <div className={cn('icon', styles.secretFundsIcon)} />
 
           {t(`Secret funds`)}
 
@@ -266,7 +292,7 @@ class ResDexAssets extends Component<Props> {
             <sub>$</sub>{secretFundsEquity && toDecimalPlaces(secretFundsEquity, 2) || t(`N/A`)}
           </div>
 
-          <div className={cn(styles.buttons, styles.secretFunds)}>
+          <div className={cn(styles.buttons, styles.singleButton)}>
             <button
               type="button"
               onClick={() => this.props.accountsActions.showWithdrawModal(null, true)}

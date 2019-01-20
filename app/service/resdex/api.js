@@ -96,6 +96,17 @@ class ResDexApiService {
     return response.swaps
   }
 
+  async instantDexDeposit(weeks: number, amount: object) {
+    const response = await this.query({
+      method: 'instantdex_deposit',
+      weeks,
+      amount: amount.toString(),
+      broadcast: 1
+    })
+    log.debug('instant dex response', response)
+    return response
+  }
+
   withdraw(opts) {
     const currency = getCurrency(opts.symbol)
     return currency.etomic
@@ -247,6 +258,19 @@ class ResDexApiService {
       relvolume: opts.total.toNumber(),
       price: opts.price.toNumber(),
     })
+  }
+
+  async balance(coin: string, address: string) {
+    const response = await this.query({
+      method: 'balance',
+      coin,
+      address
+    })
+
+    return {
+      balance: Decimal(response.balance),
+      zCredits: Decimal(response.zcredits)
+    }
   }
 
   async stop() {
