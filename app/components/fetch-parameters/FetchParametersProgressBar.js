@@ -1,4 +1,5 @@
 // @flow
+import moment from 'moment'
 import React, { Component } from 'react'
 import { translate } from 'react-i18next'
 import { connect } from 'react-redux'
@@ -9,6 +10,7 @@ import styles from './FetchParametersProgressBar.scss'
 
 type Props = {
   t: any,
+  i18n: any,
   fetchParameters: FetchParametersState
 }
 
@@ -19,16 +21,40 @@ class FetchParametersProgressBar extends Component<Props> {
 	 * @memberof FetchParametersProgressBar
 	 */
 	render() {
-    const { t } = this.props
+    const { t, i18n } = this.props
+    const {
+      minutesLeft,
+      progressRate,
+      statusMessage,
+      isDownloadComplete
+    } = this.props.fetchParameters
+
+    const timeLeft = minutesLeft
+      ? moment.duration(minutesLeft, 'minutes')
+      : null
+
+    const isDownloading = !isDownloadComplete && progressRate < 100
 
 		return (
 			<div className={styles.container}>
-        <div className={styles.nothing}>
-          {t(``)}
+
+        {isDownloading &&
+          <div className={styles.caption}>
+            {statusMessage}
+          </div>
+        }
+
+        {isDownloading &&
+          <div className={styles.status}>
+            <strong>{Math.round(progressRate)}%</strong>
+            {timeLeft && t(`({{time}} left)`, {time: timeLeft.locale(i18n.language).humanize()})}
+          </div>
+        }
+
+        <div className={styles.progressBar}>
+          <div style={{ width: `${progressRate}%` }} />
         </div>
-        <div className={styles.progressBar} title={this.props.fetchParameters.statusMessage}>
-          <div style={{ width: `${this.props.fetchParameters.progressRate}%` }} />
-        </div>
+
 			</div>
 		)
 	}
