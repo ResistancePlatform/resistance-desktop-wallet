@@ -382,6 +382,12 @@ const stopChildProcessesEpic = (action$: ActionsObservable<Action>, state$) => a
       childProcess.stopProcess(name)
     })
 
+    if (runningProcesses.length === 0) {
+      log.debug(`No running processes, quiting immediately`)
+      ipcRenderer.send('cleanup-complete')
+      return of(SettingsActions.empty())
+    }
+
     return action$.pipe(
       // TODO: Increase and lock the window after the demo
       timeout(5000),

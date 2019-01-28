@@ -1,6 +1,28 @@
 @import "~/assets/styles/vars.scss";
 
 .container {
+  position: relative;
+  color: $BASE_COLOR_FONT_GRAY;
+
+  .caption {
+    position: absolute;
+    font-size: 0.67rem;
+    text-transform: uppercase;
+    top: -1.5rem;
+    left: 1rem;
+  }
+
+  .status {
+    position: absolute;
+    font-size: 0.73rem;
+    top: -1.5rem;
+    right: 1rem;
+
+    strong {
+      color: $BASE_COLOR_WHITE;
+      margin-right: 0.4rem;
+    }
+  }
 }
 
 .progressBar {

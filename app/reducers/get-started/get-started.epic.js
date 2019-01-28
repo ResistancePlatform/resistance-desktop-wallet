@@ -9,6 +9,7 @@ import { filter, switchMap, take, map, mergeMap, catchError } from 'rxjs/operato
 import { remote, ipcRenderer } from 'electron'
 import { ofType } from 'redux-observable'
 import { push } from 'react-router-redux'
+import { toastr } from 'react-redux-toastr'
 
 import { Action } from '../types'
 import { translate } from '~/i18next.config'
@@ -35,6 +36,20 @@ const childProcess = new ChildProcessService()
 const WelcomeActions = GetStartedActions.welcome
 const unableToStartLocalNodeMessage = t(`Unable to start Resistance local node`)
 
+
+const acceptEulaEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(GetStartedActions.acceptEula),
+  map(() => push('/get-started/choose-language'))
+)
+
+const rejectEulaEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(GetStartedActions.rejectEula),
+  map(() => {
+    const confirmOptions = { onOk: () => remote.app.quit() }
+    toastr.confirm(t(`You haven't accepted the EULA, the app will quit now`), confirmOptions)
+    return GetStartedActions.empty()
+  })
+)
 
 const chooseLanguageEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(GetStartedActions.chooseLanguage),
@@ -238,6 +253,8 @@ const useResistanceEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 )
 
 export const GetStartedEpic = (action$, state$) => merge(
+  acceptEulaEpic(action$, state$),
+  rejectEulaEpic(action$, state$),
 	chooseLanguageEpic(action$, state$),
 	generateWalletEpic(action$, state$),
 	applyConfigurationEpic(action$, state$),

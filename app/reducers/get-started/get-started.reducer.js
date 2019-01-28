@@ -31,6 +31,9 @@ export const GetStartedActions = createActions(
 
     CHOOSE_LANGUAGE: (code: string) => ({ code }),
 
+    REJECT_EULA: undefined,
+    ACCEPT_EULA: undefined,
+
     CREATE_NEW_WALLET: {
       GENERATE_WALLET: undefined,
       GOT_GENERATED_WALLET: (wallet: Wallet) => wallet,

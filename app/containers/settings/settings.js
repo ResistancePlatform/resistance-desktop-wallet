@@ -229,7 +229,7 @@ class Settings extends Component<Props> {
 
                  <div className={styles.memo}>
                    <strong>{t(`Note:`)}</strong>&nbsp;
-                   {t(`Changing amount of cores requires restarting of the Resistance app.`)}
+                   {t(`Changing amount of cores requires restarting of the mining daemon.`)}
                  </div>
 
                 </div>

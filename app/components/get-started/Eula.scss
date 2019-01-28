@@ -1,0 +1,53 @@
+@import "./GetStarted.scss";
+
+.eula {
+  height: 13.5rem;
+
+  padding: 1.5rem;
+  padding-right: 0.75rem;
+  scroll-padding-top: 1rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  margin-bottom: 1.5rem;
+
+  border: 1px solid $BASE_COLOR_BORDER_GRAY;
+  border-radius: 1rem;
+
+  .content {
+    line-height: 1.3rem;
+    padding-right: 1rem;
+    text-align: justify;
+    overflow-y: scroll;
+    font-size: 0.8rem;
+    margin: 0;
+    height: 100%;
+
+
+    &::-webkit-scrollbar {
+      width: 0.3rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 0.15rem;
+      background: $BASE_COLOR_PURPLE;
+    }
+
+  }
+
+}
+
+.buttons {
+  display: flex;
+  position: absolute;
+  left: 50%;
+  bottom: 2.75rem;
+  transform: translateX(-50%);
+
+  button:first-child {
+    margin-right: 1rem;
+  }
+}
