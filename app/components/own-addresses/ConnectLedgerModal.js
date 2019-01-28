@@ -32,30 +32,30 @@ type Props = {
 class ConnectLedgerModal extends Component<Props> {
 	props: Props
 
-  state = {
+  /*state = {
     timer: null
-  }
+  }*/
 
   //blockchainExplorerIP: "http://54.91.60.116:3001"
 
   componentDidMount(){
-    if(!this.props.connectLedgerModal.isLedgerResistanceAppOpen){
+    /*if(!this.props.connectLedgerModal.isLedgerResistanceAppOpen){
       let timer = setInterval(() => {this.tick(this)}, 500)
       this.setState({timer})
-    }
+    }*/
   }
 
   componentWillUnmount() {
-    clearInterval(this.state.timer)
+    //clearInterval(this.state.timer)
   }
 
-  tick() {
+  /*tick() {
     if(!this.props.connectLedgerModal.isLedgerResistanceAppOpen){
       this.props.actions.getLedgerConnected()
     } else {
       clearInterval(this.state.timer)
     }
-  }
+  }*/
 
 
   onDestAddressInputChanged(value) {

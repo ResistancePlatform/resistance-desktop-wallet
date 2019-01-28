@@ -26,10 +26,10 @@ let ledgerRes
   try {
 
     const logger = winston.createLogger({
-      level: 'debug',
+      level: 'error',
       format: winston.format.json(),
       transports: [
-        new winston.transports.Console({ format: winston.format.splat() })
+        new winston.transports.Console({ format: winston.format.json() })
       ]
     });
 
@@ -209,20 +209,21 @@ const isLedgerConnected = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.getLedgerConnected),
   mergeMap(async () => {
     try {
-      
-      if(ledgerRes.isAvailable()){
+      var isAvailable = await ledgerRes.isAvailable()
+      console.log(isAvailable)
+      if(isAvailable){
         const result = await ledgerRes.getPublicKey(0)
         let balance = await ledgerRes.getLedgerAddressBalance(result.bitcoinAddress)
         return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_RESISTANCE_APP_OPEN", payload: {address: result.bitcoinAddress, balance: balance.toString()} }
-      }
+      } 
       return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
     } catch (err) {
       console.log(err.toString())
       if(err.toString().includes("cannot open device with path") || err.toString().includes("TransportStatusError: Ledger device: Security not satisfied (dongle locked or have invalid access rights)")){
         return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_CONNECTED" }
       }
-      //toastr.error(t(`Could not communicate with Ledger Wallet. Please disconnect and reconnect you Ledger wallet and try again.`))
       return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
+      //toastr.error(t(`Could not communicate with Ledger Wallet. Please disconnect and reconnect you Ledger wallet and try again.`))
     }
   })
 )

@@ -7,6 +7,7 @@ import { translate } from 'react-i18next'
 import cn from 'classnames'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
+import LedgerPolling from '~/components/ledger/ledger-polling.js'
 import OwnAddressList from '~/components/own-addresses/own-address-list'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
@@ -101,6 +102,8 @@ class OwnAddresses extends Component<Props> {
             failure: OwnAddressesActions.getOwnAddressesFailure
           }}
         />
+
+        <LedgerPolling />
 
         {this.props.ownAddresses.connectLedgerModal.isVisible &&
           <ConnectLedgerModal />

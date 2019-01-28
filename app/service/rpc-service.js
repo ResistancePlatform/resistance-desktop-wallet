@@ -397,6 +397,18 @@ export class RpcService {
           }))
           .filter(item => !(item.address.startsWith('rr') || item.address.startsWith('rs')))
 
+        //Add Ledger Address to List
+        if(getStore().getState().ownAddresses.connectLedgerModal.isLedgerResistanceAppOpen){
+          combinedAddresses.unshift({
+            balance: Decimal('0'),
+            confirmed: false,
+            address: getStore().getState().ownAddresses.connectLedgerModal.ledgerAddress,
+            isUnspent: false,
+            disabled: false,
+            isLedger: true
+          })
+        }
+
         log.debug(`Fetching the balances for the combined addresses: ${combinedAddresses}`)
         return this::getAddressesBalance(client, combinedAddresses)
       })
