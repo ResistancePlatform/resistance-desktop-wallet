@@ -9,6 +9,7 @@ import { Switch, Route, Redirect } from 'react-router'
 import cn from 'classnames'
 
 import Footer from '~/components/get-started/Footer'
+import EulaPage from './get-started/EulaPage'
 import ChooseLanguagePage from './get-started/ChooseLanguagePage'
 import GetStartedPage from './get-started/GetStartedPage'
 import CreateNewWalletPage from './get-started/CreateNewWalletPage'
@@ -91,13 +92,14 @@ class App extends React.Component<Props> {
         <DragBar />
         <div className={cn(styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer)}>
           <Switch>
+            <Route exact path="/get-started/eula" component={EulaPage} />
             <Route exact path="/get-started/choose-language" component={ChooseLanguagePage} />
             <Route exact path="/get-started/get-started" component={GetStartedPage} />
             <Route exact path="/get-started/create-new-wallet" component={CreateNewWalletPage} />
             <Route exact path="/get-started/choose-password" component={ChoosePasswordPage} />
             <Route exact path="/get-started/restore-your-wallet" component={RestoreYourWalletPage} />
             <Route exact path="/get-started/welcome" component={WelcomePage} />
-            <Route exact path="/" render={() => (<Redirect to="/get-started/choose-language" />)} />
+            <Route exact path="/" render={() => (<Redirect to="/get-started/eula" />)} />
           </Switch>
         </div>
         <Footer />
