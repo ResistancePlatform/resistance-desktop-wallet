@@ -13,6 +13,8 @@ export const preloadedState: State = {
   roundedForm: {},
   fetchParameters: {
     progressRate: 0,
+    startedAt: null,
+    minutesLeft: null,
     statusMessage: '',
     errorMessage: null,
     isDownloadComplete: false,

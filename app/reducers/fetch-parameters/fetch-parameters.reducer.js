@@ -1,4 +1,6 @@
 // @flow
+import log from 'electron-log'
+import moment from 'moment'
 import { createActions, handleActions } from 'redux-actions'
 
 import { translate } from '~/i18next.config'
@@ -11,6 +13,8 @@ export type Order = {}
 
 export type FetchParametersState = {
   progressRate: number,
+  startedAt: object | null,
+  minutesLeft: number | null,
   statusMessage: string,
   errorMessage: string | null,
   isDownloadComplete: boolean
@@ -38,6 +42,7 @@ export const FetchParametersReducer = handleActions(
       ...state,
       isDownloadComplete: false,
       progressRate: 0,
+      startedAt: moment(),
       errorMessage: null
     }),
     [FetchParametersActions.downloadProgress]: (state, action) => {
@@ -45,16 +50,29 @@ export const FetchParametersReducer = handleActions(
 
       const simpleRate = receivedBytes / (totalBytes + 1)
       const progressRate = simpleRate * 100.0
-      const roundedRate = Math.round(progressRate)
       const totalMb = (totalBytes / 1024 / 1024).toFixed(2)
-      const receivedMb = (simpleRate  * totalMb).toFixed(2)
 
-      const statusMessage = t(
-        `Download in progress, received {{receivedMb}}MB out of {{totalMb}}MB ({{roundedRate}}%)`,
-        { receivedMb, totalMb, roundedRate }
-      )
+      const { startedAt } = state
+      let minutesLeft = null
 
-      return { ...state, progressRate, statusMessage }
+      if (startedAt) {
+        const bytesPerSecond = receivedBytes / (moment().diff(startedAt, 'seconds') + 1)
+        minutesLeft = (totalBytes - receivedBytes) / (bytesPerSecond + 1) / 60
+
+        // Don't show time that doesn't make sense
+        if (minutesLeft > 24 * 60 * 7) {
+          minutesLeft = null
+        }
+      }
+
+      const statusMessage = t(`Downloading Resistance parameters`)
+
+      return {
+        ...state,
+        progressRate,
+        statusMessage,
+        minutesLeft
+      }
     },
     [FetchParametersActions.status]: (state, action) => ({
       ...state,
@@ -70,6 +88,7 @@ export const FetchParametersReducer = handleActions(
       ...state,
       progressRate: 0,
       statusMessage: t(`Download failed`),
+      startedAt: null,
       errorMessage: action.payload.errorMessage
     })
   }, preloadedState)

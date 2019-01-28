@@ -28,7 +28,7 @@ class Footer extends Component<Props> {
 			<div className={styles.container}>
         {t(``)}
 
-        {!this.props.fetchParameters.isDownloadComplete && !this.props.navi.currentNaviPath.includes('/welcome') &&
+        {!this.props.fetchParameters.isDownloadComplete && // !this.props.navi.currentNaviPath.includes('/welcome') &&
           <FetchParametersProgressBar className={styles.progressBar} />
         }
 			</div>

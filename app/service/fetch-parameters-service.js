@@ -168,7 +168,7 @@ export class FetchParametersService {
 }
 
 async function fetchOrThrowError() {
-  this::status(t(`Checking Resistance parameters presence...`))
+  this::status(t(`Checking Resistance parameters presence`))
 
   if (await this.checkPresence({calculateChecksums: true})) {
     this::downloadComplete()
@@ -184,7 +184,7 @@ async function fetchOrThrowError() {
   await this::downloadSproutKeys()
 
   // All the sprout keys downloaded, calculating checksums and quick hashes
-  this::status(t(`Calculating checksums...`))
+  this::status(t(`Calculating parameters checksums`))
 
   for (let index = 0; index < sproutFiles.length; index += 1) {
     const fileName = sproutFiles[index].name
@@ -247,13 +247,13 @@ function registerDownloadListener(resolve, reject) {
     this.downloadItems.add(downloadItem)
     this.totalBytes += downloadItem.getTotalBytes()
 
+    const savePath = path.join(this.getResistanceParamsFolder(), downloadItem.getFilename())
+    downloadItem.setSavePath(savePath)
+
     // It seems that Chrome doesn't perform error handling, came up with this check:
     if (downloadItem.getTotalBytes() === 0) {
       reject(Error(t(`No Internet`)))
     }
-
-    const savePath = path.join(this.getResistanceParamsFolder(), downloadItem.getFilename())
-    downloadItem.setSavePath(savePath)
 
     downloadItem.on('updated', () => this::downloadUpdatedCallback())
 
