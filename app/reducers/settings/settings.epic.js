@@ -127,7 +127,7 @@ const stopLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action
 const startEtomicNodeEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.startEtomicNode),
   map(() => {
-		//resistanceService.start(false, true)
+		resistanceService.start(false, true)
     return SettingsActions.empty()
   })
 )
@@ -135,7 +135,7 @@ const startEtomicNodeEpic = (action$: ActionsObservable<Action>) => action$.pipe
 const stopEtomicNodeEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.stopEtomicNode),
   map(() => {
-		//resistanceService.stop(true)
+		resistanceService.stop(true)
     return SettingsActions.empty()
   })
 )
