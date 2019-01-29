@@ -205,14 +205,6 @@ const mergeCoinsFailureEpic = (action$: ActionsObservable<Action>) => action$.pi
   mapTo(SystemInfoActions.empty())
 )
 
-/*
-const createAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-  ofType(OwnAddressesActions.createAddress),
-  switchMap(action => rpc.createNewAddress(action.payload.isPrivate)),
-  map(result => result ? OwnAddressesActions.getOwnAddresses() : OwnAddressesActions.empty())
-)
-*/
-
 const isLedgerConnectedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.getLedgerConnected),
   switchMap(async function(){
@@ -235,26 +227,6 @@ const isLedgerConnectedEpic = (action$: ActionsObservable<Action>) => action$.pi
   })
 )
 
-/*const isLedgerConnectedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-  ofType(OwnAddressesActions.getLedgerConnected),
-  switchMap(() => {
-
-    return ledgerRes.isAvailable().then(isAvailable => {
-      return ledgerRes.getPublicKey(0).then(result => {
-        return ledgerRes.getLedgerAddressBalance(result.bitcoinAddress).then(balance => {
-          return OwnAddressesActions.gotLedgerResistanceAppOpen(result.bitcoinAddress,balance.toString())
-        }).catch(function(err){
-          return OwnAddressesActions.getLedgerConnectedFailure()
-        )}
-      }).catch(function(err){
-      return OwnAddressesActions.getLedgerConnectedFailure()
-    })
-    }).catch(function(err){
-      return OwnAddressesActions.getLedgerConnectedFailure()
-    })
-  })
-)*/
-
 const sendLedgerTransactionEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
   ofType(OwnAddressesActions.sendLedgerTransaction),
   switchMap(async () => {
@@ -267,7 +239,7 @@ const sendLedgerTransactionEpic = (action$: ActionsObservable<Action>, state$) =
         let sentTransaction = await ledgerRes.sendRawTransaction(signedTransaction)
         console.log(sentTransaction)
         //return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_SUCCESS", payload: {txid: sentTransaction}}
-        return OwnAddressesActions.sendLedgerTransactionSuccess(txid, sentTransaction)
+        return OwnAddressesActions.sendLedgerTransactionSuccess(sentTransaction)
       }
 
       //return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }

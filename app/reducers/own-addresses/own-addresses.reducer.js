@@ -151,7 +151,7 @@ export const OwnAddressesReducer = handleActions(
       connectLedgerModal: {
         ...state.connectLedgerModal,
         isTransactionPending: true,
-        pollForLedger: false
+        //pollForLedger: false
       }
     }),
     /*[OwnAddressesActions.sendLedgerTransactionInvalidParams]: state => ({
@@ -166,12 +166,12 @@ export const OwnAddressesReducer = handleActions(
       connectLedgerModal: {
         ...state.connectLedgerModal,
         isTransactionPending: false,
-        ledgerAddress: "",
-        destinationAddress: "",
-        destinationAmount: Decimal("0"),
+        //ledgerAddress: "",
+        //destinationAddress: "",
+        //destinationAmount: Decimal("0"),
         isTransactionSent: true,
         txid: action.payload.txid,
-        pollForLedger: false
+        //pollForLedger: false
       }
     }),
     [OwnAddressesActions.sendLedgerTransactionFailure]: state => ({
@@ -179,7 +179,7 @@ export const OwnAddressesReducer = handleActions(
       connectLedgerModal: {
         ...state.connectLedgerModal,
         isTransactionPending: false,
-        pollForLedger: true
+        //pollForLedger: true
       }
     }),
     [OwnAddressesActions.updateDestinationAddress]: (state, action) => ({
@@ -211,13 +211,13 @@ export const OwnAddressesReducer = handleActions(
         ...state.connectLedgerModal,
         isVisible: false,
         isTransactionPending: false,
-        ledgerAddress: "",
-        destinationAddress: "",
-        destinationAmount: Decimal("0"),
+        //ledgerAddress: "",
+        //destinationAddress: "",
+        //destinationAmount: Decimal("0"),
         isTransactionSent: false,
         txid: "",
-        isLedgerConnected: false,
-        isLedgerResistanceAppOpen: false,
+        //isLedgerConnected: false,
+        //isLedgerResistanceAppOpen: false,
         pollForLedger: true
       }
     }),

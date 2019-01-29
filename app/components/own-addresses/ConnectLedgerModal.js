@@ -39,7 +39,9 @@ class ConnectLedgerModal extends Component<Props> {
   //blockchainExplorerIP: "http://54.91.60.116:3001"
 
   componentDidMount(){
-    this.props.actions.stopLedgerPolling()
+    if(this.props.connectLedgerModal.isLedgerResistanceAppOpen){
+      this.props.actions.stopLedgerPolling()
+    }
   }
 
   componentWillUnmount() {
@@ -153,7 +155,9 @@ class ConnectLedgerModal extends Component<Props> {
 
   createTransaction() {
     const { t } = this.props
-
+    if(this.props.connectLedgerModal.pollForLedger){
+      this.props.actions.stopLedgerPolling()
+    }
     return (
         <div className={[styles.sendCashContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
 

@@ -20,7 +20,7 @@ import styles from './own-addresses.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 
-const pollingInterval = 5.0
+const pollingInterval = 3.0
 const addressRowPopupMenuId = 'own-addresses-address-row-popup-menu-id'
 const createAddressPopupMenuId = 'own-addresses-create-address-popup-menu-id'
 const privateKeysPopupMenuId = 'own-addresses-private-keys-popup-menu-id'
