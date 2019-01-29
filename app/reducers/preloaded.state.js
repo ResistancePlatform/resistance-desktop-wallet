@@ -80,6 +80,7 @@ export const preloadedState: State = {
       isTransactionPending: false,
       ledgerBalance: "0",
       txid: "",
+      pollForLedger: true,
     }
 	},
 	sendCash: {

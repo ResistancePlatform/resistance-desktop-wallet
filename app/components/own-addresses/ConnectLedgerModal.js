@@ -39,14 +39,11 @@ class ConnectLedgerModal extends Component<Props> {
   //blockchainExplorerIP: "http://54.91.60.116:3001"
 
   componentDidMount(){
-    /*if(!this.props.connectLedgerModal.isLedgerResistanceAppOpen){
-      let timer = setInterval(() => {this.tick(this)}, 500)
-      this.setState({timer})
-    }*/
+    this.props.actions.stopLedgerPolling()
   }
 
   componentWillUnmount() {
-    //clearInterval(this.state.timer)
+    this.props.actions.startLedgerPolling()
   }
 
   /*tick() {

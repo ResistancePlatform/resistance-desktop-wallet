@@ -1,7 +1,7 @@
 // @flow
 import { remote } from 'electron'
 import { tap, map, mapTo, mergeMap, switchMap, catchError } from 'rxjs/operators'
-import { of, bindCallback, merge } from 'rxjs'
+import { Observable, of, bindCallback, merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 import LedgerRes from 'ledger-res'
@@ -205,57 +205,88 @@ const mergeCoinsFailureEpic = (action$: ActionsObservable<Action>) => action$.pi
   mapTo(SystemInfoActions.empty())
 )
 
-const isLedgerConnected = (action$: ActionsObservable<Action>) => action$.pipe(
+/*
+const createAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(OwnAddressesActions.createAddress),
+  switchMap(action => rpc.createNewAddress(action.payload.isPrivate)),
+  map(result => result ? OwnAddressesActions.getOwnAddresses() : OwnAddressesActions.empty())
+)
+*/
+
+const isLedgerConnectedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.getLedgerConnected),
-  mergeMap(async () => {
+  switchMap(async function(){
     try {
-      var isAvailable = await ledgerRes.isAvailable()
-      console.log(isAvailable)
-      if(isAvailable){
+      //console.log(isAvailable)
+      if(await ledgerRes.isAvailable()){
         const result = await ledgerRes.getPublicKey(0)
         let balance = await ledgerRes.getLedgerAddressBalance(result.bitcoinAddress)
-        return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_RESISTANCE_APP_OPEN", payload: {address: result.bitcoinAddress, balance: balance.toString()} }
-      } 
-      return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
+        return OwnAddressesActions.gotLedgerResistanceAppOpen(result.bitcoinAddress,balance.toString())
+      } else {
+        return OwnAddressesActions.getLedgerConnectedFailure()
+      }
     } catch (err) {
       console.log(err.toString())
       if(err.toString().includes("cannot open device with path") || err.toString().includes("TransportStatusError: Ledger device: Security not satisfied (dongle locked or have invalid access rights)")){
-        return { type: "APP/OWN_ADDRESSES/GOT_LEDGER_CONNECTED" }
+        return OwnAddressesActions.gotLedgerConnected()
       }
-      return { type: "APP/OWN_ADDRESSES/GET_LEDGER_CONNECTED_FAILURE" }
-      //toastr.error(t(`Could not communicate with Ledger Wallet. Please disconnect and reconnect you Ledger wallet and try again.`))
+      return OwnAddressesActions.getLedgerConnectedFailure()
     }
   })
 )
 
-const sendLedgerTransaction = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+/*const isLedgerConnectedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(OwnAddressesActions.getLedgerConnected),
+  switchMap(() => {
+
+    return ledgerRes.isAvailable().then(isAvailable => {
+      return ledgerRes.getPublicKey(0).then(result => {
+        return ledgerRes.getLedgerAddressBalance(result.bitcoinAddress).then(balance => {
+          return OwnAddressesActions.gotLedgerResistanceAppOpen(result.bitcoinAddress,balance.toString())
+        }).catch(function(err){
+          return OwnAddressesActions.getLedgerConnectedFailure()
+        )}
+      }).catch(function(err){
+      return OwnAddressesActions.getLedgerConnectedFailure()
+    })
+    }).catch(function(err){
+      return OwnAddressesActions.getLedgerConnectedFailure()
+    })
+  })
+)*/
+
+const sendLedgerTransactionEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
   ofType(OwnAddressesActions.sendLedgerTransaction),
-  mergeMap(async () => {
+  switchMap(async () => {
     try {
-      if(ledgerRes.isAvailable()){
+      if(await ledgerRes.isAvailable()){
         const state = state$.value.ownAddresses.connectLedgerModal
 
         let signedTransaction = await ledgerRes.sendCoins(state.destinationAddress, 0, 0.0001, state.destinationAmount.toNumber())
         console.log(signedTransaction)
         let sentTransaction = await ledgerRes.sendRawTransaction(signedTransaction)
         console.log(sentTransaction)
-        return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_SUCCESS", payload: {txid: sentTransaction}}
+        //return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_SUCCESS", payload: {txid: sentTransaction}}
+        return OwnAddressesActions.sendLedgerTransactionSuccess(txid, sentTransaction)
       }
 
-      return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
+      //return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
+      return OwnAddressesActions.sendLedgerTransactionFailure()
 
     } catch (err) {
       console.log(err.toString())
       /*if(err.toString().includes("TransportError: Ledger Device is busy") || err.toString().includes("Error: cannot open device with path")){
-        return { type: "APP/OWN_ADDRESSES/EMPTY"}
+        //return { type: "APP/OWN_ADDRESSES/EMPTY"}
+        return OwnAddressesActions.empty()
       }*/
 
-      return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
+      //return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
+      return OwnAddressesActions.sendLedgerTransactionFailure()
     }
   })
 )
 
-const sendLedgerTransactionInvalidParams = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+const sendLedgerTransactionInvalidParamsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
   ofType(OwnAddressesActions.sendLedgerTransactionInvalidParams),
   tap((action) => {
     toastr.error(t(`Please make sure destination address and amount are valid.`))
@@ -276,7 +307,7 @@ export const OwnAddressesEpics = (action$, state$) => merge(
   mergeAllCoinsEpic(action$, state$),
   mergeCoinsOperationStartedEpic(action$, state$),
   mergeCoinsFailureEpic(action$, state$),
-  isLedgerConnected(action$, state$),
-  sendLedgerTransaction(action$, state$),
-  sendLedgerTransactionInvalidParams(action$, state$)
+  isLedgerConnectedEpic(action$, state$),
+  sendLedgerTransactionEpic(action$, state$),
+  sendLedgerTransactionInvalidParamsEpic(action$, state$)
 )

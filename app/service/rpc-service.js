@@ -398,7 +398,7 @@ export class RpcService {
           .filter(item => !(item.address.startsWith('rr') || item.address.startsWith('rs')))
 
         //Add Ledger Address to List
-        if(getStore().getState().ownAddresses.connectLedgerModal.isLedgerResistanceAppOpen){
+        if(getStore().getState().ownAddresses.connectLedgerModal.isLedgerResistanceAppOpen && getStore().getState().ownAddresses.connectLedgerModal.pollForLedger){
           combinedAddresses.unshift({
             balance: Decimal('0'),
             confirmed: false,

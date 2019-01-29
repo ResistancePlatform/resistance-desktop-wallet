@@ -40,11 +40,12 @@ class LedgerPolling extends Component<Props> {
   }
 
   tick() {
-    //if(!this.props.connectLedgerModal.isLedgerResistanceAppOpen){
+    var attemptLedgerConnect = !this.props.connectLedgerModal.isLedgerResistanceAppOpen && !this.props.connectLedgerModal.isTransactionPending
+    if(this.props.connectLedgerModal.pollForLedger){
       this.props.actions.getLedgerConnected()
-    /*} else {
-      clearInterval(this.state.timer)
-    }*/
+    } else {
+      //clearInterval(this.state.timer)
+    }
   }
 
   render() {

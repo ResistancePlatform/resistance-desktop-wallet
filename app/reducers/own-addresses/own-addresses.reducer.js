@@ -27,6 +27,7 @@ export type OwnAddressesState = {
     destinationAmount: Decimal,
     isTransactionPending: boolean,
     txid: string,
+    pollForLedger: boolean,
   }
 }
 
@@ -47,6 +48,8 @@ export const OwnAddressesActions = createActions(
     GOT_LEDGER_CONNECTED: undefined,
     GOT_LEDGER_RESISTANCE_APP_OPEN: (address: string, balance: string) => ({ address, balance }),
     GET_LEDGER_CONNECTED_FAILURE: undefined,
+    START_LEDGER_POLLING: undefined,
+    STOP_LEDGER_POLLING: undefined,
 
     UPDATE_DESTINATION_ADDRESS: (address: string) => ({address}),
     UPDATE_DESTINATION_AMOUNT: (amount: Decimal) => ({amount}),
@@ -94,6 +97,20 @@ export const OwnAddressesReducer = handleActions(
     [OwnAddressesActions.getOwnAddressesFailure]: state => ({
       ...state, addresses: []
     }),
+    [OwnAddressesActions.startLedgerPolling]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        pollForLedger: true
+      }
+    }),
+    [OwnAddressesActions.stopLedgerPolling]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        pollForLedger: false
+      }
+    }),
     [OwnAddressesActions.showConnectLedgerModal]: state => ({
       ...state,
       connectLedgerModal: {
@@ -133,7 +150,8 @@ export const OwnAddressesReducer = handleActions(
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
-        isTransactionPending: true
+        isTransactionPending: true,
+        pollForLedger: false
       }
     }),
     /*[OwnAddressesActions.sendLedgerTransactionInvalidParams]: state => ({
@@ -152,14 +170,16 @@ export const OwnAddressesReducer = handleActions(
         destinationAddress: "",
         destinationAmount: Decimal("0"),
         isTransactionSent: true,
-        txid: action.payload.txid
+        txid: action.payload.txid,
+        pollForLedger: false
       }
     }),
     [OwnAddressesActions.sendLedgerTransactionFailure]: state => ({
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
-        isTransactionPending: false
+        isTransactionPending: false,
+        pollForLedger: true
       }
     }),
     [OwnAddressesActions.updateDestinationAddress]: (state, action) => ({
@@ -197,7 +217,8 @@ export const OwnAddressesReducer = handleActions(
         isTransactionSent: false,
         txid: "",
         isLedgerConnected: false,
-        isLedgerResistanceAppOpen: false
+        isLedgerResistanceAppOpen: false,
+        pollForLedger: true
       }
     }),
     [OwnAddressesActions.mergeAllMinedCoins]: (state, action) => ({
