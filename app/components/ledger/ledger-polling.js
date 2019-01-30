@@ -29,7 +29,7 @@ class LedgerPolling extends Component<Props> {
 
   componentDidMount(){
     //if(!this.props.connectLedgerModal.isLedgerResistanceAppOpen){
-      let timer = setInterval(() => {this.tick(this)}, 2000)
+      let timer = setInterval(() => {this.tick(this)}, 4000)
       this.setState({timer})
     //}
     //console.log(getStore())
