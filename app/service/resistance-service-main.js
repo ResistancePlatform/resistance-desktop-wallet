@@ -81,7 +81,7 @@ export class ResistanceService {
     }
 
     if (!resistanceNodeConfig.rpcport) {
-      resistanceNodeConfig.rpcport = resistanceNodeConfig.testnet ? 8132 : 8132
+      resistanceNodeConfig.rpcport = resistanceNodeConfig.testnet ? 18132 : 8132
     }
 
     return resistanceNodeConfig
