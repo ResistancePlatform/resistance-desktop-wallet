@@ -50,7 +50,7 @@ class OwnAddressList extends Component<Props> {
           }
 
           {address.isLedger &&
-            <div className={cn('icon', styles.privacyIcon)} />
+            <div className={styles.ledgerIcon} />
           }
 
           <Address className={styles.address} value={address.address} />
