@@ -274,6 +274,7 @@
     "round-to": "^3.0.0",
     "rxjs": "^6.3.3",
     "source-map-support": "^0.5.9",
+    "usb": "^1.5.0",
     "write-json-file": "^3.0.2"
   },
   "devEngines": {

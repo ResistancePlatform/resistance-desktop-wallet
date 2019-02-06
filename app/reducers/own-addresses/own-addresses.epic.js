@@ -1,7 +1,7 @@
 // @flow
 import { remote } from 'electron'
 import { tap, map, mapTo, mergeMap, switchMap, catchError } from 'rxjs/operators'
-import { Observable, of, bindCallback, merge } from 'rxjs'
+import { of, bindCallback, merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 import LedgerRes from 'ledger-res'
@@ -44,12 +44,12 @@ let ledgerRes
     }
 
     ledgerRpcClient = new Client({
-      network: network,
+      network,
       host: '127.0.0.1',
       port: nodeConfig.rpcport,
       username: nodeConfig.rpcuser,
       password: nodeConfig.rpcpassword,
-      logger: logger,
+      logger,
       timeout: 10000
     })
 
@@ -207,16 +207,15 @@ const mergeCoinsFailureEpic = (action$: ActionsObservable<Action>) => action$.pi
 
 const isLedgerConnectedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.getLedgerConnected),
-  switchMap(async function(){
+  switchMap(async () => {
     try {
-      //console.log(isAvailable)
       if(await ledgerRes.isAvailable()){
         const result = await ledgerRes.getPublicKey(0)
-        let balance = await ledgerRes.getLedgerAddressBalance(result.bitcoinAddress)
-        return OwnAddressesActions.gotLedgerResistanceAppOpen(result.bitcoinAddress,balance.toString())
-      } else {
-        return OwnAddressesActions.getLedgerConnectedFailure()
+        const balance = await ledgerRes.getLedgerAddressBalance(result.bitcoinAddress)
+        return OwnAddressesActions.gotLedgerResistanceAppOpen(result.bitcoinAddress, balance.toString())
       }
+
+      return OwnAddressesActions.getLedgerConnectedFailure()
     } catch (err) {
       console.log(err.toString())
       if(err.toString().includes("cannot open device with path") || err.toString().includes("TransportStatusError: Ledger device: Security not satisfied (dongle locked or have invalid access rights)")){
@@ -234,33 +233,35 @@ const sendLedgerTransactionEpic = (action$: ActionsObservable<Action>, state$) =
       if(await ledgerRes.isAvailable()){
         const state = state$.value.ownAddresses.connectLedgerModal
 
-        let signedTransaction = await ledgerRes.sendCoins(state.destinationAddress, 0, 0.0001, state.destinationAmount.toNumber())
+        const signedTransaction = await ledgerRes.sendCoins(state.destinationAddress, 0, 0.0001, state.destinationAmount.toNumber())
         console.log(signedTransaction)
-        let sentTransaction = await ledgerRes.sendRawTransaction(signedTransaction)
+        const sentTransaction = await ledgerRes.sendRawTransaction(signedTransaction)
         console.log(sentTransaction)
-        //return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_SUCCESS", payload: {txid: sentTransaction}}
+        // return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_SUCCESS", payload: {txid: sentTransaction}}
         return OwnAddressesActions.sendLedgerTransactionSuccess(sentTransaction)
       }
 
-      //return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
+      // return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
       return OwnAddressesActions.sendLedgerTransactionFailure()
 
     } catch (err) {
       console.log(err.toString())
-      /*if(err.toString().includes("TransportError: Ledger Device is busy") || err.toString().includes("Error: cannot open device with path")){
+      /*
+        if(err.toString().includes("TransportError: Ledger Device is busy") || err.toString().includes("Error: cannot open device with path")){
         //return { type: "APP/OWN_ADDRESSES/EMPTY"}
         return OwnAddressesActions.empty()
-      }*/
+        }
+      */
 
-      //return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
+      // return { type: "APP/OWN_ADDRESSES/SEND_LEDGER_TRANSACTION_FAILURE" }
       return OwnAddressesActions.sendLedgerTransactionFailure()
     }
   })
 )
 
-const sendLedgerTransactionInvalidParamsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+const sendLedgerTransactionInvalidParamsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.sendLedgerTransactionInvalidParams),
-  tap((action) => {
+  tap(() => {
     toastr.error(t(`Please make sure destination address and amount are valid.`))
   }),
   mapTo(OwnAddressesActions.empty())
