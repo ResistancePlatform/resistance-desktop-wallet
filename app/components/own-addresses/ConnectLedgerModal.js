@@ -1,28 +1,26 @@
 // @flow
+import { Decimal } from 'decimal.js'
 import React, { Component} from 'react'
+import log from 'electron-log'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 import { shell } from 'electron';
 
-import { getStore } from '~/store/configureStore'
 import { RoundedButton } from '~/components/rounded-form'
 import RoundedInput from '~/components/rounded-form/RoundedInput'
 import { OwnAddressesActions } from '~/reducers/own-addresses/own-addresses.reducer'
-import { DECIMAL } from '~/constants/decimal'
 
 import styles from './ConnectLedgerModal.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 
-import { Decimal } from 'decimal.js'
-
 
 type Props = {
   t: any,
   actions: object,
-  connectLedgerModal: object,
+  connectLedgerModal: object
 }
 
 /**
@@ -31,12 +29,6 @@ type Props = {
  */
 class ConnectLedgerModal extends Component<Props> {
 	props: Props
-
-  /*state = {
-    timer: null
-  }*/
-
-  //blockchainExplorerIP: "http://54.91.60.116:3001"
 
   componentDidMount(){
     if(this.props.connectLedgerModal.isLedgerResistanceAppOpen){
@@ -48,17 +40,7 @@ class ConnectLedgerModal extends Component<Props> {
     this.props.actions.startLedgerPolling()
   }
 
-  /*tick() {
-    if(!this.props.connectLedgerModal.isLedgerResistanceAppOpen){
-      this.props.actions.getLedgerConnected()
-    } else {
-      clearInterval(this.state.timer)
-    }
-  }*/
-
-
   onDestAddressInputChanged(value) {
-    //getStore().dispatch(SendCashActions.checkAddressBookByName())
     this.props.actions.updateDestinationAddress(value)
   }
 
@@ -84,11 +66,11 @@ class ConnectLedgerModal extends Component<Props> {
   }
 
   onViewTransactionDetails(){
-    //this.eventConfirm(event)
-    let url = "http://54.91.60.116:3001" + "/insight/tx/" + this.props.connectLedgerModal.txid
-    console.log(url)
-    shell.openExternal(url) //`${this.blockchainExplorerIP} + /insight/tx/ + ${this.props.connectLedgerModal.txid}`)
-    //getStore().dispatch(this.props.actions.closeConnectLedgerModal())
+    const blockchainExplorerUrl = `http://54.91.60.116:3001`
+    const { txid } = this.props.connectLedgerModal
+    const url = `${blockchainExplorerUrl}/insight/tx/${txid}`
+    log.debug(`Transaction details URL`, blockchainExplorerUrl)
+    shell.openExternal(url)
   }
 
   getConnectLedgerContent() {
@@ -97,19 +79,20 @@ class ConnectLedgerModal extends Component<Props> {
     return (
       <div>
         <div className={styles.title}>
+          <div className={cn(styles.icon, styles.ledgerIcon)} />
           {t(`Send RES from Ledger`)}
         </div>
 
         <ul className={styles.stepsList}>
           <li>
-            <div className={cn('icon', styles.icon, styles.connectIcon)} />
+            <div className={cn(styles.icon, styles.connectIcon)} />
             <div className={styles.description}>
               {t(`Connect and unlock your Ledger device`)}
             </div>
             <div className={cn('icon', styles.mark, {[styles.active]: this.props.connectLedgerModal.isLedgerConnected})} />
           </li>
           <li>
-            <div className={cn('icon', styles.icon, styles.navigateIcon)} />
+            <div className={cn(styles.icon, styles.navigateIcon)} />
             <div className={styles.description}>
               {t(`Navigate to the Resistance app on your device`)}
             </div>
@@ -117,13 +100,6 @@ class ConnectLedgerModal extends Component<Props> {
           </li>
         </ul>
 
-        {/*<RoundedButton
-          className={styles.continueButton}
-          onClick={this.props.actions.getLedgerConnected}
-          important
-        >
-          {t(`Connect`)}
-        </RoundedButton>*/}
       </div>
     )
   }
@@ -133,19 +109,28 @@ class ConnectLedgerModal extends Component<Props> {
 
     return (
       <div>
-        <div className={styles.titleBar}>{t(`Send Currency from Ledger Nano S`)}</div>
+        <div className={styles.title}>
+          <div className={cn(styles.icon, styles.ledgerIcon)} />
+          {t(`Send Currency from Ledger Nano S`)}
+        </div>
+
         <div className={styles.title}>
           {t(`Please confirm transaction on Ledger`)}
         </div>
+
         <div className={styles.transactionDetailsContainer}>
           {t(`Your Ledger Address: ${this.props.connectLedgerModal.ledgerAddress}`)}
         </div>
+
         <div className={styles.transactionDetailsContainer}>
           {t(`Destination Address: ${this.props.connectLedgerModal.destinationAddress}`)}
+
         </div>
+
         <div className={styles.transactionDetailsContainer}>
           {t(`Destination Amount: ${this.props.connectLedgerModal.destinationAmount.toNumber()}`)}
         </div>
+
         <div className={styles.transactionDetailsContainer}>
           {t(`Transaction Fee: 0.0001`)}
         </div>
@@ -162,8 +147,10 @@ class ConnectLedgerModal extends Component<Props> {
         <div className={[styles.sendCashContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
 
           <div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapperContainer].join(' ')}>
-            {/* Title bar */}
-            <div className={styles.titleBar}>{t(`Send Currency from Ledger Nano S`)}</div>
+            <div className={styles.title}>
+              <div className={cn(styles.icon, styles.ledgerIcon)} />
+              {t(`Send Currency from Ledger Nano S`)}
+            </div>
 
             <div className={styles.balanceContainer}>
               {t(`Ledger Address Balance: ${this.props.connectLedgerModal.ledgerBalance}`)}
@@ -177,8 +164,7 @@ class ConnectLedgerModal extends Component<Props> {
                 label={t(`From address`)}
                 className={styles.destinationAddressInput}
                 labelClassName={styles.inputLabel}
-              >
-              </RoundedInput>
+              />
 
             {/* Destination address */}
             <RoundedInput
@@ -201,12 +187,6 @@ class ConnectLedgerModal extends Component<Props> {
                 onChange={value => this.onAmountAddressInputChanged(value)}
               />
             </div>
-
-           {/* <div className={styles.transactionFeeContainer}>
-              <span className={styles.part1}>{t(`Transaction fee:`)} </span>
-              <span className={styles.part2}>{DECIMAL.transactionFee.toString()}</span>
-              <span className={styles.part3}>RES</span>
-            </div>*/}
 
             {/* Send button row */}
               <div className={styles.viewDetailsButton}>
@@ -258,7 +238,6 @@ class ConnectLedgerModal extends Component<Props> {
 	render() {
     const {
       isLedgerConnected,
-      isTransactionConfirmed,
       isTransactionSent,
       isLedgerResistanceAppOpen,
       isTransactionPending
@@ -266,7 +245,7 @@ class ConnectLedgerModal extends Component<Props> {
 
 		return (
       <div className={styles.overlay}>
-        <div key={location.pathname} className={cn(styles.container, styles.connectLedger)}>
+        <div className={cn(styles.container, styles.connectLedger)}>
           <div
             role="button"
             tabIndex={0}

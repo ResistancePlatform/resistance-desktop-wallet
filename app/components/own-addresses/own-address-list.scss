@@ -44,11 +44,12 @@
 
 .ledgerIcon {
   position: absolute;
-  background: url('assets/images/ledger.svg');
-  width: 1.5rem;
-  height: 1.5rem;
-  margin-left: -2rem;
-  margin-top: -0.3rem;
+  background: url('assets/images/ledger-logo.svg');
+  background-size: contain;
+  width: 1.0rem;
+  height: 1.0rem;
+  margin-left: -1.5rem;
+  margin-top: -0.04rem;
 }
 
 .addressColumn {

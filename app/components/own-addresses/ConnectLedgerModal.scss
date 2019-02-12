@@ -7,9 +7,42 @@ $connectLedgerModalWidth: 26.25rem;
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
 .connectLedger {
-  width: $connectLedgerModalWidth * 1.5 - 2 * 2rem;
-  height: 16rem * 1.5 - 2 * 2rem;
+  width: $connectLedgerModalWidth - 2 * 2rem;
+  height: 13rem - 2 * 2rem;
   padding: 2rem;
+
+  .title {
+    padding-left: 1.5rem;
+  }
+
+  .icon {
+    position: absolute;
+    width: 1.4rem;
+    height: 1.4rem;
+
+    &.ledgerIcon {
+      background: url('assets/images/ledger-logo.svg');
+      background-size: contain;
+      width: 0.95rem;
+      height: 0.95rem;
+      margin-left: -1.5rem;
+      margin-top: 0.2rem;
+    }
+
+    &.connectIcon {
+      background: url('assets/images/ledger.svg');
+      background-size: contain;
+      margin-left: -1rem;
+      margin-top: -0.04rem;
+    }
+
+    &.navigateIcon {
+      background: url('assets/images/navigate.svg');
+      background-size: contain;
+      margin-left: -1rem;
+      margin-top: -0.04rem;
+    }
+  }
 }
 
 viewDetailsButton {
@@ -27,6 +60,7 @@ viewDetailsButton {
     align-items: center;
     padding-bottom: 1.4rem;
     border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+    padding-left: 1rem;
 
     &:last-child {
       padding-top: 1.4rem;
@@ -35,22 +69,8 @@ viewDetailsButton {
 
   }
 
-  .icon {
-    background: $BASE_COLOR_GRAY;
-    border-radius: 50%;
-    content: '';
-    width: 1.4rem;
-    height: 1.4rem;
-    margin-right: 0.6rem;
-  }
-
-  .connectIcon {
-  }
-
-  .navigateIcon {
-  }
-
   .description {
+    margin-left: 1rem;
   }
 
   .mark {
@@ -120,12 +140,6 @@ Start send Cash from Ledger
     justify-content: flex-start;
     align-items: flex-start;
     width: 33.75rem !important;
-}
-
-.titleBar {
-  font-size: 1.25rem;
-  font-weight: 100;
-  margin-bottom: 2rem;
 }
 
 .sendFromContainer {
