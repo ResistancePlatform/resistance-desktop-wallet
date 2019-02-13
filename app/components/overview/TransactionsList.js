@@ -47,11 +47,11 @@ class TransactionsList extends Component<Props> {
 
   getListRowRenderer(transaction: Transaction) {
     const { t, i18n } = this.props
-
-    return (
+      return (
       <UniformListRow
-        className={styles.row}
-        key={transaction.transactionId}
+          className={styles.row}
+        //Add a random string to prevent duplicate keys
+        key={transaction.transactionId + Math.random().toString().substring(2)}
         onClick={e => this.props.onRowClick(e, transaction.transactionId)}
         onContextMenu={e => this.props.onRowContextMenu(e, transaction.transactionId)}
       >
