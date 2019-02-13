@@ -78,11 +78,6 @@ class ConnectLedgerModal extends Component<Props> {
 
     return (
       <div>
-        <div className={styles.title}>
-          <div className={cn(styles.icon, styles.ledgerIcon)} />
-          {t(`Send RES from Ledger`)}
-        </div>
-
         <ul className={styles.stepsList}>
           <li>
             <div className={cn(styles.icon, styles.connectIcon)} />
@@ -149,7 +144,7 @@ class ConnectLedgerModal extends Component<Props> {
           <div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapperContainer].join(' ')}>
             <div className={styles.title}>
               <div className={cn(styles.icon, styles.ledgerIcon)} />
-              {t(`Send Currency from Ledger Nano S`)}
+              {t(`Send RES from Ledger Nano S`)}
             </div>
 
             <div className={styles.balanceContainer}>
@@ -236,6 +231,8 @@ class ConnectLedgerModal extends Component<Props> {
   }
 
 	render() {
+    const { t } = this.props
+
     const {
       isLedgerConnected,
       isTransactionSent,
@@ -253,6 +250,11 @@ class ConnectLedgerModal extends Component<Props> {
             onClick={this.props.actions.closeConnectLedgerModal}
             onKeyDown={() => {}}
           />
+
+          <div className={styles.title}>
+            <div className={cn(styles.icon, styles.ledgerIcon)} />
+            {t(`Send RES from Ledger`)}
+          </div>
 
           { (!isLedgerConnected || !isLedgerResistanceAppOpen) && (!isTransactionPending || !isTransactionSent) && this.getConnectLedgerContent() }
 
