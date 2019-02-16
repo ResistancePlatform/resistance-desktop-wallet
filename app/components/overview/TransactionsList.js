@@ -50,8 +50,7 @@ class TransactionsList extends Component<Props> {
       return (
       <UniformListRow
           className={styles.row}
-        //Add a random string to prevent duplicate keys
-        key={transaction.transactionId + Math.random().toString().substring(2)}
+	  key={transaction.transactionId}
         onClick={e => this.props.onRowClick(e, transaction.transactionId)}
         onContextMenu={e => this.props.onRowContextMenu(e, transaction.transactionId)}
       >
