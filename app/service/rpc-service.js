@@ -178,13 +178,16 @@ export class RpcService {
     ]
 
     const combineQueryPromise = Promise.all(queryPromiseArr)
-      .then(result => {
-        const combinedTransactionsList = [...result[0], ...result[1]]
+	  .then(result => {
+	const ids = [];
+	      const combinedTransactionsList = [...result[0], ...result[1]]
+	  let dedupedSortedTransactions = []
         const sortedByDateTransactions = combinedTransactionsList.sort((trans1, trans2) => (
           new Date(trans2.timestamp) - new Date(trans1.timestamp)
         ))
-        return { transactions: sortedByDateTransactions }
-      })
+	  dedupedSortedTransactions = sortedByDateTransactions.filter(item => ids.includes(item.transactionId) ? false : ids.push(item.transactionId));
+          return { transactions: dedupedSortedTransactions }
+	  })
 
     this::applyAddressBookNamesToTransactions(combineQueryPromise)
       .subscribe(
@@ -674,7 +677,6 @@ async function getPublicTransactionsPromise(client: Client) {
       if (result.message) {
         throw new Error(result.message)
       }
-
       return []
     })
 
