@@ -6,16 +6,17 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
-import { shell } from 'electron';
+import { shell } from 'electron'
 
-import { RoundedButton } from '~/components/rounded-form'
-import RoundedInput from '~/components/rounded-form/RoundedInput'
+import {
+  RoundedButton,
+  RoundedInput,
+  RoundedInputWithPaste,
+  CurrencyAmountInput
+} from '~/components/rounded-form'
 import { OwnAddressesActions } from '~/reducers/own-addresses/own-addresses.reducer'
 
 import styles from './ConnectLedgerModal.scss'
-import HLayout from '~/assets/styles/h-box-layout.scss'
-import VLayout from '~/assets/styles/v-box-layout.scss'
-
 
 type Props = {
   t: any,
@@ -78,6 +79,11 @@ class ConnectLedgerModal extends Component<Props> {
 
     return (
       <div>
+        <div className={styles.title}>
+          <div className={cn(styles.icon, styles.ledgerIcon)} />
+          {t(`Connect Ledger`)}
+        </div>
+
         <ul className={styles.stepsList}>
           <li>
             <div className={cn(styles.icon, styles.connectIcon)} />
@@ -102,116 +108,129 @@ class ConnectLedgerModal extends Component<Props> {
   getConfirmTransactionContent() {
     const { t } = this.props
 
+    // const details = (
+    //   <div>
+    //     <div className={styles.transactionDetailsContainer}>
+    //       {t(`Your Ledger Address: ${this.props.connectLedgerModal.ledgerAddress}`)}
+    //     </div>
+    //
+    //     <div className={styles.transactionDetailsContainer}>
+    //       {t(`Destination Address: ${this.props.connectLedgerModal.destinationAddress}`)}
+    //
+    //     </div>
+    //
+    //     <div className={styles.transactionDetailsContainer}>
+    //       {t(`Destination Amount: ${this.props.connectLedgerModal.destinationAmount.toNumber()}`)}
+    //     </div>
+    //
+    //     <div className={styles.transactionDetailsContainer}>
+    //       {t(`Transaction Fee: 0.0001`)}
+    //     </div>
+    //   </div>
+    // )
+
     return (
       <div>
         <div className={styles.title}>
           <div className={cn(styles.icon, styles.ledgerIcon)} />
-          {t(`Send Currency from Ledger Nano S`)}
-        </div>
-
-        <div className={styles.title}>
           {t(`Please confirm transaction on Ledger`)}
         </div>
 
-        <div className={styles.transactionDetailsContainer}>
-          {t(`Your Ledger Address: ${this.props.connectLedgerModal.ledgerAddress}`)}
+        <div className={styles.illustration}>
+          <div className={cn('icon', styles.mark)} />
         </div>
 
-        <div className={styles.transactionDetailsContainer}>
-          {t(`Destination Address: ${this.props.connectLedgerModal.destinationAddress}`)}
-
-        </div>
-
-        <div className={styles.transactionDetailsContainer}>
-          {t(`Destination Amount: ${this.props.connectLedgerModal.destinationAmount.toNumber()}`)}
-        </div>
-
-        <div className={styles.transactionDetailsContainer}>
-          {t(`Transaction Fee: 0.0001`)}
-        </div>
       </div>
     )
   }
 
   createTransaction() {
     const { t } = this.props
-    if(this.props.connectLedgerModal.pollForLedger){
+    const {
+      pollForLedger,
+      ledgerBalance,
+      isTransactionPending,
+      ledgerAddress
+    } = this.props.connectLedgerModal
+
+    if (pollForLedger) {
       this.props.actions.stopLedgerPolling()
     }
+
     return (
-        <div className={[styles.sendCashContainer, VLayout.vBoxChild, HLayout.hBoxContainer].join(' ')}>
-
-          <div className={[HLayout.hBoxChild, VLayout.vBoxContainer, styles.wrapperContainer].join(' ')}>
-            <div className={styles.title}>
-              <div className={cn(styles.icon, styles.ledgerIcon)} />
-              {t(`Send RES from Ledger Nano S`)}
-            </div>
-
-            <div className={styles.balanceContainer}>
-              {t(`Ledger Address Balance: ${this.props.connectLedgerModal.ledgerBalance}`)}
-            </div>
-
-            {/* From address */}
-            <div>
-              <RoundedInput readOnly
-                name="from"
-                defaultValue={this.props.connectLedgerModal.ledgerAddress}
-                label={t(`From address`)}
-                className={styles.destinationAddressInput}
-                labelClassName={styles.inputLabel}
-              />
-
-            {/* Destination address */}
-            <RoundedInput
-              name="destination"
-              className={styles.destinationAddressInput}
-              defaultValue=""
-              labelClassName={styles.inputLabel}
-              label={t(`Destination address`)}
-              onChange={value => this.onDestAddressInputChanged(value)}
-            />
-
-            {/* Amount */}
-            <div className={styles.amountContainer}>
-              <RoundedInput
-                name="amount"
-                defaultValue=""
-                label={t(`Amount`)}
-                labelClassName={styles.inputLabel}
-                number
-                onChange={value => this.onAmountAddressInputChanged(value)}
-              />
-            </div>
-
-            {/* Send button row */}
-              <div className={styles.viewDetailsButton}>
-                <RoundedButton
-                  type="submit"
-                  name="send-cash"
-                  className={styles.viewDetailsButton}
-                  disabled={this.props.connectLedgerModal.isTransactionPending}
-                  onClick={event => this.onSendButtonClicked(event)}
-                  important
-                  large
-                >
-                  {t(`Send`)}
-                </RoundedButton>
-            </div>
-          </div>
+      <div>
+        <div className={styles.title}>
+          <div className={cn(styles.icon, styles.ledgerIcon)} />
+          {t(`Send currency from Ledger Nano S`)}
         </div>
+
+        <RoundedInputWithPaste
+          name="destination"
+          defaultValue=""
+          labelClassName={styles.inputLabel}
+          label={t(`Destination address`)}
+          onChange={value => this.onDestAddressInputChanged(value)}
+        />
+
+        <RoundedInput readOnly
+          name="from"
+          defaultValue={ledgerAddress}
+          labelClassName={styles.inputLabel}
+          label={t(`From address`)}
+        />
+
+      <div className={styles.caption}>
+        {t(`Amount`)}
       </div>
+
+        <div className={styles.amountContainer}>
+
+          <CurrencyAmountInput
+            name="amount"
+            className={styles.amountInput}
+            defaultValue=""
+            number
+            onChange={value => this.onAmountAddressInputChanged(value)}
+            maxAmount={ledgerBalance && Decimal(ledgerBalance)}
+          />
+
+          <div className={styles.balanceContainer}>
+            <div className={styles.caption}>
+              {t(`Available balance`) }
+            </div>
+
+            <div className={styles.balance}>
+              {ledgerBalance}
+            </div>
+
+          </div>
+
+        </div>
+
+        <RoundedButton
+          className={styles.sendButton}
+          disabled={isTransactionPending}
+          onClick={e => this.onSendButtonClicked(e)}
+          important
+          large
+        >
+          {t(`Send`)}
+        </RoundedButton>
+    </div>
     )
   }
 
   getTransactionSentContent() {
     const { t } = this.props
 
+    // const { txid } = this.props.connectLedgerModal
+
     return (
       <div className={styles.transactionSent}>
         <div className={styles.checkMark} />
 
         <div className={styles.header}>
-          {t(`Transaction sent! Transaction Id: ${this.props.connectLedgerModal.txid}`)}
+          {t(`Transaction sent`)}
         </div>
 
         <div className={styles.note}>
@@ -231,8 +250,6 @@ class ConnectLedgerModal extends Component<Props> {
   }
 
 	render() {
-    const { t } = this.props
-
     const {
       isLedgerConnected,
       isTransactionSent,
@@ -240,9 +257,29 @@ class ConnectLedgerModal extends Component<Props> {
       isTransactionPending
     } = this.props.connectLedgerModal
 
+    const showConnectLedger = (
+      (!isLedgerConnected || !isLedgerResistanceAppOpen) &&
+      (!isTransactionPending || !isTransactionSent)
+    )
+
+    const showCreateTransaction = (
+      (isLedgerConnected && isLedgerResistanceAppOpen && !isTransactionPending) &&
+      (!isTransactionPending && !isTransactionSent)
+    )
+
+    const showConfirmTransaction = !isTransactionSent && isTransactionPending
+
+    const showTransactionSent = !isTransactionPending && isTransactionSent
+
+
 		return (
       <div className={styles.overlay}>
-        <div className={cn(styles.container, styles.connectLedger)}>
+        <div className={cn(styles.container, styles.sendRes, {
+          [styles.connectLedger]: showConnectLedger,
+          [styles.createTransaction]: showCreateTransaction,
+          [styles.confirmTransaction]: showConfirmTransaction,
+          [styles.transactionSent]: showTransactionSent
+        })}>
           <div
             role="button"
             tabIndex={0}
@@ -251,18 +288,13 @@ class ConnectLedgerModal extends Component<Props> {
             onKeyDown={() => {}}
           />
 
-          <div className={styles.title}>
-            <div className={cn(styles.icon, styles.ledgerIcon)} />
-            {t(`Send RES from Ledger`)}
-          </div>
+          { showConnectLedger && this.getConnectLedgerContent() }
 
-          { (!isLedgerConnected || !isLedgerResistanceAppOpen) && (!isTransactionPending || !isTransactionSent) && this.getConnectLedgerContent() }
+          { showCreateTransaction && this.createTransaction()}
 
-          { (isLedgerConnected && isLedgerResistanceAppOpen && !isTransactionPending) && (!isTransactionPending && !isTransactionSent) && this.createTransaction()}
+          { showConfirmTransaction && this.getConfirmTransactionContent() }
 
-          { !isTransactionSent && isTransactionPending && this.getConfirmTransactionContent() }
-
-          { !isTransactionPending && isTransactionSent && this.getTransactionSentContent() }
+          { showTransactionSent && this.getTransactionSentContent() }
 
         </div>
       </div>
