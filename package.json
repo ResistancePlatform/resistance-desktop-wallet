@@ -48,7 +48,8 @@
       "app.html",
       "main.prod.js",
       "main.prod.js.map",
-      "package.json"
+      "package.json",
+      "app/"
     ],
     "extraResources": [
       "locales"
@@ -236,7 +237,6 @@
     "iocane": "^1.0.2",
     "iso-639-1": "^2.0.3",
     "joi": "^13.7.0",
-    "ledger-res": "git+ssh://git@github.com:ResistancePlatform/ledger-res-js.git",
     "momentjs": "^2.0.0",
     "node-dir": "^0.1.17",
     "node-uuid": "^1.4.8",
@@ -274,7 +274,6 @@
     "round-to": "^3.0.0",
     "rxjs": "^6.3.3",
     "source-map-support": "^0.5.9",
-    "usb": "^1.5.0",
     "write-json-file": "^3.0.2"
   },
   "devEngines": {
