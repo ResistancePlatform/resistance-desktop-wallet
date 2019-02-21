@@ -63,6 +63,16 @@ function getValidationSchema(t) {
   return schema
 }
 
+function validCoreNum(v, systemCoreCount) {
+    let coreNum = parseInt(v, 10);
+    if ((v < 0) || (v > systemCoreCount)) {
+	coreNum = 1;
+    } else if (isNaN(v)) {
+	coreNum = 1;
+    }
+    return coreNum;
+}
+
 /**
  * @class Settings
  * @extends {Component<Props>}
@@ -222,7 +232,7 @@ class Settings extends Component<Props> {
                    label={t(`Number of cores`)}
                    defaultValue={this.props.settings.cpuCoresNumber}
                    type="number"
-                   onChange={value => this.props.actions.setCpuCoresNumber(parseInt(value, 10))}
+                    onChange={value => this.props.actions.setCpuCoresNumber(validCoreNum(value, totalCpuCoresNumber))}
                    min={1}
                    max={totalCpuCoresNumber}
                  />
