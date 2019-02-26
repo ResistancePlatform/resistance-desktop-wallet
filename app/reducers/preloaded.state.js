@@ -75,7 +75,15 @@ export const preloadedState: State = {
       isVisible: false,
       isLedgerConnected: false,
       isTransactionConfirmed: false,
-      isTransactionSent: false
+      isTransactionSent: false,
+      isLedgerResistanceAppOpen: false,
+      ledgerAddress: "",
+      destinationAddress: "",
+      destinationAmount: Decimal('0'),
+      isTransactionPending: false,
+      ledgerBalance: "0",
+      txid: "",
+      pollForLedger: true,
     }
 	},
 	sendCash: {

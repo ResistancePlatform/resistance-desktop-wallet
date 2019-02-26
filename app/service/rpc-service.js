@@ -127,6 +127,21 @@ export class RpcService {
       })
   }
 
+  getInfo() {
+    const client = getClientInstance()
+
+    client.getInfo()
+      .then((info: DaemonInfo) => {
+        getStore().dispatch(SystemInfoActions.gotDaemonInfo(info))
+        return Promise.resolve()
+      })
+      .catch(err => {
+        // TODO: move the prefix to toastr error title in the epic #114
+        const errorPrefix = t(`Unable to get Resistance local node info`)
+        getStore().dispatch(SystemInfoActions.getDaemonInfoFailure(`${errorPrefix}: ${err}`, err.code))
+      })
+  }
+
   /**
    * Request the wallet information.
    *
@@ -381,6 +396,18 @@ export class RpcService {
             disabled: false
           }))
           .filter(item => !(item.address.startsWith('rr') || item.address.startsWith('rs')))
+
+        //Add Ledger Address to List
+        if(getStore().getState().ownAddresses.connectLedgerModal.isLedgerResistanceAppOpen){
+          combinedAddresses.unshift({
+            balance: Decimal('0'),
+            confirmed: false,
+            address: getStore().getState().ownAddresses.connectLedgerModal.ledgerAddress,
+            isUnspent: false,
+            disabled: false,
+            isLedger: true
+          })
+        }
 
         log.debug(`Fetching the balances for the combined addresses: ${combinedAddresses}`)
         return this::getAddressesBalance(client, combinedAddresses)

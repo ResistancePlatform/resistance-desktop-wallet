@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>tick-sm</title>
+    <desc>Created with Sketch.</desc>
+    <g id="tick-sm" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <circle id="Oval" fill="#0CCF96" fill-rule="nonzero" cx="8" cy="8" r="8"></circle>
+        <path d="M11.5643579,4.30285714 L11.5643579,4.30285714 C11.8927469,4.55531213 11.9543036,5.02617925 11.7018486,5.35456827 L7.65277652,10.6215302 C7.31616987,11.0593823 6.68834705,11.1414579 6.25049502,10.8048512 C6.23741763,10.7947977 6.224591,10.7844222 6.2120269,10.7737342 L4.48354684,9.30335346 C4.1680469,9.03496445 4.12985594,8.56162893 4.39824494,8.24612899 L4.39824494,8.24612899 C4.66663395,7.93062904 5.13996947,7.89243808 5.45546942,8.16082709 L6.78378002,9.2907923 L10.5126467,4.44034787 C10.7651017,4.11195885 11.2359688,4.05040215 11.5643579,4.30285714 Z" id="Path-12" fill="#262C47" fill-rule="nonzero"></path>
+    </g>
+</svg>

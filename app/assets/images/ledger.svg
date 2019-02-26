@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>ledger</title>
+    <desc>Created with Sketch.</desc>
+    <g id="ledger" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <circle id="Oval" fill="#393F5C" fill-rule="nonzero" cx="12" cy="12" r="12"></circle>
+        <path d="M18,13 C18,13.5522847 17.5522847,14 17,14 L14,14 C14,14.5522847 13.5522847,15 13,15 L3,15 C2.44771525,15 2,14.5522847 2,14 L2,10 C2,9.44771525 2.44771525,9 3,9 L13,9 C13.5522847,9 14,9.44771525 14,10 L17,10 C17.5522847,10 18,10.4477153 18,11 L18,12 C20.209139,12 22,13.790861 22,16 L21,16 C21,14.3431458 19.6568542,13 18,13 Z M13,14 L13,10 L3,10 L3,14 L13,14 Z M14,11 L14,13 L17,13 L17,11 L14,11 Z M5,13 C4.44771525,13 4,12.5522847 4,12 C4,11.4477153 4.44771525,11 5,11 C5.55228475,11 6,11.4477153 6,12 C6,12.5522847 5.55228475,13 5,13 Z" id="Shape" fill="#439AD0" fill-rule="nonzero"></path>
+    </g>
+</svg>

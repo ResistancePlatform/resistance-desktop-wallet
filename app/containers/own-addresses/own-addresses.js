@@ -7,6 +7,7 @@ import { translate } from 'react-i18next'
 import cn from 'classnames'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
+import LedgerPolling from '~/components/ledger/ledger-polling.js'
 import OwnAddressList from '~/components/own-addresses/own-address-list'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
@@ -19,7 +20,7 @@ import styles from './own-addresses.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 
-const pollingInterval = 5.0
+const pollingInterval = 3.0
 const addressRowPopupMenuId = 'own-addresses-address-row-popup-menu-id'
 const createAddressPopupMenuId = 'own-addresses-create-address-popup-menu-id'
 const privateKeysPopupMenuId = 'own-addresses-private-keys-popup-menu-id'
@@ -102,6 +103,8 @@ class OwnAddresses extends Component<Props> {
           }}
         />
 
+        <LedgerPolling />
+
         {this.props.ownAddresses.connectLedgerModal.isVisible &&
           <ConnectLedgerModal />
         }
@@ -134,7 +137,7 @@ class OwnAddresses extends Component<Props> {
                       {t(`New private (Z) address`)}
                     </PopupMenuItem>
                     <PopupMenuItem onClick={this.props.actions.showConnectLedgerModal}>
-                      {t(`Connect ledger`)}
+                      {t(`Send RES from Ledger`)}
                     </PopupMenuItem>
                   </PopupMenu>
 

@@ -64,3 +64,6 @@ main.js.map
 .idea
 npm-debug.log.*
 package-lock.json
+
+# Etomic files
+genETOMIC

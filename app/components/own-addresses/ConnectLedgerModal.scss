@@ -1,11 +1,117 @@
 @import "~/assets/styles/modal.scss";
+@import "~/assets/styles/vars.scss";
+@import "~/assets/styles/generic-component.scss";
 
-$connectLedgerModalWidth: 26.25rem;
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
-.connectLedger {
-  width: $connectLedgerModalWidth - 2 * 2rem;
-  height: 15.5rem - 2 * 2rem;
+.sendRes {
+  width: 26.25rem - 2 * 2rem;
+  height: 13rem - 2 * 2rem;
   padding: 2rem;
+
+  &.createTransaction {
+    width: 32.25rem - 2 * 2rem;
+    height: 18.6rem - 2 * 2rem;
+
+    .caption {
+      color: $BASE_COLOR_FONT_GRAY_2;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      user-select: none;
+      margin-left: 1.1rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .inputLabel {
+      min-width: 7rem;
+    }
+
+    .amountContainer {
+      display: flex;
+
+      .amountInput {
+        width: 8rem;
+      }
+    }
+
+    .balanceContainer {
+      margin-left: 1.1rem;
+
+      .caption {
+        color: $BASE_COLOR_FONT_GRAY;
+        margin-bottom: 0;
+        margin-left: 0;
+      }
+
+      .balance {
+        font-size: 0.65rem;
+      }
+
+    }
+
+    .sendButton {
+      float: right;
+    }
+
+  }
+
+  &.confirmTransaction {
+    height: 11.6rem - 2 * 2rem;
+
+    .illustration {
+      height: 4rem;
+      background: url('assets/images/ledger-illustration.png') no-repeat center;
+      background-size: contain;
+
+      .mark {
+        &:before {
+          position: relative;
+          content: "\e90d";
+          font-size: 0.67rem;
+          color: $BASE_COLOR_SUCCESS;
+          left: 10.1rem;
+          top: 2.25rem;
+        }
+      }
+    }
+  }
+
+  .title {
+    padding-left: 1.5rem;
+  }
+
+  .icon {
+    position: absolute;
+    width: 1.4rem;
+    height: 1.4rem;
+
+    &.ledgerIcon {
+      background: url('assets/images/ledger-logo.svg');
+      background-size: contain;
+      width: 0.95rem;
+      height: 0.95rem;
+      margin-left: -1.5rem;
+      margin-top: 0.2rem;
+    }
+
+    &.connectIcon {
+      background: url('assets/images/ledger.svg');
+      background-size: contain;
+      margin-left: -1rem;
+      margin-top: -0.04rem;
+    }
+
+    &.navigateIcon {
+      background: url('assets/images/navigate.svg');
+      background-size: contain;
+      margin-left: -1rem;
+      margin-top: -0.04rem;
+    }
+  }
+}
+
+.viewDetailsButton {
+  text-align: center !important;
 }
 
 .stepsList {
@@ -19,6 +125,7 @@ $connectLedgerModalWidth: 26.25rem;
     align-items: center;
     padding-bottom: 1.4rem;
     border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+    padding-left: 1rem;
 
     &:last-child {
       padding-top: 1.4rem;
@@ -27,25 +134,12 @@ $connectLedgerModalWidth: 26.25rem;
 
   }
 
-  .icon {
-    background: $BASE_COLOR_GRAY;
-    border-radius: 50%;
-    content: '';
-    width: 1.4rem;
-    height: 1.4rem;
-    margin-right: 0.6rem;
-  }
-
-  .connectIcon {
-  }
-
-  .navigateIcon {
-  }
-
   .description {
+    margin-left: 1rem;
   }
 
   .mark {
+    display:inline-block;
     flex: 1;
     text-align: right;
     padding-right: 0.6rem;
@@ -74,9 +168,17 @@ $connectLedgerModalWidth: 26.25rem;
 
 .transactionSent {
   text-align: center;
+  height: 15rem - 2 * 2rem;
 
   .checkMark {
-    margin-bottom: 3.6rem;
+    position: relative;
+    margin-bottom: 1.6rem;
+    width: 1.8rem;
+    height: 1.8rem;
+    background: url('assets/images/tick-lg.svg') no-repeat center;
+    background-size: contain;
+    left: calc(50% - 0.8rem);
+    top: 0.5rem;
   }
 
   .header {
@@ -89,3 +191,5 @@ $connectLedgerModalWidth: 26.25rem;
     margin-bottom: 1.6rem;
   }
 }
+
+/* Send currency from Ledger */

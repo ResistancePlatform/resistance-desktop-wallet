@@ -48,6 +48,11 @@ class OwnAddressList extends Component<Props> {
           {address.address.startsWith('z') &&
             <div className={cn('icon', styles.privacyIcon)} />
           }
+
+          {address.isLedger &&
+            <div className={styles.ledgerIcon} />
+          }
+
           <Address className={styles.address} value={address.address} />
 
           <CopyButton className={styles.copyButton} valueToCopy={address.address} />

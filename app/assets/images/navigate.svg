@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>navigate</title>
+    <desc>Created with Sketch.</desc>
+    <g id="navigate" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <circle id="Oval" fill="#393F5C" fill-rule="nonzero" cx="12" cy="12" r="12"></circle>
+        <g id="Group" transform="translate(9.000000, 7.000000)" fill="#439AD0" fill-rule="nonzero">
+            <polygon id="Path-11" points="0.659448626 4 -5.41788836e-13 3.27918253 3 -1.08357767e-13 6 3.27918253 5.34055137 4 3 1.44163494"></polygon>
+            <polygon id="Path-11" transform="translate(3.000000, 8.000000) scale(1, -1) translate(-3.000000, -8.000000) " points="0.659448626 10 0 9.27918253 3 6 6 9.27918253 5.34055137 10 3 7.44163494"></polygon>
+        </g>
+    </g>
+</svg>

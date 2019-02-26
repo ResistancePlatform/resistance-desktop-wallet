@@ -18,8 +18,16 @@ export type OwnAddressesState = {
   connectLedgerModal: {
     isVisible: boolean,
     isLedgerConnected: boolean,
+    isLedgerResistanceAppOpen: boolean,
     isTransactionConfirmed: boolean,
-    isTransactionSent: boolean
+    isTransactionSent: boolean,
+    ledgerAddress: string,
+    ledgerBalance: string,
+    destinationAddress: string,
+    destinationAmount: Decimal,
+    isTransactionPending: boolean,
+    txid: string,
+    pollForLedger: boolean,
   }
 }
 
@@ -36,6 +44,20 @@ export const OwnAddressesActions = createActions(
     SHOW_CONNECT_LEDGER_MODAL: undefined,
     CONTINUE_TO_CONFIRM_TRANSACTION: undefined,
     CLOSE_CONNECT_LEDGER_MODAL: undefined,
+    GET_LEDGER_CONNECTED: undefined,
+    GOT_LEDGER_CONNECTED: undefined,
+    GOT_LEDGER_RESISTANCE_APP_OPEN: (address: string, balance: string) => ({ address, balance }),
+    GET_LEDGER_CONNECTED_FAILURE: undefined,
+    START_LEDGER_POLLING: undefined,
+    STOP_LEDGER_POLLING: undefined,
+
+    UPDATE_DESTINATION_ADDRESS: (address: string) => ({address}),
+    UPDATE_DESTINATION_AMOUNT: (amount: Decimal) => ({amount}),
+
+    SEND_LEDGER_TRANSACTION: undefined,
+    SEND_LEDGER_TRANSACTION_SUCCESS: (txid: string) => ({txid}),
+    SEND_LEDGER_TRANSACTION_FAILURE: undefined,
+    SEND_LEDGER_TRANSACTION_INVALID_PARAMS: undefined,
 
     INITIATE_PRIVATE_KEYS_EXPORT: undefined,
     EXPORT_PRIVATE_KEYS: filePath => ({filePath}),
@@ -75,6 +97,20 @@ export const OwnAddressesReducer = handleActions(
     [OwnAddressesActions.getOwnAddressesFailure]: state => ({
       ...state, addresses: []
     }),
+    [OwnAddressesActions.startLedgerPolling]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        pollForLedger: true
+      }
+    }),
+    [OwnAddressesActions.stopLedgerPolling]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        pollForLedger: false
+      }
+    }),
     [OwnAddressesActions.showConnectLedgerModal]: state => ({
       ...state,
       connectLedgerModal: {
@@ -82,7 +118,85 @@ export const OwnAddressesReducer = handleActions(
         isVisible: true
       }
     }),
-    [OwnAddressesActions.continueToConfirmTransaction]: state => ({
+    [OwnAddressesActions.gotLedgerConnected]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isLedgerConnected: true,
+        isLedgerResistanceAppOpen: false,
+      }
+    }),
+    [OwnAddressesActions.gotLedgerResistanceAppOpen]: (state, action) => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isLedgerConnected: true,
+        isLedgerResistanceAppOpen: true,
+        ledgerAddress: action.payload.address,
+        ledgerBalance: action.payload.balance
+      }
+    }),
+    [OwnAddressesActions.getLedgerConnectedFailure]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isLedgerConnected: false,
+        isLedgerResistanceAppOpen: false,
+        isTransactionPending:false,
+        isTransactionSent:false
+      }
+    }),
+    [OwnAddressesActions.sendLedgerTransaction]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isTransactionPending: true,
+        //pollForLedger: false
+      }
+    }),
+    /*[OwnAddressesActions.sendLedgerTransactionInvalidParams]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isTransactionPending: false,
+      }
+    }),*/
+    [OwnAddressesActions.sendLedgerTransactionSuccess]: (state, action) => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isTransactionPending: false,
+        //ledgerAddress: "",
+        //destinationAddress: "",
+        //destinationAmount: Decimal("0"),
+        isTransactionSent: true,
+        txid: action.payload.txid,
+        //pollForLedger: false
+      }
+    }),
+    [OwnAddressesActions.sendLedgerTransactionFailure]: state => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        isTransactionPending: false,
+        //pollForLedger: true
+      }
+    }),
+    [OwnAddressesActions.updateDestinationAddress]: (state, action) => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        destinationAddress: action.payload.address
+      }
+    }),
+    [OwnAddressesActions.updateDestinationAmount]: (state, action) => ({
+      ...state,
+      connectLedgerModal: {
+        ...state.connectLedgerModal,
+        destinationAmount: action.payload.amount,
+      }
+    }),
+    /* [OwnAddressesActions.continueToConfirmTransaction]: state => ({
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
@@ -90,12 +204,21 @@ export const OwnAddressesReducer = handleActions(
         isTransactionConfirmed: true,
         isTransactionSent: true
       }
-    }),
+    }),*/
     [OwnAddressesActions.closeConnectLedgerModal]: state => ({
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
-        isVisible: false
+        isVisible: false,
+        isTransactionPending: false,
+        //ledgerAddress: "",
+        //destinationAddress: "",
+        //destinationAmount: Decimal("0"),
+        isTransactionSent: false,
+        txid: "",
+        //isLedgerConnected: false,
+        //isLedgerResistanceAppOpen: false,
+        pollForLedger: true
       }
     }),
     [OwnAddressesActions.mergeAllMinedCoins]: (state, action) => ({
