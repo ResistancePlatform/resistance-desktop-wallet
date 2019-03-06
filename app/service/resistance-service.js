@@ -31,7 +31,7 @@ const configFileContents = [
   ``
 ].join(EOL)
 
-const resistancedArgs = ['-printtoconsole', '-rpcthreads=8']
+const resistancedArgs = ['-printtoconsole', '-rpcthreads=8', '-server']
 const torSwitch = '-proxy=127.0.0.1:9050'
 
 
