@@ -109,10 +109,8 @@ class ResDexBuySell extends Component<Props> {
     const { isAdvanced } = this.props.buySell
 
     const isMarket = form && form.fields.isMarketOrder || !isAdvanced
-    const isPrivate = false
 
-    // TODO: Uncomment after the demo
-    // const isPrivate = Boolean(form && form.fields.enhancedPrivacy && isMarket)
+    const isPrivate = Boolean(form && form.fields.enhancedPrivacy && isMarket)
 
     const order = {
       orderType: 'buy',

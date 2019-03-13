@@ -22,9 +22,7 @@ const mainApi = resDexApiFactory('RESDEX')
 const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexAccountsActions.getCurrencies),
   switchMap(() => {
-    // Commented out for the purposes of the demo
-    // const processNames = ['RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
-    const processNames = ['RESDEX']
+    const processNames = ['RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
 
     const getPortfoliosPromise = Promise.all(processNames.map(processName => {
       const api = resDexApiFactory(processName)
@@ -51,12 +49,6 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
           ...previous,
           [processName]: responseToCurrencies(result[index])
         }), {})
-
-        // TODO: Remove, added for the purposes of the demo
-        Object.assign(currencies, {
-          RESDEX_PRIVACY1: {},
-          RESDEX_PRIVACY2: {},
-        })
 
         return of(ResDexAccountsActions.gotCurrencies(currencies))
       }),

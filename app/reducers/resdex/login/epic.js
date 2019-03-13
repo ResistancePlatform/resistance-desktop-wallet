@@ -86,10 +86,7 @@ const startResdexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     })
 
     // Start 3 ResDEX processes, one for transparent and two for private trades
-    // Commented out for the purposes of the demo
-    // const processNames = ['RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
-
-    const processNames = ['RESDEX']
+    const processNames = ['RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
 
     const observables = processNames.map(processName => {
       const api = resDexApiFactory(processName)
