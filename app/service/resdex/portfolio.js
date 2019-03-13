@@ -1,5 +1,6 @@
 // @flow
 import path from 'path'
+import log from 'electron-log'
 import { remote } from 'electron'
 import dir from 'node-dir'
 import { createSession } from 'iocane'
@@ -99,7 +100,8 @@ export class ResDexPortfolioService {
 
   async decryptSeedPhrase(seedPhrase: string, password: string) {
     try {
-      return await iocane.decrypt(seedPhrase, password)
+      const decrypted = await iocane.decrypt(seedPhrase, password)
+      return decrypted
     } catch (error) {
       if (/Authentication failed/.test(error.message)) {
         throw new IncorrectPasswordError()

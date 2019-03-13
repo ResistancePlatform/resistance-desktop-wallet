@@ -23,6 +23,7 @@ import VLayout from '~/assets/styles/v-box-layout.scss'
 import styles from './ResDex.scss'
 
 type Props = {
+  t: any,
   resDex: ResDexState,
   actions: object
 }
@@ -40,6 +41,8 @@ export class ResDex extends Component<Props> {
    * @memberof ResDex
 	 */
   getContents() {
+    const { t } = this.props
+
     return (
       <div>
         <RpcPolling
@@ -95,10 +98,10 @@ export class ResDex extends Component<Props> {
           selectedTabPanelClassName={styles.selectedTabPanel}
         >
           <TabList className={styles.tabList}>
-            <Tab className={styles.tab}>Assets</Tab>
-            <Tab className={styles.tab}>Buy/Sell</Tab>
-            <Tab className={styles.tab}>Orders</Tab>
-            <Tab className={styles.tab}>Accounts</Tab>
+            <Tab className={styles.tab}>{t(`Assets`)}</Tab>
+            <Tab className={styles.tab}>{t(`Buy/Sell`)}</Tab>
+            <Tab className={styles.tab}>{t(`Orders`)}</Tab>
+            <Tab className={styles.tab}>{t(`Accounts`)}</Tab>
           </TabList>
 
           <TabPanel><ResDexAssets /></TabPanel>
