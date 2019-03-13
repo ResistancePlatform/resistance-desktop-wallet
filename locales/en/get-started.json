@@ -38,5 +38,10 @@
   "Invalid backup wallet password, please go back and change it.": "Invalid backup wallet password, please go back and change it.",
   "Can't change the backup wallet password, check the application log for details.": "Can't change the backup wallet password, check the application log for details.",
   "Changing the wallet password...": "Changing the wallet password...",
-  "Error setting the wallet password, check the application log for details.": "Error setting the wallet password, check the application log for details."
+  "Error setting the wallet password, check the application log for details.": "Error setting the wallet password, check the application log for details.",
+  "Terms & Conditions": "Terms & Conditions",
+  "Please agree to continue": "Please agree to continue",
+  "Disagree": "Disagree",
+  "Agree": "Agree",
+  "You haven't accepted the EULA, the app will quit now": "You haven't accepted the EULA, the app will quit now"
 }

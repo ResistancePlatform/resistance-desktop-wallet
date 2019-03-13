@@ -60,5 +60,9 @@
   "ResDEX 1": "ResDEX 1",
   "ResDEX 2": "ResDEX 2",
   "ResDEX 3": "ResDEX 3",
-  "Node (Etomic)": "노드(Etomic)"
+  "Node (Etomic)": "노드(Etomic)",
+  "Number of cores": "Number of cores",
+  "Note:": "Note:",
+  "Changing amount of cores requires restarting of the mining daemon.": "Changing amount of cores requires restarting of the mining daemon.",
+  "Wallet password is required due to the local node restart": "Wallet password is required due to the local node restart"
 }

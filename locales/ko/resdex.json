@@ -147,5 +147,22 @@
   "Can't create a limit order, check the log for details": "지정가 주문을 생성할 수 없음. 자세한 내용은 로그에서 확인하십시오",
   "Error performing Resistance withdrawal to a privatizer address": "비공개화 주소로 Resistance 인출 수행 중에 오류 발생",
   "Private order created successfully": "비공개 주문이 성공적으로 생성됨",
-  "New orders creation locked until the trade complete": "거래 완료 시까지 새로운 주문 생성이 잠김"
+  "New orders creation locked until the trade complete": "거래 완료 시까지 새로운 주문 생성이 잠김",
+  "Instant DEX": "즉석 DEX",
+  "Instant swap allowed": "즉시 교환 가능",
+  "Instant swap disallowed": "즉시 스왑이 허용되지 않음",
+  "Instant swap": "즉석 스왑",
+  "Weeks": "주",
+  "Instant DEX Deposit": "즉시 DEX 보증금",
+  "You were sending": "너는 보내고 있었다",
+  "You have sent": "너는 보냈다",
+  "Swap history removed": "스왑 기록 삭제됨",
+  "Are you sure want to clear the swap history?": "스왑 기록을 삭제 하시겠습니까?",
+  "Clear history": "기록 지우기",
+  "Assets": "자산",
+  "Buy/Sell": "구매 / 판매",
+  "Orders": "명령",
+  "Accounts": "계정",
+  "Error getting Instant DEX balance, check the log for details": "",
+  "Error performing instant DEX deposit": "Error performing instant DEX deposit"
 }

@@ -91,5 +91,18 @@
   "Buy Bitcoin with": "Buy Bitcoin with",
   "Swapping {{pair}}": "Swapping {{pair}}",
   "Privatizing": "Privatizing",
-  "An error has occurred during authentication, please check the application log for details": "An error has occurred during authentication, please check the application log for details"
+  "An error has occurred during authentication, please check the application log for details": "An error has occurred during authentication, please check the application log for details",
+  "({{time}} left)": "({{time}} left)",
+  "Got {{blocksNumber}} blocks at {{hashingPower}} khash/s": "Got {{blocksNumber}} blocks at {{hashingPower}} khash/s",
+  "No pending operations": "No pending operations",
+  "{{pendingNumber}} pending, {{successNumber}} complete, {{failedNumber}} failed operations": "{{pendingNumber}} pending, {{successNumber}} complete, {{failedNumber}} failed operations",
+  "Mining status": "Mining status",
+  "Off": "Off",
+  "On": "On",
+  "Private transactions": "Private transactions",
+  "Tor status": "Tor status",
+  "Show Tor logs": "Show Tor logs",
+  "Show details": "Show details",
+  "Send Currency": "Send Currency",
+  "Downloading Resistance parameters": "Downloading Resistance parameters"
 }

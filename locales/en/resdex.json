@@ -147,5 +147,22 @@
   "Can't create a limit order, check the log for details": "Can't create a limit order, check the log for details",
   "Error performing Resistance withdrawal to a privatizer address": "Error performing Resistance withdrawal to a privatizer address",
   "Private order created successfully": "Private order created successfully",
-  "New orders creation locked until the trade complete": "New orders creation locked until the trade complete"
+  "New orders creation locked until the trade complete": "New orders creation locked until the trade complete",
+  "Instant DEX": "Instant DEX",
+  "Instant swap allowed": "Instant swap allowed",
+  "Instant swap disallowed": "Instant swap disallowed",
+  "Instant swap": "Instant swap",
+  "Weeks": "Weeks",
+  "Instant DEX Deposit": "Instant DEX Deposit",
+  "You were sending": "You were sending",
+  "You have sent": "You have sent",
+  "Swap history removed": "Swap history removed",
+  "Are you sure want to clear the swap history?": "Are you sure want to clear the swap history?",
+  "Clear history": "Clear history",
+  "Assets": "Assets",
+  "Buy/Sell": "Buy/Sell",
+  "Orders": "Orders",
+  "Accounts": "Accounts",
+  "Error getting Instant DEX balance, check the log for details": "Error getting Instant DEX balance, check the log for details",
+  "Error performing instant DEX deposit": "Error performing instant DEX deposit"
 }

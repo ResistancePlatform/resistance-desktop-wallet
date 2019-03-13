@@ -93,5 +93,17 @@
   "Buy Bitcoin with": "다음으로 Bitcoin 구매",
   "Swapping {{pair}}": "{{pair}} 교환 중",
   "Privatizing": "비공개화 중",
-  "An error has occurred during authentication, please check the application log for details": "인증 도중 오류가 발생했습니다. 자세한 내용은 앱 로그에서 확인하십시오."
+  "An error has occurred during authentication, please check the application log for details": "인증 도중 오류가 발생했습니다. 자세한 내용은 앱 로그에서 확인하십시오.",
+  "({{time}} left)": "({{time}} left)",
+  "Got {{blocksNumber}} blocks at {{hashingPower}} khash/s": "Got {{blocksNumber}} blocks at {{hashingPower}} khash/s",
+  "No pending operations": "No pending operations",
+  "{{pendingNumber}} pending, {{successNumber}} complete, {{failedNumber}} failed operations": "{{pendingNumber}} pending, {{successNumber}} complete, {{failedNumber}} failed operations",
+  "Mining status": "Mining status",
+  "Off": "Off",
+  "On": "On",
+  "Private transactions": "Private transactions",
+  "Tor status": "Tor status",
+  "Show Tor logs": "Show Tor logs",
+  "Show details": "Show details",
+  "Downloading Resistance parameters": "Downloading Resistance parameters"
 }

@@ -41,5 +41,7 @@
   "T (Private)": "T(비공개)",
   "Transaction has already been broadcasted": "이미 거래가 브로드캐스트되었습니다",
   "Couldn't create withdrawal transaction": "인출 거래를 생성하지 못함",
-  "Incorrect ResDEX password": "잘못된 ResDEX 비밀번호"
+  "Incorrect ResDEX password": "잘못된 ResDEX 비밀번호",
+  "Checking Resistance parameters presence": "Checking Resistance parameters presence",
+  "Calculating parameters checksums": "Calculating parameters checksums"
 }

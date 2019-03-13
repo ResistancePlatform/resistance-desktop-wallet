@@ -38,5 +38,10 @@
   "Invalid backup wallet password, please go back and change it.": "잘못된 백업 월렛 비밀번호입니다. 뒤로 가서 변경하십시오.",
   "Can't change the backup wallet password, check the application log for details.": "백업 월렛 비밀번호를 변경할 수 없습니다. 자세한 내용은 앱 로그에서 확인하십시오.",
   "Changing the wallet password...": "월렛 비밀번호 변경 중...",
-  "Error setting the wallet password, check the application log for details.": "월렛 비밀번호 설정 오류 발생. 자세한 내용은 앱 로그에서 확인하십시오."
+  "Error setting the wallet password, check the application log for details.": "월렛 비밀번호 설정 오류 발생. 자세한 내용은 앱 로그에서 확인하십시오.",
+  "Terms & Conditions": "Terms & Conditions",
+  "Please agree to continue": "Please agree to continue",
+  "Disagree": "Disagree",
+  "Agree": "Agree",
+  "You haven't accepted the EULA, the app will quit now": "You haven't accepted the EULA, the app will quit now"
 }

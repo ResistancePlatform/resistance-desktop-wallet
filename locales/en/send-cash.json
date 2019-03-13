@@ -23,5 +23,6 @@
   "Unable to start send currency operation": "Unable to start send currency operation",
   "Sending currency from a transparent (R) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "Sending currency from a transparent (R) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.",
   "Sending currency from a private (Z) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "Sending currency from a private (Z) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.",
-  "Sending currency from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled.": "Sending currency from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled."
+  "Sending currency from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled.": "Sending currency from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled.",
+  "Send Currency": "Send Currency"
 }

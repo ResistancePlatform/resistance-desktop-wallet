@@ -32,5 +32,21 @@
   "Are you sure want to merge all transparent address coins?": "Are you sure want to merge all transparent address coins?",
   "Are you sure want to merge all private address coins?": "Are you sure want to merge all private address coins?",
   "Are you sure want to merge all coins?": "Are you sure want to merge all coins?",
-  "It may take several minutes to rescan the blockchain for transactions affecting the newly-added keys.": "It may take several minutes to rescan the blockchain for transactions affecting the newly-added keys."
+  "It may take several minutes to rescan the blockchain for transactions affecting the newly-added keys.": "It may take several minutes to rescan the blockchain for transactions affecting the newly-added keys.",
+  "Connect Ledger": "Connect Ledger",
+  "Connect and unlock your Ledger device": "Connect and unlock your Ledger device",
+  "Navigate to the Resistance app on your device": "Navigate to the Resistance app on your device",
+  "Transaction Fee: 0.0001": "Transaction Fee: 0.0001",
+  "Please confirm transaction on Ledger": "Please confirm transaction on Ledger",
+  "Send currency from Ledger Nano S": "Send currency from Ledger Nano S",
+  "Destination address": "Destination address",
+  "From address": "From address",
+  "Amount": "Amount",
+  "Available balance": "Available balance",
+  "Send": "Send",
+  "Transaction sent": "Transaction sent",
+  "Your account balance will update once the blockchain has confirmed the transaction": "Your account balance will update once the blockchain has confirmed the transaction",
+  "View details": "View details",
+  "Send RES from Ledger": "Send RES from Ledger",
+  "Please make sure destination address and amount are valid.": "Please make sure destination address and amount are valid."
 }
