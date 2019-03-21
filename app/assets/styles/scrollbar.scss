@@ -1,0 +1,29 @@
+@import "~/assets/styles/vars.scss";
+
+.scrollbar {
+  overflow-y: scroll;
+  margin-right: 0.5rem;
+  height: 100%;
+  content: '';
+
+  &::-webkit-scrollbar {
+    width: 0.3rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 0.15rem;
+    background: $BASE_COLOR_GRAY;
+    padding-top: 0.5rem;
+  }
+
+  &.important {
+    &::-webkit-scrollbar-thumb {
+      background: $BASE_COLOR_PURPLE;
+    }
+  }
+
+}

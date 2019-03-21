@@ -7,7 +7,7 @@ import { translate } from 'react-i18next'
 import cn from 'classnames'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
-import LedgerPolling from '~/components/ledger/ledger-polling.js'
+import LedgerPolling from '~/components/ledger/ledger-polling'
 import OwnAddressList from '~/components/own-addresses/own-address-list'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
@@ -17,6 +17,7 @@ import { RoundedButtonWithDropdown, MoreButton  } from '~/components/rounded-for
 import ConnectLedgerModal from '~/components/own-addresses/ConnectLedgerModal'
 
 import styles from './own-addresses.scss'
+import scrollStyles from '~/assets/styles/scrollbar.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 
@@ -110,9 +111,9 @@ class OwnAddresses extends Component<Props> {
         }
 
 				{ /* Route content */}
-				<div className={cn(styles.container, VLayout.vBoxChild, HLayout.hBoxContainer)}>
+				<div className={cn(styles.container, VLayout.vBoxChild, HLayout.hBoxContainer, scrollStyles.scrollbar)}>
 
-					<div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer)}>
+					<div className={cn(styles.wrapper, HLayout.hBoxChild, VLayout.vBoxContainer)}>
 
 						{ /* Top bar */}
 						<div className={cn(styles.header, HLayout.hBoxContainer)}>
