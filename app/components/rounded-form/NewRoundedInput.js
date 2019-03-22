@@ -44,6 +44,9 @@ export default class RoundedInput extends GenericInput {
 		this.setState({ isFocused: false })
 	}
 
+  onClickHandler() {
+  }
+
   renderInput() {
     return (
       <input
@@ -58,6 +61,7 @@ export default class RoundedInput extends GenericInput {
         onChange={event => this.onChangeHandler(event)}
         onFocus={event => this.onFocusHandler(event)}
         onBlur={event => this.onBlurHandler(event)}
+        onClick={event => this.onClickHandler(event)}
         placeholder={this.props.placeholder}
         readOnly={this.props.readOnly}
         min={this.props.min}

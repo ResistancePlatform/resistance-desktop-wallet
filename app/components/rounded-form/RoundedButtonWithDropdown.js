@@ -14,6 +14,13 @@ export type Props = {
 export default class RoundedButtonWithDropdown extends RoundedButton {
   props: Props
 
+  onClickHandler(event) {
+    if (!this.props.onClick) {
+      return this.onDropdownClickHandler(event)
+    }
+    return super.onClickHandler(event)
+  }
+
   onDropdownClickHandler(event) {
     event.stopPropagation()
     this.props.onDropdownClick(event)

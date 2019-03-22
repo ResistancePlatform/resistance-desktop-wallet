@@ -13,6 +13,12 @@ export type Props = {
 export default class RoundedInputWithDropdown extends RoundedInput {
   props: Props
 
+  onClickHandler(event) {
+    if (this.props.readOnly) {
+      return this.onDropdownClickHandler(event)
+    }
+  }
+
   onDropdownClickHandler(event) {
     event.stopPropagation()
     this.props.onDropdownClick(event)
