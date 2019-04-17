@@ -19,7 +19,7 @@ import { AddressBookService } from './address-book-service'
 import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions, Transaction } from '../reducers/overview/overview.reducer'
 import { OwnAddressesActions, AddressRow } from '../reducers/own-addresses/own-addresses.reducer'
-import { SendCashActions } from '~/reducers/send-cash/send-cash.reducer'
+import { SendCurrencyActions } from '~/reducers/send-currency/send-currency.reducer'
 import { AddressBookRecord } from '~/reducers/address-book/address-book.reducer'
 
 
@@ -305,10 +305,8 @@ export class RpcService {
    * @returns {Observable<any>}
    * @memberof RpcService
    */
-  sendCash(fromAddress: string, toAddress: string, amountToSend: Decimal) {
+  sendCurrency(fromAddress: string, toAddress: string, amountToSend: Decimal) {
     const client = getClientInstance()
-
-    log.debug('send cash', client.port)
 
     const commandParameters= [
       fromAddress,
@@ -324,14 +322,14 @@ export class RpcService {
 
     command.then(([result])=> {
       if (typeof(result) === 'string') {
-        getStore().dispatch(SendCashActions.sendCashOperationStarted(result))
+        getStore().dispatch(SendCurrencyActions.sendCurrencyOperationStarted(result))
       } else {
-        getStore().dispatch(SendCashActions.sendCashFailure(result.message))
+        getStore().dispatch(SendCurrencyActions.sendCurrencyFailure(result.message))
       }
       return Promise.resolve()
     })
     .catch(err => (
-      getStore().dispatch(SendCashActions.sendCashFailure(err.toString()))
+      getStore().dispatch(SendCurrencyActions.sendCurrencyFailure(err.toString()))
     ))
   }
 

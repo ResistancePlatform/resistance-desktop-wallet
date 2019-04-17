@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import { translate } from 'react-i18next'
 
 import { truncateAmount } from '~/utils/decimal'
-import { AddressDropdownItem } from '~/reducers/send-cash/send-cash.reducer'
+import { AddressDropdownItem } from '~/reducers/send-currency/send-currency.reducer'
 
 import styles from './address-drodown-popup-menu.scss'
 
@@ -84,4 +84,4 @@ class AddressDropdownPopupMenu extends Component<Props> {
   }
 }
 
-export default translate('send-cash')(AddressDropdownPopupMenu)
+export default translate('send-currency')(AddressDropdownPopupMenu)

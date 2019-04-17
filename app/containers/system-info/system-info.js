@@ -272,7 +272,7 @@ class SystemInfo extends Component<Props> {
 
 const mapStateToProps = (state: State) => ({
 	systemInfo: state.systemInfo,
-	sendCash: state.sendCash,
+	sendCurrency: state.sendCurrency,
 	settings: state.settings
 })
 

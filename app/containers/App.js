@@ -25,7 +25,7 @@ import SystemInfo from './system-info/system-info'
 import Overview from './overview/overview'
 import TransactionDetails from '~/components/overview/TransactionDetails'
 import OwnAddress from './own-addresses/own-addresses'
-import SendCash from './send-cash/send-cash'
+import SendCurrency from './send-currency/send-currency'
 import Settings from './settings/settings'
 import SimplexPage from './SimplexPage'
 import ResDexPage from './ResDexPage'
@@ -124,7 +124,7 @@ class App extends React.Component<Props> {
 							<Route exact path="/overview" component={Overview} />
               <Route exact path="/overview/transaction-details" component={TransactionDetails} />
 							<Route exact path="/own-addresses" component={OwnAddress} />
-							<Route exact path="/send-cash" component={SendCash} />
+							<Route exact path="/send-currency" component={SendCurrency} />
 							<Route exact path="/settings" component={Settings} />
 							<Route exact path="/simplex" component={SimplexPage} />
 							<Route exact path="/address-book" component={AddressBookPage} />

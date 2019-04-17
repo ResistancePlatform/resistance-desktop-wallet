@@ -86,8 +86,8 @@ export const preloadedState: State = {
       pollForLedger: true,
     }
 	},
-	sendCash: {
-		isPrivateTransactions: false,
+	sendCurrency: {
+		arePrivateTransactionsEnabled: false,
 		lockIcon: 'Unlock',
 		lockTips: null,
 		fromAddress: '',

@@ -17,9 +17,9 @@ import {
   RoundedButton
 } from '~/components/rounded-form'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
-import { SendCashActions, SendCashState } from '~/reducers/send-cash/send-cash.reducer'
+import { SendCurrencyActions, SendCurrencyState } from '~/reducers/send-currency/send-currency.reducer'
 
-import styles from './send-cash.scss'
+import styles from './send-currency.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 
@@ -48,25 +48,25 @@ const addressesPopupMenuId = 'send-currency-addresses-dropdown-id'
 type Props = {
   t: any,
   actions: object,
-	sendCash: SendCashState
+	sendCurrency: SendCurrencyState
 }
 
 /**
- * @class SendCash
+ * @class SendCurrency
  * @extends {Component<Props>}
  */
-class SendCash extends Component<Props> {
+class SendCurrency extends Component<Props> {
 	props: Props
 
 	/**
-	 * @memberof SendCash
+	 * @memberof SendCurrency
 	 */
 	componentDidMount() {
     this.props.actions.checkAddressBookByName()
 	}
 
 	getDropdownAddresses() {
-    this.props.sendCash.addressList.map(address => (
+    this.props.sendCurrency.addressList.map(address => (
       <PopupMenuItem key={address.address} onClick={() => this.props.actions.updateFromAddress(address.address)}>
         {address.address}
       </PopupMenuItem>
@@ -75,10 +75,11 @@ class SendCash extends Component<Props> {
 
 	/**
 	 * @returns
-	 * @memberof SendCash
+	 * @memberof SendCurrency
 	 */
 	render() {
     const { t } = this.props
+    const { arePrivateTransactionsEnabled } = this.props.sendCurrency
 
 		return (
 			// Layout container
@@ -106,6 +107,8 @@ class SendCash extends Component<Props> {
               {/* From address */}
               <RoundedInputWithDropdown
                 name="fromAddress"
+                className={styles.input}
+                labelClassName={styles.inputLabel}
                 label={t(`From address`)}
               >
                 <PopupMenu id={addressesPopupMenuId} relative>
@@ -117,53 +120,70 @@ class SendCash extends Component<Props> {
               {/* Toggle button */}
               <ToggleButton
                 name="arePrivateTransactionsEnabled"
-                defaultValue={this.props.sendCash.arePrivateTransactionsEnabled}
+                switcherClassName={styles.toggleSwitcher}
+                defaultValue={arePrivateTransactionsEnabled}
                 label={t(`Private Transactions`)}
+                captions={[t(`On`), t(`Off`)]}
               />
             </div>
 
 						{/* Destination address */}
 						<RoundedInputWithPaste
 							name="destinationAddress"
+              labelClassName={styles.inputLabel}
 							label={t(`Destination address`)}
 						/>
 
             <div className={styles.amountRow}>
               {/* Amount */}
               <CurrencyAmountInput
-                className={styles.amount}
+                className={styles.input}
+                label={t(`Amount`)}
+                labelClassName={styles.inputLabel}
                 name="amount"
                 symbol="RES"
               />
 
-              <div className={styles.label}>
-                {t(`Transaction fee:`)}
-              </div>
+              <div className={styles.transactionFee}>
+                <div className={styles.label}>
+                  {t(`Transaction fee:`)}
+                </div>
 
-              <div className={styles.fee}>
-                {DECIMAL.transactionFee.toString()}
-              </div>
+                <div className={styles.amount}>
+                  {DECIMAL.transactionFee.toString()}
+                </div>
 
-              <div className={styles.symbol}>RES</div>
+                <div className={styles.symbol}>RES</div>
+              </div>
 
             </div>
 
 						{/* Send button row */}
 
-						<RoundedButton
-							type="submit"
-							onClick={this.props.actions.sendCash}
-							important
-						>
-							{t(`Send`)}
-						</RoundedButton>
+            <div className={styles.submitRow}>
+              <RoundedButton
+                type="submit"
+                onClick={this.props.actions.sendCurrency}
+                important
+              >
+                {t(`Send`)}
+              </RoundedButton>
 
-						<div>{t('tip-r-to-r')}</div>
+              <div
+                className={cn('icon', styles.privateIcon, {
+                  [styles.locked]: arePrivateTransactionsEnabled
+                })}
+              />
+
+              <div className={styles.hint}>{t('tip-r-to-r')}</div>
+            </div>
 
             </RoundedForm>
 
 						{/* Memo */}
 						<div className={styles.memo}>
+              <hr />
+
 							<div className={styles.label}>{t(`Memo:`)}</div>
               {t(`memo`)}
 						</div>
@@ -176,11 +196,12 @@ class SendCash extends Component<Props> {
 }
 
 const mapStateToProps = state => ({
-	sendCash: state.sendCash
+  sendCurrency: state.sendCurrency,
+  form: state.roundedForm.sendCurrency
 })
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(SendCashActions, dispatch),
+  actions: bindActionCreators(SendCurrencyActions, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate('send-cash')(SendCash))
+export default connect(mapStateToProps, mapDispatchToProps)(translate('send-currency')(SendCurrency))

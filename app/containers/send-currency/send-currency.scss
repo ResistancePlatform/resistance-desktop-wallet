@@ -1,0 +1,107 @@
+@import "~/assets/styles/vars.scss";
+@import "~/assets/styles/section.scss";
+
+.form {
+  margin-right: 9.75rem;
+
+  .inputLabel {
+    min-width: 6.7rem;
+  }
+
+}
+
+.fromAddressRow {
+  display: flex;
+  justify-content: space-between;
+
+  .input {
+    width: 100%;
+  }
+
+  .toggleSwitcher {
+    width: 3.2rem;
+    margin-right: 0;
+  }
+}
+
+.amountRow {
+  display: flex;
+  justify-content: space-between;
+
+  .input {
+    width: 100%;
+  }
+
+  .transactionFee {
+    font-size: 0.67rem;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    color: $BASE_COLOR_FONT_GRAY_2;
+
+    .label {
+      margin-right: 0.8rem;
+    }
+
+    .amount {
+      font-weight: 500;
+      margin-right: 0.4rem;
+      color: $BASE_COLOR_WHITE;
+    }
+
+    .symbol {
+    }
+  }
+
+}
+
+.submitRow {
+  display: flex;
+  align-items: center;
+
+  .privateIcon {
+    margin-left: 1.5rem;
+    margin-right: 1rem;
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 1.5rem;
+
+    &:before {
+      content: '\e904';
+    }
+
+    &.locked {
+      &:before {
+        content: '\e903';
+      }
+    }
+  }
+
+  .hint {
+    width: 24.18rem;
+    font-size: 0.63rem;
+    font-weight: 500;
+  }
+}
+
+.memo {
+  font-size: 0.67rem;
+  color: $BASE_COLOR_FONT_GRAY_2;
+  margin-right: 1.5rem;
+
+  hr {
+    margin-top: 1.8rem;
+    margin-bottom: 1.5rem;
+
+    border: none;
+    border-top: 1px solid $BASE_COLOR_BORDER_GRAY;
+    width: 100%;
+  }
+
+  .label {
+    display: inline;
+    margin-right: 0.25rem;
+    color: $BASE_COLOR_WHITE;
+    font-weight: 500;
+  }
+}

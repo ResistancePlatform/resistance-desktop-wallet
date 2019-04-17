@@ -6,7 +6,7 @@ import { i18n } from '~/i18next.config'
 import { preloadedState } from '../preloaded.state'
 
 
-const t = i18n.getFixedT(null, 'send-cash')
+const t = i18n.getFixedT(null, 'send-currency')
 
 export type SendFromRadioButtonType = 'transparent' | 'private'
 
@@ -16,8 +16,8 @@ export type AddressDropdownItem = {
 	disabled?: boolean
 }
 
-export type SendCashState = {
-	isPrivateTransactions: boolean,
+export type SendCurrencyState = {
+	arePrivateTransactionsEnabled: boolean,
 	lockIcon: 'Lock' | 'Unlock',
 	lockTips: string | null,
 	fromAddress: string,
@@ -30,7 +30,7 @@ export type SendCashState = {
   isInputDisabled: boolean
 }
 
-export const SendCashActions = createActions(
+export const SendCurrencyActions = createActions(
   {
     EMPTY: undefined,
     TOGGLE_PRIVATE_SEND: undefined,
@@ -59,10 +59,10 @@ const isTransparentAddress = (tempAddress: string) => tempAddress.startsWith('r'
 /**
  * @param {*} tempState
  */
-export const checkPrivateTransactionRule = (tempState: SendCashState) => {
+export const checkPrivateTransactionRule = (tempState: SendCurrencyState) => {
 	let checkResult = 'ok'
 
-  if (tempState.isPrivateTransactions) {
+  if (tempState.arePrivateTransactionsEnabled) {
     return checkResult
   }
 
@@ -84,7 +84,7 @@ export const checkPrivateTransactionRule = (tempState: SendCashState) => {
  * @param {*} newAddress
  * @param {*} isUpdateFromAddress
  */
-const handleAddressUpdate = (tempState: SendCashState, newAddress: string, isUpdateFromAddress: boolean) => {
+const handleAddressUpdate = (tempState: SendCurrencyState, newAddress: string, isUpdateFromAddress: boolean) => {
 	const newState = isUpdateFromAddress ? ({ ...tempState, fromAddress: newAddress }) : ({ ...tempState, toAddress: newAddress })
 
 	// We should use the "next state" to run  the `checkPrivateTransactionRule` !!!
@@ -117,8 +117,8 @@ const handleAddressUpdate = (tempState: SendCashState, newAddress: string, isUpd
 /**
  * @param {*} tempState
  */
-const handleTogglePrivateTransaction = (tempState: SendCashState) => {
-	const newState = ({ ...tempState, isPrivateTransactions: !tempState.isPrivateTransactions })
+const handleTogglePrivateTransaction = (tempState: SendCurrencyState) => {
+	const newState = ({ ...tempState, arePrivateTransactionsEnabled: !tempState.arePrivateTransactionsEnabled })
 
 	// We should use the "next state" to run  the `checkPrivateTransactionRule` !!!
 	const tempCheckResult = checkPrivateTransactionRule(newState)
@@ -128,18 +128,18 @@ const handleTogglePrivateTransaction = (tempState: SendCashState) => {
 }
 
 
-export const SendCashReducer = handleActions({
-	[SendCashActions.sendCash]: (state) => ({ ...state, isInputDisabled: true }),
-	[SendCashActions.sendCashOperationStarted]: (state) => ({ ...state, isInputDisabled: false }),
-	[SendCashActions.sendCashFailure]: (state) => ({ ...state, isInputDisabled: false }),
+export const SendCurrencyReducer = handleActions({
+	[SendCurrencyActions.sendCurrency]: (state) => ({ ...state, isInputDisabled: true }),
+	[SendCurrencyActions.sendCurrencyOperationStarted]: (state) => ({ ...state, isInputDisabled: false }),
+	[SendCurrencyActions.sendCurrencyFailure]: (state) => ({ ...state, isInputDisabled: false }),
 
-	[SendCashActions.togglePrivateSend]: (state) => handleTogglePrivateTransaction(state),
+	[SendCurrencyActions.togglePrivateSend]: (state) => handleTogglePrivateTransaction(state),
 
-	[SendCashActions.updateFromAddress]: (state, action) => handleAddressUpdate(state, action.payload, true),
-	[SendCashActions.updateToAddress]: (state, action) => handleAddressUpdate(state, action.payload, false),
-	[SendCashActions.updateAmount]: (state, action) => ({ ...state, amount: action.payload }),
-	[SendCashActions.updateDropdownMenuVisibility]: (state, action) => ({ ...state, showDropdownMenu: action.payload }),
+	[SendCurrencyActions.updateFromAddress]: (state, action) => handleAddressUpdate(state, action.payload, true),
+	[SendCurrencyActions.updateToAddress]: (state, action) => handleAddressUpdate(state, action.payload, false),
+	[SendCurrencyActions.updateAmount]: (state, action) => ({ ...state, amount: action.payload }),
+	[SendCurrencyActions.updateDropdownMenuVisibility]: (state, action) => ({ ...state, showDropdownMenu: action.payload }),
 
-	[SendCashActions.getAddressListSuccess]: (state, action) => ({ ...state, addressList: action.payload }),
-	[SendCashActions.getAddressListFail]: (state) => ({ ...state, addressList: null })
-}, preloadedState.sendCash)
+	[SendCurrencyActions.getAddressListSuccess]: (state, action) => ({ ...state, addressList: action.payload }),
+	[SendCurrencyActions.getAddressListFail]: (state) => ({ ...state, addressList: null })
+}, preloadedState.sendCurrency)
