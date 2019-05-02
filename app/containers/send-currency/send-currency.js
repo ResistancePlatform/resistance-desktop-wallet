@@ -7,7 +7,9 @@ import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 
 import { DECIMAL } from '~/constants/decimal'
+import { truncateAmount } from '~/utils/decimal'
 import ValidateAddressService from '~/service/validate-address-service'
+import { Address } from '~/components/address/Address'
 import {
   RoundedForm,
   RoundedInputWithPaste,
@@ -72,9 +74,25 @@ class SendCurrency extends Component<Props> {
 	}
 
 	getDropdownAddresses() {
-    return this.props.sendCurrency.addresses.map(address => (
-      <PopupMenuItem key={address.address} onClick={() => this.props.actions.updateFromAddress(address.address)}>
-        {address.address}
+    const { t } = this.props
+    const { addresses } = this.props.sendCurrency
+
+    return addresses.map(address => (
+      <PopupMenuItem
+        key={address.address}
+        onClick={() => this.props.actions.updateFromAddress(address.address)}
+      >
+        <div className={styles.item}>
+          <Address className={styles.address} value={address.address} />
+
+          <div className={styles.balance}>
+            {address.balance === null
+              ? t('Error')
+              : `${truncateAmount(address.balance)} RES`}
+          </div>
+
+        </div>
+
       </PopupMenuItem>
     ))
 	}
@@ -179,12 +197,13 @@ class SendCurrency extends Component<Props> {
                 labelClassName={styles.inputLabel}
                 label={t(`From address`)}
                 tooltip={this.getInputTooltip()}
-                onDropdownClick={() => {
-                  this.props.actions.getAddresses()
-                  this.props.popupMenu.show(addressesPopupMenuId)
-                }}
+                onDropdownClick={() => this.props.popupMenu.show(addressesPopupMenuId)}
               >
-                <PopupMenu id={addressesPopupMenuId} relative>
+                <PopupMenu
+                  id={addressesPopupMenuId}
+                  className={styles.dropdownMenu}
+                  relative
+                >
                   {this.getDropdownAddresses()}
                 </PopupMenu>
 

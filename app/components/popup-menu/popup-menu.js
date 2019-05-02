@@ -4,6 +4,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { translate } from 'react-i18next'
 import cn from 'classnames'
 
 import { PopupMenuState, PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
@@ -11,9 +12,11 @@ import { PopupMenuState, PopupMenuActions } from '~/reducers/popup-menu/popup-me
 import styles from './popup-menu.scss'
 
 type Props = {
+  t: any,
   id: string,
   className?: string,
   relative?: boolean,
+  emptyMessage?: string | false,
   popupMenu: PopupMenuState,
   actions: object
 }
@@ -64,11 +67,21 @@ class PopupMenu extends Component<Props> {
 	 * @memberof PopupMenu
 	 */
   renderChildren() {
-    const props = this.props.popupMenu[this.props.id]
+    const menuProps = this.props.popupMenu[this.props.id]
 
-    return React.Children.map(this.props.children, child => child && React.cloneElement(child, {
-      id: this.props.id,
-      data: props.data
+    const { t, id, children } = this.props
+
+    if (!children || !children.length) {
+      return (
+        <div className={styles.emptyMessage}>
+          {this.props.emptyMessage || t(`No menu items to display.`)}
+        </div>
+      )
+    }
+
+    return React.Children.map(children, child => child && React.cloneElement(child, {
+      id,
+      data: menuProps.data
     }))
   }
 
@@ -140,4 +153,4 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(PopupMenuActions, dispatch)
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(PopupMenu)
+export default connect(mapStateToProps, mapDispatchToProps)(translate('other')(PopupMenu))

@@ -8,6 +8,34 @@
     min-width: 6.7rem;
   }
 
+  .dropdownMenu {
+    width: 20rem;
+    font-size: 0.43rem !important;
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+
+      font-size: 0.6rem !important;
+
+      &:hover .address, &:hover .balance {
+        color: $BASE_COLOR_PURPLE;
+      }
+
+      .address {
+        color: $BASE_COLOR_FONT_GRAY_2;
+        width: 8rem;
+        max-width: 8rem;
+        text-transform: none !important;
+      }
+
+      .balance {
+        color: $BASE_COLOR_WHITE;
+        font-weight: 500;
+      }
+
+    }
+  }
 }
 
 .fromAddressRow {
