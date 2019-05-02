@@ -2,11 +2,11 @@
 import { Decimal } from 'decimal.js'
 import { createActions, handleActions } from 'redux-actions'
 
-import { i18n } from '~/i18next.config'
+// import { i18n } from '~/i18next.config'
 import { preloadedState } from '../preloaded.state'
 
 
-const t = i18n.getFixedT(null, 'send-currency')
+// const t = i18n.getFixedT(null, 'send-currency')
 
 export type SendFromRadioButtonType = 'transparent' | 'private'
 
@@ -18,128 +18,35 @@ export type AddressDropdownItem = {
 
 export type SendCurrencyState = {
 	arePrivateTransactionsEnabled: boolean,
-	lockIcon: 'Lock' | 'Unlock',
-	lockTips: string | null,
-	fromAddress: string,
-	toAddress: string,
-	inputTooltips: string,
-	amount: Decimal,
-	showDropdownMenu: boolean,
-	sendFromRadioButtonType: SendFromRadioButtonType,
-  addressList: AddressDropdownItem[],
-  isInputDisabled: boolean
+  addresses: AddressDropdownItem[],
+  isSending: boolean
 }
 
 export const SendCurrencyActions = createActions(
   {
     EMPTY: undefined,
-    TOGGLE_PRIVATE_SEND: undefined,
-    UPDATE_FROM_ADDRESS: (address: string) => address,
-    UPDATE_TO_ADDRESS: (address: string) => address,
-    UPDATE_AMOUNT: (amount: Decimal) => amount,
-    SEND_CASH: undefined,
-    SEND_CASH_OPERATION_STARTED: (operationId: string) => ({ operationId }),
-    SEND_CASH_FAILURE: (errorMessage: string) => ({ errorMessage }),
-    UPDATE_DROPDOWN_MENU_VISIBILITY: (show: boolean) => show,
-    GET_ADDRESS_LIST: (isPrivate: boolean) => isPrivate,
-    GET_ADDRESS_LIST_SUCCESS: (addressList: AddressDropdownItem[]) => addressList,
-    GET_ADDRESS_LIST_FAIL: undefined,
-    PASTE_TO_ADDRESS_FROM_CLIPBOARD: undefined,
-    CHECK_ADDRESS_BOOK_BY_NAME: undefined
+
+    GET_ADDRESSES: (searchString?: string) => ({ searchString }),
+    GOT_ADDRESSES: (addresses: AddressDropdownItem[]) => ({ addresses }),
+
+    TOGGLE_PRIVATE_TRANSACTIONS: areEnabled => ({ areEnabled }),
+
+    SEND_CURRENCY: undefined,
   },
   {
-    prefix: `APP/SEND_CASH`
+    prefix: `APP/SEND_CURRENCY`
   }
 )
 
-
-const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')
-const isTransparentAddress = (tempAddress: string) => tempAddress.startsWith('r')
-
-/**
- * @param {*} tempState
- */
-export const checkPrivateTransactionRule = (tempState: SendCurrencyState) => {
-	let checkResult = 'ok'
-
-  if (tempState.arePrivateTransactionsEnabled) {
-    return checkResult
-  }
-
-	if (isTransparentAddress(tempState.fromAddress) && isPrivateAddress(tempState.toAddress)) {
-    checkResult = t(`Sending currency from a transparent (R) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
-	}
-	else if (isPrivateAddress(tempState.fromAddress) && isPrivateAddress(tempState.toAddress)) {
-    checkResult = t(`Sending currency from a private (Z) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
-	}
-	else if (isPrivateAddress(tempState.fromAddress) && isTransparentAddress(tempState.toAddress)) {
-    checkResult = t(`Sending currency from a private (Z) address to a transparent (R) address is forbidden when "Private Transactions" are disabled.`)
-	}
-
-	return checkResult
-}
-
-/**
- * @param {*} tempState
- * @param {*} newAddress
- * @param {*} isUpdateFromAddress
- */
-const handleAddressUpdate = (tempState: SendCurrencyState, newAddress: string, isUpdateFromAddress: boolean) => {
-	const newState = isUpdateFromAddress ? ({ ...tempState, fromAddress: newAddress }) : ({ ...tempState, toAddress: newAddress })
-
-	// We should use the "next state" to run  the `checkPrivateTransactionRule` !!!
-	const tempCheckResult = checkPrivateTransactionRule(newState)
-	const newInputTooltips = tempCheckResult === 'ok' ? '' : tempCheckResult
-
-	// The new `lockIcon` and `lockTips`
-	const { fromAddress, toAddress } = newState
-
-	let lockIcon = 'Unlock'
-	let lockTips = t('tip-r-to-r')
-
-	if (isTransparentAddress(fromAddress) && isPrivateAddress(toAddress)) {
-		lockIcon = `Unlock`
-		lockTips = t('tip-r-to-z')
-	} else if (isPrivateAddress(fromAddress) && isPrivateAddress(toAddress)) {
-		lockIcon = `Lock`
-		lockTips = t('tip-z-to-z')
-	} else if (isPrivateAddress(fromAddress) && isTransparentAddress(toAddress)) {
-		lockIcon = `Unlock`
-		lockTips = t('tip-z-to-r')
-	} else if (isTransparentAddress(fromAddress) && isTransparentAddress(toAddress)) {
-		lockIcon = `Unlock`
-		lockTips = t('tip-r-to-r')
-	}
-
-	return ({ ...newState, inputTooltips: newInputTooltips, lockIcon, lockTips })
-}
-
-/**
- * @param {*} tempState
- */
-const handleTogglePrivateTransaction = (tempState: SendCurrencyState) => {
-	const newState = ({ ...tempState, arePrivateTransactionsEnabled: !tempState.arePrivateTransactionsEnabled })
-
-	// We should use the "next state" to run  the `checkPrivateTransactionRule` !!!
-	const tempCheckResult = checkPrivateTransactionRule(newState)
-	const newInputTooltips = tempCheckResult === 'ok' ? '' : tempCheckResult
-
-	return ({ ...newState, inputTooltips: newInputTooltips })
-}
-
-
 export const SendCurrencyReducer = handleActions({
-	[SendCurrencyActions.sendCurrency]: (state) => ({ ...state, isInputDisabled: true }),
-	[SendCurrencyActions.sendCurrencyOperationStarted]: (state) => ({ ...state, isInputDisabled: false }),
-	[SendCurrencyActions.sendCurrencyFailure]: (state) => ({ ...state, isInputDisabled: false }),
+	[SendCurrencyActions.gotAddresses]: (state, action) => ({ ...state, addresses: action.payload.addresses }),
 
-	[SendCurrencyActions.togglePrivateSend]: (state) => handleTogglePrivateTransaction(state),
+	[SendCurrencyActions.sendCurrency]: state => ({ ...state, isSending: true }),
+	[SendCurrencyActions.sendCurrencyOperationStarted]: state => ({ ...state, isInputDisabled: false }),
+	[SendCurrencyActions.sendCurrencyOperationFailed]: state => ({ ...state, isInputDisabled: false }),
 
-	[SendCurrencyActions.updateFromAddress]: (state, action) => handleAddressUpdate(state, action.payload, true),
-	[SendCurrencyActions.updateToAddress]: (state, action) => handleAddressUpdate(state, action.payload, false),
-	[SendCurrencyActions.updateAmount]: (state, action) => ({ ...state, amount: action.payload }),
-	[SendCurrencyActions.updateDropdownMenuVisibility]: (state, action) => ({ ...state, showDropdownMenu: action.payload }),
-
-	[SendCurrencyActions.getAddressListSuccess]: (state, action) => ({ ...state, addressList: action.payload }),
-	[SendCurrencyActions.getAddressListFail]: (state) => ({ ...state, addressList: null })
-}, preloadedState.sendCurrency)
+  [SendCurrencyActions.togglePrivateTransactions]: (state, action) => ({
+    ...state,
+    arePrivateTransactionsEnabled: action.payload.areEnabled
+  }),
+}, preloadedState)

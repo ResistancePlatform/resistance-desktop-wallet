@@ -17,6 +17,7 @@ import {
   RoundedButton
 } from '~/components/rounded-form'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
+import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { SendCurrencyActions, SendCurrencyState } from '~/reducers/send-currency/send-currency.reducer'
 
 import styles from './send-currency.scss'
@@ -34,7 +35,7 @@ const getValidationSchema = t => Joi.object().keys({
     .required().label(t(`From address`))
   ),
   arePrivateTransactionsEnabled: Joi.boolean().required(),
-  destinationAddress: (
+  toAddress: (
     validateAddress.getJoi()
     .resistanceAddress()
     .rZ().rLength().zLength().valid()
@@ -45,9 +46,14 @@ const getValidationSchema = t => Joi.object().keys({
 
 const addressesPopupMenuId = 'send-currency-addresses-dropdown-id'
 
+const isPrivateAddress = (address?: string) => address && address.startsWith('z')
+const isTransparentAddress = (address?: string) => address && address.startsWith('r')
+
 type Props = {
   t: any,
   actions: object,
+  form: any,
+  popupMenu: PopupMenuActions,
 	sendCurrency: SendCurrencyState
 }
 
@@ -62,16 +68,78 @@ class SendCurrency extends Component<Props> {
 	 * @memberof SendCurrency
 	 */
 	componentDidMount() {
-    this.props.actions.checkAddressBookByName()
+    this.props.actions.getAddresses()
 	}
 
 	getDropdownAddresses() {
-    this.props.sendCurrency.addressList.map(address => (
+    return this.props.sendCurrency.addresses.map(address => (
       <PopupMenuItem key={address.address} onClick={() => this.props.actions.updateFromAddress(address.address)}>
         {address.address}
       </PopupMenuItem>
     ))
 	}
+
+  getInputTooltip() {
+    const { t } = this.props
+
+    const { arePrivateTransactionsEnabled } = this.props.sendCurrency
+
+    if (arePrivateTransactionsEnabled || !this.props.form) {
+      return null
+    }
+
+    const { fromAddress, toAddress } = this.props.form.fields
+
+    if (isTransparentAddress(fromAddress) && isPrivateAddress(toAddress)) {
+      return t(`Sending currency from a transparent (R) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
+    }
+
+    if (isPrivateAddress(fromAddress) && isPrivateAddress(toAddress)) {
+      return t(`Sending currency from a private (Z) address to a private (Z) address is forbidden when "Private Transactions" are disabled.`)
+    }
+
+    if (isPrivateAddress(fromAddress) && isTransparentAddress(toAddress)) {
+      return t(`Sending currency from a private (Z) address to a transparent (R) address is forbidden when "Private Transactions" are disabled.`)
+    }
+
+    return null
+  }
+
+  getHint(): string {
+    const { t } = this.props
+
+    if (!this.props.form) {
+      return t('tip-r-to-r')
+    }
+
+    const { fromAddress, toAddress } = this.props.form.fields
+
+    if (isTransparentAddress(fromAddress) && isPrivateAddress(toAddress)) {
+      return t('tip-r-to-z')
+    }
+
+    if (isPrivateAddress(fromAddress) && isPrivateAddress(toAddress)) {
+      return t('tip-z-to-z')
+    }
+
+    if (isPrivateAddress(fromAddress) && isTransparentAddress(toAddress)) {
+      return t('tip-z-to-r')
+    }
+
+    if (isTransparentAddress(fromAddress) && isTransparentAddress(toAddress)) {
+      return t('tip-r-to-r')
+    }
+
+    return t('tip-r-to-r')
+  }
+
+  getIsLocked(): boolean {
+    if (!this.props.form) {
+      return true
+    }
+    const { fromAddress, toAddress } = this.props.form.fields
+    return isPrivateAddress(fromAddress) && isPrivateAddress(toAddress) || false
+  }
 
 	/**
 	 * @returns
@@ -110,6 +178,11 @@ class SendCurrency extends Component<Props> {
                 className={styles.input}
                 labelClassName={styles.inputLabel}
                 label={t(`From address`)}
+                tooltip={this.getInputTooltip()}
+                onDropdownClick={() => {
+                  this.props.actions.getAddresses()
+                  this.props.popupMenu.show(addressesPopupMenuId)
+                }}
               >
                 <PopupMenu id={addressesPopupMenuId} relative>
                   {this.getDropdownAddresses()}
@@ -124,14 +197,16 @@ class SendCurrency extends Component<Props> {
                 defaultValue={arePrivateTransactionsEnabled}
                 label={t(`Private Transactions`)}
                 captions={[t(`On`), t(`Off`)]}
+                onChange={this.props.actions.togglePrivateTransactions}
               />
             </div>
 
 						{/* Destination address */}
 						<RoundedInputWithPaste
-							name="destinationAddress"
+							name="toAddress"
               labelClassName={styles.inputLabel}
 							label={t(`Destination address`)}
+              tooltip={this.getInputTooltip()}
 						/>
 
             <div className={styles.amountRow}>
@@ -171,11 +246,13 @@ class SendCurrency extends Component<Props> {
 
               <div
                 className={cn('icon', styles.privateIcon, {
-                  [styles.locked]: arePrivateTransactionsEnabled
+                  [styles.locked]: this.getIsLocked()
                 })}
               />
 
-              <div className={styles.hint}>{t('tip-r-to-r')}</div>
+              <div className={styles.hint}>
+                {this.getHint()}
+              </div>
             </div>
 
             </RoundedForm>
@@ -202,6 +279,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(SendCurrencyActions, dispatch),
+  popupMenu: bindActionCreators(PopupMenuActions, dispatch),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate('send-currency')(SendCurrency))

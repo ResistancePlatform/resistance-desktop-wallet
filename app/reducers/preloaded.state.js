@@ -87,18 +87,9 @@ export const preloadedState: State = {
     }
 	},
 	sendCurrency: {
-		arePrivateTransactionsEnabled: false,
-		lockIcon: 'Unlock',
-		lockTips: null,
-		fromAddress: '',
-		toAddress: '',
-		inputTooltips: '',
-		amount: Decimal('0'),
-		currentOperation: null,
-		showDropdownMenu: false,
-		sendFromRadioButtonType: 'transparent',
-    addressList: [],
-    isInputDisabled: false
+    arePrivateTransactionsEnabled: false,
+    addresses: [],
+    isSending: false
 	},
 	addressBook: {
 		records: [],
