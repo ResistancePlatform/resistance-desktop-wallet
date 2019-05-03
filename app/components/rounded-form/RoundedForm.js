@@ -178,6 +178,7 @@ class RoundedForm extends Component<Props> {
         const error = formState.errors[child.props.name]
 
         // Collect children default values to initialize the fields
+
         if (child.props.defaultValue) {
           this.defaultValues[child.props.name] = child.props.defaultValue
         }

@@ -29,7 +29,6 @@ import VLayout from '~/assets/styles/v-box-layout.scss'
 const validateAddress = new ValidateAddressService()
 
 const getValidationSchema = t => Joi.object().keys({
-  name: Joi.string().required().label(t(`Name`)),
   fromAddress: (
     validateAddress.getJoi()
     .resistanceAddress()
@@ -40,6 +39,14 @@ const getValidationSchema = t => Joi.object().keys({
   toAddress: (
     validateAddress.getJoi()
     .resistanceAddress()
+    .disallow(Joi.ref('fromAddress'))
+    .options({
+      language: {
+        any: {
+          invalid: t(`Destination and source addresses cannot be the same`)
+        }
+      }
+    })
     .rZ().rLength().zLength().valid()
     .required().label(t(`Destination address`))
   ),
@@ -194,6 +201,7 @@ class SendCurrency extends Component<Props> {
               <RoundedInputWithDropdown
                 name="fromAddress"
                 className={styles.input}
+                defaultValue={this.props.sendCurrency.fromAddress}
                 labelClassName={styles.inputLabel}
                 label={t(`From address`)}
                 tooltip={this.getInputTooltip()}

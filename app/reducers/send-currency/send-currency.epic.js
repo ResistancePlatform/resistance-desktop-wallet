@@ -1,10 +1,11 @@
 // @flow
-import { tap, switchMap, map, mapTo } from 'rxjs/operators'
+import { switchMap, map } from 'rxjs/operators'
 import { merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
 import { i18n } from '~/i18next.config'
+import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { Action } from '../types'
 import { SystemInfoActions } from '../system-info/system-info.reducer'
 import { SendCurrencyActions } from './send-currency.reducer'
@@ -16,6 +17,11 @@ import { AddressBookService } from '~/service/address-book-service'
 const t = i18n.getFixedT(null, 'send-currency')
 const rpc = new RpcService()
 const addressBook = new AddressBookService()
+
+const updateFromAddressEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(SendCurrencyActions.updateFromAddressEpic ),
+  mapTo(RoundedFormActions.updateField('addressBookNewAddressModal'))
+)
 
 const sendCurrencyEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SendCurrencyActions.sendCurrency),
@@ -41,12 +47,12 @@ const sendCurrencyOperationStartedEpic = (action$: ActionsObservable<Action>) =>
   })
 )
 
-const sendCurrencyFailureEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(SendCurrencyActions.sendCurrencyFailure),
-  tap((action: Action) => {
+const sendCurrencyOperationFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SendCurrencyActions.sendCurrencyOperationFailed),
+  map((action: Action) => {
     toastr.error(t(`Unable to start send currency operation`), action.payload.errorMessage)
+    return SendCurrencyActions.empty()
   }),
-	mapTo(SendCurrencyActions.empty())
 )
 
 const getAddressesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
@@ -84,9 +90,10 @@ const checkAddressBookByNameEpic = (action$: ActionsObservable<Action>, state$) 
 )
 
 export const SendCurrencyEpics = (action$, state$) => merge(
+  updateFromAddressEpic(action$, state$),
 	sendCurrencyEpic(action$, state$),
 	sendCurrencyOperationStartedEpic(action$, state$),
-	sendCurrencyFailureEpic(action$, state$),
+	sendCurrencyOperationFailedEpic(action$, state$),
 	getAddressesEpic(action$, state$),
 	checkAddressBookByNameEpic(action$, state$)
 )
