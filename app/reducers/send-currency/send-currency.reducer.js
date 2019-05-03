@@ -20,7 +20,7 @@ export type SendCurrencyState = {
   fromAddress?: string,
 	arePrivateTransactionsEnabled: boolean,
   addresses: AddressDropdownItem[],
-  isSending: boolean
+  isSubmitting: boolean
 }
 
 export const SendCurrencyActions = createActions(
@@ -55,14 +55,14 @@ export const SendCurrencyReducer = handleActions({
   }),
 
   [SendCurrencyActions.sendCurrency]: state => ({
-    ...state, isSending: true
+    ...state, isSubmitting: true
   }),
   [SendCurrencyActions.sendCurrencyOperationStarted]: state => ({
     ...state,
-    isInputDisabled: false
+    isSubmitting: false
   }),
   [SendCurrencyActions.sendCurrencyOperationFailed]: state => ({
-    ...state, isInputDisabled: false
+    ...state, isSubmitting: false
   }),
 
   [SendCurrencyActions.togglePrivateTransactions]: (state, action) => ({

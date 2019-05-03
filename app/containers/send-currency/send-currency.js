@@ -35,7 +35,6 @@ const getValidationSchema = t => Joi.object().keys({
     .rZ().rLength().zLength().valid()
     .required().label(t(`From address`))
   ),
-  arePrivateTransactionsEnabled: Joi.boolean().required(),
   toAddress: (
     validateAddress.getJoi()
     .resistanceAddress()
@@ -172,7 +171,10 @@ class SendCurrency extends Component<Props> {
 	 */
 	render() {
     const { t } = this.props
-    const { arePrivateTransactionsEnabled } = this.props.sendCurrency
+    const {
+      isSubmitting,
+      arePrivateTransactionsEnabled
+    } = this.props.sendCurrency
 
 		return (
 			// Layout container
@@ -267,6 +269,7 @@ class SendCurrency extends Component<Props> {
                 type="submit"
                 onClick={this.props.actions.sendCurrency}
                 important
+                disabled={isSubmitting}
               >
                 {t(`Send`)}
               </RoundedButton>

@@ -1,5 +1,6 @@
 // @flow
 import { switchMap, map } from 'rxjs/operators'
+import { Decimal } from 'decimal.js'
 import { merge, of } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
@@ -18,9 +19,11 @@ const t = i18n.getFixedT(null, 'send-currency')
 const rpc = new RpcService()
 const addressBook = new AddressBookService()
 
-const updateFromAddressEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(SendCurrencyActions.updateFromAddressEpic ),
-  mapTo(RoundedFormActions.updateField('addressBookNewAddressModal'))
+const updateFromAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SendCurrencyActions.updateFromAddress),
+  map(action => (
+    RoundedFormActions.updateField('sendCurrency', 'fromAddress', action.payload.address)
+  ))
 )
 
 const sendCurrencyEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
@@ -32,7 +35,7 @@ const sendCurrencyEpic = (action$: ActionsObservable<Action>, state$) => action$
       amount
     } = state$.value.roundedForm.sendCurrency.fields
 
-    rpc.sendCurrency(fromAddress, toAddress, amount)
+    rpc.sendCurrency(fromAddress, toAddress, Decimal(amount))
 
     // Lock local Resistance node and Tor from toggling
 		return SystemInfoActions.newOperationTriggered()
