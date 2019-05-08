@@ -12,6 +12,7 @@ import ValidateAddressService from '~/service/validate-address-service'
 import { Address } from '~/components/address/Address'
 import {
   RoundedForm,
+  RoundedInput,
   RoundedInputWithPaste,
   RoundedInputWithDropdown,
   CurrencyAmountInput,
@@ -81,15 +82,27 @@ class SendCurrency extends Component<Props> {
 
 	getDropdownAddresses() {
     const { t } = this.props
-    const { addresses } = this.props.sendCurrency
+    const { arePrivateTransactionsEnabled, addresses } = this.props.sendCurrency
+    const isAddressDisabled = address => address.startsWith('z') && !arePrivateTransactionsEnabled
+    const { addressSearchString } = this.props.sendCurrency
 
-    return addresses.map(address => (
+    const filteredAddresses = addresses.filter(address => (
+      (address.name || '').toLowerCase().includes(addressSearchString.toLowerCase())
+    ))
+
+    return filteredAddresses.map(address => (
       <PopupMenuItem
         key={address.address}
+        disabled={isAddressDisabled(address.address)}
         onClick={() => this.props.actions.updateFromAddress(address.address)}
+        tooltip={isAddressDisabled(address.address) && t(`Please enable Private Transactions to use Z-addresses`)}
       >
         <div className={styles.item}>
           <Address className={styles.address} value={address.address} />
+
+          <div className={styles.name}>
+            {address.name}
+          </div>
 
           <div className={styles.balance}>
             {address.balance === null
@@ -207,14 +220,23 @@ class SendCurrency extends Component<Props> {
                 labelClassName={styles.inputLabel}
                 label={t(`From address`)}
                 tooltip={this.getInputTooltip()}
-                onDropdownClick={() => this.props.popupMenu.show(addressesPopupMenuId)}
+                onDropdownClick={() => (
+                  this.props.actions.updateAddressSearchString('') &&
+                  this.props.popupMenu.show(addressesPopupMenuId)
+                )}
               >
                 <PopupMenu
                   id={addressesPopupMenuId}
                   className={styles.dropdownMenu}
                   relative
                 >
+                  <RoundedInput
+                    className={styles.searchInput}
+                    placeholder={t(`Search name in addressbook`)}
+                    onChange={value => this.props.actions.updateAddressSearchString(value)}
+                  />
                   {this.getDropdownAddresses()}
+
                 </PopupMenu>
 
               </RoundedInputWithDropdown>
@@ -222,6 +244,7 @@ class SendCurrency extends Component<Props> {
               {/* Toggle button */}
               <ToggleButton
                 name="arePrivateTransactionsEnabled"
+                className={styles.toggleButton}
                 switcherClassName={styles.toggleSwitcher}
                 defaultValue={arePrivateTransactionsEnabled}
                 label={t(`Private Transactions`)}

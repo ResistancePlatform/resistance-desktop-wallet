@@ -1,7 +1,7 @@
 import React from 'react'
 import cn from 'classnames'
 
-import { RoundedInputProps } from './NewRoundedInput'
+import { RoundedInputProps } from './RoundedInput'
 import CurrencyAmountInput from './CurrencyAmountInput'
 
 import styles from './PriceInput.scss'

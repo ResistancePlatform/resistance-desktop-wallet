@@ -63,33 +63,25 @@ const getAddressesEpic = (action$: ActionsObservable<Action>, state$) => action$
 	switchMap(() => {
 		const sendCurrencyState = state$.value.sendCurrency
 		return rpc.getWalletAddressAndBalance(true, !sendCurrencyState.arePrivateTransactionsEnabled)
-	}),
-	map(addresses => SendCurrencyActions.gotAddresses(addresses))
-)
+  }),
+  map(walletAddresses => {
+    const result = walletAddresses.slice()
 
-const checkAddressBookByNameEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(SendCurrencyActions.checkAddressBookByName),
-	switchMap(() => {
-		const sendCurrencyState = state$.value.sendCurrency
-		if (sendCurrencyState.toAddress.trim() === '') {
-			return of(SendCurrencyActions.empty())
-		}
+    addressBook.loadAddressBook().subscribe(bookAddresses => {
+      const bookAddressesMap = {}
 
-		const addressBookState = state$.value.addressBook
-		const addressbookContent$ = addressBookState.addresses && addressBookState.addresses.length > 0 ?
-			of(addressBookState.addresses) : addressBook.loadAddressBook()
+      bookAddresses.reduce((accumulator, record) => {
+        accumulator[record.address] = record.name
+        return accumulator
+      }, bookAddressesMap)
 
-		return addressbookContent$.pipe(
-			map((addressBookRows: AddressBookRecord[]) => {
-				if (!addressBookRows || addressBookRows.length <= 0) {
-					return SendCurrencyActions.empty()
-				}
+      result.forEach((address, index) => {
+        result[index].name = bookAddressesMap[address.address]
+      })
+    })
 
-				const matchedAddressRow = addressBookRows.find(tempAddressRow => tempAddressRow.name.toLowerCase() === sendCurrencyState.toAddress.trim().toLowerCase())
-				return matchedAddressRow ? SendCurrencyActions.updateToAddress(matchedAddressRow.address) : SendCurrencyActions.empty()
-			})
-		)
-	})
+    return SendCurrencyActions.gotAddresses(result)
+  })
 )
 
 export const SendCurrencyEpics = (action$, state$) => merge(
@@ -98,5 +90,4 @@ export const SendCurrencyEpics = (action$, state$) => merge(
 	sendCurrencyOperationStartedEpic(action$, state$),
 	sendCurrencyOperationFailedEpic(action$, state$),
 	getAddressesEpic(action$, state$),
-	checkAddressBookByNameEpic(action$, state$)
 )

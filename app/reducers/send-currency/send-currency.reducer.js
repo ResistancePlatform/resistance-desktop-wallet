@@ -12,6 +12,7 @@ export type SendFromRadioButtonType = 'transparent' | 'private'
 
 export type AddressDropdownItem = {
 	address: string,
+  name?: string,
 	balance: Decimal | null,
 	disabled?: boolean
 }
@@ -20,6 +21,7 @@ export type SendCurrencyState = {
   fromAddress?: string,
 	arePrivateTransactionsEnabled: boolean,
   addresses: AddressDropdownItem[],
+  addressSearchString: string,
   isSubmitting: boolean
 }
 
@@ -37,6 +39,8 @@ export const SendCurrencyActions = createActions(
     SEND_CURRENCY: undefined,
     SEND_CURRENCY_OPERATION_STARTED: undefined,
     SEND_CURRENCY_OPERATION_FAILED: (errorMessage: string) => ({ errorMessage }),
+
+    UPDATE_ADDRESS_SEARCH_STRING: searchString => ({ searchString }),
   },
   {
     prefix: `APP/SEND_CURRENCY`
@@ -68,5 +72,9 @@ export const SendCurrencyReducer = handleActions({
   [SendCurrencyActions.togglePrivateTransactions]: (state, action) => ({
     ...state,
     arePrivateTransactionsEnabled: action.payload.areEnabled
+  }),
+  [SendCurrencyActions.updateAddressSearchString]: (state, action) => ({
+    ...state,
+    addressSearchString: action.payload.searchString
   }),
 }, preloadedState)

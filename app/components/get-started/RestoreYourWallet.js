@@ -7,7 +7,7 @@ import * as Joi from 'joi'
 
 import { getWalletNameJoi } from '~/utils/get-started'
 import { ResistanceService } from '~/service/resistance-service'
-import RoundedInput from '~/components/rounded-form/NewRoundedInput'
+import RoundedInput from '~/components/rounded-form/RoundedInput'
 import OpenFileInput from '~/components/rounded-form/OpenFileInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 

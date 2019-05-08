@@ -89,6 +89,7 @@ export const preloadedState: State = {
 	sendCurrency: {
     arePrivateTransactionsEnabled: false,
     addresses: [],
+    addressSearchString: '',
     isSubmitting: false
 	},
 	addressBook: {

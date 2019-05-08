@@ -3,9 +3,9 @@ import React from 'react'
 import cn from 'classnames'
 
 import { translate } from '~/i18next.config'
-import RoundedInput, { RoundedInputProps } from './NewRoundedInput'
+import RoundedInput, { RoundedInputProps } from './RoundedInput'
 
-import parentStyles from './NewRoundedInput.scss'
+import parentStyles from './RoundedInput.scss'
 import styles from './CurrencyAmountInput.scss'
 
 
