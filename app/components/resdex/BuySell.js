@@ -7,6 +7,7 @@ import { bindActionCreators } from 'redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
+import log from 'electron-log'
 
 import { toDecimalPlaces } from '~/utils/decimal'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
@@ -21,7 +22,7 @@ import {
   RadioButton,
   CurrencyAmountInput,
   PriceInput,
-  ChooseWallet
+  ChooseWalletInput
 } from '~/components/rounded-form'
 import OrderSummary from './OrderSummary'
 import OrderBook from './OrderBook'
@@ -186,6 +187,7 @@ class ResDexBuySell extends Component<Props> {
     const { t } = this.props
     const { baseCurrency, quoteCurrency } = this.props.buySell
     const txFee = this.props.accounts.currencyFees[quoteCurrency]
+    log.info(" baseCurrency, quoteCurrency ", baseCurrency, quoteCurrency)
 
     const isInstantSwapAllowed = this.getIsInstanceSwapAllowed()
 
@@ -220,7 +222,7 @@ class ResDexBuySell extends Component<Props> {
             </RadioButton>
           </div>
         }
-        <ChooseWallet
+        <ChooseWalletInput
           name="sendFrom"
           labelClassName={styles.oldInputLabel}
           defaultValue={quoteCurrency}
@@ -229,7 +231,7 @@ class ResDexBuySell extends Component<Props> {
           currencies={this.props.accounts.currencies.RESDEX}
         />
 
-        <ChooseWallet
+        <ChooseWalletInput
           name="receiveTo"
           labelClassName={styles.oldInputLabel}
           defaultValue={baseCurrency}
