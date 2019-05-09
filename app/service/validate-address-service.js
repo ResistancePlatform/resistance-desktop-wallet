@@ -1,8 +1,10 @@
 // @flow
 import bs58check from 'bs58check'
+import bech32 from 'bech32'
 import * as Joi from 'joi'
+import { remote } from 'electron'
 
-import { i18n } from '~/i18next.config'
+import { i18n } from '../i18next.config'
 
 /**
  * ES6 singleton
@@ -10,7 +12,6 @@ import { i18n } from '~/i18next.config'
 let instance = null
 
 const rAddrLeadingBytes = [0x1C0C, 0x1B97]
-const zAddrLeadingBytes = [0x16B6, 0x16B2]
 
 /**
  * Validates Resistance addresses
@@ -53,13 +54,27 @@ export default class ValidateAddressService {
       }
     }
 
+    const getBech32Prefix = () => {
+      try {
+        const decoded = bech32.decode(address)
+        return decoded.prefix
+      } catch(err) {
+        return null
+      }
+    }
+
     if (address.startsWith('r')) {
       isValid = address.length === 35 && rAddrLeadingBytes.includes(getLeadingBytes())
     } if (address.startsWith('z')) {
-      isValid = address.length === 95 && zAddrLeadingBytes.includes(getLeadingBytes())
+      isValid = address.length === this.getZAddressLength()  && ['zs', 'ztestsapling'].includes(getBech32Prefix())
     }
 
     return isValid
+  }
+
+  getZAddressLength() {
+    const nodeConfig = remote.getGlobal('resistanceNodeConfig')
+    return nodeConfig.testnet || nodeConfig.regtest ? 88 : 77
   }
 
 	/**
@@ -74,7 +89,10 @@ export default class ValidateAddressService {
       language: {
         rZ: this.t(`has to begin with R- for a transparent address or Z- for a private one`),
         rLength: this.t(`R-addresses are 35 characters long, not {{length}}`, { length: `{{l}}` }),
-        zLength: this.t(`Z-addresses are 95 characters long, not {{length}}`, { length: `{{l}}` }),
+        zLength: this.t(`Z-addresses are {{zAddressLength}} characters long, not {{length}}`, {
+          zAddressLength: this.getZAddressLength(),
+          length: `{{l}}`
+        }),
         valid: this.t(`is not a valid Resistance address`)
       },
       /* eslint-disable-next-line no-unused-vars */
@@ -101,7 +119,7 @@ export default class ValidateAddressService {
         {
           name: 'zLength',
           validate: (params, value, state, options) => {
-            if (value.startsWith('z') && value.length !== 95) {
+            if (value.startsWith('z') && value.length !== this.getZAddressLength()) {
               return joi.createError('resistanceAddress.zLength', { l: value.length }, state, options)
             }
             return value
