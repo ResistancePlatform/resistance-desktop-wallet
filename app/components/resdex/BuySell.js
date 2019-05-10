@@ -196,6 +196,7 @@ class ResDexBuySell extends Component<Props> {
         id="resDexBuySell"
         className={styles.form}
         schema={getValidationSchema(t, isAdvanced)}
+        clearOnUnmount
       >
 
         {isAdvanced &&

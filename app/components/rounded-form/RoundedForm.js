@@ -18,6 +18,7 @@ type Props = {
   options?: object,
   onValidate?: (errors: object) => void,
   important?: boolean,
+  clearOnUnmount?: boolean,
   children: any
 }
 
@@ -65,6 +66,12 @@ class RoundedForm extends Component<Props> {
 
     if (fields.length) {
       this.validate(fields)
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.clearOnUnmount) {
+      this.props.actions.clear(this.props.id)
     }
   }
 
@@ -143,7 +150,7 @@ class RoundedForm extends Component<Props> {
       }
 
       return fn(childToMap)
-    });
+    })
   }
 
 	/**
@@ -213,7 +220,6 @@ class RoundedForm extends Component<Props> {
       </div>
     )
   }
-
 }
 
 /**
