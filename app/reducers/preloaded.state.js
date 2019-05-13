@@ -100,6 +100,7 @@ export const preloadedState: State = {
     }
 	},
 	settings: {
+    isSavingPassword: false,
 		isTorEnabled: false,
 		isMinerEnabled: false,
 		isStatusModalOpen: false,
