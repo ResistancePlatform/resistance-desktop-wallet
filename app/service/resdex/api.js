@@ -340,11 +340,19 @@ async function enableElectrumServers(symbol) {
     port: server.port,
   }))
 
-  const responses = await Promise.all(queries)
+  let responses
+
+  try {
+    responses = await Promise.all(queries)
+  } catch(err) {
+    log.error(`Error enabling Electrum currency`, err)
+    return false
+  }
+
   const success = responses.filter(response => response.result === 'success').length > 0
 
   if (!success) {
-    throw new Error(t(`Could not connect to {{symbol}} Electrum server`, { symbol }))
+    log.error(`Could not connect to {{symbol}} Electrum server`)
   }
 
   return success

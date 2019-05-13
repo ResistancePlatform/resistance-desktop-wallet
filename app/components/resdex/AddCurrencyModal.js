@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
+import log from 'electron-log'
 
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import {
@@ -46,7 +47,14 @@ class AddCurrencyModal extends Component<Props> {
     const { defaultValues, isInEditMode } = this.props.accounts.addCurrencyModal
 
     const { fields } = this.props.form || {}
-    const isUseElectrumEnabled = fields && fields.useElectrum || defaultValues.useElectrum
+
+    const isUseElectrumEnabled = (
+      fields && fields.useElectrum !== undefined
+      ? fields.useElectrum
+      : defaultValues.useElectrum
+    )
+
+    log.info(`isElectrum`, isUseElectrumEnabled, fields)
 
     return (
       <div className={styles.overlay}>
@@ -66,6 +74,7 @@ class AddCurrencyModal extends Component<Props> {
         <RoundedForm
           id="resDexAccountsAddCurrencyModal"
           schema={getValidationSchema(t)}
+          clearOnUnmount
         >
           <ChooseCurrencyInput
             name="symbol"
@@ -91,7 +100,7 @@ class AddCurrencyModal extends Component<Props> {
             defaultValue={defaultValues.rpcPort}
             type="number"
             label={t(`RPC port`)}
-            disabled
+            disabled={isUseElectrumEnabled}
           />
 
           <hr />

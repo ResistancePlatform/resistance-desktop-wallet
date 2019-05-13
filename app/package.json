@@ -15,6 +15,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "iocane": "^1.0.2",
     "ledger-res": "git+ssh://git@github.com:ResistancePlatform/ledger-res-js.git"
   }
 }
