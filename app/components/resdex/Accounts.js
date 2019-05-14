@@ -215,6 +215,9 @@ class ResDexAccounts extends Component<Props> {
 
     const sortedCurrencies = getSortedCurrencies(enabledCurrencies)
     const totalEquity = this.getTotalEquity()
+    const isAlwaysEnabled = this.getPopupMenuCurrencyAlwaysEnabled()
+
+    const isRes = this.getPopupMenuSymbol() === 'RES'
 
 		return (
       <div className={cn(styles.container)}>
@@ -281,14 +284,16 @@ class ResDexAccounts extends Component<Props> {
           </PopupMenuItem>
           <PopupMenuItem
             onClick={(e, clickedSymbol) => this.props.actions.showEditCurrencyModal(this.getCurrencyConfig(clickedSymbol))}
-            disabled={this.getPopupMenuSymbol() === 'RES'}
+            tooltip={isRes ? t(`Resistance cannot be edited`) : undefined}
+            disabled={isRes}
           >
             {t(`Edit coin`)}
           </PopupMenuItem>
           <PopupMenuItem
             className={styles.deleteCoin}
             onClick={(e, clickedSymbol) => this.props.actions.confirmCurrencyDeletion(clickedSymbol)}
-            disabled={this.getPopupMenuCurrencyAlwaysEnabled()}
+            tooltip={isAlwaysEnabled ? t(`{{symbol}} is a default currency and cannot be deleted`, {symbol: this.getPopupMenuSymbol()}) : undefined}
+            disabled={isAlwaysEnabled}
           >
             {t(`Delete coin`)}
           </PopupMenuItem>

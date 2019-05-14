@@ -242,6 +242,7 @@ const supportedCurrencies = [
 	},
 	{
 		coin: 'BTC',
+    rpcport: 8332,
 		electrumServers: [
 			{
 				host: 'electrum1.cipig.net',

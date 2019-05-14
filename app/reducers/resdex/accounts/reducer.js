@@ -59,6 +59,8 @@ export const ResDexAccountsActions = createActions(
     GET_TRANSACTIONS: undefined,
     GOT_CURRENCY_TRANSACTIONS: (symbol: string, transactions: object[] | null) => ({ symbol, transactions }),
     GET_TRANSACTIONS_FAILED: (errorMessage: string) => ({ errorMessage }),
+
+    MARK_CURRENCIES_AS_DISABLED: (symbols: string[]) => ({ symbols }),
   },
   {
     prefix: 'APP/RESDEX/ACCOUNTS'

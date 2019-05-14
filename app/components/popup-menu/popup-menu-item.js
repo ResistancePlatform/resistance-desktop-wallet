@@ -52,13 +52,13 @@ class PopupMenuItem extends Component<Props> {
 		return (
       <div
         role="none"
-        className={cn(styles.menuItem, this.props.className)}
+        className={cn(styles.menuItem)}
         onClick={(e) => this.handleClick(e)}
         onKeyDown={(e) => this.handleClick(e)}
         data-tip={this.props.tooltip || true}
         data-for={this.tooltipId}
       >
-        <div className={cn({ [styles.disabled]: this.props.disabled })}>
+        <div className={cn(this.props.className, {[styles.disabled]: this.props.disabled })}>
           {this.props.children}
         </div>
 

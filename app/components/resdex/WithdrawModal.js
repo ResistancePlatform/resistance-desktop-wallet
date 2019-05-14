@@ -15,7 +15,7 @@ import {
   RoundedInputWithPaste,
   CurrencyAmountInput,
   RoundedTextArea,
-  ChooseWallet,
+  ChooseWalletInput,
 } from '~/components/rounded-form'
 
 import styles from './WithdrawModal.scss'
@@ -98,7 +98,7 @@ class WithdrawModal extends Component<Props> {
             label={t(`Recipient wallet`)}
           />
 
-          <ChooseWallet
+          <ChooseWalletInput
             name="withdrawFrom"
             label={t(`Withdraw from`)}
             defaultValue={symbol}

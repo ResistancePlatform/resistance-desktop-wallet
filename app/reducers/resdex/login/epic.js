@@ -166,11 +166,28 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
     )
 
     const enableCurrenciesObservable = from(enableCurrenciesPromise).pipe(
-      switchMap(() => concat(
-        sendPassphraseObservable,
-        getFeesObservable,
-        of(ResDexOrdersActions.getSwapHistory()),
-      )),
+      switchMap(results => {
+        const inactiveSymbols = (enabledCurrencies
+         .filter((currency, index) => !results[index])
+         .map(currency => currency.symbol)
+        )
+
+        let observables = concat(
+          sendPassphraseObservable,
+          getFeesObservable,
+          of(ResDexOrdersActions.getSwapHistory()),
+        )
+
+        if (inactiveSymbols.length) {
+          toastr.error(t(`Error enabling {{symbols}}`, { symbols: inactiveSymbols.join(', ') }))
+          observables = concat(
+            observables,
+            ResDexAccountsActions.markCurrenciesAsDisabled(inactiveSymbols)
+          )
+        }
+
+        return observables
+      }),
       catchError(err => {
         // TODO: Do some proper treatment like marking the coin as failed to get enabled
         log.error(`Can't enable currencies`, err)

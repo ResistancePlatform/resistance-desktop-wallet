@@ -151,12 +151,14 @@ const updateCurrencyEpic = (action$: ActionsObservable<any>, state$) => action$.
       })
     )
 
+    log.info("Updated:", fields)
     toastr.success(
       t(`Currency {{currencyName}} ({{symbol}}) updated`, { currencyName, symbol })
     )
 
     return concat(
       of(ResDexAccountsActions.closeAddCurrencyModal()),
+      of(ResDexAccountsActions.updateEnabledCurrencies(enabledCurrencies)),
       restartCurrencyObservable
     )
   })

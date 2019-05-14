@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react'
+import React from 'react'
 import { v4 as uuid } from 'uuid'
 import cn from 'classnames'
 import { connect } from 'react-redux'
@@ -10,97 +10,72 @@ import { translate } from '~/i18next.config'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import CurrencyIcon from '~/components/resdex/CurrencyIcon'
+import GenericInput, { GenericInputProps } from './GenericInput'
 
-import styles from './ChooseWallet.scss'
+import styles from './ChooseWalletInput.scss'
 
 const t = translate('resdex')
 
-type Props = {
+export type ChooseWalletInputProps = {
+  ...GenericInputProps,
 	name: string,
-  className?: string,
-  labelClassName?: string,
-	label?: string,
   currencies: { [string]: Currency },
-  defaultValue?: string | null,
-	onChange?: value => void,
-  disabled?: boolean,
   popupMenu: object
 }
 
-type State = {
-  symbol: string
-}
-
-class ChooseWallet extends Component<Props> {
-	props: Props
-  state: State
+class ChooseWalletInput extends GenericInput {
+	props: ChooseWalletInputProps
   popupMenuId: string
-
-  static get displayName() { return 'ChooseWallet' }
 
 	/**
 	 * @param {*} props
-	 * @memberof ChooseWallet
+	 * @memberof ChooseWalletInput
 	 */
 	constructor(props) {
 		super(props)
     this.popupMenuId = `popup-menu-${uuid()}`
     this.state = {
-      symbol: props.defaultValue || 'RES',
+      value: props.defaultValue || 'RES',
     }
 	}
 
-	onChangeHandler(event, symbol) {
-		event.stopPropagation()
-    this.setState({ symbol })
+  renderInput() {
+    const selectedCurrency = this.props.currencies[this.state.value]
 
-		if (this.props.onChange) {
-			this.props.onChange(symbol)
-		}
-	}
+    return (
+      <div className={styles.chooseWallet}>
+        <CurrencyIcon className={styles.currencyIcon} symbol={this.state.value} size="1.0rem" />
 
-	render() {
-    const selectedCurrency = this.props.currencies[this.state.symbol]
+        <div className={styles.walletName}>{t(`{{symbol}} Wallet`, {symbol: this.state.value})}</div>
+
+        <div className={styles.balance}>{selectedCurrency && toDecimalPlaces(selectedCurrency.balance)}</div>
+
+        <div className={styles.symbol}>{this.state.value}</div>
+
+      </div>
+    )
+  }
+
+  renderAddon() {
     const sortedCurrencies = Object.values(this.props.currencies).sort((item1, item2) => (
       item1.symbol.localeCompare(item2.symbol)
     ))
 
-		return (
-      <div
-        className={cn(styles.container, styles.chooseWalletContainer, this.props.className)}
-        name={this.props.name}
-        disabled={this.props.disabled}
-      >
-
-      {this.props.label &&
-        <div className={cn(styles.label, this.props.labelClassName)}>
-          {this.props.label}
-        </div>
-      }
-
-      <div className={styles.chooseWallet}>
-        <CurrencyIcon className={styles.currencyIcon} symbol={this.state.symbol} size="1.0rem" />
-
-        <div className={styles.walletName}>{t(`{{symbol}} Wallet`, {symbol: this.state.symbol})}</div>
-
-        <div className={styles.balance}>{selectedCurrency && toDecimalPlaces(selectedCurrency.balance)}</div>
-
-        <div className={styles.symbol}>{this.state.symbol}</div>
-
+    return (
+      <div className={styles.button}>
         <div
-          className={cn('icon', styles.arrowDownButton)}
+          className={cn('icon', styles.arrowDownIcon)}
           role="button"
           tabIndex={0}
           onClick={() => this.props.popupMenu.show(this.popupMenuId) && false }
           onKeyDown={() => false}
         />
-
         <PopupMenu id={this.popupMenuId} className={styles.menu} relative>
           { sortedCurrencies.map(currency => (
             <PopupMenuItem
               key={currency.symbol}
               className={styles.menuItem}
-              onClick={e => this.onChangeHandler(e, currency.symbol)}
+              onClick={() => this.changeValue(currency.symbol)}
             >
               <CurrencyIcon className={styles.icon} symbol={currency.symbol} size="1rem" />
               <div className={styles.walletName}>{currency.name}</div>
@@ -110,15 +85,14 @@ class ChooseWallet extends Component<Props> {
           ))
           }
         </PopupMenu>
-      </div>
-
     </div>
-		)
-	}
+    )
+  }
+
 }
 
 const mapDispatchToProps = dispatch => ({
   popupMenu: bindActionCreators(PopupMenuActions, dispatch)
 })
 
-export default connect(null, mapDispatchToProps)(ChooseWallet)
+export default connect(null, mapDispatchToProps)(ChooseWalletInput)
