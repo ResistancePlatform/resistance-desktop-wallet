@@ -11,12 +11,16 @@ export type SettingsState = {
   isStatusModalOpen: boolean,
   statusModalTabIndex: number,
   childProcessesStatus: { [ChildProcessName]: ChildProcessStatus },
+  isSavingPassword: boolean,
   language: string
 }
 
 export const SettingsActions = createActions(
   {
     EMPTY: undefined,
+
+    SAVE_PASSWORD: undefined,
+    SAVE_PASSWORD_COMPLETED: undefined,
 
     UPDATE_LANGUAGE: (code: string) => ({ code }),
 
@@ -88,6 +92,17 @@ const getChildProcessUpdateFailedState = (state, action, processStatus: ChildPro
 
 export const SettingsReducer = handleActions(
   {
+    // Save password
+    [SettingsActions.savePassword]: state => ({
+      ...state,
+      isSavingPassword: true
+    }),
+
+    [SettingsActions.savePasswordCompleted]: state => ({
+      ...state,
+      isSavingPassword: false
+    }),
+
     // Language
     [SettingsActions.updateLanguage]: (state, action) => ({
       ...state, language: action.payload.code

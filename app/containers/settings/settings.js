@@ -130,7 +130,7 @@ class Settings extends Component<Props> {
                 <div className={cn(styles.body)}>
                   <RoundedForm
                     className={styles.form}
-                    id=""
+                    id="settingsSavePassword"
                     schema={getValidationSchema(t)}
                   >
 
@@ -156,8 +156,11 @@ class Settings extends Component<Props> {
 
                     <RoundedButton
                       type="submit"
+                      className={styles.savePasswordButton}
                       onClick={this.props.actions.savePassword}
                       important
+                      spinner={this.props.settings.isSavingPassword}
+                      disabled={this.props.settings.isSavingPassword}
                     >
                       {t(`Save password`)}
                     </RoundedButton>

@@ -29,6 +29,7 @@ import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
 import { i18n, translate } from '~/i18next.config'
+import { RPC } from '~/constants/rpc'
 import { getEnsureLoginObservable } from '~/utils/auth'
 import { Action } from '../types'
 import { AuthActions } from '../auth/auth.reducer'
@@ -45,6 +46,32 @@ const resistanceService = new ResistanceService()
 const minerService = new MinerService()
 const childProcess = new ChildProcessService()
 const torService = new TorService()
+
+const savePasswordEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(SettingsActions.savePassword),
+  switchMap(() => {
+    const { oldPassword, newPassword } = state$.value.roundedForm.settingsSavePassword.fields
+    const observable = from(rpc.changeWalletPassword(oldPassword, newPassword)).pipe(
+      switchMap(() => {
+        toastr.success(t(`Password changed.`))
+        return of(SettingsActions.savePasswordCompleted())
+      }),
+      catchError(err => {
+        let errorMessage
+
+        if (err.code === RPC.WALLET_PASSPHRASE_INCORRECT) {
+          errorMessage = t(`The old wallet password is incorrect.`)
+        } else {
+          log.error(`Can't save password`, err.message)
+          errorMessage = t(`Error changing the password, check the log for details.`)
+        }
+        toastr.error(errorMessage)
+        return of(SettingsActions.savePasswordCompleted())
+      })
+    )
+    return observable
+  })
+)
 
 const updateLanguageEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.updateLanguage),
@@ -413,6 +440,7 @@ const stopChildProcessesEpic = (action$: ActionsObservable<Action>, state$) => a
 
 
 export const SettingsEpics = (action$, state$) => merge(
+  savePasswordEpic(action$, state$),
   updateLanguageEpic(action$, state$),
 	kickOffChildProcessesEpic(action$, state$),
   toggleLocalNodeEpic(action$, state$),
