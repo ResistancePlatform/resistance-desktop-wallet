@@ -86,19 +86,11 @@ export const preloadedState: State = {
       pollForLedger: true,
     }
 	},
-	sendCash: {
-		isPrivateTransactions: false,
-		lockIcon: 'Unlock',
-		lockTips: null,
-		fromAddress: '',
-		toAddress: '',
-		inputTooltips: '',
-		amount: Decimal('0'),
-		currentOperation: null,
-		showDropdownMenu: false,
-		sendFromRadioButtonType: 'transparent',
-    addressList: [],
-    isInputDisabled: false
+	sendCurrency: {
+    arePrivateTransactionsEnabled: false,
+    addresses: [],
+    addressSearchString: '',
+    isSubmitting: false
 	},
 	addressBook: {
 		records: [],

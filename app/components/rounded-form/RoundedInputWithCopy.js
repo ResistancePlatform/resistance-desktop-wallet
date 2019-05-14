@@ -1,6 +1,6 @@
 import React from 'react'
 import CopyButton from './CopyButton'
-import RoundedInput from './NewRoundedInput'
+import RoundedInput from './RoundedInput'
 
 
 export default class RoundedInputWithCopy extends RoundedInput {

@@ -1,7 +1,7 @@
 import React from 'react'
 import cn from 'classnames'
 
-import RoundedInput, { RoundedInputProps } from './NewRoundedInput'
+import RoundedInput, { RoundedInputProps } from './RoundedInput'
 
 import styles from './RoundedInputWithDropdown.scss'
 
@@ -12,6 +12,12 @@ export type Props = {
 
 export default class RoundedInputWithDropdown extends RoundedInput {
   props: Props
+
+  onClickHandler(event) {
+    if (this.props.readOnly) {
+      return this.onDropdownClickHandler(event)
+    }
+  }
 
   onDropdownClickHandler(event) {
     event.stopPropagation()

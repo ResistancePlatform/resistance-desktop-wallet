@@ -1,1 +1,150 @@
-{}
+{
+  "any": {
+    "unknown": "허용되지 않습니다",
+    "invalid": "잘못된 값이 들어 있습니다",
+    "empty": "공백으로 둘 수 없음",
+    "required": "필수 입력 항목입니다",
+    "allowOnly": "{{valids}} 중 하나이어야 합니다",
+    "default": "기본 방법을 실행 중에 오류가 발생함"
+  },
+  "alternatives": {
+    "base": "허용된 대안과 일치하지 않음",
+    "child": null
+  },
+  "array": {
+    "base": "배열이어야 함",
+    "includes": "{{pos}} 위치의 허용된 유형과 일치하지 않음",
+    "includesSingle": "\"{{!label}}\"의 단일 값이 허용된 유형과 일치하지 않음",
+    "includesOne": "{{reason}}의 이유로 {{pos}} 위치에서 실패함",
+    "includesOneSingle": "{{reason}}의 이유로 \"{{label}}\"의 단일 값이 실패함",
+    "includesRequiredUnknowns": "{{unknownMisses}} 필수 값을 포함하지 않음",
+    "includesRequiredKnowns": "{{knownMisses}}(을)를 포함하지 않음",
+    "includesRequiredBoth": "{{knownMisses}} 및 {{unknownMisses}}의 다른 필수 값을 포함하지 않음",
+    "excludes": "{{pos}} 위치에 제외된 값이 포함되어 있음",
+    "excludesSingle": "\"{{!label}}\"의 단일 값에 제외된 값이 포함되어 있음",
+    "min": "최소한 {{limit}}개의 아이템을 포함해야 함",
+    "max": "{{limit}}개 이하의 아이템을 포함해야 함",
+    "length": "{{limit}}개의 아이템을 포함해야 함",
+    "ordered": "{{reason}}의 이유로 {{pos}} 위치에서 실패함",
+    "orderedLength": "배열은 최대 {{limit}}개의 아이템을 포함해야 하므로 {{pos}} 위치에서 오류가 발생",
+    "ref": "양의 정수가 아닌 \"{{ref}}\" 참조값",
+    "sparse": "희소 배열이 아니어야 함",
+    "unique": "{{pos}} 위치에 중복 값이 ​​있음"
+  },
+  "boolean": {
+    "base": "불 방식이어야 함"
+  },
+  "binary": {
+    "base": "버퍼 또는 문자열이어야 함",
+    "min": "{{limit}}byte 이상이어야 함",
+    "max": "{{limit}}byte 이하이어야 함",
+    "length": "{{limit}}byte이어야 함"
+  },
+  "date": {
+    "base": "밀리 초 또는 유효한 날짜 문자열이어야 함",
+    "format": "{{format}} 형식의 문자열이어야 함",
+    "strict": "유효한 날짜이어야 함",
+    "min": "“{{limit}}” 이상이어야 함",
+    "max": "“{{limit}}” 이하이어야 함",
+    "less": "“{{limit}}”보다 작아야 함",
+    "greater": "“{{limit}}”보다 커야 함",
+    "isoDate": "유효한 ISO 8601 날짜이어야 함",
+    "timestamp": {
+      "javascript": "유효한 밀리 초 단위의 시각이나 숫자이어야 함",
+      "unix": "유효한 초 단위의 시각이나 숫자이어야 함"
+    },
+    "ref": "날짜가 아닌 \"{{ref}}\" 참조값"
+  },
+  "function": {
+    "base": "함수이어야 함",
+    "arity": "{{n}} arity가 있어야 함",
+    "minArity": "{{n}}보다 크거나 같아야 함",
+    "maxArity": "{{n}}보다 작거나 같은 arity가 있어야 함",
+    "ref": "Joi 참조값이어야 함",
+    "class": "클래스이어야 함"
+  },
+  "lazy": {
+    "base": "!!스키마 오류: 지연 스키마가 설정되어야 함",
+    "schema": "!!스키마 오류: 지연 스키마 함수가 스키마를 반환해야 함"
+  },
+  "object": {
+    "base": "객체이어야 함",
+    "child": "!!자식(\"{{!child}}\") {{reason}}의 이유로 실패함",
+    "min": "최소한 {{limit}} 자식이 있어야 함",
+    "max": "{{limit}} 이하의 자식이 있어야 함",
+    "length": "{{limit}} 자식이 있어야 함",
+    "allowUnknown": "!!\"{{!child}}\"(은)는 허용되지 않음",
+    "with": "!!\"{{mainWithLabel}}\" 필수 피어(\"{{peerWithLabel}}\")가 누락됨",
+    "without": "!!\"{{mainWithLabel}}\" 금지된 피어(\"{{peerWithLabel}}\")와 충돌 발생",
+    "missing": "{{peersWithLabels}} 중 하나 이상을 포함해야 함",
+    "xor": "독점 피어({{peersWithLabels}}) 사이에 충돌이 존재함",
+    "or": "{{peersWithLabels}} 중 하나 이상을 포함해야 함",
+    "and": "필수 피어({{missingWithLabels}}) 없이 {{presentWithLabels}}(을)를 포함하고 있음",
+    "nand": "!!\"{{mainWithLabel}}\"(은)는 {{peersWithLabels}}(와)과 동시에 존재할 수 없음",
+    "assert": "!!\"{{ref}}\" 검증이 \"{{ref}}\"(이)가 {{message}} 실패로 실패함",
+    "rename": {
+      "multiple": "복수의 이름 변경이 비활성화 상태이고 다른 키가 이미 \"{{to}}\"(으)로 변경되었으므로 자식(\"{{from}}\")의 이름을 변경할 수 없음",
+      "override": "재정의가 비활성화 상태이고 대상(“{{to}}”)이 존재하므로 자식({{from}})의 이름을 변경할 수 없음",
+      "regex": {
+        "multiple": "복수의 이름 변경이 비활성화 상태이고 다른 키가 이미 \"{{to}}\"(으)로 변경되었으므로 자식(\"{{from}}\")의 이름을 변경할 수 없음",
+        "override": "재정의가 비활성화 상태이고 대상(“{{to}}”)이 존재하므로 자식({{from}})의 이름을 변경할 수 없음"
+      }
+    },
+    "type": "\"{{type}}\"의 인스턴스이어야 함",
+    "schema": "Joi 인스턴스이어야 함"
+  },
+  "number": {
+    "base": "숫자이어야 함",
+    "min": "{{limit}}보다 크거나 같아야 함",
+    "max": "{{limit}}보다 작거나 같아야 함",
+    "less": "{{limit}}보다 작아야 함",
+    "greater": "{{limit}}보다 커야 함",
+    "float": "float 또는 double이어야 함",
+    "integer": "정수이어야 함",
+    "negative": "음수이어야 함",
+    "positive": "양수이어야 함",
+    "precision": "소수 자리가 {{limit}} 이하이어야 함",
+    "ref": "숫자가 아닌 \"{{ref}}\" 참조값",
+    "multiple": "{{multiple}}의 배수이어야 함",
+    "port": "유효한 포트이어야 함"
+  },
+  "string": {
+    "base": "문자열이어야 함",
+    "min": "길이는 최소한 {{limit}}문자 이상이어야 함",
+    "max": "길이는 {{limit}}문자보다 작거나 같아야 함",
+    "length": "길이는 {{limit}}문자이어야 함",
+    "alphanum": "영숫자만 포함해야 함",
+    "token": "영숫자와 밑줄 문자만 포함해야 함",
+    "regex": {
+      "base": "문자, 숫자, 특수 문자 및 공백을 포함할 수 있음",
+      "name": "값(\"{{!value}}\")이 {{name}} 패턴과 일치하지 않음",
+      "invert": {
+        "base": "값(\"{{!value}}\")이 반전된 패턴과 일치함: {{pattern}}",
+        "name": "값(\"{{!value}}\")이 반전된 {{name}} 패턴과 일치함"
+      }
+    },
+    "email": "유효한 이메일이어야 함",
+    "uri": "유효한 URI이어야 함",
+    "uriRelativeOnly": "유효한 상대 URI이어야 함",
+    "uriCustomScheme": "{{scheme}} 패턴과 일치하는 스키마가 있는 유효한 URI이어야 함",
+    "isoDate": "유효한 ISO 8601 날짜이어야 함",
+    "guid": "유효한 GUID이어야 함",
+    "hex": "16진수 문자만 포함해야 함",
+    "hexAlign": "16진수로 디코딩된 표현은 바이트 단위로 정렬되어야 함",
+    "base64": "유효한 base64 문자열이어야 함",
+    "dataUri": "유효한 dataUri 문자열이어야 함",
+    "hostname": "올바른 hostname이어야 함",
+    "normalize": "{{form}} 형식으로 정규화된 유니코드이어야 함",
+    "lowercase": "소문자만 포함해야 함",
+    "uppercase": "대문자만 포함해야 함",
+    "trim": "선행 또는 후행 공백이 없어야 함",
+    "creditCard": "신용카드이어야 함",
+    "ref": "숫자가 아닌 \"{{ref}}\" 참조값",
+    "ip": "{{cidr}} CIDR이 있는 유효한 IP 주소이어야 함",
+    "ipVersion": "{{cidr}} CIDR이 있는 {{version}} 버전 중 하나의 유효한 IP 주소이어야 함"
+  },
+  "symbol": {
+    "base": "기호이어야 함",
+    "map": "{{map}} 중 하나이어야 함"
+  }
+}

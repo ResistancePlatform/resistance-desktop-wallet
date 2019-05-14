@@ -8,6 +8,7 @@ import styles from './ToggleButton.scss'
 
 export type Props = {
   ...CheckBoxProps,
+  switcherClassName?: string,
   label?: string,
   value?: string,
   captions?: string[]
@@ -30,7 +31,7 @@ export default class ToggleButton extends CheckBox {
         <div
           role="button"
           tabIndex={0}
-          className={cn(styles.container, {
+          className={cn(styles.container, this.props.switcherClassName, {
             [styles.on]: this.props.value !== undefined ? this.props.value : this.state.value,
             [styles.disabled]: this.props.disabled
           })}

@@ -60,5 +60,9 @@
   "Child process failure": "Child process failure",
   "Failed to stop {{processName}}.": "Failed to stop {{processName}}.",
   "Stop child process error": "Stop child process error",
-  "Node (Etomic)": "Node (Etomic)"
+  "Node (Etomic)": "Node (Etomic)",
+  "Number of cores": "Number of cores",
+  "Note:": "Note:",
+  "Changing amount of cores requires restarting of the mining daemon.": "Changing amount of cores requires restarting of the mining daemon.",
+  "Wallet password is required due to the local node restart": "Wallet password is required due to the local node restart"
 }

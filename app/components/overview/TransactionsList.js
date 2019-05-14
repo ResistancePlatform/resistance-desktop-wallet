@@ -63,7 +63,7 @@ class TransactionsList extends Component<Props> {
         <UniformListColumn>
           {truncateAmount(transaction.amount)}
         </UniformListColumn>
-        <UniformListColumn>{moment.unix(transaction.timestamp).locale(i18n.language).format('L kk:mm:ss')}</UniformListColumn>
+        <UniformListColumn className={styles.dateColumn}>{moment.unix(transaction.timestamp).locale(i18n.language).format('L kk:mm:ss')}</UniformListColumn>
         <UniformListColumn>
           <Address className={styles.address} value={transaction.destinationAddress} />
 

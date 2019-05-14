@@ -376,7 +376,7 @@ function formatSwap(data) {
     && isAfter(appTimeStarted, swap.timeStarted)
   )
 
-  if (privateCancelled) {
+  if (privateCancelled || swap.status === 'failed') {
     swap.privacy.status = 'failed'
   }
 

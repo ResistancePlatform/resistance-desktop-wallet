@@ -11,7 +11,7 @@ import {
 } from '~/utils/child-process'
 import StatusModal from '~/components/settings/status-modal'
 import OperationsModal from '~/components/system-info/OperationsModal'
-import { SendCashActions, SendCashState } from '~/reducers/send-cash/send-cash.reducer'
+import { SendCurrencyActions, SendCurrencyState } from '~/reducers/send-currency/send-currency.reducer'
 import { SettingsActions, SettingsState } from '~/reducers/settings/settings.reducer'
 import { SystemInfoActions, SystemInfoState } from '~/reducers/system-info/system-info.reducer'
 import { ToggleButton } from '~/components/rounded-form'
@@ -27,11 +27,11 @@ const operationsTooltipId = 'status-icons-operations-tooltip-id'
 type Props = {
   t: () => string,
   settings: SettingsState,
-  sendCash: SendCashState,
+  sendCurrency: SendCurrencyState,
 	systemInfo: SystemInfoState,
   settingsActions: SettingsActions,
   systemInfoActions: SystemInfoActions,
-  sendCashActions: SendCashActions
+  sendCurrencyActions: SendCurrencyActions
 }
 
 /**
@@ -112,7 +112,7 @@ class StatusIcons extends Component<Props> {
       isTorEnabled,
       childProcessesStatus
     } = this.props.settings
-    const { isPrivateTransactions } = this.props.sendCash
+    const { arePrivateTransactionsEnabled } = this.props.sendCurrency
     const miningDescription = this.getMiningStateDescription()
 
     return (
@@ -161,7 +161,7 @@ class StatusIcons extends Component<Props> {
           </ReactTooltip>
 
           <div
-            className={cn('icon', styles.privateTransactions, { [styles.active]: isPrivateTransactions })}
+            className={cn('icon', styles.privateTransactions, { [styles.active]: arePrivateTransactionsEnabled })}
             data-tip
             data-for={privateTransactionsTooltipId}
             data-place="top"
@@ -178,12 +178,12 @@ class StatusIcons extends Component<Props> {
             </div>
 
             <div className={styles.toggleContainer}>
-              <div className={cn(styles.label, {[styles.active]: !isPrivateTransactions})}>{t(`Off`)}</div>
+              <div className={cn(styles.label, {[styles.active]: !arePrivateTransactionsEnabled})}>{t(`Off`)}</div>
               <ToggleButton
-                value={isPrivateTransactions}
-                onChange={this.props.sendCashActions.togglePrivateSend}
+                value={arePrivateTransactionsEnabled}
+                onChange={this.props.sendCurrencyActions.togglePrivateSend}
               />
-              <div className={cn(styles.label, {[styles.active]: isPrivateTransactions})}>{t(`On`)}</div>
+              <div className={cn(styles.label, {[styles.active]: arePrivateTransactionsEnabled})}>{t(`On`)}</div>
             </div>
           </ReactTooltip>
 
@@ -277,7 +277,7 @@ class StatusIcons extends Component<Props> {
 }
 
 const mapStateToProps = state => ({
-	sendCash: state.sendCash,
+	sendCurrency: state.sendCurrency,
 	settings: state.settings,
   systemInfo: state.systemInfo,
 })
@@ -285,7 +285,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   settingsActions: bindActionCreators(SettingsActions, dispatch),
   systemInfoActions: bindActionCreators(SystemInfoActions, dispatch),
-  sendCashActions: bindActionCreators(SendCashActions, dispatch)
+  sendCurrencyActions: bindActionCreators(SendCurrencyActions, dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate('other')(StatusIcons))

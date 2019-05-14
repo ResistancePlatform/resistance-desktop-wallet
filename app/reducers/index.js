@@ -14,7 +14,7 @@ import { GetStartedReducer } from './get-started/get-started.reducer'
 import { SystemInfoReducer } from './system-info/system-info.reducer'
 import { OverviewReducer } from './overview/overview.reducer'
 import { OwnAddressesReducer } from './own-addresses/own-addresses.reducer'
-import { SendCashReducer } from './send-cash/send-cash.reducer'
+import { SendCurrencyReducer } from './send-currency/send-currency.reducer'
 import { SettingsReducer } from './settings/settings.reducer'
 import { ResDexReducer } from './resdex/resdex.reducer'
 import { AddressBookReducer } from './address-book/address-book.reducer'
@@ -27,7 +27,7 @@ import { OwnAddressesEpics } from './own-addresses/own-addresses.epic'
 import { NaviEpics } from './navi/navi.epic'
 import { OverviewEpics } from './overview/overview.epic'
 import { SystemInfoEpics } from './system-info/system-info.epic'
-import { SendCashEpics } from './send-cash/send-cash.epic'
+import { SendCurrencyEpics } from './send-currency/send-currency.epic'
 import { SettingsEpics } from './settings/settings.epic'
 import { ResDexEpic } from './resdex/resdex.epic'
 import { AddressBookEpics } from './address-book/address-book.epic'
@@ -44,7 +44,7 @@ const rootReducer = combineReducers({
 	systemInfo: SystemInfoReducer,
 	overview: OverviewReducer,
 	ownAddresses: OwnAddressesReducer,
-	sendCash: SendCashReducer,
+	sendCurrency: SendCurrencyReducer,
 	addressBook: AddressBookReducer,
 	settings: SettingsReducer,
   resDex: ResDexReducer
@@ -58,7 +58,7 @@ const rootEpic = combineEpics(
 	SystemInfoEpics,
 	OverviewEpics,
 	OwnAddressesEpics,
-	SendCashEpics,
+	SendCurrencyEpics,
 	AddressBookEpics,
 	SettingsEpics,
   ResDexEpic

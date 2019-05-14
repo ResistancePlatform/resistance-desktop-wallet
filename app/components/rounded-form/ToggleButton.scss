@@ -4,11 +4,12 @@
   display: flex;
 
   .label {
-    color: $BASE_COLOR_GRAY;
+    color: $BASE_COLOR_FONT_GRAY_2;
     text-transform: uppercase;
-    font-size: 0.7rem;
+    font-size: 0.67rem;
     user-select: none;
     align-self: center;
+    white-space: nowrap;
   }
 
   margin-bottom: 0.75rem;
@@ -16,6 +17,7 @@
 
 .container {
   display: inline-block;
+  position: relative;
 
   width: 2.8rem;
   height: 1.4rem;
@@ -48,16 +50,18 @@
   }
 
   .caption {
+    font-size: 0.6rem;
     position: absolute;
     right: 0.5rem;
     top: 0.5rem;
     color: $BASE_COLOR_GRAY;
     text-transform: uppercase;
+    user-select: none;
   }
 
   &.on {
     .switcher {
-      margin-left: 1.3rem;
+      margin-left: calc(100% - 1.5rem);
     }
 
     .caption {

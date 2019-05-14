@@ -11,7 +11,7 @@ import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import CurrencyIcon from '~/components/resdex/CurrencyIcon'
 
-import styles from './RoundedInput.scss'
+import styles from './ChooseWallet.scss'
 
 const t = translate('resdex')
 

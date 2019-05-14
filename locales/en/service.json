@@ -41,5 +41,7 @@
   "T (Private)": "T (Private)",
   "Transaction has already been broadcasted": "Transaction has already been broadcasted",
   "Couldn't create withdrawal transaction": "Couldn't create withdrawal transaction",
-  "Incorrect ResDEX password": "Incorrect ResDEX password"
+  "Incorrect ResDEX password": "Incorrect ResDEX password",
+  "Checking Resistance parameters presence": "Checking Resistance parameters presence",
+  "Calculating parameters checksums": "Calculating parameters checksums"
 }

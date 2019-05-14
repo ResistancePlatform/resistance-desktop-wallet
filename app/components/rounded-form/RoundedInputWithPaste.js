@@ -3,7 +3,7 @@ import { clipboard } from 'electron'
 import cn from 'classnames'
 
 import { translate } from '~/i18next.config'
-import RoundedInput from './NewRoundedInput'
+import RoundedInput from './RoundedInput'
 import styles from './BorderlessButton.scss'
 
 

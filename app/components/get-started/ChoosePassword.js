@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom'
 import * as Joi from 'joi'
 
 import { getPasswordValidationSchema } from '~/utils/auth'
-import RoundedInput from '~/components/rounded-form/NewRoundedInput'
+import RoundedInput from '~/components/rounded-form/RoundedInput'
 import RoundedForm from '~/components/rounded-form/RoundedForm'
 import PasswordStrength from '~/components/password-strength/PasswordStrength'
 

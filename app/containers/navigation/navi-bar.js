@@ -63,9 +63,9 @@ class NaviBar extends Component<Props> {
             <i />
             <NavLink to="/">{t(`Home`)}</NavLink>
           </div>
-          <div className={cn(styles.sendCash, getItemClasses('/send-cash'))}>
+          <div className={cn(styles.sendCurrency, getItemClasses('/send-currency'))}>
             <i />
-            <NavLink to="/send-cash">{t(`Send Currency`)}</NavLink>
+            <NavLink to="/send-currency">{t(`Send Currency`)}</NavLink>
           </div>
           <div className={cn(styles.ownAddresses, getItemClasses('/own-addresses'))}>
             <i />

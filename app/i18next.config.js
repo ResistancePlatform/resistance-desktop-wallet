@@ -12,7 +12,7 @@ const availableNamespaces = [
   'overview',
   'own-addresses',
   'address-book',
-  'send-cash',
+  'send-currency',
   'settings',
   'resdex',
   'service',

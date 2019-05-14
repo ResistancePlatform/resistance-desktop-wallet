@@ -14,6 +14,7 @@ import Balance from '~/components/overview/Balance'
 import TransactionsList from '~/components/overview/TransactionsList'
 
 import styles from './overview.scss'
+import scrollStyles from '~/assets/styles/scrollbar.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 
@@ -71,7 +72,7 @@ class Overview extends Component<Props> {
 
             <Balance balances={this.props.overview.balances} />
 
-            <div className={cn(styles.transactionsContainer)}>
+            <div className={cn(styles.transactionsContainer, scrollStyles.scrollbar)}>
               <div className={styles.title}>
                 {t(`Transactions`)}
 

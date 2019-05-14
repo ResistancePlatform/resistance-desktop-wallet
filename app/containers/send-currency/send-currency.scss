@@ -1,0 +1,174 @@
+@import "~/assets/styles/vars.scss";
+@import "~/assets/styles/section.scss";
+@import "~/assets/styles/tooltip.scss";
+
+.form {
+  margin-right: 4.75rem;
+
+  .inputLabel {
+    min-width: 6.7rem;
+  }
+
+  .dropdownMenu {
+    width: 26rem;
+    font-size: 0.43rem !important;
+
+    .searchInput {
+      margin-top: 0.25rem;
+      margin-bottom: -1rem;
+      padding: 0.12rem 0.85rem;
+      height: 1rem;
+      font-size: 0.57rem;
+    }
+
+    .disabled {
+      pointer-events: none;
+
+      .address, .balance {
+        color: $BASE_COLOR_GRAY !important;
+      }
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+
+      font-size: 0.6rem !important;
+
+      &:hover .address, &:hover .name, &:hover .balance,  {
+        color: $BASE_COLOR_PURPLE;
+      }
+
+      .address {
+        color: $BASE_COLOR_FONT_GRAY_2;
+        width: 14rem;
+        text-transform: none !important;
+      }
+
+      .name {
+        color: $BASE_COLOR_FONT_GRAY_2;
+        text-align: center;
+        text-transform: none;
+      }
+
+      .balance {
+        color: $BASE_COLOR_WHITE;
+        width: 5rem;
+        font-weight: 500;
+        text-align: right;
+      }
+
+    }
+  }
+}
+
+.fromAddressRow {
+  display: flex;
+  align-content: stretch;
+
+  > div:first-child {
+    width: 100%;
+  }
+
+  .input {
+    margin-right: 1rem;
+  }
+
+  .toggleButton {
+    width: 16.25rem;
+
+    .toggleSwitcher {
+      width: 3.2rem;
+      margin-right: 0;
+    }
+  }
+}
+
+.amountRow {
+  display: flex;
+  align-content: stretch;
+
+  > div:first-child {
+    width: 100%;
+  }
+
+  .input {
+    margin-right: 1rem;
+  }
+
+  .transactionFee {
+    font-size: 0.67rem;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 16.25rem;
+    margin-bottom: 0.75rem;
+    color: $BASE_COLOR_FONT_GRAY_2;
+    white-space: nowrap;
+
+    .label {
+      margin-right: 0.8rem;
+    }
+
+    .amount {
+      font-weight: 500;
+      margin-right: 0.4rem;
+      color: $BASE_COLOR_WHITE;
+    }
+
+    .symbol {
+    }
+  }
+
+}
+
+.submitRow {
+  display: flex;
+  align-items: center;
+
+  .privateIcon {
+    margin-left: 1.5rem;
+    margin-right: 1rem;
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 1.5rem;
+
+    &:before {
+      content: '\e904';
+    }
+
+    &.locked {
+      &:before {
+        content: '\e903';
+      }
+    }
+  }
+
+  .hint {
+    width: 24.18rem;
+    font-size: 0.63rem;
+    font-weight: 500;
+  }
+}
+
+.memo {
+  font-size: 0.67rem;
+  color: $BASE_COLOR_FONT_GRAY_2;
+  margin-right: 1.5rem;
+
+  hr {
+    margin-top: 1.8rem;
+    margin-bottom: 1.5rem;
+
+    border: none;
+    border-top: 1px solid $BASE_COLOR_BORDER_GRAY;
+    width: 100%;
+  }
+
+  .label {
+    display: inline;
+    margin-right: 0.25rem;
+    color: $BASE_COLOR_WHITE;
+    font-weight: 500;
+  }
+}

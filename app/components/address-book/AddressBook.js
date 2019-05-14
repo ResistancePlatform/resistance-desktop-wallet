@@ -9,6 +9,7 @@ import NewAddressModal from './NewAddressModal'
 import AddressBookList from './AddressBookList'
 
 import styles from './AddressBook.scss'
+import scrollStyles from '~/assets/styles/scrollbar.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 
@@ -39,50 +40,54 @@ export class AddressBook extends Component<Props> {
     const { t } = this.props
 
 		return (
-      /* Layout container */
 			<div
         role="none"
-				className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}
-				onKeyDown={() => {}}
+				className={cn(HLayout.hBoxChild, VLayout.vBoxContainer)}
 			>
 
-				{/* Top bar */}
-				<div className={cn(styles.header, HLayout.hBoxContainer)}>
-					<div className={styles.title}>{t(`Address Book`)}</div>
+      <div className={cn(styles.container, VLayout.vBoxChild, HLayout.hBoxContainer, scrollStyles.scrollbar)}>
 
-          <div className={styles.buttonsContainer}>
-            <RoundedButton
-              className={styles.addAddressButton}
-              onClick={() => this.props.actions.openNewAddressModal()}
-              glyph="add"
-              important
-            >
-              {t(`Add new address`)}
-            </RoundedButton>
+        <div className={cn(styles.wrapper, HLayout.hBoxChild, VLayout.vBoxContainer)}>
+
+          {/* Top bar */}
+          <div className={cn(styles.header, HLayout.hBoxContainer)}>
+            <div className={styles.title}>{t(`Address Book`)}</div>
+
+            <div className={styles.buttonsContainer}>
+              <RoundedButton
+                className={styles.addAddressButton}
+                onClick={() => this.props.actions.openNewAddressModal()}
+                glyph="add"
+                important
+              >
+                {t(`Add new address`)}
+              </RoundedButton>
+            </div>
+
           </div>
 
-				</div>
+          <NewAddressModal />
 
-        <NewAddressModal />
+          <AddressBookList
+            items={this.props.addressBook.records}
+            onRowContextMenu={(e, record) => this.props.popupMenu.show(addressBookPopupMenuId, record, e.clientY, e.clientX)}
+          />
 
-        <AddressBookList
-          items={this.props.addressBook.records}
-          onRowContextMenu={(e, record) => this.props.popupMenu.show(addressBookPopupMenuId, record, e.clientY, e.clientX)}
-        />
+          <PopupMenu id={addressBookPopupMenuId}>
+            <PopupMenuItem onClick={(e, record) => this.props.actions.openNewAddressModal(record)}>
+              {t(`Edit address`)}
+            </PopupMenuItem>
+            <PopupMenuItem onClick={(e, record) => this.props.actions.copyAddress(record)}>
+              {t(`Copy Address`)}
+            </PopupMenuItem>
+            <PopupMenuItem onClick={(e, record) => this.props.actions.confirmAddressRemoval(record)}>
+              {t(`Remove Address`)}
+            </PopupMenuItem>
+          </PopupMenu>
 
-				<PopupMenu id={addressBookPopupMenuId}>
-          <PopupMenuItem onClick={(e, record) => this.props.actions.openNewAddressModal(record)}>
-            {t(`Edit address`)}
-          </PopupMenuItem>
-          <PopupMenuItem onClick={(e, record) => this.props.actions.copyAddress(record)}>
-            {t(`Copy Address`)}
-          </PopupMenuItem>
-          <PopupMenuItem onClick={(e, record) => this.props.actions.confirmAddressRemoval(record)}>
-            {t(`Remove Address`)}
-          </PopupMenuItem>
-				</PopupMenu>
-
-			</div>
+        </div>
+      </div>
+      </div>
 		)
 	}
 }

@@ -22,20 +22,6 @@
     margin: 0;
     height: 100%;
 
-
-    &::-webkit-scrollbar {
-      width: 0.3rem;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      border-radius: 0.15rem;
-      background: $BASE_COLOR_PURPLE;
-    }
-
   }
 
 }

@@ -3,6 +3,7 @@
 
 .container {
   overflow-x: visible;
+  margin-top: -0.3rem;
 }
 
 .top {
@@ -199,8 +200,4 @@
   .coin:last-child {
     margin-right: 0;
   }
-}
-
-.secretFunds {
-  visibility: hidden;
 }
