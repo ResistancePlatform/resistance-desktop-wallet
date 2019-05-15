@@ -42,6 +42,7 @@ class Overview extends Component<Props> {
 	 */
 	render() {
     const { t } = this.props
+    const { transactions } = this.props.overview
 
 		return (
 			<div className={cn(styles.layoutContainer, HLayout.hBoxChild, VLayout.vBoxContainer)}>
@@ -78,8 +79,9 @@ class Overview extends Component<Props> {
 
                 <BorderlessButton
                   className={styles.exportButton}
-                  onClick={(e, transactionId) => this.props.actions.exportToCsv(transactionId)}
+                  onClick={this.props.actions.initiateExportToCsv}
                   glyphClassName={styles.glyph}
+                  disabled={!transactions || !transactions.length}
                 >
                   {t(`Export to .CSV`)}
                 </BorderlessButton>
@@ -87,7 +89,7 @@ class Overview extends Component<Props> {
               </div>
 
               <TransactionsList
-                items={this.props.overview.transactions}
+                items={transactions}
                 onRowClick={(e, transactionId) => this.props.actions.getTransactionDetails(transactionId)}
                 onRowContextMenu={(e, transactionId) => this.props.popupMenu.show(overviewPopupMenuId, transactionId, e.clientY, e.clientX)}
               />

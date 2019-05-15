@@ -40,6 +40,9 @@ export const OverviewActions = createActions(
 		GOT_TRANSACTION_DATA_FROM_WALLET: (transactions: Array<Transaction>) => transactions,
 		GET_TRANSACTION_DATA_FROM_WALLET_FAILURE: (errorMessage: string) => ({ errorMessage }),
 
+    INITIATE_EXPORT_TO_CSV: undefined,
+    EXPORT_TO_CSV: (filePath: string) => ({ filePath }),
+
 		MAIN_WINDOW_CLOSE: undefined,
 		MAIN_WINDOW_MINIMIZE: undefined,
 		MAIN_WINDOW_MAXIMIZE: undefined,
