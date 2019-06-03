@@ -1,5 +1,6 @@
 // @flow
 import { Decimal } from 'decimal.js'
+import moment from 'moment'
 import crypto from 'crypto'
 import rp from 'request-promise-native'
 import log from 'electron-log'
@@ -271,6 +272,44 @@ class ResDexApiService {
       balance: Decimal(response.balance),
       zCredits: Decimal(response.zcredits)
     }
+  }
+
+  async getOHLC(base: string, rel: string, timescale: number) {
+    const response = await this.query({
+      method: 'tradesarray',
+      base,
+      rel,
+      timescale
+    })
+
+    // [timestamp, high, low, open, close, relvolume, basevolume, aveprice, numtrades]
+    const trades = response.map(item => ({
+      date: moment.unix(item[0]).toDate(),
+      high: item[1],
+      low: item[2],
+      open: item[3],
+      close: item[4],
+      volume: item[6],
+    }))
+
+    return trades
+  }
+
+  async getTrades(base: string, rel: string) {
+    const response = await this.query({
+      method: 'ticker',
+      base,
+      rel
+    })
+
+    const trades = response.map(item => ({
+      time: moment.unix(item.timestamp).toDate(),
+      baseAmount: Decimal(item[base]),
+      quoteAmount: Decimal(item[rel]),
+      price: Decimal(item.price),
+    }))
+
+    return trades
   }
 
   async stop() {

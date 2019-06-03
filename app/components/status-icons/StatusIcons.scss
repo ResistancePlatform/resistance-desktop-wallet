@@ -1,6 +1,10 @@
 @import "~/assets/styles/tooltip.scss";
 @import "~/assets/styles/vars.scss";
 
+.hidden {
+  display: none !important;
+}
+
 .toggleContainer {
   color: $BASE_COLOR_FONT_GRAY;
   text-transform: uppercase;

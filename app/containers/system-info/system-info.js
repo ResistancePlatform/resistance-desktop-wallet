@@ -12,6 +12,7 @@ import { getOS } from '~/utils/os'
 import { ChildProcessService } from '~/service/child-process-service'
 import { ResDexAssetsActions } from '~/reducers/resdex/assets/reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
+import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { SystemInfoActions, SystemInfoState } from '~/reducers/system-info/system-info.reducer'
 import { getStore } from '~/store/configureStore'
 import { State } from '~/reducers/types'
@@ -31,7 +32,8 @@ type Props = {
   t: any,
   i18n: any,
 	systemInfo: SystemInfoState,
-	settings: SettingsState
+	settings: SettingsState,
+	resDex: ResDexState
 }
 
 /**
@@ -153,9 +155,10 @@ class SystemInfo extends Component<Props> {
 	 */
 	render() {
     const { t } = this.props
+    const { isExpanded: isResDexExpanded } = this.props.resDex.common
 
 		return (
-			<div className={cn(styles.systemInfoContainer, HLayout.hBoxContainer)}>
+			<div className={cn(styles.systemInfoContainer, HLayout.hBoxContainer, {[styles.shrink]: isResDexExpanded})}>
         <RpcPolling
           criticalChildProcess="NODE"
           interval={daemonInfoPollingInterval}
@@ -273,7 +276,8 @@ class SystemInfo extends Component<Props> {
 const mapStateToProps = (state: State) => ({
 	systemInfo: state.systemInfo,
 	sendCurrency: state.sendCurrency,
-	settings: state.settings
+	settings: state.settings,
+	resDex: state.resDex
 })
 
 export default connect(mapStateToProps, null)(translate('other')(SystemInfo))

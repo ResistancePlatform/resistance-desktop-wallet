@@ -15,6 +15,7 @@ import AddCurrencyModal from './AddCurrencyModal'
 import OrderModal from './OrderModal'
 import ResDexAssets from './Assets'
 import ResDexBuySell from './BuySell'
+import ResDexAdvancedTrading from './AdvancedTrading'
 import ResDexOrders from './Orders'
 import ResDexAccounts from './Accounts'
 
@@ -43,9 +44,10 @@ export class ResDex extends Component<Props> {
 	 */
   getContents() {
     const { t } = this.props
+    const { isExpanded } = this.props.resDex.common
 
     return (
-      <div>
+      <div className={cn({[styles.expanded]: isExpanded})}>
         <RpcPolling
           interval={15.0 * 60}
           criticalChildProcess="RESDEX"
@@ -101,20 +103,24 @@ export class ResDex extends Component<Props> {
           <TabList className={styles.tabList}>
             <Tab className={styles.tab}>{t(`Assets`)}</Tab>
             <Tab className={styles.tab}>{t(`Buy/Sell`)}</Tab>
+            <Tab className={styles.tab}>{t(`Advanced Trading`)}</Tab>
             <Tab className={styles.tab}>{t(`Orders`)}</Tab>
             <Tab className={styles.tab}>{t(`Accounts`)}</Tab>
           </TabList>
 
-          <TabPanel className={cn(scrollStyles.scrollbar, scrollStyles.resdex)}>
+          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
             <ResDexAssets />
           </TabPanel>
-          <TabPanel className={cn(scrollStyles.scrollbar, scrollStyles.resdex)}>
+          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
             <ResDexBuySell />
           </TabPanel>
-          <TabPanel className={cn(scrollStyles.scrollbar, scrollStyles.resdex)}>
+          <TabPanel className={cn(styles.tabPanel)}>
+            <ResDexAdvancedTrading />
+          </TabPanel>
+          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
             <ResDexOrders />
           </TabPanel>
-          <TabPanel className={cn(scrollStyles.scrollbar, scrollStyles.resdex)}>
+          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
             <ResDexAccounts />
           </TabPanel>
 

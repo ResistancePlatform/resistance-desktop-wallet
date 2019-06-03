@@ -118,6 +118,7 @@ export const preloadedState: State = {
 	},
   resDex: {
     common: {
+      isExpanded: false,
       selectedTabIndex: 0,
     },
     bootstrapping: {
@@ -158,6 +159,7 @@ export const preloadedState: State = {
         }
       },
       enhancedPrivacy: false,
+      trades: [],
     },
     orders: {
       isInitialKickStartDone: false,

@@ -486,6 +486,41 @@ const selectTabEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   mapTo(RoundedFormActions.clear('resDexBuySell'))
 )
 
+const getOhlcEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+  ofType(ResDexBuySellActions.getOhlc),
+  switchMap(() => {
+    const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
+
+    const ohlcObservable = from(mainApi.getOhlc(baseCurrency, quoteCurrency, 120)).pipe(
+      map(ohlc => ResDexBuySellActions.gotOhlc(ohlc)),
+      catchError(err => {
+        log.error(`Can't get order ticks`, err)
+        toastr.error(t(`Error getting price ticks, please check the log for details`))
+        return of(ResDexBuySellActions.getOhlcFailed())
+      })
+    )
+
+    return ohlcObservable
+  })
+)
+
+const getTradesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+  ofType(ResDexBuySellActions.getTrades),
+  switchMap(() => {
+    const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
+
+    const tradesObservable = from(mainApi.getTrades(baseCurrency, quoteCurrency)).pipe(
+      map(trades => ResDexBuySellActions.gotTrades(trades)),
+      catchError(err => {
+        log.error(`Can't get order trades`, err)
+        toastr.error(t(`Error getting trades, please check the log for details`))
+        return of(ResDexBuySellActions.getTradesFailed())
+      })
+    )
+
+    return tradesObservable
+  })
+)
 
 export const ResDexBuySellEpic = (action$, state$) => merge(
   createOrderEpic(action$, state$),
@@ -498,5 +533,7 @@ export const ResDexBuySellEpic = (action$, state$) => merge(
   setPrivateOrderStatusEpic(action$, state$),
   linkPrivateOrderToBaseResOrderEpic(action$, state$),
   selectTabEpic(action$, state$),
+  getOhlcEpic(action$, state$),
+  getTradesEpic(action$, state$),
 )
 

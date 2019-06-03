@@ -29,6 +29,14 @@ export const ResDexBuySellActions = createActions(
     LINK_PRIVATE_ORDER_TO_BASE_RES_ORDER: (uuid: string, baseResOrderUuid: string) => ({uuid, baseResOrderUuid}),
 
     CREATE_LIMIT_ORDER: undefined,
+
+    GET_OHLC: undefined,
+    GOT_OHLC: (ohlc: object[]) => ({ ohlc }),
+    GET_OHLC_FAILED: undefined,
+
+    GET_TRADES: undefined,
+    GOT_TRADES: (trades: object[]) => ({ trades }),
+    GET_TRADES_FAILED: undefined,
   },
   {
     prefix: 'APP/RESDEX/BUY_SELL'
@@ -95,5 +103,13 @@ export const ResDexBuySellReducer = handleActions(
     [ResDexBuySellActions.createPrivateOrderFailed]: state => ({
       ...state,
       isSendingOrder: false,
+    }),
+    [ResDexBuySellActions.gotOhlc]: (state, action) => ({
+      ...state,
+      ohlc: action.payload.trades,
+    }),
+    [ResDexBuySellActions.gotTrades]: (state, action) => ({
+      ...state,
+      trades: action.payload.trades,
     }),
   }, preloadedState)
