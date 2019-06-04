@@ -106,7 +106,7 @@ export const ResDexBuySellReducer = handleActions(
     }),
     [ResDexBuySellActions.gotOhlc]: (state, action) => ({
       ...state,
-      ohlc: action.payload.trades,
+      ohlc: action.payload.ohlc,
     }),
     [ResDexBuySellActions.gotTrades]: (state, action) => ({
       ...state,

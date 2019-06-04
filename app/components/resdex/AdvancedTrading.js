@@ -32,7 +32,7 @@ class ResDexAdvancedTrading extends Component<Props> {
    * @memberof ResDexAdvancedTrading
 	 */
 	render() {
-    const { baseCurrency, quoteCurrency, orderBook } = this.props.buySell
+    const { baseCurrency, quoteCurrency, orderBook, trades } = this.props.buySell
     const { RESDEX: currencies } = this.props.accounts.currencies
 
     const baseSmartAddress = baseCurrency in currencies ? currencies[baseCurrency].address : null
@@ -61,22 +61,31 @@ class ResDexAdvancedTrading extends Component<Props> {
         />
 
         <div className={styles.container}>
-          <div className={styles.awesome}>
+          <div className={styles.chartContainer}>
             <TradingChart />
           </div>
 
           <div className={styles.widgetsContainer}>
-            <BuySellForm isAdvanced />
-            <OrderBook
-              className={styles.orderBook}
-              baseCurrency={baseCurrency}
-              quoteCurrency={quoteCurrency}
-              baseSmartAddress={baseSmartAddress}
-              quoteSmartAddress={quoteSmartAddress}
-              onPickPrice={price => this.props.formActions.updateField('resDexBuySell', 'price', price.toString())}
-              orderBook={orderBook.baseQuote}
+            <BuySellForm
+              className={styles.buySellForm}
+              isAdvanced
             />
-            <Trades />
+            <div className={styles.listsContainer}>
+              <OrderBook
+                className={styles.orderBook}
+                baseCurrency={baseCurrency}
+                quoteCurrency={quoteCurrency}
+                baseSmartAddress={baseSmartAddress}
+                quoteSmartAddress={quoteSmartAddress}
+                onPickPrice={price => this.props.formActions.updateField('resDexBuySell', 'price', price.toString())}
+                orderBook={orderBook.baseQuote}
+              />
+              <Trades
+                baseCurrency={baseCurrency}
+                quoteCurrency={quoteCurrency}
+                trades={trades}
+              />
+            </div>
           </div>
         </div>
       </React.Fragment>

@@ -274,7 +274,7 @@ class ResDexApiService {
     }
   }
 
-  async getOHLC(base: string, rel: string, timescale: number) {
+  async getOhlc(base: string, rel: string, timescale: number) {
     const response = await this.query({
       method: 'tradesarray',
       base,

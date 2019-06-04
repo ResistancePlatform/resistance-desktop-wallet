@@ -15,6 +15,7 @@ import styles from './OrderBook.scss'
 
 type Props = {
   t: any,
+  className?: string,
   baseCurrency: string,
   quoteCurrency: string,
   baseSmartAddress: string | null,
@@ -77,7 +78,7 @@ class OrderBook extends Component<Props> {
     const { asks, bids } = this.props.orderBook
 
     return (
-      <div className={styles.orderBook}>
+      <div className={cn(styles.orderBook, this.props.className)}>
         <div className={styles.asks}>
           <div className={styles.title}>
             <div className={cn('icon', styles.asksIcon)} />

@@ -1,16 +1,15 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import cn from 'classnames'
-import log from 'electron-log'
 
 import { tsvParse } from  'd3-dsv'
 import { timeParse } from 'd3-time-format'
 import { scaleTime } from 'd3-scale'
+import { format } from 'd3-format'
 
 import { utcDay } from 'd3-time'
 import { ChartCanvas, Chart } from 'react-stockcharts'
-import { CandlestickSeries } from 'react-stockcharts/lib/series'
+import { BarSeries, CandlestickSeries } from 'react-stockcharts/lib/series'
 import { XAxis, YAxis } from 'react-stockcharts/lib/axes'
 import { fitWidth } from 'react-stockcharts/lib/helper'
 import { last, timeIntervalBarWidth } from 'react-stockcharts/lib/utils'
@@ -20,7 +19,7 @@ import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import styles from './TradingChart.scss'
 
 type Props = {
-  buySell: ResDexState.buySell,
+  resDex: ResDexState,
 	width: number,
 	ratio: number
 }
@@ -55,9 +54,7 @@ class TradingChart extends Component<Props> {
 	props: Props
 
 	componentDidMount() {
-    log.debug('Getting chart data')
 		getData().then(data => {
-      log.debug('Data', data)
 			this.setState({ data })
 		})
 	}
@@ -83,6 +80,24 @@ class TradingChart extends Component<Props> {
   }
 
 	/**
+	 * @memberof TradingChart
+	 */
+  elementRef(element) {
+    this.element = element
+  }
+
+	/**
+	 * @memberof TradingChart
+	 * @returns {number}
+	 */
+  getHeight() {
+    if (!this.element) {
+      return 0
+    }
+    return Math.max(504, this.element.clientHeight-64)
+  }
+
+	/**
 	 * @returns
    * @memberof TradingChart
 	 */
@@ -97,23 +112,30 @@ class TradingChart extends Component<Props> {
     const xAccessor = d => d.date
 
 		return (
-      <div className={styles.container}>
-        <ChartCanvas height={400}
-            ratio={ratio}
-            width={width}
-            margin={{ left: 50, right: 50, top: 10, bottom: 30 }}
-            type="hybrid"
-            seriesName="RES/MONA"
-            data={this.state.data}
-            xAccessor={xAccessor}
-            xScale={scaleTime()}
-            xExtents={this.getXExtents()}>
+      <div className={styles.container} ref={el => this.elementRef(el)}>
+        <ChartCanvas
+          height={this.getHeight()}
+          ratio={ratio}
+          width={width}
+          margin={{ left: 50, right: 50, top: 10, bottom: 30 }}
+          type="hybrid"
+          seriesName="RES/MONA"
+          data={this.state.data}
+          xAccessor={xAccessor}
+          xScale={scaleTime()}
+          xExtents={this.getXExtents()}>
 
           <Chart id={1} yExtents={d => [d.high, d.low]}>
             <XAxis axisAt="bottom" orient="bottom" ticks={6}/>
             <YAxis axisAt="left" orient="left" ticks={5} />
             <CandlestickSeries width={timeIntervalBarWidth(utcDay)}/>
           </Chart>
+
+          <Chart id={2} yExtents={d => d.volume}>
+            <YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".0s")}/>
+            <BarSeries yAccessor={d => d.volume} />
+          </Chart>
+
         </ChartCanvas>
       </div>
 		)
@@ -121,7 +143,7 @@ class TradingChart extends Component<Props> {
 }
 
 const mapStateToProps = (state) => ({
-	buySell: state.resDex.buySell,
+	resDex: state.resDex,
 })
 
 export default connect(mapStateToProps, null)(translate('resdex')(fitWidth(TradingChart)))

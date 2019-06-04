@@ -26,6 +26,7 @@ import styles from './BuySellForm.scss'
 
 type Props = {
   t: any,
+  className?: string,
   isAdvanced?: boolean,
   form: object,
   buySell: ResDexState.buySell,
@@ -175,7 +176,7 @@ class BuySellForm extends Component<Props> {
     return (
       <RoundedForm
         id="resDexBuySell"
-        className={styles.form}
+        className={cn(styles.form, this.props.className)}
         schema={getValidationSchema(t, isAdvanced)}
         clearOnUnmount
       >
@@ -318,7 +319,7 @@ class BuySellForm extends Component<Props> {
           spinner={this.props.buySell.isSendingOrder}
           spinnerTooltip={t(`Sending the order...`)}
           important
-          large
+          large={!isAdvanced}
         >
           {orderAttrs.isMarket ? t(`Exchange`) : t(`Add to order book`)}
         </RoundedButton>

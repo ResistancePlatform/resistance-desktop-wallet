@@ -159,6 +159,7 @@ export const preloadedState: State = {
         }
       },
       enhancedPrivacy: false,
+      ohlc: [],
       trades: [],
     },
     orders: {

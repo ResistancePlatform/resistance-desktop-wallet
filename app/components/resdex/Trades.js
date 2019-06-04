@@ -66,7 +66,7 @@ class Trades extends Component<Props> {
         <div className={styles.trades}>
           <div className={styles.title}>
             <div className={cn('icon', styles.bidsIcon)} />
-            {t(`Market trades`)}
+            {t(`Trades`)}
           </div>
 
           <UniformList
