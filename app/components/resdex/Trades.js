@@ -75,6 +75,7 @@ class Trades extends Component<Props> {
             headerRenderer={() => this.getListHeaderRenderer()}
             rowRenderer={item => this.getListRowRenderer(item)}
             emptyMessage={t(`No market trades available yet`)}
+            scrollable
           />
 
         </div>

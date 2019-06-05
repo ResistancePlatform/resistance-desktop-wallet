@@ -12,6 +12,7 @@ type Props = {
   className?: string,
   emptyMessage?: string | false,
   sortKeys?: string[],
+  scrollable?: boolean,
   +items: object[],
   +headerRenderer: item => void,
   +rowRenderer: item => void
@@ -91,7 +92,12 @@ class UniformList extends Component<Props> {
     const emptyMessage = this.props.emptyMessage === false ? '' : this.props.emptyMessage || t(`No data to display.`)
 
     return (
-      <div className={cn(styles.container, VLayout.vBoxChild, this.props.className)}>
+      <div className={cn(
+        styles.container,
+        VLayout.vBoxChild,
+        this.props.className,
+        {[styles.scrollable]: this.props.scrollable}
+      )}>
 
         {this.props.items.length > 0 && this.getHeader()}
 

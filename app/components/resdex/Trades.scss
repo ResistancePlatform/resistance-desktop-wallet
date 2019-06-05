@@ -1,5 +1,7 @@
 @import "./OrderBook.scss";
 
 .trades {
-  margin-right: -1rem;
+  margin-right: -0.5rem;
+  height: calc(100% - 1rem);
+  width: 100%;
 }

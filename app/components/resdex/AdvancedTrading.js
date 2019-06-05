@@ -38,8 +38,7 @@ class ResDexAdvancedTrading extends Component<Props> {
     const baseSmartAddress = baseCurrency in currencies ? currencies[baseCurrency].address : null
     const quoteSmartAddress = quoteCurrency in currencies ? currencies[quoteCurrency].address : null
 
-		return (
-      <React.Fragment>
+    /*
         <RpcPolling
           interval={5.0}
           criticalChildProcess="RESDEX"
@@ -59,7 +58,10 @@ class ResDexAdvancedTrading extends Component<Props> {
             failure: ResDexBuySellActions.getTradesFailed
           }}
         />
+    */
 
+		return (
+      <React.Fragment>
         <div className={styles.container}>
           <div className={styles.chartContainer}>
             <TradingChart />

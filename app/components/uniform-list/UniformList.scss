@@ -3,6 +3,11 @@
 .container {
   background-color: transparent;
   color: $BASE_COLOR_WHITE;
+
+  &.scrollable {
+    overflow-y: scroll;
+    height: calc(100% - 3rem);
+  }
 }
 
 .header {
