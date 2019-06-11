@@ -20,26 +20,26 @@ const RESDEX = {
     //   symbol: 'ETOMIC',
     //   useElectrum: false
     // },
-    // {
-    //   symbol: 'ETH',
-    //   useElectrum: true
-    // },
+    {
+      symbol: 'ETH',
+      useElectrum: false
+    },
     {
       symbol: 'BTC',
-      useElectrum: true
+      useElectrum: false
     },
-    {
+    /*{
       symbol: 'LTC',
       useElectrum: true
-    },
-    {
+    },*/
+    /*{
       symbol: 'DGB',
       useElectrum: true
     },
     {
       symbol: 'MONA',
       useElectrum: true
-    },
+    },*/
     // {
     //   symbol: 'NEXO',
     //   useElectrum: true

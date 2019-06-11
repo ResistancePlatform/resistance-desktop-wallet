@@ -83,17 +83,17 @@ class ResDexApiService {
 			method: 'walletpassphrase',
       coin,
 			password,
-      timeout: String(timeout)
+      timeout: timeout
 		})
   }
 
   async getPendingSwaps() {
-    const response = await this.query({
-      method: 'swapstatus',
+    /*const response = await this.query({
+      method: 'my_swap_status',
       pending: 1
-    })
+    })*/
 
-    return response.swaps
+    return [] //response.swaps TODO: use my_swap_status instead
   }
 
   async instantDexDeposit(weeks: number, amount: object) {
@@ -170,16 +170,23 @@ class ResDexApiService {
   }
 
 	async getFee(coin) {
-		const response = await this.query({
+		/*const response = await this.query({
 			method: 'getfee',
 			coin,
-		})
+		})*/
 
-		return Decimal(response.txfee)
+		return Decimal("0.0001")//response.txfee) TODO
 	}
 
   getPortfolio() {
-    return this.query({ method: 'portfolio' })
+    var enabledCoins = ["RES","BTC","ETH"]
+    var result = {"result": "success", "portfolio":[]}
+    for(var i = 0; i < enabledCoins.length; i++){
+      var coinData = this.query({method: 'my_balance', coin:enabledCoins[i]})
+      result.portfolio.push(coinData)
+    }
+    return result
+    //return this.query({ method: 'portfolio' }) TODO
   }
 
   async enableCurrency(symbol: string, useElectrum: boolean = true) {
@@ -197,15 +204,19 @@ class ResDexApiService {
     let response
 
     try {
-      response = await this.query({ method: 'enable', coin: symbol })
+      log.debug(`Coin: ${JSON.stringify(currency)}`)
+      var query_params = Object.assign({}, {method: 'enable', mm2: 1}, currency)
+      response = await this.query(query_params)
+      log.debug(`Response is: ${JSON.stringify(response)}`)
     } catch(err) {
       if (err.message.includes('couldnt find coin locally installed')) {
         log.error(`Can't enable a currency that's not installed locally, re-trying in Electrum mode`)
-        return this::enableElectrumServers(symbol)
+        //return this::enableElectrumServers(symbol)
+        return false //response.status === 'active' //TODO
       }
     }
 
-    return response.status === 'active'
+    return true //=== 'active' TODO
   }
 
   disableCurrency(coin: string) {
@@ -262,7 +273,7 @@ class ResDexApiService {
 
   async balance(coin: string, address: string) {
     const response = await this.query({
-      method: 'balance',
+      method: 'my_balance',
       coin,
       address
     })
