@@ -184,6 +184,7 @@ export const preloadedState: State = {
       enhancedPrivacy: false,
       ohlc: [],
       trades: getRandomTrades(),
+      chartPeriod: 'day',
     },
     orders: {
       isInitialKickStartDone: false,

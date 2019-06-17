@@ -78,7 +78,8 @@ export type ResDexState = {
     },
     enhancedPrivacy: boolean,
     ohlc: object[],
-    trades: object[]
+    trades: object[],
+    chartPeriod: string
   },
   orders: {
     isInitialKickStartDone: boolean,

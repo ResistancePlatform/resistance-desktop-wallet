@@ -5,3 +5,40 @@
   background: $BASE_COLOR_DARK_BLUE_2;
   height: calc(100% - 4rem);
 }
+
+.period { $bulletDiameter: 1.35rem; user-select: none;
+  float: right;
+  margin: 0;
+  margin-right: 5rem;
+  position: absolute;
+  top: 0.57rem;
+  left: calc(100% - 2.78rem);
+  transform: translateX(-100%);
+  white-space: nowrap;
+
+  li {
+    cursor: pointer;
+    color: #9fabdc;
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 200;
+    list-style: none;
+    padding: 0;
+    width: $bulletDiameter;
+    height: $bulletDiameter;
+    text-align: center;
+    line-height: $bulletDiameter;
+
+    &.active {
+      color: $BASE_COLOR_WHITE;
+      background: $BASE_COLOR_PURPLE;
+      border-radius: 50%;
+    }
+  }
+}
+
+.indicatorsButton {
+  &:before {
+    content: '\e907';
+  }
+}

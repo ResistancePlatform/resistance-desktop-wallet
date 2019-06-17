@@ -1,25 +1,31 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
+import cn from 'classnames'
 import log from 'electron-log'
 
 import { tsvParse } from  'd3-dsv'
 import { timeParse, timeFormat  } from 'd3-time-format'
 import { scaleTime } from 'd3-scale'
 import { format } from 'd3-format'
-
-import { utcDay } from 'd3-time'
+import { utcHour, utcDay, utcWeek, utcMonth, utcYear } from 'd3-time'
 import { ChartCanvas, Chart } from 'react-stockcharts'
 import {
+  AreaSeries,
   BarSeries,
   CandlestickSeries,
+  BollingerSeries,
   LineSeries,
-  MACDSeries
+  MACDSeries,
+  RSISeries,
 } from 'react-stockcharts/lib/series'
 import {
 	OHLCTooltip,
 	MovingAverageTooltip,
+  BollingerBandTooltip,
 	MACDTooltip,
+  RSITooltip,
 } from 'react-stockcharts/lib/tooltip'
 import {
 	CrossHairCursor,
@@ -28,15 +34,19 @@ import {
 	MouseCoordinateX,
 	MouseCoordinateY,
 } from 'react-stockcharts/lib/coordinates'
-import { discontinuousTimeScaleProvider } from 'react-stockcharts/lib/scale'
 import { XAxis, YAxis } from 'react-stockcharts/lib/axes'
 import { fitWidth } from 'react-stockcharts/lib/helper'
-import { last, timeIntervalBarWidth } from 'react-stockcharts/lib/utils'
-import { ema, macd } from 'react-stockcharts/lib/indicator'
+import { first, last, timeIntervalBarWidth } from 'react-stockcharts/lib/utils'
+import { sma, ema, bollingerBand, rsi, macd } from 'react-stockcharts/lib/indicator'
+
+import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 
 import styles from './TradingChart.scss'
 
 type Props = {
+  t: any,
+  actions: object,
+  resDex: any,
 	width: number,
 	ratio: number
 }
@@ -66,10 +76,20 @@ const ema20 = ema()
     sourcePath: 'close',
   })
   .skipUndefined(true)
-  // .merge((d, c) => ({...d, ema20: c}))
-  .merge((d, c) => {d.ema20 = c})
+  .merge((d, c) => ({...d, ema20: c}))
   .accessor(d => d.ema20)
   .stroke('red')
+
+const smaVolume50 = sma()
+  .options({ windowSize: 20, sourcePath: 'volume' })
+  .merge((d, c) => ({...d, smaVolume50: c}))
+  .accessor(d => d.smaVolume50)
+  .stroke('#4682B4')
+  .fill('#4682B4')
+
+const bb = bollingerBand()
+  .merge((d, c) => ({...d, bb: c}))
+  .accessor(d => d.bb)
 
 const macdCalculator = macd()
   .options({
@@ -77,8 +97,13 @@ const macdCalculator = macd()
     slow: 26,
     signal: 9,
   })
-  .merge((d, c) => {d.macd = c})
+  .merge((d, c) => ({...d, macd: c}))
   .accessor(d => d.macd)
+
+const rsiCalculator = rsi()
+  .options({ windowSize: 14 })
+  .merge((d, c) => ({...d, rsi: c}))
+  .accessor(d => d.rsi);
 
 function parseData(parse) {
   return d => ({
@@ -101,6 +126,15 @@ function getData() {
 	return promiseMSFT
 }
 
+const getPeriodCaption = (t, period) => ({
+  hour: t(`1H`),
+  day: t(`24H`),
+  week: t(`1W`),
+  month: t(`1M`),
+  year: t(`1Y`),
+  all: t(`All`),
+})[period]
+
 /**
  * @class TradingChart
  * @extends {Component<Props>}
@@ -109,30 +143,11 @@ class TradingChart extends Component<Props> {
 	props: Props
 
 	componentDidMount() {
-    const xScaleProvider = discontinuousTimeScaleProvider.inputDateAccessor(d => d.date)
-
     log.debug("Calculatin things")
 
 		getData().then(initialData => {
-      const calculatedData = ema20(macdCalculator(initialData))
-
-      const {
-        data,
-        xScale,
-        xAccessor,
-        displayXAccessor,
-      } = xScaleProvider(calculatedData)
-
-      log.debug(xScale, xAccessor, displayXAccessor, data.length)
-      log.debug(data)
-
-      this.setState({
-        data,
-        xScale,
-        xAccessor,
-        displayXAccessor,
-      })
-
+      const calculatedData = rsiCalculator(bb(smaVolume50(ema20(macdCalculator(initialData)))))
+      this.setState({ data: calculatedData })
       return null
     }).catch(() => null)
 	}
@@ -141,20 +156,46 @@ class TradingChart extends Component<Props> {
 	 * @returns
    * @memberof TradingChart
 	 */
-  getXExtents() {
-    // const { trades } = this.props.buySell
+  getXExtents(period: string) {
     const { data } = this.state
+    const barsNumber = 100
 
     if (!data.length) {
       return []
     }
 
-    const xExtents = [
-      last(data).date,
-      data[Math.max(data.length - 100, 0)].date
-    ]
+    const lastDate = last(data).date
+    let firstDate = new Date(lastDate.getTime())
 
-    return xExtents
+    switch (period) {
+      case 'hour':
+        firstDate.setHours(firstDate.getHours() - barsNumber)
+        break
+      case 'day':
+        firstDate.setDate(firstDate.getDate() - barsNumber)
+        break
+      case 'week':
+        firstDate.setDate(firstDate.getDate() - barsNumber * 7)
+        break
+      case 'month':
+        firstDate.setMonth(firstDate.getMonth() - barsNumber)
+        break
+      case 'year':
+        firstDate.setYear(firstDate.getMonth() - barsNumber)
+        break
+      case 'all':
+        firstDate = first(data).date
+        break
+      default:
+    }
+
+    const firstTime = first(data).date.getTime()
+
+    if (firstDate.getTime() < firstTime) {
+      firstDate = first(data).date
+    }
+
+    return [lastDate, firstDate]
   }
 
 	/**
@@ -180,14 +221,14 @@ class TradingChart extends Component<Props> {
    * @memberof TradingChart
 	 */
 	render() {
-    const { width, ratio } = this.props
+    const { t, width, ratio } = this.props
     // const { trades } = this.props.buySell
 
     if (!this.state || !this.state.data) {
       return null
     }
 
-		const margin = { left: 70, right: 70, top: 20, bottom: 30 }
+		const margin = { left: 50, right: 50, top: 20, bottom: 30 }
 		const gridHeight = this.getHeight() - margin.top - margin.bottom;
 		const gridWidth = width - margin.left - margin.right;
 
@@ -196,8 +237,44 @@ class TradingChart extends Component<Props> {
 
     const height = this.getHeight()
 
+    const { chartPeriod } = this.props.resDex.buySell
+    const chartPeriods = ['hour', 'day', 'week', 'month', 'year']
+
+    const d3Interval = {
+      'hour': utcHour,
+      'day': utcDay,
+      'week': utcWeek,
+      'month': utcMonth,
+      'year': utcYear,
+      'all': utcYear,
+    }[chartPeriod] || utcDay
+
 		return (
       <div className={styles.container} ref={el => this.elementRef(el)}>
+
+        <ul className={styles.period}>
+          {
+            chartPeriods.map(period => (
+              <li
+                role="none"
+                key={period}
+                className={cn({ [styles.active]: period === chartPeriod })}
+                onClick={() => this.props.actions.setChartPeriod(period)}
+              >
+                {getPeriodCaption(t, period)}
+              </li>
+            ))
+          }
+        </ul>
+
+        <div
+          role="button"
+          className={cn('icon', styles.indicatorsButton)}
+          onClick={this.props.actions.openIndicatorsModal}
+          tabIndex={chartPeriods.length}
+          onKeydown={() => false}
+        />
+
         <ChartCanvas
           height={height}
           ratio={ratio}
@@ -207,10 +284,10 @@ class TradingChart extends Component<Props> {
           seriesName="RES/MONA"
           data={this.state.data}
           xAccessor={d => d.date}
-          xScale={scaleTime()}
-          xExtents={this.getXExtents()}>
+          xScale={scaleTime().domain([new Date(2000, 0, 1, 0), new Date(2000, 0, 1, 1)])}
+          xExtents={this.getXExtents(chartPeriod)}>
 
-          <Chart id={1} height={height-150}
+          <Chart id={1} height={height-250}
             yExtents={[d => [d.high, d.low], ema20.accessor()]}
             padding={{ top: 10, bottom: 20 }}
           >
@@ -230,7 +307,6 @@ class TradingChart extends Component<Props> {
               ticks={6}
               showTicks={false}
               outerTickSize={0}
-              stroke="#a367f0"
               opacity={0.5}
               {...xGrid}
             />
@@ -247,7 +323,19 @@ class TradingChart extends Component<Props> {
             <CandlestickSeries
               stroke={d => d.close > d.open ? "#00d492" : "#e20063"}
               wickStroke={d => d.close > d.open ? "#00d492" : "#e20063"}
-              fill={d => d.close > d.open ? "#00d492" : "#e20063"} width={timeIntervalBarWidth(utcDay)} />
+              fill={d => d.close > d.open ? "#00d492" : "#e20063"}
+              width={timeIntervalBarWidth(d3Interval)}
+            />
+
+            <BollingerSeries
+              yAccessor={d => d.bb}
+              stroke={{
+                top: "#964B00",
+                middle: "#000000",
+                bottom: "#964B00",
+              }}
+              fill="#4682B4"
+            />
 
             <EdgeIndicator itemType="last" orient="right" edgeAt="right"
               yAccessor={d => d.close}
@@ -275,22 +363,45 @@ class TradingChart extends Component<Props> {
                 },
               ]}
             />
+
+            <BollingerBandTooltip
+              origin={[-38, 60]}
+              yAccessor={d => d.bb}
+              options={bb.options()}
+            />
+
           </Chart>
 
           <Chart
             id={2}
-            yExtents={d => d.volume}
-            origin={(w, h) => [0, h - 300]}
+            yExtents={[d => d.volume, smaVolume50.accessor()]}
+            height={150}
+            origin={(w, h) => [0, h - 350]}
           >
-            <YAxis axisAt="left" orient="left" ticks={5} stroke="#a367f0" tickStroke="#a367f0" tickFormat={format(".0s")}/>
+            <YAxis
+              axisAt="left"
+              orient="left"
+              ticks={5}
+              stroke="#a367f0"
+              tickStroke="#a367f0"
+              tickFormat={format(".0s")}
+            />
+
             <BarSeries fill="#1d2440" yAccessor={d => d.volume} />
+            <AreaSeries yAccessor={smaVolume50.accessor()} stroke={smaVolume50.stroke()} fill={smaVolume50.fill()}/>
+
+            <CurrentCoordinate yAccessor={smaVolume50.accessor()} fill={smaVolume50.stroke()} />
+            <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47" />
           </Chart>
 
-          <Chart id={3} height={150}
+          <Chart
+            id={3}
+            height={100}
             yExtents={macdCalculator.accessor()}
-            origin={(w, h) => [0, h - 150]} padding={{ top: 10, bottom: 10 }}
+            origin={(w, h) => [0, h - 200]}
+            padding={{ top: 10, bottom: 10 }}
           >
-            <XAxis axisAt="bottom" orient="bottom"/>
+            <XAxis axisAt="bottom" showTicks={false} orient="bottom"/>
             <YAxis axisAt="right" orient="right" ticks={2} />
 
             <MouseCoordinateX
@@ -311,10 +422,40 @@ class TradingChart extends Component<Props> {
               {...macdAppearance} />
 
             <MACDTooltip
-              origin={[-38, 15]}
+              origin={[-38, 20]}
               yAccessor={d => d.macd}
               options={macdCalculator.options()}
               appearance={macdAppearance}
+            />
+          </Chart>
+
+          <Chart id={4}
+            yExtents={[0, 100]}
+            height={100} origin={(w, h) => [0, h - 100]}
+            padding={{ top: 10, bottom: 10 }}
+          >
+            <XAxis
+              axisAt="bottom"
+              orient="bottom"
+              stroke="#a367f0"
+              outerTickSize={0}
+            />
+
+            <YAxis axisAt="right"
+              orient="right"
+              tickValues={[30, 50, 70]}/>
+
+            <MouseCoordinateY
+              at="right"
+              orient="right"
+              displayFormat={format(".2f")} />
+
+            <RSISeries yAccessor={d => d.rsi} />
+
+            <RSITooltip
+              origin={[-38, 20]}
+              yAccessor={d => d.rsi}
+              options={rsiCalculator.options()}
             />
           </Chart>
 
@@ -327,7 +468,11 @@ class TradingChart extends Component<Props> {
 }
 
 const mapStateToProps = (state) => ({
-       resDex: state.resDex,
+  resDex: state.resDex,
 })
 
-export default connect(mapStateToProps, null)(translate('resdex')(fitWidth(TradingChart)))
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(ResDexBuySellActions, dispatch),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(fitWidth(TradingChart)))
