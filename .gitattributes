@@ -11,5 +11,4 @@ app/bin/macos/** filter=lfs diff=lfs merge=lfs -text
 app/bin/windows/** filter=lfs diff=lfs merge=lfs -text
 app/bin/linux/** filter=lfs diff=lfs merge=lfs -text
 bin/** filter=lfs diff=lfs merge=lfs -text
-
-
+bin/macos/resdex filter=lfs diff=lfs merge=lfs -text
