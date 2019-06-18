@@ -37,8 +37,8 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
         address: currency.address,
         balance: Decimal(currency.balance),
         zcredits: Decimal(currency.zcredits || 0),
-        price: Decimal(currency.price),
-        amount: Decimal(currency.amount),
+        price: Decimal(currency.price || 0),
+        amount: Decimal(currency.amount || currency.balance),
       }
     }), {})
 
@@ -321,7 +321,7 @@ const closeWithdrawModalEpic = (action$: ActionsObservable<any>) => action$.pipe
 export const ResDexAccountsEpic = (action$, state$) => merge(
   getCurrenciesEpic(action$, state$),
   getCurrenciesFailedEpic(action$, state$),
-  getZCreditsEpic(action$, state$),
+  //getZCreditsEpic(action$, state$), TODO
   getTransactionsEpic(action$, state$),
   copySmartAddressEpic(action$, state$),
   addCurrencyEpic(action$, state$),

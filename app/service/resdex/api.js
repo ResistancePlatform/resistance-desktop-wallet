@@ -69,13 +69,14 @@ class ResDexApiService {
   }
 
 	async enableSocket() {
-		const port = await getPort()
+		/*const port = await getPort()
 		const {endpoint} = await this.query({method: 'getendpoint', port})
 		const socket = new MarketmakerSocket(endpoint)
 		await socket.connected
 		this.socket = socket
 
-		return this.socket
+		return this.socket*/ //TODO
+    return undefined
 	}
 
   sendWalletPassphrase(coin: string, password: string, timeout: number) {
@@ -83,17 +84,18 @@ class ResDexApiService {
 			method: 'walletpassphrase',
       coin,
 			password,
-      timeout: String(timeout)
+      timeout: timeout
 		})
   }
 
   async getPendingSwaps() {
-    const response = await this.query({
+    /*const response = await this.query({
       method: 'swapstatus',
       pending: 1
     })
 
-    return response.swaps
+    return response.swaps*/ //TODO
+    return []
   }
 
   async instantDexDeposit(weeks: number, amount: object) {
@@ -197,15 +199,19 @@ class ResDexApiService {
     let response
 
     try {
-      response = await this.query({ method: 'enable', coin: symbol })
+      log.debug(`Coin: ${JSON.stringify(currency)}`)
+      var query_params = Object.assign({}, {method: 'enable', mm2: 1}, currency)
+      response = await this.query(query_params)
+      log.debug(`Response is: ${JSON.stringify(response)}`)
     } catch(err) {
       if (err.message.includes('couldnt find coin locally installed')) {
         log.error(`Can't enable a currency that's not installed locally, re-trying in Electrum mode`)
-        return this::enableElectrumServers(symbol)
+        //return this::enableElectrumServers(symbol)
+        return false //response.status === 'active' //TODO
       }
     }
 
-    return response.status === 'active'
+    return true //=== 'active' TODO
   }
 
   disableCurrency(coin: string) {
