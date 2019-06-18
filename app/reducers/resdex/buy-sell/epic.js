@@ -39,12 +39,15 @@ const getOrderBookEpic = (action$: ActionsObservable<Action>, state$) => action$
           baseRes
         }
         log.debug('Order book prices')
+        log.debug(JSON.stringify(baseQuote))
         if (baseQuote.asks.length) {
           log.debug('baseQuote', baseQuote.asks[0])
         }
+        log.debug(JSON.stringify(resQuote))
         if (resQuote.asks.length) {
           log.debug('resQuote', resQuote.asks[0])
         }
+        log.debug(JSON.stringify(baseRes))
         if (baseRes.asks.length) {
           log.debug('baseRes', baseRes.asks[0])
         }
@@ -78,7 +81,7 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
 
     if (isMarketOrder && !price) {
       const { price: askPrice } = orderBook.baseQuote.asks[0]
-      price = askPrice.times(Decimal('1.2'))
+      price = askPrice.times(Decimal('1.0001'))
     }
 
     const orderOptions = {
@@ -121,13 +124,13 @@ const getCreateMarketOrderObservable = (processName, options, privacy, getSucces
   const txFee = state$.value.resDex.accounts.currencyFees[quoteCurrency]
 
   const dexFee = RESDEX.dexFee.div(Decimal('100'))
-  const divider = price.plus(price.times(dexFee)).plus(txFee)
+  //const divider = price.plus(price.times(dexFee)).plus(txFee)
 
   const requestOpts = {
     type: 'buy',
     baseCurrency,
     quoteCurrency,
-    price: divider,
+    price: price,
     amount: Decimal(quoteCurrencyAmount).dividedBy(price).toDP(8, Decimal.ROUND_FLOOR),
     total: Decimal(quoteCurrencyAmount).toDP(8, Decimal.ROUND_FLOOR)
   }

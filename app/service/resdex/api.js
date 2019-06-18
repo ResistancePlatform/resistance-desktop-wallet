@@ -89,13 +89,13 @@ class ResDexApiService {
   }
 
   async getPendingSwaps() {
-    /*const response = await this.query({
-      method: 'swapstatus',
-      pending: 1
+    const response = await this.query({
+      method: 'my_recent_swaps',
     })
 
-    return response.swaps*/ //TODO
-    return []
+    //TODO parse this correctly
+
+    return response.result.swaps
   }
 
   async instantDexDeposit(weeks: number, amount: object) {
@@ -229,7 +229,7 @@ class ResDexApiService {
 		})
 
 		const formatOrders = orders => orders
-			.filter(order => order.numutxos > 0)
+			//.filter(order => order.numutxos > 0) TODO
 			.map(order => ({
 				address: order.address,
 				depth: Decimal(order.depth),
@@ -237,7 +237,7 @@ class ResDexApiService {
 				utxoCount: order.numutxos,
 				averageVolume: Decimal(order.avevolume),
 				maxVolume: Decimal(order.maxvolume),
-				zCredits: order.zcredits,
+				//zCredits: order.zcredits, TODO
 			}))
 
 		const formattedResponse = {
@@ -256,11 +256,11 @@ class ResDexApiService {
   createMarketOrder(opts) {
     return this.query({
       method: opts.type,
-      gtc: 1,
+      //gtc: 1,
       duration: 240,
       base: opts.baseCurrency,
       rel: opts.quoteCurrency,
-      basevolume: opts.amount.toNumber(),
+      //basevolume: opts.amount.toNumber(),
       relvolume: opts.total.toNumber(),
       price: opts.price.toNumber(),
     })
@@ -365,81 +365,25 @@ async function enableElectrumServers(symbol) {
 }
 
 async function withdrawBtcFork(opts) {
-  const {
-    txfee: txFeeSatoshis,
-    txid,
-    amount,
-    symbol,
-    address,
-  } = await this::createTransaction(opts)
-
-  // Convert from satoshis
-  const SATOSHIS = 100000000
-  const txFee = txFeeSatoshis / SATOSHIS
-
-  return {
-    txFee,
-    txid,
-    amount,
-    symbol,
-    address,
-  }
+  var result = await this::withdraw(opts)
+  return result.response
 }
 
 async function withdrawEth(opts) {
-  const {
-    eth_fee: txFee,
-    gas_price: gasPrice,
-    gas,
-  } = await this.query({
-    method: 'eth_withdraw',
-    coin: opts.symbol,
-    to: opts.address,
-    amount: opts.amount,
-    broadcast: 0,
-  })
-
-  let hasBroadcast = false
-
-  const broadcast = async () => {
-    if (hasBroadcast) {
-      throw new Error(t(`Transaction has already been broadcasted`))
-    }
-    hasBroadcast = true
-
-    const response = await this.query({
-      method: 'eth_withdraw',
-      gas,
-      gas_price: gasPrice,
-      coin: opts.symbol,
-      to: opts.address,
-      amount: opts.amount,
-      broadcast: 1,
-    }, t(`Couldn't create withdrawal transaction`))
-
-    return {
-      txid: response.tx_id,
-      symbol: opts.symbol,
-      amount: opts.amount,
-      address: opts.address,
-    }
-  }
-
-  return {
-    txFee,
-    broadcast,
-  }
+    var result = await this::withdraw(opts)
+    return result.response
 }
 
-async function createTransaction(opts) {
+async function withdraw(opts) {
   const response = await this.query({
     method: 'withdraw',
     coin: opts.symbol,
-    outputs: [{[opts.address]: opts.amount.toString()}],
+    amount: opts.amount,
+    to:opts.address,
     broadcast: 1,
   })
 
-  if (!response.complete) {
+  if (!response.tx_hash) {
     throw new ResDexApiError(response, t(`Couldn't create withdrawal transaction`))
   }
 

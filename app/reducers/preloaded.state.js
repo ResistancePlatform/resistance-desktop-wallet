@@ -140,10 +140,10 @@ export const preloadedState: State = {
       isAdvanced: false,
       isSendingOrder: false,
       baseCurrency: 'RES',
-      quoteCurrency: 'BTC',
+      quoteCurrency: 'ETH',
       orderBook: {
         baseCurrency: 'RES',
-        quoteCurrency: 'BTC',
+        quoteCurrency: 'ETH',
         baseQuote: {
           bids: [],
           asks: [],

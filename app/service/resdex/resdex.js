@@ -108,7 +108,7 @@ export class ResDexService {
     }
 
     if (processName !== 'RESDEX') {
-      //options.privacy = processName === 'RESDEX_PRIVACY1' ? '1' : '2'
+      options.privacy = processName === 'RESDEX_PRIVACY1' ? 1 : 2
     }
 
     const resDexParentDir = path.join(getAppDataPath(), 'ResDEX')
