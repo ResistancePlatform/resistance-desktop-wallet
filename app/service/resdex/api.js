@@ -70,13 +70,14 @@ class ResDexApiService {
   }
 
 	async enableSocket() {
-		const port = await getPort()
+		/*const port = await getPort()
 		const {endpoint} = await this.query({method: 'getendpoint', port})
 		const socket = new MarketmakerSocket(endpoint)
 		await socket.connected
 		this.socket = socket
 
-		return this.socket
+		return this.socket*/ //TODO
+    return undefined
 	}
 
   sendWalletPassphrase(coin: string, password: string, timeout: number) {
@@ -84,17 +85,18 @@ class ResDexApiService {
 			method: 'walletpassphrase',
       coin,
 			password,
-      timeout: String(timeout)
+      timeout: timeout
 		})
   }
 
   async getPendingSwaps() {
     const response = await this.query({
-      method: 'swapstatus',
-      pending: 1
+      method: 'my_recent_swaps',
     })
 
-    return response.swaps
+    //TODO parse this correctly
+
+    return response.result.swaps
   }
 
   async instantDexDeposit(weeks: number, amount: object) {
@@ -198,15 +200,19 @@ class ResDexApiService {
     let response
 
     try {
-      response = await this.query({ method: 'enable', coin: symbol })
+      log.debug(`Coin: ${JSON.stringify(currency)}`)
+      var query_params = Object.assign({}, {method: 'enable', mm2: 1}, currency)
+      response = await this.query(query_params)
+      log.debug(`Response is: ${JSON.stringify(response)}`)
     } catch(err) {
       if (err.message.includes('couldnt find coin locally installed')) {
         log.error(`Can't enable a currency that's not installed locally, re-trying in Electrum mode`)
-        return this::enableElectrumServers(symbol)
+        //return this::enableElectrumServers(symbol)
+        return false //response.status === 'active' //TODO
       }
     }
 
-    return response.status === 'active'
+    return true //=== 'active' TODO
   }
 
   disableCurrency(coin: string) {
@@ -224,7 +230,7 @@ class ResDexApiService {
 		})
 
 		const formatOrders = orders => orders
-			.filter(order => order.numutxos > 0)
+			//.filter(order => order.numutxos > 0) TODO
 			.map(order => ({
 				address: order.address,
 				depth: Decimal(order.depth),
@@ -232,7 +238,7 @@ class ResDexApiService {
 				utxoCount: order.numutxos,
 				averageVolume: Decimal(order.avevolume),
 				maxVolume: Decimal(order.maxvolume),
-				zCredits: order.zcredits,
+				//zCredits: order.zcredits, TODO
 			}))
 
 		const formattedResponse = {
@@ -251,11 +257,11 @@ class ResDexApiService {
   createMarketOrder(opts) {
     return this.query({
       method: opts.type,
-      gtc: 1,
+      //gtc: 1,
       duration: 240,
       base: opts.baseCurrency,
       rel: opts.quoteCurrency,
-      basevolume: opts.amount.toNumber(),
+      //basevolume: opts.amount.toNumber(),
       relvolume: opts.total.toNumber(),
       price: opts.price.toNumber(),
     })
@@ -398,81 +404,25 @@ async function enableElectrumServers(symbol) {
 }
 
 async function withdrawBtcFork(opts) {
-  const {
-    txfee: txFeeSatoshis,
-    txid,
-    amount,
-    symbol,
-    address,
-  } = await this::createTransaction(opts)
-
-  // Convert from satoshis
-  const SATOSHIS = 100000000
-  const txFee = txFeeSatoshis / SATOSHIS
-
-  return {
-    txFee,
-    txid,
-    amount,
-    symbol,
-    address,
-  }
+  var result = await this::withdraw(opts)
+  return result.response
 }
 
 async function withdrawEth(opts) {
-  const {
-    eth_fee: txFee,
-    gas_price: gasPrice,
-    gas,
-  } = await this.query({
-    method: 'eth_withdraw',
-    coin: opts.symbol,
-    to: opts.address,
-    amount: opts.amount,
-    broadcast: 0,
-  })
-
-  let hasBroadcast = false
-
-  const broadcast = async () => {
-    if (hasBroadcast) {
-      throw new Error(t(`Transaction has already been broadcasted`))
-    }
-    hasBroadcast = true
-
-    const response = await this.query({
-      method: 'eth_withdraw',
-      gas,
-      gas_price: gasPrice,
-      coin: opts.symbol,
-      to: opts.address,
-      amount: opts.amount,
-      broadcast: 1,
-    }, t(`Couldn't create withdrawal transaction`))
-
-    return {
-      txid: response.tx_id,
-      symbol: opts.symbol,
-      amount: opts.amount,
-      address: opts.address,
-    }
-  }
-
-  return {
-    txFee,
-    broadcast,
-  }
+    var result = await this::withdraw(opts)
+    return result.response
 }
 
-async function createTransaction(opts) {
+async function withdraw(opts) {
   const response = await this.query({
     method: 'withdraw',
     coin: opts.symbol,
-    outputs: [{[opts.address]: opts.amount.toString()}],
+    amount: opts.amount,
+    to:opts.address,
     broadcast: 1,
   })
 
-  if (!response.complete) {
+  if (!response.tx_hash) {
     throw new ResDexApiError(response, t(`Couldn't create withdrawal transaction`))
   }
 

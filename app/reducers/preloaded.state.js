@@ -163,11 +163,11 @@ export const preloadedState: State = {
       selectedTabIndex: 0,
       isAdvanced: false,
       isSendingOrder: false,
-      baseCurrency: 'DGB',
-      quoteCurrency: 'MONA',
+      baseCurrency: 'RES',
+      quoteCurrency: 'ETH',
       orderBook: {
-        baseCurrency: 'DGB',
-        quoteCurrency: 'MONA',
+        baseCurrency: 'RES',
+        quoteCurrency: 'ETH',
         baseQuote: {
           bids: [],
           asks: [],

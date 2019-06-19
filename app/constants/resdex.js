@@ -20,15 +20,15 @@ const RESDEX = {
     //   symbol: 'ETOMIC',
     //   useElectrum: false
     // },
-    // {
-    //   symbol: 'ETH',
-    //   useElectrum: true
-    // },
+    {
+      symbol: 'ETH',
+      useElectrum: true
+    },
     {
       symbol: 'BTC',
       useElectrum: true
     },
-    {
+    /*{
       symbol: 'LTC',
       useElectrum: true
     },
@@ -39,7 +39,7 @@ const RESDEX = {
     {
       symbol: 'MONA',
       useElectrum: true
-    },
+    },*/
     // {
     //   symbol: 'NEXO',
     //   useElectrum: true

@@ -114,7 +114,7 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
 
     const api = resDexApiFactory(processName)
 
-    api.enableSocket()
+    //api.enableSocket() TODO
 
     const { enabledCurrencies } = state$.value.resDex.accounts
 
