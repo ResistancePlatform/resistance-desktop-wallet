@@ -1,0 +1,80 @@
+@import "~/assets/styles/vars.scss";
+
+.container {
+  position: absolute;
+  display: flex;
+  top: 0.57rem;
+  left: calc(100% - 0.78rem);
+  float: right;
+  transform: translateX(-100%);
+  z-index: 10000000;
+}
+
+.popupMenu {
+  .item {
+    display: flex;
+
+    .name {
+      width: 100%;
+    }
+
+    .check {
+      width: 1rem;
+
+      &:before {
+        content: '\e90c';
+      }
+
+      &.active:before {
+        content: '\e90d';
+      }
+
+    }
+  }
+}
+
+.button {
+  margin-top: 0.3rem;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+
+  .chartType {
+    &:before {
+      content: '\e907';
+    }
+  }
+
+  .indicators {
+    &:before {
+      content: '\e907';
+    }
+  }
+}
+
+.period {
+  $bulletDiameter: 1.35rem; user-select: none;
+  margin: 0;
+  white-space: nowrap;
+  padding-left: 0;
+
+  li {
+    cursor: pointer;
+    color: #9fabdc;
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 200;
+    list-style: none;
+    padding: 0;
+    width: $bulletDiameter;
+    height: $bulletDiameter;
+    text-align: center;
+    line-height: $bulletDiameter;
+
+    &.active {
+      color: $BASE_COLOR_WHITE;
+      background: $BASE_COLOR_PURPLE;
+      border-radius: 50%;
+    }
+  }
+}

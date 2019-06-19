@@ -2,8 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
-import cn from 'classnames'
-import log from 'electron-log'
 
 import { tsvParse } from  'd3-dsv'
 import { timeParse, timeFormat  } from 'd3-time-format'
@@ -40,6 +38,7 @@ import { first, last, timeIntervalBarWidth } from 'react-stockcharts/lib/utils'
 import { sma, ema, bollingerBand, rsi, macd } from 'react-stockcharts/lib/indicator'
 
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
+import TradingChartSettings from './TradingChartSettings'
 
 import styles from './TradingChart.scss'
 
@@ -78,6 +77,16 @@ const ema20 = ema()
   .skipUndefined(true)
   .merge((d, c) => ({...d, ema20: c}))
   .accessor(d => d.ema20)
+  .stroke('green')
+
+const ema50 = ema()
+  .options({
+    windowSize: 50,
+    sourcePath: 'close',
+  })
+  .skipUndefined(true)
+  .merge((d, c) => ({...d, ema50: c}))
+  .accessor(d => d.ema50)
   .stroke('red')
 
 const smaVolume50 = sma()
@@ -126,15 +135,6 @@ function getData() {
 	return promiseMSFT
 }
 
-const getPeriodCaption = (t, period) => ({
-  hour: t(`1H`),
-  day: t(`24H`),
-  week: t(`1W`),
-  month: t(`1M`),
-  year: t(`1Y`),
-  all: t(`All`),
-})[period]
-
 /**
  * @class TradingChart
  * @extends {Component<Props>}
@@ -143,10 +143,18 @@ class TradingChart extends Component<Props> {
 	props: Props
 
 	componentDidMount() {
-    log.debug("Calculatin things")
-
 		getData().then(initialData => {
-      const calculatedData = rsiCalculator(bb(smaVolume50(ema20(macdCalculator(initialData)))))
+      const calculatedData = rsiCalculator(
+        bb(
+          smaVolume50(
+            ema20(
+              ema50(
+                macdCalculator(initialData)
+              )
+            )
+          )
+        )
+      )
       this.setState({ data: calculatedData })
       return null
     }).catch(() => null)
@@ -221,7 +229,7 @@ class TradingChart extends Component<Props> {
    * @memberof TradingChart
 	 */
 	render() {
-    const { t, width, ratio } = this.props
+    const { width, ratio } = this.props
     // const { trades } = this.props.buySell
 
     if (!this.state || !this.state.data) {
@@ -237,9 +245,7 @@ class TradingChart extends Component<Props> {
 
     const height = this.getHeight()
 
-    const { chartPeriod } = this.props.resDex.buySell
-    const chartPeriods = ['hour', 'day', 'week', 'month', 'year']
-
+    const { period: chartPeriod } = this.props.resDex.buySell.tradingChart
     const d3Interval = {
       'hour': utcHour,
       'day': utcDay,
@@ -249,31 +255,11 @@ class TradingChart extends Component<Props> {
       'all': utcYear,
     }[chartPeriod] || utcDay
 
+    const { tradingChart: chartSettings } = this.props.resDex.buySell
+
 		return (
       <div className={styles.container} ref={el => this.elementRef(el)}>
-
-        <ul className={styles.period}>
-          {
-            chartPeriods.map(period => (
-              <li
-                role="none"
-                key={period}
-                className={cn({ [styles.active]: period === chartPeriod })}
-                onClick={() => this.props.actions.setChartPeriod(period)}
-              >
-                {getPeriodCaption(t, period)}
-              </li>
-            ))
-          }
-        </ul>
-
-        <div
-          role="button"
-          className={cn('icon', styles.indicatorsButton)}
-          onClick={this.props.actions.openIndicatorsModal}
-          tabIndex={chartPeriods.length}
-          onKeydown={() => false}
-        />
+        <TradingChartSettings />
 
         <ChartCanvas
           height={height}
@@ -318,7 +304,13 @@ class TradingChart extends Component<Props> {
               {...mouseEdgeAppearance}
             />
 
-            <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>
+            {chartSettings.ema20 &&
+              <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>
+            }
+
+            {chartSettings.ema50 &&
+              <LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()}/>
+            }
 
             <CandlestickSeries
               stroke={d => d.close > d.open ? "#00d492" : "#e20063"}
@@ -327,15 +319,17 @@ class TradingChart extends Component<Props> {
               width={timeIntervalBarWidth(d3Interval)}
             />
 
-            <BollingerSeries
-              yAccessor={d => d.bb}
-              stroke={{
-                top: "#964B00",
-                middle: "#000000",
-                bottom: "#964B00",
-              }}
-              fill="#4682B4"
-            />
+            {chartSettings.bb &&
+              <BollingerSeries
+                yAccessor={d => d.bb}
+                stroke={{
+                  top: "#964B00",
+                  middle: "#000000",
+                  bottom: "#964B00",
+                }}
+                fill="#4682B4"
+              />
+            }
 
             <EdgeIndicator itemType="last" orient="right" edgeAt="right"
               yAccessor={d => d.close}
@@ -351,113 +345,138 @@ class TradingChart extends Component<Props> {
 
             <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
 
-            <MovingAverageTooltip
-              onClick={e => console.log(e)}
-              origin={[-38, 15]}
-              options={[
-                {
-                  yAccessor: ema20.accessor(),
-                  type: "EMA",
-                  stroke: ema20.stroke(),
-                  windowSize: ema20.options().windowSize,
-                },
-              ]}
-            />
+            {chartSettings.ema20 &&
+              <MovingAverageTooltip
+                onClick={e => console.log(e)}
+                origin={[-38, 15]}
+                options={[
+                  {
+                    yAccessor: ema20.accessor(),
+                    type: 'EMA',
+                    stroke: ema20.stroke(),
+                    windowSize: ema20.options().windowSize,
+                  },
+                ]}
+              />
+            }
 
-            <BollingerBandTooltip
-              origin={[-38, 60]}
-              yAccessor={d => d.bb}
-              options={bb.options()}
-            />
+            {chartSettings.ema50 &&
+              <MovingAverageTooltip
+                onClick={e => console.log(e)}
+                origin={[chartSettings.ema20 ? 57 : -38, 15]}
+                options={[
+                  {
+                    yAccessor: ema50.accessor(),
+                    type: 'EMA',
+                    stroke: ema50.stroke(),
+                    windowSize: ema50.options().windowSize,
+                  },
+                ]}
+              />
+            }
+
+            {chartSettings.bb &&
+              <BollingerBandTooltip
+                origin={[-38, 60]}
+                yAccessor={d => d.bb}
+                options={bb.options()}
+              />
+            }
 
           </Chart>
 
-          <Chart
-            id={2}
-            yExtents={[d => d.volume, smaVolume50.accessor()]}
-            height={150}
-            origin={(w, h) => [0, h - 350]}
-          >
-            <YAxis
-              axisAt="left"
-              orient="left"
-              ticks={5}
-              stroke="#a367f0"
-              tickStroke="#a367f0"
-              tickFormat={format(".0s")}
-            />
+          {chartSettings.volume &&
+           <Chart
+              id={2}
+              yExtents={[d => d.volume, smaVolume50.accessor()]}
+              height={150}
+              origin={(w, h) => [0, h - 350]}
+            >
+              <YAxis
+                axisAt="left"
+                orient="left"
+                ticks={5}
+                stroke="#a367f0"
+                tickStroke="#a367f0"
+                tickFormat={format(".0s")}
+              />
 
-            <BarSeries fill="#1d2440" yAccessor={d => d.volume} />
-            <AreaSeries yAccessor={smaVolume50.accessor()} stroke={smaVolume50.stroke()} fill={smaVolume50.fill()}/>
+              <BarSeries fill="#1d2440" yAccessor={d => d.volume} />
+              <AreaSeries yAccessor={smaVolume50.accessor()} stroke={smaVolume50.stroke()} fill={smaVolume50.fill()}/>
 
-            <CurrentCoordinate yAccessor={smaVolume50.accessor()} fill={smaVolume50.stroke()} />
-            <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47" />
-          </Chart>
+              <CurrentCoordinate yAccessor={smaVolume50.accessor()} fill={smaVolume50.stroke()} />
+              <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47" />
+            </Chart>
+          }
 
-          <Chart
-            id={3}
-            height={100}
-            yExtents={macdCalculator.accessor()}
-            origin={(w, h) => [0, h - 200]}
-            padding={{ top: 10, bottom: 10 }}
-          >
-            <XAxis axisAt="bottom" showTicks={false} orient="bottom"/>
-            <YAxis axisAt="right" orient="right" ticks={2} />
+          {chartSettings.macd &&
+            <Chart
+              id={3}
+              height={100}
+              yExtents={macdCalculator.accessor()}
+              origin={(w, h) => [0, h - 200]}
+              padding={{ top: 10, bottom: 10 }}
+            >
+              <XAxis axisAt="bottom" showTicks={false} orient="bottom"/>
+              <YAxis axisAt="right" orient="right" ticks={2} />
 
-            <MouseCoordinateX
-              at="bottom"
-              orient="bottom"
-              displayFormat={timeFormat("%Y-%m-%d")}
-              rectRadius={5}
-              {...mouseEdgeAppearance}
-            />
-            <MouseCoordinateY
-              at="right"
-              orient="right"
-              displayFormat={format(".2f")}
-              {...mouseEdgeAppearance}
-            />
+              <MouseCoordinateX
+                at="bottom"
+                orient="bottom"
+                displayFormat={timeFormat("%Y-%m-%d")}
+                rectRadius={5}
+                {...mouseEdgeAppearance}
+              />
+              <MouseCoordinateY
+                at="right"
+                orient="right"
+                displayFormat={format(".2f")}
+                {...mouseEdgeAppearance}
+              />
 
-            <MACDSeries yAccessor={d => d.macd}
-              {...macdAppearance} />
+              <MACDSeries yAccessor={d => d.macd}
+                {...macdAppearance} />
 
-            <MACDTooltip
-              origin={[-38, 20]}
-              yAccessor={d => d.macd}
-              options={macdCalculator.options()}
-              appearance={macdAppearance}
-            />
-          </Chart>
+              <MACDTooltip
+                origin={[-38, 20]}
+                yAccessor={d => d.macd}
+                options={macdCalculator.options()}
+                appearance={macdAppearance}
+              />
+            </Chart>
+          }
 
-          <Chart id={4}
-            yExtents={[0, 100]}
-            height={100} origin={(w, h) => [0, h - 100]}
-            padding={{ top: 10, bottom: 10 }}
-          >
-            <XAxis
-              axisAt="bottom"
-              orient="bottom"
-              stroke="#a367f0"
-              outerTickSize={0}
-            />
+          {chartSettings.rsi &&
+           <Chart id={4}
+              yExtents={[0, 100]}
+              height={100} origin={(w, h) => [0, h - 100]}
+              padding={{ top: 10, bottom: 10 }}
+            >
+              <XAxis
+                axisAt="bottom"
+                orient="bottom"
+                stroke="#a367f0"
+                outerTickSize={0}
+              />
 
-            <YAxis axisAt="right"
-              orient="right"
-              tickValues={[30, 50, 70]}/>
+              <YAxis axisAt="right"
+                orient="right"
+                tickValues={[30, 50, 70]}/>
 
-            <MouseCoordinateY
-              at="right"
-              orient="right"
-              displayFormat={format(".2f")} />
+              <MouseCoordinateY
+                at="right"
+                orient="right"
+                displayFormat={format(".2f")} />
 
-            <RSISeries yAccessor={d => d.rsi} />
+              <RSISeries yAccessor={d => d.rsi} />
 
-            <RSITooltip
-              origin={[-38, 20]}
-              yAccessor={d => d.rsi}
-              options={rsiCalculator.options()}
-            />
-          </Chart>
+              <RSITooltip
+                origin={[-38, 20]}
+                yAccessor={d => d.rsi}
+                options={rsiCalculator.options()}
+              />
+            </Chart>
+          }
 
           <CrossHairCursor />
 

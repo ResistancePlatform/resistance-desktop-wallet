@@ -79,7 +79,16 @@ export type ResDexState = {
     enhancedPrivacy: boolean,
     ohlc: object[],
     trades: object[],
-    chartPeriod: string
+    tradingChart: {
+      period: string,
+      volume: boolean,
+      type: 'candlestick' | 'heikin-ashi' | 'kagi' | 'point-figure' | 'renko',
+      ema20: boolean,
+      ema50: boolean,
+      bb: boolean,
+      rsi: boolean,
+      macd: boolean
+    }
   },
   orders: {
     isInitialKickStartDone: boolean,

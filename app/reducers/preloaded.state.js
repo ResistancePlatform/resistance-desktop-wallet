@@ -184,7 +184,16 @@ export const preloadedState: State = {
       enhancedPrivacy: false,
       ohlc: [],
       trades: getRandomTrades(),
-      chartPeriod: 'day',
+      tradingChart: {
+        period: 'day',
+        volume: true,
+        type: 'candlestick',
+        macd: false,
+        ema20: true,
+        ema50: true,
+        bb: false,
+        rsi: true
+      }
     },
     orders: {
       isInitialKickStartDone: false,
