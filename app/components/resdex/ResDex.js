@@ -68,7 +68,8 @@ export class ResDex extends Component<Props> {
           }}
         />
 
-        {/**
+        {
+        /*
         <RpcPolling
           interval={3.5}
           criticalChildProcess="RESDEX"
@@ -78,7 +79,9 @@ export class ResDex extends Component<Props> {
             failure: ResDexAccountsActions.getZCreditsFailed
           }}
         />
-        **/} 
+
+          */
+        }
 
         {this.props.resDex.accounts.instantDexDepositModal.isVisible &&
           <InstantDexDepositModal />

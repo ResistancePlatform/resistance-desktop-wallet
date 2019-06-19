@@ -97,14 +97,12 @@ export class ResDexService {
     const { uri, rpcPort, folderName } = getProcessSettings(processName)
 
     const options = {
-      //client: 1,
       netid: netId,
       rpcport: rpcPort,
-      //canbind: 0,
       seednodes: [seedNodeAddress],
-      userhome: userhome,
+      userhome,
       passphrase: getActualSeedPhrase(processName, seedPhrase),
-      coins: [{"coin": "RES","rpcport": 18132,"confpath": "/Users/luke/Library/Application Support/Resistance/resistance.conf","mm2": 1},{"coin": "ETH","name": "ethereum","fname": "Ethereum","etomic": "0x0000000000000000000000000000000000000000","rpcport": 80}]
+      coins: currenciesWithoutElectrum,
     }
 
     if (processName !== 'RESDEX') {
@@ -154,8 +152,7 @@ function checkApiAvailability(uri) {
       const response = await rp({
         method: 'POST',
         uri,
-        body: {
-        },
+        body: {},
         json: true, // Automatically stringifies the body to JSON
         resolveWithFullResponse: true,
       })

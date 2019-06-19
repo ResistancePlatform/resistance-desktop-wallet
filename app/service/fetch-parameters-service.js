@@ -392,8 +392,7 @@ async function verifySproutFiles(verifier: (fileName, index) => boolean): boolea
     }
 
     if (!isVerified) {
-      //return false TODO
-      return true
+      return false
     }
   }
 

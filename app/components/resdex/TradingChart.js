@@ -142,30 +142,31 @@ function getData() {
 class TradingChart extends Component<Props> {
 	props: Props
 
-	componentDidMount() {
-		getData().then(initialData => {
-      const calculatedData = rsiCalculator(
-        bb(
-          smaVolume50(
-            ema20(
-              ema50(
-                macdCalculator(initialData)
-              )
+	getData() {
+    const { ohlc } = this.props.resDex.buySell
+
+    const initialData = ohlc.filter(tick => tick.open > 0)
+
+    const calculatedData = rsiCalculator(
+      bb(
+        smaVolume50(
+          ema20(
+            ema50(
+              macdCalculator(initialData)
             )
           )
         )
       )
-      this.setState({ data: calculatedData })
-      return null
-    }).catch(() => null)
+    )
+
+    return calculatedData
 	}
 
 	/**
 	 * @returns
    * @memberof TradingChart
 	 */
-  getXExtents(period: string) {
-    const { data } = this.state
+  getXExtents(data, period: string) {
     const barsNumber = 100
 
     if (!data.length) {
@@ -230,11 +231,6 @@ class TradingChart extends Component<Props> {
 	 */
 	render() {
     const { width, ratio } = this.props
-    // const { trades } = this.props.buySell
-
-    if (!this.state || !this.state.data) {
-      return null
-    }
 
 		const margin = { left: 50, right: 50, top: 20, bottom: 30 }
 		const gridHeight = this.getHeight() - margin.top - margin.bottom;
@@ -257,6 +253,8 @@ class TradingChart extends Component<Props> {
 
     const { tradingChart: chartSettings } = this.props.resDex.buySell
 
+    const data = this.getData()
+
 		return (
       <div className={styles.container} ref={el => this.elementRef(el)}>
         <TradingChartSettings />
@@ -268,10 +266,10 @@ class TradingChart extends Component<Props> {
           margin={margin}
           type="hybrid"
           seriesName="RES/MONA"
-          data={this.state.data}
+          data={data}
           xAccessor={d => d.date}
           xScale={scaleTime().domain([new Date(2000, 0, 1, 0), new Date(2000, 0, 1, 1)])}
-          xExtents={this.getXExtents(chartPeriod)}>
+          xExtents={this.getXExtents(data, chartPeriod)}>
 
           <Chart id={1} height={height-250}
             yExtents={[d => [d.high, d.low], ema20.accessor()]}
@@ -486,7 +484,7 @@ class TradingChart extends Component<Props> {
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   resDex: state.resDex,
 })
 

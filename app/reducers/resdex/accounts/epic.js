@@ -321,7 +321,7 @@ const closeWithdrawModalEpic = (action$: ActionsObservable<any>) => action$.pipe
 export const ResDexAccountsEpic = (action$, state$) => merge(
   getCurrenciesEpic(action$, state$),
   getCurrenciesFailedEpic(action$, state$),
-  //getZCreditsEpic(action$, state$), TODO
+  getZCreditsEpic(action$, state$),
   getTransactionsEpic(action$, state$),
   copySmartAddressEpic(action$, state$),
   addCurrencyEpic(action$, state$),
