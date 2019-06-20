@@ -255,6 +255,10 @@ class TradingChart extends Component<Props> {
 
     const data = this.getData()
 
+    if (!data.length) {
+      return null
+    }
+
 		return (
       <div className={styles.container} ref={el => this.elementRef(el)}>
         <TradingChartSettings />
