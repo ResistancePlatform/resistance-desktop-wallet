@@ -114,7 +114,6 @@ class ResDexBuySell extends Component<Props> {
     const isPrivate = Boolean(form && form.fields.enhancedPrivacy && isMarket)
 
     const order = {
-      orderType: 'buy',
       quoteCurrencyAmount,
       price: price || null,
       baseCurrency,

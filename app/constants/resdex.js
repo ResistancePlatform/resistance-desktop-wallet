@@ -24,6 +24,30 @@ const RESDEX = {
       symbol: 'BTC',
       useElectrum: true
     },
+  ],
+  errorEvents: [
+    'StartFailed',
+    'NegotiateFailed',
+    'TakerFeeSendFailed',
+    'MakerPaymentValidateFailed',
+    'TakerPaymentTransactionFailed',
+    'TakerPaymentDataSendFailed',
+    'TakerPaymentWaitForSpendFailed',
+    'MakerPaymentSpendFailed',
+    'TakerPaymentRefunded',
+    'TakerPaymentRefundFailed'
+  ],
+  successEvents: [
+    'Started',
+    'Negotiated',
+    'TakerFeeSent',
+    'MakerPaymentReceived',
+    'MakerPaymentWaitConfirmStarted',
+    'MakerPaymentValidatedAndConfirmed',
+    'TakerPaymentSent',
+    'TakerPaymentSpent',
+    'MakerPaymentSpent',
+    'Finished'
   ]
 }
 

@@ -4,12 +4,10 @@ import moment from 'moment'
 import crypto from 'crypto'
 import rp from 'request-promise-native'
 import log from 'electron-log'
-import getPort from 'get-port'
 
 import { getActualSeedPhrase, getProcessSettings } from '~/service/resdex/resdex'
 import { getStore } from '~/store/configureStore'
 import { translate } from '~/i18next.config'
-import MarketmakerSocket from './marketmaker-socket'
 import { getCurrency } from '~/utils/resdex'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 
@@ -68,16 +66,6 @@ class ResDexApiService {
     const actualSeedPhrase = getActualSeedPhrase(this.processName, seedPhrase)
     this.token = crypto.createHash('sha256').update(actualSeedPhrase).digest('hex')
   }
-
-	async enableSocket() {
-		const port = await getPort()
-		const {endpoint} = await this.query({method: 'getendpoint', port})
-		const socket = new MarketmakerSocket(endpoint)
-		await socket.connected
-		this.socket = socket
-
-		return this.socket
-	}
 
   sendWalletPassphrase(coin: string, password: string, timeout: number) {
 		return this.query({
@@ -330,6 +318,11 @@ class ResDexApiService {
     }))
 
     return trades
+  }
+
+  async getRecentSwaps() {
+    const response = await this.query({ method: 'my_recent_swaps' })
+    return response.result
   }
 
   async stop() {

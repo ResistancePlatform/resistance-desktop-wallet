@@ -193,9 +193,9 @@ class SystemInfo extends Component<Props> {
           interval={2.0 * 60}
           criticalChildProcess="RESDEX"
           actions={{
-            polling: ResDexOrdersActions.cleanupPendingSwaps,
-            success: ResDexOrdersActions.gotPendingSwaps,
-            failure: ResDexOrdersActions.cleanupPendingSwapsFailed
+            polling: ResDexOrdersActions.getSwapHistory,
+            success: ResDexOrdersActions.gotSwapHistory,
+            failure: ResDexOrdersActions.getSwapHistoryFailed
           }}
         />
 

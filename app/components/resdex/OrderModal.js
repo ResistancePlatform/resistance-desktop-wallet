@@ -28,23 +28,8 @@ class OrderModal extends Component<Props> {
 
   getOrder(): object | null {
     const { uuid } = this.props.orders.orderModal
-    const order = this.props.orders.swapHistory.find(swap => swap.uuid === uuid)
+    const order = this.props.orders.swapHistory.find(o => o.uuid === uuid)
     return order || null
-  }
-
-  getIsStageComplete(stage: string): boolean {
-    const order = this.getOrder()
-
-    if (!order || !order.transactions) {
-      return false
-    }
-
-    // A hack to address Komodo limit order status updates ambiguity
-    if (stage === 'myfee' && order.transactions.length) {
-      return true
-    }
-
-    return Boolean(order.transactions.find(chainStage => chainStage.stage === stage))
   }
 
 	render() {
@@ -81,19 +66,19 @@ class OrderModal extends Component<Props> {
 
           <div className={cn(styles.stagesContainer, styles.slider, {[styles.close]: status === 'privatizing'})}>
             <ul>
-              <li className={cn({ [styles.active]: this.getIsStageComplete('myfee') })}>
+              <li className={cn({ [styles.active]: order.eventTypes.includes('TakerFeeSent') })}>
                 {t(`My fee`)}
               </li>
-              <li className={cn({ [styles.active]: this.getIsStageComplete('bobdeposit') })}>
+              <li className={cn({ [styles.active]: order.eventTypes.includes('TakerFeeSent') })}>
                 {t(`My deposit`)}
               </li>
-              <li className={cn({ [styles.active]: this.getIsStageComplete('alicepayment') })}>
+              <li className={cn({ [styles.active]: order.eventTypes.includes('MakerPaymentValidatedAndConfirmed') })}>
                 {t(`Their deposit`)}
               </li>
-              <li className={cn({ [styles.active]: this.getIsStageComplete('bobpayment') })}>
+              <li className={cn({ [styles.active]: order.eventTypes.includes('TakerPaymentSpent') })}>
                 {t(`My payment`)}
               </li>
-              <li className={cn({ [styles.active]: this.getIsStageComplete('alicespend') })}>
+              <li className={cn({ [styles.active]: order.eventTypes.includes('Finished') })}>
                 {t(`Their spend`)}
               </li>
             </ul>

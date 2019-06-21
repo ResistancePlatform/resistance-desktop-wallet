@@ -10,14 +10,12 @@ import { toastr } from 'react-redux-toastr'
 import { translate } from '~/i18next.config'
 import { RESDEX } from '~/constants/resdex'
 import { flattenDecimals } from '~/utils/decimal'
-import { SwapDBService } from '~/service/resdex/swap-db'
 import { resDexApiFactory } from '~/service/resdex/api'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { ResDexBuySellActions } from './reducer'
 
 
 const t = translate('resdex')
-const swapDB = new SwapDBService()
 const mainApi = resDexApiFactory('RESDEX')
 
 const getOrderBookEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
@@ -145,11 +143,7 @@ const getCreateMarketOrderObservable = (processName, options, privacy, getSucces
       }
 
       const swap = result.pending
-      const flattenedOptions = flattenDecimals(requestOpts)
-      log.debug(`Inserting a swap`, result.swaps, swap, flattenedOptions)
-
-      const flattenedPrivacy = privacy ? flattenDecimals({...privacy, processName}) : null
-      swapDB.insertSwapData(swap, flattenedOptions, true, flattenedPrivacy)
+      log.debug("Created a swap check if UUID is there", result)
 
       return getSuccessObservable(swap.uuid)
     }),
@@ -210,18 +204,20 @@ const getCreateLimitOrderObservable = (options, successObservable, failureAction
 
       if (previousSwap) {
         log.debug(`Cancelling the existing limit order(s)`)
-        swapDB.forceSwapStatus(previousSwap.uuid, 'cancelled')
+        // TODO: Fix for ResDEX 2
+        // swapDB.forceSwapStatus(previousSwap.uuid, 'cancelled')
       }
 
       // Amount and total are just for the display
-      const flattenedOptions = flattenDecimals({
-        ...requestOpts,
-        amount: Decimal(quoteCurrencyAmount).dividedBy(price).toDP(8, Decimal.ROUND_FLOOR),
-        total: Decimal(quoteCurrencyAmount).toDP(8, Decimal.ROUND_FLOOR),
-        isMarket: false,
-      })
-      log.debug(`Inserting a swap`, swap, flattenedOptions)
-      swapDB.insertSwapData(swap, flattenedOptions, false)
+      // TODO: Fix for ResDEX 2
+      // const flattenedOptions = flattenDecimals({
+      //   ...requestOpts,
+      //   amount: Decimal(quoteCurrencyAmount).dividedBy(price).toDP(8, Decimal.ROUND_FLOOR),
+      //   total: Decimal(quoteCurrencyAmount).toDP(8, Decimal.ROUND_FLOOR),
+      //   isMarket: false,
+      // })
+      // log.debug(`Inserting a swap`, swap, flattenedOptions)
+      // swapDB.insertSwapData(swap, flattenedOptions, false)
 
       return successObservable
     }),

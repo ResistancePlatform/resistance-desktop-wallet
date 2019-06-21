@@ -18,7 +18,6 @@ type Props = {
   t: any,
   className?: string,
   order: {
-    orderType: 'buy' | 'sell',
     quoteCurrencyAmount: object,
     price: object | null,
     baseCurrency: string,
@@ -138,8 +137,8 @@ class OrderSummary extends Component<Props> {
     const { order, t } = this.props
     const txFee = this.getTxFee()
 
-    const quoteBlockExplorerUrl = this.getBlockExplorerUrl(order.quoteCurrency, order.destinationTxId)
-    const baseBlockExplorerUrl = this.getBlockExplorerUrl(order.baseCurrency, order.txId)
+    const quoteBlockExplorerUrl = this.getBlockExplorerUrl(order.quoteCurrency, order.quoteTxId)
+    const baseBlockExplorerUrl = this.getBlockExplorerUrl(order.baseCurrency, order.baseTxId)
 
     return (
       <div className={cn(styles.container, this.props.className)}>
