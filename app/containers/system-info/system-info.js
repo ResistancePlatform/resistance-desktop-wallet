@@ -190,7 +190,7 @@ class SystemInfo extends Component<Props> {
         />
 
         <RpcPolling
-          interval={2.0 * 60}
+          interval={10.0}
           criticalChildProcess="RESDEX"
           actions={{
             polling: ResDexOrdersActions.getSwapHistory,
