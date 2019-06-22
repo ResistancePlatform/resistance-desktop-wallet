@@ -1,5 +1,4 @@
 // @flow
-import { Decimal } from 'decimal.js'
 import moment from 'moment'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -56,7 +55,8 @@ class ResDexOrders extends Component<Props> {
     const { t } = this.props
 
     const clearHistory = () => {
-      const { swapHistory } = this.props.orders
+      // TODO: Figure out if we need this after ResDEX 2 integration
+      // const { swapHistory } = this.props.orders
       // swapHistory.filter(swap => !swap.isActive).forEach(swap => swapDB.removeSwap(swap.uuid))
       toastr.success(t(`Swap history removed`))
     }
@@ -141,7 +141,7 @@ class ResDexOrders extends Component<Props> {
         <div className={styles.header}>
           {t(`Swap history`)}
 
-          {completedOrders.length !== 0 &&
+          {false && completedOrders.length !== 0 &&
             <BorderlessButton
               className={styles.clearHistoryButton}
               onClick={() => this.onClearHistoryClick()}

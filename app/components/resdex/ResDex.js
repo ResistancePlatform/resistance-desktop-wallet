@@ -48,20 +48,6 @@ export class ResDex extends Component<Props> {
 
     return (
       <div className={cn({[styles.expanded]: isExpanded})}>
-        {
-          /*
-        <RpcPolling
-          interval={15.0 * 60}
-          criticalChildProcess="RESDEX"
-          actions={{
-            polling: ResDexOrdersActions.kickStartStuckSwaps,
-            success: ResDexOrdersActions.kickStartStuckSwapsSucceeded,
-            failure: ResDexOrdersActions.kickStartStuckSwapsFailed
-          }}
-        />
-        */
-        }
-
         <RpcPolling
           interval={10.0}
           criticalChildProcess="RESDEX"

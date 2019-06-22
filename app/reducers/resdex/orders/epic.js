@@ -1,7 +1,6 @@
 // @flow
 import { Decimal } from 'decimal.js'
 import moment from 'moment'
-import pMap from 'p-map'
 import { remote } from 'electron'
 import log from 'electron-log'
 import { of, from, merge } from 'rxjs'
@@ -46,6 +45,7 @@ function recentSwapsToOrders(swaps) {
       isMarket: swap.type === 'Taker',
       isPrivate: false,
       isHidden: false,
+      isActive: true,
     }
 
     if (!swap.events.length) {
@@ -62,6 +62,16 @@ function recentSwapsToOrders(swaps) {
     const baseCurrencyAmount = satoshiToAmount(startedEvent.event.data.maker_amount)
     const quoteCurrencyAmount = satoshiToAmount(startedEvent.event.data.taker_amount)
 
+    let status = orderStatus(lastEvent.event.type)
+    let isActive = !['completed', 'failed', 'cancelled'].includes(status)
+
+    const momentStarted = moment(startedEvent.timestamp)
+
+    if (isActive && momentStarted.isBefore(moment().subtract(1, 'hours'))) {
+      status = 'failed'
+      isActive = false
+    }
+
     order = {
       ...order,
       baseCurrency: startedEvent.event.data.maker_coin,
@@ -72,8 +82,9 @@ function recentSwapsToOrders(swaps) {
       baseTxId: makerPayment && makerPayment.event.data.tx_hash,
       quoteTxId: takerPayment && takerPayment.event.data.tx_hash,
       eventTypes: swap.events.map(e => e.event.type),
-      status: orderStatus(lastEvent.event.type),
-      timeStarted: moment.unix(startedEvent.timestamp / 1000.0).toDate(),
+      timeStarted: momentStarted.toDate(),
+      status,
+      isActive,
     }
 
     return order
@@ -81,41 +92,6 @@ function recentSwapsToOrders(swaps) {
 
   return orders
 }
-
-const kickStartStuckSwapsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(ResDexOrdersActions.kickStartStuckSwaps),
-  switchMap(() => {
-    const { isInitialKickStartDone, swapHistory } = state$.value.resDex.orders
-
-    const stuckSwaps = swapHistory.filter(swap => (
-      !swap.isPrivate
-      && swap.status === 'swapping'
-      && (!isInitialKickStartDone || moment(swap.timeStarted).isBefore(moment().subtract(4, 'hours')))
-    ))
-
-    log.info(`Kick starting ${stuckSwaps.length} stuck orders`)
-
-    const kickStartPromise = pMap(
-      stuckSwaps,
-      swap => api.kickstart(swap.requestId, swap.quoteId),
-      { concurrency: 1 }
-    )
-
-    const observable = from(kickStartPromise).pipe(
-      switchMap(() => {
-        log.info(`Stuck orders kick start completed`)
-        return of(ResDexOrdersActions.kickStartStuckSwapsSucceeded())
-      }),
-      catchError(err => {
-        log.error(`Error kick starting stuck swaps`, err)
-        toastr.error(t(`Can't kick start stuck swaps, check the application log for details`))
-        return of(ResDexOrdersActions.kickStartStuckSwapsFailed())
-      })
-    )
-
-    return observable
-  })
-)
 
 const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexOrdersActions.getSwapHistory),
@@ -145,5 +121,4 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 
 export const ResDexOrdersEpic = (action$, state$) => merge(
   getSwapHistoryEpic(action$, state$),
-  kickStartStuckSwapsEpic(action$, state$),
 )
