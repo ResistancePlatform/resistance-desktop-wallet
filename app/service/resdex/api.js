@@ -257,8 +257,8 @@ class ResDexApiService {
    *
 	 * @memberof ResDexApiService
 	 */
-  createMarketOrder(opts) {
-    return this.query({
+  async createMarketOrder(opts) {
+    const response = await this.query({
       method: opts.type,
       duration: 240,
       base: opts.baseCurrency,
@@ -266,6 +266,8 @@ class ResDexApiService {
       volume: opts.amount.toNumber(),
       price: opts.price.toNumber(),
     })
+
+    return response.result
   }
 
   async balance(coin: string, address: string) {

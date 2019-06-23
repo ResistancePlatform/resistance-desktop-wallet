@@ -5,6 +5,8 @@ import { of, from, merge, interval, defer } from 'rxjs'
 import { map, mapTo, take, filter, switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
+import { tsvParse } from  'd3-dsv'
+import { timeParse } from 'd3-time-format'
 
 import { translate } from '~/i18next.config'
 import { RESDEX } from '~/constants/resdex'
@@ -136,15 +138,14 @@ const getCreateMarketOrderObservable = (processName, options, privacy, getSucces
 
   const orderObservable = from(api.createMarketOrder(requestOpts)).pipe(
     switchMap(result => {
-      if (!result.pending) {
+      log.debug(`Buy response:`, JSON.stringify(result))
+
+      if (!result || !result.uuid) {
         const message = t(`Something unexpected happened. Are you sure you have enough UTXO?`)
         return of(failureAction(message))
       }
 
-      const swap = result.pending
-      log.debug("Created a swap check if UUID is there", result)
-
-      return getSuccessObservable(swap.uuid)
+      return getSuccessObservable(result.uuid)
     }),
     catchError(err => {
       let { message } = err
@@ -486,7 +487,26 @@ const getOhlcEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe
   switchMap(() => {
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
 
-    const ohlcObservable = from(mainApi.getOhlc(baseCurrency, quoteCurrency, 120)).pipe(
+    function parseData(parse) {
+      return d => ({
+        ...d,
+        date: parse(d.date),
+        open: +d.open,
+        high: +d.high,
+        low: +d.low,
+        close: +d.close,
+        volume: +d.volume,
+      })
+    }
+
+    const msftDataPromise = (
+      fetch("https://cdn.rawgit.com/rrag/react-stockcharts/master/docs/data/MSFT.tsv")
+        .then(response => response.text())
+        .then(data => tsvParse(data, parseData(timeParse("%Y-%m-%d"))))
+    )
+
+    // const ohlcObservable = from(mainApi.getOhlc(baseCurrency, quoteCurrency, 120)).pipe(
+    const ohlcObservable = from(msftDataPromise).pipe(
       map(ohlc => ResDexBuySellActions.gotOhlc(ohlc)),
       catchError(err => {
         log.error(`Can't get order ticks`, err)

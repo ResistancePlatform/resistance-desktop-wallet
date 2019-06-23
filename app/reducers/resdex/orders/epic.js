@@ -59,8 +59,8 @@ function recentSwapsToOrders(swaps) {
     const makerPayment = findEvent('MakerPaymentReceived')
     const takerPayment = findEvent('TakerPaymentSent')
 
-    const baseCurrencyAmount = satoshiToAmount(startedEvent.event.data.maker_amount)
-    const quoteCurrencyAmount = satoshiToAmount(startedEvent.event.data.taker_amount)
+    const baseCurrencyAmount = Decimal(startedEvent.event.data.maker_amount)
+    const quoteCurrencyAmount = Decimal(startedEvent.event.data.taker_amount)
 
     let status = orderStatus(lastEvent.event.type)
     let isActive = !['completed', 'failed', 'cancelled'].includes(status)

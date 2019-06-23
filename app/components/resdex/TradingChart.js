@@ -3,8 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 
-import { tsvParse } from  'd3-dsv'
-import { timeParse, timeFormat  } from 'd3-time-format'
+import { timeFormat } from 'd3-time-format'
 import { scaleTime } from 'd3-scale'
 import { format } from 'd3-format'
 import { utcHour, utcDay, utcWeek, utcMonth, utcYear } from 'd3-time'
@@ -113,27 +112,6 @@ const rsiCalculator = rsi()
   .options({ windowSize: 14 })
   .merge((d, c) => ({...d, rsi: c}))
   .accessor(d => d.rsi);
-
-function parseData(parse) {
-  return d => ({
-    ...d,
-		date: parse(d.date),
-		open: +d.open,
-		high: +d.high,
-		low: +d.low,
-		close: +d.close,
-		volume: +d.volume,
-	})
-}
-
-const parseDate = timeParse("%Y-%m-%d")
-
-function getData() {
-	const promiseMSFT = fetch("https://cdn.rawgit.com/rrag/react-stockcharts/master/docs/data/MSFT.tsv")
-		.then(response => response.text())
-		.then(data => tsvParse(data, parseData(parseDate)))
-	return promiseMSFT
-}
 
 /**
  * @class TradingChart

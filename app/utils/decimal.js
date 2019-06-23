@@ -7,7 +7,7 @@ function truncateAmount(amount: Decimal) {
   return amount.abs().toFixed(DECIMAL.fractionalDigitsNumber, Decimal.ROUND_FLOOR)
 }
 
-function toDecimalPlaces(amount: Decimal, places: number = 4) {
+function toDecimalPlaces(amount: Decimal, places: number = 6) {
   return amount.toDP(places, Decimal.ROUND_FLOOR).toString()
 }
 
