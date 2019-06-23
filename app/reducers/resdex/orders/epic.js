@@ -18,7 +18,7 @@ const t = translate('resdex')
 const api = resDexApiFactory('RESDEX')
 
 function recentSwapsToOrders(swaps) {
-  const satoshiToAmount = satoshi => Decimal(satoshi).div(100000000)
+  const satoshiToAmount = satoshi => Decimal(satoshi).dividedBy(100000000)
 
   const orderStatus = lastEventType => {
     switch (lastEventType) {

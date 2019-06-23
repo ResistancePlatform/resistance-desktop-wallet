@@ -20,10 +20,10 @@ const RESDEX = {
       symbol: 'ETH',
       useElectrum: true
     },
-    {
-      symbol: 'BTC',
-      useElectrum: true
-    },
+    // {
+    //   symbol: 'BTC',
+    //   useElectrum: true
+    // },
   ],
   errorEvents: [
     'StartFailed',

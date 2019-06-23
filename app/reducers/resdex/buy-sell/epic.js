@@ -1,6 +1,5 @@
 // @flow
 import { Decimal } from 'decimal.js'
-import { v4 as createUuid } from 'uuid'
 import log from 'electron-log'
 import { of, from, merge, interval, defer } from 'rxjs'
 import { map, mapTo, take, filter, switchMap, catchError } from 'rxjs/operators'
@@ -110,7 +109,7 @@ const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.
   })
 )
 
-const getCreateMarketOrderObservable = (processName, options, privacy, getSuccessObservable, failureAction, state$) => {
+const getCreateMarketOrderObservable = (processName, options, privacy, getSuccessObservable, failureAction) => {
   const {
     baseCurrency,
     quoteCurrency,
@@ -119,21 +118,21 @@ const getCreateMarketOrderObservable = (processName, options, privacy, getSucces
   } = options
 
   const api = resDexApiFactory(processName)
-  const txFee = state$.value.resDex.accounts.currencyFees[quoteCurrency]
-
-  const dexFee = RESDEX.dexFee.div(Decimal('100'))
-  //const divider = price.plus(price.times(dexFee)).plus(txFee)
+  // const txFee = state$.value.resDex.accounts.currencyFees[quoteCurrency]
+  //
+  // const dexFee = RESDEX.dexFee.div(Decimal('100'))
+  // const divider = price.plus(price.times(dexFee)).plus(txFee)
 
   const requestOpts = {
     type: 'buy',
     baseCurrency,
     quoteCurrency,
-    price: price,
+    price,
     amount: Decimal(quoteCurrencyAmount).dividedBy(price).toDP(8, Decimal.ROUND_FLOOR),
     total: Decimal(quoteCurrencyAmount).toDP(8, Decimal.ROUND_FLOOR)
   }
 
-  log.debug(`Submitting a swap (market order)`, requestOpts)
+  log.debug(`Submitting a swap (market order)`, flattenDecimals(requestOpts))
 
   const orderObservable = from(api.createMarketOrder(requestOpts)).pipe(
     switchMap(result => {
@@ -162,7 +161,7 @@ const getCreateMarketOrderObservable = (processName, options, privacy, getSucces
   return orderObservable
 }
 
-const getCreateLimitOrderObservable = (options, successObservable, failureAction, state$) => {
+const getCreateLimitOrderObservable = (options, successObservable, failureAction) => {
   const {
     baseCurrency,
     quoteCurrency,
@@ -173,6 +172,7 @@ const getCreateLimitOrderObservable = (options, successObservable, failureAction
   const requestOpts = {
     baseCurrency,
     quoteCurrency,
+    baseCurrencyAmount: quoteCurrencyAmount.dividedBy(price).times(Decimal('0.999')),
     price,
   }
 
@@ -185,28 +185,28 @@ const getCreateLimitOrderObservable = (options, successObservable, failureAction
         return of(failureAction(message))
       }
 
-      const swap = {
-        uuid: createUuid(),
-        base: baseCurrency,
-        rel: quoteCurrency,
-        basevalue: 0,
-        relvalue: 0,
-      }
-
-      const { swapHistory } = state$.value.resDex.orders
-
-      const previousSwap = swapHistory.find(order => (
-        !order.isMarket
-        && order.isActive
-        && order.baseCurrency === baseCurrency
-        && order.quoteCurrency === quoteCurrency
-      ))
-
-      if (previousSwap) {
-        log.debug(`Cancelling the existing limit order(s)`)
-        // TODO: Fix for ResDEX 2
-        // swapDB.forceSwapStatus(previousSwap.uuid, 'cancelled')
-      }
+      // const swap = {
+      //   uuid: createUuid(),
+      //   base: baseCurrency,
+      //   rel: quoteCurrency,
+      //   basevalue: 0,
+      //   relvalue: 0,
+      // }
+      //
+      // const { swapHistory } = state$.value.resDex.orders
+      //
+      // const previousSwap = swapHistory.find(order => (
+      //   !order.isMarket
+      //   && order.isActive
+      //   && order.baseCurrency === baseCurrency
+      //   && order.quoteCurrency === quoteCurrency
+      // ))
+      //
+      // if (previousSwap) {
+      //   log.debug(`Cancelling the existing limit order(s)`)
+      //   // TODO: Fix for ResDEX 2
+      //   // swapDB.forceSwapStatus(previousSwap.uuid, 'cancelled')
+      // }
 
       // Amount and total are just for the display
       // TODO: Fix for ResDEX 2
@@ -239,7 +239,7 @@ const getRelResOrderObservable = (privacy, getSuccessObservable, state$) => {
       baseCurrency: 'RES',
       quoteCurrency,
       quoteCurrencyAmount,
-      price: askPrice.times(Decimal('1.2')),
+      price: askPrice.times(Decimal('1.0001')),
     }
     log.debug(`Private market order stage 1, ${quoteCurrency} -> RES`, orderOptions)
 
@@ -319,7 +319,7 @@ const getResBaseOrderObservable = (privacy, getSuccessObservable, state$) => {
     baseCurrency,
     quoteCurrency: 'RES',
     quoteCurrencyAmount: balance.minus(initialPrivacy2ResBalance),
-    price: askPrice.times(Decimal('1.2')),
+    price: askPrice.times(Decimal('1.0001')),
   }
 
   log.debug(`Private market order stage 5, RES -> ${baseCurrency}`, orderOptions)
@@ -368,7 +368,7 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
     // Calculate expected amount to receive to display in the orders list
     const { price: baseResPrice } = orderBook.baseRes.asks[0]
     const { price: resQuotePrice } = orderBook.resQuote.asks[0]
-    const dexFee = RESDEX.dexFee.div(Decimal('100'))
+    const dexFee = RESDEX.dexFee.dividedBy(Decimal('100'))
     const expectedBaseCurrencyAmount = (
       Decimal(maxRel)
       .dividedBy(resQuotePrice.plus(resQuotePrice.times(dexFee)))
@@ -458,26 +458,22 @@ const createOrderFailedEpic = (action$: ActionsObservable<Action>) => action$.pi
 
 const linkPrivateOrderToBaseResOrderEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.linkPrivateOrderToBaseResOrder),
-  map(action => {
-    swapDB.updateSwapData({
-      uuid: action.payload.uuid,
-      method: 'set_private_order_base_res_uuid',
-      baseResOrderUuid: action.payload.baseResOrderUuid,
-    })
-    return ResDexBuySellActions.empty()
-  })
+  // swapDB.updateSwapData({
+  //   uuid: action.payload.uuid,
+  //   method: 'set_private_order_base_res_uuid',
+  //   baseResOrderUuid: action.payload.baseResOrderUuid,
+  // })
+  map(() => ResDexBuySellActions.empty())
 )
 
 const setPrivateOrderStatusEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.setPrivateOrderStatus),
-  map(action => {
-    swapDB.updateSwapData({
-      uuid: action.payload.uuid,
-      method: 'set_private_order_status',
-      status: action.payload.status,
-    })
-    return ResDexBuySellActions.empty()
-  })
+  // swapDB.updateSwapData({
+  //   uuid: action.payload.uuid,
+  //   method: 'set_private_order_status',
+  //   status: action.payload.status,
+  // })
+  map(() => ResDexBuySellActions.empty())
 )
 
 const selectTabEpic = (action$: ActionsObservable<Action>) => action$.pipe(

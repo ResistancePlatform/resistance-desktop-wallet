@@ -103,7 +103,7 @@ const getTransactionsEpic = (action$: ActionsObservable<Action>, state$) => acti
     const observables = getSortedCurrencies(enabledCurrencies).map(currency => {
       const { symbol } = currency
 
-      const observable = from(mainApi.listTransactions(symbol, currencies[symbol].address)).pipe(
+      const observable = from(mainApi.getTransactionHistory(symbol, currencies[symbol].address)).pipe(
         switchMap(transactions => {
           log.debug(`Got ${transactions.length} transactions for ${symbol}`)
           return of(ResDexAccountsActions.gotCurrencyTransactions(symbol, transactions.reverse()))

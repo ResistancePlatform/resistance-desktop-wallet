@@ -12,6 +12,7 @@ import { getCurrency } from '~/utils/resdex'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 
 
+const satoshiDivider = 100000000
 const t = translate('service')
 
 /**
@@ -123,22 +124,28 @@ class ResDexApiService {
     })
   }
 
-  async getRawTransaction(coin: string, txid: string) {
+  async getTransactionDetails(coin: string, txid: string) {
     return this.query({
-      method: 'getrawtransaction',
+      method: 'get_transaction_details',
       coin,
       txid,
     })
   }
 
-  async listTransactions(coin: string, address: string) {
+  async getTransactionHistory(coin: string, address: string) {
     const response = await this.query({
-      method: 'listtransactions',
+      method: 'my_tx_history',
       coin,
       address
     })
 
-    if (response.length && response[0].tx_hash) {
+    if (!response.result || !response.result.transactions) {
+      return []
+    }
+
+    const { transactions } = response.result
+
+    if (transactions.length && transactions[0].tx_hash) {
       return []
 
       /*
@@ -153,10 +160,10 @@ class ResDexApiService {
       */
     }
 
-    const result = response.map(transaction => ({
+    const result = transactions.map(transaction => ({
       ...response,
       amount: Decimal(transaction.amount),
-      fee: Decimal(transaction.fee),
+      fee: Decimal(transaction.fee).dividedBy(satoshiDivider),
     }))
 
     return result
@@ -168,7 +175,7 @@ class ResDexApiService {
 			coin,
 		})
 
-		return Decimal(response.txfee)
+    return Decimal(response.txfee).dividedBy(satoshiDivider)
 	}
 
   getPortfolio() {
@@ -256,7 +263,7 @@ class ResDexApiService {
       duration: 240,
       base: opts.baseCurrency,
       rel: opts.quoteCurrency,
-      relvolume: opts.total.toNumber(),
+      volume: opts.amount.toNumber(),
       price: opts.price.toNumber(),
     })
   }
@@ -282,6 +289,8 @@ class ResDexApiService {
       timescale
     })
 
+    // log.debug(`Trades array response`, JSON.stringify(response))
+
     // [timestamp, high, low, open, close, relvolume, basevolume, aveprice, numtrades]
     const trades = response.map(item => ({
       date: moment.unix(item[0]).toDate(),
@@ -301,6 +310,8 @@ class ResDexApiService {
       base,
       rel
     })
+
+    // log.debug(`Ticker response`, JSON.stringify(response))
 
     const trades = response.map(item => ({
       time: moment.unix(item.timestamp).toDate(),
@@ -331,6 +342,7 @@ class ResDexApiService {
       method: 'setprice',
       base: opts.baseCurrency,
       rel: opts.quoteCurrency,
+      volume: opts.baseCurrencyAmount,
       price: opts.price.toNumber(),
     })
   }

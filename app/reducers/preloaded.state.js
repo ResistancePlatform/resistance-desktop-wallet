@@ -4,29 +4,6 @@ import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
 import { RESDEX } from '~/constants/resdex'
 
-function getRandomTrades() {
-  const trades = []
-
-  const secondsFromNow = number => {
-    const date = new Date()
-    date.setSeconds(date.getSeconds()-number)
-    return date
-  }
-
-  for (let index = 0; index < 20; index+=1) {
-    const baseAmount = Decimal(Math.random() * 100.0).toDecimalPlaces(3)
-
-    trades.push({
-      time: secondsFromNow(1),
-      baseAmount,
-      quoteAmount: baseAmount.div(20),
-      price: Decimal(60).add(Decimal(Math.random() * 40 - 20))
-    })
-  }
-
-  return trades
-}
-
 export const preloadedState: State = {
   auth: {
     reason: null,
@@ -183,7 +160,7 @@ export const preloadedState: State = {
       },
       enhancedPrivacy: false,
       ohlc: [],
-      trades: getRandomTrades(),
+      trades: [],
       tradingChart: {
         period: 'day',
         volume: true,

@@ -244,7 +244,21 @@ const supportedCurrencies = [
   },
   */
 	{
-		coin: 'BTC',
+    coin: 'BTC',
+    electrumServers: [
+      {
+        host: 'electrum1.cipig.net',
+        port: 10000,
+      },
+      {
+        host: 'electrum2.cipig.net',
+        port: 10000,
+      },
+      {
+        host: 'electrum3.cipig.net',
+        port: 10000,
+      },
+    ],
   },
   /*
 	{
