@@ -79,7 +79,7 @@ class ChooseWalletInput extends GenericInput {
             >
               <CurrencyIcon className={styles.icon} symbol={currency.symbol} size="1rem" />
               <div className={styles.walletName}>{currency.name}</div>
-              <div className={styles.balance}>{currency.balance.toString()}</div>
+              <div className={styles.balance}>{toDecimalPlaces(currency.balance)}</div>
               <div className={styles.symbol}>{currency.symbol}</div>
             </PopupMenuItem>
           ))

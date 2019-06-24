@@ -103,6 +103,7 @@ export class ResDexService {
       userhome,
       passphrase: getActualSeedPhrase(processName, seedPhrase),
       coins: currenciesWithoutElectrum,
+      tx_history: true,
     }
 
     if (processName !== 'RESDEX') {

@@ -49,23 +49,24 @@ type Props = {
 	ratio: number
 }
 
+const chartFontFamily = `Quicksand, Arial, Helvetica, Helvetica Neue, serif`
+
 const macdAppearance = {
 	stroke: {
-		macd: "#FF0000",
-		signal: "#00F300",
+		macd: "#e20063",
+		signal: "#00d492",
 	},
 	fill: {
-		divergence: "#4682B4"
+		divergence: "#009ed8"
 	},
 }
 
 const mouseEdgeAppearance = {
-	textFill: '#542605',
-	stroke: "#05233B",
+	textFill: '#a4abc7',
 	strokeOpacity: 1,
-	strokeWidth: 3,
+	strokeWidth: 0,
 	arrowWidth: 5,
-	fill: "#BCDEFA",
+	fill: "#262c47",
 }
 
 const ema20 = ema()
@@ -76,7 +77,7 @@ const ema20 = ema()
   .skipUndefined(true)
   .merge((d, c) => ({...d, ema20: c}))
   .accessor(d => d.ema20)
-  .stroke('green')
+  .stroke('#00d492')
 
 const ema50 = ema()
   .options({
@@ -86,14 +87,14 @@ const ema50 = ema()
   .skipUndefined(true)
   .merge((d, c) => ({...d, ema50: c}))
   .accessor(d => d.ema50)
-  .stroke('red')
+  .stroke('#e20063')
 
 const smaVolume50 = sma()
   .options({ windowSize: 20, sourcePath: 'volume' })
   .merge((d, c) => ({...d, smaVolume50: c}))
   .accessor(d => d.smaVolume50)
-  .stroke('#4682B4')
-  .fill('#4682B4')
+  .stroke('#009ed7')
+  .fill('#1e4266')
 
 const bb = bollingerBand()
   .merge((d, c) => ({...d, bb: c}))
@@ -203,6 +204,38 @@ class TradingChart extends Component<Props> {
     return Math.max(504, this.element.clientHeight-64)
   }
 
+  getBottomIndicatorsNumber() {
+    const { tradingChart } = this.props.resDex.buySell
+    let counter = 0
+
+    if (tradingChart.macd) {
+      counter += 1
+    }
+
+    if (tradingChart.rsi) {
+      counter += 1
+    }
+
+    return counter
+  }
+
+  getXAxis(xGrid, showTicks: boolean) {
+    return (
+      <XAxis
+        axisAt="bottom"
+        orient="bottom"
+        stroke="#009ed8"
+        tickStroke="#009ed8"
+        showTicks={showTicks}
+        fontFamily={chartFontFamily}
+        fontSize="8"
+        outerTickSize={0}
+        opacity={0.5}
+        {...xGrid}
+      />
+    )
+  }
+
 	/**
 	 * @returns
    * @memberof TradingChart
@@ -231,6 +264,9 @@ class TradingChart extends Component<Props> {
 
     const { tradingChart: chartSettings } = this.props.resDex.buySell
 
+    const bottomIndicatorHeight = 100
+    const bottomIndicatorsNumber = this.getBottomIndicatorsNumber()
+
     const data = this.getData()
 
     if (!data.length) {
@@ -253,7 +289,7 @@ class TradingChart extends Component<Props> {
           xScale={scaleTime().domain([new Date(2000, 0, 1, 0), new Date(2000, 0, 1, 1)])}
           xExtents={this.getXExtents(data, chartPeriod)}>
 
-          <Chart id={1} height={height-250}
+          <Chart id={1} height={height - bottomIndicatorsNumber * bottomIndicatorHeight - 50}
             yExtents={[d => [d.high, d.low], ema20.accessor()]}
             padding={{ top: 10, bottom: 20 }}
           >
@@ -261,21 +297,15 @@ class TradingChart extends Component<Props> {
               axisAt="right"
               orient="right"
               ticks={5}
-              stroke="#a367f0"
-              tickStroke="#a367f0"
+              stroke="rgb(90, 98, 131)"
+              tickStroke="#009ed8"
+              fontFamily={chartFontFamily}
+              fontSize={10}
               {...yGrid}
               inverted
             />
 
-            <XAxis
-              axisAt="bottom"
-              orient="bottom"
-              ticks={6}
-              showTicks={false}
-              outerTickSize={0}
-              opacity={0.5}
-              {...xGrid}
-            />
+            { this.getXAxis(xGrid, bottomIndicatorsNumber === 0) }
 
             <MouseCoordinateY
               at="right"
@@ -303,25 +333,31 @@ class TradingChart extends Component<Props> {
               <BollingerSeries
                 yAccessor={d => d.bb}
                 stroke={{
-                  top: "#964B00",
-                  middle: "#000000",
-                  bottom: "#964B00",
+                  top: "#009ed7",
+                  middle: "#9c62e5",
+                  bottom: "#009ed7",
                 }}
-                fill="#4682B4"
+                fill="#3f356e"
               />
             }
 
-            <EdgeIndicator itemType="last" orient="right" edgeAt="right"
+            <EdgeIndicator
+              itemType="last"
+              orient="right"
+              edgeAt="right"
               yAccessor={d => d.close}
-              fill={d => d.close > d.open ? "#A2F5BF" : "#F9ACAA"}
-              stroke={d => d.close > d.open ? "#0B4228" : "#6A1B19"}
-              textFill={d => d.close > d.open ? "#0B4228" : "#420806"}
+              fill={d => d.close > d.open ? "#00d492" : "#e20063"}
+              textFill="rgb(90, 98, 131)"
               strokeOpacity={1}
-              strokeWidth={3}
+              strokeWidth={0}
               arrowWidth={2}
             />
 
-            <OHLCTooltip origin={[-40, 0]}/>
+            <OHLCTooltip
+              origin={[-40, 0]}
+              textFill="rgb(238, 238, 241)"
+              fontFamily={chartFontFamily}
+            />
 
             <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
 
@@ -337,6 +373,8 @@ class TradingChart extends Component<Props> {
                     windowSize: ema20.options().windowSize,
                   },
                 ]}
+                textFill="rgb(238, 238, 241)"
+                fontFamily={chartFontFamily}
               />
             }
 
@@ -352,6 +390,8 @@ class TradingChart extends Component<Props> {
                     windowSize: ema50.options().windowSize,
                   },
                 ]}
+                textFill="rgb(238, 238, 241)"
+                fontFamily={chartFontFamily}
               />
             }
 
@@ -360,6 +400,8 @@ class TradingChart extends Component<Props> {
                 origin={[-38, 60]}
                 yAccessor={d => d.bb}
                 options={bb.options()}
+                textFill="rgb(238, 238, 241)"
+                fontFamily={chartFontFamily}
               />
             }
 
@@ -370,35 +412,47 @@ class TradingChart extends Component<Props> {
               id={2}
               yExtents={[d => d.volume, smaVolume50.accessor()]}
               height={150}
-              origin={(w, h) => [0, h - 350]}
+              origin={(w, h) => [0, h - bottomIndicatorsNumber * bottomIndicatorHeight - 150]}
             >
               <YAxis
                 axisAt="left"
                 orient="left"
                 ticks={5}
-                stroke="#a367f0"
-                tickStroke="#a367f0"
+                stroke="rgb(90, 98, 131)"
+                tickStroke="#009ed8"
                 tickFormat={format(".0s")}
+                fontFamily={chartFontFamily}
+                fontSize={10}
               />
 
               <BarSeries fill="#1d2440" yAccessor={d => d.volume} />
               <AreaSeries yAccessor={smaVolume50.accessor()} stroke={smaVolume50.stroke()} fill={smaVolume50.fill()}/>
 
               <CurrentCoordinate yAccessor={smaVolume50.accessor()} fill={smaVolume50.stroke()} />
-              <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47" />
+              <CurrentCoordinate yAccessor={d => d.volume} fill="#009ed7" />
             </Chart>
           }
 
           {chartSettings.macd &&
             <Chart
               id={3}
-              height={100}
+              height={bottomIndicatorHeight}
               yExtents={macdCalculator.accessor()}
-              origin={(w, h) => [0, h - 200]}
+              origin={(w, h) => [0, h - bottomIndicatorsNumber * bottomIndicatorHeight]}
               padding={{ top: 10, bottom: 10 }}
             >
-              <XAxis axisAt="bottom" showTicks={false} orient="bottom"/>
-              <YAxis axisAt="right" orient="right" ticks={2} />
+
+              { this.getXAxis(xGrid, bottomIndicatorsNumber === 1) }
+
+              <YAxis
+                axisAt="right"
+                orient="right"
+                ticks={2}
+                stroke="rgb(90, 98, 131)"
+                tickStroke="#009ed8"
+                fontFamily={chartFontFamily}
+                fontSize={10}
+              />
 
               <MouseCoordinateX
                 at="bottom"
@@ -407,6 +461,7 @@ class TradingChart extends Component<Props> {
                 rectRadius={5}
                 {...mouseEdgeAppearance}
               />
+
               <MouseCoordinateY
                 at="right"
                 orient="right"
@@ -414,39 +469,47 @@ class TradingChart extends Component<Props> {
                 {...mouseEdgeAppearance}
               />
 
-              <MACDSeries yAccessor={d => d.macd}
-                {...macdAppearance} />
+              <MACDSeries
+                yAccessor={d => d.macd}
+                {...macdAppearance}
+              />
 
               <MACDTooltip
                 origin={[-38, 20]}
                 yAccessor={d => d.macd}
                 options={macdCalculator.options()}
                 appearance={macdAppearance}
+                textFill="rgb(238, 238, 241)"
+                fontFamily={chartFontFamily}
               />
             </Chart>
           }
 
           {chartSettings.rsi &&
            <Chart id={4}
-              yExtents={[0, 100]}
-              height={100} origin={(w, h) => [0, h - 100]}
+              yExtents={[0, bottomIndicatorHeight]}
+              height={bottomIndicatorHeight}
+              origin={(w, h) => [0, h - bottomIndicatorHeight]}
               padding={{ top: 10, bottom: 10 }}
             >
-              <XAxis
-                axisAt="bottom"
-                orient="bottom"
-                stroke="#a367f0"
-                outerTickSize={0}
-              />
+              { this.getXAxis(xGrid, true) }
 
-              <YAxis axisAt="right"
+              <YAxis
+                axisAt="right"
                 orient="right"
-                tickValues={[30, 50, 70]}/>
+                tickValues={[30, 50, 70]}
+                stroke="rgb(90, 98, 131)"
+                tickStroke="#009ed8"
+                fontFamily={chartFontFamily}
+                fontSize={10}
+              />
 
               <MouseCoordinateY
                 at="right"
                 orient="right"
-                displayFormat={format(".2f")} />
+                displayFormat={format(".2f")}
+                {...mouseEdgeAppearance}
+              />
 
               <RSISeries yAccessor={d => d.rsi} />
 
@@ -454,6 +517,8 @@ class TradingChart extends Component<Props> {
                 origin={[-38, 20]}
                 yAccessor={d => d.rsi}
                 options={rsiCalculator.options()}
+                textFill="rgb(238, 238, 241)"
+                fontFamily={chartFontFamily}
               />
             </Chart>
           }

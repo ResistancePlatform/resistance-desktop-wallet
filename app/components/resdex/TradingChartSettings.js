@@ -11,6 +11,7 @@ import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 
 import styles from './TradingChartSettings.scss'
 
+const drawPopupMenuId = 'resdex-buy-sell-chart-draw-popup-menu-id'
 const chartTypePopupMenuId = 'resdex-buy-sell-chart-type-popup-menu-id'
 const indicatorsPopupMenuId = 'resdex-buy-sell-chart-indicators-popup-menu-id'
 
@@ -45,7 +46,60 @@ class TradingChartSettings extends Component<Props> {
 
     return (
       <div className={styles.container}>
+        <div
+          role="button"
+          className={styles.button}
+          onClick={() => this.props.popupMenuActions.show(drawPopupMenuId)}
+          tabIndex={-1}
+          onKeydown={() => false}
+        >
+          <div className={styles.label}>
+            {t(`Draw`)}
+          </div>
 
+          <PopupMenu
+            id={drawPopupMenuId}
+            className={styles.popupMenu}
+            relative
+          >
+            <PopupMenuItem onClick={() => false} disabled>
+              <div className={styles.item}>
+                <div className={styles.name}>{t(`Trendline`)}</div>
+              </div>
+            </PopupMenuItem>
+            <PopupMenuItem onClick={() => false} disabled>
+              <div className={styles.item}>
+                <div className={styles.name}>{t(`Fibonacci Retracement`)}</div>
+              </div>
+            </PopupMenuItem>
+            <PopupMenuItem onClick={() => false} disabled>
+              <div className={styles.item}>
+                <div className={styles.name}>{t(`Standard Deviation Channel`)}</div>
+              </div>
+            </PopupMenuItem>
+            <PopupMenuItem onClick={() => false} disabled>
+              <div className={styles.item}>
+                <div className={styles.name}>{t(`Gann Fan`)}</div>
+              </div>
+            </PopupMenuItem>
+            <PopupMenuItem onClick={() => false} disabled>
+              <div className={styles.item}>
+                <div className={styles.name}>{t(`Label`)}</div>
+              </div>
+            </PopupMenuItem>
+            <PopupMenuItem onClick={() => false} disabled>
+              <div className={styles.item}>
+                <div className={styles.name}>{t(`Alert`)}</div>
+              </div>
+            </PopupMenuItem>
+            <PopupMenuItem onClick={() => false} disabled>
+              <div className={styles.item}>
+                <div className={styles.name}>{t(`Brush`)}</div>
+              </div>
+            </PopupMenuItem>
+          </PopupMenu>
+
+        </div>
         <div
           role="button"
           className={styles.button}
@@ -53,7 +107,13 @@ class TradingChartSettings extends Component<Props> {
           tabIndex={-1}
           onKeydown={() => false}
         >
-          <div className={cn('icon', styles.chartType)} />
+          <div className={styles.label}>
+            {t(`Chart`)}
+          </div>
+
+          {/*
+            <div className={cn('icon', styles.chartType)} />
+          */}
 
           <PopupMenu
             id={chartTypePopupMenuId}
@@ -101,7 +161,13 @@ class TradingChartSettings extends Component<Props> {
           tabIndex={0}
           onKeydown={() => false}
         >
-          <div className={cn('icon', styles.chartType)} />
+          <div className={styles.label}>
+            {t(`Indicators`)}
+          </div>
+
+          {/*
+            <div className={cn('icon', styles.chartType)} />
+          */}
 
           <PopupMenu
             id={indicatorsPopupMenuId}
@@ -116,13 +182,13 @@ class TradingChartSettings extends Component<Props> {
             </PopupMenuItem>
             <PopupMenuItem onClick={() => updateChartSettings({ema20: !chartSettings.ema20})}>
               <div className={styles.item}>
-                <div className={styles.name}>{t(`Exponential Moving Average (20)`)}</div>
+                <div className={styles.name}>{t(`Exponential Moving Average 20`)}</div>
                 <div className={cn('icon', styles.check, {[styles.active]: chartSettings.ema20})} />
               </div>
             </PopupMenuItem>
             <PopupMenuItem onClick={() => updateChartSettings({ema50: !chartSettings.ema50})}>
               <div className={styles.item}>
-                <div className={styles.name}>{t(`Exponential Moving Average (50)`)}</div>
+                <div className={styles.name}>{t(`Exponential Moving Average 50`)}</div>
                 <div className={cn('icon', styles.check, {[styles.active]: chartSettings.ema50})} />
               </div>
             </PopupMenuItem>

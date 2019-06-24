@@ -136,7 +136,8 @@ class ResDexApiService {
     const response = await this.query({
       method: 'my_tx_history',
       coin,
-      address
+      limit: 10,
+      from_id: null,
     })
 
     if (!response.result || !response.result.transactions) {
@@ -230,6 +231,8 @@ class ResDexApiService {
 			base,
 			rel,
 		})
+
+    log.debug("Order book", JSON.stringify(response))
 
 		const formatOrders = orders => orders
 			// TODO

@@ -41,6 +41,16 @@ class ResDexAdvancedTrading extends Component<Props> {
 		return (
       <React.Fragment>
         <RpcPolling
+          criticalChildProcess="RESDEX"
+          interval={10.0}
+          actions={{
+            polling: ResDexBuySellActions.getOrderBook,
+            success: ResDexBuySellActions.gotOrderBook,
+            failure: ResDexBuySellActions.getOrderBookFailed
+          }}
+        />
+
+        <RpcPolling
           interval={60.0}
           criticalChildProcess="RESDEX"
           actions={{

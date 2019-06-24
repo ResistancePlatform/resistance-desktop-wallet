@@ -111,7 +111,7 @@ class ResDexAssets extends Component<Props> {
         {getCurrencyName(symbol)}
 
         <div className={styles.amount}>
-          {currency ? `${currency.balance} ${symbol}` : t(`N/A`)}
+          {currency ? `${toDecimalPlaces(currency.balance)} ${symbol}` : t(`N/A`)}
         </div>
 
         <div className={styles.equity}>
