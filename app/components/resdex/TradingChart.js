@@ -583,7 +583,9 @@ class TradingChart extends Component<Props> {
             </Chart>
           }
 
-          <CrossHairCursor />
+          <CrossHairCursor
+            stroke="rgb(238, 238, 241)"
+          />
 
         </ChartCanvas>
       </div>
