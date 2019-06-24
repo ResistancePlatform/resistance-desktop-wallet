@@ -12,6 +12,9 @@ import {
   AreaSeries,
   BarSeries,
   CandlestickSeries,
+  KagiSeries,
+  PointAndFigureSeries,
+  RenkoSeries,
   BollingerSeries,
   LineSeries,
   MACDSeries,
@@ -34,7 +37,17 @@ import {
 import { XAxis, YAxis } from 'react-stockcharts/lib/axes'
 import { fitWidth } from 'react-stockcharts/lib/helper'
 import { first, last, timeIntervalBarWidth } from 'react-stockcharts/lib/utils'
-import { sma, ema, bollingerBand, rsi, macd } from 'react-stockcharts/lib/indicator'
+import {
+  heikinAshi,
+  kagi,
+  pointAndFigure,
+  renko,
+  sma,
+  ema,
+  bollingerBand,
+  rsi,
+  macd
+} from 'react-stockcharts/lib/indicator'
 
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import TradingChartSettings from './TradingChartSettings'
@@ -50,6 +63,11 @@ type Props = {
 }
 
 const chartFontFamily = `Quicksand, Arial, Helvetica, Helvetica Neue, serif`
+
+const ha = heikinAshi()
+const kagiCalculator = kagi()
+const pAndF = pointAndFigure()
+const renkoCalculator = renko()
 
 const macdAppearance = {
 	stroke: {
@@ -122,11 +140,11 @@ class TradingChart extends Component<Props> {
 	props: Props
 
 	getData() {
-    const { ohlc } = this.props.resDex.buySell
+    const { tradingChart, ohlc } = this.props.resDex.buySell
 
     const initialData = ohlc.filter(tick => tick.open > 0)
 
-    const calculatedData = rsiCalculator(
+    let calculatedData = rsiCalculator(
       bb(
         smaVolume50(
           ema20(
@@ -137,6 +155,22 @@ class TradingChart extends Component<Props> {
         )
       )
     )
+
+    switch (tradingChart.type) {
+      case 'heikin-ashi':
+        calculatedData = ha(calculatedData)
+        break
+      case 'kagi':
+        calculatedData = kagiCalculator(calculatedData)
+        break
+      case 'point-figure':
+        calculatedData = pAndF(calculatedData)
+        break
+      case 'renko':
+        calculatedData = renkoCalculator(calculatedData)
+        break
+      default:
+    }
 
     return calculatedData
 	}
@@ -322,12 +356,37 @@ class TradingChart extends Component<Props> {
               <LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()}/>
             }
 
-            <CandlestickSeries
-              stroke={d => d.close > d.open ? "#00d492" : "#e20063"}
-              wickStroke={d => d.close > d.open ? "#00d492" : "#e20063"}
-              fill={d => d.close > d.open ? "#00d492" : "#e20063"}
-              width={timeIntervalBarWidth(d3Interval)}
-            />
+            {['candlestick', 'heikin-ashi'].includes(chartSettings.type) &&
+              <CandlestickSeries
+                stroke={d => d.close > d.open ? "#00d492" : "#e20063"}
+                wickStroke={d => d.close > d.open ? "#00d492" : "#e20063"}
+                fill={d => d.close > d.open ? "#00d492" : "#e20063"}
+                width={timeIntervalBarWidth(d3Interval)}
+              />
+            }
+
+            {chartSettings.type === 'kagi' &&
+              <KagiSeries
+                stroke={{ yang: '#e20063', yin: '#00d492' }}
+                currentValueStroke="rgb(238, 238, 241)"
+              />
+            }
+
+            {chartSettings.type === 'point-figure' &&
+              <PointAndFigureSeries
+                stroke={{ up: '#e20063', down: '#00d492' }}
+              />
+            }
+
+            {chartSettings.type === 'renko' &&
+              <RenkoSeries
+                fill={{
+                  up: '#e20063',
+                  down: '#00d492',
+                  partial: '#009ed8',
+                }}
+              />
+            }
 
             {chartSettings.bb &&
               <BollingerSeries
@@ -472,6 +531,7 @@ class TradingChart extends Component<Props> {
               <MACDSeries
                 yAccessor={d => d.macd}
                 {...macdAppearance}
+                zeroLineStroke="#009ed8"
               />
 
               <MACDTooltip

@@ -51,7 +51,7 @@ class TradingChartSettings extends Component<Props> {
           className={styles.button}
           onClick={() => this.props.popupMenuActions.show(drawPopupMenuId)}
           tabIndex={-1}
-          onKeydown={() => false}
+          onKeyDown={() => false}
         >
           <div className={styles.label}>
             {t(`Draw`)}
@@ -105,7 +105,7 @@ class TradingChartSettings extends Component<Props> {
           className={styles.button}
           onClick={() => this.props.popupMenuActions.show(chartTypePopupMenuId)}
           tabIndex={-1}
-          onKeydown={() => false}
+          onKeyDown={() => false}
         >
           <div className={styles.label}>
             {t(`Chart`)}
@@ -159,7 +159,7 @@ class TradingChartSettings extends Component<Props> {
           className={styles.button}
           onClick={() => this.props.popupMenuActions.show(indicatorsPopupMenuId)}
           tabIndex={0}
-          onKeydown={() => false}
+          onKeyDown={() => false}
         >
           <div className={styles.label}>
             {t(`Indicators`)}
@@ -167,6 +167,9 @@ class TradingChartSettings extends Component<Props> {
 
           {/*
             <div className={cn('icon', styles.chartType)} />
+
+              onClick={() => updateChartSettings({period})}
+              onKeyDown={() => updateChartSettings({period})}
           */}
 
           <PopupMenu
@@ -220,8 +223,6 @@ class TradingChartSettings extends Component<Props> {
               key={period}
               tabIndex={index + 1}
               className={cn({ [styles.active]: period === chartSettings.period })}
-              onClick={() => updateChartSettings({period})}
-              onKeydown={() => updateChartSettings({period})}
             >
               {getPeriodCaption(t, period)}
             </li>

@@ -505,7 +505,7 @@ const getOhlcEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe
         .then(data => tsvParse(data, parseData(timeParse("%Y-%m-%d"))))
     )
 
-    // const ohlcObservable = from(mainApi.getOhlc(baseCurrency, quoteCurrency, 120)).pipe(
+    // const ohlcObservable = from(mainApi.getOhlc(baseCurrency, quoteCurrency, 60 * 60 * 24)).pipe(
     const ohlcObservable = from(msftDataPromise).pipe(
       map(ohlc => ResDexBuySellActions.gotOhlc(ohlc)),
       catchError(err => {
