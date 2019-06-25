@@ -287,10 +287,7 @@ export class RpcService {
    */
   createNewAddress(isPrivate?: boolean): Promise<any> {
     const client = getClientInstance()
-
-    return client.command({
-      method: isPrivate ? `z_getnewaddress` : `getnewaddress`
-    })
+    return client.command(isPrivate ? 'z_getnewaddress' : 'getnewaddress')
   }
 
   /**

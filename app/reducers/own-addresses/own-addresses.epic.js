@@ -71,15 +71,15 @@ const getOwnAddressesEpic = (action$: ActionsObservable<Action>) => action$.pipe
 const createAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.createAddress),
   switchMap(action => rpc.createNewAddress(action.payload.isPrivate)),
+  map(() => {
+    toastr.success(t(`New address created successfully`))
+    return OwnAddressesActions.getOwnAddresses()
+  }),
   catchError(err => {
     log.error(`Can't create a new address`, err)
     toastr.error(`Unable to create new address, check the log for details`)
     return of(OwnAddressesActions.empty())
   }),
-  map(() => {
-    toastr.success(t(`New address created successfully`))
-    return OwnAddressesActions.getOwnAddresses()
-  })
 )
 
 const initiatePrivateKeysExportEpic = (action$: ActionsObservable<Action>) => action$.pipe(

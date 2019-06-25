@@ -132,7 +132,7 @@ class ResDexApiService {
     })
   }
 
-  async getTransactionHistory(coin: string, address: string) {
+  async getTransactionHistory(coin: string) {
     const response = await this.query({
       method: 'my_tx_history',
       coin,
