@@ -118,6 +118,7 @@ export const preloadedState: State = {
 	},
   resDex: {
     common: {
+      isExpanded: false,
       selectedTabIndex: 0,
     },
     bootstrapping: {
@@ -139,11 +140,11 @@ export const preloadedState: State = {
       selectedTabIndex: 0,
       isAdvanced: false,
       isSendingOrder: false,
-      baseCurrency: 'DGB',
-      quoteCurrency: 'MONA',
+      baseCurrency: 'RES',
+      quoteCurrency: 'ETH',
       orderBook: {
-        baseCurrency: 'DGB',
-        quoteCurrency: 'MONA',
+        baseCurrency: 'RES',
+        quoteCurrency: 'ETH',
         baseQuote: {
           bids: [],
           asks: [],
@@ -158,6 +159,18 @@ export const preloadedState: State = {
         }
       },
       enhancedPrivacy: false,
+      ohlc: [],
+      trades: [],
+      tradingChart: {
+        period: 'day',
+        volume: true,
+        type: 'candlestick',
+        macd: false,
+        ema20: true,
+        ema50: true,
+        bb: false,
+        rsi: true
+      }
     },
     orders: {
       isInitialKickStartDone: false,

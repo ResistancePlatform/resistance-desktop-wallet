@@ -29,6 +29,7 @@
     overflow: hidden;
     box-shadow: 0.3125rem 0.3125rem 3.6875rem -0.125rem $BASE_COLOR_SHADOW;
     padding: 1.5rem;
+    z-index: 100000000;
 
     .rrt-message {
       width: 100%;

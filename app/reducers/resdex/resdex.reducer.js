@@ -32,6 +32,7 @@ export type CurrencyHistoryResolution = 'hour' | 'day' | 'week' | 'month' | 'yea
 
 export type ResDexState = {
   common: {
+    isExpanded: boolean,
     selectedTabIndex: number
   },
   bootstrapping: {
@@ -75,7 +76,19 @@ export type ResDexState = {
         ['bids' | 'asks']: Order[]
       }
     },
-    enhancedPrivacy: boolean
+    enhancedPrivacy: boolean,
+    ohlc: object[],
+    trades: object[],
+    tradingChart: {
+      period: string,
+      volume: boolean,
+      type: 'candlestick' | 'heikin-ashi' | 'kagi' | 'point-figure' | 'renko',
+      ema20: boolean,
+      ema50: boolean,
+      bb: boolean,
+      rsi: boolean,
+      macd: boolean
+    }
   },
   orders: {
     isInitialKickStartDone: boolean,
@@ -133,6 +146,7 @@ export const ResDexCommonReducer = handleActions(
     [ResDexActions.selectTab]: (state, action) => ({
       ...state,
       selectedTabIndex: action.payload.index,
+      isExpanded: action.payload.index === 2,
     }),
   }, preloadedState)
 

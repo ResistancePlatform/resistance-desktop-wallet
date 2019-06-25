@@ -141,7 +141,7 @@ app.on('window-all-closed', () => {
 
 app.on('ready', async () => {
   app.on('activate', () => {
-    if (getOS() === 'macos') {
+    if (getOS() === 'macos' && mainWindow !== null) {
       mainWindow.show()
     }
   })

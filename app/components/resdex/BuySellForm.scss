@@ -1,0 +1,107 @@
+@import "~/assets/styles/vars.scss";
+@import "./ResDex.scss";
+
+.form {
+  .orderType {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.7rem;
+  }
+
+  .maxRelAddon {
+    width: 5.2rem;
+    border-left: 1px solid $BASE_COLOR_BORDER_GRAY;
+    padding-left: 0.3rem;
+
+    button {
+      color: $BASE_COLOR_WHITE;
+      background-color: $BASE_COLOR_PURPLE;
+      border: 0;
+    }
+  }
+
+  .exchangeButton {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+  .caption {
+    color: $BASE_COLOR_FONT_GRAY_2;
+    font-size: 0.67rem;
+    font-weight: 300;
+    text-transform: uppercase;
+    margin-left: 1rem;
+    white-space: nowrap;
+
+    > * {
+      text-transform: none;
+    }
+  }
+
+  .enhancedPrivacyTooltip {
+    width: 22rem !important;
+  }
+
+  .inputLabel {
+    min-width: 4.3rem;
+  }
+
+  .oldInputLabel {
+    width: 5.2rem;
+  }
+
+  .advancedInputs {
+    display: flex;
+
+    .box {
+      width: 50%;
+
+      &:first-child {
+        margin-right: 0.3rem;
+      }
+
+      &:last-child {
+        margin-left: 0.3rem;
+      }
+
+      .caption {
+        margin-bottom: 0.8rem;
+      }
+    }
+
+  }
+
+}
+
+.bottomControls {
+  display: flex;
+
+  .instantSwap {
+    text-align: right;
+    flex: 1;
+
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.7rem;
+
+    &.allowed {
+      color: $BASE_COLOR_LIGHT_GREEN;
+    }
+
+    .tooltip {
+      text-align: left;
+      font-size: 0.7rem;
+
+      .title {
+        color: $BASE_COLOR_FONT_GRAY;
+        margin-bottom: 0.3rem;
+      }
+
+      .body {
+        color: $BASE_COLOR_WHITE;
+        font-weight: 500;
+      }
+    }
+  }
+}

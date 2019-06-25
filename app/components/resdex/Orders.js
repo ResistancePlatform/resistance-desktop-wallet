@@ -1,5 +1,4 @@
 // @flow
-import { Decimal } from 'decimal.js'
 import moment from 'moment'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -13,13 +12,10 @@ import { toDecimalPlaces } from '~/utils/decimal'
 import { ResDexActions } from '~/reducers/resdex/resdex.reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import { RoundedButton, BorderlessButton } from '~/components/rounded-form'
-import { SwapDBService } from '~/service/resdex/swap-db'
 import { UniformList, UniformListHeader, UniformListRow, UniformListColumn} from '~/components/uniform-list'
 
 import styles from './Orders.scss'
 
-
-const swapDB = new SwapDBService()
 
 type Props = {
   t: any,
@@ -55,30 +51,13 @@ class ResDexOrders extends Component<Props> {
     )
   }
 
-  getBaseCurrencyAmount(order) {
-    let baseCurrencyAmount = null
-
-    if (!order.isPrivate) {
-      ({ baseCurrencyAmount } = order.isMarket ? order : order.requested)
-    } else if (order.privacy.baseResOrderUuid) {
-      const { swapHistory } = this.props.orders
-      const baseResOrder = swapHistory[order.privacy.baseResOrderUuid]
-      ({ baseCurrencyAmount } = baseResOrder || {})
-    }
-
-    if (order.isPrivate && !baseCurrencyAmount) {
-      baseCurrencyAmount = order.privacy.expectedBaseCurrencyAmount
-    }
-
-    return Decimal(baseCurrencyAmount)
-  }
-
   onClearHistoryClick() {
     const { t } = this.props
 
     const clearHistory = () => {
-      const { swapHistory } = this.props.orders
-      swapHistory.filter(swap => !swap.isActive).forEach(swap => swapDB.removeSwap(swap.uuid))
+      // TODO: Figure out if we need this after ResDEX 2 integration
+      // const { swapHistory } = this.props.orders
+      // swapHistory.filter(swap => !swap.isActive).forEach(swap => swapDB.removeSwap(swap.uuid))
       toastr.success(t(`Swap history removed`))
     }
 
@@ -92,8 +71,6 @@ class ResDexOrders extends Component<Props> {
   getListRowRenderer(order) {
     const { i18n } = this.props
 
-    const { baseCurrency, quoteCurrency, status } = order.isPrivate ? order.privacy : order
-
     return (
       <UniformListRow
         className={styles.row}
@@ -104,19 +81,19 @@ class ResDexOrders extends Component<Props> {
           {moment(order.timeStarted).locale(i18n.language).format('kk:mm L')}
         </UniformListColumn>
         <UniformListColumn>
-          {baseCurrency}/{quoteCurrency}
+          {order.baseCurrency}/{order.quoteCurrency}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.lesser)}>
-          -{toDecimalPlaces(Decimal(order.isMarket ? order.quoteCurrencyAmount : order.requested.quoteCurrencyAmount ))} {quoteCurrency}
+          -{toDecimalPlaces(order.quoteCurrencyAmount)} {order.quoteCurrency}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.greater)}>
-          {toDecimalPlaces(this.getBaseCurrencyAmount(order))} {baseCurrency}
+          {toDecimalPlaces(order.baseCurrencyAmount)} {order.baseCurrency}
         </UniformListColumn>
         <UniformListColumn>
           <i className={cn('icon', styles.private, { [styles.enabled]: order.isPrivate })} />
         </UniformListColumn>
         <UniformListColumn>
-          <span className={cn(styles.status, styles[status])}>
+          <span className={cn(styles.status, styles[order.status])}>
             {getOrderStatusName(order)}
           </span>
         </UniformListColumn>
@@ -164,7 +141,7 @@ class ResDexOrders extends Component<Props> {
         <div className={styles.header}>
           {t(`Swap history`)}
 
-          {completedOrders.length !== 0 &&
+          {false && completedOrders.length !== 0 &&
             <BorderlessButton
               className={styles.clearHistoryButton}
               onClick={() => this.onClearHistoryClick()}

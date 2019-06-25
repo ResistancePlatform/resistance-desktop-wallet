@@ -8,10 +8,8 @@ import { routerActions } from 'react-router-redux'
 import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
-import { getStore } from '~/store/configureStore'
 import { AUTH } from '~/constants/auth'
 import { ChildProcessService } from '~/service/child-process-service'
-import { SwapDBService } from '~/service/resdex/swap-db'
 import { ResDexService } from '~/service/resdex/resdex'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
@@ -23,7 +21,6 @@ import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 const t = translate('resdex')
 
 const childProcess = new ChildProcessService()
-const swapDB = new SwapDBService()
 const resDex = new ResDexService()
 const portfolio = new ResDexPortfolioService()
 
@@ -79,12 +76,6 @@ const startResdexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   switchMap(action => {
     const { seedPhrase, walletPassword } = action.payload
 
-    swapDB.init(seedPhrase)
-
-    swapDB.on('change', () => {
-      getStore().dispatch(ResDexOrdersActions.getSwapHistory())
-    })
-
     // Start 3 ResDEX processes, one for transparent and two for private trades
     const processNames = ['RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
 
@@ -114,7 +105,8 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
 
     const api = resDexApiFactory(processName)
 
-    api.enableSocket()
+    // TODO: Re-enable after implementing ResDEX 2 Websockets
+    // api.enableSocket()
 
     const { enabledCurrencies } = state$.value.resDex.accounts
 

@@ -6,10 +6,10 @@
   margin-top: 1.8rem;
 }
 
-.asks, .bids {
+.asks, .bids, .trades {
   @extend %smallContainer;
-  width: 50%;
-  padding: 1.5rem;
+  padding: 0.5rem;
+  height: 100%;
 
   .title {
     color: $BASE_COLOR_WHITE;
@@ -23,7 +23,7 @@
 }
 
 .asks {
-  margin-right: 2rem;
+  margin-bottom: 1rem;
 }
 
 .asksIcon, .bidsIcon {

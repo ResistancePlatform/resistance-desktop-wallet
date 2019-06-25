@@ -8,6 +8,11 @@
   width: $NAVI_BAR_CONTAINER_WIDTH + 1.35rem;
   user-select: none;
   cursor: pointer;
+
+  &.shrink {
+    min-width: 0;
+    width: 0;
+  }
 }
 
 .draggableContainer {

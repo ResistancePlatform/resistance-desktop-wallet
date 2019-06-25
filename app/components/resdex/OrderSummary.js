@@ -18,7 +18,6 @@ type Props = {
   t: any,
   className?: string,
   order: {
-    orderType: 'buy' | 'sell',
     quoteCurrencyAmount: object,
     price: object | null,
     baseCurrency: string,
@@ -42,12 +41,15 @@ class OrderSummary extends Component<Props> {
   }
 
   getBaseAmount(): Decimal | null {
-    const { quoteCurrencyAmount, price } = this.props.order
-    const txFee = this.getTxFee() || Decimal(0)
+    const { baseCurrency, quoteCurrencyAmount, price } = this.props.order
+    let txFee = this.getTxFee() || Decimal(0)
 
     if (price === null) {
       return null
     }
+
+    // TODO: Fix it
+    txFee = Decimal(0)
 
     const dexFee = RESDEX.dexFee.div(Decimal('100'))
     const divider = Decimal(price).plus(Decimal(price).times(dexFee)).plus(txFee)
@@ -138,8 +140,8 @@ class OrderSummary extends Component<Props> {
     const { order, t } = this.props
     const txFee = this.getTxFee()
 
-    const quoteBlockExplorerUrl = this.getBlockExplorerUrl(order.quoteCurrency, order.destinationTxId)
-    const baseBlockExplorerUrl = this.getBlockExplorerUrl(order.baseCurrency, order.txId)
+    const quoteBlockExplorerUrl = this.getBlockExplorerUrl(order.quoteCurrency, order.quoteTxId)
+    const baseBlockExplorerUrl = this.getBlockExplorerUrl(order.baseCurrency, order.baseTxId)
 
     return (
       <div className={cn(styles.container, this.props.className)}>
@@ -207,7 +209,7 @@ class OrderSummary extends Component<Props> {
           <li>
             {t(`{{symbol}} Fee`, { symbol: order.quoteCurrency })}
             <hr />
-            <span>{txFee && txFee.toString()}</span>
+            <span>{txFee && `${txFee} RES`}</span>
           </li>
           <li>
             {t(`Max. Total Payout`)}

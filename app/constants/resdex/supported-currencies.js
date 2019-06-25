@@ -1,4 +1,5 @@
 // @flow
+import { remote } from 'electron'
 
 /*
 Info:
@@ -6,7 +7,8 @@ We use the `name` property only when the currency is not on `coinmarketcap.com`.
 */
 
 const supportedCurrencies = [
-	{
+  /*
+   {
 		coin: '$PAC',
 		rpcport: 7111,
 		pubtype: 55,
@@ -239,25 +241,26 @@ const supportedCurrencies = [
 		name: 'Beonbox',
 		etomic: '0x01e579be97433f861340268521a7a2ab9829082c',
 		rpcport: 80,
-	},
+  },
+  */
 	{
-		coin: 'BTC',
-    rpcport: 8332,
-		electrumServers: [
-			{
-				host: 'electrum1.cipig.net',
-				port: 10000,
-			},
-			{
-				host: 'electrum2.cipig.net',
-				port: 10000,
-			},
-			{
-				host: 'electrum3.cipig.net',
-				port: 10000,
-			},
-		],
-	},
+    coin: 'BTC',
+    electrumServers: [
+      {
+        host: 'electrum1.cipig.net',
+        port: 10000,
+      },
+      {
+        host: 'electrum2.cipig.net',
+        port: 10000,
+      },
+      {
+        host: 'electrum3.cipig.net',
+        port: 10000,
+      },
+    ],
+  },
+  /*
 	{
 		coin: 'BTCH',
 		name: 'Bitcoin Hush',
@@ -829,12 +832,21 @@ const supportedCurrencies = [
 			},
 		],
 	},
+	*/
 	{
-		coin: 'ETH',
-		etomic: '0x0000000000000000000000000000000000000000',
-    node: 'mainnet.infura.io/v3/125e6ea342154b6bb962b180a15ae497',
-		rpcport: 80,
-	},
+    coin: 'RES',
+    rpcport: 18132,
+  },
+  {
+     coin: 'ETH',
+     urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
+     swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
+     fname: 'Ethereum',
+     etomic: '0x0000000000000000000000000000000000000000',
+     rpcport: 80
+  },
+
+	/*
 	{
 		coin: 'ETHOS',
 		name: 'Ethos',
@@ -1099,7 +1111,7 @@ const supportedCurrencies = [
 				port: 10009,
 			},
 		],
-  }, */
+  },
 	{
 		coin: 'HODLC',
 		name: 'Hodlcoin',
@@ -1294,7 +1306,6 @@ const supportedCurrencies = [
 		wiftype: 176,
 		txfee: 100000,
 		electrumServers: [
-      /*
 			{
 				host: 'electrum1.cipig.net',
 				port: 10065,
@@ -1307,7 +1318,6 @@ const supportedCurrencies = [
 				host: 'electrum3.cipig.net',
 				port: 10065,
       },
-      */
       {
         host: '34.205.81.68',
         port: 10004,
@@ -2346,7 +2356,18 @@ const supportedCurrencies = [
 		name: '0x',
 		etomic: '0xE41d2489571d322189246DaFA5ebDe1F4699F498',
 		rpcport: 80,
-	},
+  },
+  */
 ]
 
+supportedCurrencies.forEach((currency, index) => {
+  if (currency.coin === 'RES') {
+    const resistanceConfig = remote.getGlobal('resistanceNodeConfig')
+    supportedCurrencies[index].confpath = resistanceConfig.configPath
+  }
+
+  supportedCurrencies[index].mm2 = 1
+})
+
+// '/Users/negus/Library/Application Support/Resistance/resistance.conf',
 export { supportedCurrencies }

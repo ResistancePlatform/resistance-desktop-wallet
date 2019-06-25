@@ -200,21 +200,7 @@ class StatusModal extends Component<Props> {
                     className={this.getChildProcessStatusClassNames('RESDEX')}
                     title={childProcess.getStatusName(this.props.settings.childProcessesStatus.RESDEX)}
                   />
-                  {t(`ResDEX 1`)}
-                </Tab>
-                <Tab className={styles.tab}>
-                  <i
-                    className={this.getChildProcessStatusClassNames('RESDEX_PRIVACY1')}
-                    title={childProcess.getStatusName(this.props.settings.childProcessesStatus.RESDEX_PRIVACY1)}
-                  />
-                  {t(`ResDEX 2`)}
-                </Tab>
-                <Tab className={styles.tab}>
-                  <i
-                    className={this.getChildProcessStatusClassNames('RESDEX_PRIVACY2')}
-                    title={childProcess.getStatusName(this.props.settings.childProcessesStatus.RESDEX_PRIVACY2)}
-                  />
-                  {t(`ResDEX 3`)}
+                  {t(`ResDEX`)}
                 </Tab>
               </TabList>
 

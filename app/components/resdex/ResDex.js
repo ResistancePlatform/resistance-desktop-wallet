@@ -5,7 +5,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
-import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
+// import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import ResDexLogin from './Login'
 import InstantDexDepositModal from './InstantDexDepositModal'
@@ -15,6 +15,7 @@ import AddCurrencyModal from './AddCurrencyModal'
 import OrderModal from './OrderModal'
 import ResDexAssets from './Assets'
 import ResDexBuySell from './BuySell'
+import ResDexAdvancedTrading from './AdvancedTrading'
 import ResDexOrders from './Orders'
 import ResDexAccounts from './Accounts'
 
@@ -43,21 +44,12 @@ export class ResDex extends Component<Props> {
 	 */
   getContents() {
     const { t } = this.props
+    const { isExpanded } = this.props.resDex.common
 
     return (
-      <div>
+      <div className={cn({[styles.expanded]: isExpanded})}>
         <RpcPolling
-          interval={15.0 * 60}
-          criticalChildProcess="RESDEX"
-          actions={{
-            polling: ResDexOrdersActions.kickStartStuckSwaps,
-            success: ResDexOrdersActions.kickStartStuckSwapsSucceeded,
-            failure: ResDexOrdersActions.kickStartStuckSwapsFailed
-          }}
-        />
-
-        <RpcPolling
-          interval={1.0}
+          interval={10.0}
           criticalChildProcess="RESDEX"
           actions={{
             polling: ResDexAccountsActions.getCurrencies,
@@ -66,8 +58,10 @@ export class ResDex extends Component<Props> {
           }}
         />
 
+        {
+        /*
         <RpcPolling
-          interval={1.5}
+          interval={3.5}
           criticalChildProcess="RESDEX"
           actions={{
             polling: ResDexAccountsActions.getZCredits,
@@ -75,6 +69,9 @@ export class ResDex extends Component<Props> {
             failure: ResDexAccountsActions.getZCreditsFailed
           }}
         />
+
+          */
+        }
 
         {this.props.resDex.accounts.instantDexDepositModal.isVisible &&
           <InstantDexDepositModal />
@@ -101,20 +98,24 @@ export class ResDex extends Component<Props> {
           <TabList className={styles.tabList}>
             <Tab className={styles.tab}>{t(`Assets`)}</Tab>
             <Tab className={styles.tab}>{t(`Buy/Sell`)}</Tab>
+            <Tab className={styles.tab}>{t(`Advanced Trading`)}</Tab>
             <Tab className={styles.tab}>{t(`Orders`)}</Tab>
             <Tab className={styles.tab}>{t(`Accounts`)}</Tab>
           </TabList>
 
-          <TabPanel className={cn(scrollStyles.scrollbar, scrollStyles.resdex)}>
+          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
             <ResDexAssets />
           </TabPanel>
-          <TabPanel className={cn(scrollStyles.scrollbar, scrollStyles.resdex)}>
+          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
             <ResDexBuySell />
           </TabPanel>
-          <TabPanel className={cn(scrollStyles.scrollbar, scrollStyles.resdex)}>
+          <TabPanel className={cn(styles.tabPanel)}>
+            <ResDexAdvancedTrading />
+          </TabPanel>
+          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
             <ResDexOrders />
           </TabPanel>
-          <TabPanel className={cn(scrollStyles.scrollbar, scrollStyles.resdex)}>
+          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
             <ResDexAccounts />
           </TabPanel>
 

@@ -244,11 +244,11 @@ function downloadDoneCallback(state, downloadItem, resolve, reject) {
 function registerDownloadListener(resolve, reject) {
   this.downloadListener = (e, downloadItem) => {
 
-    this.downloadItems.add(downloadItem)
-    this.totalBytes += downloadItem.getTotalBytes()
-
     const savePath = path.join(this.getResistanceParamsFolder(), downloadItem.getFilename())
     downloadItem.setSavePath(savePath)
+
+    this.downloadItems.add(downloadItem)
+    this.totalBytes += downloadItem.getTotalBytes()
 
     // It seems that Chrome doesn't perform error handling, came up with this check:
     if (downloadItem.getTotalBytes() === 0) {

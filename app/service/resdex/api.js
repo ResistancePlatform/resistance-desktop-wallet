@@ -1,18 +1,18 @@
 // @flow
 import { Decimal } from 'decimal.js'
+import moment from 'moment'
 import crypto from 'crypto'
 import rp from 'request-promise-native'
 import log from 'electron-log'
-import getPort from 'get-port'
 
 import { getActualSeedPhrase, getProcessSettings } from '~/service/resdex/resdex'
 import { getStore } from '~/store/configureStore'
 import { translate } from '~/i18next.config'
-import MarketmakerSocket from './marketmaker-socket'
 import { getCurrency } from '~/utils/resdex'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 
 
+const satoshiDivider = 100000000
 const t = translate('service')
 
 /**
@@ -68,32 +68,22 @@ class ResDexApiService {
     this.token = crypto.createHash('sha256').update(actualSeedPhrase).digest('hex')
   }
 
-	async enableSocket() {
-		const port = await getPort()
-		const {endpoint} = await this.query({method: 'getendpoint', port})
-		const socket = new MarketmakerSocket(endpoint)
-		await socket.connected
-		this.socket = socket
-
-		return this.socket
-	}
-
   sendWalletPassphrase(coin: string, password: string, timeout: number) {
 		return this.query({
 			method: 'walletpassphrase',
       coin,
 			password,
-      timeout: String(timeout)
+      timeout,
 		})
   }
 
   async getPendingSwaps() {
     const response = await this.query({
-      method: 'swapstatus',
-      pending: 1
+      method: 'my_recent_swaps',
     })
 
-    return response.swaps
+    // TODO: parse this correctly
+    return response.result.swaps
   }
 
   async instantDexDeposit(weeks: number, amount: object) {
@@ -107,20 +97,24 @@ class ResDexApiService {
     return response
   }
 
-  withdraw(opts) {
-    const currency = getCurrency(opts.symbol)
-    return currency.etomic
-      ? this::withdrawEth(opts)
-      : this::withdrawBtcFork(opts)
-  }
-
-	kickstart(requestId: number, quoteId: number) {
-		return this.query({
-			method: 'kickstart',
-			requestid: requestId,
-			quoteid: quoteId,
+  async withdraw(opts) {
+		const response = await this.query({
+			method: 'withdraw',
+			coin: opts.symbol,
+			amount: opts.amount,
+			to:opts.address,
+			broadcast: 1,
 		})
-	}
+
+		if (!response.tx_hash) {
+			throw new ResDexApiError(response, t(`Couldn't create withdrawal transaction`))
+		}
+
+		return {
+			...opts,
+			...response,
+		}
+  }
 
   setConfirmationsNumber(coin: string, confirmationsNumber: number) {
     return this.query({
@@ -130,22 +124,29 @@ class ResDexApiService {
     })
   }
 
-  async getRawTransaction(coin: string, txid: string) {
+  async getTransactionDetails(coin: string, txid: string) {
     return this.query({
-      method: 'getrawtransaction',
+      method: 'get_transaction_details',
       coin,
       txid,
     })
   }
 
-  async listTransactions(coin: string, address: string) {
+  async getTransactionHistory(coin: string, address: string) {
     const response = await this.query({
-      method: 'listtransactions',
+      method: 'my_tx_history',
       coin,
-      address
+      limit: 10,
+      from_id: null,
     })
 
-    if (response.length && response[0].tx_hash) {
+    if (!response.result || !response.result.transactions) {
+      return []
+    }
+
+    const { transactions } = response.result
+
+    if (transactions.length && transactions[0].tx_hash) {
       return []
 
       /*
@@ -160,10 +161,10 @@ class ResDexApiService {
       */
     }
 
-    const result = response.map(transaction => ({
+    const result = transactions.map(transaction => ({
       ...response,
       amount: Decimal(transaction.amount),
-      fee: Decimal(transaction.fee),
+      fee: Decimal(transaction.fee).dividedBy(satoshiDivider),
     }))
 
     return result
@@ -175,7 +176,7 @@ class ResDexApiService {
 			coin,
 		})
 
-		return Decimal(response.txfee)
+    return Decimal(response.txfee).dividedBy(satoshiDivider)
 	}
 
   getPortfolio() {
@@ -197,15 +198,24 @@ class ResDexApiService {
     let response
 
     try {
-      response = await this.query({ method: 'enable', coin: symbol })
+      log.debug(`Coin: ${JSON.stringify(currency)}`)
+      const queryParams = Object.assign({}, {method: 'enable', mm2: 1}, currency)
+      response = await this.query(queryParams)
+      log.debug(`Response is: ${JSON.stringify(response)}`)
     } catch(err) {
       if (err.message.includes('couldnt find coin locally installed')) {
         log.error(`Can't enable a currency that's not installed locally, re-trying in Electrum mode`)
-        return this::enableElectrumServers(symbol)
+        // return this::enableElectrumServers(symbol)
+				// TODO
+        // return response.status === 'active'
+        return false
       }
     }
 
-    return response.status === 'active'
+		// TODO
+    // return === 'active'
+
+    return true
   }
 
   disableCurrency(coin: string) {
@@ -222,8 +232,11 @@ class ResDexApiService {
 			rel,
 		})
 
+    log.debug("Order book", JSON.stringify(response))
+
 		const formatOrders = orders => orders
-			.filter(order => order.numutxos > 0)
+			// TODO
+			// .filter(order => order.numutxos > 0)
 			.map(order => ({
 				address: order.address,
 				depth: Decimal(order.depth),
@@ -247,17 +260,17 @@ class ResDexApiService {
    *
 	 * @memberof ResDexApiService
 	 */
-  createMarketOrder(opts) {
-    return this.query({
+  async createMarketOrder(opts) {
+    const response = await this.query({
       method: opts.type,
-      gtc: 1,
       duration: 240,
       base: opts.baseCurrency,
       rel: opts.quoteCurrency,
-      basevolume: opts.amount.toNumber(),
-      relvolume: opts.total.toNumber(),
+      volume: opts.amount.toNumber(),
       price: opts.price.toNumber(),
     })
+
+    return response.result
   }
 
   async balance(coin: string, address: string) {
@@ -271,6 +284,53 @@ class ResDexApiService {
       balance: Decimal(response.balance),
       zCredits: Decimal(response.zcredits)
     }
+  }
+
+  async getOhlc(base: string, rel: string, timescale: number) {
+    const response = await this.query({
+      method: 'tradesarray',
+      base,
+      rel,
+      timescale
+    })
+
+    // log.debug(`Trades array response`, JSON.stringify(response))
+
+    // [timestamp, high, low, open, close, relvolume, basevolume, aveprice, numtrades]
+    const trades = response.map(item => ({
+      date: moment.unix(item[0]).toDate(),
+      high: item[1],
+      low: item[2],
+      open: item[3],
+      close: item[4],
+      volume: item[6],
+    }))
+
+    return trades.filter(trade => trade.open > 0)
+  }
+
+  async getTrades(base: string, rel: string) {
+    const response = await this.query({
+      method: 'ticker',
+      base,
+      rel
+    })
+
+    // log.debug(`Ticker response`, JSON.stringify(response))
+
+    const trades = response.map(item => ({
+      time: moment.unix(item.timestamp).toDate(),
+      baseAmount: Decimal(item[base]),
+      quoteAmount: Decimal(item[rel]),
+      price: Decimal(item.price),
+    }))
+
+    return trades
+  }
+
+  async getRecentSwaps() {
+    const response = await this.query({ method: 'my_recent_swaps' })
+    return response.result
   }
 
   async stop() {
@@ -287,6 +347,7 @@ class ResDexApiService {
       method: 'setprice',
       base: opts.baseCurrency,
       rel: opts.quoteCurrency,
+      volume: opts.baseCurrencyAmount,
       price: opts.price.toNumber(),
     })
   }
@@ -356,89 +417,4 @@ async function enableElectrumServers(symbol) {
   }
 
   return success
-}
-
-async function withdrawBtcFork(opts) {
-  const {
-    txfee: txFeeSatoshis,
-    txid,
-    amount,
-    symbol,
-    address,
-  } = await this::createTransaction(opts)
-
-  // Convert from satoshis
-  const SATOSHIS = 100000000
-  const txFee = txFeeSatoshis / SATOSHIS
-
-  return {
-    txFee,
-    txid,
-    amount,
-    symbol,
-    address,
-  }
-}
-
-async function withdrawEth(opts) {
-  const {
-    eth_fee: txFee,
-    gas_price: gasPrice,
-    gas,
-  } = await this.query({
-    method: 'eth_withdraw',
-    coin: opts.symbol,
-    to: opts.address,
-    amount: opts.amount,
-    broadcast: 0,
-  })
-
-  let hasBroadcast = false
-
-  const broadcast = async () => {
-    if (hasBroadcast) {
-      throw new Error(t(`Transaction has already been broadcasted`))
-    }
-    hasBroadcast = true
-
-    const response = await this.query({
-      method: 'eth_withdraw',
-      gas,
-      gas_price: gasPrice,
-      coin: opts.symbol,
-      to: opts.address,
-      amount: opts.amount,
-      broadcast: 1,
-    }, t(`Couldn't create withdrawal transaction`))
-
-    return {
-      txid: response.tx_id,
-      symbol: opts.symbol,
-      amount: opts.amount,
-      address: opts.address,
-    }
-  }
-
-  return {
-    txFee,
-    broadcast,
-  }
-}
-
-async function createTransaction(opts) {
-  const response = await this.query({
-    method: 'withdraw',
-    coin: opts.symbol,
-    outputs: [{[opts.address]: opts.amount.toString()}],
-    broadcast: 1,
-  })
-
-  if (!response.complete) {
-    throw new ResDexApiError(response, t(`Couldn't create withdrawal transaction`))
-  }
-
-  return {
-    ...opts,
-    ...response,
-  }
 }

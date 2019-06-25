@@ -1,0 +1,43 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+}
+
+.chartContainer {
+  width: 100%;
+  height: 100%;
+}
+
+.widgetsContainer {
+  padding-left: 0.5rem;
+  padding-right: 0.75rem;
+  min-width: 24.75rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .buySellForm {
+    margin-left: 0.5rem;
+    margin-right: -0.65rem;
+  }
+}
+
+.listsContainer {
+  display: flex;
+  flex-direction: row;
+  margin-top: 1rem;
+  margin-right: 0;
+  margin-bottom: 4rem;
+  height: 100%;
+  width: 100%;
+
+  .orderBook {
+    margin-right: 1rem;
+    flex-direction: column !important;
+    justify-content: space-between;
+    margin-top: 0;
+    width: 100%;
+  }
+}

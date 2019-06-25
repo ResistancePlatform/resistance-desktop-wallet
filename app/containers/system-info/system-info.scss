@@ -10,6 +10,11 @@
     min-width: 46rem;
 
     background-color: $SYSTEM_INFO_BAR_BACKGROUND_COLOR;
+
+    &.shrink {
+      min-height: 0;
+      height: 0;
+    }
 }
 
 .statusColumnWrapper {

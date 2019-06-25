@@ -45,6 +45,7 @@ class NaviBar extends Component<Props> {
 
 	render() {
     const { t } = this.props
+    const { isExpanded: isResDexExpanded } = this.props.resDex.common
 
     const getItemClasses = path => ({
       [HLayout.hBoxContainer]: true,
@@ -56,7 +57,7 @@ class NaviBar extends Component<Props> {
     const resDexStatus = this.props.settings.childProcessesStatus.RESDEX
 
 		return (
-      <div className={cn(styles.container)} data-tid="navi-bar-container">
+      <div className={cn(styles.container, {[styles.shrink]: isResDexExpanded})} data-tid="navi-bar-container">
         <div className={styles.draggableContainer}>
           {/* Route items */}
           <div className={cn(styles.overview, getItemClasses('/overview'))}>

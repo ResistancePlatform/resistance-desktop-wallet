@@ -16,38 +16,38 @@ const RESDEX = {
       symbol: 'RES',
       useElectrum: false
     },
+    {
+      symbol: 'ETH',
+      useElectrum: true
+    },
     // {
-    //   symbol: 'ETOMIC',
-    //   useElectrum: false
-    // },
-    // {
-    //   symbol: 'ETH',
+    //   symbol: 'BTC',
     //   useElectrum: true
     // },
-    {
-      symbol: 'BTC',
-      useElectrum: true
-    },
-    {
-      symbol: 'LTC',
-      useElectrum: true
-    },
-    {
-      symbol: 'DGB',
-      useElectrum: true
-    },
-    {
-      symbol: 'MONA',
-      useElectrum: true
-    },
-    // {
-    //   symbol: 'NEXO',
-    //   useElectrum: true
-    // },
-    // {
-    //   symbol: 'ZIL',
-    //   useElectrum: true
-    // },
+  ],
+  errorEvents: [
+    'StartFailed',
+    'NegotiateFailed',
+    'TakerFeeSendFailed',
+    'MakerPaymentValidateFailed',
+    'TakerPaymentTransactionFailed',
+    'TakerPaymentDataSendFailed',
+    'TakerPaymentWaitForSpendFailed',
+    'MakerPaymentSpendFailed',
+    'TakerPaymentRefunded',
+    'TakerPaymentRefundFailed'
+  ],
+  successEvents: [
+    'Started',
+    'Negotiated',
+    'TakerFeeSent',
+    'MakerPaymentReceived',
+    'MakerPaymentWaitConfirmStarted',
+    'MakerPaymentValidatedAndConfirmed',
+    'TakerPaymentSent',
+    'TakerPaymentSpent',
+    'MakerPaymentSpent',
+    'Finished'
   ]
 }
 

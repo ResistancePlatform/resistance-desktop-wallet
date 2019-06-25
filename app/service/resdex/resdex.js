@@ -11,8 +11,8 @@ import { ChildProcessService } from '../child-process-service'
 import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 
 
-const netId = 2045
-const seedNodeAddress = '34.201.64.15'
+const netId = 1234
+const seedNodeAddress = '54.226.203.173'
 // const seedNodeAddress = '35.174.118.206'
 
 const processSettings = {
@@ -97,19 +97,17 @@ export class ResDexService {
     const { uri, rpcPort, folderName } = getProcessSettings(processName)
 
     const options = {
-      gui: 'resdex',
-      client: 1,
       netid: netId,
       rpcport: rpcPort,
-      canbind: 0,
-      seednode: seedNodeAddress,
+      seednodes: [seedNodeAddress],
       userhome,
       passphrase: getActualSeedPhrase(processName, seedPhrase),
       coins: currenciesWithoutElectrum,
+      tx_history: true,
     }
 
     if (processName !== 'RESDEX') {
-      options.privacy = processName === 'RESDEX_PRIVACY1' ? '1' : '2'
+      options.privacy = processName === 'RESDEX_PRIVACY1' ? 1 : 2
     }
 
     const resDexParentDir = path.join(getAppDataPath(), 'ResDEX')
@@ -153,17 +151,28 @@ function checkApiAvailability(uri) {
 
     try {
       const response = await rp({
+        method: 'POST',
         uri,
+        body: {},
+        json: true, // Automatically stringifies the body to JSON
         resolveWithFullResponse: true,
       })
 
-      const result = response.statusCode === 200
+      log.debug(`${JSON.stringify(response)}`)
+
+      const result = response.statusCode === 500
       if (result) {
         log.debug(`ResDEX process on ${uri} is ready!`)
       }
 
       return result
     } catch (err) {
+      log.debug(`${JSON.stringify(err)}`)
+      const result = err.statusCode === 500
+      if (result) {
+        log.debug(`ResDEX process on ${uri} is ready!`)
+        return true
+      }
       return false
     }
   }

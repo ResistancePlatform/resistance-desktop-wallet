@@ -1,6 +1,26 @@
 @import "~/assets/styles/vars.scss";
 @import "~/assets/styles/tabs.scss";
 
+.expanded {
+  margin-top: -3rem;
+  position: relative;
+  padding-right: 0.5rem;
+
+  .tabList {
+    padding-left: 5rem;
+  }
+
+  .selectedMainTabPanel {
+    height: 100%;
+    &::after {
+      border: none;
+    }
+
+  }
+
+  height: 100%;
+}
+
 .dragBar {
   -webkit-app-region: drag;
   height: 3.2rem;

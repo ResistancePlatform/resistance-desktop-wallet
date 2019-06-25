@@ -2,18 +2,13 @@
 import { Decimal } from 'decimal.js'
 import * as Joi from 'joi'
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import log from 'electron-log'
 
 import { toDecimalPlaces } from '~/utils/decimal'
-import RpcPolling from '~/components/rpc-polling/rpc-polling'
-import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
-import { ResDexState } from '~/reducers/resdex/resdex.reducer'
-import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import {
   Info,
   RoundedForm,
@@ -24,10 +19,21 @@ import {
   PriceInput,
   ChooseWalletInput
 } from '~/components/rounded-form'
-import OrderSummary from './OrderSummary'
-import OrderBook from './OrderBook'
+import { ResDexState } from '~/reducers/resdex/resdex.reducer'
+import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 
-import styles from './BuySell.scss'
+import styles from './BuySellForm.scss'
+
+type Props = {
+  t: any,
+  className?: string,
+  isAdvanced?: boolean,
+  form: object,
+  buySell: ResDexState.buySell,
+  orders: ResDexState.orders,
+  accounts: ResDexState.accounts,
+  actions: object
+}
 
 function getValidationSchema(t, isAdvanced) {
   return Joi.object().keys({
@@ -42,22 +48,11 @@ function getValidationSchema(t, isAdvanced) {
   })
 }
 
-type Props = {
-  t: any,
-  form: object,
-  buySell: ResDexState.buySell,
-  orders: ResDexState.orders,
-  accounts: ResDexState.accounts,
-  actions: object,
-  formActions: object
-}
-
-
 /**
- * @class ResDexBuySell
+ * @class BuySellForm
  * @extends {Component<Props>}
  */
-class ResDexBuySell extends Component<Props> {
+class BuySellForm extends Component<Props> {
 	props: Props
 
   getMaxQuoteAmount() {
@@ -70,59 +65,6 @@ class ResDexBuySell extends Component<Props> {
     const { orderBook } = this.props.buySell
     const { asks  } = orderBook.baseQuote
     return asks.length ? asks[0].price : null
-  }
-
-  // Can't create a market order if there's no liquidity or when sending an order
-  getSubmitButtonDisabledAttribute(order) {
-    const { swapHistory } = this.props.orders
-    const { baseCurrency, quoteCurrency, orderBook, isSendingOrder } = this.props.buySell
-
-    if (!order.isMarket) {
-      return isSendingOrder
-    }
-
-    const arePendingPrivateOrdersPresent = swapHistory.filter(
-      swap => swap.isPrivate &&
-      !['completed', 'failed'].includes(swap.privacy.status)
-    ).length
-
-    const areAllAsksPresent = order.isPrivate
-      ? orderBook.resQuote.asks.length && orderBook.baseRes.asks.length
-      : orderBook.baseQuote.asks.length
-
-    return (
-      isSendingOrder
-      || orderBook.baseCurrency !== baseCurrency
-      || orderBook.quoteCurrency !== quoteCurrency
-      || !areAllAsksPresent
-      || arePendingPrivateOrdersPresent
-    )
-
-  }
-
-  getOrder() {
-    const { form } = this.props
-    const quoteCurrencyAmount = Decimal(form && form.fields.maxRel || '0')
-
-    const { baseCurrency, quoteCurrency, orderBook } = this.props.buySell
-    const { asks } = orderBook.baseQuote
-    const { price } = asks.length && asks[0]
-    const { isAdvanced } = this.props.buySell
-
-    const isMarket = form && form.fields.isMarketOrder || !isAdvanced
-
-    const isPrivate = Boolean(form && form.fields.enhancedPrivacy && isMarket)
-
-    const order = {
-      quoteCurrencyAmount,
-      price: price || null,
-      baseCurrency,
-      quoteCurrency,
-      isMarket,
-      isPrivate,
-    }
-
-    return order
   }
 
   getZCreditsQuoteEquivalent() {
@@ -182,18 +124,59 @@ class ResDexBuySell extends Component<Props> {
     return zCredits.greaterThanOrEqualTo(Decimal(maxRel))
   }
 
-  getForm(isAdvanced: boolean, order: object) {
-    const { t } = this.props
+  getOrderAttributes() {
+    const { form, isAdvanced } = this.props
+    const isMarket = form && form.fields.isMarketOrder || !isAdvanced
+    const isPrivate = Boolean(form && form.fields.enhancedPrivacy && isMarket)
+    return {
+      isMarket,
+      isPrivate
+    }
+  }
+
+  // Can't create a market order if there's no liquidity or when sending an order
+  getSubmitButtonDisabledAttribute() {
+    const { swapHistory } = this.props.orders
+    const { baseCurrency, quoteCurrency, orderBook, isSendingOrder } = this.props.buySell
+
+    const orderAttrs = this.getOrderAttributes()
+
+    if (!orderAttrs.isMarket) {
+      return isSendingOrder
+    }
+
+    const arePendingPrivateOrdersPresent = swapHistory.filter(
+      swap => swap.isPrivate &&
+      !['completed', 'failed'].includes(swap.privacy.status)
+    ).length
+
+    const areAllAsksPresent = orderAttrs.isPrivate
+      ? orderBook.resQuote.asks.length && orderBook.baseRes.asks.length
+      : orderBook.baseQuote.asks.length
+
+    return (
+      isSendingOrder
+      || orderBook.baseCurrency !== baseCurrency
+      || orderBook.quoteCurrency !== quoteCurrency
+      || !areAllAsksPresent
+      || arePendingPrivateOrdersPresent
+    )
+
+  }
+
+  render() {
+    const { t, isAdvanced } = this.props
     const { baseCurrency, quoteCurrency } = this.props.buySell
     const txFee = this.props.accounts.currencyFees[quoteCurrency]
     log.info(" baseCurrency, quoteCurrency ", baseCurrency, quoteCurrency)
 
+    const orderAttrs = this.getOrderAttributes()
     const isInstantSwapAllowed = this.getIsInstanceSwapAllowed()
 
     return (
       <RoundedForm
         id="resDexBuySell"
-        className={styles.form}
+        className={cn(styles.form, this.props.className)}
         schema={getValidationSchema(t, isAdvanced)}
         clearOnUnmount
       >
@@ -269,7 +252,7 @@ class ResDexBuySell extends Component<Props> {
                   bestPrice={this.getBestPrice()}
                   baseCurrency={baseCurrency}
                   quoteCurrency={quoteCurrency}
-                  disabled={order.isMarket && order.isPrivate}
+                  disabled={orderAttrs.isMarket && orderAttrs.isPrivate}
                 />
 
               </div>
@@ -291,7 +274,7 @@ class ResDexBuySell extends Component<Props> {
           )
         }
 
-        {order.isMarket &&
+        {orderAttrs.isMarket &&
         <div className={styles.bottomControls}>
 
           <CheckBox name="enhancedPrivacy" className={styles.enhancedPrivacyCheckbox} defaultValue={false}>
@@ -328,95 +311,23 @@ class ResDexBuySell extends Component<Props> {
           type="submit"
           className={styles.exchangeButton}
           onClick={
-            order.isPrivate
+            orderAttrs.isPrivate
             ? this.props.actions.createPrivateOrder
             : this.props.actions.createOrder
           }
-          disabled={txFee && this.getSubmitButtonDisabledAttribute(order)}
+          disabled={txFee && this.getSubmitButtonDisabledAttribute()}
           spinner={this.props.buySell.isSendingOrder}
           spinnerTooltip={t(`Sending the order...`)}
           important
-          large
+          large={!isAdvanced}
         >
-          {order.isMarket ? t(`Exchange`) : t(`Add to order book`)}
+          {orderAttrs.isMarket ? t(`Exchange`) : t(`Add to order book`)}
         </RoundedButton>
       </RoundedForm>
     )
 
   }
 
-	/**
-	 * @returns
-   * @memberof ResDexBuySell
-	 */
-	render() {
-    const { t } = this.props
-    const order = this.getOrder()
-    const { baseCurrency, quoteCurrency } = this.props.buySell
-    const { RESDEX: currencies } = this.props.accounts.currencies
-
-    const baseSmartAddress = baseCurrency in currencies ? currencies[baseCurrency].address : null
-    const quoteSmartAddress = quoteCurrency in currencies ? currencies[quoteCurrency].address : null
-
-		return (
-      <div className={cn(styles.container)}>
-
-        <div className={styles.topContainer}>
-          <RpcPolling
-            criticalChildProcess="RESDEX"
-            interval={10.0}
-            actions={{
-              polling: ResDexBuySellActions.getOrderBook,
-              success: ResDexBuySellActions.gotOrderBook,
-              failure: ResDexBuySellActions.getOrderBookFailed
-            }}
-          />
-
-          <div className={styles.actionContainer}>
-            <Tabs
-              className={styles.tabs}
-              selectedIndex={this.props.buySell.selectedTabIndex}
-              onSelect={tabIndex => this.props.actions.selectTab(tabIndex)}
-              selectedTabClassName={styles.selectedTab}
-              selectedTabPanelClassName={styles.selectedTabPanel}
-            >
-              <TabList className={styles.tabList}>
-                <Tab className={styles.tab}>{t(`Simple`)}</Tab>
-                <Tab className={styles.tab}>{t(`Advanced`)}</Tab>
-              </TabList>
-
-              <TabPanel className={styles.tabPanel}>
-                {this.getForm(false, order)}
-              </TabPanel>
-
-              <TabPanel className={styles.tabPanel}>
-                {this.getForm(true, order)}
-              </TabPanel>
-
-            </Tabs>
-
-          </div>
-
-          <div className={styles.orderSummaryContainer}>
-            <OrderSummary order={order} />
-          </div>
-        </div>
-
-        {this.props.buySell.isAdvanced &&
-          <OrderBook
-            className={styles.orderBook}
-            baseCurrency={baseCurrency}
-            quoteCurrency={quoteCurrency}
-            baseSmartAddress={baseSmartAddress}
-            quoteSmartAddress={quoteSmartAddress}
-            onPickPrice={price => this.props.formActions.updateField('resDexBuySell', 'price', price.toString())}
-            orderBook={this.props.buySell.orderBook.baseQuote}
-          />
-        }
-
-      </div>
-    )
-  }
 }
 
 const mapStateToProps = (state) => ({
@@ -428,7 +339,6 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(ResDexBuySellActions, dispatch),
-  formActions: bindActionCreators(RoundedFormActions, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexBuySell))
+export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(BuySellForm))

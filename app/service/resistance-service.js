@@ -100,7 +100,7 @@ export class ResistanceService {
 	 */
   checkAndCreateConfig(): Object {
     const configFolder = this.getDataPath()
-    const configFile = path.join(configFolder, configFileName)
+    const configPath = path.join(configFolder, configFileName)
 
     if (!fs.existsSync(configFolder)) {
       fs.mkdirSync(configFolder)
@@ -108,17 +108,19 @@ export class ResistanceService {
 
     let resistanceNodeConfig
 
-    if (fs.existsSync(configFile)) {
-      resistanceNodeConfig = PropertiesReader(configFile).path()
-      log.info(`The Resistance config file ${configFile} exists and does not need to be created.`)
+    if (fs.existsSync(configPath)) {
+      resistanceNodeConfig = PropertiesReader(configPath).path()
+      log.info(`The Resistance config file ${configPath} exists and does not need to be created.`)
     } else {
-      resistanceNodeConfig = this.createConfig(configFile)
-      log.info(`The Resistance config file ${configFile} was successfully created.`)
+      resistanceNodeConfig = this.createConfig(configPath)
+      log.info(`The Resistance config file ${configPath} was successfully created.`)
     }
 
     if (!resistanceNodeConfig.rpcport) {
       resistanceNodeConfig.rpcport = resistanceNodeConfig.testnet ? 18132 : 8132
     }
+
+    resistanceNodeConfig.configPath = configPath
 
     return resistanceNodeConfig
   }

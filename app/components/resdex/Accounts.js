@@ -132,7 +132,7 @@ class ResDexAccounts extends Component<Props> {
 
           <div className={styles.balance}>
             <span>{getCurrencyName(symbol)}</span>
-            {currency ? `${currency.balance} ${symbol}` : t(`N/A`)}
+            {currency ? `${toDecimalPlaces(currency.balance)} ${symbol}` : t(`N/A`)}
           </div>
 
           <div className={styles.equity}>
@@ -223,7 +223,7 @@ class ResDexAccounts extends Component<Props> {
       <div className={cn(styles.container)}>
 
         <RpcPolling
-          interval={5.0 * 60}
+          interval={2.0 * 60}
           criticalChildProcess="RESDEX"
           actions={{
             polling: ResDexAccountsActions.getTransactions,
