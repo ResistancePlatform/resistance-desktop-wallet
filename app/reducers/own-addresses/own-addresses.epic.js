@@ -6,6 +6,7 @@ import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 import LedgerRes from 'ledger-res'
 import Client from 'bitcoin-core'
+import log from 'electron-log'
 import winston from 'winston'
 
 import { i18n } from '~/i18next.config'
@@ -21,8 +22,7 @@ let ledgerRpcClient
 let ledgerRes
 
 
-
-;(async () => {
+(async () => {
   try {
 
     const logger = winston.createLogger({
@@ -60,7 +60,7 @@ let ledgerRes
     console.log(err)
   }
 
-})();
+})()
 
 const getOwnAddressesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.getOwnAddresses),
@@ -71,7 +71,15 @@ const getOwnAddressesEpic = (action$: ActionsObservable<Action>) => action$.pipe
 const createAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.createAddress),
   switchMap(action => rpc.createNewAddress(action.payload.isPrivate)),
-  map(result => result ? OwnAddressesActions.getOwnAddresses() : OwnAddressesActions.empty())
+  catchError(err => {
+    log.error(`Can't create a new address`, err)
+    toastr.error(`Unable to create new address, check the log for details`)
+    return of(OwnAddressesActions.empty())
+  }),
+  map(() => {
+    toastr.success(t(`New address created successfully`))
+    return OwnAddressesActions.getOwnAddresses()
+  })
 )
 
 const initiatePrivateKeysExportEpic = (action$: ActionsObservable<Action>) => action$.pipe(
