@@ -46,6 +46,9 @@ export class MinerService {
       args.push(`--threads=${threadsNumber}`)
     }
 
+    // Mining address
+    // args.push(`--coinbase-addr=rpTFwK6gPqkXJA7CvJff2jXpgtdd3GJuB5C`)
+
     await childProcess.startProcess({processName: 'MINER', args, outputHandler: this.handleOutput})
 	}
 
