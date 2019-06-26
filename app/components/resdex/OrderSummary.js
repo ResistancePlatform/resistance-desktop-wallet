@@ -41,15 +41,12 @@ class OrderSummary extends Component<Props> {
   }
 
   getBaseAmount(): Decimal | null {
-    const { baseCurrency, quoteCurrencyAmount, price } = this.props.order
-    let txFee = this.getTxFee() || Decimal(0)
+    const { quoteCurrencyAmount, price } = this.props.order
+    const txFee = this.getTxFee() || Decimal(0)
 
     if (price === null) {
       return null
     }
-
-    // TODO: Fix it
-    txFee = Decimal(0)
 
     const dexFee = RESDEX.dexFee.div(Decimal('100'))
     const divider = Decimal(price).plus(Decimal(price).times(dexFee)).plus(txFee)
@@ -209,7 +206,7 @@ class OrderSummary extends Component<Props> {
           <li>
             {t(`{{symbol}} Fee`, { symbol: order.quoteCurrency })}
             <hr />
-            <span>{txFee && `${txFee} RES`}</span>
+            <span>{txFee && `${txFee}`}</span>
           </li>
           <li>
             {t(`Max. Total Payout`)}

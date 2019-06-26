@@ -13,6 +13,7 @@ import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 
 
 const satoshiDivider = 100000000
+const weiDivider = 1000000000000000000
 const t = translate('service')
 
 /**
@@ -133,6 +134,8 @@ class ResDexApiService {
   }
 
   async getTransactionHistory(coin: string) {
+		const currency = getCurrency(coin)
+
     const response = await this.query({
       method: 'my_tx_history',
       coin,
@@ -161,22 +164,35 @@ class ResDexApiService {
       */
     }
 
+    const divider = currency.etomic ? weiDivider : satoshiDivider
+
     const result = transactions.map(transaction => ({
       ...response,
       amount: Decimal(transaction.amount),
-      fee: Decimal(transaction.fee).dividedBy(satoshiDivider),
+      fee: Decimal(transaction.fee).dividedBy(divider),
     }))
 
     return result
   }
 
 	async getFee(coin) {
-		const response = await this.query({
-			method: 'getfee',
-			coin,
-		})
+		const currency = getCurrency(coin)
 
-    return Decimal(response.txfee).dividedBy(satoshiDivider)
+    let response
+
+    try {
+      response = await this.query({
+        method: 'getfee',
+        coin,
+      })
+      log.debug(`Get fee response`, response)
+    } catch(err) {
+      log.error(`Can't get fee for ${coin}, assuming 0.0001`, err)
+      return Decimal('0.0001')
+    }
+
+    const divider = currency.etomic ? weiDivider : satoshiDivider
+    return Decimal(response.txfee).dividedBy(divider)
 	}
 
   getPortfolio() {
@@ -207,8 +223,10 @@ class ResDexApiService {
 
     try {
       response = await this.query(queryParams)
-      log.debug("Enable currency response", symbol, useElectrum, response)
+      log.debug(`Enable currency response`, symbol, response)
     } catch(err) {
+      log.debug(`Error enabling currency`, symbol, response)
+
       if (err.message.includes('couldnt find coin locally installed')) {
         log.error(`Can't enable a currency that's not installed locally, re-trying in Electrum mode`)
         return this::enableWithElectrum(symbol)

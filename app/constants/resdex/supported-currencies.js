@@ -233,8 +233,6 @@ const supportedCurrencies = [
   },
   {
     coin: 'ETH',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
     fname: 'Ethereum',
     etomic: '0x0000000000000000000000000000000000000000',
     rpcport: 80
@@ -290,8 +288,6 @@ const supportedCurrencies = [
   {
     coin: 'ICX',
     name: 'ICON',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xb5a5f22694352c15b00323844ad545abb2b11028',
     decimals: 18,
     rpcport: 80,
@@ -299,8 +295,6 @@ const supportedCurrencies = [
   {
     coin: 'IOST',
     name: 'IOST',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xfa1a856cfa3409cfa145fa4e20eb270df3eb21ab',
     rpcport: 80,
   },
@@ -324,24 +318,18 @@ const supportedCurrencies = [
   {
     coin: 'KNC',
     name: 'Kyber Network',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xdd974D5C2e2928deA5F71b9825b8b646686BD200',
     rpcport: 80,
   },
   {
     coin: 'LINK',
     name: 'ChainLink',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x514910771af9ca656af840dff83e8264ecf986ca',
     rpcport: 80,
   },
   {
     coin: 'LOOM',
     name: 'Loom Network',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xa4e8c3ec456107ea67d3075bf9e3df3a75823db0',
     rpcport: 80,
   },
@@ -374,32 +362,24 @@ const supportedCurrencies = [
   {
     coin: 'LUN',
     name: 'Lunyr',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xfa05A73FfE78ef8f1a739473e462c54bae6567D9',
     rpcport: 80,
   },
   {
     coin: 'MAN',
     name: 'Matrix AI Network',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xe25bcec5d3801ce3a794079bf94adf1b8ccd802d',
     rpcport: 80,
   },
   {
     coin: 'MANA',
     name: 'Decentraland',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x0F5D2fB29fb7d3CFeE444a200298f468908cC942',
     rpcport: 80,
   },
   {
     coin: 'MCO',
     name: 'Monaco',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xB63B606Ac810a52cCa15e44bB630fd42D8d1d83d',
     rpcport: 80,
   },
@@ -432,80 +412,60 @@ const supportedCurrencies = [
   {
     coin: 'MTL',
     name: 'Metal',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xF433089366899D83a9f26A773D59ec7eCF30355e',
     rpcport: 80,
   },
   {
     coin: 'NAS',
     name: 'Nebulas',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x5d65d971895edc438f465c17db6992698a52318d',
     rpcport: 80,
   },
   {
     coin: 'NEXO',
     name: 'nexo',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
     etomic: '0xb62132e35a6c13ee1ee0f84dc5d40bad8d815206',
-    urls: [ 'mainnet.infura.io/v3/125e6ea342154b6bb962b180a15ae497'],
     rpcport: 80,
   },
   {
     coin: 'NULS',
     name: 'Nuls',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xb91318f35bdb262e9423bc7c7c2a3a93dd93c92c',
     rpcport: 80,
   },
   {
     coin: 'OMG',
     name: 'OmiseGo',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xd26114cd6EE289AccF82350c8d8487fedB8A0C07',
     rpcport: 80,
   },
   {
     coin: 'PAY',
     name: 'TenX',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xB97048628DB6B661D4C2aA833e95Dbe1A905B280',
     rpcport: 80,
   },
   {
     coin: 'POLY',
     name: 'Polymath',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x9992ec3cf6a55b00978cddf2b27bc6882d88d1ec',
     rpcport: 80,
   },
   {
     coin: 'POWR',
     name: 'Power Ledger',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x595832f8fc6bf59c85c527fec3740a1b7a361269',
     rpcport: 80,
   },
   {
     coin: 'QASH',
     name: 'Qash',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x618E75Ac90b12c6049Ba3b27f5d5F8651b0037F6',
     rpcport: 80,
   },
   {
     coin: 'QSP',
     name: 'Quantstamp',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x99ea4dB9EE77ACD40B119BD1dC4E33e1C070b80d',
     rpcport: 80,
   },
@@ -538,24 +498,18 @@ const supportedCurrencies = [
   {
     coin: 'RCN',
     name: 'Ripio Credit Network',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xF970b8E36e23F7fC3FD752EeA86f8Be8D83375A6',
     rpcport: 80,
   },
   {
     coin: 'RDN',
     name: 'Raiden Network Token',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x255Aa6DF07540Cb5d3d297f0D0D4D84cb52bc8e6',
     rpcport: 80,
   },
   {
     coin: 'REQ',
     name: 'Request Network',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x8f8221aFbB33998d8584A2B05749bA73c37a938a',
     rpcport: 80,
   },
@@ -568,64 +522,48 @@ const supportedCurrencies = [
   {
     coin: 'SALT',
     name: 'Salt',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x4156D3342D5c385a87D264F90653733592000581',
     rpcport: 80,
   },
   {
     coin: 'SNT',
     name: 'Status',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x744d70FDBE2Ba4CF95131626614a1763DF805B9E',
     rpcport: 80,
   },
   {
     coin: 'SRN',
     name: 'SIRIN LABS Token',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x68d57c9a1c35f63e2c83ee8e49a64e9d70528d25',
     rpcport: 80,
   },
   {
     coin: 'STORJ',
     name: 'Storj',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC',
     rpcport: 80,
   },
   {
     coin: 'THETA',
     name: 'Theta Token',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x3883f5e181fccaF8410FA61e12b59BAd963fb645',
     rpcport: 80,
   },
   {
     coin: 'USDT',
     name: 'Tether',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
-    etomic: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+    etomic: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
     rpcport: 80,
   },
   {
     coin: 'WAX',
     name: 'WAX',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0x39Bb259F66E1C59d5ABEF88375979b4D20D98022',
     rpcport: 80,
   },
   {
     coin: 'WTC',
     name: 'Waltonchain',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xb7cb1c96db6b22b0d3d9536e0108d062bd488f74',
     rpcport: 80,
   },
@@ -674,23 +612,28 @@ const supportedCurrencies = [
   {
     coin: 'ZIL',
     name: 'Zilliqa',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
     etomic: '0x05f4a42e251f2d52b8ed15e9fedaacfcef1fad27',
-    urls: [ 'mainnet.infura.io/v3/125e6ea342154b6bb962b180a15ae497'],
     rpcport: 80,
   },
   {
     coin: 'ZRX',
     name: '0x',
-    swap_contract_address: '0x8500AFc0bc5214728082163326C2FF0C73f4a871',
-    urls: ['https://mainnet.infura.io/v4/125e6ea342154b6bb962b180a15ae497'],
     etomic: '0xE41d2489571d322189246DaFA5ebDe1F4699F498',
     rpcport: 80,
   },
 ]
 
-const resCurrency = supportedCurrencies.find(c => c.coin === 'RES')
-const resistanceConfig = remote.getGlobal('resistanceNodeConfig')
-resCurrency.confpath = resistanceConfig.configPath
+supportedCurrencies.forEach((_, index) => {
+  const currency = supportedCurrencies[index]
+
+  if (currency.etomic) {
+    currency.swap_contract_address = '0x8500AFc0bc5214728082163326C2FF0C73f4a871'
+    currency.urls = ['https://mainnet.infura.io/v3/221b0130b86441818f62fa33b348ec75']
+  } else if (currency.coin === 'RES') {
+    const resistanceConfig = remote.getGlobal('resistanceNodeConfig')
+    currency.confpath = resistanceConfig.configPath
+  }
+
+})
 
 export { supportedCurrencies }
