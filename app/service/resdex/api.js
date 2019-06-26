@@ -192,30 +192,30 @@ class ResDexApiService {
 		}
 
 		if (useElectrum && currency.electrumServers) {
-      return this::enableElectrumServers(symbol)
+      return this::enableWithElectrum(symbol)
 		}
 
     let response
 
+    log.debug(`Enable currency: ${JSON.stringify(currency)}`)
+
+    const queryParams = {
+      ...currency,
+      method: 'enable',
+      mm2: 1,
+    }
+
     try {
-      log.debug(`Coin: ${JSON.stringify(currency)}`)
-      const queryParams = Object.assign({}, {method: 'enable', mm2: 1}, currency)
       response = await this.query(queryParams)
-      log.debug(`Response is: ${JSON.stringify(response)}`)
+      log.debug("Enable currency response", symbol, useElectrum, response)
     } catch(err) {
       if (err.message.includes('couldnt find coin locally installed')) {
         log.error(`Can't enable a currency that's not installed locally, re-trying in Electrum mode`)
-        // return this::enableElectrumServers(symbol)
-				// TODO
-        // return response.status === 'active'
-        return false
+        return this::enableWithElectrum(symbol)
       }
     }
 
-		// TODO
-    // return === 'active'
-
-    return true
+    return response && response.result === 'success'
   }
 
   disableCurrency(coin: string) {
@@ -391,30 +391,13 @@ class ResDexApiService {
 
 /* Private methods */
 
-async function enableElectrumServers(symbol) {
-  const currency = getCurrency(symbol)
-
-  const queries = currency.electrumServers.map(server => this.query({
+async function enableWithElectrum(symbol) {
+  const response = await this.query({
     method: 'electrum',
     coin: symbol,
-    ipaddr: server.host,
-    port: server.port,
-  }))
+    mm2: 1,
+  })
 
-  let responses
-
-  try {
-    responses = await Promise.all(queries)
-  } catch(err) {
-    log.error(`Error enabling Electrum currency`, err)
-    return false
-  }
-
-  const success = responses.filter(response => response.result === 'success').length > 0
-
-  if (!success) {
-    log.error(`Could not connect to {{symbol}} Electrum server`)
-  }
-
-  return success
+  log.debug(`Electrum call response:`, response)
+  return response && response.result === 'success'
 }
