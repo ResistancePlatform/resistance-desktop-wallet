@@ -17,6 +17,7 @@ export const ResDexLoginActions = createActions(
     LOGIN_FAILED: (errorMessage: string) => ({ errorMessage }),
     SHOW_DIALOG: undefined,
 
+    CONFIRM_LOGOUT: undefined,
     LOGOUT: undefined,
     LOGOUT_SUCCEEDED: undefined,
     LOGOUT_FAILED: undefined,

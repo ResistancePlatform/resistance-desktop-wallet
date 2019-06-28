@@ -46,7 +46,7 @@ export class ResDex extends Component<Props> {
 	 */
   getContents() {
     const { t } = this.props
-    const { isExpanded } = this.props.resDex.common
+    const { isExpanded, selectedTabIndex } = this.props.resDex.common
 
     return (
       <div className={cn({[styles.expanded]: isExpanded})}>
@@ -104,13 +104,15 @@ export class ResDex extends Component<Props> {
             <Tab className={styles.tab}>{t(`Orders`)}</Tab>
             <Tab className={styles.tab}>{t(`Accounts`)}</Tab>
 
-            <BorderlessButton
-              className={styles.logoutButton}
-              glyphClassName={styles.logoutGlyph}
-              onClick={this.props.loginActions.logout}
-              disabled={getIsLoginDisabled(this.props)}
-              tooltip={t(`Logout`)}
-            />
+            {selectedTabIndex == 4 &&
+              <BorderlessButton
+                className={styles.logoutButton}
+                glyphClassName={styles.logoutGlyph}
+                onClick={this.props.loginActions.confirmLogout}
+                disabled={getIsLoginDisabled(this.props)}
+                tooltip={t(`Logout from ResDEX`)}
+              />
+            }
 
           </TabList>
 

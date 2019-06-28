@@ -57,10 +57,12 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   })
 )
 
-const getCurrenciesFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const getCurrenciesFailedEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
   ofType(ResDexAccountsActions.getCurrenciesFailed),
   map(action => {
-    toastr.error(t(`Error getting currencies from ResDEX`), action.payload.errorMessage)
+    if (!state$.value.resDex.login.isInProgress) {
+      toastr.error(t(`Error getting currencies from ResDEX`), action.payload.errorMessage)
+    }
     return ResDexAccountsActions.empty()
   })
 )
