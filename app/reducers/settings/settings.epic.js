@@ -312,7 +312,7 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     const newWalletPath = path.join(resistanceService.getWalletPath(), walletFileName)
 
     // Third, send the password for the new wallet
-    const startLocalNodeObservable = childProcess.getObservable({
+    const startLocalNodeObservable = childProcess.getStartObservable({
       processName: 'NODE',
       onSuccess: concat(
         of(AuthActions.ensureLogin(t(`Your restored wallet password is required`), true)),

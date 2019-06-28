@@ -65,7 +65,7 @@ export class ChildProcessService {
     return nameMap[processStatus] || t(`Unknown`)
   }
 
-  getObservable({processName, onSuccess, onFailure, action$}) {
+  getStartObservable({processName, onSuccess, onFailure, action$}) {
     const actions = this.getSettingsActions()
 
     const observable = race(
@@ -77,6 +77,27 @@ export class ChildProcessService {
       ),
       action$.pipe(
         ofType(actions.childProcessFailed),
+        filter(action => action.payload.processName === processName),
+        take(1),
+        switchMap(() => onFailure)
+      )
+    )
+
+    return observable
+  }
+
+  getStopObservable({processName, onSuccess, onFailure, action$}) {
+    const actions = this.getSettingsActions()
+
+    const observable = race(
+      action$.pipe(
+        ofType(actions.childProcessMurdered),
+        filter(action => action.payload.processName === processName),
+        take(1),
+        mergeMap(() => onSuccess)
+      ),
+      action$.pipe(
+        ofType(actions.childProcessMurderFailed),
         filter(action => action.payload.processName === processName),
         take(1),
         switchMap(() => onFailure)

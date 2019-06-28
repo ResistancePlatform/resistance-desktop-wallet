@@ -103,7 +103,7 @@ const applyConfigurationEpic = (action$: ActionsObservable<Action>, state$) => a
       return of(WelcomeActions.restoreWallet())
     }
 
-    const nodeStartedObservable = childProcess.getObservable({
+    const nodeStartedObservable = childProcess.getStartObservable({
       processName: 'NODE',
       onSuccess: of(WelcomeActions.encryptWallet()),
       onFailure: of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
@@ -146,7 +146,7 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       })
     )
 
-    const nodeStartedObservable = childProcess.getObservable({
+    const nodeStartedObservable = childProcess.getStartObservable({
       processName: 'NODE',
       onSuccess: concat(
         of(WelcomeActions.displayHint(t(`Changing the wallet password...`))),
@@ -183,7 +183,7 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
 
     // Wallet encryption shuts the node down, let's start it back up and trigger the next action
-    const nodeStartedObservable = childProcess.getObservable({
+    const nodeStartedObservable = childProcess.getStartObservable({
       processName: 'NODE',
       onSuccess: of(WelcomeActions.authenticate()),
       onFailure: of(WelcomeActions.walletBootstrappingFailed(unableToStartLocalNodeMessage)),
