@@ -36,6 +36,28 @@
   overflow-y: hidden;
 }
 
+.logoutButton {
+  position: absolute;
+  top: 4.2rem;
+  right: 0.8rem;
+
+  .logoutGlyph {
+    &:before {
+      font-size: 0.9rem;
+      color: $BASE_COLOR_FONT_GRAY;
+      content: '\e91d';
+
+    }
+
+    &:hover {
+      &:before {
+        color: $BASE_COLOR_PURPLE;
+      }
+    }
+
+  }
+}
+
 /* Base classes for all top level containers inside the tab panel */
 %largeContainer {
   border-radius: 0.3rem;

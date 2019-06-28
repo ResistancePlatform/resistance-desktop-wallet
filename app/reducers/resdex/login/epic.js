@@ -1,7 +1,7 @@
 // @flow
 import log from 'electron-log'
 import config from 'electron-settings'
-import { of, from, merge, concat, defer } from 'rxjs'
+import { Observable, of, from, merge, concat, defer } from 'rxjs'
 import { switchMap, map, catchError, delay } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { routerActions } from 'react-router-redux'
@@ -19,6 +19,8 @@ import { ResDexLoginActions } from './reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 
 const t = translate('resdex')
+// 3 ResDEX processes, one for transparent and two for private trades
+const resDexProcessNames = ['RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
 
 const childProcess = new ChildProcessService()
 const resDex = new ResDexService()
@@ -76,15 +78,12 @@ const startResdexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   switchMap(action => {
     const { seedPhrase, walletPassword } = action.payload
 
-    // Start 3 ResDEX processes, one for transparent and two for private trades
-    const processNames = ['RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
-
-    const observables = processNames.map(processName => {
+    const observables = resDexProcessNames.map(processName => {
       const api = resDexApiFactory(processName)
       api.setToken(seedPhrase)
       resDex.start(processName, seedPhrase)
 
-      const resDexStartedObservable = defer(() => childProcess.getObservable({
+      const resDexStartedObservable = defer(() => childProcess.getStartObservable({
         processName,
         onSuccess: of(ResDexLoginActions.initResdex(processName, walletPassword)).pipe(delay(400)),  // Give marketmaker some time just in case
         onFailure: of(ResDexLoginActions.loginFailed(t(`Unable to start ResDEX, check the log for details`))),
@@ -199,6 +198,46 @@ const loginFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   })
 )
 
+const confirmLogout = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(ResDexLoginActions.confirmLogout),
+  switchMap(() => (
+    Observable.create(observer => {
+      const confirmOptions = {
+        onOk: () => {
+          observer.next(ResDexLoginActions.logout())
+          observer.complete()
+        },
+        onCancel: () => {
+          observer.next(ResDexLoginActions.empty())
+          observer.complete()
+        }
+      }
+      const message = t(`Are you sure want to logout from ResDEX?`)
+      toastr.confirm(message, confirmOptions)
+    })
+  ))
+)
+
+const logout = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(ResDexLoginActions.logout),
+  switchMap(() => {
+    const observables = resDexProcessNames.map(processName => {
+      childProcess.stopProcess(processName)
+
+      const resDexStoppedObservable = defer(() => childProcess.getStopObservable({
+        processName,
+        onSuccess: of(ResDexLoginActions.logoutSucceeded()),  // Give marketmaker some time just in case
+        onFailure: of(ResDexLoginActions.logoutFailed(t(`Unable to stop a {{processName}} process, check the log for details`, { processName }))),
+        action$
+      }))
+
+      return resDexStoppedObservable
+    })
+
+    return merge(...observables)
+  })
+)
+
 export const ResDexLoginEpic = (action$, state$) => merge(
   getPortfolios(action$, state$),
   login(action$, state$),
@@ -206,4 +245,6 @@ export const ResDexLoginEpic = (action$, state$) => merge(
   setDefaultPortfolioEpic(action$, state$),
   startResdexEpic(action$, state$),
   initResdexEpic(action$, state$),
+  confirmLogout(action$, state$),
+  logout(action$, state$),
 )

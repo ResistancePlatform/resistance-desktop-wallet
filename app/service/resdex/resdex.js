@@ -84,12 +84,6 @@ export class ResDexService {
 	 * @memberof ResDexService
 	 */
   async start(processName: string, seedPhrase) {
-    const currenciesWithoutElectrum = supportedCurrencies.map(currency => {
-      const result = {...currency}
-      delete result.electrumServers
-      return result
-    })
-
     const userhome = getOS() === 'windows'
       ? path.join(os.homedir(), 'AppData', 'Roaming')
       : os.homedir()
@@ -102,7 +96,7 @@ export class ResDexService {
       seednodes: [seedNodeAddress],
       userhome,
       passphrase: getActualSeedPhrase(processName, seedPhrase),
-      coins: currenciesWithoutElectrum,
+      coins: supportedCurrencies,
       tx_history: true,
     }
 

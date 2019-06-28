@@ -4,13 +4,7 @@ const RESDEX = {
   dexFee: Decimal('0.15'),
   resFee: Decimal('0.0001'),
   currencyHistoryResolutions: ['hour', 'day', 'week', 'month', 'year'],
-	ignoreExternalPrice: new Set([
-		'REVS',
-		'SUPERNET',
-		'PIZZA',
-		'BEER',
-		'EQL',
-	]),
+	ignoreExternalPrice: new Set([]),
   alwaysEnabledCurrencies: [
     {
       symbol: 'RES',
@@ -20,10 +14,14 @@ const RESDEX = {
       symbol: 'ETH',
       useElectrum: true
     },
-    // {
-    //   symbol: 'BTC',
-    //   useElectrum: true
-    // },
+    {
+      symbol: 'BTC',
+      useElectrum: true
+    },
+    {
+      symbol: 'USDT',
+      useElectrum: true
+    },
   ],
   errorEvents: [
     'StartFailed',

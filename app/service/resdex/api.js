@@ -13,6 +13,7 @@ import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 
 
 const satoshiDivider = 100000000
+const weiDivider = 1000000000000000000
 const t = translate('service')
 
 /**
@@ -132,7 +133,9 @@ class ResDexApiService {
     })
   }
 
-  async getTransactionHistory(coin: string, address: string) {
+  async getTransactionHistory(coin: string) {
+		const currency = getCurrency(coin)
+
     const response = await this.query({
       method: 'my_tx_history',
       coin,
@@ -161,22 +164,35 @@ class ResDexApiService {
       */
     }
 
+    const divider = currency.etomic ? weiDivider : satoshiDivider
+
     const result = transactions.map(transaction => ({
       ...response,
       amount: Decimal(transaction.amount),
-      fee: Decimal(transaction.fee).dividedBy(satoshiDivider),
+      fee: Decimal(transaction.fee).dividedBy(divider),
     }))
 
     return result
   }
 
 	async getFee(coin) {
-		const response = await this.query({
-			method: 'getfee',
-			coin,
-		})
+		const currency = getCurrency(coin)
 
-    return Decimal(response.txfee).dividedBy(satoshiDivider)
+    let response
+
+    try {
+      response = await this.query({
+        method: 'getfee',
+        coin,
+      })
+      log.debug(`Get fee response`, response)
+    } catch(err) {
+      log.error(`Can't get fee for ${coin}, assuming 0.0001`, err)
+      return Decimal('0.0001')
+    }
+
+    const divider = currency.etomic ? weiDivider : satoshiDivider
+    return Decimal(response.txfee).dividedBy(divider)
 	}
 
   getPortfolio() {
@@ -192,30 +208,32 @@ class ResDexApiService {
 		}
 
 		if (useElectrum && currency.electrumServers) {
-      return this::enableElectrumServers(symbol)
+      return this::enableWithElectrum(symbol)
 		}
 
     let response
 
+    log.debug(`Enable currency: ${JSON.stringify(currency)}`)
+
+    const queryParams = {
+      ...currency,
+      method: 'enable',
+      mm2: 1,
+    }
+
     try {
-      log.debug(`Coin: ${JSON.stringify(currency)}`)
-      const queryParams = Object.assign({}, {method: 'enable', mm2: 1}, currency)
       response = await this.query(queryParams)
-      log.debug(`Response is: ${JSON.stringify(response)}`)
+      log.debug(`Enable currency response`, symbol, response)
     } catch(err) {
+      log.debug(`Error enabling currency`, symbol, response)
+
       if (err.message.includes('couldnt find coin locally installed')) {
         log.error(`Can't enable a currency that's not installed locally, re-trying in Electrum mode`)
-        // return this::enableElectrumServers(symbol)
-				// TODO
-        // return response.status === 'active'
-        return false
+        return this::enableWithElectrum(symbol)
       }
     }
 
-		// TODO
-    // return === 'active'
-
-    return true
+    return response && response.result === 'success'
   }
 
   disableCurrency(coin: string) {
@@ -391,30 +409,13 @@ class ResDexApiService {
 
 /* Private methods */
 
-async function enableElectrumServers(symbol) {
-  const currency = getCurrency(symbol)
-
-  const queries = currency.electrumServers.map(server => this.query({
+async function enableWithElectrum(symbol) {
+  const response = await this.query({
     method: 'electrum',
     coin: symbol,
-    ipaddr: server.host,
-    port: server.port,
-  }))
+    mm2: 1,
+  })
 
-  let responses
-
-  try {
-    responses = await Promise.all(queries)
-  } catch(err) {
-    log.error(`Error enabling Electrum currency`, err)
-    return false
-  }
-
-  const success = responses.filter(response => response.result === 'success').length > 0
-
-  if (!success) {
-    log.error(`Could not connect to {{symbol}} Electrum server`)
-  }
-
-  return success
+  log.debug(`Electrum call response:`, response)
+  return response && response.result === 'success'
 }

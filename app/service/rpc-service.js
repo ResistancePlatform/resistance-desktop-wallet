@@ -285,17 +285,9 @@ export class RpcService {
    * @returns {Observable<any>}
    * @memberof RpcService
    */
-  createNewAddress(isPrivate?: boolean): Observable<any> {
+  createNewAddress(isPrivate?: boolean): Promise<any> {
     const client = getClientInstance()
-    const createNewAddressPromise = client.command([{ method: isPrivate ? `z_getnewaddress` : `getnewaddress` }])
-
-    return from(createNewAddressPromise).pipe(
-      map(result => result[0]),
-      catchError(error => {
-        log.debug(`There was an error creating a new address: ${error}`)
-        return of('')
-      })
-    )
+    return client.command(isPrivate ? 'z_getnewaddress' : 'getnewaddress')
   }
 
   /**

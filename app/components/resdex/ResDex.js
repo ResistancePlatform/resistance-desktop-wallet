@@ -5,7 +5,6 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
-// import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import ResDexLogin from './Login'
 import InstantDexDepositModal from './InstantDexDepositModal'
@@ -18,6 +17,8 @@ import ResDexBuySell from './BuySell'
 import ResDexAdvancedTrading from './AdvancedTrading'
 import ResDexOrders from './Orders'
 import ResDexAccounts from './Accounts'
+import { getIsLoginDisabled } from '~/utils/resdex'
+import { BorderlessButton } from '~/components/rounded-form'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
@@ -27,7 +28,8 @@ import scrollStyles from '~/assets/styles/scrollbar.scss'
 type Props = {
   t: any,
   resDex: ResDexState,
-  actions: object
+  actions: object,
+  loginActions: object
 }
 
 
@@ -44,7 +46,7 @@ export class ResDex extends Component<Props> {
 	 */
   getContents() {
     const { t } = this.props
-    const { isExpanded } = this.props.resDex.common
+    const { isExpanded, selectedTabIndex } = this.props.resDex.common
 
     return (
       <div className={cn({[styles.expanded]: isExpanded})}>
@@ -101,6 +103,17 @@ export class ResDex extends Component<Props> {
             <Tab className={styles.tab}>{t(`Advanced Trading`)}</Tab>
             <Tab className={styles.tab}>{t(`Orders`)}</Tab>
             <Tab className={styles.tab}>{t(`Accounts`)}</Tab>
+
+            {selectedTabIndex == 4 &&
+              <BorderlessButton
+                className={styles.logoutButton}
+                glyphClassName={styles.logoutGlyph}
+                onClick={this.props.loginActions.confirmLogout}
+                disabled={getIsLoginDisabled(this.props)}
+                tooltip={t(`Logout from ResDEX`)}
+              />
+            }
+
           </TabList>
 
           <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
