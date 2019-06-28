@@ -9,12 +9,13 @@ import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { AUTH } from '~/constants/auth'
+import { resDexApiFactory } from '~/service/resdex/api'
 import { ChildProcessService } from '~/service/child-process-service'
 import { ResDexService } from '~/service/resdex/resdex'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import { ResDexPortfolioService } from '~/service/resdex/portfolio'
-import { resDexApiFactory } from '~/service/resdex/api'
+import { LoadingPopupActions } from '~/reducers/loading-popup/loading-popup.reducer'
 import { ResDexLoginActions } from './reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 
@@ -226,13 +227,15 @@ const logout = (action$: ActionsObservable<Action>) => action$.pipe(
 
       const resDexStoppedObservable = defer(() => childProcess.getStopObservable({
         processName,
-        onSuccess: of(ResDexLoginActions.logoutSucceeded()),  // Give marketmaker some time just in case
-        onFailure: of(ResDexLoginActions.logoutFailed(t(`Unable to stop a {{processName}} process, check the log for details`, { processName }))),
+        onSuccess: of(LoadingPopupActions.hide(), ResDexLoginActions.logoutSucceeded()),  // Give marketmaker some time just in case
+        onFailure: of(LoadingPopupActions.hide(), ResDexLoginActions.logoutFailed(t(`Unable to stop a {{processName}} process, check the log for details`, { processName }))),
         action$
       }))
 
       return resDexStoppedObservable
     })
+
+    observables.push(of(LoadingPopupActions.show(t(`Logging out from ResDEX.`))))
 
     return merge(...observables)
   })

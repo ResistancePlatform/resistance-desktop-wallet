@@ -37,7 +37,7 @@ export const preloadedState: State = {
     actionsResponseReceived: {}
   },
   loadingPopup: {
-    isVisible: true,
+    isVisible: false,
     message: ''
   },
   popupMenu: {},
