@@ -7,6 +7,7 @@ import { reducer as toastrReducer } from 'react-redux-toastr'
 import { AuthReducer } from './auth/auth.reducer'
 import { RoundedFormReducer } from './rounded-form/rounded-form.reducer'
 import { RpcPollingReducer } from './rpc-polling/rpc-polling.reducer'
+import { LoadingPopupReducer } from './loading-popup/loading-popup.reducer'
 import { PopupMenuReducer } from './popup-menu/popup-menu.reducer'
 import { FetchParametersReducer } from './fetch-parameters/fetch-parameters.reducer'
 import { NaviReducer } from './navi/navi.reducer'
@@ -38,6 +39,7 @@ const rootReducer = combineReducers({
   roundedForm: RoundedFormReducer,
   getStarted: GetStartedReducer,
   rpcPolling: RpcPollingReducer,
+  loadingPopup: LoadingPopupReducer,
   popupMenu: PopupMenuReducer,
   fetchParameters: FetchParametersReducer,
 	navi: NaviReducer,

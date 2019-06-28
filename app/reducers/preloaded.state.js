@@ -36,6 +36,10 @@ export const preloadedState: State = {
     registeredActions: [],
     actionsResponseReceived: {}
   },
+  loadingPopup: {
+    isVisible: true,
+    message: ''
+  },
   popupMenu: {},
 	navi: {
 		currentNaviPath: '/overview'
