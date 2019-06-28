@@ -1,6 +1,7 @@
 // @flow
 import log from 'electron-log'
 import config from 'electron-settings'
+import { remote } from 'electron'
 import { Observable, of, from, merge, concat, defer } from 'rxjs'
 import { switchMap, map, catchError, delay } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
@@ -213,7 +214,13 @@ const confirmLogout = (action$: ActionsObservable<Action>) => action$.pipe(
           observer.complete()
         }
       }
-      const message = t(`Are you sure want to logout from ResDEX?`)
+
+      const { orders, operations } = remote.getGlobal('pendingActivities')
+
+      const message = orders || operations
+        ? t(`Pending activities are present: logging out from ResDEX may lead to unpredictable consequences. Are you sure?`)
+        : t(`Are you sure want to logout from ResDEX?`)
+
       toastr.confirm(message, confirmOptions)
     })
   ))
