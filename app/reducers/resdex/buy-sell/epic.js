@@ -487,6 +487,7 @@ const getOhlcEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe
   switchMap(() => {
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
 
+    /*
     function parseData(parse) {
       return d => ({
         ...d,
@@ -504,9 +505,10 @@ const getOhlcEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe
         .then(response => response.text())
         .then(data => tsvParse(data, parseData(timeParse("%Y-%m-%d"))))
     )
+    */
 
-    // const ohlcObservable = from(mainApi.getOhlc(baseCurrency, quoteCurrency, 60 * 60 * 24)).pipe(
-    const ohlcObservable = from(msftDataPromise).pipe(
+    // const ohlcObservable = from(msftDataPromise).pipe(
+    const ohlcObservable = from(mainApi.getOhlc(baseCurrency, quoteCurrency, 60 * 60 * 24)).pipe(
       map(ohlc => ResDexBuySellActions.gotOhlc(ohlc)),
       catchError(err => {
         log.error(`Can't get order ticks`, err)

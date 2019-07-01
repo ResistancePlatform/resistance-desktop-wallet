@@ -183,7 +183,7 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
       }),
       catchError(err => {
         // TODO: Do some proper treatment like marking the coin as failed to get enabled
-        log.error(`Can't enable currencies`, err)
+        log.error(`Can't enable currencies`, JSON.stringify(err.data), err)
         return of(ResDexLoginActions.empty())
       })
     )

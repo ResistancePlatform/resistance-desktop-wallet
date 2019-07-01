@@ -38,11 +38,12 @@ export function resDexApiFactory(processName: string) {
 }
 
 class ResDexApiError extends Error {
-  constructor(response, message) {
+  constructor(response, message, data) {
     const { error } = response
     super(error || message)
     this.response = response
     this.code = error && error.code
+    this.data = data
   }
 }
 
@@ -312,7 +313,7 @@ class ResDexApiService {
       timescale
     })
 
-    // log.debug(`Trades array response`, JSON.stringify(response))
+    log.debug(`Trades array response`, JSON.stringify(response))
 
     // [timestamp, high, low, open, close, relvolume, basevolume, aveprice, numtrades]
     const trades = response.map(item => ({
@@ -397,12 +398,16 @@ class ResDexApiService {
       json: true
     }
 
-    return rp(options).then(response => {
-      if (response.error) {
-        throw new ResDexApiError(response, errorMessage)
-      }
-      return response
-    })
+    return rp(options)
+      .then(response => {
+        if (response.error) {
+          throw new ResDexApiError(response, errorMessage, data)
+        }
+        return response
+      })
+      .catch(error => {
+          throw new ResDexApiError({error}, errorMessage, data)
+      })
   }
 
 }
