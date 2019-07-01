@@ -1,0 +1,28 @@
+@import "~/assets/styles/modal.scss";
+
+$loadingPopupWidth: 15rem;
+$resistanceLogoWidth: 3.8rem;
+
+.container {
+  width: $loadingPopupWidth;
+  height: $loadingPopupWidth;
+  text-align: center;
+
+  img {
+    margin-top: 2rem;
+    margin-bottom: 0.7rem;
+    width: $resistanceLogoWidth;
+    height: $resistanceLogoWidth;
+    user-select: none;
+  }
+
+  .body {
+    margin-top: -1rem;
+    font-size: 0.7rem;
+    color: $BASE_COLOR_FONT_GRAY_2;
+  }
+}
+
+.body {
+  color: $BASE_COLOR_WHITE;
+}

@@ -18,8 +18,6 @@ const t = translate('resdex')
 const api = resDexApiFactory('RESDEX')
 
 function recentSwapsToOrders(swaps) {
-  const satoshiToAmount = satoshi => Decimal(satoshi).dividedBy(100000000)
-
   const orderStatus = lastEventType => {
     switch (lastEventType) {
       case 'Finished':
@@ -93,7 +91,7 @@ function recentSwapsToOrders(swaps) {
   return orders
 }
 
-const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const getSwapHistoryEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexOrdersActions.getSwapHistory),
   switchMap(() => {
     const observable = from(api.getRecentSwaps()).pipe(
@@ -110,7 +108,9 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>) => action$.pipe(
       }),
       catchError(err => {
         log.error(`Error getting recent swaps`, err)
-        toastr.error(t(`Error getting orders list`))
+        if (!state$.value.resDex.login.isInProgress) {
+          toastr.error(t(`Error getting orders list`))
+        }
         return of(ResDexOrdersActions.getSwapHistoryFailed())
       })
     )

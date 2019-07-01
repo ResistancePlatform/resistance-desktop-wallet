@@ -1,6 +1,7 @@
 // @flow
 import log from 'electron-log'
 import config from 'electron-settings'
+import { remote } from 'electron'
 import { Observable, of, from, merge, concat, defer } from 'rxjs'
 import { switchMap, map, catchError, delay } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
@@ -9,12 +10,13 @@ import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { AUTH } from '~/constants/auth'
+import { resDexApiFactory } from '~/service/resdex/api'
 import { ChildProcessService } from '~/service/child-process-service'
 import { ResDexService } from '~/service/resdex/resdex'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import { ResDexPortfolioService } from '~/service/resdex/portfolio'
-import { resDexApiFactory } from '~/service/resdex/api'
+import { LoadingPopupActions } from '~/reducers/loading-popup/loading-popup.reducer'
 import { ResDexLoginActions } from './reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 
@@ -212,7 +214,13 @@ const confirmLogout = (action$: ActionsObservable<Action>) => action$.pipe(
           observer.complete()
         }
       }
-      const message = t(`Are you sure want to logout from ResDEX?`)
+
+      const { orders, operations } = remote.getGlobal('pendingActivities')
+
+      const message = orders || operations
+        ? t(`Pending activities are present: logging out from ResDEX may lead to unpredictable consequences. Are you sure?`)
+        : t(`Are you sure want to logout from ResDEX?`)
+
       toastr.confirm(message, confirmOptions)
     })
   ))
@@ -226,13 +234,15 @@ const logout = (action$: ActionsObservable<Action>) => action$.pipe(
 
       const resDexStoppedObservable = defer(() => childProcess.getStopObservable({
         processName,
-        onSuccess: of(ResDexLoginActions.logoutSucceeded()),  // Give marketmaker some time just in case
-        onFailure: of(ResDexLoginActions.logoutFailed(t(`Unable to stop a {{processName}} process, check the log for details`, { processName }))),
+        onSuccess: of(LoadingPopupActions.hide(), ResDexLoginActions.logoutSucceeded()),  // Give marketmaker some time just in case
+        onFailure: of(LoadingPopupActions.hide(), ResDexLoginActions.logoutFailed(t(`Unable to stop a {{processName}} process, check the log for details`, { processName }))),
         action$
       }))
 
       return resDexStoppedObservable
     })
+
+    observables.push(of(LoadingPopupActions.show(t(`Logging out from ResDEX.`))))
 
     return merge(...observables)
   })

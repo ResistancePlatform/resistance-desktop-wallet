@@ -17,6 +17,7 @@ import RestoreYourWalletPage from './get-started/RestoreYourWalletPage'
 import ChoosePasswordPage from './get-started/ChoosePasswordPage'
 import WelcomePage from './get-started/WelcomePage'
 
+import LoadingPopup from '~/components/LoadingPopup/LoadingPopup'
 import Login from '~/components/auth/Login'
 import TitleBarButtons, { DragBar } from '~/components/title-bar-buttons/TitleBarButtons'
 import NaviBar from './navigation/navi-bar'
@@ -112,6 +113,7 @@ class App extends React.Component<Props> {
       <div className={cn(styles.contentContainer, VLayout.vBoxContainer)}>
 				{ /* Content container */}
 				<div className={cn(VLayout.vBoxChild, HLayout.hBoxContainer)} style={{overflowY: 'hidden', height: '100%'}}>
+          <LoadingPopup />
           <TitleBarButtons />
 					<NaviBar />
           <StatusIcons />
