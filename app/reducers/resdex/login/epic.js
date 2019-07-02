@@ -106,9 +106,6 @@ const initResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.p
 
     const api = resDexApiFactory(processName)
 
-    // TODO: Re-enable after implementing ResDEX 2 Websockets
-    // api.enableSocket()
-
     const { enabledCurrencies } = state$.value.resDex.accounts
 
     const symbols = enabledCurrencies.map(currency => currency.symbol)

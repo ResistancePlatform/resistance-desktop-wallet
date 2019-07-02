@@ -41,7 +41,7 @@ class TradingChartSettings extends Component<Props> {
     const { t } = this.props
     const { tradingChart: chartSettings } = this.props.resDex.buySell
     const chartPeriods = ['hour', 'day', 'week', 'month', 'year']
-    const { updateChartSettings } = this.props.actions
+    const { updateChartSettings, updateChartPeriod } = this.props.actions
     const { type: chartType } = chartSettings
 
     return (
@@ -111,10 +111,6 @@ class TradingChartSettings extends Component<Props> {
             {t(`Chart`)}
           </div>
 
-          {/*
-            <div className={cn('icon', styles.chartType)} />
-          */}
-
           <PopupMenu
             id={chartTypePopupMenuId}
             className={styles.popupMenu}
@@ -164,13 +160,6 @@ class TradingChartSettings extends Component<Props> {
           <div className={styles.label}>
             {t(`Indicators`)}
           </div>
-
-          {/*
-            <div className={cn('icon', styles.chartType)} />
-
-              onClick={() => updateChartSettings({period})}
-              onKeyDown={() => updateChartSettings({period})}
-          */}
 
           <PopupMenu
             id={indicatorsPopupMenuId}
@@ -223,6 +212,9 @@ class TradingChartSettings extends Component<Props> {
               key={period}
               tabIndex={index + 1}
               className={cn({ [styles.active]: period === chartSettings.period })}
+              onClick={() => updateChartPeriod(period)}
+              onKeyDown={() => updateChartPeriod(period)}
+
             >
               {getPeriodCaption(t, period)}
             </li>

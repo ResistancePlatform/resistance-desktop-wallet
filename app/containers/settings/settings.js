@@ -246,6 +246,11 @@ class Settings extends Component<Props> {
                     disabled={getTorDisabledAttribute(childProcessesStatus, this.props.systemInfo)}
                   />
 
+                 <div className={styles.memo}>
+                   <strong>{t(`Note:`)}</strong>&nbsp;
+                   {t(`With Tor enabled, users can achieve greater privacy by masking their IP addresses. This feature is currently in BETA phase.`)}
+                 </div>
+
                 </div>
 
               </TabPanel>

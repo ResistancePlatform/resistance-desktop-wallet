@@ -211,7 +211,7 @@ async function startOrRestart({isTorEnabled, start, isEtomic}) {
 
     args.push(`-exportdir=${exportDir}`)
 
-    args.push(`-mineraddress=rpTFwK6gPqkXJA7CvJff2jXpgtdd3GJuB5C`)
+    // args.push(`-mineraddress=rpTFwK6gPqkXJA7CvJff2jXpgtdd3GJuB5C`)
 
   }
 

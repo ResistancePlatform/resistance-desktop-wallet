@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
+import log from 'electron-log'
 
 import { timeFormat } from 'd3-time-format'
 import { scaleTime } from 'd3-scale'
@@ -36,7 +37,7 @@ import {
 } from 'react-stockcharts/lib/coordinates'
 import { XAxis, YAxis } from 'react-stockcharts/lib/axes'
 import { fitWidth } from 'react-stockcharts/lib/helper'
-import { first, last, timeIntervalBarWidth } from 'react-stockcharts/lib/utils'
+import { first, timeIntervalBarWidth } from 'react-stockcharts/lib/utils'
 import {
   heikinAshi,
   kagi,
@@ -140,16 +141,31 @@ class TradingChart extends Component<Props> {
 	props: Props
 
 	getData() {
-    const { tradingChart, ohlc } = this.props.resDex.buySell
+    const { tradingChart, ohlc: initialData } = this.props.resDex.buySell
 
-    const initialData = ohlc.filter(tick => tick.open > 0)
+    if (initialData.length === 0) {
+      return []
+    }
+
+    const data = initialData.slice()
+
+    if (data.length === 1) {
+      for (let day = -1; day < 0; day += 1) {
+        const dayDate = new Date(initialData[0].date.getTime())
+        dayDate.setDate(dayDate.getDate() + day)
+        data.unshift({
+          ...initialData[0],
+          date: dayDate,
+        })
+      }
+    }
 
     let calculatedData = rsiCalculator(
       bb(
         smaVolume50(
           ema20(
             ema50(
-              macdCalculator(initialData)
+              macdCalculator(data)
             )
           )
         )
@@ -186,7 +202,7 @@ class TradingChart extends Component<Props> {
       return []
     }
 
-    const lastDate = last(data).date
+    const lastDate = new Date()
     let firstDate = new Date(lastDate.getTime())
 
     switch (period) {
@@ -211,13 +227,14 @@ class TradingChart extends Component<Props> {
       default:
     }
 
-    const firstTime = first(data).date.getTime()
+    // const firstTime = first(data).date.getTime()
+    // if (firstDate.getTime() < firstTime) {
+    //   firstDate = first(data).date
+    // }
 
-    if (firstDate.getTime() < firstTime) {
-      firstDate = first(data).date
-    }
+    log.debug(`XExtents`, firstDate, lastDate)
 
-    return [lastDate, firstDate]
+    return [firstDate, lastDate]
   }
 
 	/**
@@ -303,14 +320,13 @@ class TradingChart extends Component<Props> {
 
     const data = this.getData()
 
-    if (!data.length) {
-      return null
-    }
+    log.debug(`Processed OHLC`, JSON.stringify(data))
 
 		return (
       <div className={styles.container} ref={el => this.elementRef(el)}>
         <TradingChartSettings />
 
+        {data.length &&
         <ChartCanvas
           height={height}
           ratio={ratio}
@@ -319,7 +335,7 @@ class TradingChart extends Component<Props> {
           type="hybrid"
           seriesName="RES/MONA"
           data={data}
-          xAccessor={d => d.date}
+          xAccessor={d => d && d.date}
           xScale={scaleTime().domain([new Date(2000, 0, 1, 0), new Date(2000, 0, 1, 1)])}
           xExtents={this.getXExtents(data, chartPeriod)}>
 
@@ -588,6 +604,7 @@ class TradingChart extends Component<Props> {
           />
 
         </ChartCanvas>
+        }
       </div>
 		)
   }
