@@ -5,8 +5,6 @@ import { of, from, merge, interval, defer } from 'rxjs'
 import { map, mapTo, take, filter, switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
-import { tsvParse } from  'd3-dsv'
-import { timeParse } from 'd3-time-format'
 
 import { translate } from '~/i18next.config'
 import { RESDEX } from '~/constants/resdex'
@@ -19,7 +17,7 @@ import { ResDexBuySellActions } from './reducer'
 const t = translate('resdex')
 const mainApi = resDexApiFactory('RESDEX')
 
-const getOrderBookEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+const getOrderBook = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexBuySellActions.getOrderBook),
   switchMap(() => {
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
@@ -62,7 +60,7 @@ const getOrderBookEpic = (action$: ActionsObservable<Action>, state$) => action$
   })
 )
 
-const getOrderBookFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const getOrderBookFailed = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.getOrderBookFailed),
   map(action => {
     toastr.error(t(`Error getting the order book`), action.payload.errorMessage)
@@ -70,7 +68,7 @@ const getOrderBookFailedEpic = (action$: ActionsObservable<Action>) => action$.p
   })
 )
 
-const createOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+const createOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexBuySellActions.createOrder),
   switchMap(() => {
     const { fields } = state$.value.roundedForm.resDexBuySell
@@ -359,7 +357,7 @@ const getPollResBaseOrderObservable = (relResOrderUuid, resBaseOrderUuid, state$
   return pollingObservable
 }
 
-const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+const createPrivateOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexBuySellActions.createPrivateOrder),
   switchMap(() => {
     const { currencies } = state$.value.resDex.accounts
@@ -433,7 +431,7 @@ const createPrivateOrderEpic = (action$: ActionsObservable<Action>, state$) => a
   })
 )
 
-const createOrderSucceededEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const createOrderSucceeded = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.createOrderSucceeded),
   map(() => {
     toastr.success(t(`Market order created successfully`))
@@ -441,7 +439,7 @@ const createOrderSucceededEpic = (action$: ActionsObservable<Action>) => action$
   })
 )
 
-const createPrivateOrderSucceededEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const createPrivateOrderSucceeded = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.createPrivateOrderSucceeded),
   map(() => {
     toastr.success(t(`Private order created successfully`), t(`New orders creation locked until the trade complete`))
@@ -449,7 +447,7 @@ const createPrivateOrderSucceededEpic = (action$: ActionsObservable<Action>) => 
   })
 )
 
-const createOrderFailedEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const createOrderFailed = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.createOrderFailed),
   map(action => {
     toastr.error(t(`Error creating a market order`), action.payload.errorMessage)
@@ -457,7 +455,7 @@ const createOrderFailedEpic = (action$: ActionsObservable<Action>) => action$.pi
   })
 )
 
-const linkPrivateOrderToBaseResOrderEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const linkPrivateOrderToBaseResOrder = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.linkPrivateOrderToBaseResOrder),
   // swapDB.updateSwapData({
   //   uuid: action.payload.uuid,
@@ -467,7 +465,7 @@ const linkPrivateOrderToBaseResOrderEpic = (action$: ActionsObservable<Action>) 
   map(() => ResDexBuySellActions.empty())
 )
 
-const setPrivateOrderStatusEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const setPrivateOrderStatus = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.setPrivateOrderStatus),
   // swapDB.updateSwapData({
   //   uuid: action.payload.uuid,
@@ -477,36 +475,25 @@ const setPrivateOrderStatusEpic = (action$: ActionsObservable<Action>) => action
   map(() => ResDexBuySellActions.empty())
 )
 
-const selectTabEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const selectTab = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.selectTab),
   mapTo(RoundedFormActions.clear('resDexBuySell'))
 )
 
-const getOhlcEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+const getOhlc = (action$: ActionsObservable<Action>, state$) => action$.pipe(
   ofType(ResDexBuySellActions.getOhlc),
   switchMap(() => {
-    const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
+    const { baseCurrency, quoteCurrency, period } = state$.value.resDex.buySell
 
-    function parseData(parse) {
-      return d => ({
-        ...d,
-        date: parse(d.date),
-        open: +d.open,
-        high: +d.high,
-        low: +d.low,
-        close: +d.close,
-        volume: +d.volume,
-      })
-    }
+    const periodSeconds = {
+      hour: 60 * 60,
+      day: 24 * 60 * 60,
+      week: 7 * 24 * 60 * 60,
+      month: 30 * 24 * 60 * 60,
+      year: 365 * 24 * 60 * 60,
+    }[period] || 24 * 60 * 60
 
-    const msftDataPromise = (
-      fetch("https://cdn.rawgit.com/rrag/react-stockcharts/master/docs/data/MSFT.tsv")
-        .then(response => response.text())
-        .then(data => tsvParse(data, parseData(timeParse("%Y-%m-%d"))))
-    )
-
-    // const ohlcObservable = from(mainApi.getOhlc(baseCurrency, quoteCurrency, 60 * 60 * 24)).pipe(
-    const ohlcObservable = from(msftDataPromise).pipe(
+    const ohlcObservable = from(mainApi.getOhlc(baseCurrency, quoteCurrency, periodSeconds)).pipe(
       map(ohlc => ResDexBuySellActions.gotOhlc(ohlc)),
       catchError(err => {
         log.error(`Can't get order ticks`, err)
@@ -519,7 +506,7 @@ const getOhlcEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe
   })
 )
 
-const getTradesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+const getTrades = (action$: ActionsObservable<Action>, state$) => action$.pipe(
   ofType(ResDexBuySellActions.getTrades),
   switchMap(() => {
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
@@ -537,18 +524,24 @@ const getTradesEpic = (action$: ActionsObservable<Action>, state$) => action$.pi
   })
 )
 
+const updateChartPeriod = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexBuySellActions.updateChartPeriod),
+  mapTo(ResDexBuySellActions.getOhlc()),
+)
+
 export const ResDexBuySellEpic = (action$, state$) => merge(
-  createOrderEpic(action$, state$),
-  createPrivateOrderEpic(action$, state$),
-  createOrderSucceededEpic(action$, state$),
-  createPrivateOrderSucceededEpic(action$, state$),
-  createOrderFailedEpic(action$, state$),
-  getOrderBookEpic(action$, state$),
-  getOrderBookFailedEpic(action$, state$),
-  setPrivateOrderStatusEpic(action$, state$),
-  linkPrivateOrderToBaseResOrderEpic(action$, state$),
-  selectTabEpic(action$, state$),
-  getOhlcEpic(action$, state$),
-  getTradesEpic(action$, state$),
+  createOrder(action$, state$),
+  createPrivateOrder(action$, state$),
+  createOrderSucceeded(action$, state$),
+  createPrivateOrderSucceeded(action$, state$),
+  createOrderFailed(action$, state$),
+  getOrderBook(action$, state$),
+  getOrderBookFailed(action$, state$),
+  setPrivateOrderStatus(action$, state$),
+  linkPrivateOrderToBaseResOrder(action$, state$),
+  selectTab(action$, state$),
+  getOhlc(action$, state$),
+  getTrades(action$, state$),
+  updateChartPeriod(action$, state$),
 )
 

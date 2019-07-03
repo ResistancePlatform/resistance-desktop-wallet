@@ -39,6 +39,7 @@ export const ResDexBuySellActions = createActions(
     GET_TRADES_FAILED: undefined,
 
     UPDATE_CHART_SETTINGS: (settings: object) => ({ ...settings }),
+    UPDATE_CHART_PERIOD: (period: string) => ({ period }),
   },
   {
     prefix: 'APP/RESDEX/BUY_SELL'
@@ -119,6 +120,14 @@ export const ResDexBuySellReducer = handleActions(
       tradingChart: {
         ...state.tradingChart,
         ...action.payload
+      }
+    }),
+    [ResDexBuySellActions.updateChartPeriod]: (state, action) => ({
+      ...state,
+      ohlc: [],
+      tradingChart: {
+        ...state.tradingChart,
+        period: action.payload.period
       }
     }),
   }, preloadedState)

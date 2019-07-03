@@ -38,11 +38,12 @@ export function resDexApiFactory(processName: string) {
 }
 
 class ResDexApiError extends Error {
-  constructor(response, message) {
+  constructor(response, message, data) {
     const { error } = response
     super(error || message)
     this.response = response
     this.code = error && error.code
+    this.data = data
   }
 }
 
@@ -306,16 +307,16 @@ class ResDexApiService {
 
   async getOhlc(base: string, rel: string, timescale: number) {
     const response = await this.query({
-      method: 'tradesarray',
+      method: 'ohlc_data',
       base,
       rel,
       timescale
     })
 
-    // log.debug(`Trades array response`, JSON.stringify(response))
+    log.debug(`OHLC data response`, JSON.stringify(response))
 
     // [timestamp, high, low, open, close, relvolume, basevolume, aveprice, numtrades]
-    const trades = response.map(item => ({
+    const ohlcData = response.map(item => ({
       date: moment.unix(item[0]).toDate(),
       high: item[1],
       low: item[2],
@@ -324,23 +325,27 @@ class ResDexApiService {
       volume: item[6],
     }))
 
-    return trades.filter(trade => trade.open > 0)
+    return ohlcData
   }
 
   async getTrades(base: string, rel: string) {
     const response = await this.query({
-      method: 'ticker',
+      method: 'swap_history',
       base,
-      rel
+      rel,
+      limit: 50,
+      from_uuid: null
     })
 
-    // log.debug(`Ticker response`, JSON.stringify(response))
+    log.debug(`Get Trades response`, JSON.stringify(response))
+    const { swaps } = response.result
 
-    const trades = response.map(item => ({
-      time: moment.unix(item.timestamp).toDate(),
-      baseAmount: Decimal(item[base]),
-      quoteAmount: Decimal(item[rel]),
-      price: Decimal(item.price),
+    const trades = swaps.map(item => ({
+      uuid: item[0],
+      time: moment.unix(item[1]).toDate(),
+      baseAmount: Decimal(item[2]),
+      quoteAmount: Decimal(item[3]),
+      price: Decimal(item[4]),
     }))
 
     return trades
@@ -397,12 +402,16 @@ class ResDexApiService {
       json: true
     }
 
-    return rp(options).then(response => {
-      if (response.error) {
-        throw new ResDexApiError(response, errorMessage)
-      }
-      return response
-    })
+    return rp(options)
+      .then(response => {
+        if (response.error) {
+          throw new ResDexApiError(response, errorMessage, data)
+        }
+        return response
+      })
+      .catch(error => {
+          throw new ResDexApiError({error}, errorMessage, data)
+      })
   }
 
 }
@@ -410,9 +419,26 @@ class ResDexApiService {
 /* Private methods */
 
 async function enableWithElectrum(symbol) {
+  const currency = getCurrency(symbol)
+
+  if (!currency) {
+    throw new Error(`Currency ${symbol} not found.`)
+  }
+
+  if (!currency.electrumServers) {
+    throw new Error(`Currency ${symbol} doesn't have Electrum servers configured.`)
+  }
+
+  const servers = currency.electrumServers.map(server => ({
+    url: `${server.host}:${server.port}`
+  }))
+
+  log.debug(`Electrum servers for ${symbol}:`, servers)
+
   const response = await this.query({
     method: 'electrum',
     coin: symbol,
+    servers,
     mm2: 1,
   })
 

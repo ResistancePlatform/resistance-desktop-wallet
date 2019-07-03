@@ -228,7 +228,7 @@ class BuySellForm extends Component<Props> {
               <div className={styles.box}>
                 <div className={styles.caption}>
                   {t(`Max. {{symbol}}`, {symbol: quoteCurrency})}
-                  <Info tooltip={t(`Lorem ipsum`)} />
+                  <Info tooltip={t(`The maximum amount of {{symbol}} you are willing to trade — the actual trade amount can be less.`, {symbol: quoteCurrency})} />
                 </div>
 
                 <CurrencyAmountInput
@@ -244,7 +244,7 @@ class BuySellForm extends Component<Props> {
               <div className={styles.box}>
                 <div className={styles.caption}>
                   {t(`Price {{symbol}}`, {symbol: quoteCurrency})}
-                  <Info tooltip={t(`Lorem ipsum`)} />
+                  <Info tooltip={t(`The minimum price in RES you will accept for 1 {{symbol}}`, {symbol: quoteCurrency})} />
                 </div>
 
                 <PriceInput

@@ -104,7 +104,7 @@ class ResDexLogin extends Component<Props> {
         <a role="button"
           className={styles.forgotPassword}
           tabIndex={0}
-          onClick={() => this.props.routerActions.push('/resdex/forgot-password')}
+          onClick={() => this.props.routerActions.push('/resdex/restore-portfolio')}
           onKeyDown={ () => false }
         >{t(`Forgot password`)}</a>
 
