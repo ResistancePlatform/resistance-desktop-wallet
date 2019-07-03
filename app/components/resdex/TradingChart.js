@@ -5,9 +5,9 @@ import { translate } from 'react-i18next'
 import log from 'electron-log'
 
 import { timeFormat } from 'd3-time-format'
-import { scaleTime } from 'd3-scale'
 import { format } from 'd3-format'
 import { utcHour, utcDay, utcWeek, utcMonth, utcYear } from 'd3-time'
+import { discontinuousTimeScaleProvider } from 'react-stockcharts/lib/scale'
 import { ChartCanvas, Chart } from 'react-stockcharts'
 import {
   AreaSeries,
@@ -140,25 +140,32 @@ const rsiCalculator = rsi()
 class TradingChart extends Component<Props> {
 	props: Props
 
-	getData() {
-    const { tradingChart, ohlc: initialData } = this.props.resDex.buySell
+/**
+ * Adds an extra data point if data size is too small.
+ *
+ * @class TradingChart
+ * @extends {Component<Props>}
+ */
+  tweakData(sourceData) {
+    const data = sourceData.slice()
 
-    if (initialData.length === 0) {
-      return []
-    }
-
-    const data = initialData.slice()
-
-    if (data.length === 1) {
-      for (let day = -1; day < 0; day += 1) {
-        const dayDate = new Date(initialData[0].date.getTime())
+    if (sourceData.length === 1) {
+      for (let day = -1; day > -10; day -= 1) {
+        const dayDate = new Date(sourceData[0].date.getTime())
         dayDate.setDate(dayDate.getDate() + day)
         data.unshift({
-          ...initialData[0],
+          ...sourceData[0],
           date: dayDate,
         })
       }
     }
+
+    log.debug(`Data`, JSON.stringify(data))
+    return data
+  }
+
+  calculateIndicators(data) {
+    const { tradingChart } = this.props.resDex.buySell
 
     let calculatedData = rsiCalculator(
       bb(
@@ -189,6 +196,46 @@ class TradingChart extends Component<Props> {
     }
 
     return calculatedData
+  }
+
+	getDataAndScale() {
+    const { ohlc: initialData } = this.props.resDex.buySell
+
+    if (initialData.length === 0) {
+      return {
+        data: [],
+        xScale: null,
+        xAccessor: null,
+        displayXAccessor: null,
+      }
+    }
+
+    /*
+     * Couldn't make discontinuousTimeScaleProvider working — it only returns null values
+     */
+
+		const xScaleProvider = discontinuousTimeScaleProvider
+      .inputDateAccessor(d => d && d.date)
+
+    const {
+      data,
+      xScale,
+      xAccessor,
+      displayXAccessor,
+    } = xScaleProvider(this.tweakData(initialData))
+
+    const calculatedData = this.calculateIndicators(data)
+
+    const result = {
+      data: calculatedData,
+      xScale,
+      xAccessor,
+      displayXAccessor,
+    }
+
+    log.debug(`Data and scale`, typeof result.xScale, typeof result.xAccessor, JSON.stringify(result.data))
+
+    return result
 	}
 
 	/**
@@ -227,11 +274,6 @@ class TradingChart extends Component<Props> {
       default:
     }
 
-    // const firstTime = first(data).date.getTime()
-    // if (firstDate.getTime() < firstTime) {
-    //   firstDate = first(data).date
-    // }
-
     log.debug(`XExtents`, firstDate, lastDate)
 
     return [firstDate, lastDate]
@@ -253,6 +295,21 @@ class TradingChart extends Component<Props> {
       return 0
     }
     return Math.max(504, this.element.clientHeight-64)
+  }
+
+  getCandleStickWidth() {
+    const { period } = this.props.resDex.buySell.tradingChart
+
+    const d3Interval = {
+      'hour': utcHour,
+      'day': utcDay,
+      'week': utcWeek,
+      'month': utcMonth,
+      'year': utcYear,
+      'all': utcYear,
+    }[period] || utcDay
+
+    return timeIntervalBarWidth(d3Interval)
   }
 
   getBottomIndicatorsNumber() {
@@ -304,23 +361,18 @@ class TradingChart extends Component<Props> {
     const height = this.getHeight()
 
     const { period: chartPeriod } = this.props.resDex.buySell.tradingChart
-    const d3Interval = {
-      'hour': utcHour,
-      'day': utcDay,
-      'week': utcWeek,
-      'month': utcMonth,
-      'year': utcYear,
-      'all': utcYear,
-    }[chartPeriod] || utcDay
 
     const { tradingChart: chartSettings } = this.props.resDex.buySell
 
     const bottomIndicatorHeight = 100
     const bottomIndicatorsNumber = this.getBottomIndicatorsNumber()
 
-    const data = this.getData()
-
-    log.debug(`Processed OHLC`, JSON.stringify(data))
+    const {
+      data,
+      xScale,
+      xAccessor,
+      displayXAccessor,
+    } = this.getDataAndScale()
 
 		return (
       <div className={styles.container} ref={el => this.elementRef(el)}>
@@ -336,7 +388,8 @@ class TradingChart extends Component<Props> {
           seriesName="RES/MONA"
           data={data}
           xAccessor={d => d && d.date}
-          xScale={scaleTime().domain([new Date(2000, 0, 1, 0), new Date(2000, 0, 1, 1)])}
+          xScale={xScale}
+          displayXAccessor={displayXAccessor}
           xExtents={this.getXExtents(data, chartPeriod)}>
 
           <Chart id={1} height={height - bottomIndicatorsNumber * bottomIndicatorHeight - 50}
@@ -377,7 +430,7 @@ class TradingChart extends Component<Props> {
                 stroke={d => d.close > d.open ? "#00d492" : "#e20063"}
                 wickStroke={d => d.close > d.open ? "#00d492" : "#e20063"}
                 fill={d => d.close > d.open ? "#00d492" : "#e20063"}
-                width={timeIntervalBarWidth(d3Interval)}
+                width={this.getCandleStickWidth()}
               />
             }
 
