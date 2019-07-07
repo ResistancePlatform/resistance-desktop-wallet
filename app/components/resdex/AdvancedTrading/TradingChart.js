@@ -363,6 +363,7 @@ class TradingChart extends Component<Props> {
     const { period: chartPeriod } = this.props.resDex.buySell.tradingChart
 
     const { tradingChart: chartSettings } = this.props.resDex.buySell
+    const { indicators } = chartSettings
 
     const bottomIndicatorHeight = 100
     const bottomIndicatorsNumber = this.getBottomIndicatorsNumber()
@@ -370,7 +371,6 @@ class TradingChart extends Component<Props> {
     const {
       data,
       xScale,
-      xAccessor,
       displayXAccessor,
     } = this.getDataAndScale()
 

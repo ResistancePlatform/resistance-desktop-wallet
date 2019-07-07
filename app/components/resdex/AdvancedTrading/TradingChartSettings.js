@@ -13,7 +13,6 @@ import styles from './TradingChartSettings.scss'
 
 const drawPopupMenuId = 'resdex-buy-sell-chart-draw-popup-menu-id'
 const chartTypePopupMenuId = 'resdex-buy-sell-chart-type-popup-menu-id'
-const indicatorsPopupMenuId = 'resdex-buy-sell-chart-indicators-popup-menu-id'
 
 type Props = {
   t: any,
@@ -153,7 +152,7 @@ class TradingChartSettings extends Component<Props> {
         <div
           role="button"
           className={styles.button}
-          onClick={() => this.props.popupMenuActions.show(indicatorsPopupMenuId)}
+          onClick={this.props.actions.showIndicatorsModal}
           tabIndex={0}
           onKeyDown={() => false}
         >
@@ -161,48 +160,6 @@ class TradingChartSettings extends Component<Props> {
             {t(`Indicators`)}
           </div>
 
-          <PopupMenu
-            id={indicatorsPopupMenuId}
-            className={styles.popupMenu}
-            relative
-          >
-            <PopupMenuItem onClick={() => updateChartSettings({volume: !chartSettings.volume})}>
-              <div className={styles.item}>
-                <div className={styles.name}>{t(`Volume`)}</div>
-                <div className={cn('icon', styles.check, {[styles.active]: chartSettings.volume})} />
-              </div>
-            </PopupMenuItem>
-            <PopupMenuItem onClick={() => updateChartSettings({ema20: !chartSettings.ema20})}>
-              <div className={styles.item}>
-                <div className={styles.name}>{t(`Exponential Moving Average 20`)}</div>
-                <div className={cn('icon', styles.check, {[styles.active]: chartSettings.ema20})} />
-              </div>
-            </PopupMenuItem>
-            <PopupMenuItem onClick={() => updateChartSettings({ema50: !chartSettings.ema50})}>
-              <div className={styles.item}>
-                <div className={styles.name}>{t(`Exponential Moving Average 50`)}</div>
-                <div className={cn('icon', styles.check, {[styles.active]: chartSettings.ema50})} />
-              </div>
-            </PopupMenuItem>
-            <PopupMenuItem onClick={() => updateChartSettings({bb: !chartSettings.bb})}>
-              <div className={styles.item}>
-                <div className={styles.name}>{t(`Bollinger Bands`)}</div>
-                <div className={cn('icon', styles.check, {[styles.active]: chartSettings.bb})} />
-              </div>
-            </PopupMenuItem>
-            <PopupMenuItem onClick={() => updateChartSettings({rsi: !chartSettings.rsi})}>
-              <div className={styles.item}>
-                <div className={styles.name}>{t(`RSI`)}</div>
-                <div className={cn('icon', styles.check, {[styles.active]: chartSettings.rsi})} />
-              </div>
-            </PopupMenuItem>
-            <PopupMenuItem onClick={() => updateChartSettings({macd: !chartSettings.macd})}>
-              <div className={styles.item}>
-                <div className={styles.name}>{t(`MACD`)}</div>
-                <div className={cn('icon', styles.check, {[styles.active]: chartSettings.macd})} />
-              </div>
-            </PopupMenuItem>
-          </PopupMenu>
         </div>
 
         <ul className={styles.period}>

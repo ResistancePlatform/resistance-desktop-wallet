@@ -40,6 +40,11 @@ export const ResDexBuySellActions = createActions(
 
     UPDATE_CHART_SETTINGS: (settings: object) => ({ ...settings }),
     UPDATE_CHART_PERIOD: (period: string) => ({ period }),
+
+    SHOW_INDICATORS_MODAL: undefined,
+    UPDATE_INDICATORS_SEARCH_STRING: (searchString: string) => ({searchString}),
+    EDIT_INDICATOR: (key: string) => ({key}),
+    CLOSE_INDICATORS_MODAL: undefined,
   },
   {
     prefix: 'APP/RESDEX/BUY_SELL'
@@ -128,6 +133,34 @@ export const ResDexBuySellReducer = handleActions(
       tradingChart: {
         ...state.tradingChart,
         period: action.payload.period
+      }
+    }),
+    [ResDexBuySellActions.showIndicatorsModal]: state => ({
+      ...state,
+      indicatorsModal: {
+        ...state.indicatorsModal,
+        isVisible: true
+      }
+    }),
+    [ResDexBuySellActions.updateIndicatorsSearchString]: (state, action) => ({
+      ...state,
+      indicatorsModal: {
+        ...state.indicatorsModal,
+        searchString: action.payload.searchString
+      }
+    }),
+    [ResDexBuySellActions.editIndicator]: (state, action) => ({
+      ...state,
+      indicatorsModal: {
+        ...state.indicatorsModal,
+        formKey: action.payload.key
+      }
+    }),
+    [ResDexBuySellActions.closeIndicatorsModal]: state => ({
+      ...state,
+      indicatorsModal: {
+        ...state.indicatorsModal,
+        isVisible: false
       }
     }),
   }, preloadedState)

@@ -14,6 +14,7 @@ export type RoundedButtonProps = {
   ...GenericButtonProps,
   type?: string,
   important?: boolean,
+  small?: boolean,
   spinner?: boolean,
   spinnerTooltip?: string,
   glyph?: string
