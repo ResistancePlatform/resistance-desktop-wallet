@@ -344,6 +344,27 @@ class TradingChart extends Component<Props> {
     )
   }
 
+  getIndicatorConfig(key: string) {
+    const { indicators } = this.props.resDex.buySell.tradingChart
+    const indicator = indicators[key]
+
+    if (!indicator) {
+      return false
+    }
+
+    let result = indicator.inputs.reduce((input, accumulated) => ({
+      ...accumulated,
+      [input.name]: input.value
+    }), {})
+
+    result = indicator.colors.reduce((color, accumulated) => ({
+      ...accumulated,
+      [color.name]: color.value
+    }), result)
+
+    return result
+  }
+
 	/**
 	 * @returns
    * @memberof TradingChart
@@ -363,7 +384,6 @@ class TradingChart extends Component<Props> {
     const { period: chartPeriod } = this.props.resDex.buySell.tradingChart
 
     const { tradingChart: chartSettings } = this.props.resDex.buySell
-    const { indicators } = chartSettings
 
     const bottomIndicatorHeight = 100
     const bottomIndicatorsNumber = this.getBottomIndicatorsNumber()
@@ -373,6 +393,8 @@ class TradingChart extends Component<Props> {
       xScale,
       displayXAccessor,
     } = this.getDataAndScale()
+
+    const volume = this.getIndicatorConfig('volume')
 
 		return (
       <div className={styles.container} ref={el => this.elementRef(el)}>
@@ -535,7 +557,7 @@ class TradingChart extends Component<Props> {
 
           </Chart>
 
-          {indicators.volume &&
+          {volume &&
            <Chart
               id={2}
               yExtents={[d => d.volume, smaVolume50.accessor()]}
@@ -555,20 +577,20 @@ class TradingChart extends Component<Props> {
 
               <BarSeries fill={
                 d => d.close > d.open
-                  ? indicators.volume.colors.up
-                  : indicators.volume.colors.down
+                  ? volume.volumeUp
+                  : volume.volumeDown
               } yAccessor={d => d.volume} />
 
-              {indicators.volume.sma.isEnabled &&
+              {volume.isSmaEnabled &&
                 <React.Fragment>
                   <AreaSeries
                     yAccessor={smaVolume50.accessor()}
-                    stroke={indicators.volume.colors.sma.stroke}
-                    fill={indicators.volume.colors.sma.fill}
+                    stroke={volume.smaStroke}
+                    fill={volume.smaFill}
                   />
                   <CurrentCoordinate
                     yAccessor={smaVolume50.accessor()}
-                    fill={indicators.volume.colors.sma.stroke}
+                    fill={volume.smaStroke}
                   />
                 </React.Fragment>
               }

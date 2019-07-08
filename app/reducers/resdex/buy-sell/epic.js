@@ -543,20 +543,25 @@ const saveIndicator = (action$: ActionsObservable<Action>, state$) => action$.pi
   ofType(ResDexBuySellActions.saveIndicator),
   switchMap(action => {
     const { key } = action.payload
+
     const { fields } = state$.value.roundedForm[`resDexBuySellIndicatorsModal-${key}`]
+    const indicator = {...state$.value.resDex.buySell.tradingChart.indicators[key]}
 
     log.debug('Fields', fields)
 
-    const indicator = {...state$.value.resDex.buySell.tradingChart.indicators[key]}
+    const findInput = name => indicator.inputs.find(i => i.name === name)
+    const findColor = name => indicator.colors.find(i => i.name === name)
 
-    switch (key) {
-      case 'volume':
-        indicator.sma.period = fields.smaPeriod
-        indicator.sma.isEnabled = fields.isSmaEnabled
-        indicator.colors.sma.stroke = fields.smaColor
-        break
-      default:
-    }
+    Object.keys(fields).forEach(name => {
+      const value = fields[name]
+      const input = findInput(name)
+      const color = findColor(name)
+      if (input) {
+        input.value = value
+      } else if (color) {
+        color.value = value
+      }
+    })
 
     return of(
       ResDexBuySellActions.updateIndicator(key, indicator),

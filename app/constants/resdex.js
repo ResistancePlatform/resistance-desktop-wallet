@@ -50,118 +50,258 @@ const RESDEX = {
   getAvailableIndicators: t => ([
     {
       key: 'volume',
-      name: t(`Volume`),
-      sma: {
-        period: 50,
-        isEnabled: true,
-      },
-      colors: {
-        up: '#1d2440',
-        down: '#1d2440',
-        sma: {
-          stroke: '#009ed7',
-          fill: '#1e4266',
+      label: t(`Volume`),
+      formHeight: '13rem',
+      inputs: [
+        {
+          name: 'smaPeriod',
+          label: t(`SMA Period`),
+          type: 'number',
+          value: 20,
+        },
+        {
+          name: 'isSmaEnabled',
+          label: t(`Enable SMA`),
+          type: 'boolean',
+          value: true,
+        },
+      ],
+      colors: [
+        {
+          name: 'volumeUp',
+          label: t(`Volume Up`),
+          value: '#1d2440',
+        },
+        {
+          name: 'volumeDown',
+          label: t(`Volume Down`),
+          value: '#1d2440',
+        },
+        {
+          name: 'smaStroke',
+          label: t(`SMA Stroke`),
+          value: '#009ed7'
+        },
+        {
+          name: 'smaFill',
+          label: t(`SMA Fill`),
+          value: '#1e4266'
         }
-      }
+      ]
     },
     {
       key: 'macd',
-      name: t(`MACD — Moving Average Convergence/Divergence`),
-      periods: {
-        fast: 10,
-        slow: 26,
-        lag: 9,
-      },
-      colors: {
-        main: '#e20063',
-        signal: '#00d492',
-        histogram: '#009ed8'
-      }
-    },
-    {
-      key: 'ema',
-      name: t(`EMA — Exponential Moving Average`),
-      emas: [
+      label: t(`MACD — Moving Average Convergence/Divergence`),
+      formHeight: '10.5rem',
+      inputs: [
         {
-          period: 20,
-          isEnabled: true,
-          color: '#00d492'
+          name: 'fastPeriod',
+          label: t(`Fast Period`),
+          type: 'number',
+          value: 10,
         },
         {
-          period: 50,
-          isEnabled: false,
-          color: '#e20063'
+          name: 'slowPeriod',
+          label: t(`Slow Period`),
+          type: 'number',
+          value: 26,
         },
         {
-          period: 100,
-          isEnabled: false,
-          color: '#f7a336'
+          name: 'lagPeriod',
+          label: t(`Lag Period`),
+          type: 'number',
+          value: 9,
+        },
+      ],
+      colors: [
+        {
+          name: 'main',
+          label: t(`Main`),
+          value: '#e20063',
         },
         {
-          period: 250,
-          isEnabled: false,
-          color: 'rgb(238, 238, 241)'
+          name: 'signal',
+          label: t(`Signal`),
+          value: '#00d492',
         },
         {
-          period: 360,
-          isEnabled: false,
-          color: '#7557b4'
+          name: 'histogram',
+          label: t(`Histogram`),
+          value: '#009ed8',
         },
       ]
     },
     {
+      key: 'ema',
+      label: t(`EMA — Exponential Moving Average`),
+      formHeight: '16.5rem',
+      inputs: [
+        {
+          name: 'ema1Period',
+          label: t(`EMA 1 Period`),
+          type: 'number',
+          value: 20,
+        },
+        {
+          name: 'isEma1Enabled',
+          label: t(`Enable EMA 1`),
+          type: 'boolean',
+          value: true,
+        },
+        {
+          name: 'ema2Period',
+          label: t(`EMA 2 Period`),
+          type: 'number',
+          value: 50,
+        },
+        {
+          name: 'isEma2Enabled',
+          label: t(`Enable EMA 2`),
+          type: 'boolean',
+          value: true,
+        },
+        {
+          name: 'ema3Period',
+          label: t(`EMA 3 Period`),
+          type: 'number',
+          value: 100,
+        },
+        {
+          name: 'isEma3Enabled',
+          label: t(`Enable EMA 3`),
+          type: 'boolean',
+          value: true,
+        },
+
+      ],
+      colors: [
+        {
+          name: 'ema1',
+          label: t(`EMA 1`),
+          value: '#00d492'
+        },
+        {
+          name: 'ema2',
+          label: t(`EMA 2`),
+          value: '#e20063'
+        },
+        {
+          name: 'ema3',
+          label: t(`EMA 3`),
+          value: '#f7a336'
+        }
+      ]
+    },
+    {
       key: 'bb',
-      name: t(`Bollinger Bands`),
-      sma: 20,
-      standardDeviation: 2,
-      colors: {
-        top: '#009ed7',
-        middle: '#9c62e5',
-        bottom: '#009ed7',
-        fill: '#3f356e',
-      }
+      label: t(`Bollinger Bands`),
+      formHeight: '13rem',
+      inputs: [
+        {
+          name: 'smaPeriod',
+          label: t(`SMA Period`),
+          type: 'number',
+          value: 20,
+        },
+        {
+          name: 'standardDeviation',
+          label: t(`Standard Deviation`),
+          type: 'number',
+          value: 2,
+          min: 1,
+          max: 100
+        },
+      ],
+      colors: [
+        {
+          name: 'top',
+          label: t(`Top`),
+          value: '#009ed7',
+        },
+        {
+          name: 'top',
+          label: t(`Middle`),
+          value: '#009ed7',
+        },
+        {
+          name: 'bottom',
+          label: t(`Bottom`),
+          value: '#009ed7',
+        },
+        {
+          name: 'fill',
+          label: t(`Fill`),
+          value: '#3f356e',
+        },
+      ],
     },
     {
       key: 'rsi',
-      name: t(`RSI — Relative Strength Index`),
-      period: 14,
-      os: 35,
-      color: 'rgb(238, 238, 241)',
-      isEnabled: true,
+      label: t(`RSI — Relative Strength Index`),
+      formHeight: '5rem',
+      inputs: [
+        {
+          name: 'windowSize',
+          label: t(`Window Size`),
+          type: 'number',
+          value: 14,
+        },
+      ],
+      colors: [
+        {
+          name: 'stroke',
+          label: t(`Stroke`),
+          value: 'rgb(238, 238, 241)',
+        },
+      ]
     },
     {
       key: 'sma',
-      name: t(`SMA — Simple Moving Average`),
+      label: t(`SMA — Simple Moving Average`),
+      inputs: [],
+      colors: [],
       isNotImplemented: true,
     },
     {
       key: 'wma',
-      name: t(`WMA — Weighted Moving Average`),
+      label: t(`WMA — Weighted Moving Average`),
+      inputs: [],
+      colors: [],
       isNotImplemented: true,
     },
     {
       key: 'sar',
-      name: t(`Parabolic SAR — Stop And Reverse`),
+      label: t(`Parabolic SAR — Stop And Reverse`),
+      inputs: [],
+      colors: [],
       isNotImplemented: true,
     },
     {
       key: 'stochastic',
-      name: t(`Stochastic — fast, slow, full`),
+      label: t(`Stochastic — fast, slow, full`),
+      inputs: [],
+      colors: [],
       isNotImplemented: true,
     },
     {
       key: 'forceIndex',
-      name: t(`ForceIndex`),
+      label: t(`ForceIndex`),
+      inputs: [],
+      colors: [],
       isNotImplemented: true,
     },
     {
       key: 'elderRay',
-      name: t(`ElderRay`),
+      label: t(`ElderRay`),
+      inputs: [],
+      colors: [],
       isNotImplemented: true,
     },
     {
       key: 'elderImpulse',
-      name: t(`Elder Impulse`),
+      label: t(`Elder Impulse`),
+      inputs: [],
+      colors: [],
       isNotImplemented: true,
     },
   ])

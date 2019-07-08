@@ -35,52 +35,73 @@ type Props = {
 class IndicatorForm extends Component<Props> {
 	props: Props
 
+  getInputs(inputs) {
+    const result = inputs.map(input => {
+      switch (input.type) {
+        case 'number':
+          return (
+            <RoundedInput
+              name={input.name}
+              label={input.label}
+              labelClassName={styles.inputLabel}
+              type="number"
+              min={input.min || 2}
+              max={input.max || 1000}
+              defaultValue={input.value}
+            />
+          )
+        case 'boolean':
+          return (
+            <CheckBox name={input.name} defaultValue={input.value}>
+              {input.label}
+            </CheckBox>
+          )
+        default:
+          return null
+      }
+    })
+
+    return result
+  }
+
+  getColors(colors) {
+    const result = colors.map(color => (
+      <ColorPicker
+        name={color.name}
+        label={color.label}
+        labelClassName={styles.colorPickerLabel}
+        defaultValue={color.value}
+      />
+    ))
+    return result
+  }
+
   getFormBody() {
     const { t, indicatorKey } = this.props
     const { indicators } = this.props.resDex.buySell.tradingChart
     const indicator = indicators[indicatorKey]
 
-    switch (indicatorKey) {
-      case 'volume':
-        return (
-          <Tabs
-            className={styles.tabs}
-            selectedTabClassName={styles.selectedTab}
-            selectedTabPanelClassName={styles.selectedTabPanel}
-          >
-            <TabList className={styles.tabList}>
-                <Tab className={styles.tab}>{t(`Inputs`)}</Tab>
-                <Tab className={styles.tab}>{t(`Styles`)}</Tab>
-            </TabList>
-            <TabPanel className={styles.tabPanel}>
-              <CheckBox
-                name="isSmaEnabled"
-                defaultValue={indicator.sma.isEnabled}
-              >
-                {t(`Enable SMA`)}
-              </CheckBox>
+    const body = (
+      <Tabs
+        className={styles.tabs}
+        selectedTabClassName={styles.selectedTab}
+        selectedTabPanelClassName={styles.selectedTabPanel}
+        style={{height: indicator.formHeight || '4rem'}}
+      >
+        <TabList className={styles.tabList}>
+            <Tab className={styles.tab}>{t(`Inputs`)}</Tab>
+            <Tab className={styles.tab}>{t(`Colors`)}</Tab>
+        </TabList>
+        <TabPanel className={styles.tabPanel}>
+          {this.getInputs(indicator.inputs)}
+        </TabPanel>
+        <TabPanel className={styles.tabPanel}>
+          {this.getColors(indicator.colors)}
+        </TabPanel>
+      </Tabs>
+    )
 
-              <RoundedInput
-                name="smaPeriod"
-                label={t(`SMA Period`)}
-                type="number"
-                min="2"
-                max="1000"
-                defaultValue={indicator.sma.period}
-              />
-            </TabPanel>
-            <TabPanel className={styles.tabPanel}>
-              <ColorPicker
-                name="smaColor"
-                label={t(`SMA Stroke Color`)}
-                defaultValue={indicator.colors.sma.stroke}
-              />
-            </TabPanel>
-          </Tabs>
-        )
-      default:
-        return null
-    }
+    return body
   }
 
   render() {
@@ -91,7 +112,7 @@ class IndicatorForm extends Component<Props> {
 
     return (
       <div className={cn(styles.form, this.props.className)}>
-        <div className={styles.title}>{defaultIndicator.name}</div>
+        <div className={styles.title}>{defaultIndicator.label}</div>
         <div className={styles.body}>
           <RoundedForm id={formId}>
             {this.getFormBody()}

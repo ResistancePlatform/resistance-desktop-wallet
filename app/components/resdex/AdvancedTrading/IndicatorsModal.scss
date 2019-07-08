@@ -16,7 +16,7 @@ $indicatorsModalWidth: 40rem;
   font-size: 0.7rem;
 
   .title {
-    font-size: 0.7rem;
+    font-size: 0.9rem;
   }
 }
 
@@ -39,12 +39,14 @@ $indicatorsModalWidth: 40rem;
     &.notImplemented {
       color: $BASE_COLOR_FONT_GRAY;
     }
+
+    border-bottom: 1px solid $BASE_COLOR_BORDER_BLUE;
   }
 
   .removeButton {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 0.2rem;
+    right: 0.2rem;
     outline: none;
     z-index: 100000000000;
 

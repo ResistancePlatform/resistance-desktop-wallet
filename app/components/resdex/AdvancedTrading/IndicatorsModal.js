@@ -42,11 +42,11 @@ class IndicatorsModal extends Component<Props> {
     const { searchString } = this.props.resDex.buySell.indicatorsModal
 
     const indicators = RESDEX.getAvailableIndicators(t)
-    indicators.sort((indicator1, indicator2) => indicator1.name.localeCompare(indicator2.name))
+    indicators.sort((indicator1, indicator2) => (indicator1.label || indicator1.key).localeCompare(indicator2.label || indicator2.key))
 
     log.debug(JSON.stringify(indicators))
     log.debug(JSON.stringify(this.props.resDex.buySell))
-    return indicators.filter(indicator => indicator.name.toLowerCase().includes(searchString.toLowerCase()))
+    return indicators.filter(indicator => indicator.label.toLowerCase().includes(searchString.toLowerCase()))
   }
 
 	render() {
@@ -92,10 +92,10 @@ class IndicatorsModal extends Component<Props> {
                 >
                   <div
                     role="none"
-                    className={styles.name}
+                    className={styles.label}
                     onClick={() => this.props.actions.editIndicator(indicator.key)}
                   >
-                    {indicator.name}
+                    {indicator.label}
                   </div>
 
                   <div
@@ -136,7 +136,7 @@ class IndicatorsModal extends Component<Props> {
                           : () => this.props.actions.editIndicator(indicator.key)
                         }
                       >
-                        {indicator.name}
+                        {indicator.label}
                       </div>
                     )
                   }

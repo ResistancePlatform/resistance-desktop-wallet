@@ -5,7 +5,11 @@
 
   .buttonsRow {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
+    padding-bottom: 0.2rem;
+    > div {
+      margin-left: 0.5rem;
+    }
   }
 }
 
@@ -16,7 +20,7 @@
 }
 
 .tabs {
-  min-height: 8rem;
+  min-height: 5rem;
 }
 
 .selectedTabPanel {
@@ -30,4 +34,12 @@
     margin: 0;
     padding: 0.5rem;
   }
+}
+
+.inputLabel {
+  min-width: 7rem;
+}
+
+.colorPickerLabel {
+  min-width: 5rem;
 }
