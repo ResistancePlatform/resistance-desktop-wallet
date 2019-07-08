@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import cn from 'classnames'
 
 import {
@@ -16,6 +17,7 @@ import { RESDEX } from '~/constants/resdex'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 
+import 'react-tabs/style/react-tabs.scss'
 import styles from './IndicatorForm.scss'
 
 type Props = {
@@ -41,29 +43,40 @@ class IndicatorForm extends Component<Props> {
     switch (indicatorKey) {
       case 'volume':
         return (
-          <React.Fragment>
-            <CheckBox
-              name="isSmaEnabled"
-              defaultValue={indicator.sma.isEnabled}
-            >
-              {t(`Enable SMA`)}
-            </CheckBox>
+          <Tabs
+            className={styles.tabs}
+            selectedTabClassName={styles.selectedTab}
+            selectedTabPanelClassName={styles.selectedTabPanel}
+          >
+            <TabList className={styles.tabList}>
+                <Tab className={styles.tab}>{t(`Inputs`)}</Tab>
+                <Tab className={styles.tab}>{t(`Styles`)}</Tab>
+            </TabList>
+            <TabPanel className={styles.tabPanel}>
+              <CheckBox
+                name="isSmaEnabled"
+                defaultValue={indicator.sma.isEnabled}
+              >
+                {t(`Enable SMA`)}
+              </CheckBox>
 
-            <RoundedInput
-              name="smaPeriod"
-              label={t(`SMA Period`)}
-              type="number"
-              min="2"
-              max="1000"
-              defaultValue={indicator.sma.period}
-            />
-
-            <ColorPicker
-              name="smaColor"
-              label={t(`SMA Stroke Color`)}
-              defaultValue={indicator.colors.sma.stroke}
-            />
-          </React.Fragment>
+              <RoundedInput
+                name="smaPeriod"
+                label={t(`SMA Period`)}
+                type="number"
+                min="2"
+                max="1000"
+                defaultValue={indicator.sma.period}
+              />
+            </TabPanel>
+            <TabPanel className={styles.tabPanel}>
+              <ColorPicker
+                name="smaColor"
+                label={t(`SMA Stroke Color`)}
+                defaultValue={indicator.colors.sma.stroke}
+              />
+            </TabPanel>
+          </Tabs>
         )
       default:
         return null

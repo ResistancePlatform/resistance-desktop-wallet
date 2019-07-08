@@ -1,4 +1,5 @@
 @import "~/assets/styles/vars.scss";
+@import "~/assets/styles/tabs.scss";
 
 .form {
 
@@ -12,4 +13,21 @@
   margin-top: 0.25rem;
   padding: 0.25rem;
   border: 1px solid $BASE_COLOR_BORDER_BLUE;
+}
+
+.tabs {
+  min-height: 8rem;
+}
+
+.selectedTabPanel {
+  display: block;
+  height: 100%;
+  padding-top: 0.5rem;
+}
+
+.tabList {
+  .tab {
+    margin: 0;
+    padding: 0.5rem;
+  }
 }
