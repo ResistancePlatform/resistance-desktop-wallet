@@ -138,6 +138,16 @@ class RoundedForm extends Component<Props> {
 	/**
 	 * @memberof RoundedForm
 	 */
+  onResetHandler(originalHandler: func) {
+    return (event) => {
+      this.props.actions.updateFields(this.props.id, this.defaultValues, true)
+      return originalHandler ? originalHandler(event) : false
+    }
+  }
+
+	/**
+	 * @memberof RoundedForm
+	 */
   mapChildrenRecursively(children, fn) {
     return React.Children.map(children, child => {
       if (!React.isValidElement(child)) {
@@ -173,6 +183,13 @@ class RoundedForm extends Component<Props> {
         return React.cloneElement(child, {
           onClick: this.onSubmitHandler(child.props.onClick),
           onKeyDown: this.onSubmitHandler(child.props.onKeyDown)
+        })
+      }
+
+      if (isButton && child.props.type === 'reset') {
+        return React.cloneElement(child, {
+          onClick: this.onResetHandler(child.props.onClick),
+          onKeyDown: this.onResetHandler(child.props.onKeyDown)
         })
       }
 

@@ -43,25 +43,25 @@ class IndicatorForm extends Component<Props> {
         return (
           <React.Fragment>
             <CheckBox
-              name="isEmaEnabled"
-              defaultValue={indicator.ema.isEnabled}
+              name="isSmaEnabled"
+              defaultValue={indicator.sma.isEnabled}
             >
-              {t(`Enable EMA`)}
+              {t(`Enable SMA`)}
             </CheckBox>
 
             <RoundedInput
-              name="emaPeriod"
-              label={t(`EMA Period`)}
+              name="smaPeriod"
+              label={t(`SMA Period`)}
               type="number"
               min="2"
               max="1000"
-              defaultValue={indicator.ema.period}
+              defaultValue={indicator.sma.period}
             />
 
             <ColorPicker
-              name="emaColor"
-              label={t(`EMA Stroke Color`)}
-              defaultValue={indicator.colors.ema.stroke}
+              name="smaColor"
+              label={t(`SMA Stroke Color`)}
+              defaultValue={indicator.colors.sma.stroke}
             />
           </React.Fragment>
         )
@@ -85,7 +85,7 @@ class IndicatorForm extends Component<Props> {
 
             <div className={styles.buttonsRow}>
               <RoundedButton
-                onClick={() => this.props.actions.resetIndicatorForm(indicatorKey)}
+                type="reset"
                 small
               >
                 {t(`Reset`)}

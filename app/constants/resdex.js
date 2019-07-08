@@ -51,14 +51,14 @@ const RESDEX = {
     {
       key: 'volume',
       name: t(`Volume`),
-      ema: {
-        period: 15,
+      sma: {
+        period: 50,
         isEnabled: true,
       },
       colors: {
         up: '#1d2440',
         down: '#1d2440',
-        ema: {
+        sma: {
           stroke: '#009ed7',
           fill: '#1e4266',
         }

@@ -535,7 +535,7 @@ class TradingChart extends Component<Props> {
 
           </Chart>
 
-          {chartSettings.volume &&
+          {indicators.volume &&
            <Chart
               id={2}
               yExtents={[d => d.volume, smaVolume50.accessor()]}
@@ -553,11 +553,28 @@ class TradingChart extends Component<Props> {
                 fontSize={10}
               />
 
-              <BarSeries fill="#1d2440" yAccessor={d => d.volume} />
-              <AreaSeries yAccessor={smaVolume50.accessor()} stroke={smaVolume50.stroke()} fill={smaVolume50.fill()}/>
+              <BarSeries fill={
+                d => d.close > d.open
+                  ? indicators.volume.colors.up
+                  : indicators.volume.colors.down
+              } yAccessor={d => d.volume} />
 
-              <CurrentCoordinate yAccessor={smaVolume50.accessor()} fill={smaVolume50.stroke()} />
+              {indicators.volume.sma.isEnabled &&
+                <React.Fragment>
+                  <AreaSeries
+                    yAccessor={smaVolume50.accessor()}
+                    stroke={indicators.volume.colors.sma.stroke}
+                    fill={indicators.volume.colors.sma.fill}
+                  />
+                  <CurrentCoordinate
+                    yAccessor={smaVolume50.accessor()}
+                    fill={indicators.volume.colors.sma.stroke}
+                  />
+                </React.Fragment>
+              }
+
               <CurrentCoordinate yAccessor={d => d.volume} fill="#009ed7" />
+
             </Chart>
           }
 

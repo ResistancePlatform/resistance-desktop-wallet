@@ -551,9 +551,9 @@ const saveIndicator = (action$: ActionsObservable<Action>, state$) => action$.pi
 
     switch (key) {
       case 'volume':
-        indicator.ema.period = fields.emaPeriod
-        indicator.ema.isEnabled = fields.isEmaEnabled
-        indicator.colors.ema.stroke = fields.emaColor
+        indicator.sma.period = fields.smaPeriod
+        indicator.sma.isEnabled = fields.isSmaEnabled
+        indicator.colors.sma.stroke = fields.smaColor
         break
       default:
     }

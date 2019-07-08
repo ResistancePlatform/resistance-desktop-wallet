@@ -53,6 +53,7 @@ export const ResDexBuySellActions = createActions(
     REMOVE_INDICATOR: (key: string) => ({key}),
     SAVE_INDICATOR: (key: string) => ({key}),
     UPDATE_INDICATOR: (key: string, config: object) => ({key, config}),
+    RESET_INDICATOR: (key: string) => ({key}),
     CLOSE_INDICATORS_MODAL: undefined,
   },
   {
