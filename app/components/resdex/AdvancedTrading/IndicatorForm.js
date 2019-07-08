@@ -4,13 +4,13 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
-import log from 'electron-log'
 
 import {
   RoundedForm,
   RoundedButton,
   RoundedInput,
   CheckBox,
+  ColorPicker,
 } from '~/components/rounded-form'
 import { RESDEX } from '~/constants/resdex'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
@@ -22,7 +22,6 @@ type Props = {
   t: any,
   className?: string,
   indicatorKey: string,
-  form: object,
   resDex: ResDexState,
   actions: object
 }
@@ -43,16 +42,27 @@ class IndicatorForm extends Component<Props> {
       case 'volume':
         return (
           <React.Fragment>
-            <RoundedInput
-              name="emaPeriod"
-              label={t(`Period`)}
-              type="number"
-            />
-
-            <CheckBox name="isEmaEnabled">
+            <CheckBox
+              name="isEmaEnabled"
+              defaultValue={indicator.ema.isEnabled}
+            >
               {t(`Enable EMA`)}
             </CheckBox>
 
+            <RoundedInput
+              name="emaPeriod"
+              label={t(`EMA Period`)}
+              type="number"
+              min="2"
+              max="1000"
+              defaultValue={indicator.ema.period}
+            />
+
+            <ColorPicker
+              name="emaColor"
+              label={t(`EMA Stroke Color`)}
+              defaultValue={indicator.colors.ema.stroke}
+            />
           </React.Fragment>
         )
       default:
@@ -64,26 +74,35 @@ class IndicatorForm extends Component<Props> {
     const { t, indicatorKey } = this.props
 
     const defaultIndicator = RESDEX.getAvailableIndicators(t).find(item => item.key === indicatorKey)
+    const formId = `resDexBuySellIndicatorsModal-${indicatorKey}`
 
     return (
       <div className={cn(styles.form, this.props.className)}>
         <div className={styles.title}>{defaultIndicator.name}</div>
         <div className={styles.body}>
-          <RoundedForm
-            id={`resDexBuySellIndicatorsModal-${indicatorKey}`}
-          >
+          <RoundedForm id={formId}>
             {this.getFormBody()}
 
             <div className={styles.buttonsRow}>
-              <RoundedButton small>
+              <RoundedButton
+                onClick={() => this.props.actions.resetIndicatorForm(indicatorKey)}
+                small
+              >
                 {t(`Reset`)}
               </RoundedButton>
 
-              <RoundedButton small>
+              <RoundedButton
+                onClick={() => this.props.actions.cancelIndicatorEdition(indicatorKey)}
+                small
+              >
                 {t(`Cancel`)}
               </RoundedButton>
 
-              <RoundedButton small>
+              <RoundedButton
+                onClick={() => this.props.actions.saveIndicator(indicatorKey)}
+                small
+                important
+              >
                 {t(`Apply`)}
               </RoundedButton>
 

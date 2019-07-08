@@ -22,14 +22,14 @@ $indicatorsModalWidth: 40rem;
 
 .availableContainer {
   width: 50%;
+  height: 19rem;
 }
 
 .indicatorsList {
-  // background: $BASE_COLOR_DARK_BLUE_2;
   overflow-y: scroll;
-  height: calc(100% - 5rem);
 
   .indicator {
+    position: relative;
     color: $BASE_COLOR_WHITE;
     font-size: 0.65rem;
     padding: 0.5rem;
@@ -38,6 +38,19 @@ $indicatorsModalWidth: 40rem;
 
     &.notImplemented {
       color: $BASE_COLOR_FONT_GRAY;
+    }
+  }
+
+  .removeButton {
+    position: absolute;
+    top: 0;
+    right: 0;
+    outline: none;
+    z-index: 100000000000;
+
+    &:before {
+      font-size: 0.5rem;
+      content: '\e906';
     }
   }
 }

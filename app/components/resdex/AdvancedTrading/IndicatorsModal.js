@@ -8,7 +8,6 @@ import log from 'electron-log'
 
 import {
   RoundedInput,
-  CheckBox,
 } from '~/components/rounded-form'
 import IndicatorForm from './IndicatorForm'
 import { RESDEX } from '~/constants/resdex'
@@ -90,11 +89,20 @@ class IndicatorsModal extends Component<Props> {
                   key={indicator.key}
                   role="none"
                   className={styles.indicator}
-                  onClick={() => this.props.actions.editIndicator(indicator.key)}
                 >
-                  {indicator.name}
+                  <div
+                    role="none"
+                    className={styles.name}
+                    onClick={() => this.props.actions.editIndicator(indicator.key)}
+                  >
+                    {indicator.name}
+                  </div>
 
-                  <div className={styles.removeButton}>X</div>
+                  <div
+                    className={cn('icon', styles.removeButton)}
+                    role="none"
+                    onClick={() => this.props.actions.removeIndicator(indicator.key)}
+                  />
                 </div>
               ))}
             </div>
@@ -112,16 +120,22 @@ class IndicatorsModal extends Component<Props> {
               {availableIndicators.map(indicator => (
                 <div
                   key={indicator.key}
-                  role="none"
                   className={cn(styles.indicator, {[styles.notImplemented]: indicator.isNotImplemented})}
-                  onClick={() => this.props.actions.editIndicator(indicator.key)}
                 >
                   {indicatorsModal.formKey === indicator.key
                     ? (
                       <IndicatorForm indicatorKey={indicator.key} />
                     )
                     : (
-                      <div className={styles.body}>
+                      <div
+                        className={styles.body}
+                        role="none"
+                        onClick={
+                          indicator.isNotImplemented
+                          ? () => false
+                          : () => this.props.actions.editIndicator(indicator.key)
+                        }
+                      >
                         {indicator.name}
                       </div>
                     )

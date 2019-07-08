@@ -1,6 +1,15 @@
+@import "~/assets/styles/vars.scss";
+
 .form {
+
   .buttonsRow {
     display: flex;
     justify-content: space-between;
   }
+}
+
+.body {
+  margin-top: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid $BASE_COLOR_BORDER_BLUE;
 }

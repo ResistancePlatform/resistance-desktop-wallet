@@ -14,7 +14,7 @@ type Props = {
   roundedForm: RoundedFormState,
   +id: string,
   className?: string,
-  schema: object,
+  schema?: object,
   options?: object,
   onValidate?: (errors: object) => void,
   important?: boolean,
@@ -89,7 +89,10 @@ class RoundedForm extends Component<Props> {
     const language = i18n.getResourceBundle(i18n.language, 'validation')
 
     const options = Object.assign({ abortEarly: false, language }, this.props.options)
-    const {error, value} = Joi.validate(stateFields, this.props.schema, options)
+
+    const {error, value} = this.props.schema
+      ? Joi.validate(stateFields, this.props.schema, options)
+      : {error: null, value: {...stateFields}}
 
     if (error === null) {
       // Put cleaned up field values in the store
