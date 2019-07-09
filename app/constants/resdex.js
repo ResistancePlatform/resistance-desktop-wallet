@@ -47,6 +47,7 @@ const RESDEX = {
     'MakerPaymentSpent',
     'Finished'
   ],
+  chartFontFamily: `Quicksand, Arial, Helvetica, Helvetica Neue, serif`,
   getAvailableIndicators: t => ([
     {
       key: 'volume',
@@ -219,7 +220,7 @@ const RESDEX = {
           value: '#009ed7',
         },
         {
-          name: 'top',
+          name: 'middle',
           label: t(`Middle`),
           value: '#009ed7',
         },
@@ -241,8 +242,8 @@ const RESDEX = {
       formHeight: '5rem',
       inputs: [
         {
-          name: 'windowSize',
-          label: t(`Window Size`),
+          name: 'period',
+          label: t(`Period`),
           type: 'number',
           value: 14,
         },
