@@ -1,0 +1,26 @@
+@import "~/assets/styles/vars.scss";
+
+.input {
+  margin-right: 0.5rem;
+}
+
+.color {
+  width: 100%;
+  border-radius: 0.2rem;
+  margin: 0.5rem;
+  height: 1rem;
+  content: ' ';
+}
+
+.picker {
+  position: absolute !important;
+  background-color: $BASE_COLOR_DARK_BLUE_3 !important;
+  z-index: 10000000;
+  box-shadow: 0.3125rem 0.3125rem 3.6875rem -0.125rem $BASE_COLOR_SHADOW !important;
+  left: 3.8rem;
+  top: 1.4rem;
+
+  div:nth-child(2) {
+    border-color: transparent transparent $BASE_COLOR_DARK_BLUE_3 !important;
+  }
+}

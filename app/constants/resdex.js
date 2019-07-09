@@ -107,8 +107,8 @@ const RESDEX = {
           value: 26,
         },
         {
-          name: 'lagPeriod',
-          label: t(`Lag Period`),
+          name: 'signalPeriod',
+          label: t(`Signal Period`),
           type: 'number',
           value: 9,
         },

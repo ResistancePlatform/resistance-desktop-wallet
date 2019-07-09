@@ -70,16 +70,6 @@ const kagiCalculator = kagi()
 const pAndF = pointAndFigure()
 const renkoCalculator = renko()
 
-const macdAppearance = {
-	stroke: {
-		macd: "#e20063",
-		signal: "#00d492",
-	},
-	fill: {
-		divergence: "#009ed8"
-	},
-}
-
 const mouseEdgeAppearance = {
 	textFill: '#a4abc7',
 	strokeOpacity: 1,
@@ -108,10 +98,9 @@ const ema50 = ema()
   .accessor(d => d.ema50)
   .stroke('#e20063')
 
-const smaVolume50 = sma()
-  .options({ windowSize: 20, sourcePath: 'volume' })
-  .merge((d, c) => ({...d, smaVolume50: c}))
-  .accessor(d => d.smaVolume50)
+const smaVolume = sma()
+  .merge((d, c) => ({...d, smaVolume: c}))
+  .accessor(d => d.smaVolume)
   .stroke('#009ed7')
   .fill('#1e4266')
 
@@ -120,11 +109,6 @@ const bb = bollingerBand()
   .accessor(d => d.bb)
 
 const macdCalculator = macd()
-  .options({
-    fast: 12,
-    slow: 26,
-    signal: 9,
-  })
   .merge((d, c) => ({...d, macd: c}))
   .accessor(d => d.macd)
 
@@ -164,20 +148,39 @@ class TradingChart extends Component<Props> {
     return data
   }
 
-  calculateIndicators(data) {
+  calculateIndicators(data, indicatorsConfig) {
     const { tradingChart } = this.props.resDex.buySell
 
     let calculatedData = rsiCalculator(
       bb(
-        smaVolume50(
-          ema20(
-            ema50(
-              macdCalculator(data)
-            )
+        ema20(
+          ema50(
+            data
           )
         )
       )
     )
+    log.debug('Indicators config', indicatorsConfig)
+
+    // Volume SMA
+    if (indicatorsConfig.volume && indicatorsConfig.volume.isSmaEnabled) {
+      calculatedData = smaVolume
+        .options({
+          windowSize: indicatorsConfig.volume.smaPeriod,
+          sourcePath: 'volume'
+        })(calculatedData)
+    }
+
+    // MACD
+    if (indicatorsConfig.macd) {
+      calculatedData = macdCalculator
+        .options({
+          fast: indicatorsConfig.fastPeriod,
+          slow: indicatorsConfig.slowPeriod,
+          signal: indicatorsConfig.signalPeriod,
+        })(calculatedData)
+    }
+
 
     switch (tradingChart.type) {
       case 'heikin-ashi':
@@ -198,7 +201,7 @@ class TradingChart extends Component<Props> {
     return calculatedData
   }
 
-	getDataAndScale() {
+	getDataAndScale(indicatorsConfig) {
     const { ohlc: initialData } = this.props.resDex.buySell
 
     if (initialData.length === 0) {
@@ -210,10 +213,6 @@ class TradingChart extends Component<Props> {
       }
     }
 
-    /*
-     * Couldn't make discontinuousTimeScaleProvider working — it only returns null values
-     */
-
 		const xScaleProvider = discontinuousTimeScaleProvider
       .inputDateAccessor(d => d && d.date)
 
@@ -224,7 +223,7 @@ class TradingChart extends Component<Props> {
       displayXAccessor,
     } = xScaleProvider(this.tweakData(initialData))
 
-    const calculatedData = this.calculateIndicators(data)
+    const calculatedData = this.calculateIndicators(data, indicatorsConfig)
 
     const result = {
       data: calculatedData,
@@ -232,8 +231,6 @@ class TradingChart extends Component<Props> {
       xAccessor,
       displayXAccessor,
     }
-
-    log.debug(`Data and scale`, typeof result.xScale, typeof result.xAccessor, JSON.stringify(result.data))
 
     return result
 	}
@@ -352,17 +349,47 @@ class TradingChart extends Component<Props> {
       return false
     }
 
-    let result = indicator.inputs.reduce((input, accumulated) => ({
+    let result = indicator.inputs.reduce((accumulated, input) => ({
       ...accumulated,
       [input.name]: input.value
     }), {})
 
-    result = indicator.colors.reduce((color, accumulated) => ({
+    result = indicator.colors.reduce((accumulated, color) => ({
       ...accumulated,
       [color.name]: color.value
     }), result)
 
     return result
+  }
+
+  getIndicatorsConfig() {
+    const { indicators } = this.props.resDex.buySell.tradingChart
+
+    log.debug('indicators', Object.keys(indicators))
+    const config = Object.keys(indicators).reduce((accumulated, key) => ({
+      ...accumulated,
+      [key]: this.getIndicatorConfig(key)
+    }), {})
+
+    return config
+  }
+
+  getMacdAppearance(macdConfig) {
+    if (!macdConfig) {
+      return {}
+    }
+
+    const appearance = {
+      stroke: {
+        macd: macdConfig.main,
+        signal: macdConfig.signal,
+      },
+      fill: {
+        divergence: macdConfig.histogram
+      },
+    }
+
+    return appearance
   }
 
 	/**
@@ -388,13 +415,19 @@ class TradingChart extends Component<Props> {
     const bottomIndicatorHeight = 100
     const bottomIndicatorsNumber = this.getBottomIndicatorsNumber()
 
+    const indicatorsConfig = this.getIndicatorsConfig()
+
     const {
       data,
       xScale,
       displayXAccessor,
-    } = this.getDataAndScale()
+    } = this.getDataAndScale(indicatorsConfig)
 
-    const volume = this.getIndicatorConfig('volume')
+    const {
+      volume,
+    } = indicatorsConfig
+
+    const macdAppearance = this.getMacdAppearance(indicatorsConfig.macd)
 
 		return (
       <div className={styles.container} ref={el => this.elementRef(el)}>
@@ -560,7 +593,7 @@ class TradingChart extends Component<Props> {
           {volume &&
            <Chart
               id={2}
-              yExtents={[d => d.volume, smaVolume50.accessor()]}
+              yExtents={[d => d.volume, smaVolume.accessor()]}
               height={150}
               origin={(w, h) => [0, h - bottomIndicatorsNumber * bottomIndicatorHeight - 150]}
             >
@@ -584,12 +617,12 @@ class TradingChart extends Component<Props> {
               {volume.isSmaEnabled &&
                 <React.Fragment>
                   <AreaSeries
-                    yAccessor={smaVolume50.accessor()}
+                    yAccessor={smaVolume.accessor()}
                     stroke={volume.smaStroke}
                     fill={volume.smaFill}
                   />
                   <CurrentCoordinate
-                    yAccessor={smaVolume50.accessor()}
+                    yAccessor={smaVolume.accessor()}
                     fill={volume.smaStroke}
                   />
                 </React.Fragment>
