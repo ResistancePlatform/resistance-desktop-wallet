@@ -171,6 +171,10 @@ export const preloadedState: State = {
         indicators: {
         },
         editFormIndicatorKey: null,
+        interactiveMode: null,
+        interactive: {
+          'trendline': [],
+        }
       },
       indicatorsModal: {
         isVisible: false,

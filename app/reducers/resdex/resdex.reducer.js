@@ -84,7 +84,9 @@ export type ResDexState = {
       type: 'candlestick' | 'heikin-ashi' | 'kagi' | 'point-figure' | 'renko',
       indicators: {
         [key: string]: object
-      }
+      },
+      interactiveMode: string | null,
+      interactive: {[key: string]: any}
     },
     indicatorsModal: {
       isVisible: boolean,

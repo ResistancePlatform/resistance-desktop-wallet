@@ -5,15 +5,8 @@ import { translate } from 'react-i18next'
 import log from 'electron-log'
 
 import { format } from 'd3-format'
-import { utcHour, utcDay, utcWeek, utcMonth, utcYear } from 'd3-time'
 import { discontinuousTimeScaleProvider } from 'react-stockcharts/lib/scale'
 import { ChartCanvas, Chart } from 'react-stockcharts'
-import {
-  CandlestickSeries,
-  KagiSeries,
-  PointAndFigureSeries,
-  RenkoSeries,
-} from 'react-stockcharts/lib/series'
 import { OHLCTooltip } from 'react-stockcharts/lib/tooltip'
 import {
 	CrossHairCursor,
@@ -22,7 +15,7 @@ import {
 } from 'react-stockcharts/lib/coordinates'
 import { XAxis, YAxis } from 'react-stockcharts/lib/axes'
 import { fitWidth } from 'react-stockcharts/lib/helper'
-import { first, timeIntervalBarWidth } from 'react-stockcharts/lib/utils'
+import { first, last } from 'react-stockcharts/lib/utils'
 import {
   heikinAshi,
   kagi,
@@ -34,7 +27,9 @@ import {
   rsi,
   macd
 } from 'react-stockcharts/lib/indicator'
+import { DrawingObjectSelector } from 'react-stockcharts/lib/interactive'
 
+import { RESDEX } from '~/constants/resdex'
 import {
   getVolumeIndicator,
   getMacdIndicator,
@@ -42,6 +37,10 @@ import {
   getRsiIndicator,
   getEmaIndicators,
 } from './Indicators'
+import {
+  getTrendlines,
+} from './Interactive'
+import getMainSeries from './MainSeries'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import TradingChartSettings from './TradingChartSettings'
 
@@ -54,8 +53,6 @@ type Props = {
 	width: number,
 	ratio: number
 }
-
-const chartFontFamily = `Quicksand, Arial, Helvetica, Helvetica Neue, serif`
 
 const ha = heikinAshi()
 const kagiCalculator = kagi()
@@ -77,6 +74,13 @@ const mouseEdgeAppearance = {
 class TradingChart extends Component<Props> {
 	props: Props
 
+	/**
+	 * @memberof TradingChart
+	 */
+  componentDidMount() {
+    this.interactiveNodes = {}
+  }
+
 /**
  * Adds an extra data point if data size is too small.
  *
@@ -87,6 +91,7 @@ class TradingChart extends Component<Props> {
     const data = sourceData.slice()
 
     if (sourceData.length === 1) {
+      log.debug(`Tweaking data of length`, sourceData.length)
       for (let day = -1; day > -10; day -= 1) {
         const dayDate = new Date(sourceData[0].date.getTime())
         dayDate.setDate(dayDate.getDate() + day)
@@ -97,7 +102,7 @@ class TradingChart extends Component<Props> {
       }
     }
 
-    log.debug(`Data`, JSON.stringify(data))
+    // log.debug(`Data`, JSON.stringify(data))
     return data
   }
 
@@ -232,7 +237,7 @@ class TradingChart extends Component<Props> {
       return []
     }
 
-    const lastDate = new Date()
+    const lastDate = last(data).date
     let firstDate = new Date(lastDate.getTime())
 
     switch (period) {
@@ -277,33 +282,17 @@ class TradingChart extends Component<Props> {
     if (!this.element) {
       return 0
     }
-    return Math.max(504, this.element.clientHeight-64)
-  }
-
-  getCandleStickWidth() {
-    const { period } = this.props.resDex.buySell.tradingChart
-
-    const d3Interval = {
-      'hour': utcHour,
-      'day': utcDay,
-      'week': utcWeek,
-      'month': utcMonth,
-      'year': utcYear,
-      'all': utcYear,
-    }[period] || utcDay
-
-    return timeIntervalBarWidth(d3Interval)
+    return Math.max(504, this.element.clientHeight - 64)
   }
 
   getBottomIndicatorsNumber() {
-    const { tradingChart } = this.props.resDex.buySell
     let counter = 0
 
-    if (tradingChart.macd) {
+    if (this.indicatorsConfig.macd) {
       counter += 1
     }
 
-    if (tradingChart.rsi) {
+    if (this.indicatorsConfig.rsi) {
       counter += 1
     }
 
@@ -311,6 +300,7 @@ class TradingChart extends Component<Props> {
   }
 
   getXAxis(xGrid, showTicks: boolean) {
+    log.debug('xGrid', JSON.stringify(xGrid))
     return (
       <XAxis
         axisAt="bottom"
@@ -318,7 +308,7 @@ class TradingChart extends Component<Props> {
         stroke="#009ed8"
         tickStroke="#009ed8"
         showTicks={showTicks}
-        fontFamily={chartFontFamily}
+        fontFamily={RESDEX.chartFontFamily}
         fontSize="8"
         outerTickSize={0}
         opacity={0.5}
@@ -360,6 +350,21 @@ class TradingChart extends Component<Props> {
     return config
   }
 
+  getGrids(margin) {
+    const { width } = this.props
+
+		const gridHeight = this.getHeight() - margin.top - margin.bottom;
+		const gridWidth = width - margin.left - margin.right;
+
+		const xGrid = { innerTickSize: -1 * gridWidth, tickStrokeOpacity: 0.2 }
+		const yGrid = { innerTickSize: -1 * gridHeight, tickStrokeOpacity: 0.2 }
+
+    return {
+      xGrid,
+      yGrid,
+    }
+  }
+
 	/**
 	 * @returns
    * @memberof TradingChart
@@ -368,23 +373,19 @@ class TradingChart extends Component<Props> {
     const { width, ratio } = this.props
 
 		const margin = { left: 50, right: 50, top: 20, bottom: 30 }
-		const gridHeight = this.getHeight() - margin.top - margin.bottom;
-		const gridWidth = width - margin.left - margin.right;
-
-		const yGrid = { innerTickSize: -1 * gridWidth, tickStrokeOpacity: 0.2 }
-		const xGrid = { innerTickSize: -1 * gridHeight, tickStrokeOpacity: 0.2 }
+    const { xGrid, yGrid } = this.getGrids(margin)
 
     const height = this.getHeight()
 
-    const { period: chartPeriod } = this.props.resDex.buySell.tradingChart
-
     const { tradingChart: chartSettings } = this.props.resDex.buySell
+    const { interactive } = chartSettings
 
     const bottomIndicatorHeight = 100
-    const bottomIndicatorsNumber = this.getBottomIndicatorsNumber()
 
     this.indicatorsConfig = this.getIndicatorsConfig()
     this.calculators = this.getCalculators()
+
+    const bottomIndicatorsNumber = this.getBottomIndicatorsNumber()
 
     const {
       data,
@@ -396,7 +397,7 @@ class TradingChart extends Component<Props> {
       <div className={styles.container} ref={el => this.elementRef(el)}>
         <TradingChartSettings />
 
-        {data.length &&
+        {data.length > 10 &&
         <ChartCanvas
           height={height}
           ratio={ratio}
@@ -408,7 +409,7 @@ class TradingChart extends Component<Props> {
           xAccessor={d => d && d.date}
           xScale={xScale}
           displayXAccessor={displayXAccessor}
-          xExtents={this.getXExtents(data, chartPeriod)}>
+          xExtents={this.getXExtents(data, chartSettings.period)}>
 
           <Chart id={1} height={height - bottomIndicatorsNumber * bottomIndicatorHeight - 50}
             yExtents={[d => [d.high, d.low]]}
@@ -420,13 +421,13 @@ class TradingChart extends Component<Props> {
               ticks={5}
               stroke="rgb(90, 98, 131)"
               tickStroke="#009ed8"
-              fontFamily={chartFontFamily}
+              fontFamily={RESDEX.chartFontFamily}
               fontSize={10}
               {...yGrid}
               inverted
             />
 
-            { this.getXAxis(xGrid, bottomIndicatorsNumber === 0) }
+            { this.getXAxis(xGrid, true) }
 
             <MouseCoordinateY
               at="right"
@@ -440,43 +441,16 @@ class TradingChart extends Component<Props> {
               calculators: this.calculators
             })}
 
-            {['candlestick', 'heikin-ashi'].includes(chartSettings.type) &&
-              <CandlestickSeries
-                stroke={d => d.close > d.open ? "#00d492" : "#e20063"}
-                wickStroke={d => d.close > d.open ? "#00d492" : "#e20063"}
-                fill={d => d.close > d.open ? "#00d492" : "#e20063"}
-                width={this.getCandleStickWidth()}
-              />
-            }
-
-            {chartSettings.type === 'kagi' &&
-              <KagiSeries
-                stroke={{ yang: '#e20063', yin: '#00d492' }}
-                currentValueStroke="rgb(238, 238, 241)"
-              />
-            }
-
-            {chartSettings.type === 'point-figure' &&
-              <PointAndFigureSeries
-                stroke={{ up: '#e20063', down: '#00d492' }}
-              />
-            }
-
-            {chartSettings.type === 'renko' &&
-              <RenkoSeries
-                fill={{
-                  up: '#e20063',
-                  down: '#00d492',
-                  partial: '#009ed8',
-                }}
-              />
-            }
-
             {this.indicatorsConfig.bb && getBbIndicator({
                 config: this.indicatorsConfig.bb,
                 calculator: this.calculators.bb
               })
             }
+
+            {getMainSeries({
+              type: chartSettings.type,
+              period: chartSettings.period
+            })}
 
             <EdgeIndicator
               itemType="last"
@@ -493,9 +467,18 @@ class TradingChart extends Component<Props> {
             <OHLCTooltip
               origin={[-40, 0]}
               textFill="rgb(238, 238, 241)"
-              fontFamily={chartFontFamily}
+              fontFamily={RESDEX.chartFontFamily}
             />
 
+            {interactive.trendline.length &&
+              getTrendlines({
+                chartId: 1,
+                mode: chartSettings.interactiveMode,
+                nodes: this.interactiveNodes,
+                config: interactive.trendline,
+                update: trends => this.props.actions.updateInteractive({trendline: trends})
+              })
+            }
           </Chart>
 
           {this.indicatorsConfig.volume && getVolumeIndicator({
@@ -528,6 +511,15 @@ class TradingChart extends Component<Props> {
 
           <CrossHairCursor
             stroke="rgb(238, 238, 241)"
+          />
+
+          <DrawingObjectSelector
+            enabled={chartSettings.interactiveMode === null}
+            getInteractiveNodes={() => this.interactiveNodes}
+            drawingObjectMap={{
+              Trendline: "trends"
+            }}
+            onSelect={this.handleSelection}
           />
 
         </ChartCanvas>
