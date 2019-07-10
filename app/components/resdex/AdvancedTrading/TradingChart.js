@@ -79,7 +79,12 @@ class TradingChart extends Component<Props> {
 	 */
   componentDidMount() {
     this.interactiveNodes = {}
+		document.addEventListener('keyup', this.onKeyPress)
   }
+
+	componentWillUnmount() {
+		document.removeEventListener('keyup', this.onKeyPress)
+	}
 
 /**
  * Adds an extra data point if data size is too small.
@@ -365,6 +370,13 @@ class TradingChart extends Component<Props> {
     }
   }
 
+  onKeyPress(event) {
+  }
+
+  handleInteractiveSelection(interactives) {
+    log.debug("Interactives", JSON.stringify(interactives))
+  }
+
 	/**
 	 * @returns
    * @memberof TradingChart
@@ -519,7 +531,7 @@ class TradingChart extends Component<Props> {
             drawingObjectMap={{
               Trendline: "trends"
             }}
-            onSelect={this.handleSelection}
+            onSelect={this.handleInteractiveSelection}
           />
 
         </ChartCanvas>

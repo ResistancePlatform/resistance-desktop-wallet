@@ -43,7 +43,6 @@ export const ResDexBuySellActions = createActions(
     GOT_TRADES: (trades: object[]) => ({ trades }),
     GET_TRADES_FAILED: undefined,
 
-    UPDATE_INTERACTIVE_MODE: (mode: string | null) => ({ mode }),
     UPDATE_CHART_SETTINGS: (settings: object) => ({ ...settings }),
     UPDATE_CHART_PERIOD: (period: string) => ({ period }),
 
@@ -56,6 +55,9 @@ export const ResDexBuySellActions = createActions(
     UPDATE_INDICATOR: (key: string, config: object) => ({key, config}),
     RESET_INDICATOR: (key: string) => ({key}),
     CLOSE_INDICATORS_MODAL: undefined,
+
+    UPDATE_INTERACTIVE_MODE: (mode: string | null) => ({ mode }),
+    UPDATE_INTERACTIVE: (config: object) => ({ ...config }),
   },
   {
     prefix: 'APP/RESDEX/BUY_SELL'
@@ -85,6 +87,8 @@ function removeIndicator(key: string, indicators: object) {
 
 export const ResDexBuySellReducer = handleActions(
   {
+    // Trading
+
     [ResDexBuySellActions.selectTab]: (state, action) => ({
       ...state,
       selectedTabIndex: action.payload.index,
@@ -144,6 +148,10 @@ export const ResDexBuySellReducer = handleActions(
       ...state,
       isSendingOrder: false,
     }),
+
+
+    // Advanced Trading
+
     [ResDexBuySellActions.gotOhlc]: (state, action) => ({
       ...state,
       ohlc: action.payload.ohlc,
@@ -152,13 +160,9 @@ export const ResDexBuySellReducer = handleActions(
       ...state,
       trades: action.payload.trades,
     }),
-    [ResDexBuySellActions.updateInteractiveMode]: (state, action) => ({
-      ...state,
-      tradingChart: {
-        ...state.tradingChart,
-        interactiveMode: action.payload.mode
-      }
-    }),
+
+    // Chart Settings
+
     [ResDexBuySellActions.updateChartSettings]: (state, action) => ({
       ...state,
       tradingChart: {
@@ -174,6 +178,9 @@ export const ResDexBuySellReducer = handleActions(
         period: action.payload.period
       }
     }),
+
+    // Indicators
+
     [ResDexBuySellActions.showIndicatorsModal]: state => ({
       ...state,
       indicatorsModal: {
@@ -230,6 +237,26 @@ export const ResDexBuySellReducer = handleActions(
       indicatorsModal: {
         ...state.indicatorsModal,
         isVisible: false
+      }
+    }),
+
+    // Interactive
+
+    [ResDexBuySellActions.updateInteractiveMode]: (state, action) => ({
+      ...state,
+      tradingChart: {
+        ...state.tradingChart,
+        interactiveMode: action.payload.mode
+      }
+    }),
+    [ResDexBuySellActions.updateInteractive]: (state, action) => ({
+      ...state,
+      tradingChart: {
+        ...state.tradingChart,
+        interactive: {
+          ...state.tradingChart.interactive,
+          ...action.payload
+        }
       }
     }),
   }, preloadedState)
