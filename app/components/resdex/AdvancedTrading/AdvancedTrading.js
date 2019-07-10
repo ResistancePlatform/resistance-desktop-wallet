@@ -8,7 +8,8 @@ import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import TradingChart from './TradingChart'
-import BuySellForm from './BuySellForm'
+import BuySellForm from '../BuySellForm'
+import IndicatorsModal from './IndicatorsModal'
 import OrderBook from './OrderBook'
 import Trades from './Trades'
 
@@ -32,7 +33,13 @@ class ResDexAdvancedTrading extends Component<Props> {
    * @memberof ResDexAdvancedTrading
 	 */
 	render() {
-    const { baseCurrency, quoteCurrency, orderBook, trades } = this.props.buySell
+    const {
+      baseCurrency,
+      quoteCurrency,
+      orderBook,
+      trades,
+      indicatorsModal
+    } = this.props.buySell
     const { RESDEX: currencies } = this.props.accounts.currencies
 
     const baseSmartAddress = baseCurrency in currencies ? currencies[baseCurrency].address : null
@@ -69,6 +76,10 @@ class ResDexAdvancedTrading extends Component<Props> {
             failure: ResDexBuySellActions.getOhlcFailed
           }}
         />
+
+        {indicatorsModal.isVisible &&
+          <IndicatorsModal />
+        }
 
         <div className={styles.container}>
           <div className={styles.chartContainer}>

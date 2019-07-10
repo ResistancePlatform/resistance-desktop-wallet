@@ -1,8 +1,13 @@
 // @flow
+import { translate } from '~/i18next.config'
 import { createActions, handleActions } from 'redux-actions'
 import { preloadedState } from '~/reducers/preloaded.state'
 
+import { RESDEX } from '~/constants/resdex'
+
 export type PrivateOrderStatus = 'swapping_rel_res' | 'privatizing' | 'swapping_res_base' | 'completed' | 'failed' | 'cancelled'
+
+const t = translate('resdex')
 
 export const ResDexBuySellActions = createActions(
   {
@@ -40,11 +45,42 @@ export const ResDexBuySellActions = createActions(
 
     UPDATE_CHART_SETTINGS: (settings: object) => ({ ...settings }),
     UPDATE_CHART_PERIOD: (period: string) => ({ period }),
+
+    SHOW_INDICATORS_MODAL: undefined,
+    UPDATE_INDICATORS_SEARCH_STRING: (searchString: string) => ({searchString}),
+    EDIT_INDICATOR: (key: string) => ({key}),
+    CANCEL_INDICATOR_EDITION: (key: string) => ({key}),
+    REMOVE_INDICATOR: (key: string) => ({key}),
+    SAVE_INDICATOR: (key: string) => ({key}),
+    UPDATE_INDICATOR: (key: string, config: object) => ({key, config}),
+    RESET_INDICATOR: (key: string) => ({key}),
+    CLOSE_INDICATORS_MODAL: undefined,
   },
   {
     prefix: 'APP/RESDEX/BUY_SELL'
   }
 )
+
+function getIndicators(key: string, indicators: object) {
+  if (indicators[key]) {
+    return indicators
+  }
+
+  const newIndicator = RESDEX.getAvailableIndicators(t).find(i => i.key === key)
+
+  const updatedIndicators = {
+    ...indicators,
+    [key]: {...newIndicator}
+  }
+
+  return updatedIndicators
+}
+
+function removeIndicator(key: string, indicators: object) {
+  const result = {...indicators}
+  delete result[key]
+  return result
+}
 
 export const ResDexBuySellReducer = handleActions(
   {
@@ -128,6 +164,64 @@ export const ResDexBuySellReducer = handleActions(
       tradingChart: {
         ...state.tradingChart,
         period: action.payload.period
+      }
+    }),
+    [ResDexBuySellActions.showIndicatorsModal]: state => ({
+      ...state,
+      indicatorsModal: {
+        ...state.indicatorsModal,
+        isVisible: true
+      }
+    }),
+    [ResDexBuySellActions.updateIndicatorsSearchString]: (state, action) => ({
+      ...state,
+      indicatorsModal: {
+        ...state.indicatorsModal,
+        searchString: action.payload.searchString
+      }
+    }),
+    [ResDexBuySellActions.editIndicator]: (state, action) => ({
+      ...state,
+      tradingChart: {
+        ...state.tradingChart,
+        indicators: getIndicators(action.payload.key, state.tradingChart.indicators)
+      },
+      indicatorsModal: {
+        ...state.indicatorsModal,
+        formKey: action.payload.key
+      },
+    }),
+    [ResDexBuySellActions.cancelIndicatorEdition]: (state, action) => ({
+      ...state,
+      indicatorsModal: {
+        ...state.indicatorsModal,
+        formKey: action.payload.key === state.indicatorsModal.formKey
+          ? null
+          : state.indicatorsModal.formKey
+      }
+    }),
+    [ResDexBuySellActions.removeIndicator]: (state, action) => ({
+      ...state,
+      tradingChart: {
+        ...state.tradingChart,
+        indicators: removeIndicator(action.payload.key, state.tradingChart.indicators)
+      },
+    }),
+    [ResDexBuySellActions.updateIndicator]: (state, action) => ({
+      ...state,
+      tradingChart: {
+        ...state.tradingChart,
+        indicators: {
+          ...state.tradingChart.indicators,
+          [action.payload.key]: action.payload.config
+        }
+      },
+    }),
+    [ResDexBuySellActions.closeIndicatorsModal]: state => ({
+      ...state,
+      indicatorsModal: {
+        ...state.indicatorsModal,
+        isVisible: false
       }
     }),
   }, preloadedState)

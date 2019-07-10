@@ -48,10 +48,10 @@ class Trades extends Component<Props> {
           {toDecimalPlaces(trade.price, 4)}
         </UniformListColumn>
         <UniformListColumn>
-          {toDecimalPlaces(trade.quoteAmount)}
+          {toDecimalPlaces(trade.quoteAmount, 4)}
         </UniformListColumn>
         <UniformListColumn>
-          {toDecimalPlaces(trade.baseAmount)}
+          {toDecimalPlaces(trade.baseAmount, 4)}
         </UniformListColumn>
         <UniformListColumn>
           {moment(trade.time).format('HH:mm:ss')}

@@ -167,13 +167,15 @@ export const preloadedState: State = {
       trades: [],
       tradingChart: {
         period: 'day',
-        volume: true,
         type: 'candlestick',
-        macd: false,
-        ema20: true,
-        ema50: true,
-        bb: false,
-        rsi: true
+        indicators: {
+        },
+        editFormIndicatorKey: null,
+      },
+      indicatorsModal: {
+        isVisible: false,
+        searchString: '',
+        formKey: null
       }
     },
     orders: {

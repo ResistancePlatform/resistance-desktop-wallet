@@ -14,7 +14,7 @@ import AddCurrencyModal from './AddCurrencyModal'
 import OrderModal from './OrderModal'
 import ResDexAssets from './Assets'
 import ResDexBuySell from './BuySell'
-import ResDexAdvancedTrading from './AdvancedTrading'
+import ResDexAdvancedTrading from './AdvancedTrading/AdvancedTrading'
 import ResDexOrders from './Orders'
 import ResDexAccounts from './Accounts'
 import { getIsLoginDisabled } from '~/utils/resdex'
@@ -104,7 +104,7 @@ export class ResDex extends Component<Props> {
             <Tab className={styles.tab}>{t(`Orders`)}</Tab>
             <Tab className={styles.tab}>{t(`Accounts`)}</Tab>
 
-            {selectedTabIndex == 4 &&
+            {selectedTabIndex === 4 &&
               <BorderlessButton
                 className={styles.logoutButton}
                 glyphClassName={styles.logoutGlyph}

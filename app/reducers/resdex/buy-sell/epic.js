@@ -529,6 +529,47 @@ const updateChartPeriod = (action$: ActionsObservable<Action>) => action$.pipe(
   mapTo(ResDexBuySellActions.getOhlc()),
 )
 
+const cancelIndicatorEdition = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexBuySellActions.cancelIndicatorEdition),
+  map(action => RoundedFormActions.clear(`resDexBuySellIndicatorsModal-${action.payload.key}`))
+)
+
+const removeIndicator = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexBuySellActions.removeIndicator),
+  map(action => ResDexBuySellActions.cancelIndicatorEdition(action.payload.key))
+)
+
+const saveIndicator = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+  ofType(ResDexBuySellActions.saveIndicator),
+  switchMap(action => {
+    const { key } = action.payload
+
+    const { fields } = state$.value.roundedForm[`resDexBuySellIndicatorsModal-${key}`]
+    const indicator = {...state$.value.resDex.buySell.tradingChart.indicators[key]}
+
+    log.debug('Fields', fields)
+
+    const findInput = name => indicator.inputs.find(i => i.name === name)
+    const findColor = name => indicator.colors.find(i => i.name === name)
+
+    Object.keys(fields).forEach(name => {
+      const value = fields[name]
+      const input = findInput(name)
+      const color = findColor(name)
+      if (input) {
+        input.value = value
+      } else if (color) {
+        color.value = value
+      }
+    })
+
+    return of(
+      ResDexBuySellActions.updateIndicator(key, indicator),
+      ResDexBuySellActions.cancelIndicatorEdition(key)
+    )
+  })
+)
+
 export const ResDexBuySellEpic = (action$, state$) => merge(
   createOrder(action$, state$),
   createPrivateOrder(action$, state$),
@@ -543,5 +584,8 @@ export const ResDexBuySellEpic = (action$, state$) => merge(
   getOhlc(action$, state$),
   getTrades(action$, state$),
   updateChartPeriod(action$, state$),
+  cancelIndicatorEdition(action$, state$),
+  removeIndicator(action$, state$),
+  saveIndicator(action$, state$),
 )
 

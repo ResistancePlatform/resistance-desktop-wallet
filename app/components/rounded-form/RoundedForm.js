@@ -14,7 +14,7 @@ type Props = {
   roundedForm: RoundedFormState,
   +id: string,
   className?: string,
-  schema: object,
+  schema?: object,
   options?: object,
   onValidate?: (errors: object) => void,
   important?: boolean,
@@ -89,7 +89,10 @@ class RoundedForm extends Component<Props> {
     const language = i18n.getResourceBundle(i18n.language, 'validation')
 
     const options = Object.assign({ abortEarly: false, language }, this.props.options)
-    const {error, value} = Joi.validate(stateFields, this.props.schema, options)
+
+    const {error, value} = this.props.schema
+      ? Joi.validate(stateFields, this.props.schema, options)
+      : {error: null, value: {...stateFields}}
 
     if (error === null) {
       // Put cleaned up field values in the store
@@ -135,6 +138,16 @@ class RoundedForm extends Component<Props> {
 	/**
 	 * @memberof RoundedForm
 	 */
+  onResetHandler(originalHandler: func) {
+    return (event) => {
+      this.props.actions.updateFields(this.props.id, this.defaultValues, true)
+      return originalHandler ? originalHandler(event) : false
+    }
+  }
+
+	/**
+	 * @memberof RoundedForm
+	 */
   mapChildrenRecursively(children, fn) {
     return React.Children.map(children, child => {
       if (!React.isValidElement(child)) {
@@ -170,6 +183,13 @@ class RoundedForm extends Component<Props> {
         return React.cloneElement(child, {
           onClick: this.onSubmitHandler(child.props.onClick),
           onKeyDown: this.onSubmitHandler(child.props.onKeyDown)
+        })
+      }
+
+      if (isButton && child.props.type === 'reset') {
+        return React.cloneElement(child, {
+          onClick: this.onResetHandler(child.props.onClick),
+          onKeyDown: this.onResetHandler(child.props.onKeyDown)
         })
       }
 

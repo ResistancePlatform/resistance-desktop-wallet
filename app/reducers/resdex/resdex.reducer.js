@@ -81,13 +81,15 @@ export type ResDexState = {
     trades: object[],
     tradingChart: {
       period: string,
-      volume: boolean,
       type: 'candlestick' | 'heikin-ashi' | 'kagi' | 'point-figure' | 'renko',
-      ema20: boolean,
-      ema50: boolean,
-      bb: boolean,
-      rsi: boolean,
-      macd: boolean
+      indicators: {
+        [key: string]: object
+      }
+    },
+    indicatorsModal: {
+      isVisible: boolean,
+      searchString: string,
+      formKey: string | null
     }
   },
   orders: {

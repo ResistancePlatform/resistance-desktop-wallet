@@ -4,35 +4,20 @@ import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import log from 'electron-log'
 
-import { timeFormat } from 'd3-time-format'
 import { format } from 'd3-format'
 import { utcHour, utcDay, utcWeek, utcMonth, utcYear } from 'd3-time'
 import { discontinuousTimeScaleProvider } from 'react-stockcharts/lib/scale'
 import { ChartCanvas, Chart } from 'react-stockcharts'
 import {
-  AreaSeries,
-  BarSeries,
   CandlestickSeries,
   KagiSeries,
   PointAndFigureSeries,
   RenkoSeries,
-  BollingerSeries,
-  LineSeries,
-  MACDSeries,
-  RSISeries,
 } from 'react-stockcharts/lib/series'
-import {
-	OHLCTooltip,
-	MovingAverageTooltip,
-  BollingerBandTooltip,
-	MACDTooltip,
-  RSITooltip,
-} from 'react-stockcharts/lib/tooltip'
+import { OHLCTooltip } from 'react-stockcharts/lib/tooltip'
 import {
 	CrossHairCursor,
 	EdgeIndicator,
-	CurrentCoordinate,
-	MouseCoordinateX,
 	MouseCoordinateY,
 } from 'react-stockcharts/lib/coordinates'
 import { XAxis, YAxis } from 'react-stockcharts/lib/axes'
@@ -50,6 +35,13 @@ import {
   macd
 } from 'react-stockcharts/lib/indicator'
 
+import {
+  getVolumeIndicator,
+  getMacdIndicator,
+  getBbIndicator,
+  getRsiIndicator,
+  getEmaIndicators,
+} from './Indicators'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import TradingChartSettings from './TradingChartSettings'
 
@@ -70,16 +62,6 @@ const kagiCalculator = kagi()
 const pAndF = pointAndFigure()
 const renkoCalculator = renko()
 
-const macdAppearance = {
-	stroke: {
-		macd: "#e20063",
-		signal: "#00d492",
-	},
-	fill: {
-		divergence: "#009ed8"
-	},
-}
-
 const mouseEdgeAppearance = {
 	textFill: '#a4abc7',
 	strokeOpacity: 1,
@@ -87,51 +69,6 @@ const mouseEdgeAppearance = {
 	arrowWidth: 5,
 	fill: "#262c47",
 }
-
-const ema20 = ema()
-  .options({
-    windowSize: 20,
-    sourcePath: 'close',
-  })
-  .skipUndefined(true)
-  .merge((d, c) => ({...d, ema20: c}))
-  .accessor(d => d.ema20)
-  .stroke('#00d492')
-
-const ema50 = ema()
-  .options({
-    windowSize: 50,
-    sourcePath: 'close',
-  })
-  .skipUndefined(true)
-  .merge((d, c) => ({...d, ema50: c}))
-  .accessor(d => d.ema50)
-  .stroke('#e20063')
-
-const smaVolume50 = sma()
-  .options({ windowSize: 20, sourcePath: 'volume' })
-  .merge((d, c) => ({...d, smaVolume50: c}))
-  .accessor(d => d.smaVolume50)
-  .stroke('#009ed7')
-  .fill('#1e4266')
-
-const bb = bollingerBand()
-  .merge((d, c) => ({...d, bb: c}))
-  .accessor(d => d.bb)
-
-const macdCalculator = macd()
-  .options({
-    fast: 12,
-    slow: 26,
-    signal: 9,
-  })
-  .merge((d, c) => ({...d, macd: c}))
-  .accessor(d => d.macd)
-
-const rsiCalculator = rsi()
-  .options({ windowSize: 14 })
-  .merge((d, c) => ({...d, rsi: c}))
-  .accessor(d => d.rsi);
 
 /**
  * @class TradingChart
@@ -164,20 +101,72 @@ class TradingChart extends Component<Props> {
     return data
   }
 
+  getCalculators() {
+    const config = this.indicatorsConfig
+
+    const emaCalculator = period => ema()
+        .options({
+          windowSize: period,
+          sourcePath: 'close',
+        })
+        .skipUndefined(true)
+        .merge((d, c) => ({...d, ema20: c}))
+        .accessor(d => d.ema20)
+
+    const calculators = {}
+
+    if (config.ema) {
+      calculators.ema1 = emaCalculator(config.ema.ema1Period)
+      calculators.ema2 = emaCalculator(config.ema.ema2Period)
+      calculators.ema3 = emaCalculator(config.ema.ema3Period)
+    }
+
+    if (config.volume) {
+      calculators.smaVolume = sma()
+        .options({
+          windowSize: config.volume.smaPeriod,
+          sourcePath: 'volume'
+        })
+        .merge((d, c) => ({...d, smaVolume: c}))
+        .accessor(d => d.smaVolume)
+    }
+
+    if (config.bb) {
+      calculators.bb = bollingerBand()
+        .options({ windowSize: config.bb.smaPeriod, multiplier: config.bb.standardDeviation })
+        .merge((d, c) => ({...d, bb: c}))
+        .accessor(d => d.bb)
+    }
+
+    if (config.macd) {
+      calculators.macd = macd()
+        .options({
+          fast: config.macd.fastPeriod,
+          slow: config.macd.slowPeriod,
+          signal: config.macd.signalPeriod,
+        })
+        .merge((d, c) => ({...d, macd: c}))
+        .accessor(d => d.macd)
+    }
+
+    if (config.rsi) {
+      calculators.rsi = rsi()
+        .options({ windowSize: config.rsi.period })
+        .merge((d, c) => ({...d, rsi: c}))
+        .accessor(d => d.rsi)
+    }
+
+    return calculators
+  }
+
   calculateIndicators(data) {
     const { tradingChart } = this.props.resDex.buySell
 
-    let calculatedData = rsiCalculator(
-      bb(
-        smaVolume50(
-          ema20(
-            ema50(
-              macdCalculator(data)
-            )
-          )
-        )
-      )
-    )
+    let calculatedData = data
+
+    Object.keys(this.calculators).forEach(key => {
+      calculatedData = this.calculators[key](calculatedData)
+    })
 
     switch (tradingChart.type) {
       case 'heikin-ashi':
@@ -210,10 +199,6 @@ class TradingChart extends Component<Props> {
       }
     }
 
-    /*
-     * Couldn't make discontinuousTimeScaleProvider working — it only returns null values
-     */
-
 		const xScaleProvider = discontinuousTimeScaleProvider
       .inputDateAccessor(d => d && d.date)
 
@@ -232,8 +217,6 @@ class TradingChart extends Component<Props> {
       xAccessor,
       displayXAccessor,
     }
-
-    log.debug(`Data and scale`, typeof result.xScale, typeof result.xAccessor, JSON.stringify(result.data))
 
     return result
 	}
@@ -344,6 +327,39 @@ class TradingChart extends Component<Props> {
     )
   }
 
+  getIndicatorConfig(key: string) {
+    const { indicators } = this.props.resDex.buySell.tradingChart
+    const indicator = indicators[key]
+
+    if (!indicator) {
+      return false
+    }
+
+    let result = indicator.inputs.reduce((accumulated, input) => ({
+      ...accumulated,
+      [input.name]: input.value
+    }), {})
+
+    result = indicator.colors.reduce((accumulated, color) => ({
+      ...accumulated,
+      [color.name]: color.value
+    }), result)
+
+    return result
+  }
+
+  getIndicatorsConfig() {
+    const { indicators } = this.props.resDex.buySell.tradingChart
+
+    log.debug('indicators', Object.keys(indicators))
+    const config = Object.keys(indicators).reduce((accumulated, key) => ({
+      ...accumulated,
+      [key]: this.getIndicatorConfig(key)
+    }), {})
+
+    return config
+  }
+
 	/**
 	 * @returns
    * @memberof TradingChart
@@ -367,10 +383,12 @@ class TradingChart extends Component<Props> {
     const bottomIndicatorHeight = 100
     const bottomIndicatorsNumber = this.getBottomIndicatorsNumber()
 
+    this.indicatorsConfig = this.getIndicatorsConfig()
+    this.calculators = this.getCalculators()
+
     const {
       data,
       xScale,
-      xAccessor,
       displayXAccessor,
     } = this.getDataAndScale()
 
@@ -393,7 +411,7 @@ class TradingChart extends Component<Props> {
           xExtents={this.getXExtents(data, chartPeriod)}>
 
           <Chart id={1} height={height - bottomIndicatorsNumber * bottomIndicatorHeight - 50}
-            yExtents={[d => [d.high, d.low], ema20.accessor()]}
+            yExtents={[d => [d.high, d.low]]}
             padding={{ top: 10, bottom: 20 }}
           >
             <YAxis
@@ -417,13 +435,10 @@ class TradingChart extends Component<Props> {
               {...mouseEdgeAppearance}
             />
 
-            {chartSettings.ema20 &&
-              <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>
-            }
-
-            {chartSettings.ema50 &&
-              <LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()}/>
-            }
+            {this.indicatorsConfig.ema && getEmaIndicators({
+              config: this.indicatorsConfig.ema,
+              calculators: this.calculators
+            })}
 
             {['candlestick', 'heikin-ashi'].includes(chartSettings.type) &&
               <CandlestickSeries
@@ -457,16 +472,10 @@ class TradingChart extends Component<Props> {
               />
             }
 
-            {chartSettings.bb &&
-              <BollingerSeries
-                yAccessor={d => d.bb}
-                stroke={{
-                  top: "#009ed7",
-                  middle: "#9c62e5",
-                  bottom: "#009ed7",
-                }}
-                fill="#3f356e"
-              />
+            {this.indicatorsConfig.bb && getBbIndicator({
+                config: this.indicatorsConfig.bb,
+                calculator: this.calculators.bb
+              })
             }
 
             <EdgeIndicator
@@ -487,169 +496,34 @@ class TradingChart extends Component<Props> {
               fontFamily={chartFontFamily}
             />
 
-            <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
-
-            {chartSettings.ema20 &&
-              <MovingAverageTooltip
-                onClick={e => console.log(e)}
-                origin={[-38, 15]}
-                options={[
-                  {
-                    yAccessor: ema20.accessor(),
-                    type: 'EMA',
-                    stroke: ema20.stroke(),
-                    windowSize: ema20.options().windowSize,
-                  },
-                ]}
-                textFill="rgb(238, 238, 241)"
-                fontFamily={chartFontFamily}
-              />
-            }
-
-            {chartSettings.ema50 &&
-              <MovingAverageTooltip
-                onClick={e => console.log(e)}
-                origin={[chartSettings.ema20 ? 57 : -38, 15]}
-                options={[
-                  {
-                    yAccessor: ema50.accessor(),
-                    type: 'EMA',
-                    stroke: ema50.stroke(),
-                    windowSize: ema50.options().windowSize,
-                  },
-                ]}
-                textFill="rgb(238, 238, 241)"
-                fontFamily={chartFontFamily}
-              />
-            }
-
-            {chartSettings.bb &&
-              <BollingerBandTooltip
-                origin={[-38, 60]}
-                yAccessor={d => d.bb}
-                options={bb.options()}
-                textFill="rgb(238, 238, 241)"
-                fontFamily={chartFontFamily}
-              />
-            }
-
           </Chart>
 
-          {chartSettings.volume &&
-           <Chart
-              id={2}
-              yExtents={[d => d.volume, smaVolume50.accessor()]}
-              height={150}
-              origin={(w, h) => [0, h - bottomIndicatorsNumber * bottomIndicatorHeight - 150]}
-            >
-              <YAxis
-                axisAt="left"
-                orient="left"
-                ticks={5}
-                stroke="rgb(90, 98, 131)"
-                tickStroke="#009ed8"
-                tickFormat={format(".0s")}
-                fontFamily={chartFontFamily}
-                fontSize={10}
-              />
-
-              <BarSeries fill="#1d2440" yAccessor={d => d.volume} />
-              <AreaSeries yAccessor={smaVolume50.accessor()} stroke={smaVolume50.stroke()} fill={smaVolume50.fill()}/>
-
-              <CurrentCoordinate yAccessor={smaVolume50.accessor()} fill={smaVolume50.stroke()} />
-              <CurrentCoordinate yAccessor={d => d.volume} fill="#009ed7" />
-            </Chart>
+          {this.indicatorsConfig.volume && getVolumeIndicator({
+              id: 2,
+              config: this.indicatorsConfig.volume,
+              origin: (w, h) => [0, h - bottomIndicatorsNumber * bottomIndicatorHeight - 150],
+              calculator: this.calculators.smaVolume
+            })
           }
 
-          {chartSettings.macd &&
-            <Chart
-              id={3}
-              height={bottomIndicatorHeight}
-              yExtents={macdCalculator.accessor()}
-              origin={(w, h) => [0, h - bottomIndicatorsNumber * bottomIndicatorHeight]}
-              padding={{ top: 10, bottom: 10 }}
-            >
-
-              { this.getXAxis(xGrid, bottomIndicatorsNumber === 1) }
-
-              <YAxis
-                axisAt="right"
-                orient="right"
-                ticks={2}
-                stroke="rgb(90, 98, 131)"
-                tickStroke="#009ed8"
-                fontFamily={chartFontFamily}
-                fontSize={10}
-              />
-
-              <MouseCoordinateX
-                at="bottom"
-                orient="bottom"
-                displayFormat={timeFormat("%Y-%m-%d")}
-                rectRadius={5}
-                {...mouseEdgeAppearance}
-              />
-
-              <MouseCoordinateY
-                at="right"
-                orient="right"
-                displayFormat={format(".2f")}
-                {...mouseEdgeAppearance}
-              />
-
-              <MACDSeries
-                yAccessor={d => d.macd}
-                {...macdAppearance}
-                zeroLineStroke="#009ed8"
-              />
-
-              <MACDTooltip
-                origin={[-38, 20]}
-                yAccessor={d => d.macd}
-                options={macdCalculator.options()}
-                appearance={macdAppearance}
-                textFill="rgb(238, 238, 241)"
-                fontFamily={chartFontFamily}
-              />
-            </Chart>
+          {this.indicatorsConfig.macd && getMacdIndicator({
+              id: 3,
+              config: this.indicatorsConfig.macd,
+              origin: (w, h) => [0, h - bottomIndicatorsNumber * bottomIndicatorHeight],
+              mouseEdgeAppearance,
+              xAxis: this.getXAxis(xGrid, bottomIndicatorsNumber === 1),
+              calculator: this.calculators.macd
+            })
           }
 
-          {chartSettings.rsi &&
-           <Chart id={4}
-              yExtents={[0, bottomIndicatorHeight]}
-              height={bottomIndicatorHeight}
-              origin={(w, h) => [0, h - bottomIndicatorHeight]}
-              padding={{ top: 10, bottom: 10 }}
-            >
-              { this.getXAxis(xGrid, true) }
-
-              <YAxis
-                axisAt="right"
-                orient="right"
-                tickValues={[30, 50, 70]}
-                stroke="rgb(90, 98, 131)"
-                tickStroke="#009ed8"
-                fontFamily={chartFontFamily}
-                fontSize={10}
-              />
-
-              <MouseCoordinateY
-                at="right"
-                orient="right"
-                displayFormat={format(".2f")}
-                {...mouseEdgeAppearance}
-              />
-
-              <RSISeries yAccessor={d => d.rsi} />
-
-              <RSITooltip
-                origin={[-38, 20]}
-                yAccessor={d => d.rsi}
-                options={rsiCalculator.options()}
-                textFill="rgb(238, 238, 241)"
-                fontFamily={chartFontFamily}
-              />
-            </Chart>
+          {this.indicatorsConfig.rsi && getRsiIndicator({
+              id: 4,
+              config: this.indicatorsConfig.rsi,
+              xAxis: this.getXAxis(xGrid, true),
+              origin: (w, h) => [0, h - bottomIndicatorHeight],
+              mouseEdgeAppearance,
+              calculator: this.calculators.rsi,
+            })
           }
 
           <CrossHairCursor

@@ -14,6 +14,7 @@ export type RoundedButtonProps = {
   ...GenericButtonProps,
   type?: string,
   important?: boolean,
+  small?: boolean,
   spinner?: boolean,
   spinnerTooltip?: string,
   glyph?: string
@@ -33,6 +34,7 @@ export default class RoundedButton extends GenericButton {
         type={this.props.type || 'button'}
         className={cn(styles.button, this.props.className, {
           [styles.important]: this.props.important,
+          [styles.small]: this.props.small,
           [styles.large]: this.props.large
         })}
         onClick={e => this.onClickHandler(e)}
