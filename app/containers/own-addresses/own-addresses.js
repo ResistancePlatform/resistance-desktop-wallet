@@ -2,7 +2,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { toastr } from 'react-redux-toastr'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 
@@ -22,7 +21,6 @@ import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 
 const pollingInterval = 3.0
-const addressRowPopupMenuId = 'own-addresses-address-row-popup-menu-id'
 const createAddressPopupMenuId = 'own-addresses-create-address-popup-menu-id'
 const privateKeysPopupMenuId = 'own-addresses-private-keys-popup-menu-id'
 
@@ -58,27 +56,6 @@ class OwnAddresses extends Component<Props> {
 
   onAddressRowClicked(event, address) {
     this.setState({ isZAddressClicked: address.toLowerCase().startsWith('z')})
-    this.props.popupMenu.show(addressRowPopupMenuId, address, event.clientY, event.clientX)
-  }
-
-  mergeAllMinedCoinsClicked(event, address, t) {
-    const confirmOptions = { onOk: () => this.props.actions.mergeAllMinedCoins(address) }
-    toastr.confirm(t(`Are you sure want to merge all mined coins?`), confirmOptions)
-  }
-
-  mergeAllTransparentAddressCoinsClicked(event, address, t) {
-    const confirmOptions = { onOk: () => this.props.actions.mergeAllRAddressCoins(address) }
-    toastr.confirm(t(`Are you sure want to merge all transparent address coins?`), confirmOptions)
-  }
-
-  mergeAllPrivateAddressCoinsClicked(event, address, t) {
-    const confirmOptions = { onOk: () => this.props.actions.mergeAllZAddressCoins(address) }
-    toastr.confirm(t(`Are you sure want to merge all private address coins?`), confirmOptions)
-  }
-
-  mergeAllCoinsClicked(event, address, t) {
-    const confirmOptions = { onOk: () => this.props.actions.mergeAllCoins(address) }
-    toastr.confirm(t(`Are you sure want to merge all coins?`), confirmOptions)
   }
 
 	/**
@@ -175,23 +152,6 @@ class OwnAddresses extends Component<Props> {
               frozenAddresses={this.props.ownAddresses.frozenAddresses}
               onRowClick={(e, address) => this.onAddressRowClicked(e, address)}
             />
-
-            <PopupMenu id={addressRowPopupMenuId}>
-              {this.state.isZAddressClicked &&
-                <PopupMenuItem onClick={(e, address) => this.mergeAllMinedCoinsClicked(e, address, t)}>
-                  {t(`Merge all mined coins here`)}
-                </PopupMenuItem>
-              }
-              <PopupMenuItem onClick={(e, address) => this.mergeAllTransparentAddressCoinsClicked(e, address, t)}>
-                {t(`Merge all transparent address coins here`)}
-              </PopupMenuItem>
-              <PopupMenuItem onClick={(e, address) => this.mergeAllPrivateAddressCoinsClicked(e, address, t)}>
-                {t(`Merge all private address coins here`)}
-              </PopupMenuItem>
-              <PopupMenuItem onClick={(e, address) => this.mergeAllCoinsClicked(e, address, t)}>
-                {t(`Merge all coins here`)}
-              </PopupMenuItem>
-            </PopupMenu>
 
 					</div>
 				</div>
