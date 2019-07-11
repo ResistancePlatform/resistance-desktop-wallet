@@ -74,16 +74,20 @@ const mouseEdgeAppearance = {
 class TradingChart extends Component<Props> {
 	props: Props
 
+  constructor(props) {
+    super(props)
+    this.interactiveRef = this.interactiveRef.bind(this)
+  }
+
 	/**
 	 * @memberof TradingChart
 	 */
   componentDidMount() {
-    this.interactiveNodes = {}
 		document.addEventListener('keyup', this.onKeyPress)
   }
 
 	componentWillUnmount() {
-		document.removeEventListener('keyup', this.onKeyPress)
+		document.removeEventListener("keyup", this.onKeyPress)
 	}
 
 /**
@@ -275,19 +279,45 @@ class TradingChart extends Component<Props> {
 	/**
 	 * @memberof TradingChart
 	 */
-  elementRef(element) {
-    this.element = element
+  containerRef(element) {
+    this.containerElement = element
   }
+
+	/**
+	 * @memberof TradingChart
+	 */
+  chartRef(element) {
+    this.chartElement = element
+  }
+
+	/**
+	 * @memberof TradingChart
+	 */
+  interactiveRef(type, chartId, element) {
+    if (!this.interactiveNodes) {
+      this.interactiveNodes = {}
+    }
+
+    const key = `${type}_${chartId}`
+
+    if (element || this.interactiveNodes.key) {
+      this.interactiveNodes = {
+        ...this.interactiveNodes,
+        [key]: { type, chartId, node: element }
+      }
+    }
+  }
+
 
 	/**
 	 * @memberof TradingChart
 	 * @returns {number}
 	 */
   getHeight() {
-    if (!this.element) {
+    if (!this.containerElement) {
       return 0
     }
-    return Math.max(504, this.element.clientHeight - 64)
+    return Math.max(504, this.containerElement.clientHeight - 64)
   }
 
   getBottomIndicatorsNumber() {
@@ -371,10 +401,41 @@ class TradingChart extends Component<Props> {
   }
 
   onKeyPress(event) {
+    if (!this.chartElement) {
+      return
+    }
+
+    const { interactive } = this.props.resDex.buySell.tradingChart
+
+    switch (event.which) {
+      // Backspace and Delete
+      case 8:
+      case 46: {
+        const newInteractive = Object.keys(interactive).reduce((accumulated, key) => ({
+          [key]: interactive[key].filter(item => !item.selected)
+        }), {})
+        this.props.actions.updateInteractive(newInteractive)
+        break
+      }
+      // Escape
+      case 27: {
+        this.chartElement.cancelDrag()
+        break
+      }
+      default:
+    }
   }
 
   handleInteractiveSelection(interactives) {
-    log.debug("Interactives", JSON.stringify(interactives))
+    if (interactives.length) {
+      log.debug(interactives[0].objects.length, JSON.stringify(interactives[0].objects))
+    }
+
+    const config = interactives.reduce((accumulated, value) => ({
+      [`${value.type}_${value.chartId}`]: value.objects
+    }), {})
+
+    this.props.actions.updateInteractive(config)
   }
 
 	/**
@@ -406,11 +467,12 @@ class TradingChart extends Component<Props> {
     } = this.getDataAndScale()
 
 		return (
-      <div className={styles.container} ref={el => this.elementRef(el)}>
+      <div className={styles.container} ref={el => this.containerRef(el)}>
         <TradingChartSettings />
 
         {data.length > 10 &&
         <ChartCanvas
+          ref={el => this.chartRef(el)}
           height={height}
           ratio={ratio}
           width={width}
@@ -482,15 +544,14 @@ class TradingChart extends Component<Props> {
               fontFamily={RESDEX.chartFontFamily}
             />
 
-            {interactive.trendline.length &&
-              getTrendlines({
+            {getTrendlines({
                 chartId: 1,
+                ref: this.interactiveRef,
                 mode: chartSettings.interactiveMode,
-                nodes: this.interactiveNodes,
-                config: interactive.trendline,
-                update: trends => this.props.actions.updateInteractive({trendline: trends})
-              })
-            }
+                config: interactive,
+                update: this.props.actions.updateInteractive
+            })}
+
           </Chart>
 
           {this.indicatorsConfig.volume && getVolumeIndicator({
@@ -531,7 +592,7 @@ class TradingChart extends Component<Props> {
             drawingObjectMap={{
               Trendline: "trends"
             }}
-            onSelect={this.handleInteractiveSelection}
+            onSelect={interactives => this.handleInteractiveSelection(interactives)}
           />
 
         </ChartCanvas>

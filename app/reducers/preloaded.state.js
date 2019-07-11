@@ -173,7 +173,7 @@ export const preloadedState: State = {
         editFormIndicatorKey: null,
         interactiveMode: null,
         interactive: {
-          'trendline': [],
+          'Trendline_1': [],
         }
       },
       indicatorsModal: {
