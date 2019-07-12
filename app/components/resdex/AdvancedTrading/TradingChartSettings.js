@@ -38,7 +38,7 @@ class TradingChartSettings extends Component<Props> {
 
   render() {
     const { t } = this.props
-    const { updateInteractiveMode } = this.props.actions
+    const { updateInteractiveMode, clearAllInteractive } = this.props.actions
     const { tradingChart: chartSettings } = this.props.resDex.buySell
     const chartPeriods = ['hour', 'day', 'week', 'month', 'year']
     const { updateChartSettings, updateChartPeriod } = this.props.actions
@@ -67,6 +67,11 @@ class TradingChartSettings extends Component<Props> {
                 {t(`Select mode`)}
               </div>
             </PopupMenuItem>
+            <PopupMenuItem onClick={clearAllInteractive}>
+              <div className={styles.item}>
+                {t(`Clear All`)}
+              </div>
+            </PopupMenuItem>
             <PopupMenuItem onClick={() => updateInteractiveMode('trendline')}>
               <div className={cn(styles.item, {[styles.active]: interactiveMode === 'trendline'})}>
                 {t(`Trendline`)}
@@ -77,27 +82,32 @@ class TradingChartSettings extends Component<Props> {
                 {t(`Fibonacci Retracement`)}
               </div>
             </PopupMenuItem>
-            <PopupMenuItem onClick={() => updateInteractiveMode('standardDeviation')} disabled>
+            <PopupMenuItem onClick={() => updateInteractiveMode('equidistant')}>
+              <div className={cn(styles.item, {[styles.active]: interactiveMode === 'equidistant'})}>
+                {t(`Equidistant Channel`)}
+              </div>
+            </PopupMenuItem>
+            <PopupMenuItem onClick={() => updateInteractiveMode('standardDeviation')}>
               <div className={cn(styles.item, {[styles.active]: interactiveMode === 'standardDeviation'})}>
                 {t(`Standard Deviation Channel`)}
               </div>
             </PopupMenuItem>
-            <PopupMenuItem onClick={() => updateInteractiveMode('gannFan')} disabled>
+            <PopupMenuItem onClick={() => updateInteractiveMode('gannFan')}>
               <div className={cn(styles.item, {[styles.active]: interactiveMode === 'gannFan'})}>
                 {t(`Gann Fan`)}
               </div>
             </PopupMenuItem>
-            <PopupMenuItem onClick={() => updateInteractiveMode('label')} disabled>
+            <PopupMenuItem onClick={() => updateInteractiveMode('label')}>
               <div className={cn(styles.item, {[styles.active]: interactiveMode === 'label'})}>
                 {t(`Label`)}
               </div>
             </PopupMenuItem>
-            <PopupMenuItem onClick={() => updateInteractiveMode('alert')} disabled>
+            <PopupMenuItem onClick={() => updateInteractiveMode('alert')}>
               <div className={cn(styles.item, {[styles.active]: interactiveMode === 'alert'})}>
                 {t(`Alert`)}
               </div>
             </PopupMenuItem>
-            <PopupMenuItem onClick={() => updateInteractiveMode('brush')} disabled>
+            <PopupMenuItem onClick={() => updateInteractiveMode('brush')}>
               <div className={cn(styles.item, {[styles.active]: interactiveMode === 'brush'})}>
                 {t(`Brush`)}
               </div>

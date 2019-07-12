@@ -1,2 +1,5 @@
 export { default as getTrendlines } from './Trendline'
 export { default as getFibonacciRetracements } from './Fibonacci'
+export { default as getEquidistantChannels } from './Equidistant'
+export { default as getStandardDeviationChannels } from './StandardDeviation'
+export { default as getGannFans } from './GannFan'

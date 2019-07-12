@@ -40,6 +40,9 @@ import {
 import {
   getTrendlines,
   getFibonacciRetracements,
+  getEquidistantChannels,
+  getStandardDeviationChannels,
+  getGannFans,
 } from './Interactive'
 import getMainSeries from './MainSeries'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
@@ -563,6 +566,30 @@ class TradingChart extends Component<Props> {
                 update: this.props.actions.updateInteractive
             })}
 
+            {getEquidistantChannels({
+                chartId: 1,
+                ref: this.interactiveRef,
+                mode: chartSettings.interactiveMode,
+                config: interactive,
+                update: this.props.actions.updateInteractive
+            })}
+
+            {getStandardDeviationChannels({
+                chartId: 1,
+                ref: this.interactiveRef,
+                mode: chartSettings.interactiveMode,
+                config: interactive,
+                update: this.props.actions.updateInteractive
+            })}
+
+            {getGannFans({
+                chartId: 1,
+                ref: this.interactiveRef,
+                mode: chartSettings.interactiveMode,
+                config: interactive,
+                update: this.props.actions.updateInteractive
+            })}
+
           </Chart>
 
           {this.indicatorsConfig.volume && getVolumeIndicator({
@@ -601,8 +628,11 @@ class TradingChart extends Component<Props> {
             enabled={chartSettings.interactiveMode === null}
             getInteractiveNodes={() => this.interactiveNodes}
             drawingObjectMap={{
-              Trendline: "trends",
-              FibonacciRetracement: "retracements",
+              Trendline: 'trends',
+              FibonacciRetracement: 'retracements',
+              EquidistantChannel: 'channels',
+              StandardDeviationChannel: 'channels',
+              GannFan: 'fans',
             }}
             onSelect={interactives => this.handleInteractiveSelection(interactives)}
           />

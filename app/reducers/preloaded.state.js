@@ -175,6 +175,9 @@ export const preloadedState: State = {
         interactive: {
           'Trendline_1': [],
           'FibonacciRetracement_1': [],
+          'EquidistantChannel_1': [],
+          'StandardDeviationChannel_1': [],
+          'GannFan_1': [],
         }
       },
       indicatorsModal: {
