@@ -39,6 +39,7 @@ import {
 } from './Indicators'
 import {
   getTrendlines,
+  getFibonacciRetracements,
 } from './Interactive'
 import getMainSeries from './MainSeries'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
@@ -554,6 +555,14 @@ class TradingChart extends Component<Props> {
                 update: this.props.actions.updateInteractive
             })}
 
+            {getFibonacciRetracements({
+                chartId: 1,
+                ref: this.interactiveRef,
+                mode: chartSettings.interactiveMode,
+                config: interactive,
+                update: this.props.actions.updateInteractive
+            })}
+
           </Chart>
 
           {this.indicatorsConfig.volume && getVolumeIndicator({
@@ -592,7 +601,8 @@ class TradingChart extends Component<Props> {
             enabled={chartSettings.interactiveMode === null}
             getInteractiveNodes={() => this.interactiveNodes}
             drawingObjectMap={{
-              Trendline: "trends"
+              Trendline: "trends",
+              FibonacciRetracement: "retracements",
             }}
             onSelect={interactives => this.handleInteractiveSelection(interactives)}
           />

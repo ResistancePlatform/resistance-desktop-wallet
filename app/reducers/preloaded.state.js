@@ -174,6 +174,7 @@ export const preloadedState: State = {
         interactiveMode: null,
         interactive: {
           'Trendline_1': [],
+          'FibonacciRetracement_1': [],
         }
       },
       indicatorsModal: {

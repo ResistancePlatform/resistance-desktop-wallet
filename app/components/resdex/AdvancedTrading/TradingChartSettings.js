@@ -72,7 +72,7 @@ class TradingChartSettings extends Component<Props> {
                 {t(`Trendline`)}
               </div>
             </PopupMenuItem>
-            <PopupMenuItem onClick={() => updateInteractiveMode('fibonacci')} disabled>
+            <PopupMenuItem onClick={() => updateInteractiveMode('fibonacci')}>
               <div className={cn(styles.item, {[styles.active]: interactiveMode === 'fibonacci'})}>
                 {t(`Fibonacci Retracement`)}
               </div>
