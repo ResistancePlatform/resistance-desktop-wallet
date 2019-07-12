@@ -77,6 +77,7 @@ class TradingChart extends Component<Props> {
   constructor(props) {
     super(props)
     this.interactiveRef = this.interactiveRef.bind(this)
+    this.onKeyPress = this.onKeyPress.bind(this)
   }
 
 	/**
@@ -414,6 +415,7 @@ class TradingChart extends Component<Props> {
         const newInteractive = Object.keys(interactive).reduce((accumulated, key) => ({
           [key]: interactive[key].filter(item => !item.selected)
         }), {})
+        log.debug('New interactive', newInteractive)
         this.props.actions.updateInteractive(newInteractive)
         break
       }
