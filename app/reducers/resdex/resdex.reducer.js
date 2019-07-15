@@ -92,6 +92,12 @@ export type ResDexState = {
       isVisible: boolean,
       searchString: string,
       formKey: string | null
+    },
+    editTextModal: {
+      isVisible: boolean,
+      sumbitCallback: func | null,
+      defaultText: string,
+      type: 'label' | 'alert'
     }
   },
   orders: {

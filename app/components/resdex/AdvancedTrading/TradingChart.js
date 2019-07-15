@@ -435,9 +435,7 @@ class TradingChart extends Component<Props> {
   }
 
   handleInteractiveSelection(interactives) {
-    if (interactives.length) {
-      log.debug(interactives[0].objects.length, JSON.stringify(interactives[0].objects))
-    }
+    log.debug(`Interactives`, JSON.stringify(interactives))
 
     const config = interactives.reduce((accumulated, value) => ({
       [`${value.type}_${value.chartId}`]: value.objects
@@ -652,6 +650,7 @@ class TradingChart extends Component<Props> {
               StandardDeviationChannel: 'channels',
               GannFan: 'fans',
 							InteractiveText: 'textList',
+              InteractiveYCoordinate: 'yCoordinateList',
             }}
             onSelect={interactives => this.handleInteractiveSelection(interactives)}
           />

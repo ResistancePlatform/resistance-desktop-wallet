@@ -46,7 +46,7 @@ export const ResDexBuySellActions = createActions(
     UPDATE_CHART_SETTINGS: (settings: object) => ({ ...settings }),
     UPDATE_CHART_PERIOD: (period: string) => ({ period }),
 
-    SHOW_INDICATORS_MODAL: undefined,
+    SHOW_INDICATORS_MODAL: (type: string, submitCallback: func) => ({ type, submitCallback }),
     UPDATE_INDICATORS_SEARCH_STRING: (searchString: string) => ({searchString}),
     EDIT_INDICATOR: (key: string) => ({key}),
     CANCEL_INDICATOR_EDITION: (key: string) => ({key}),
@@ -58,6 +58,9 @@ export const ResDexBuySellActions = createActions(
 
     UPDATE_INTERACTIVE_MODE: (mode: string | null) => ({ mode }),
     UPDATE_INTERACTIVE: (config: object) => ({ ...config }),
+
+    SHOW_EDIT_TEXT_MODAL: undefined,
+    CLOSE_EDIT_TEXT_MODAL: undefined,
   },
   {
     prefix: 'APP/RESDEX/BUY_SELL'
@@ -257,6 +260,22 @@ export const ResDexBuySellReducer = handleActions(
           ...state.tradingChart.interactive,
           ...action.payload
         }
+      }
+    }),
+    [ResDexBuySellActions.showEditTextModal]: (state, action) => ({
+      ...state,
+      indicatorsModal: {
+        ...state.editTextModal,
+        type: action.payload.type,
+        submitCallback: action.payload.submitCallback,
+        isVisible: true
+      }
+    }),
+    [ResDexBuySellActions.closeEditTextModal]: state => ({
+      ...state,
+      indicatorsModal: {
+        ...state.editTextModal,
+        isVisible: false
       }
     }),
   }, preloadedState)
