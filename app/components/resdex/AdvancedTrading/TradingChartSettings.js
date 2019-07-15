@@ -107,11 +107,6 @@ class TradingChartSettings extends Component<Props> {
                 {t(`Alert`)}
               </div>
             </PopupMenuItem>
-            <PopupMenuItem onClick={() => updateInteractiveMode('brush')}>
-              <div className={cn(styles.item, {[styles.active]: interactiveMode === 'brush'})}>
-                {t(`Brush`)}
-              </div>
-            </PopupMenuItem>
           </PopupMenu>
 
         </div>

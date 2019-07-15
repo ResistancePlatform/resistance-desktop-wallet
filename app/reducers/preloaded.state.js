@@ -178,6 +178,7 @@ export const preloadedState: State = {
           'EquidistantChannel_1': [],
           'StandardDeviationChannel_1': [],
           'GannFan_1': [],
+          'InteractiveText_1': [],
         }
       },
       indicatorsModal: {

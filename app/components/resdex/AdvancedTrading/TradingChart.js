@@ -43,6 +43,8 @@ import {
   getEquidistantChannels,
   getStandardDeviationChannels,
   getGannFans,
+  getInteractiveTexts,
+  getAlerts,
 } from './Interactive'
 import getMainSeries from './MainSeries'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
@@ -590,6 +592,22 @@ class TradingChart extends Component<Props> {
                 update: this.props.actions.updateInteractive
             })}
 
+            {getInteractiveTexts({
+                chartId: 1,
+                ref: this.interactiveRef,
+                mode: chartSettings.interactiveMode,
+                config: interactive,
+                update: this.props.actions.updateInteractive
+            })}
+
+            {getAlerts({
+                chartId: 1,
+                ref: this.interactiveRef,
+                mode: chartSettings.interactiveMode,
+                config: interactive,
+                update: this.props.actions.updateInteractive
+            })}
+
           </Chart>
 
           {this.indicatorsConfig.volume && getVolumeIndicator({
@@ -633,6 +651,7 @@ class TradingChart extends Component<Props> {
               EquidistantChannel: 'channels',
               StandardDeviationChannel: 'channels',
               GannFan: 'fans',
+							InteractiveText: 'textList',
             }}
             onSelect={interactives => this.handleInteractiveSelection(interactives)}
           />
