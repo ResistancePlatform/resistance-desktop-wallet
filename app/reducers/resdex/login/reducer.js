@@ -11,6 +11,7 @@ export const ResDexLoginActions = createActions(
 
     GET_PORTFOLIOS: undefined,
     GOT_PORTFOLIOS: portfolios => ({ portfolios }),
+    UPDATE_PORTFOLIO: (id: string, fields: object) => ({ id, fields }),
 
     LOGIN: undefined,
     LOGIN_SUCCEEDED: undefined,

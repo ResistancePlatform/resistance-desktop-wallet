@@ -35,6 +35,7 @@ import ResDexCreatePortfolio from '~/components/resdex/bootstrapping/CreatePortf
 import ResDexSaveSeed from '~/components/resdex/bootstrapping/SaveSeed'
 import ResDexEnterSeed from '~/components/resdex/bootstrapping/EnterSeed'
 import ResDexForgotPassword from '~/components/resdex/bootstrapping/ForgotPassword'
+import ResDexKyc from '~/components/resdex/bootstrapping/Kyc'
 
 import AddressBookPage from './AddressBookPage'
 
@@ -138,6 +139,7 @@ class App extends React.Component<Props> {
               )} />
 
               <Route exact path="/resdex/start" component={ResDexStart} />
+              <Route exact path="/resdex/kyc" component={ResDexKyc} />
               <Route exact path="/resdex/restore-portfolio" component={ResDexEnterSeed} />
               <Route exact path="/resdex/create-portfolio" component={ResDexCreatePortfolio} />
               <Route exact path="/resdex/save-seed" component={ResDexSaveSeed} />

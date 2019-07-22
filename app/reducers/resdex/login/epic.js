@@ -44,6 +44,24 @@ const getPortfolios = (action$: ActionsObservable<Action>) => action$.pipe(
   ))
 )
 
+const updatePortfolio = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(ResDexLoginActions.updatePortfolio),
+  switchMap(action => {
+    const { id, fields } = action.payload
+
+    return from(portfolio.update(id, fields)).pipe(
+      switchMap(() => (
+        of(ResDexLoginActions.getPortfolios(), routerActions.push('/resdex'))
+      )),
+      catchError(err => {
+        log.error(`Can't update portfolio`, err)
+        toastr.error(t(`Error updating portfolio, check the log for details.`))
+        return ResDexLoginActions.empty()
+      })
+    )
+  })
+)
+
 const login = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexLoginActions.login),
   switchMap(() => {
@@ -247,6 +265,7 @@ const logout = (action$: ActionsObservable<Action>) => action$.pipe(
 
 export const ResDexLoginEpic = (action$, state$) => merge(
   getPortfolios(action$, state$),
+  updatePortfolio(action$, state$),
   login(action$, state$),
   loginFailedEpic(action$, state$),
   setDefaultPortfolioEpic(action$, state$),

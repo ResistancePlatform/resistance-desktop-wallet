@@ -376,6 +376,18 @@ class ResDexApiService {
   }
 
 	/**
+	 * Signs a KYC message.
+   *
+	 * @memberof ResDexApiService
+	 */
+  signKycMessage(message) {
+    return this.query({
+      method: 'sign_kyc_msg',
+      msg: JSON.stringify(message),
+    })
+  }
+
+	/**
 	 * Creates an instance of ResDexApiService.
    *
 	 * @memberof ResDexApiService

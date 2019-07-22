@@ -18,7 +18,7 @@ import ResDexAdvancedTrading from './AdvancedTrading/AdvancedTrading'
 import ResDexOrders from './Orders'
 import ResDexAccounts from './Accounts'
 import { getIsLoginDisabled } from '~/utils/resdex'
-import { BorderlessButton } from '~/components/rounded-form'
+import { Info, BorderlessButton } from '~/components/rounded-form'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
@@ -40,6 +40,28 @@ type Props = {
 export class ResDex extends Component<Props> {
 	props: Props
 
+  getIsVerified() {
+    const { defaultPortfolioId, portfolios } = this.props.resDex.login
+
+    if (!portfolios || defaultPortfolioId === null) {
+      return false
+    }
+    const portfolio = portfolios.find(p => p.id === defaultPortfolioId)
+    return portfolio.isVerified
+  }
+
+  getGetVerifiedTooltip() {
+    const { t } = this.props
+
+    if (this.getIsVerified()) {
+      return null
+    }
+
+    return (
+      <Info>{t(`Verification required in order to start trading on ResDEX.`)}</Info>
+    )
+  }
+
 	/**
 	 * @returns
    * @memberof ResDex
@@ -47,6 +69,7 @@ export class ResDex extends Component<Props> {
   getContents() {
     const { t } = this.props
     const { isExpanded, selectedTabIndex } = this.props.resDex.common
+    const isVerified = this.getIsVerified()
 
     return (
       <div className={cn({[styles.expanded]: isExpanded})}>
@@ -99,9 +122,18 @@ export class ResDex extends Component<Props> {
         >
           <TabList className={styles.tabList}>
             <Tab className={styles.tab}>{t(`Assets`)}</Tab>
-            <Tab className={styles.tab}>{t(`Buy/Sell`)}</Tab>
-            <Tab className={styles.tab}>{t(`Advanced Trading`)}</Tab>
-            <Tab className={styles.tab}>{t(`Orders`)}</Tab>
+            <Tab className={styles.tab} disabled={!isVerified}>
+              {t(`Buy/Sell`)}
+              {this.getGetVerifiedTooltip()}
+            </Tab>
+            <Tab className={styles.tab} disabled={!isVerified}>
+              {t(`Advanced Trading`)}
+              {this.getGetVerifiedTooltip()}
+            </Tab>
+            <Tab className={styles.tab} disabled={!isVerified}>
+              {t(`Orders`)}
+              {this.getGetVerifiedTooltip()}
+            </Tab>
             <Tab className={styles.tab}>{t(`Accounts`)}</Tab>
 
             {selectedTabIndex === 4 &&

@@ -25,7 +25,8 @@ export type Order = {}
 export type Portfolio = {
   name: string,
   encryptedSeedPhrase: string,
-  appVersion: string
+  appVersion: string,
+  isVerified?: boolean
 }
 
 export type CurrencyHistoryResolution = 'hour' | 'day' | 'week' | 'month' | 'year'

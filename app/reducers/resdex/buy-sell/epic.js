@@ -45,13 +45,21 @@ const getOrderBook = (action$: ActionsObservable<Action>, state$) => action$.pip
 	ofType(ResDexBuySellActions.getOrderBook),
   switchMap(() => {
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
+
+    const emptyBook = { asks: [], bids: [] }
+
     const getOrderBookPromise = Promise.all([
       mainApi.getOrderBook(baseCurrency, quoteCurrency),
-      mainApi.getOrderBook('RES', quoteCurrency),
-      mainApi.getOrderBook(baseCurrency, 'RES'),
+      quoteCurrency !== 'RES'
+        ? mainApi.getOrderBook('RES', quoteCurrency)
+        : () => emptyBook,
+      baseCurrency !== 'RES'
+        ? mainApi.getOrderBook(baseCurrency, 'RES')
+        : () => emptyBook,
     ])
+
     const observable = from(getOrderBookPromise).pipe(
-      switchMap(([baseQuote,  resQuote, baseRes]) => {
+      switchMap(([baseQuote, resQuote, baseRes]) => {
         const orderBook = {
           baseCurrency,
           quoteCurrency,
