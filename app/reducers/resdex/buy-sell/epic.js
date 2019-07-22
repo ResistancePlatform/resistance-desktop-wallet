@@ -52,10 +52,10 @@ const getOrderBook = (action$: ActionsObservable<Action>, state$) => action$.pip
       mainApi.getOrderBook(baseCurrency, quoteCurrency),
       quoteCurrency !== 'RES'
         ? mainApi.getOrderBook('RES', quoteCurrency)
-        : () => emptyBook,
+        : emptyBook,
       baseCurrency !== 'RES'
         ? mainApi.getOrderBook(baseCurrency, 'RES')
-        : () => emptyBook,
+        : emptyBook,
     ])
 
     const observable = from(getOrderBookPromise).pipe(

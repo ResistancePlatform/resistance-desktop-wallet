@@ -122,10 +122,12 @@ export const ResDexBuySellReducer = handleActions(
     [ResDexBuySellActions.updateBaseCurrency]: (state, action) => ({
       ...state,
       baseCurrency: action.payload.symbol,
+      quoteCurrency: state.quoteCurrency === action.payload.symbol ? state.baseCurrency : state.quoteCurrency,
     }),
     [ResDexBuySellActions.updateQuoteCurrency]: (state, action) => ({
       ...state,
       quoteCurrency: action.payload.symbol,
+      baseCurrency: state.baseCurrency === action.payload.symbol ? state.quoteCurrency : state.baseCurrency,
     }),
     [ResDexBuySellActions.createOrder]: state => ({
       ...state,
