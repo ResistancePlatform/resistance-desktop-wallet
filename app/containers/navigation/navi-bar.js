@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
+import log from 'electron-log'
 
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
@@ -41,6 +42,37 @@ class NaviBar extends Component<Props> {
     ))
 
     return pendingSwaps.length
+  }
+
+  getVerificationLabel() {
+    const { t } = this.props
+
+    const { RESDEX: resDexStatus } = this.props.settings.childProcessesStatus
+
+    if (resDexStatus  !== 'RUNNING') {
+      return null
+    }
+
+    const { defaultPortfolioId, portfolios } = this.props.resDex.login
+
+    if (!portfolios || defaultPortfolioId === null) {
+      return null
+    }
+
+    const portfolio = portfolios.find(p => p.id === defaultPortfolioId)
+
+    if (!portfolio || portfolio.isVerified) {
+      return null
+    }
+
+    return (
+      <NavLink
+        to="/resdex/kyc"
+        className={styles.getVerified}
+      >
+        {t(`Get Verified`)}
+      </NavLink>
+    )
   }
 
 	render() {
@@ -106,6 +138,9 @@ class NaviBar extends Component<Props> {
                   </div>
                 </div>
               }
+
+              {this.getVerificationLabel()}
+
             </NavLink>
           </div>
         </div>

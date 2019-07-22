@@ -14,27 +14,8 @@
   margin-top: -1rem;
 
   .item {
-    display: flex;
-
-    .name {
-      width: 100%;
-    }
-
-    .check {
-      width: 1rem;
-      margin-top: 0.1rem;
-      margin-right: -0.3rem;
-
-      &:before {
-        content: '\e90c';
-        color: $BASE_COLOR_LIGHT_RED;
-      }
-
-      &.active:before {
-        content: '\e90d';
-        color: $BASE_COLOR_LIGHT_GREEN;
-      }
-
+    &.active {
+      color: $BASE_COLOR_LIGHT_BLUE !important;
     }
   }
 }

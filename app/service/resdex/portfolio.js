@@ -1,6 +1,5 @@
 // @flow
 import path from 'path'
-import log from 'electron-log'
 import { remote } from 'electron'
 import dir from 'node-dir'
 import { createSession } from 'iocane'
@@ -64,11 +63,19 @@ export class ResDexPortfolioService {
       name,
       encryptedSeedPhrase: await iocane.encrypt(seedPhrase, password),
       appVersion: remote.app.getVersion(),
+      isVerified: false,
     }
 
     await writeJsonFile(filePath, portfolio)
 
     return id
+  }
+
+  async update(id: string, fields: object) {
+    const filePath = path.join(portfolioPath, idToFileName(id))
+    const portfolio = await loadJsonFile(filePath)
+    const newPortfolio = Object.assign({}, portfolio, fields)
+    await writeJsonFile(filePath, newPortfolio)
   }
 
   async getPortfolios(): Portfolio[] {

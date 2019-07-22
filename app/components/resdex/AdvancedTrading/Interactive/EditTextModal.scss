@@ -1,0 +1,19 @@
+@import "~/assets/styles/modal.scss";
+
+$editTextWidth: 17rem;
+
+.editText {
+  width: $depositModalWidth;
+  padding: 1.8rem;
+}
+
+.form {
+  .buttonsRow {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 0.2rem;
+    > div {
+      margin-left: 0.5rem;
+    }
+  }
+}

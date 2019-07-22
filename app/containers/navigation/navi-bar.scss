@@ -164,4 +164,15 @@
       }
     }
   }
+
+  .getVerified {
+    padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+    border-radius: 0.55rem;
+    font-size: 0.55rem;
+    font-weight: 500;
+    background: $BASE_COLOR_PURPLE;
+    color: $BASE_COLOR_WHITE;
+    text-transform: uppercase;
+    margin-left: 2rem;
+  }
 }

@@ -1,5 +1,6 @@
 // @flow
 import log from 'electron-log'
+import crypto from 'crypto'
 import os from 'os'
 import path from 'path'
 import rp from 'request-promise-native'
@@ -90,14 +91,18 @@ export class ResDexService {
 
     const { uri, rpcPort, folderName } = getProcessSettings(processName)
 
+    const actualSeedPhrase = getActualSeedPhrase(processName, seedPhrase)
+    const rpcPassword = crypto.createHash('sha256').update(actualSeedPhrase).digest('hex')
+
     const options = {
       netid: netId,
       rpcport: rpcPort,
       seednodes: [seedNodeAddress],
       userhome,
-      passphrase: getActualSeedPhrase(processName, seedPhrase),
+      passphrase: actualSeedPhrase,
       coins: supportedCurrencies,
       tx_history: true,
+      rpc_password: rpcPassword,
     }
 
     if (processName !== 'RESDEX') {

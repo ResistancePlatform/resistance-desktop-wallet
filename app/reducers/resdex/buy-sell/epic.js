@@ -6,6 +6,9 @@ import { map, mapTo, take, filter, switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
+import { tsvParse } from  'd3-dsv'
+import { timeParse } from 'd3-time-format'
+
 import { translate } from '~/i18next.config'
 import { RESDEX } from '~/constants/resdex'
 import { flattenDecimals } from '~/utils/decimal'
@@ -17,17 +20,46 @@ import { ResDexBuySellActions } from './reducer'
 const t = translate('resdex')
 const mainApi = resDexApiFactory('RESDEX')
 
+function getMsftOhlcDataPromise() {
+    function parseData(parse) {
+      return d => ({
+        ...d,
+        date: parse(d.date),
+        open: +d.open,
+        high: +d.high,
+        low: +d.low,
+        close: +d.close,
+        volume: +d.volume,
+      })
+    }
+
+    const msftDataPromise = (
+      fetch("https://cdn.rawgit.com/rrag/react-stockcharts/master/docs/data/MSFT.tsv")
+        .then(response => response.text())
+        .then(data => tsvParse(data, parseData(timeParse("%Y-%m-%d"))))
+    )
+    return msftDataPromise
+}
+
 const getOrderBook = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexBuySellActions.getOrderBook),
   switchMap(() => {
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
+
+    const emptyBook = { asks: [], bids: [] }
+
     const getOrderBookPromise = Promise.all([
       mainApi.getOrderBook(baseCurrency, quoteCurrency),
-      mainApi.getOrderBook('RES', quoteCurrency),
-      mainApi.getOrderBook(baseCurrency, 'RES'),
+      quoteCurrency !== 'RES'
+        ? mainApi.getOrderBook('RES', quoteCurrency)
+        : () => emptyBook,
+      baseCurrency !== 'RES'
+        ? mainApi.getOrderBook(baseCurrency, 'RES')
+        : () => emptyBook,
     ])
+
     const observable = from(getOrderBookPromise).pipe(
-      switchMap(([baseQuote,  resQuote, baseRes]) => {
+      switchMap(([baseQuote, resQuote, baseRes]) => {
         const orderBook = {
           baseCurrency,
           quoteCurrency,
@@ -483,6 +515,7 @@ const selectTab = (action$: ActionsObservable<Action>) => action$.pipe(
 const getOhlc = (action$: ActionsObservable<Action>, state$) => action$.pipe(
   ofType(ResDexBuySellActions.getOhlc),
   switchMap(() => {
+    /*
     const { baseCurrency, quoteCurrency, period } = state$.value.resDex.buySell
 
     const periodSeconds = {
@@ -494,6 +527,8 @@ const getOhlc = (action$: ActionsObservable<Action>, state$) => action$.pipe(
     }[period] || 24 * 60 * 60
 
     const ohlcObservable = from(mainApi.getOhlc(baseCurrency, quoteCurrency, periodSeconds)).pipe(
+    */
+    const ohlcObservable = from(getMsftOhlcDataPromise()).pipe(
       map(ohlc => ResDexBuySellActions.gotOhlc(ohlc)),
       catchError(err => {
         log.error(`Can't get order ticks`, err)

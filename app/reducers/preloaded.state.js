@@ -3,6 +3,7 @@ import { remote } from 'electron'
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
 import { RESDEX } from '~/constants/resdex'
+import { InteractiveYCoordinate } from 'react-stockcharts/lib/interactive'
 
 export const preloadedState: State = {
   auth: {
@@ -171,11 +172,32 @@ export const preloadedState: State = {
         indicators: {
         },
         editFormIndicatorKey: null,
+        interactiveMode: null,
+        interactive: {
+          'Trendline_1': [],
+          'FibonacciRetracement_1': [],
+          'EquidistantChannel_1': [],
+          'StandardDeviationChannel_1': [],
+          'GannFan_1': [],
+          'InteractiveText_1': [],
+          'InteractiveYCoordinate_1': [{
+            ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
+            yValue: 55.90,
+            id: 220,
+            draggable: true,
+          }],
+        }
       },
       indicatorsModal: {
         isVisible: false,
         searchString: '',
         formKey: null
+      },
+      editTextModal: {
+        isVisible: false,
+        sumbitCallback: null,
+        defaultText: '',
+        type: 'label'
       }
     },
     orders: {

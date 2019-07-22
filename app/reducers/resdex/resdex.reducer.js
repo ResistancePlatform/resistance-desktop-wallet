@@ -25,7 +25,8 @@ export type Order = {}
 export type Portfolio = {
   name: string,
   encryptedSeedPhrase: string,
-  appVersion: string
+  appVersion: string,
+  isVerified?: boolean
 }
 
 export type CurrencyHistoryResolution = 'hour' | 'day' | 'week' | 'month' | 'year'
@@ -84,12 +85,20 @@ export type ResDexState = {
       type: 'candlestick' | 'heikin-ashi' | 'kagi' | 'point-figure' | 'renko',
       indicators: {
         [key: string]: object
-      }
+      },
+      interactiveMode: string | null,
+      interactive: {[key: string]: any}
     },
     indicatorsModal: {
       isVisible: boolean,
       searchString: string,
       formKey: string | null
+    },
+    editTextModal: {
+      isVisible: boolean,
+      sumbitCallback: func | null,
+      defaultText: string,
+      type: 'label' | 'alert'
     }
   },
   orders: {
