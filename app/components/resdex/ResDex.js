@@ -46,7 +46,13 @@ export class ResDex extends Component<Props> {
     if (!portfolios || defaultPortfolioId === null) {
       return false
     }
+
     const portfolio = portfolios.find(p => p.id === defaultPortfolioId)
+
+    if (!portfolio) {
+      return false
+    }
+
     return portfolio.isVerified
   }
 

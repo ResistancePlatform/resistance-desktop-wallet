@@ -83,6 +83,8 @@ export class Kyc extends Component<Props> {
     const resDexApi = resDexApiFactory('RESDEX')
 
     const payload = await resDexApi.signKycMessage({ tid })
+    log.debug(`Submitting KYC ID to ResDEX:`, tid)
+    log.debug(`Got KYC registration payload:`, payload)
 
     try {
       const result = await this.post(`${kycApiUrl}/api/v1/register`, payload)

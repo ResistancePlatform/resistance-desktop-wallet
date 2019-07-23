@@ -401,6 +401,8 @@ class ResDexApiService {
 
     const { uri } = getProcessSettings(this.processName)
 
+    log.debug(`Token for ${this.processName}:`, this.token)
+
     const options = {
       uri,
       method: 'POST',
