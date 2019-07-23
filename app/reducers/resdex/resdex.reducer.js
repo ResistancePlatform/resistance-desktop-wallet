@@ -26,7 +26,8 @@ export type Portfolio = {
   name: string,
   encryptedSeedPhrase: string,
   appVersion: string,
-  isVerified?: boolean
+  isVerified?: boolean,
+  tid?: string
 }
 
 export type CurrencyHistoryResolution = 'hour' | 'day' | 'week' | 'month' | 'year'

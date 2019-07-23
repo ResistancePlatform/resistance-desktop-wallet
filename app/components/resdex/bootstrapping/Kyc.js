@@ -60,7 +60,7 @@ export class Kyc extends Component<Props> {
         if (!isRegistered) {
           toastr.error(t(`Error submitting verification form, please make sure your Internet connection is good or check the log for details.`))
         } else {
-          this.props.actions.updatePortfolio(defaultPortfolioId, { isVerified: true })
+          this.props.actions.updatePortfolio(defaultPortfolioId, { isVerified: true, tid: result.tid })
           toastr.success(t(`You have successfully passed verification!`))
         }
 

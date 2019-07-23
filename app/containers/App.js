@@ -29,6 +29,7 @@ import OwnAddress from './own-addresses/own-addresses'
 import SendCurrency from './send-currency/send-currency'
 import Settings from './settings/settings'
 import SimplexPage from './SimplexPage'
+import DutchAuction from '~/components/DutchAuction/DutchAuction'
 import ResDexPage from './ResDexPage'
 import ResDexStart from '~/components/resdex/bootstrapping/Start'
 import ResDexCreatePortfolio from '~/components/resdex/bootstrapping/CreatePortfolio'
@@ -131,6 +132,7 @@ class App extends React.Component<Props> {
 							<Route exact path="/settings" component={Settings} />
 							<Route exact path="/simplex" component={SimplexPage} />
 							<Route exact path="/address-book" component={AddressBookPage} />
+							<Route exact path="/dutch-auction" component={DutchAuction} />
 
               <Route exact path="/resdex" render={() => (
                 this.props.resDex.bootstrapping.isInProgress

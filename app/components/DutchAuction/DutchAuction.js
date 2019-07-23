@@ -31,7 +31,6 @@ export class DutchAuction extends Component<Props> {
 
     return (
       <div className={styles.container}>
-        <DutchAuction />
       </div>
     )
   }

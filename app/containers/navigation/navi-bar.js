@@ -143,6 +143,12 @@ class NaviBar extends Component<Props> {
 
             </NavLink>
           </div>
+          <div className={cn(styles.dutchAuction, getItemClasses('/dutch-auction'))}>
+            <i />
+            <NavLink to="/dutch-auction">
+              {t(`Dutch Auction`)}
+            </NavLink>
+          </div>
         </div>
 
 			</div>
