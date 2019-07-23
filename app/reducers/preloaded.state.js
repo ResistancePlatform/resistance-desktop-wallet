@@ -242,7 +242,10 @@ export const preloadedState: State = {
         secretFunds: false
       }
     }
-  }
+  },
+  dutchAuction: {
+    status: {}
+  },
 }
 
 // Load serialized settings
