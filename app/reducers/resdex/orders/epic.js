@@ -18,7 +18,17 @@ const t = translate('resdex')
 const api = resDexApiFactory('RESDEX')
 
 function recentSwapsToOrders(swaps) {
-  const orderStatus = lastEventType => {
+
+  const orderStatus = events => {
+    const unmatched = events.find(event => event.event.type === 'NegotiateFailed')
+
+    if (unmatched) {
+      return 'failed'
+    }
+
+    const lastEvent = events[events.length-1]
+    const lastEventType = lastEvent.event.type
+
     switch (lastEventType) {
       case 'Finished':
         return 'completed'
@@ -52,7 +62,6 @@ function recentSwapsToOrders(swaps) {
 
     const findEvent = (type: string) => swap.events.find(e => e.event.type === type)
     const startedEvent = findEvent('Started')
-    const lastEvent = swap.events[swap.events.length-1]
 
     const makerPayment = findEvent('MakerPaymentReceived')
     const takerPayment = findEvent('TakerPaymentSent')
@@ -60,7 +69,7 @@ function recentSwapsToOrders(swaps) {
     const baseCurrencyAmount = Decimal(startedEvent.event.data.maker_amount)
     const quoteCurrencyAmount = Decimal(startedEvent.event.data.taker_amount)
 
-    let status = orderStatus(lastEvent.event.type)
+    let status = orderStatus(swap.events)
     let isActive = !['completed', 'failed', 'cancelled'].includes(status)
 
     const momentStarted = moment(startedEvent.timestamp)
