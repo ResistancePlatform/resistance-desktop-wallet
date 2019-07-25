@@ -25,7 +25,8 @@ const walletFolderName = 'testnet3'
 const configFolderName = 'Resistance'
 const configFileName = 'resistance.conf'
 const configFileContents = [
-  `testnet=1`,
+  // Uncomment for testnet
+  // `testnet=1`,
   `rpcuser=resuser`,
   `rpcpassword=%generatedPassword%`,
   ``
