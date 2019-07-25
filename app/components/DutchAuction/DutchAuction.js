@@ -1,21 +1,20 @@
 // @flow
-import * as Joi from 'joi'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import { translate } from 'react-i18next'
 
-import ValidateAddressService from '~/service/validate-address-service'
+import { toDecimalPlaces } from '~/utils/decimal'
+import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import {
-  RoundedForm,
   RoundedButton,
-  RoundedInputWithPaste,
 } from '~/components/rounded-form'
 import {
   DutchAuctionActions,
   DutchAuctionState
 } from '~/reducers/dutch-auction/dutch-auction.reducer'
 import { Kyc } from '~/components/Kyc/Kyc'
+import Countdown from './Countdown'
 
 import styles from './DutchAuction.scss'
 
@@ -25,17 +24,7 @@ type Props = {
   actions: object
 }
 
-const kycUrl = 'https://kvk0a65tl4.execute-api.us-east-1.amazonaws.com/api'
-const validateAddress = new ValidateAddressService()
-
-const getValidationSchema = t => Joi.object().keys({
-  resAddress: (
-    validateAddress.getJoi()
-    .resistanceAddress()
-    .rZ().rLength().zLength().valid()
-    .required().label(t(`RES address`))
-  ),
-})
+const kycUrl = 'https://lbt95atwl1.execute-api.us-east-1.amazonaws.com/api/v1/kyc'
 
 /**
  * @class DutchAuction
@@ -55,11 +44,11 @@ export class DutchAuction extends Component<Props> {
 	 * @returns
    * @memberof DutchAuction
 	 */
-  getPre() {
+  getBootstrapping() {
     const { resAddress, kyc, credentials } = this.props.dutchAuction
 
     if (resAddress === null) {
-      return this.getResAddressForm()
+      return this.getAddressGeneration()
     }
 
     if (kyc.tid === null) {
@@ -70,7 +59,31 @@ export class DutchAuction extends Component<Props> {
       return this.getRegister()
     }
 
-    return this.getCountdown()
+  }
+
+	/**
+	 * @returns
+   * @memberof DutchAuction
+	 */
+  getPre() {
+    const { t } = this.props
+    const { resAddress } = this.props.dutchAuction
+
+    return (
+      <div className={styles.pre}>
+        <div className={styles.title}>
+          {t(`The auction starts in`)}
+        </div>
+
+        {this.getCountdown()}
+
+        <ul className={styles.list}>
+          <li>
+            <span>{t(`RES payout address`)}:</span> {resAddress}
+          </li>
+        </ul>
+      </div>
+    )
   }
 
 	/**
@@ -78,7 +91,43 @@ export class DutchAuction extends Component<Props> {
    * @memberof DutchAuction
 	 */
   getActive() {
-    return null
+    const { t } = this.props
+    const { user, status } = this.props.dutchAuction
+
+    return (
+      <div className={styles.active}>
+        <div className={styles.title}>
+          {t(`The auction is active`)}
+        </div>
+
+        <ul className={styles.list}>
+          <li>
+            <span>{t(`Address to send Ethereum to`)}:</span> {user.ethAddress}
+          </li>
+          <li>
+            <span>{t(`You committed`)}:</span> {user.ethCommitted} ETH
+          </li>
+          <li>
+            <span>{t(`Total committed`)}:</span> {status.ethCommitted} ETH
+          </li>
+          <li>
+            <span>{t(`Your expected RES payout`)}:</span> Fixme! RES
+          </li>
+          <li>
+            <span>{t(`Total expected RES payout`)}:</span> Fixme! RES
+          </li>
+        </ul>
+
+        <div className={styles.title}>
+          {t(`Next price decrease`)}
+        </div>
+
+        <Countdown
+          date="Thu Jul 25 2019 22:37:37 GMT+0200 (Central European Summer Time)"
+        />
+
+      </div>
+    )
   }
 
 	/**
@@ -86,41 +135,73 @@ export class DutchAuction extends Component<Props> {
    * @memberof DutchAuction
 	 */
   getFinished() {
-    return null
+    const { t } = this.props
+    const { user, status } = this.props.dutchAuction
+
+    const resToPayOut = user.ethCommited
+      ? user.ethCommited.times(status.finalPrice)
+      : null
+
+    return (
+      <div className={styles.finished}>
+        <div className={styles.title}>
+          {t(`The auction is finished`)}
+        </div>
+
+        <div className={styles.title}>
+          {t(`Round {{currentRound}} of {{roundCount}}`, status)}
+        </div>
+
+        <ul className={styles.list}>
+          <li>
+            <span>{t(`Finish time`)}:</span> {status.finishTime}
+          </li>
+          <li>
+            <span>{t(`Final price`)}:</span> {status.finalPrice} RES
+          </li>
+          <li>
+            <span>{t(`RES sold`)}:</span> {status.resSold}
+          </li>
+          <li>
+            <span>{t(`Your RES to payout`)}:</span>
+            {resToPayOut
+              ? toDecimalPlaces(resToPayOut)
+              : t(`N/A`)
+            }
+          </li>
+        </ul>
+
+        <div className={styles.note}>
+          <strong>{t(`Note`)}:</strong>
+          {t(`No RES will be paid out until 48 hours after the *final* round of the Resistance Dutch Auction. The RES coins will be paid out to the RES address stated below`)}
+        </div>
+
+      </div>
+    )
   }
 
 	/**
 	 * @returns
    * @memberof DutchAuction
 	 */
-  getResAddressForm() {
+  getAddressGeneration() {
     const { t } = this.props
+    const { isGeneratingAddress } = this.props.dutchAuction.status
 
     return (
-      <RoundedForm
-        id="dutchAuctionResAddress"
-        className={styles.form}
-        schema={getValidationSchema(t)}
-      >
-        <div className={styles.title}>
-          {t(`Specify Resistance address to recieve the payout`)}
-        </div>
-
-        <RoundedInputWithPaste
-          name="resAddress"
-          labelClassName={styles.inputLabel}
-          label={t(`RES address`)}
-        />
+      <React.Fragment>
+        {this.getCountdown()}
 
         <RoundedButton
-          type="submit"
-          onClick={this.props.actions.updateResAddress}
+          onClick={this.props.actions.generateResAddress}
           important
+          disabled={isGeneratingAddress}
+          spinner={isGeneratingAddress}
         >
-          {t(`Next`)}
+          {t(`Register`)}
         </RoundedButton>
 
-      </RoundedForm>
+      </React.Fragment>
     )
   }
 
@@ -166,7 +247,11 @@ export class DutchAuction extends Component<Props> {
    * @memberof DutchAuction
 	 */
   getCountdown() {
-    return null
+    return (
+      <div className={styles.countdown}>
+        Countdown
+      </div>
+    )
   }
 
 	/**
@@ -181,6 +266,12 @@ export class DutchAuction extends Component<Props> {
     }
 
     status.status = 'pre'
+
+    const bootstrapping = this.getBootstrapping()
+
+    if (bootstrapping !== null) {
+      return bootstrapping
+    }
 
     let contents = null
     switch (status.status) {
@@ -199,6 +290,24 @@ export class DutchAuction extends Component<Props> {
 
     return (
       <div className={styles.container}>
+        <RpcPolling
+          interval={60.0}
+          criticalChildProcess="RESDEX"
+          actions={{
+            polling: DutchAuctionActions.getAuctionStatus,
+            success: DutchAuctionActions.gotAuctionStatus,
+            failure: DutchAuctionActions.getAuctionStatusFailed,
+          }}
+        />
+        <RpcPolling
+          interval={61.0}
+          criticalChildProcess="RESDEX"
+          actions={{
+            polling: DutchAuctionActions.getUserStatus,
+            success: DutchAuctionActions.gotUserStatus,
+            failure: DutchAuctionActions.getUserStatusFailed,
+          }}
+        />
         {contents}
       </div>
     )

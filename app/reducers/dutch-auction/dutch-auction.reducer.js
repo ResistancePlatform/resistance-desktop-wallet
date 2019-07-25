@@ -4,6 +4,10 @@ import { preloadedState } from '../preloaded.state'
 
 export type DutchAuctionState = {
   status: object,
+  user: {
+    ethAddress: string | null,
+    ethCommitted: object | null
+  },
   resAddress: string | null,
   kyc: {
     email: string | null,
@@ -11,8 +15,9 @@ export type DutchAuctionState = {
   },
   credentials: {
     userId: string | null,
-    authToken: string | null
+    accessToken: string | null
   },
+  isGeneratingAddress: boolean,
   isRegistering: boolean
 }
 
@@ -22,9 +27,15 @@ export const DutchAuctionActions = createActions(
 
     GET_AUCTION_STATUS: undefined,
     GOT_AUCTION_STATUS: (status: object) => ({ status }),
+    GET_AUCTION_STATUS_FAILED: undefined,
 
-    SUBMIT_RES_ADDRESS: undefined,
-    UPDATE_RES_ADDRESS: (address: string) => ({ address }),
+    GET_USER_STATUS: undefined,
+    GOT_USER_STATUS: (status: object) => ({ status }),
+    GET_USER_STATUS_FAILED: undefined,
+
+    GENERATE_RES_ADDRESS: undefined,
+    GENERATE_RES_ADDRESS_SUCCEEDED: (address: string) => ({ address }),
+    GENERATE_RES_ADDRESS_FAILED: undefined,
 
     SUBMIT_KYC_DATA: (kyc: object) => ({ kyc }),
     UPDATE_KYC_DATA: (kyc: object) => ({ kyc }),
@@ -45,9 +56,22 @@ export const DutchAuctionReducer = handleActions(
       ...state,
       status: action.payload.status.data
     }),
-    [DutchAuctionActions.updateResAddress]: (state, action) => ({
+    [DutchAuctionActions.gotUserStatus]: (state, action) => ({
       ...state,
-      resAddress: action.payload.address
+      user: action.payload.status
+    }),
+    [DutchAuctionActions.generateResAddress]: state => ({
+      ...state,
+      isGeneratingAddress: true,
+    }),
+    [DutchAuctionActions.generateResAddressSucceeded]: (state, action) => ({
+      ...state,
+      resAddress: action.payload.address,
+      isGeneratingAddress: false,
+    }),
+    [DutchAuctionActions.generateResAddressFailed]: state => ({
+      ...state,
+      isGeneratingAddress: false,
     }),
     [DutchAuctionActions.updateKycData]: (state, action) => ({
       ...state,
@@ -56,5 +80,13 @@ export const DutchAuctionReducer = handleActions(
     [DutchAuctionActions.updateCredentials]: (state, action) => ({
       ...state,
       credentials: action.payload.credentials
+    }),
+    [DutchAuctionActions.register]: state => ({
+      ...state,
+      isRegistering: true
+    }),
+    [DutchAuctionActions.registrationFinished]: state => ({
+      ...state,
+      isRegistering: false
     }),
   }, preloadedState)

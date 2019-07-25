@@ -1,4 +1,5 @@
 // @flow
+import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
 import moment from 'moment'
 import rp from 'request-promise-native'
@@ -13,6 +14,9 @@ const apiUrl = 'https://lbt95atwl1.execute-api.us-east-1.amazonaws.com/api/v1/'
  */
 let instance = null
 
+const fromWei = wei => Decimal(wei).dividedBy(RESDEX.weiDivider)
+const toDate = ts => moment.unix(ts).toDate()
+
 
 /**
  * @export
@@ -23,19 +27,26 @@ export class DutchAuctionService {
 	 * @memberof DutchAuctionService
 	 */
 	constructor() {
-    if (!instance) {
-      instance = this
+    if (instance) {
+      return instance
     }
 
     this.get = (path, data) => this.query({ path, method: 'GET', data })
     this.post = (path, data) => this.query({ path, method: 'POST', data })
 
+    const credentials = config.get('dutchAuction.credentials', {userId: null, accessToken: null})
+
+    this.userId = credentials.userId
+    this.accessToken = credentials.accessToken
+
+    instance = this
+
 		return instance
 	}
 
-  setCredentials({userId, authToken}) {
+  setCredentials({userId, accessToken}) {
     this.userId = userId
-    this.authToken = authToken
+    this.accessToken = accessToken
   }
 
   async register({tid, email, resAddress}) {
@@ -50,9 +61,6 @@ export class DutchAuctionService {
     const response = await this.get('auction/status')
     const { data } = response
 
-    const fromWei = wei => Decimal(wei).dividedBy(RESDEX.weiDivider)
-    const toDate = ts => moment.unix(ts).toDate()
-
     return {
       ...response,
       timestamp: toDate(response.timestamp),
@@ -61,8 +69,18 @@ export class DutchAuctionService {
         initialPrice: fromWei(data.initialPrice),
         reservePrice: fromWei(data.reservePrice),
         startTime: toDate(data.startTime),
-        amountCommitted: fromWei(data.weiCommitted),
+        ethCommitted: fromWei(data.weiCommitted),
       }
+    }
+  }
+
+  async getUserStatus() {
+    const response = await this.get('user')
+
+    return {
+      ethCommitted: fromWei(response.weiCommitted),
+      ethAddress: response.ethAddress,
+      auctionId: response.auctionId
     }
   }
 
@@ -79,11 +97,11 @@ export class DutchAuctionService {
     log.debug(`Calling Dutch auction API ${method}`, uri, JSON.stringify(data))
 
     if (isAuthRequired) {
-      if (!this.userId || !this.authToken) {
+      if (!this.userId || !this.accessToken) {
         throw new Error(`Missing credentials.`)
       }
 
-      const auth = Buffer.from(`${this.userId}:${this.authToken}`).toString('base64')
+      const auth = Buffer.from(`${this.userId}:${this.accessToken}`).toString('base64')
 
       options.headers = {
         Authorization: `Basic ${auth}`,

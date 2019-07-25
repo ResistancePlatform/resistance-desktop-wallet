@@ -54,12 +54,27 @@ export class AddressBookService {
 	 */
 	addAddress(addressRecord: AddressBookRecord) {
     const validated = this::validateAddressRecord(addressRecord)
-    const match = record => (
-      record.name === validated.name || record.address === validated.address
-    )
 
-    if (this.addressBook.filter(match).length) {
+    const addressMatch = record => record.address === validated.address
+
+    if (this.addressBook.filter(addressMatch).length) {
       return throwError(this.t(`Address already exists in the database.`))
+    }
+
+    const nameMatch = record => record.name === validated.name
+    const nameMatches = this.addressBook.filter(nameMatch)
+
+    if (nameMatches.length) {
+      const number = nameMatches.reduce((accumulated, value) => {
+        const m = value.name.match(/\d+/g)
+        if (m) {
+          const numbers = m.map(Number)
+          return Math.max(numbers[numbers.length - 1] + 1, accumulated)
+        }
+        return accumulated
+      }, 1)
+
+      validated.name = `${validated.name} ${number}`
     }
 
     this.addressBook.push(validated)

@@ -245,6 +245,10 @@ export const preloadedState: State = {
   },
   dutchAuction: {
     status: {},
+    user: {
+      ethAddress: null,
+      ethCommitted: null,
+    },
     resAddress: null,
     kyc: {
       isVerified: false,
@@ -253,8 +257,10 @@ export const preloadedState: State = {
     },
     credentials: {
       userId: null,
-      authToken: null,
-    }
+      accessToken: null,
+    },
+    isGeneratingAddress: false,
+    isRegistering: false
   },
 }
 

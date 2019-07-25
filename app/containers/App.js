@@ -6,6 +6,7 @@ import { ipcRenderer } from 'electron'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
+import { bindActionCreators } from 'redux';
 import cn from 'classnames'
 
 import Footer from '~/components/get-started/Footer'
@@ -37,6 +38,7 @@ import ResDexSaveSeed from '~/components/resdex/bootstrapping/SaveSeed'
 import ResDexEnterSeed from '~/components/resdex/bootstrapping/EnterSeed'
 import ResDexForgotPassword from '~/components/resdex/bootstrapping/ForgotPassword'
 import ResDexKyc from '~/components/resdex/bootstrapping/Kyc'
+import { DutchAuctionActions } from '~/reducers/dutch-auction/dutch-auction.reducer'
 
 import AddressBookPage from './AddressBookPage'
 
@@ -57,7 +59,8 @@ type Props = {
   auth: AuthState,
   fetchParameters: FetchParametersState,
   getStarted: GetStartedState,
-  resDex: ResDexState
+  resDex: ResDexState,
+  dutchAuctionActions: any
 }
 
 /**
@@ -82,6 +85,8 @@ class App extends React.Component<Props> {
     }
 
     ipcRenderer.on('cleanup', () => this.cleanup())
+
+    this.props.dutchAuctionActions.getAuctionStatus()
   }
 
   cleanup() {
@@ -181,4 +186,8 @@ class App extends React.Component<Props> {
 	}
 }
 
-export default connect(state => state, null)(App)
+const mapDispatchToProps = dispatch => ({
+  dutchAuctionActions: bindActionCreators(DutchAuctionActions, dispatch),
+})
+
+export default connect(state => state, mapDispatchToProps)(App)

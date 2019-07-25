@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
 import { remote } from 'electron'
 import { Webview } from '~/components/Webview/Webview'
 import log from 'electron-log'
@@ -84,4 +83,4 @@ export class Kyc extends Component<Props> {
   }
 }
 
-export default connect(null, null)(translate('resdex')(Kyc))
+export default Kyc

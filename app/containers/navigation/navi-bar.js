@@ -4,12 +4,12 @@ import { connect } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
-import log from 'electron-log'
 
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ChildProcessService } from '~/service/child-process-service'
 import { NaviState } from '~/reducers/navi/navi.reducer'
+import { DutchAuctionState } from '~/reducers/dutch-auction/dutch-auction.reducer'
 
 import visaLogo from '~/assets/images/visa-logo.svg'
 import mastercardLogo from '~/assets/images/mastercard-logo.svg'
@@ -25,7 +25,8 @@ type Props = {
   t: any,
 	navi: NaviState,
 	settings: SettingsState,
-  resDex: ResDexState
+  resDex: ResDexState,
+  dutchAuction: DutchAuctionState
 }
 
 class NaviBar extends Component<Props> {
@@ -87,6 +88,7 @@ class NaviBar extends Component<Props> {
 
     const pendingOrdersNumber = this.getPendingOrdersNumber()
     const resDexStatus = this.props.settings.childProcessesStatus.RESDEX
+    const { status: dutchAuctionStatus } = this.props.dutchAuction.status
 
 		return (
       <div className={cn(styles.container, {[styles.shrink]: isResDexExpanded})} data-tid="navi-bar-container">
@@ -143,12 +145,14 @@ class NaviBar extends Component<Props> {
 
             </NavLink>
           </div>
-          <div className={cn(styles.dutchAuction, getItemClasses('/dutch-auction'))}>
-            <i />
-            <NavLink to="/dutch-auction">
-              {t(`Dutch Auction`)}
-            </NavLink>
-          </div>
+          {dutchAuctionStatus && dutchAuctionStatus !== 'terminated' &&
+            <div className={cn(styles.dutchAuction, getItemClasses('/dutch-auction'))}>
+              <i />
+              <NavLink to="/dutch-auction">
+                {t(`Dutch Auction`)}
+              </NavLink>
+            </div>
+          }
         </div>
 
 			</div>
@@ -159,7 +163,8 @@ class NaviBar extends Component<Props> {
 const mapStateToProps = state => ({
 	navi: state.navi,
 	settings: state.settings,
-  resDex: state.resDex
+  resDex: state.resDex,
+  dutchAuction: state.dutchAuction
 })
 
 export default connect(mapStateToProps, null)(translate('other')(NaviBar))
