@@ -38,8 +38,12 @@ export class DutchAuctionService {
     this.authToken = authToken
   }
 
-  async register(options) {
-    return this.post('register', { ...options })
+  async register({tid, email, resAddress}) {
+    return this.post('register', {
+      tid,
+      email,
+      resAddress
+    })
   }
 
   async getAuctionStatus() {

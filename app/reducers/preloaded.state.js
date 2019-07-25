@@ -244,7 +244,17 @@ export const preloadedState: State = {
     }
   },
   dutchAuction: {
-    status: {}
+    status: {},
+    resAddress: null,
+    kyc: {
+      isVerified: false,
+      email: null,
+      tid: null,
+    },
+    credentials: {
+      userId: null,
+      authToken: null,
+    }
   },
 }
 
@@ -270,6 +280,10 @@ Object.assign(preloadedState.resDex.login, {
 
 Object.assign(preloadedState.resDex.bootstrapping, {
   isInProgress: config.get('resDex.bootstrappingInProgress', true)
+})
+
+Object.assign(preloadedState.dutchAuction, {
+  resAddress: config.get('dutchAuction.resAddress', null)
 })
 
 const enabledCurrencies = config.get('resDex.enabledCurrencies', [])
