@@ -1,5 +1,4 @@
 // @flow
-import { Decimal } from 'decimal.js'
 import moment from 'moment'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -22,12 +21,18 @@ import styles from './DutchAuction.scss'
 
 type Props = {
   t: any,
+  i18n: any,
   dutchAuction: DutchAuctionState,
   actions: object
 }
 
-// const kycUrl = 'https://lbt95atwl1.execute-api.us-east-1.amazonaws.com/api/v1/kyc'
-const kycUrl = 'https://kvk0a65tl4.execute-api.us-east-1.amazonaws.com/api'
+const kycUrl = 'https://lbt95atwl1.execute-api.us-east-1.amazonaws.com/api/v1/kyc'
+
+const calculatePayout = (committed, price) => (
+  committed && price && !price.isZero()
+    ? committed.dividedBy(price)
+    : null
+)
 
 /**
  * @class DutchAuction
@@ -41,6 +46,11 @@ export class DutchAuction extends Component<Props> {
 	 */
   componentDidMount() {
     this.props.actions.getAuctionStatus()
+  }
+
+  amountToCaption(amount) {
+    const { t } = this.props
+    return amount ? toDecimalPlaces(amount) : t(`N/A`)
   }
 
 	/**
@@ -71,7 +81,7 @@ export class DutchAuction extends Component<Props> {
 	 */
   getPre() {
     const { t } = this.props
-    const { resAddress } = this.props.dutchAuction
+    const { resAddress, status } = this.props.dutchAuction
 
     return (
       <div className={styles.pre}>
@@ -79,7 +89,10 @@ export class DutchAuction extends Component<Props> {
           {t(`The auction starts in`)}
         </div>
 
-        {this.getCountdown()}
+        <Countdown
+          className={styles.countdown}
+          date={status.startTime}
+        />
 
         <ul className={styles.list}>
           <li>
@@ -98,12 +111,14 @@ export class DutchAuction extends Component<Props> {
     const { t } = this.props
     const { user, status } = this.props.dutchAuction
 
-    const amountToCaption = a => a ? toDecimalPlaces(a) : t(`N/A`)
+    const totalExpectedPayout = calculatePayout(status.ethCommitted, status.currentPrice)
+    const userExpectedPayout = calculatePayout(user.ethCommitted, status.currentPrice)
+    const nextPrice = status.currentPrice.minus(status.priceInterval)
 
     return (
       <div className={styles.active}>
         <div className={styles.title}>
-          {t(`The auction is active`)}
+          {t(`The current auction is in progress`)}
         </div>
 
         <ul className={styles.list}>
@@ -113,26 +128,34 @@ export class DutchAuction extends Component<Props> {
           </li>
           <li>
             <span>{t(`You committed`)}:</span>
-            {amountToCaption(user.ethCommitted)} ETH
+            {this.amountToCaption(user.ethCommitted)} ETH
           </li>
           <li>
-            <span>{t(`Total committed`)}:</span> {amountToCaption(status.ethCommitted)} ETH
+            <span>{t(`Current price`)}:</span>
+            {this.amountToCaption(status.currentPrice)} ETH
           </li>
           <li>
-            <span>{t(`Your expected RES payout`)}:</span> 548543 RES
+            <span>{t(`Reserve price`)}:</span>
+            {this.amountToCaption(status.reservePrice)} ETH
           </li>
           <li>
-            <span>{t(`Total expected RES payout`)}:</span> 71136931249 RES
+            <span>{t(`Total committed`)}:</span> {this.amountToCaption(status.ethCommitted)} ETH
+          </li>
+          <li>
+            <span>{t(`Your expected RES payout`)}:</span> {this.amountToCaption(userExpectedPayout)} RES
+          </li>
+          <li>
+            <span>{t(`Total expected RES payout`)}:</span> {this.amountToCaption(totalExpectedPayout)} RES
           </li>
         </ul>
 
         <div className={styles.title}>
-          {t(`Next price decrease`)}
+          {t(`The price will decrease to {{nextPrice}} Ethereum (ETH) in`, {nextPrice: this.amountToCaption(nextPrice)})}
         </div>
 
         <Countdown
           className={styles.countdown}
-          date="2019-07-27T23:57:32.102Z"
+          date={status.nextRoundTime}
         />
 
       </div>
@@ -145,39 +168,36 @@ export class DutchAuction extends Component<Props> {
 	 */
   getFinished() {
     const { t } = this.props
+    const { i18n } = this.props
     const { user, status } = this.props.dutchAuction
 
-    const resToPayOut = user.ethCommited
-      ? user.ethCommited.times(status.finalPrice)
+    const resToPayOut = user.ethCommited && status.finalPrice && !status.finalPrice.isZero()
+      ? user.ethCommited.dividedBy(status.finalPrice)
       : null
-
-    const fakeDate = moment().format('MMMM Do YYYY, h:mm:ss a')
-
-    const amountToCaption = a => a ? toDecimalPlaces(a) : t(`N/A`)
 
     return (
       <div className={styles.finished}>
         <div className={styles.title}>
-          {t(`The auction is finished`)}
-        </div>
-
-        <div className={styles.title}>
-          {t(`Round {{currentRound}} of {{roundCount}}`, status)}
+          {t(`The auction has finished`)}
         </div>
 
         <ul className={styles.list}>
           <li>
-            <span>{t(`Finish time`)}:</span> {status.finishTime} {fakeDate}
+            <span>{t(`Finish time`)}:</span>
+            {moment(status.finishTime)
+              .locale(i18n.language)
+              .format('MMMM Do YYYY, h:mm:ss a')
+            }
           </li>
           <li>
-            <span>{t(`Final price`)}:</span> {status.finalPrice} 0.002833 ETH per RES
+            <span>{t(`Final price`)}:</span> {status.finalPrice} ETH per RES
           </li>
           <li>
-            <span>{t(`RES sold`)}:</span> 71136931249{status.resSold}
+            <span>{t(`RES sold`)}:</span> {status.resSold}
           </li>
           <li>
             <span>{t(`Your RES to payout`)}:</span>
-            {amountToCaption(Decimal(55695))}
+            {this.amountToCaption(resToPayOut)}
           </li>
         </ul>
 
@@ -196,7 +216,13 @@ export class DutchAuction extends Component<Props> {
 	 */
   getAddressGeneration() {
     const { t } = this.props
-    const { isGeneratingAddress } = this.props.dutchAuction.status
+
+    const {
+      status,
+      isGeneratingAddress
+    } = this.props.dutchAuction
+
+    const auctionStatus = status.status
 
     return (
       <div className={styles.addressGeneration}>
@@ -212,11 +238,37 @@ export class DutchAuction extends Component<Props> {
             </div>
           </div>
 
-          <div className={styles.title}>
-            {t(`The auction starts in`)}
-          </div>
+          {auctionStatus === 'pre' && (
+            <React.Fragment>
+              <div className={styles.title}>
+                {t(`The auction starts in`)}
+              </div>
 
-          {this.getCountdown()}
+              <Countdown
+                className={styles.countdown}
+                date={status.startTime}
+              />
+            </React.Fragment>
+          )}
+
+          {auctionStatus === 'active' && (
+            <React.Fragment>
+              <div className={styles.title}>
+                {t(`The auction is in progress, the price will decrease in`)}
+              </div>
+
+              <Countdown
+                className={styles.countdown}
+                date={status.nextRoundTime}
+              />
+            </React.Fragment>
+          )}
+
+          {auctionStatus === 'finished' && (
+            <div className={styles.title}>
+              {t(`The auction is finished, but you can apply to participate in the future`)}
+            </div>
+          )}
 
           <div className={styles.buttons}>
             <RoundedButton

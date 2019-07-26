@@ -16,7 +16,7 @@ let instance = null
 
 const fromWei = wei => wei && Decimal(wei).dividedBy(RESDEX.weiDivider)
 const fromSatoshi = satoshi => satoshi && Decimal(satoshi ).dividedBy(RESDEX.satoshiDivider)
-const toDate = ts => ts && moment.unix(ts).toDate()
+const toDate = ts => ts && moment(ts).toDate()
 
 /**
  * @export
@@ -67,7 +67,7 @@ export class DutchAuctionService {
     const response = await this.get('auction/status')
     const { data } = response
 
-    return {
+    const result = {
       ...response,
       timestamp: toDate(response.timestamp),
       data: {
@@ -75,6 +75,7 @@ export class DutchAuctionService {
 
         // Default
         initialPrice: fromWei(data.initialPrice),
+        priceInterval: fromWei(data.priceInterval),
         reservePrice: fromWei(data.reservePrice),
         startTime: toDate(data.startTime),
         ethCommitted: fromWei(data.weiCommitted),
@@ -89,6 +90,9 @@ export class DutchAuctionService {
         finalPrice: fromWei(data.finalPrice)
       }
     }
+
+    log.debug(`Dutch auction status:`, result)
+    return result
   }
 
   async getUserStatus() {

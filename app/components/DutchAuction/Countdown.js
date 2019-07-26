@@ -5,7 +5,7 @@ import React, { Component } from 'react'
 import cn from 'classnames'
 
 type Props = {
-  date: string,
+  date: string | object,
   className?: string
 }
 
