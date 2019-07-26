@@ -14,9 +14,9 @@ const apiUrl = 'https://lbt95atwl1.execute-api.us-east-1.amazonaws.com/api/v1/'
  */
 let instance = null
 
-const fromWei = wei => Decimal(wei).dividedBy(RESDEX.weiDivider)
-const toDate = ts => moment.unix(ts).toDate()
-
+const fromWei = wei => wei && Decimal(wei).dividedBy(RESDEX.weiDivider)
+const fromSatoshi = satoshi => satoshi && Decimal(satoshi ).dividedBy(RESDEX.satoshiDivider)
+const toDate = ts => ts && moment.unix(ts).toDate()
 
 /**
  * @export
@@ -36,6 +36,8 @@ export class DutchAuctionService {
 
     const credentials = config.get('dutchAuction.credentials', {userId: null, accessToken: null})
 
+    log.debug(`Dutch Auction credentials:`, credentials)
+
     this.userId = credentials.userId
     this.accessToken = credentials.accessToken
 
@@ -44,9 +46,13 @@ export class DutchAuctionService {
 		return instance
 	}
 
-  setCredentials({userId, accessToken}) {
+  setCredentials(userId, accessToken) {
     this.userId = userId
     this.accessToken = accessToken
+  }
+
+  hasCredentials() {
+    return this.userId !== null && this.accessToken !== null
   }
 
   async register({tid, email, resAddress}) {
@@ -66,16 +72,31 @@ export class DutchAuctionService {
       timestamp: toDate(response.timestamp),
       data: {
         ...response.data,
+
+        // Default
         initialPrice: fromWei(data.initialPrice),
         reservePrice: fromWei(data.reservePrice),
         startTime: toDate(data.startTime),
         ethCommitted: fromWei(data.weiCommitted),
+
+        // Active
+        currentPrice: fromWei(data.currentPrice),
+        nextRoundTime: toDate(data.nextRoundTime),
+        resSold: fromSatoshi(data.resSold),
+
+        // Finished
+        finishTime: toDate(data.finishTime),
+        finalPrice: fromWei(data.finalPrice)
       }
     }
   }
 
   async getUserStatus() {
-    const response = await this.get('user')
+    const response = await this.query({
+      path: 'user',
+      method: 'GET',
+      isAuthRequired: true
+    })
 
     return {
       ethCommitted: fromWei(response.weiCommitted),
@@ -106,6 +127,7 @@ export class DutchAuctionService {
       options.headers = {
         Authorization: `Basic ${auth}`,
       }
+      log.debug(`Dutch Auction auth headers:`, options.headers)
     }
 
     let response

@@ -29,7 +29,8 @@ type Props = {
 export class ResDexKyc extends Component<Props> {
 	props: Props
 
-  async register(tid) {
+  async register(data) {
+    const { tid } = data
     const { t } = this.props
     const { defaultPortfolioId } = this.props.resDex.login
     const isRegistered = await this.generateAndSendRegister(tid)
@@ -79,7 +80,7 @@ export class ResDexKyc extends Component<Props> {
     return (
       <Kyc
         url={kycUrl}
-        submitCallback={this.register}
+        submitCallback={data => this.register(data)}
       />
     )
   }

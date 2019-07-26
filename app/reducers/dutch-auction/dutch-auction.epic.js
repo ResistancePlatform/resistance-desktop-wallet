@@ -36,6 +36,9 @@ const getAuctionStatus = (action$: ActionsObservable<any>) => action$.pipe(
 const getUserStatus = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(DutchAuctionActions.getUserStatus),
   switchMap(() => {
+    if (!dutchAuction.hasCredentials()) {
+      return of(DutchAuctionActions.getUserStatusFailed())
+    }
     const observable = from(dutchAuction.getUserStatus()).pipe(
       switchMap(status => of(DutchAuctionActions.gotUserStatus(status))),
       catchError(err => {
@@ -79,25 +82,29 @@ const register = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(DutchAuctionActions.register),
   switchMap(() => {
     const { resAddress, kyc } = state$.value.dutchAuction
+
     const observable = from(dutchAuction.register({ ...kyc, resAddress }))
+      .pipe(
+        switchMap(credentials => {
+          log.debug(`Got credentials:`, credentials)
 
-    observable.pipe(
-      switchMap(credentials => {
-        config.set('dutchAuction.credentials', {
-          userId: credentials.userId,
-          accessToken: credentials.accessToken
+          const { userId, accessToken } = credentials
+
+          config.set('dutchAuction.credentials', {
+            userId,
+            accessToken,
+          })
+
+          dutchAuction.setCredentials(userId, accessToken)
+
+          return of(DutchAuctionActions.updateCredentials(credentials))
+        }),
+        catchError(err => {
+          log.error(`Can't register for the Dutch auction`, err)
+          toastr.error(t(`Can't register for the auction, check the log for details`))
+          return of(DutchAuctionActions.registrationFinished())
         })
-
-        dutchAuction.setCredentials(credentials.userId, credentials.accessToken)
-
-        return of(DutchAuctionActions.updateCredentials(credentials))
-      }),
-      catchError(err => {
-        log.error(`Can't register for the Dutch auction`, err)
-        toastr.error(t(`Can't register for the auction, check the log for details`))
-        return of(DutchAuctionActions.registrationFinished())
-      })
-    )
+      )
 
     return observable
   })

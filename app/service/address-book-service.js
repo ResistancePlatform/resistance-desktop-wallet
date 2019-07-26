@@ -62,9 +62,10 @@ export class AddressBookService {
     }
 
     const nameMatch = record => record.name === validated.name
-    const nameMatches = this.addressBook.filter(nameMatch)
 
-    if (nameMatches.length) {
+    if (this.addressBook.filter(nameMatch).length) {
+      const nameMatches = this.addressBook.filter(r => r.name.includes(validated.name))
+
       const number = nameMatches.reduce((accumulated, value) => {
         const m = value.name.match(/\d+/g)
         if (m) {

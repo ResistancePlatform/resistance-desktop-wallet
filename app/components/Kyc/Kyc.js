@@ -32,6 +32,9 @@ export class Kyc extends Component<Props> {
     log.debug(`Creating web hook`)
 
     currentWindow.webContents.session.webRequest.onBeforeRequest({}, async (details, callback) => {
+      if (details.url.includes('/api/v1/idmwebhook')) {
+        log.debug(`Details:`, details)
+      }
 
       if (details.method === 'POST' && details.url.endsWith('/api/v1/idmwebhook')) {
         log.debug(`Web hook:`, details)
@@ -42,9 +45,13 @@ export class Kyc extends Component<Props> {
         const text = buffer.toString('ascii')
         const result = JSON.parse(text)
 
-        log.debug(`Got KYC tid:`, result.tid, `email:`, result.email)
+        log.debug(`Got KYC data:`, JSON.stringify(result))
 
-        submitCallback(result.tid, result.email)
+        submitCallback({
+          tid: result.tid,
+          email: result.form_data.email,
+          phone: result.form_data.phone,
+        })
 
         callback({ cancel: true })
       } else {
@@ -70,9 +77,6 @@ export class Kyc extends Component<Props> {
 
     return (
       <div className={styles.container}>
-        <div className={styles.title}>
-          {t(`Get Verified`)}
-        </div>
         <Webview
           className={styles.webview}
           title={t(`Get Verified`)}

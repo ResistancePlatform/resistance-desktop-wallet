@@ -10,8 +10,9 @@ export type DutchAuctionState = {
   },
   resAddress: string | null,
   kyc: {
+    tid: string | null,
     email: string | null,
-    tid: string | null
+    phone: string | null
   },
   credentials: {
     userId: string | null,

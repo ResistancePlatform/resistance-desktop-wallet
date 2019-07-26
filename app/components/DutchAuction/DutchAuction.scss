@@ -1,11 +1,10 @@
 @import "~/assets/styles/vars.scss";
 
 .container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 1.5rem;
   width: 100%;
   -webkit-app-region: drag;
+  height: 100%;
 
   .form {
     text-align: center;
@@ -18,4 +17,65 @@
     user-select: none;
     cursor: pointer;
   }
+}
+
+.note {
+  font-size: 0.67rem;
+  color: $BASE_COLOR_FONT_GRAY;
+
+  strong {
+    color: $BASE_COLOR_WHITE;
+  }
+}
+
+.list {
+  padding: 0.3rem 2rem 0.1rem 2rem;
+  text-align: left;
+  list-style: none;
+
+  li {
+    font-size: 0.7rem;
+    font-weight: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-bottom: 1.1rem;
+  }
+
+  span {
+    color: $BASE_COLOR_FONT_GRAY;
+    width: 10rem;
+    display: inline-block;
+    font-weight: 500;
+  }
+}
+
+.countdown {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.buttons {
+  text-align: center;
+}
+
+.breadCrumbs {
+  display: flex;
+  width: 100%;
+  font-size: 0.65rem;
+  color: $BASE_COLOR_FONT_GRAY;
+  margin-bottom: 1rem;
+
+  .active {
+    color: $BASE_COLOR_PURPLE;
+  }
+
+  > div {
+    margin-right: 1rem;
+  }
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.kyc {
+  height: 100%;
 }

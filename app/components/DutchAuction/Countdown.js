@@ -2,9 +2,11 @@
 // Based on https://github.com/kristinbaumann/react-countdown/blob/master/src/Countdown.js
 
 import React, { Component } from 'react'
+import cn from 'classnames'
 
 type Props = {
-  date: string
+  date: string,
+  className?: string
 }
 
 class Countdown extends Component {
@@ -88,7 +90,7 @@ class Countdown extends Component {
     const countDown = this.state
 
     return (
-      <div className="Countdown">
+      <div className={cn(this.props.className)}>
         <span className="Countdown-col">
           <span className="Countdown-col-element">
               <strong>{this.addLeadingZeros(countDown.days)}</strong>

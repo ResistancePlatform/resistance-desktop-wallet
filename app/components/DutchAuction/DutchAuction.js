@@ -1,4 +1,6 @@
 // @flow
+import { Decimal } from 'decimal.js'
+import moment from 'moment'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
@@ -24,7 +26,8 @@ type Props = {
   actions: object
 }
 
-const kycUrl = 'https://lbt95atwl1.execute-api.us-east-1.amazonaws.com/api/v1/kyc'
+// const kycUrl = 'https://lbt95atwl1.execute-api.us-east-1.amazonaws.com/api/v1/kyc'
+const kycUrl = 'https://kvk0a65tl4.execute-api.us-east-1.amazonaws.com/api'
 
 /**
  * @class DutchAuction
@@ -59,6 +62,7 @@ export class DutchAuction extends Component<Props> {
       return this.getRegister()
     }
 
+    return null
   }
 
 	/**
@@ -94,6 +98,8 @@ export class DutchAuction extends Component<Props> {
     const { t } = this.props
     const { user, status } = this.props.dutchAuction
 
+    const amountToCaption = a => a ? toDecimalPlaces(a) : t(`N/A`)
+
     return (
       <div className={styles.active}>
         <div className={styles.title}>
@@ -102,19 +108,21 @@ export class DutchAuction extends Component<Props> {
 
         <ul className={styles.list}>
           <li>
-            <span>{t(`Address to send Ethereum to`)}:</span> {user.ethAddress}
+            <span>{t(`Address to send Ethereum to`)}:</span>
+            {user.ethAddress}
           </li>
           <li>
-            <span>{t(`You committed`)}:</span> {user.ethCommitted} ETH
+            <span>{t(`You committed`)}:</span>
+            {amountToCaption(user.ethCommitted)} ETH
           </li>
           <li>
-            <span>{t(`Total committed`)}:</span> {status.ethCommitted} ETH
+            <span>{t(`Total committed`)}:</span> {amountToCaption(status.ethCommitted)} ETH
           </li>
           <li>
-            <span>{t(`Your expected RES payout`)}:</span> Fixme! RES
+            <span>{t(`Your expected RES payout`)}:</span> 548543 RES
           </li>
           <li>
-            <span>{t(`Total expected RES payout`)}:</span> Fixme! RES
+            <span>{t(`Total expected RES payout`)}:</span> 71136931249 RES
           </li>
         </ul>
 
@@ -123,7 +131,8 @@ export class DutchAuction extends Component<Props> {
         </div>
 
         <Countdown
-          date="Thu Jul 25 2019 22:37:37 GMT+0200 (Central European Summer Time)"
+          className={styles.countdown}
+          date="2019-07-27T23:57:32.102Z"
         />
 
       </div>
@@ -142,6 +151,10 @@ export class DutchAuction extends Component<Props> {
       ? user.ethCommited.times(status.finalPrice)
       : null
 
+    const fakeDate = moment().format('MMMM Do YYYY, h:mm:ss a')
+
+    const amountToCaption = a => a ? toDecimalPlaces(a) : t(`N/A`)
+
     return (
       <div className={styles.finished}>
         <div className={styles.title}>
@@ -154,25 +167,22 @@ export class DutchAuction extends Component<Props> {
 
         <ul className={styles.list}>
           <li>
-            <span>{t(`Finish time`)}:</span> {status.finishTime}
+            <span>{t(`Finish time`)}:</span> {status.finishTime} {fakeDate}
           </li>
           <li>
-            <span>{t(`Final price`)}:</span> {status.finalPrice} RES
+            <span>{t(`Final price`)}:</span> {status.finalPrice} 0.002833 ETH per RES
           </li>
           <li>
-            <span>{t(`RES sold`)}:</span> {status.resSold}
+            <span>{t(`RES sold`)}:</span> 71136931249{status.resSold}
           </li>
           <li>
             <span>{t(`Your RES to payout`)}:</span>
-            {resToPayOut
-              ? toDecimalPlaces(resToPayOut)
-              : t(`N/A`)
-            }
+            {amountToCaption(Decimal(55695))}
           </li>
         </ul>
 
         <div className={styles.note}>
-          <strong>{t(`Note`)}:</strong>
+          <strong>{t(`Note`)}:</strong>&nbsp;
           {t(`No RES will be paid out until 48 hours after the *final* round of the Resistance Dutch Auction. The RES coins will be paid out to the RES address stated below`)}
         </div>
 
@@ -189,19 +199,37 @@ export class DutchAuction extends Component<Props> {
     const { isGeneratingAddress } = this.props.dutchAuction.status
 
     return (
-      <React.Fragment>
-        {this.getCountdown()}
+      <div className={styles.addressGeneration}>
+          <div className={styles.breadCrumbs}>
+            <div className={styles.active}>
+              1. {t(`Introduction`)}
+            </div>
+            <div>
+              2. {t(`Get Verified`)}
+            </div>
+            <div>
+              3. {t(`Register`)}
+            </div>
+          </div>
 
-        <RoundedButton
-          onClick={this.props.actions.generateResAddress}
-          important
-          disabled={isGeneratingAddress}
-          spinner={isGeneratingAddress}
-        >
-          {t(`Register`)}
-        </RoundedButton>
+          <div className={styles.title}>
+            {t(`The auction starts in`)}
+          </div>
 
-      </React.Fragment>
+          {this.getCountdown()}
+
+          <div className={styles.buttons}>
+            <RoundedButton
+              onClick={this.props.actions.generateResAddress}
+              important
+              disabled={isGeneratingAddress}
+              spinner={isGeneratingAddress}
+            >
+              {t(`Participate`)}
+            </RoundedButton>
+          </div>
+
+        </div>
     )
   }
 
@@ -210,11 +238,27 @@ export class DutchAuction extends Component<Props> {
    * @memberof DutchAuction
 	 */
   getKyc() {
+    const { t } = this.props
+
     return (
-      <Kyc
-        url={kycUrl}
-        submitCallback={this.props.actions.submitKycData}
-      />
+      <div className={styles.kyc}>
+        <div className={styles.breadCrumbs}>
+          <div>
+            1. {t(`Introduction`)}
+          </div>
+          <div className={styles.active}>
+            2. {t(`Get Verified`)}
+          </div>
+          <div>
+            3. {t(`Register`)}
+          </div>
+        </div>
+
+        <Kyc
+          url={kycUrl}
+          submitCallback={this.props.actions.submitKycData}
+        />
+      </div>
     )
   }
 
@@ -227,18 +271,37 @@ export class DutchAuction extends Component<Props> {
     const { isRegistering } = this.props.dutchAuction
 
     return (
-      <React.Fragment>
+      <div className={styles.register}>
+        <div className={styles.breadCrumbs}>
+          <div>
+            1. {t(`Introduction`)}
+          </div>
+          <div>
+            2. {t(`Get Verified`)}
+          </div>
+          <div className={styles.active}>
+            3. {t(`Register`)}
+          </div>
+        </div>
+
+        <div className={styles.title}>
+          {t(`Almost done!`)}
+        </div>
+
         {this.getCountdown()}
 
-        <RoundedButton
-          onClick={this.props.actions.register}
-          important
-          disabled={isRegistering}
-          spinner={isRegistering}
-        >
-          {t(`Register for the auction`)}
-        </RoundedButton>
-      </React.Fragment>
+        <div className={styles.buttons}>
+          <RoundedButton
+            onClick={this.props.actions.register}
+            important
+            disabled={isRegistering}
+            spinner={isRegistering}
+          >
+            {t(`Register for the auction`)}
+          </RoundedButton>
+        </div>
+
+      </div>
     )
   }
 
@@ -248,9 +311,10 @@ export class DutchAuction extends Component<Props> {
 	 */
   getCountdown() {
     return (
-      <div className={styles.countdown}>
-        Countdown
-      </div>
+      <Countdown
+        className={styles.countdown}
+        date="2019-07-27T23:57:32.102Z"
+      />
     )
   }
 
@@ -265,34 +329,34 @@ export class DutchAuction extends Component<Props> {
       return null
     }
 
-    status.status = 'pre'
+    status.status = 'finished'
+
+    let contents = null
 
     const bootstrapping = this.getBootstrapping()
 
     if (bootstrapping !== null) {
-      return bootstrapping
-    }
-
-    let contents = null
-    switch (status.status) {
-      case 'pre':
-        contents = this.getPre()
-        break
-      case 'active':
-        contents = this.getActive()
-        break
-      case 'finished':
-        contents = this.getFinished()
-        break
-      default:
-        break
+      contents = bootstrapping
+    } else {
+      switch (status.status) {
+        case 'pre':
+          contents = this.getPre()
+          break
+        case 'active':
+          contents = this.getActive()
+          break
+        case 'finished':
+          contents = this.getFinished()
+          break
+        default:
+          break
+      }
     }
 
     return (
       <div className={styles.container}>
         <RpcPolling
           interval={60.0}
-          criticalChildProcess="RESDEX"
           actions={{
             polling: DutchAuctionActions.getAuctionStatus,
             success: DutchAuctionActions.gotAuctionStatus,
@@ -301,7 +365,6 @@ export class DutchAuction extends Component<Props> {
         />
         <RpcPolling
           interval={61.0}
-          criticalChildProcess="RESDEX"
           actions={{
             polling: DutchAuctionActions.getUserStatus,
             success: DutchAuctionActions.gotUserStatus,
