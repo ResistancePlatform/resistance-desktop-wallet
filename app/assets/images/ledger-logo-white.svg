@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>ledger-logo</title>
+    <desc>Created with Sketch.</desc>
+    <g id="ledger-logo" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-15" fill="#eeeef1" fill-rule="nonzero">
+            <path d="M26.902264,0 L12,0 L12,20 L32,20 L31.9999784,5.20358306 C32.0081217,2.39413681 29.7117073,2.89308931e-16 26.902264,0 Z" id="Path"></path>
+            <path d="M8,0 L5.40654699,0 C2.49208025,0 0,2.37381204 0,5.40654699 L0,8 L8,8 L8,0 Z" id="Path"></path>
+            <polygon id="Path" points="0 12 8 12 8 20 0 20"></polygon>
+            <path d="M24,32 L26.593453,32 C29.5079197,32 32,29.6236786 32,26.5877378 L32,24 L24,24 L24,32 Z" id="Path"></path>
+            <polygon id="Path" points="12 24 20 24 20 32 12 32"></polygon>
+            <path d="M0,24 L0,26.593453 C0,29.5079197 2.37381204,32 5.40654699,32 L8,32 L8,24 L0,24 Z" id="Path"></path>
+        </g>
+    </g>
+</svg>

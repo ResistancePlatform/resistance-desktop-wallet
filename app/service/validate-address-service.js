@@ -74,7 +74,7 @@ export default class ValidateAddressService {
 
   getZAddressLength() {
     const nodeConfig = remote.getGlobal('resistanceNodeConfig')
-    return nodeConfig.testnet || nodeConfig.regtest ? 88 : 77
+    return nodeConfig.testnet || nodeConfig.regtest ? 88 : 78
   }
 
 	/**

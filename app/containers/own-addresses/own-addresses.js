@@ -12,7 +12,11 @@ import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { OwnAddressesActions, OwnAddressesState } from '~/reducers/own-addresses/own-addresses.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
-import { RoundedButtonWithDropdown, MoreButton  } from '~/components/rounded-form'
+import {
+  RoundedButton,
+  RoundedButtonWithDropdown,
+  MoreButton
+} from '~/components/rounded-form'
 import ConnectLedgerModal from '~/components/own-addresses/ConnectLedgerModal'
 
 import styles from './own-addresses.scss'
@@ -114,12 +118,19 @@ class OwnAddresses extends Component<Props> {
                     <PopupMenuItem onClick={() => this.props.actions.createAddress(true)}>
                       {t(`New private (Z) address`)}
                     </PopupMenuItem>
-                    <PopupMenuItem onClick={this.props.actions.showConnectLedgerModal}>
-                      {t(`Send RES from Ledger`)}
-                    </PopupMenuItem>
                   </PopupMenu>
 
                 </RoundedButtonWithDropdown>
+
+                <RoundedButton
+                  className={styles.menuButton}
+                  onClick={this.props.actions.showConnectLedgerModal}
+                  glyph="ledger"
+                  disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
+                  important
+                >
+                  {t(`Send RES from Ledger`)}
+                </RoundedButton>
 
                 <MoreButton
                   className={styles.moreButton}

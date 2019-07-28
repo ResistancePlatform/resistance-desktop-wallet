@@ -21,11 +21,15 @@ const childProcess = new ChildProcessService()
  */
 let instance = null
 
-const walletFolderName = 'testnet3'
+// Uncomment for testnet
+// const walletFolderName = 'testnet3'
+
+const walletFolderName = ''
 const configFolderName = 'Resistance'
 const configFileName = 'resistance.conf'
 const configFileContents = [
-  `testnet=1`,
+  // Uncomment for testnet
+  // `testnet=1`,
   `rpcuser=resuser`,
   `rpcpassword=%generatedPassword%`,
   ``
