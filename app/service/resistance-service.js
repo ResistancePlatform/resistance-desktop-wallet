@@ -200,6 +200,12 @@ async function startOrRestart({isTorEnabled, start, isEtomic}) {
     const walletName = config.get('wallet.name', 'wallet')
     args.push(`-wallet=${walletName}.dat`)
 
+    const miningAddress = config.get('miningAddress', false)
+
+    if (miningAddress) {
+      args.push(`-mineraddress=${miningAddress}`)
+    }
+
     const exportDir = getExportDir()
 
     log.info(`Export Dir: ${exportDir}`)
@@ -214,8 +220,6 @@ async function startOrRestart({isTorEnabled, start, isEtomic}) {
     }
 
     args.push(`-exportdir=${exportDir}`)
-
-    // args.push(`-mineraddress=rpTFwK6gPqkXJA7CvJff2jXpgtdd3GJuB5C`)
 
   }
 

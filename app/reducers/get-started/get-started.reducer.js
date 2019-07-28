@@ -45,6 +45,8 @@ export const GetStartedActions = createActions(
       AUTHENTICATE: undefined,
       CHANGE_PASSWORD: undefined,
 
+      CREATE_MINING_ADDRESS: undefined,
+
       DISPLAY_HINT: (message: string) => ({ message }),
       WALLET_BOOTSTRAPPING_SUCCEEDED: undefined,
       WALLET_BOOTSTRAPPING_FAILED: (errorMessage: string) => ({ errorMessage }),
