@@ -243,7 +243,6 @@ function downloadDoneCallback(state, downloadItem, resolve, reject) {
 
 function registerDownloadListener(resolve, reject) {
   this.downloadListener = (e, downloadItem) => {
-
     const savePath = path.join(this.getResistanceParamsFolder(), downloadItem.getFilename())
     downloadItem.setSavePath(savePath)
 
@@ -260,6 +259,7 @@ function registerDownloadListener(resolve, reject) {
     downloadItem.on('done', (event, state) => (
       this::downloadDoneCallback(state, downloadItem, resolve, reject)
     ))
+
   }
 
   this.mainWindow.webContents.session.on('will-download', this.downloadListener)
