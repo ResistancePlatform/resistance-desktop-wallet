@@ -293,7 +293,7 @@ export class DutchAuction extends Component<Props> {
     const { t } = this.props
 
     return (
-      <div className={styles.kyc}>
+      <div className={styles.kycContainer}>
         <div className={styles.breadCrumbs}>
           <div>
             1. {t(`Introduction`)}
@@ -307,6 +307,7 @@ export class DutchAuction extends Component<Props> {
         </div>
 
         <Kyc
+          className={styles.kyc}
           url={kycUrl}
           submitCallback={this.props.actions.submitKycData}
         />

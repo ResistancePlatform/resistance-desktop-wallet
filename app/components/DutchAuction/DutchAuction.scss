@@ -76,6 +76,13 @@
   white-space: nowrap;
 }
 
-.kyc {
+.kycContainer {
   height: 100%;
+
+  .kyc {
+    height: 100%;
+    padding: 0;
+    margin: -1rem;
+  }
+
 }

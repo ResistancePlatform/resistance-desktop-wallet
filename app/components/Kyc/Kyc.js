@@ -2,6 +2,7 @@
 import React, { Component } from 'react'
 import { remote } from 'electron'
 import { Webview } from '~/components/Webview/Webview'
+import cn from 'classnames'
 import log from 'electron-log'
 
 import { translate } from '~/i18next.config'
@@ -9,6 +10,7 @@ import { translate } from '~/i18next.config'
 import styles from './Kyc.scss'
 
 type Props = {
+  className?: string,
   url: string,
   submitCallback: func
 }
@@ -76,7 +78,7 @@ export class Kyc extends Component<Props> {
     const { url } = this.props
 
     return (
-      <div className={styles.container}>
+      <div className={cn(styles.container, this.props.className)}>
         <Webview
           className={styles.webview}
           title={t(`Get Verified`)}
