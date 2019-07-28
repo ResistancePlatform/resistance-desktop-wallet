@@ -59,6 +59,21 @@
         content: '\e900';
       }
     }
+
+
+    &.ledger {
+      &:before {
+        content: ' ';
+        position: absolute;
+        background: url('assets/images/ledger-logo-white.svg');
+        color: white;
+        background-size: contain;
+        width: 0.67rem;
+        height: 0.67rem;
+        margin-left: 0.67rem;
+        margin-top: -0.35rem;
+      }
+    }
   }
 }
 
