@@ -253,7 +253,7 @@ const createMiningAddressEpic = (action$: ActionsObservable<Action>) => action$.
       mergeMap(address => {
         config.set('miningAddress', address)
         addressBook.addAddress({
-          name: t(`Mining Address`),
+          name: t(`Mining`),
           address,
         })
         return concat(

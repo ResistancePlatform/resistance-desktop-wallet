@@ -266,7 +266,7 @@ export class DutchAuction extends Component<Props> {
 
           {auctionStatus === 'finished' && (
             <div className={styles.title}>
-              {t(`The auction is finished, but you can apply to participate in the future`)}
+              {t(`The auction is now complete, but you can apply to participate in the next round here`)}
             </div>
           )}
 
@@ -382,7 +382,7 @@ export class DutchAuction extends Component<Props> {
       return null
     }
 
-    status.status = 'finished'
+    // status.status = 'finished'
 
     let contents = null
 
