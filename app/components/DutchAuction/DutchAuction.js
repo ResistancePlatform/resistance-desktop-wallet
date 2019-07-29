@@ -224,6 +224,12 @@ export class DutchAuction extends Component<Props> {
 
     const auctionStatus = status.status
 
+    // const getTimeCaption = time => (
+    //   moment(status.startTime)
+    //   .locale(i18n.language)
+    //   .format('MMMM Do YYYY, h:mm:ss a')
+    // )
+
     return (
       <div className={styles.addressGeneration}>
           <div className={styles.breadCrumbs}>
@@ -270,6 +276,12 @@ export class DutchAuction extends Component<Props> {
             </div>
           )}
 
+          <div className={styles.note}>
+            {t(`There will be four auctions in total, with the first taking place on {{startDate}}.`, {startDate: ''})}
+            {t(`Following that, there will be a week’s interval before the second auction, another week before third, and another week before the final auction.`)}
+            {t(`Only after the final auction ends will the Resistance IEO complete. Let’s get started!`)}
+          </div>
+
           <div className={styles.buttons}>
             <RoundedButton
               onClick={this.props.actions.generateResAddress}
@@ -277,7 +289,7 @@ export class DutchAuction extends Component<Props> {
               disabled={isGeneratingAddress}
               spinner={isGeneratingAddress}
             >
-              {t(`Participate`)}
+              {t(`Get Verified`)}
             </RoundedButton>
           </div>
 
