@@ -19,13 +19,17 @@
   }
 }
 
-.note {
+.note, .intro {
   font-size: 0.67rem;
   color: $BASE_COLOR_FONT_GRAY;
 
   strong {
     color: $BASE_COLOR_WHITE;
   }
+}
+
+.intro {
+  color: $BASE_COLOR_WHITE;
 }
 
 .list {
@@ -85,4 +89,10 @@
     margin: -1rem;
   }
 
+}
+
+.spinner {
+  width: 1.2rem;
+  left: 0.6rem;
+  margin-top: -0.6rem;
 }

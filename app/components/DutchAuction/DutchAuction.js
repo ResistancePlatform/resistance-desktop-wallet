@@ -17,6 +17,7 @@ import {
 import { Kyc } from '~/components/Kyc/Kyc'
 import Countdown from './Countdown'
 
+import animatedSpinner from '~/assets/images/animated-spinner.svg'
 import styles from './DutchAuction.scss'
 
 type Props = {
@@ -50,7 +51,15 @@ export class DutchAuction extends Component<Props> {
 
   amountToCaption(amount) {
     const { t } = this.props
-    return amount ? toDecimalPlaces(amount) : t(`N/A`)
+    // const na = t(`N/A`)
+    const na = (
+      <img
+        className={styles.spinner}
+        src={animatedSpinner}
+        alt={t(`Loading...`)}
+      />
+    )
+    return amount ? toDecimalPlaces(amount) : na
   }
 
 	/**
@@ -92,6 +101,7 @@ export class DutchAuction extends Component<Props> {
         <Countdown
           className={styles.countdown}
           date={status.startTime}
+          onStop={this.props.actions.getAuctionStatus}
         />
 
         <ul className={styles.list}>
@@ -156,6 +166,7 @@ export class DutchAuction extends Component<Props> {
         <Countdown
           className={styles.countdown}
           date={status.nextRoundTime}
+          onStop={this.props.actions.getAuctionStatus}
         />
 
       </div>
@@ -214,21 +225,35 @@ export class DutchAuction extends Component<Props> {
 	 * @returns
    * @memberof DutchAuction
 	 */
-  getAddressGeneration() {
+  getIntroductoryNote() {
     const { t } = this.props
 
-    const {
-      status,
-      isGeneratingAddress
-    } = this.props.dutchAuction
-
-    const auctionStatus = status.status
-
     // const getTimeCaption = time => (
-    //   moment(status.startTime)
+    //   moment(time)
     //   .locale(i18n.language)
     //   .format('MMMM Do YYYY, h:mm:ss a')
     // )
+
+    return (
+      <React.Fragment>
+        {t(`There will be four auctions in total, with the first taking place on 2nd August 2019.`)}
+        {t(`Following that, there will be a week’s interval before the second auction, another week before third, and another week before the final auction.`)}
+        {t(`Only after the final auction ends will the Resistance IEO complete.`)}
+        {t(`Before you can participate in an auction, you'll need to pass KYC verification.`)}
+        {t(`Let’s get started!`)}
+      </React.Fragment>
+    )
+
+  }
+
+	/**
+	 * @returns
+   * @memberof DutchAuction
+	 */
+  getAddressGeneration() {
+    const { t } = this.props
+
+    const { isGeneratingAddress } = this.props.dutchAuction
 
     return (
       <div className={styles.addressGeneration}>
@@ -244,42 +269,10 @@ export class DutchAuction extends Component<Props> {
             </div>
           </div>
 
-          {auctionStatus === 'pre' && (
-            <React.Fragment>
-              <div className={styles.title}>
-                {t(`The auction starts in`)}
-              </div>
+          {this.getStatusSummary()}
 
-              <Countdown
-                className={styles.countdown}
-                date={status.startTime}
-              />
-            </React.Fragment>
-          )}
-
-          {auctionStatus === 'active' && (
-            <React.Fragment>
-              <div className={styles.title}>
-                {t(`The auction is in progress, the price will decrease in`)}
-              </div>
-
-              <Countdown
-                className={styles.countdown}
-                date={status.nextRoundTime}
-              />
-            </React.Fragment>
-          )}
-
-          {auctionStatus === 'finished' && (
-            <div className={styles.title}>
-              {t(`The auction is now complete, but you can apply to participate in the next round here`)}
-            </div>
-          )}
-
-          <div className={styles.note}>
-            {t(`There will be four auctions in total, with the first taking place on {{startDate}}.`, {startDate: ''})}
-            {t(`Following that, there will be a week’s interval before the second auction, another week before third, and another week before the final auction.`)}
-            {t(`Only after the final auction ends will the Resistance IEO complete. Let’s get started!`)}
+          <div className={styles.intro}>
+            {this.getIntroductoryNote()}
           </div>
 
           <div className={styles.buttons}>
@@ -353,7 +346,7 @@ export class DutchAuction extends Component<Props> {
           {t(`Almost done!`)}
         </div>
 
-        {this.getCountdown()}
+        {this.getStatusSummary()}
 
         <div className={styles.buttons}>
           <RoundedButton
@@ -374,12 +367,45 @@ export class DutchAuction extends Component<Props> {
 	 * @returns
    * @memberof DutchAuction
 	 */
-  getCountdown() {
+  getStatusSummary() {
+    const { t } = this.props
+    const { status } = this.props.dutchAuction.status
+
     return (
-      <Countdown
-        className={styles.countdown}
-        date="2019-07-27T23:57:32.102Z"
-      />
+      <div className={styles.statusSummary}>
+      {status === 'pre' && (
+        <React.Fragment>
+          <div className={styles.title}>
+            {t(`The auction starts in`)}
+          </div>
+
+          <Countdown
+            className={styles.countdown}
+            date={status.startTime}
+          />
+        </React.Fragment>
+      )}
+
+      {status === 'active' && (
+        <React.Fragment>
+          <div className={styles.title}>
+            {t(`The auction is in progress, the price will decrease in`)}
+          </div>
+
+          <Countdown
+            className={styles.countdown}
+            date={status.nextRoundTime}
+          />
+        </React.Fragment>
+      )}
+
+      {status === 'finished' && (
+        <div className={styles.title}>
+          {t(`The auction is now complete, but you can apply to participate in the next round here`)}
+        </div>
+      )}
+
+      </div>
     )
   }
 

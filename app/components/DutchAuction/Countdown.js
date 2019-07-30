@@ -6,6 +6,7 @@ import cn from 'classnames'
 
 type Props = {
   date: string | object,
+  onStop?: func,
   className?: string
 }
 
@@ -76,6 +77,10 @@ class Countdown extends Component {
 
   stop() {
     clearInterval(this.interval)
+
+    if (this.props.onStop) {
+      this.props.onStop()
+    }
   }
 
   addLeadingZeros(value) {

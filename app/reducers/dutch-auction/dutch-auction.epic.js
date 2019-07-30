@@ -33,12 +33,15 @@ const getAuctionStatus = (action$: ActionsObservable<any>) => action$.pipe(
   })
 )
 
-const getUserStatus = (action$: ActionsObservable<any>) => action$.pipe(
+const getUserStatus = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(DutchAuctionActions.getUserStatus),
   switchMap(() => {
-    if (!dutchAuction.hasCredentials()) {
+    const { status: auctionStatus } = state$.value.dutchAuction.status
+
+    if (auctionStatus !=='active' || !dutchAuction.hasCredentials()) {
       return of(DutchAuctionActions.getUserStatusFailed())
     }
+
     const observable = from(dutchAuction.getUserStatus()).pipe(
       switchMap(status => of(DutchAuctionActions.gotUserStatus(status))),
       catchError(err => {
@@ -97,7 +100,11 @@ const register = (action$: ActionsObservable<any>, state$) => action$.pipe(
 
           dutchAuction.setCredentials(userId, accessToken)
 
-          return of(DutchAuctionActions.updateCredentials(credentials))
+          return of(
+            DutchAuctionActions.updateCredentials(credentials),
+            // Update user status immediately
+            DutchAuctionActions.getUserStatus()
+          )
         }),
         catchError(err => {
           log.error(`Can't register for the Dutch auction`, err)
