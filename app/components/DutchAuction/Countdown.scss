@@ -1,0 +1,44 @@
+@import "~/assets/styles/vars.scss";
+
+$elementWidth: 6rem;
+
+.container {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+.columns {
+  display: flex;
+  color: $BASE_COLOR_WHITE;
+}
+
+.column {
+  color: $BASE_COLOR_WHITE;
+  margin: 0.4rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $elementWidth;
+  height: $elementWidth;
+
+  border: 1px solid $BASE_COLOR_BORDER_BLUE;
+  background: $BASE_COLOR_DARK_BLUE_3;
+}
+
+.element {
+  font-size: 1.1rem;
+  border-radius: 0.3rem;
+  display: flex;
+
+  strong {
+    font-size: 2.2rem;
+    font-weight: 300;
+  }
+
+  > div {
+    margin-left: 0.5rem;
+    margin-top: 1rem;
+  }
+}

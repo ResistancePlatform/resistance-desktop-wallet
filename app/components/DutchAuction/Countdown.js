@@ -2,9 +2,13 @@
 // Based on https://github.com/kristinbaumann/react-countdown/blob/master/src/Countdown.js
 
 import React, { Component } from 'react'
+import { translate } from 'react-i18next'
 import cn from 'classnames'
 
+import styles from './Countdown.scss'
+
 type Props = {
+  t: any,
   date: string | object,
   onStop?: func,
   className?: string
@@ -70,7 +74,7 @@ class Countdown extends Component {
       timeLeft.min = Math.floor(diff / 60)
       diff -= timeLeft.min * 60
     }
-    timeLeft.sec = diff
+    timeLeft.sec = diff || 0
 
     return timeLeft
   }
@@ -92,41 +96,44 @@ class Countdown extends Component {
   }
 
   render() {
+    const { t } = this.props
     const countDown = this.state
 
     return (
-      <div className={cn(this.props.className)}>
-        <span className="Countdown-col">
-          <span className="Countdown-col-element">
-              <strong>{this.addLeadingZeros(countDown.days)}</strong>
-              <span>{countDown.days === 1 ? 'Day' : 'Days'}</span>
-          </span>
-        </span>
+      <div className={cn(styles.container, this.props.className)}>
+        <div className={styles.columns}>
+          <div className={styles.column}>
+            <div className={styles.element}>
+                <strong>{this.addLeadingZeros(countDown.days)}</strong>
+                <div>{t(`D`)}</div>
+            </div>
+          </div>
 
-        <span className="Countdown-col">
-          <span className="Countdown-col-element">
-            <strong>{this.addLeadingZeros(countDown.hours)}</strong>
-            <span>Hours</span>
-          </span>
-        </span>
+          <div className={styles.column}>
+            <div className={styles.element}>
+              <strong>{this.addLeadingZeros(countDown.hours)}</strong>
+              <div>{t(`H`)}</div>
+            </div>
+          </div>
 
 
-        <span className="Countdown-col">
-          <span className="Countdown-col-element">
-            <strong>{this.addLeadingZeros(countDown.min)}</strong>
-            <span>Min</span>
-          </span>
-        </span>
+          <div className={styles.column}>
+            <div className={styles.element}>
+              <strong>{this.addLeadingZeros(countDown.min)}</strong>
+              <div>{t(`M`)}</div>
+            </div>
+          </div>
 
-        <span className="Countdown-col">
-          <span className="Countdown-col-element">
-            <strong>{this.addLeadingZeros(countDown.sec)}</strong>
-            <span>Sec</span>
-          </span>
-        </span>
+          <div className={styles.column}>
+            <div className={styles.element}>
+              <strong>{this.addLeadingZeros(countDown.sec)}</strong>
+              <div>{t(`S`)}</div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
 }
 
-export default Countdown
+export default translate('other')(Countdown)

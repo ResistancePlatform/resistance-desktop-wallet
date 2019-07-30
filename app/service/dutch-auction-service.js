@@ -73,6 +73,8 @@ export class DutchAuctionService {
       data: {
         ...response.data,
 
+        status: 'pre',
+
         // Default
         initialPrice: fromWei(data.initialPrice),
         priceInterval: fromWei(data.priceInterval),
@@ -87,7 +89,8 @@ export class DutchAuctionService {
 
         // Finished
         finishTime: toDate(data.finishTime),
-        finalPrice: fromWei(data.finalPrice)
+        // finalPrice: fromWei(data.finalPrice)
+        finalPrice: Decimal(0)
       }
     }
 

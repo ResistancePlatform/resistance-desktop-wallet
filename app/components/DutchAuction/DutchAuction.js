@@ -4,6 +4,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import { translate } from 'react-i18next'
+import cn from 'classnames'
 
 import { toDecimalPlaces } from '~/utils/decimal'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
@@ -93,7 +94,7 @@ export class DutchAuction extends Component<Props> {
     const { resAddress, status } = this.props.dutchAuction
 
     return (
-      <div className={styles.pre}>
+      <div className={styles.innerContainer}>
         <div className={styles.title}>
           {t(`The auction starts in`)}
         </div>
@@ -126,7 +127,7 @@ export class DutchAuction extends Component<Props> {
     const nextPrice = status.currentPrice.minus(status.priceInterval)
 
     return (
-      <div className={styles.active}>
+      <div className={styles.innerContainer}>
         <div className={styles.title}>
           {t(`The current auction is in progress`)}
         </div>
@@ -187,7 +188,7 @@ export class DutchAuction extends Component<Props> {
       : null
 
     return (
-      <div className={styles.finished}>
+      <div className={styles.innerContainer}>
         <div className={styles.title}>
           {t(`The auction has finished`)}
         </div>
@@ -269,21 +270,25 @@ export class DutchAuction extends Component<Props> {
             </div>
           </div>
 
-          {this.getStatusSummary()}
+          <div className={cn(styles.bootstrapping, styles.innerContainer)}>
+            {this.getStatusSummary()}
 
-          <div className={styles.intro}>
-            {this.getIntroductoryNote()}
+            <div className={styles.buttons}>
+              <RoundedButton
+                onClick={this.props.actions.generateResAddress}
+                important
+                disabled={isGeneratingAddress}
+                spinner={isGeneratingAddress}
+              >
+                {t(`Get Verified`)}
+              </RoundedButton>
+            </div>
+
           </div>
 
-          <div className={styles.buttons}>
-            <RoundedButton
-              onClick={this.props.actions.generateResAddress}
-              important
-              disabled={isGeneratingAddress}
-              spinner={isGeneratingAddress}
-            >
-              {t(`Get Verified`)}
-            </RoundedButton>
+          <div className={styles.note}>
+            <strong>{t(`Note`)}:</strong>&nbsp;
+            {this.getIntroductoryNote()}
           </div>
 
         </div>
@@ -311,11 +316,20 @@ export class DutchAuction extends Component<Props> {
           </div>
         </div>
 
-        <Kyc
-          className={styles.kyc}
-          url={kycUrl}
-          submitCallback={this.props.actions.submitKycData}
-        />
+        <div className={cn(styles.bootstrapping, styles.innerContainer)}>
+          <Kyc
+            className={styles.kyc}
+            url={kycUrl}
+            submitCallback={this.props.actions.submitKycData}
+          />
+
+        </div>
+
+        <div className={styles.note}>
+          <strong>{t(`Note`)}:</strong>&nbsp;
+          {this.getIntroductoryNote()}
+        </div>
+
       </div>
     )
   }
@@ -342,21 +356,29 @@ export class DutchAuction extends Component<Props> {
           </div>
         </div>
 
-        <div className={styles.title}>
-          {t(`Almost done!`)}
+        <div className={cn(styles.bootstrapping, styles.innerContainer)}>
+          <div className={styles.title}>
+            {t(`Almost done!`)}
+          </div>
+
+          {this.getStatusSummary()}
+
+          <div className={styles.buttons}>
+            <RoundedButton
+              onClick={this.props.actions.register}
+              important
+              disabled={isRegistering}
+              spinner={isRegistering}
+            >
+              {t(`Register for the auction`)}
+            </RoundedButton>
+          </div>
+
         </div>
 
-        {this.getStatusSummary()}
-
-        <div className={styles.buttons}>
-          <RoundedButton
-            onClick={this.props.actions.register}
-            important
-            disabled={isRegistering}
-            spinner={isRegistering}
-          >
-            {t(`Register for the auction`)}
-          </RoundedButton>
+        <div className={styles.note}>
+          <strong>{t(`Note`)}:</strong>&nbsp;
+          {this.getIntroductoryNote()}
         </div>
 
       </div>
@@ -388,8 +410,13 @@ export class DutchAuction extends Component<Props> {
 
       {status === 'active' && (
         <React.Fragment>
+          <div className={cn(styles.status, styles.active)}>
+            <div className={cn('icon', styles.icon)} />
+            {t(`The auction is in progress`)}
+          </div>
+
           <div className={styles.title}>
-            {t(`The auction is in progress, the price will decrease in`)}
+            {t(`The price will decrease in`)}
           </div>
 
           <Countdown
@@ -400,9 +427,16 @@ export class DutchAuction extends Component<Props> {
       )}
 
       {status === 'finished' && (
-        <div className={styles.title}>
-          {t(`The auction is now complete, but you can apply to participate in the next round here`)}
-        </div>
+        <React.Fragment>
+          <div className={cn(styles.status)}>
+            <div className={cn('icon', styles.icon)} />
+            {t(`The auction is now complete`)}
+          </div>
+
+          <div className={styles.title}>
+            {t(`You can apply to participate in the next round here`)}
+          </div>
+        </React.Fragment>
       )}
 
       </div>
@@ -462,7 +496,7 @@ export class DutchAuction extends Component<Props> {
             failure: DutchAuctionActions.getUserStatusFailed,
           }}
         />
-        {contents}
+          {contents}
       </div>
     )
   }
@@ -476,4 +510,4 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(DutchAuctionActions, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(DutchAuction))
+export default connect(mapStateToProps, mapDispatchToProps)(translate('other')(DutchAuction))

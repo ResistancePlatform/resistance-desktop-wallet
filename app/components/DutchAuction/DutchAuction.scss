@@ -1,7 +1,9 @@
 @import "~/assets/styles/vars.scss";
 
 .container {
-  padding: 1.5rem;
+  position: relative;
+  padding: 0;
+  margin: 0;
   width: 100%;
   -webkit-app-region: drag;
   height: 100%;
@@ -10,26 +12,62 @@
     text-align: center;
   }
 
+  .status {
+    text-transform: uppercase;
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.65rem;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+
+    .icon {
+      margin-right: 0.4rem;
+      margin-top: 0.1rem;
+      &:before {
+        content: "\e90d";
+      }
+    }
+
+    &.active {
+      .icon {
+        color: $BASE_COLOR_LIGHT_GREEN;
+      }
+    }
+  }
+
   .title {
     font-size: 1.2rem;
     color: $BASE_COLOR_WHITE;
     margin-bottom: 1.5rem;
     user-select: none;
     cursor: default;
+    text-align: center;
+    margin-top: 1rem;
   }
 }
 
-.note, .intro {
+.innerContainer {
+  padding: 1.5rem;
+}
+
+.bootstrapping {
+  position: absolute;
+  width: calc(100% - 3rem);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.note {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+  bottom: 1.5rem;
+  position: absolute;
   font-size: 0.67rem;
   color: $BASE_COLOR_FONT_GRAY;
 
   strong {
     color: $BASE_COLOR_WHITE;
   }
-}
-
-.intro {
-  color: $BASE_COLOR_WHITE;
 }
 
 .list {
@@ -60,22 +98,33 @@
 
 .buttons {
   text-align: center;
+  margin-top: 2rem;
 }
 
 .breadCrumbs {
   display: flex;
   width: 100%;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   color: $BASE_COLOR_FONT_GRAY;
+  margin-top: 1rem;
   margin-bottom: 1rem;
 
+  border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+  padding-left: 1rem;
+  user-select: none;
+  cursor: default;
+
   .active {
-    color: $BASE_COLOR_PURPLE;
+    color: $BASE_COLOR_WHITE;
+    border-bottom: 1px solid $BASE_COLOR_LIGHT_BLUE;
   }
 
   > div {
     margin-right: 1rem;
+    padding: 1rem;
+    margin-bottom: -1px;
   }
+
   text-transform: uppercase;
   white-space: nowrap;
 }
