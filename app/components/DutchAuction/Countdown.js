@@ -30,7 +30,29 @@ class Countdown extends Component {
   }
 
   componentDidMount() {
+    log.debug(`Mounting countdown`, this.props.date, typeof this.props.date)
+    this.kickOff()
+  }
+
+  componentDidUpdate(prevProps) {
+    const prevDate = prevProps.date && prevProps.date.toString()
+    const newDate = this.props.date && this.props.date.toString()
+
+    if (prevDate !== newDate) {
+      log.debug(`Countdown updated from ${prevDate} to ${newDate}`)
+      this.stop()
+      this.kickOff()
+    }
+
+  }
+
+  componentWillUnmount() {
+    this.stop()
+  }
+
+  kickOff() {
     this.interval = setInterval(() => {
+      log.debug(`Countdown tick, `, this.props.date, typeof this.props.date)
       const date = this.calculateCountdown(this.props.date)
       if (date) {
         this.setState(date)
@@ -38,10 +60,6 @@ class Countdown extends Component {
         this.stop()
       }
     }, 1000)
-  }
-
-  componentWillUnmount() {
-    this.stop()
   }
 
   calculateCountdown(endDate) {

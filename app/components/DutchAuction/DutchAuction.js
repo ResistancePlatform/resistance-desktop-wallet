@@ -445,11 +445,11 @@ export class DutchAuction extends Component<Props> {
 	 */
   getStatusSummary() {
     const { t } = this.props
-    const { status } = this.props.dutchAuction.status
+    const { status: auction } = this.props.dutchAuction
 
     return (
       <div className={styles.statusSummary}>
-      {status === 'pre' && (
+      {auction.status === 'pre' && (
         <React.Fragment>
           <div className={styles.centeredTitle}>
             {t(`The auction starts in`)}
@@ -457,12 +457,12 @@ export class DutchAuction extends Component<Props> {
 
           <Countdown
             className={styles.countdown}
-            date={status.startTime}
+            date={auction.startTime}
           />
         </React.Fragment>
       )}
 
-      {status === 'active' && (
+      {auction.status === 'active' && (
         <React.Fragment>
           <div className={cn(styles.status, styles.active)}>
             <div className={cn('icon', styles.icon)} />
@@ -475,12 +475,12 @@ export class DutchAuction extends Component<Props> {
 
           <Countdown
             className={styles.countdown}
-            date={status.nextRoundTime}
+            date={auction.nextRoundTime}
           />
         </React.Fragment>
       )}
 
-      {status === 'finished' && (
+      {auction.status === 'finished' && (
         <React.Fragment>
           <div className={cn(styles.status)}>
             <div className={cn('icon', styles.icon)} />
