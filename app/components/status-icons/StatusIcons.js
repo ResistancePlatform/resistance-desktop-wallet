@@ -181,7 +181,7 @@ class StatusIcons extends Component<Props> {
               <div className={cn(styles.label, {[styles.active]: !arePrivateTransactionsEnabled})}>{t(`Off`)}</div>
               <ToggleButton
                 value={arePrivateTransactionsEnabled}
-                onChange={this.props.sendCurrencyActions.togglePrivateSend}
+                onChange={this.props.sendCurrencyActions.togglePrivateTransactions}
               />
               <div className={cn(styles.label, {[styles.active]: arePrivateTransactionsEnabled})}>{t(`On`)}</div>
             </div>
