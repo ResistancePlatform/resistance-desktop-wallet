@@ -6,6 +6,7 @@ import { ipcRenderer } from 'electron'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
+import { bindActionCreators } from 'redux';
 import cn from 'classnames'
 
 import Footer from '~/components/get-started/Footer'
@@ -29,6 +30,7 @@ import OwnAddress from './own-addresses/own-addresses'
 import SendCurrency from './send-currency/send-currency'
 import Settings from './settings/settings'
 import SimplexPage from './SimplexPage'
+import DutchAuction from '~/components/DutchAuction/DutchAuction'
 import ResDexPage from './ResDexPage'
 import ResDexStart from '~/components/resdex/bootstrapping/Start'
 import ResDexCreatePortfolio from '~/components/resdex/bootstrapping/CreatePortfolio'
@@ -36,6 +38,7 @@ import ResDexSaveSeed from '~/components/resdex/bootstrapping/SaveSeed'
 import ResDexEnterSeed from '~/components/resdex/bootstrapping/EnterSeed'
 import ResDexForgotPassword from '~/components/resdex/bootstrapping/ForgotPassword'
 import ResDexKyc from '~/components/resdex/bootstrapping/Kyc'
+import { DutchAuctionActions } from '~/reducers/dutch-auction/dutch-auction.reducer'
 
 import AddressBookPage from './AddressBookPage'
 
@@ -56,7 +59,8 @@ type Props = {
   auth: AuthState,
   fetchParameters: FetchParametersState,
   getStarted: GetStartedState,
-  resDex: ResDexState
+  resDex: ResDexState,
+  dutchAuctionActions: any
 }
 
 /**
@@ -81,6 +85,8 @@ class App extends React.Component<Props> {
     }
 
     ipcRenderer.on('cleanup', () => this.cleanup())
+
+    this.props.dutchAuctionActions.getAuctionStatus()
   }
 
   cleanup() {
@@ -131,6 +137,7 @@ class App extends React.Component<Props> {
 							<Route exact path="/settings" component={Settings} />
 							<Route exact path="/simplex" component={SimplexPage} />
 							<Route exact path="/address-book" component={AddressBookPage} />
+							<Route exact path="/dutch-auction" component={DutchAuction} />
 
               <Route exact path="/resdex" render={() => (
                 this.props.resDex.bootstrapping.isInProgress
@@ -179,4 +186,8 @@ class App extends React.Component<Props> {
 	}
 }
 
-export default connect(state => state, null)(App)
+const mapDispatchToProps = dispatch => ({
+  dutchAuctionActions: bindActionCreators(DutchAuctionActions, dispatch),
+})
+
+export default connect(state => state, mapDispatchToProps)(App)

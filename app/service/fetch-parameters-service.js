@@ -221,12 +221,10 @@ function downloadDoneCallback(state, downloadItem, resolve, reject) {
       error = new Error(t(`The download of {{fileName}} was interruped`, { fileName }))
       break
     case 'completed':
-      if (this.downloadItems.size !== 0) {
-        break
+      if (this.downloadItems.size === 0) {
+        removeListener()
+        resolve()
       }
-
-      removeListener()
-      resolve()
 
       break
     default:
@@ -235,7 +233,9 @@ function downloadDoneCallback(state, downloadItem, resolve, reject) {
   }
 
   if (error !== null) {
-    removeListener()
+    if (this.downloadItems.size === 0) {
+      removeListener()
+    }
     reject(error)
   }
 
@@ -244,6 +244,7 @@ function downloadDoneCallback(state, downloadItem, resolve, reject) {
 function registerDownloadListener(resolve, reject) {
   this.downloadListener = (e, downloadItem) => {
     const savePath = path.join(this.getResistanceParamsFolder(), downloadItem.getFilename())
+
     downloadItem.setSavePath(savePath)
 
     this.downloadItems.add(downloadItem)

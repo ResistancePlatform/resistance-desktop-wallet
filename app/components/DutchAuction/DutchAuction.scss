@@ -1,0 +1,253 @@
+@import "~/assets/styles/vars.scss";
+
+.container {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  -webkit-app-region: drag;
+  height: 100%;
+
+  .form {
+    text-align: center;
+  }
+
+  .status {
+    text-transform: uppercase;
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.65rem;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+
+    .icon {
+      margin-right: 0.4rem;
+      margin-top: 0.1rem;
+      &:before {
+        content: "\e90d";
+      }
+    }
+
+    &.active {
+      .icon {
+        color: $BASE_COLOR_LIGHT_GREEN;
+      }
+    }
+  }
+
+  .title, .centeredTitle {
+    font-size: 1.2rem;
+    color: $BASE_COLOR_WHITE;
+    margin-bottom: 1.5rem;
+    user-select: none;
+    cursor: default;
+    margin-top: 1rem;
+
+    .check {
+      display: inline;
+      margin-right: 0.4rem;
+      margin-top: 0.2rem;
+      color: $BASE_COLOR_LIGHT_GREEN;
+      font-size: 1rem;
+      &:before {
+        content: "\e90d";
+      }
+    }
+
+  }
+
+  .centeredTitle {
+    text-align: center;
+  }
+
+}
+
+.innerContainer {
+  padding: 1.5rem;
+}
+
+.centerVertically {
+  position: absolute;
+  width: calc(100% - 3rem);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.note {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+  bottom: 1.5rem;
+  position: absolute;
+  font-size: 0.67rem;
+  color: $BASE_COLOR_FONT_GRAY;
+
+  strong {
+    color: $BASE_COLOR_WHITE;
+  }
+}
+
+.list {
+  padding: 0;
+  margin: 0;
+  margin-left: 2rem;
+  text-align: left;
+  list-style: none;
+
+  li {
+    font-size: 0.7rem;
+    font-weight: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  li:last-child {
+    margin-bottom: 0;
+  }
+
+  span {
+    color: $BASE_COLOR_FONT_GRAY;
+    width: 11.2rem;
+    display: inline-block;
+    font-weight: 500;
+  }
+}
+
+.countdown {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.buttons {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.breadCrumbs {
+  display: flex;
+  width: 100%;
+  font-size: 0.75rem;
+  color: $BASE_COLOR_FONT_GRAY;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+
+  border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
+  padding-left: 1rem;
+  user-select: none;
+  cursor: default;
+
+  .active {
+    color: $BASE_COLOR_WHITE;
+    border-bottom: 1px solid $BASE_COLOR_LIGHT_BLUE;
+  }
+
+  > div {
+    margin-right: 1rem;
+    padding: 1rem;
+    margin-bottom: -1px;
+  }
+
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+
+.kycContainer {
+  height: 100%;
+
+  .kycWrapper {
+    position: relative;
+    height: calc(100% - 3.5rem);
+    margin-top: -1.5rem;
+  }
+
+  .kyc {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+}
+
+.spinner {
+  width: 0.6rem;
+  left: 0.6rem;
+  margin-top: 0.1rem;
+}
+
+.payoutAddressContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.address, .committed {
+  .label {
+    color: $BASE_COLOR_FONT_GRAY;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+
+    &.centered {
+      text-align: center;
+    }
+  }
+
+  .body {
+    display: flex;
+    font-size: 0.9rem;
+    align-items: center;
+  }
+
+  .copyButton {
+    margin-left: 0.5rem;
+    width: 1.25rem;
+    user-select: none;
+    cursor: pointer;
+
+    color: $BASE_COLOR_PURPLE;
+    font-size: 1.25rem;
+
+    &:before {
+      content: '\e905';
+    }
+  }
+}
+
+.panel {
+  padding: 1.5rem;
+  border-radius: 0.3rem;
+  border: 1px solid $BASE_COLOR_BORDER_BLUE;
+  background: $BASE_COLOR_DARK_BLUE_3;
+}
+
+.activeAuction {
+  .topContainer {
+    display: flex;
+  }
+
+  .ethAddressContainer {
+    width: 20rem;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid $BASE_COLOR_BORDER_GRAY;
+    margin-top: 2.2rem;
+    margin-bottom: 1.8rem;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+  }
+
+  .committed {
+    margin-top: 1rem;
+  }
+}
+
+.finishedListContainer {
+  width: 20rem;
+  margin-left: auto;
+  margin-right: auto;
+
+  .list {
+    margin-left: 0;
+  }
+}

@@ -5,6 +5,7 @@ import crypto from 'crypto'
 import rp from 'request-promise-native'
 import log from 'electron-log'
 
+import { RESDEX } from '~/constants/resdex'
 import { getActualSeedPhrase, getProcessSettings } from '~/service/resdex/resdex'
 import { getStore } from '~/store/configureStore'
 import { translate } from '~/i18next.config'
@@ -12,8 +13,6 @@ import { getCurrency } from '~/utils/resdex'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 
 
-const satoshiDivider = 100000000
-const weiDivider = 1000000000000000000
 const t = translate('service')
 
 /**
@@ -165,7 +164,7 @@ class ResDexApiService {
       */
     }
 
-    const divider = currency.etomic ? weiDivider : satoshiDivider
+    const divider = currency.etomic ? RESDEX.weiDivider : RESDEX.satoshiDivider
 
     const result = transactions.map(transaction => ({
       ...response,
@@ -192,7 +191,7 @@ class ResDexApiService {
       return Decimal('0.0001')
     }
 
-    const divider = currency.etomic ? weiDivider : satoshiDivider
+    const divider = currency.etomic ? RESDEX.weiDivider : RESDEX.satoshiDivider
     return Decimal(response.txfee).dividedBy(divider)
 	}
 

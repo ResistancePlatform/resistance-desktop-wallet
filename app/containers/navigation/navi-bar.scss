@@ -176,3 +176,13 @@
     margin-left: 2rem;
   }
 }
+
+.dutchAuction {
+  position: relative;
+
+  i:before {
+    content: '\e91f';
+    font-size: 1.41rem;
+    margin-left: -0.1rem;
+  }
+}

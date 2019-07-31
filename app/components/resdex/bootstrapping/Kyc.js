@@ -3,17 +3,14 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import { translate } from 'react-i18next'
-import { remote } from 'electron'
-import { Webview } from '~/components/Webview/Webview'
 import { toastr } from 'react-redux-toastr'
 import request from 'request-promise'
 import log from 'electron-log'
 
+import { Kyc } from '~/components/Kyc/Kyc'
 import { resDexApiFactory } from '~/service/resdex/api'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
-
-import styles from './Kyc.scss'
 
 const kycUrl = 'https://kvk0a65tl4.execute-api.us-east-1.amazonaws.com/api'
 // const kycUrl = 'https://regtech.identitymind.store/viewform/vs33y/'
@@ -26,58 +23,25 @@ type Props = {
 }
 
 /**
- * @class Kyc
+ * @class ResDexKyc
  * @extends {Component<Props>}
  */
-export class Kyc extends Component<Props> {
+export class ResDexKyc extends Component<Props> {
 	props: Props
 
-	/**
-	 * @memberof Kyc
-	 */
-	componentDidMount() {
+  async register(data) {
+    const { tid } = data
     const { t } = this.props
     const { defaultPortfolioId } = this.props.resDex.login
-    const currentWindow = remote.getCurrentWindow()
+    const isRegistered = await this.generateAndSendRegister(tid)
 
-    log.debug(`Creating web hook`)
-
-    currentWindow.webContents.session.webRequest.onBeforeRequest({}, async (details, callback) => {
-
-      if (details.method === 'POST' && details.url.endsWith('/api/v1/idmwebhook')) {
-        log.debug(`Web hook:`, details)
-
-        const ca = JSON.parse(details.uploadData[0].bytes.toString('utf8')).jwtresponse
-        const base64Data = ca.split('.')[1]
-        const buffer = Buffer.from(base64Data, 'base64')
-        const text = buffer.toString('ascii')
-        const result = JSON.parse(text)
-
-        log.debug(`Got KYC secret:`, result.tid)
-
-        const isRegistered = await this.generateAndSendRegister(result.tid)
-
-        if (!isRegistered) {
-          toastr.error(t(`Error submitting verification form, please make sure your Internet connection is good or check the log for details.`))
-        } else {
-          this.props.actions.updatePortfolio(defaultPortfolioId, { isVerified: true })
-          toastr.success(t(`You have successfully passed verification!`))
-        }
-
-        callback({ cancel: true })
-      } else {
-        callback({ cancel: false })
-      }
-    })
+    if (!isRegistered) {
+      toastr.error(t(`Error submitting verification form, please make sure your Internet connection is good or check the log for details.`))
+    } else {
+      this.props.actions.updatePortfolio(defaultPortfolioId, { isVerified: true, tid })
+      toastr.success(t(`You have successfully passed verification!`))
+    }
   }
-
-	/**
-	 * @memberof Kyc
-	 */
-	componentWillUnmount() {
-    const currentWindow = remote.getCurrentWindow()
-    currentWindow.webContents.session.webRequest.onBeforeRequest({}, null)
-	}
 
   async generateAndSendRegister(tid: string): boolean {
     const resDexApi = resDexApiFactory('RESDEX')
@@ -110,22 +74,14 @@ export class Kyc extends Component<Props> {
 
 	/**
 	 * @returns
-   * @memberof Kyc
+   * @memberof ResDexKyc
 	 */
 	render() {
-    const { t } = this.props
-
     return (
-      <div className={styles.container}>
-        <div className={styles.title}>
-          {t(`Get Verified`)}
-        </div>
-        <Webview
-          className={styles.webview}
-          title={t(`Get Verified`)}
-          url={kycUrl}
-        />
-      </div>
+      <Kyc
+        url={kycUrl}
+        submitCallback={data => this.register(data)}
+      />
     )
   }
 }
@@ -138,4 +94,4 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(ResDexLoginActions, dispatch),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(Kyc))
+export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ResDexKyc))

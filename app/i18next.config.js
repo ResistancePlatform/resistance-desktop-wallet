@@ -5,7 +5,7 @@ import i18nextBackend from 'i18next-node-fs-backend'
 
 import { getResourcesPath } from './utils/os'
 
-const availableLanguages = ['en', 'eo', 'ko']
+const availableLanguages = ['en', 'ko']
 
 const availableNamespaces = [
   'get-started',

@@ -3,6 +3,8 @@ import { Decimal } from 'decimal.js'
 const RESDEX = {
   dexFee: Decimal('0.15'),
   resFee: Decimal('0.0001'),
+  satoshiDivider: 100000000,
+  weiDivider: 1000000000000000000,
   currencyHistoryResolutions: ['hour', 'day', 'week', 'month', 'year'],
 	ignoreExternalPrice: new Set([]),
   alwaysEnabledCurrencies: [
