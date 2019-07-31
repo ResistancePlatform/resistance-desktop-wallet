@@ -4,6 +4,7 @@
 import React, { Component } from 'react'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
+import log from 'electron-log'
 
 import styles from './Countdown.scss'
 
@@ -83,6 +84,7 @@ class Countdown extends Component {
     clearInterval(this.interval)
 
     if (this.props.onStop) {
+      log.debug('Countdown componenet onStop() triggered.')
       this.props.onStop()
     }
   }

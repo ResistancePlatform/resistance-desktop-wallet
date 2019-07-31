@@ -4,6 +4,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import { translate } from 'react-i18next'
+import { clipboard } from 'electron'
+import { toastr } from 'react-redux-toastr'
+import log from 'electron-log'
 import cn from 'classnames'
 
 import { toDecimalPlaces } from '~/utils/decimal'
@@ -50,17 +53,19 @@ export class DutchAuction extends Component<Props> {
     this.props.actions.getAuctionStatus()
   }
 
-  amountToCaption(amount) {
+  getSpinner() {
     const { t } = this.props
-    // const na = t(`N/A`)
-    const na = (
+    return (
       <img
         className={styles.spinner}
         src={animatedSpinner}
         alt={t(`Loading...`)}
       />
     )
-    return amount ? toDecimalPlaces(amount) : na
+  }
+
+  amountToCaption(amount) {
+    return amount ? toDecimalPlaces(amount) : this.getSpinner()
   }
 
 	/**
@@ -94,24 +99,54 @@ export class DutchAuction extends Component<Props> {
     const { resAddress, status } = this.props.dutchAuction
 
     return (
-      <div className={styles.innerContainer}>
-        <div className={styles.title}>
-          {t(`The auction starts in`)}
+      <React.Fragment>
+        <div className={cn(styles.centerVertically, styles.innerContainer)}>
+          <div className={styles.centeredTitle}>
+            {t(`The auction starts in`)}
+          </div>
+
+          <Countdown
+            className={styles.countdown}
+            date={status.startTime}
+            onStop={this.props.actions.getAuctionStatus}
+          />
+
+          <div className={styles.payoutAddressContainer}>
+            {this.getAddressControl(t(`RES payout address`), resAddress)}
+          </div>
+
         </div>
 
-        <Countdown
-          className={styles.countdown}
-          date={status.startTime}
-          onStop={this.props.actions.getAuctionStatus}
-        />
+        {this.getIntroductoryNote()}
 
-        <ul className={styles.list}>
-          <li>
-            <span>{t(`RES payout address`)}:</span> {resAddress}
-          </li>
-        </ul>
+      </React.Fragment>
+    )
+  }
+
+  getAddressControl(label, address) {
+    const { t } = this.props
+
+    return (
+      <div className={styles.address}>
+        <div className={styles.label}>
+          {label}
+        </div>
+
+        <div className={styles.body}>
+          <div className={styles.value}>
+            {address || this.getSpinner()}
+          </div>
+
+          <div
+            role="none"
+            className={cn('icon', styles.copyButton)}
+            onClick={() => { clipboard.writeText(address); toastr.success(t(`Copied to clipboard`)) }}
+          />
+        </div>
+
       </div>
     )
+
   }
 
 	/**
@@ -127,40 +162,53 @@ export class DutchAuction extends Component<Props> {
     const nextPrice = status.currentPrice.minus(status.priceInterval)
 
     return (
-      <div className={styles.innerContainer}>
+      <div className={cn(styles.activeAuction, styles.innerContainer)}>
         <div className={styles.title}>
+          <div className={cn('icon', styles.check)} />
           {t(`The current auction is in progress`)}
         </div>
 
-        <ul className={styles.list}>
-          <li>
-            <span>{t(`Address to send Ethereum to`)}:</span>
-            {user.ethAddress}
-          </li>
-          <li>
-            <span>{t(`You committed`)}:</span>
-            {this.amountToCaption(user.ethCommitted)} ETH
-          </li>
-          <li>
-            <span>{t(`Current price`)}:</span>
-            {this.amountToCaption(status.currentPrice)} ETH
-          </li>
-          <li>
-            <span>{t(`Reserve price`)}:</span>
-            {this.amountToCaption(status.reservePrice)} ETH
-          </li>
-          <li>
-            <span>{t(`Total committed`)}:</span> {this.amountToCaption(status.ethCommitted)} ETH
-          </li>
-          <li>
-            <span>{t(`Your expected RES payout`)}:</span> {this.amountToCaption(userExpectedPayout)} RES
-          </li>
-          <li>
-            <span>{t(`Total expected RES payout`)}:</span> {this.amountToCaption(totalExpectedPayout)} RES
-          </li>
-        </ul>
+        <div className={styles.topContainer}>
+          <div className={styles.ethAddressContainer}>
+              {this.getAddressControl(t(`Address to send Ethereum to`), user.ethAddress)}
 
-        <div className={styles.title}>
+              <div className={styles.committed}>
+                <div className={styles.label}>
+                  {t(`You committed`)}
+                </div>
+
+                <div className={styles.body}>
+                  {this.amountToCaption(user.ethCommitted)} ETH
+                </div>
+              </div>
+
+          </div>
+
+          <ul className={styles.list}>
+            <li>
+              <span>{t(`Current price`)}:</span>
+              {this.amountToCaption(status.currentPrice)} ETH
+            </li>
+            <li>
+              <span>{t(`Reserve price`)}:</span>
+              {this.amountToCaption(status.reservePrice)} ETH
+            </li>
+            <li>
+              <span>{t(`Total committed`)}:</span> {this.amountToCaption(status.ethCommitted)} ETH
+            </li>
+            <li>
+              <span>{t(`Your expected RES payout`)}:</span> {this.amountToCaption(userExpectedPayout)} RES
+            </li>
+            <li>
+              <span>{t(`Total expected RES payout`)}:</span> {this.amountToCaption(totalExpectedPayout)} RES
+            </li>
+          </ul>
+
+        </div>
+
+        <hr />
+
+        <div className={styles.centeredTitle}>
           {t(`The price will decrease to {{nextPrice}} Ethereum (ETH) in`, {nextPrice: this.amountToCaption(nextPrice)})}
         </div>
 
@@ -189,7 +237,7 @@ export class DutchAuction extends Component<Props> {
 
     return (
       <div className={styles.innerContainer}>
-        <div className={styles.title}>
+        <div className={styles.centeredTitle}>
           {t(`The auction has finished`)}
         </div>
 
@@ -202,10 +250,10 @@ export class DutchAuction extends Component<Props> {
             }
           </li>
           <li>
-            <span>{t(`Final price`)}:</span> {status.finalPrice} ETH per RES
+            <span>{t(`Final price`)}:</span> {this.amountToCaption(status.finalPrice)} ETH per RES
           </li>
           <li>
-            <span>{t(`RES sold`)}:</span> {status.resSold}
+            <span>{t(`RES sold`)}:</span> {this.amountToCaption(status.resSold)}
           </li>
           <li>
             <span>{t(`Your RES to payout`)}:</span>
@@ -236,13 +284,14 @@ export class DutchAuction extends Component<Props> {
     // )
 
     return (
-      <React.Fragment>
-        {t(`There will be four auctions in total, with the first taking place on 2nd August 2019.`)}
-        {t(`Following that, there will be a week’s interval before the second auction, another week before third, and another week before the final auction.`)}
-        {t(`Only after the final auction ends will the Resistance IEO complete.`)}
-        {t(`Before you can participate in an auction, you'll need to pass KYC verification.`)}
+      <div className={styles.note}>
+        <strong>{t(`Note`)}:</strong>&nbsp;
+        {t(`There will be four auctions in total, with the first taking place on 2nd August 2019.`)}&nbsp;
+        {t(`Following that, there will be a week’s interval before the second auction, another week before third, and another week before the final auction.`)}&nbsp;
+        {t(`Only after the final auction ends will the Resistance IEO complete.`)}&nbsp;
+        {t(`Before you can participate in an auction, you'll need to pass KYC verification.`)}&nbsp;
         {t(`Let’s get started!`)}
-      </React.Fragment>
+      </div>
     )
 
   }
@@ -254,7 +303,11 @@ export class DutchAuction extends Component<Props> {
   getAddressGeneration() {
     const { t } = this.props
 
-    const { isGeneratingAddress } = this.props.dutchAuction
+    const { status, isGeneratingAddress } = this.props.dutchAuction
+
+    if (status && status.nextRoundTime) {
+      log.debug(`Timestamp:`, status.nextRoundTime.toString())
+    }
 
     return (
       <div className={styles.addressGeneration}>
@@ -270,7 +323,7 @@ export class DutchAuction extends Component<Props> {
             </div>
           </div>
 
-          <div className={cn(styles.bootstrapping, styles.innerContainer)}>
+          <div className={cn(styles.centerVertically, styles.innerContainer)}>
             {this.getStatusSummary()}
 
             <div className={styles.buttons}>
@@ -286,10 +339,7 @@ export class DutchAuction extends Component<Props> {
 
           </div>
 
-          <div className={styles.note}>
-            <strong>{t(`Note`)}:</strong>&nbsp;
-            {this.getIntroductoryNote()}
-          </div>
+          {this.getIntroductoryNote()}
 
         </div>
     )
@@ -316,18 +366,13 @@ export class DutchAuction extends Component<Props> {
           </div>
         </div>
 
-        <div className={cn(styles.bootstrapping, styles.innerContainer)}>
+        <div className={styles.kycWrapper}>
           <Kyc
             className={styles.kyc}
             url={kycUrl}
             submitCallback={this.props.actions.submitKycData}
           />
 
-        </div>
-
-        <div className={styles.note}>
-          <strong>{t(`Note`)}:</strong>&nbsp;
-          {this.getIntroductoryNote()}
         </div>
 
       </div>
@@ -356,8 +401,8 @@ export class DutchAuction extends Component<Props> {
           </div>
         </div>
 
-        <div className={cn(styles.bootstrapping, styles.innerContainer)}>
-          <div className={styles.title}>
+        <div className={cn(styles.centerVertically, styles.innerContainer)}>
+          <div className={styles.centeredTitle}>
             {t(`Almost done!`)}
           </div>
 
@@ -376,10 +421,7 @@ export class DutchAuction extends Component<Props> {
 
         </div>
 
-        <div className={styles.note}>
-          <strong>{t(`Note`)}:</strong>&nbsp;
-          {this.getIntroductoryNote()}
-        </div>
+        {this.getIntroductoryNote()}
 
       </div>
     )
@@ -397,7 +439,7 @@ export class DutchAuction extends Component<Props> {
       <div className={styles.statusSummary}>
       {status === 'pre' && (
         <React.Fragment>
-          <div className={styles.title}>
+          <div className={styles.centeredTitle}>
             {t(`The auction starts in`)}
           </div>
 
@@ -415,7 +457,7 @@ export class DutchAuction extends Component<Props> {
             {t(`The auction is in progress`)}
           </div>
 
-          <div className={styles.title}>
+          <div className={styles.centeredTitle}>
             {t(`The price will decrease in`)}
           </div>
 
@@ -433,7 +475,7 @@ export class DutchAuction extends Component<Props> {
             {t(`The auction is now complete`)}
           </div>
 
-          <div className={styles.title}>
+          <div className={styles.centeredTitle}>
             {t(`You can apply to participate in the next round here`)}
           </div>
         </React.Fragment>
@@ -453,8 +495,6 @@ export class DutchAuction extends Component<Props> {
     if (!status) {
       return null
     }
-
-    // status.status = 'finished'
 
     let contents = null
 

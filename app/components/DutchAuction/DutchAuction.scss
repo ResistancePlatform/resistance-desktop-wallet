@@ -35,22 +35,38 @@
     }
   }
 
-  .title {
+  .title, .centeredTitle {
     font-size: 1.2rem;
     color: $BASE_COLOR_WHITE;
     margin-bottom: 1.5rem;
     user-select: none;
     cursor: default;
-    text-align: center;
     margin-top: 1rem;
+
+    .check {
+      display: inline;
+      margin-right: 0.4rem;
+      margin-top: 0.2rem;
+      color: $BASE_COLOR_LIGHT_GREEN;
+      font-size: 1rem;
+      &:before {
+        content: "\e90d";
+      }
+    }
+
   }
+
+  .centeredTitle {
+    text-align: center;
+  }
+
 }
 
 .innerContainer {
   padding: 1.5rem;
 }
 
-.bootstrapping {
+.centerVertically {
   position: absolute;
   width: calc(100% - 3rem);
   top: 50%;
@@ -71,7 +87,9 @@
 }
 
 .list {
-  padding: 0.3rem 2rem 0.1rem 2rem;
+  padding: 0;
+  margin: 0;
+  margin-left: 2rem;
   text-align: left;
   list-style: none;
 
@@ -83,9 +101,13 @@
     margin-bottom: 1.1rem;
   }
 
+  li:last-child {
+    margin-bottom: 0;
+  }
+
   span {
     color: $BASE_COLOR_FONT_GRAY;
-    width: 10rem;
+    width: 11.2rem;
     display: inline-block;
     font-weight: 500;
   }
@@ -129,19 +151,83 @@
   white-space: nowrap;
 }
 
+
 .kycContainer {
   height: 100%;
+
+  .kycWrapper {
+    position: relative;
+    height: calc(100% - 3.5rem);
+    margin-top: -1.5rem;
+  }
 
   .kyc {
     height: 100%;
     padding: 0;
-    margin: -1rem;
+    margin: 0;
   }
 
 }
 
 .spinner {
-  width: 1.2rem;
+  width: 0.6rem;
   left: 0.6rem;
-  margin-top: -0.6rem;
+  margin-top: 0.1rem;
+}
+
+.payoutAddressContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.address, .committed {
+  .label {
+    color: $BASE_COLOR_FONT_GRAY;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    text-align: center;
+  }
+
+  .body {
+    display: flex;
+    font-size: 0.9rem;
+    align-items: center;
+  }
+
+  .copyButton {
+    margin-left: 0.5rem;
+    width: 1.25rem;
+    user-select: none;
+    cursor: pointer;
+
+    color: $BASE_COLOR_PURPLE;
+    font-size: 1.25rem;
+
+    &:before {
+      content: '\e905';
+    }
+  }
+}
+
+.activeAuction {
+  .topContainer {
+    display: flex;
+  }
+
+  .ethAddressContainer {
+    padding: 1.5rem;
+    width: 20rem;
+    border-radius: 0.3rem;
+    border: 1px solid $BASE_COLOR_BORDER_BLUE;
+    background: $BASE_COLOR_DARK_BLUE_3;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid $BASE_COLOR_BORDER_GRAY;
+    margin-top: 2.2rem;
+    margin-bottom: 1.8rem;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+  }
 }

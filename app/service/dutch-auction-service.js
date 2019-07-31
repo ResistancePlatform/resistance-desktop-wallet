@@ -14,8 +14,12 @@ const apiUrl = 'https://lbt95atwl1.execute-api.us-east-1.amazonaws.com/api/v1/'
  */
 let instance = null
 
-const fromWei = wei => wei && Decimal(wei).dividedBy(RESDEX.weiDivider)
-const fromSatoshi = satoshi => satoshi && Decimal(satoshi ).dividedBy(RESDEX.satoshiDivider)
+const fromWei = wei => (
+  wei !== undefined &&
+  Decimal(wei).dividedBy(RESDEX.weiDivider)
+)
+
+// const fromSatoshi = satoshi => satoshi  !== undefined && Decimal(satoshi).dividedBy(RESDEX.satoshiDivider)
 const toDate = ts => ts && moment(ts).toDate()
 
 /**
@@ -73,7 +77,7 @@ export class DutchAuctionService {
       data: {
         ...response.data,
 
-        status: 'pre',
+        // status: 'active',
 
         // Default
         initialPrice: fromWei(data.initialPrice),
@@ -85,12 +89,11 @@ export class DutchAuctionService {
         // Active
         currentPrice: fromWei(data.currentPrice),
         nextRoundTime: toDate(data.nextRoundTime),
-        resSold: fromSatoshi(data.resSold),
+        resSold: data.resSold !== undefined && Decimal(data.resSold),
 
         // Finished
         finishTime: toDate(data.finishTime),
-        // finalPrice: fromWei(data.finalPrice)
-        finalPrice: Decimal(0)
+        finalPrice: fromWei(data.finalPrice)
       }
     }
 
