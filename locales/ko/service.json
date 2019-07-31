@@ -42,6 +42,7 @@
   "Transaction has already been broadcasted": "이미 거래가 브로드캐스트되었습니다",
   "Couldn't create withdrawal transaction": "인출 거래를 생성하지 못함",
   "Incorrect ResDEX password": "잘못된 ResDEX 비밀번호",
-  "Checking Resistance parameters presence": "Checking Resistance parameters presence",
-  "Calculating parameters checksums": "Calculating parameters checksums"
+  "Checking Resistance parameters presence": "저항 매개 변수 존재 확인",
+  "Calculating parameters checksums": "매개 변수 체크섬 계산",
+  "Z-addresses are {{zAddressLength}} characters long, not {{length}}": "Z- 주소는 {{zAddressLength}} 자이며 {{length}}가 아닙니다."
 }

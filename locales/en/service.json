@@ -43,5 +43,6 @@
   "Couldn't create withdrawal transaction": "Couldn't create withdrawal transaction",
   "Incorrect ResDEX password": "Incorrect ResDEX password",
   "Checking Resistance parameters presence": "Checking Resistance parameters presence",
-  "Calculating parameters checksums": "Calculating parameters checksums"
+  "Calculating parameters checksums": "Calculating parameters checksums",
+  "Z-addresses are {{zAddressLength}} characters long, not {{length}}": "Z-addresses are {{zAddressLength}} characters long, not {{length}}"
 }

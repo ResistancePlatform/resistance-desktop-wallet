@@ -24,5 +24,8 @@
   "Unable to start send currency operation": "통화 전송 작업을 시작할 수 없습니다.",
   "Sending currency from a transparent (R) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "“비공개 거래\"가 비활성화 상태인 경우, 투명(R) 주소에서 비공개(Z) 주소로의 통화 송금은 금지됩니다.",
   "Sending currency from a private (Z) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "“비공개 거래”가 비활성화 상태인 경우, 비공개(Z) 주소에서 비공개(Z) 주소로의 통화 송금은 금지됩니다.",
-  "Sending currency from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled.": "“비공개 거래”가 비활성화 상태인 경우, 비공개(Z) 주소에서 투명(R) 주소로의 통화 송금은 금지됩니다."
+  "Sending currency from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled.": "“비공개 거래”가 비활성화 상태인 경우, 비공개(Z) 주소에서 투명(R) 주소로의 통화 송금은 금지됩니다.",
+  "Destination and source addresses cannot be the same": "도착지와 발신지 주소는 같을 수 없습니다",
+  "Please enable Private Transactions to use Z-addresses": "Z- 주소를 사용하려면 비공개 거래를 사용하십시오",
+  "Search name in addressbook": "주소록에서 검색 이름"
 }

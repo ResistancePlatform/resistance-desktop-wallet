@@ -57,7 +57,7 @@ export class MinerService {
 	}
 
   handleOutput(data: Buffer) {
-    const regex = /^.* accepted: \d+\/(\d+) \(100.00%\), (\d+\.\d+) khash\/s \(yay!!!\)$/m
+    const regex = /^.* thread \d+: (\d+) hashes, (\d+\.\d+) hash\/s$/m
     const matchResult = data.toString().match(regex)
 
     if (matchResult) {

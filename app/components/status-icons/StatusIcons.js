@@ -53,7 +53,7 @@ class StatusIcons extends Component<Props> {
 
     const minerInfo = this.props.systemInfo.miner
 
-    const description = t(`Got {{blocksNumber}} blocks at {{hashingPower}} khash/s`, {
+    const description = t(`Got {{blocksNumber}} hashes at {{hashingPower}} hash/s`, {
       blocksNumber: minerInfo.minedBlocksNumber,
       hashingPower: minerInfo.hashingPower
     })

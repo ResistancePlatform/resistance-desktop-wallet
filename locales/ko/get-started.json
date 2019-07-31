@@ -39,9 +39,13 @@
   "Can't change the backup wallet password, check the application log for details.": "백업 월렛 비밀번호를 변경할 수 없습니다. 자세한 내용은 앱 로그에서 확인하십시오.",
   "Changing the wallet password...": "월렛 비밀번호 변경 중...",
   "Error setting the wallet password, check the application log for details.": "월렛 비밀번호 설정 오류 발생. 자세한 내용은 앱 로그에서 확인하십시오.",
-  "Terms & Conditions": "Terms & Conditions",
-  "Please agree to continue": "Please agree to continue",
-  "Disagree": "Disagree",
-  "Agree": "Agree",
-  "You haven't accepted the EULA, the app will quit now": "You haven't accepted the EULA, the app will quit now"
+  "Terms & Conditions": "이용 약관",
+  "Please agree to continue": "계속 동의하십시오",
+  "Disagree": "맞지 않다",
+  "Agree": "동의하다",
+  "You haven't accepted the EULA, the app will quit now": "EULA를 수락하지 않으면 앱이 종료됩니다",
+  "Unable to restart Resistance local node": "Resistance 로컬 노드를 다시 시작할 수 없습니다",
+  "Mining": "채광",
+  "Restarting the local node...": "로컬 노드 다시 시작 중 ...",
+  "Error creating mining address, check the application log for details.": "마이닝 주소를 만드는 동안 오류가 발생했습니다. 응용 프로그램 로그에서 자세한 내용을 확인하십시오."
 }
