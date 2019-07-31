@@ -98,7 +98,7 @@
     font-weight: normal;
     white-space: nowrap;
     overflow: hidden;
-    margin-bottom: 1.1rem;
+    margin-bottom: 0.75rem;
   }
 
   li:last-child {
@@ -185,7 +185,10 @@
     color: $BASE_COLOR_FONT_GRAY;
     text-transform: uppercase;
     font-size: 0.65rem;
-    text-align: center;
+
+    &.centered {
+      text-align: center;
+    }
   }
 
   .body {
@@ -209,17 +212,20 @@
   }
 }
 
+.panel {
+  padding: 1.5rem;
+  border-radius: 0.3rem;
+  border: 1px solid $BASE_COLOR_BORDER_BLUE;
+  background: $BASE_COLOR_DARK_BLUE_3;
+}
+
 .activeAuction {
   .topContainer {
     display: flex;
   }
 
   .ethAddressContainer {
-    padding: 1.5rem;
     width: 20rem;
-    border-radius: 0.3rem;
-    border: 1px solid $BASE_COLOR_BORDER_BLUE;
-    background: $BASE_COLOR_DARK_BLUE_3;
   }
 
   hr {
@@ -229,5 +235,19 @@
     margin-bottom: 1.8rem;
     margin-left: -1.5rem;
     margin-right: -1.5rem;
+  }
+
+  .committed {
+    margin-top: 1rem;
+  }
+}
+
+.finishedListContainer {
+  width: 20rem;
+  margin-left: auto;
+  margin-right: auto;
+
+  .list {
+    margin-left: 0;
   }
 }

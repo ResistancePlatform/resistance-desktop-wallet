@@ -112,7 +112,7 @@ export class DutchAuction extends Component<Props> {
           />
 
           <div className={styles.payoutAddressContainer}>
-            {this.getAddressControl(t(`RES payout address`), resAddress)}
+            {this.getAddressControl(t(`RES payout address`), resAddress, true)}
           </div>
 
         </div>
@@ -123,12 +123,12 @@ export class DutchAuction extends Component<Props> {
     )
   }
 
-  getAddressControl(label, address) {
+  getAddressControl(label, address, centerLabel) {
     const { t } = this.props
 
     return (
       <div className={styles.address}>
-        <div className={styles.label}>
+        <div className={cn(styles.label, {[styles.centered]: centerLabel})}>
           {label}
         </div>
 
@@ -137,11 +137,13 @@ export class DutchAuction extends Component<Props> {
             {address || this.getSpinner()}
           </div>
 
-          <div
-            role="none"
-            className={cn('icon', styles.copyButton)}
-            onClick={() => { clipboard.writeText(address); toastr.success(t(`Copied to clipboard`)) }}
-          />
+          {address &&
+            <div
+              role="none"
+              className={cn('icon', styles.copyButton)}
+              onClick={() => { clipboard.writeText(address); toastr.success(t(`Copied to clipboard`)) }}
+            />
+          }
         </div>
 
       </div>
@@ -155,7 +157,7 @@ export class DutchAuction extends Component<Props> {
 	 */
   getActive() {
     const { t } = this.props
-    const { user, status } = this.props.dutchAuction
+    const { resAddress, user, status } = this.props.dutchAuction
 
     const totalExpectedPayout = calculatePayout(status.ethCommitted, status.currentPrice)
     const userExpectedPayout = calculatePayout(user.ethCommitted, status.currentPrice)
@@ -169,7 +171,7 @@ export class DutchAuction extends Component<Props> {
         </div>
 
         <div className={styles.topContainer}>
-          <div className={styles.ethAddressContainer}>
+          <div className={cn(styles.panel, styles.ethAddressContainer)}>
               {this.getAddressControl(t(`Address to send Ethereum to`), user.ethAddress)}
 
               <div className={styles.committed}>
@@ -178,7 +180,8 @@ export class DutchAuction extends Component<Props> {
                 </div>
 
                 <div className={styles.body}>
-                  {this.amountToCaption(user.ethCommitted)} ETH
+                  {this.amountToCaption(user.ethCommitted)}&nbsp;
+                  ETH
                 </div>
               </div>
 
@@ -201,6 +204,9 @@ export class DutchAuction extends Component<Props> {
             </li>
             <li>
               <span>{t(`Total expected RES payout`)}:</span> {this.amountToCaption(totalExpectedPayout)} RES
+            </li>
+            <li>
+              {this.getAddressControl(t(`RES payout address`), resAddress)}
             </li>
           </ul>
 
@@ -236,37 +242,43 @@ export class DutchAuction extends Component<Props> {
       : null
 
     return (
-      <div className={styles.innerContainer}>
-        <div className={styles.centeredTitle}>
-          {t(`The auction has finished`)}
-        </div>
+      <React.Fragment>
+        <div className={cn(styles.centerVertically, styles.innerContainer)}>
+          <div className={styles.centeredTitle}>
+            <div className={cn('icon', styles.check)} />
+            {t(`The auction has finished`)}
+          </div>
 
-        <ul className={styles.list}>
-          <li>
-            <span>{t(`Finish time`)}:</span>
-            {moment(status.finishTime)
-              .locale(i18n.language)
-              .format('MMMM Do YYYY, h:mm:ss a')
-            }
-          </li>
-          <li>
-            <span>{t(`Final price`)}:</span> {this.amountToCaption(status.finalPrice)} ETH per RES
-          </li>
-          <li>
-            <span>{t(`RES sold`)}:</span> {this.amountToCaption(status.resSold)}
-          </li>
-          <li>
-            <span>{t(`Your RES to payout`)}:</span>
-            {this.amountToCaption(resToPayOut)}
-          </li>
-        </ul>
+          <div className={cn(styles.panel, styles.finishedListContainer)}>
+            <ul className={styles.list}>
+              <li>
+                <span>{t(`Finish time`)}:</span>
+                {moment(status.finishTime)
+                  .locale(i18n.language)
+                  .format('MMMM Do YYYY, h:mm:ss a')
+                }
+              </li>
+              <li>
+                <span>{t(`Final price`)}:</span> {this.amountToCaption(status.finalPrice)} ETH per RES
+              </li>
+              <li>
+                <span>{t(`RES sold`)}:</span> {this.amountToCaption(status.resSold)}
+              </li>
+              <li>
+                <span>{t(`Your RES to payout`)}:</span>
+                {this.amountToCaption(resToPayOut)}
+              </li>
+            </ul>
+          </div>
+
+        </div>
 
         <div className={styles.note}>
           <strong>{t(`Note`)}:</strong>&nbsp;
           {t(`No RES will be paid out until 48 hours after the *final* round of the Resistance Dutch Auction. The RES coins will be paid out to the RES address stated below`)}
         </div>
 
-      </div>
+      </React.Fragment>
     )
   }
 

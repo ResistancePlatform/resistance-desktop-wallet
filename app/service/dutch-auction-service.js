@@ -77,7 +77,7 @@ export class DutchAuctionService {
       data: {
         ...response.data,
 
-        // status: 'active',
+        // status: 'finished',
 
         // Default
         initialPrice: fromWei(data.initialPrice),
