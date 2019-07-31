@@ -187,5 +187,9 @@
   "Error getting user status, check the log for details": "Error getting user status, check the log for details",
   "Dutch Auction Payout": "Dutch Auction Payout",
   "Can't register for the auction, check the log for details": "Can't register for the auction, check the log for details",
-  "Got {{blocksNumber}} hashes at {{hashingPower}} hash/s": "Got {{blocksNumber}} hashes at {{hashingPower}} hash/s"
+  "Got {{blocksNumber}} hashes at {{hashingPower}} hash/s": "Got {{blocksNumber}} hashes at {{hashingPower}} hash/s",
+  "Coming 25 Aug 2019": "Coming 25 Aug 2019",
+  "No RES will be paid out until 48 hours after the final round of the Resistance Dutch Auction.": "No RES will be paid out until 48 hours after the final round of the Resistance Dutch Auction.",
+  "This is estimated to be (at latest) August 25, 2019.": "This is estimated to be (at latest) August 25, 2019.",
+  "The RES coins will be paid out to the RES address specified above.": "The RES coins will be paid out to the RES address specified above."
 }

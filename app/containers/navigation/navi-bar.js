@@ -71,6 +71,17 @@ class NaviBar extends Component<Props> {
               <img className={styles.mastercard} src={mastercardLogo} alt="Mastercard" />
             </NavLink>
           </div>
+
+          <div className={cn(styles.resdex, HLayout.hBoxContainer, styles.item)}>
+            <i />
+            <NavLink to="/resdex" disabled>
+              {t(`ResDEX`)}
+              <div className={styles.comingSoon}>
+                {t(`Coming 25 Aug 2019`)}
+              </div>
+            </NavLink>
+          </div>
+
           {dutchAuctionStatus && dutchAuctionStatus !== 'terminated' &&
             <div className={cn(styles.dutchAuction, getItemClasses('/dutch-auction'))}>
               <i />

@@ -183,17 +183,22 @@
 .address, .committed {
   .label {
     color: $BASE_COLOR_FONT_GRAY;
-    text-transform: uppercase;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
+    font-weight: 500;
 
     &.centered {
       text-align: center;
+    }
+
+    &.capitalized {
+      text-transform: uppercase;
+      font-weight: normal;
     }
   }
 
   .body {
     display: flex;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     align-items: center;
   }
 

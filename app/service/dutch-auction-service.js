@@ -108,11 +108,15 @@ export class DutchAuctionService {
       isAuthRequired: true
     })
 
-    return {
+    const result = {
       ethCommitted: fromWei(response.weiCommitted),
       ethAddress: response.ethAddress,
       auctionId: response.auctionId
     }
+
+    log.debug(`User status:`, result)
+
+    return result
   }
 
   async query({path, method, data, isAuthRequired}) {

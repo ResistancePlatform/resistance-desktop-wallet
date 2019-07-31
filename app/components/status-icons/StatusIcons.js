@@ -129,7 +129,7 @@ class StatusIcons extends Component<Props> {
           <ReactTooltip
             id={miningTooltipId}
             globalEventOff="click"
-            className={cn(styles.tooltip)}
+            className={cn(styles.tooltip, styles.mining)}
           >
 
             <div className={styles.title}>

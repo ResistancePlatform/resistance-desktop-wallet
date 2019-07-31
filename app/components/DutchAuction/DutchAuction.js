@@ -112,7 +112,7 @@ export class DutchAuction extends Component<Props> {
           />
 
           <div className={styles.payoutAddressContainer}>
-            {this.getAddressControl(t(`RES payout address`), resAddress, true)}
+            {this.getAddressControl(t(`RES payout address`), resAddress, true, true)}
           </div>
 
         </div>
@@ -123,12 +123,15 @@ export class DutchAuction extends Component<Props> {
     )
   }
 
-  getAddressControl(label, address, centerLabel) {
+  getAddressControl(label, address, centerLabel, capitalizeLabel) {
     const { t } = this.props
 
     return (
       <div className={styles.address}>
-        <div className={cn(styles.label, {[styles.centered]: centerLabel})}>
+        <div className={cn(styles.label, {
+          [styles.centered]: centerLabel,
+          [styles.capitalized]: capitalizeLabel
+        })}>
           {label}
         </div>
 
@@ -172,7 +175,7 @@ export class DutchAuction extends Component<Props> {
 
         <div className={styles.topContainer}>
           <div className={cn(styles.panel, styles.ethAddressContainer)}>
-              {this.getAddressControl(t(`Address to send Ethereum to`), user.ethAddress)}
+              {this.getAddressControl(t(`Address to send Ethereum to`), user.ethAddress, false, true)}
 
               <div className={styles.committed}>
                 <div className={styles.label}>
@@ -206,7 +209,7 @@ export class DutchAuction extends Component<Props> {
               <span>{t(`Total expected RES payout`)}:</span> {this.amountToCaption(totalExpectedPayout)} RES
             </li>
             <li>
-              {this.getAddressControl(t(`RES payout address`), resAddress)}
+              {this.getAddressControl(t(`RES payout address`), resAddress, false, false)}
             </li>
           </ul>
 
@@ -235,11 +238,9 @@ export class DutchAuction extends Component<Props> {
   getFinished() {
     const { t } = this.props
     const { i18n } = this.props
-    const { user, status } = this.props.dutchAuction
+    const { resAddress, user, status } = this.props.dutchAuction
 
-    const resToPayOut = user.ethCommited && status.finalPrice && !status.finalPrice.isZero()
-      ? user.ethCommited.dividedBy(status.finalPrice)
-      : null
+    const resToPayOut = calculatePayout(user.ethCommitted, status.finalPrice)
 
     return (
       <React.Fragment>
@@ -262,11 +263,11 @@ export class DutchAuction extends Component<Props> {
                 <span>{t(`Final price`)}:</span> {this.amountToCaption(status.finalPrice)} ETH per RES
               </li>
               <li>
-                <span>{t(`RES sold`)}:</span> {this.amountToCaption(status.resSold)}
-              </li>
-              <li>
                 <span>{t(`Your RES to payout`)}:</span>
                 {this.amountToCaption(resToPayOut)}
+              </li>
+              <li>
+                {this.getAddressControl(t(`RES payout address`), resAddress, false, false)}
               </li>
             </ul>
           </div>
@@ -275,7 +276,9 @@ export class DutchAuction extends Component<Props> {
 
         <div className={styles.note}>
           <strong>{t(`Note`)}:</strong>&nbsp;
-          {t(`No RES will be paid out until 48 hours after the *final* round of the Resistance Dutch Auction. The RES coins will be paid out to the RES address stated below`)}
+          {t(`No RES will be paid out until 48 hours after the final round of the Resistance Dutch Auction.`)}&nbsp;
+          {t(`This is estimated to be (at latest) August 25, 2019.`)}&nbsp;
+          {t(`The RES coins will be paid out to the RES address specified above.`)}&nbsp;
         </div>
 
       </React.Fragment>
