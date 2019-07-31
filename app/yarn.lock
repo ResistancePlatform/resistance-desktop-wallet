@@ -63,7 +63,7 @@ bignumber.js@^4.0.0:
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-4.1.0.tgz#db6f14067c140bd46624815a7916c92d9b6c24b1"
   integrity sha512-eJzYkFYy9L4JzXsbymsFn3p54D+llV27oTQ+ziJG7WFRheJcNZilgVXMG0LoZtlQSKBsJdWtLFqOD0u+U0jZKA==
 
-bitcoin-core@^2.2.0:
+bitcoin-core@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/bitcoin-core/-/bitcoin-core-2.2.0.tgz#151d89e935d642ff0b2dc562ef4aa329baffd3b0"
   integrity sha512-WIEvgEbVzezbPWLddNwRLaN/mx1i3SrAqJAsFHoWMMjOOxpFWZePqEJO2R0ZjvP+H1VMtWjREc44QoX7oxfESQ==

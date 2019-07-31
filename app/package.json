@@ -1,7 +1,7 @@
 {
   "name": "resistance-desktop-wallet",
   "productName": "ResistanceWallet",
-  "version": "2.0.4-2",
+  "version": "2.0.6",
   "description": "Resistance cross-platform desktop wallet",
   "main": "./main.prod.js",
   "author": {
@@ -15,6 +15,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "bitcoin-core": "^2.2.0"
+    "bitcoin-core": "^2.0.0"
   }
 }
