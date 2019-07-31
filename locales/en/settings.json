@@ -64,5 +64,10 @@
   "Number of cores": "Number of cores",
   "Note:": "Note:",
   "Changing amount of cores requires restarting of the mining daemon.": "Changing amount of cores requires restarting of the mining daemon.",
-  "Wallet password is required due to the local node restart": "Wallet password is required due to the local node restart"
+  "Wallet password is required due to the local node restart": "Wallet password is required due to the local node restart",
+  "ResDEX": "ResDEX",
+  "With Tor enabled, users can achieve greater privacy by masking their IP addresses. This feature is currently in BETA phase.": "With Tor enabled, users can achieve greater privacy by masking their IP addresses. This feature is currently in BETA phase.",
+  "Password changed.": "Password changed.",
+  "The old wallet password is incorrect.": "The old wallet password is incorrect.",
+  "Error changing the password, check the log for details.": "Error changing the password, check the log for details."
 }

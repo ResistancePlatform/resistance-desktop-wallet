@@ -24,5 +24,8 @@
   "Sending currency from a transparent (R) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "Sending currency from a transparent (R) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.",
   "Sending currency from a private (Z) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.": "Sending currency from a private (Z) address to a private (Z) address is forbidden when \"Private Transactions\" are disabled.",
   "Sending currency from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled.": "Sending currency from a private (Z) address to a transparent (R) address is forbidden when \"Private Transactions\" are disabled.",
-  "Send Currency": "Send Currency"
+  "Send Currency": "Send Currency",
+  "Destination and source addresses cannot be the same": "Destination and source addresses cannot be the same",
+  "Please enable Private Transactions to use Z-addresses": "Please enable Private Transactions to use Z-addresses",
+  "Search name in addressbook": "Search name in addressbook"
 }

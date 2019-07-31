@@ -48,5 +48,7 @@
   "Your account balance will update once the blockchain has confirmed the transaction": "Your account balance will update once the blockchain has confirmed the transaction",
   "View details": "View details",
   "Send RES from Ledger": "Send RES from Ledger",
-  "Please make sure destination address and amount are valid.": "Please make sure destination address and amount are valid."
+  "Please make sure destination address and amount are valid.": "Please make sure destination address and amount are valid.",
+  "N/A": "N/A",
+  "Address {{address}} created successfully": "Address {{address}} created successfully"
 }

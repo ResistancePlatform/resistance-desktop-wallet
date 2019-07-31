@@ -34,5 +34,10 @@
   "Transaction details": "Transaction details",
   "You have no transactions yet": "You have no transactions yet",
   "Export to .CSV": "Export to .CSV",
-  "Show transaction memo": "Show transaction memo"
+  "Show transaction memo": "Show transaction memo",
+  "Export transactions to CSV": "Export transactions to CSV",
+  "File name:": "File name:",
+  "Comma-Separated Values (CSV) ": "Comma-Separated Values (CSV) ",
+  "CSV export completed.": "CSV export completed.",
+  "Error exporting to CSV, check the log for details.": "Error exporting to CSV, check the log for details."
 }
