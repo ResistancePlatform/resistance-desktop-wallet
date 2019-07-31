@@ -6,8 +6,6 @@ import { translate } from 'react-i18next'
 import cn from 'classnames'
 
 import { SettingsState } from '~/reducers/settings/settings.reducer'
-import { ResDexState } from '~/reducers/resdex/resdex.reducer'
-import { ChildProcessService } from '~/service/child-process-service'
 import { NaviState } from '~/reducers/navi/navi.reducer'
 import { DutchAuctionState } from '~/reducers/dutch-auction/dutch-auction.reducer'
 
@@ -15,70 +13,23 @@ import visaLogo from '~/assets/images/visa-logo.svg'
 import mastercardLogo from '~/assets/images/mastercard-logo.svg'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
-import statusStyles from '~/assets/styles/status-colors.scss'
 import styles from './navi-bar.scss'
 
-
-const childProcess = new ChildProcessService()
 
 type Props = {
   t: any,
 	navi: NaviState,
 	settings: SettingsState,
-  resDex: ResDexState,
   dutchAuction: DutchAuctionState
 }
 
 class NaviBar extends Component<Props> {
 	props: Props
 
-  getPendingOrdersNumber(): number {
-    const { swapHistory } = this.props.resDex.orders
-    const completed = status => ['completed', 'failed', 'cancelled'].includes(status)
-
-    const pendingSwaps = swapHistory.filter(swap => (
-      !swap.isHidden
-      && !(!swap.isPrivate && completed(swap.status))
-      && !(swap.isPrivate && completed(swap.privacy.status))
-    ))
-
-    return pendingSwaps.length
-  }
-
-  getVerificationLabel() {
-    const { t } = this.props
-
-    const { RESDEX: resDexStatus } = this.props.settings.childProcessesStatus
-
-    if (resDexStatus  !== 'RUNNING') {
-      return null
-    }
-
-    const { defaultPortfolioId, portfolios } = this.props.resDex.login
-
-    if (!portfolios || defaultPortfolioId === null) {
-      return null
-    }
-
-    const portfolio = portfolios.find(p => p.id === defaultPortfolioId)
-
-    if (!portfolio || portfolio.isVerified) {
-      return null
-    }
-
-    return (
-      <NavLink
-        to="/resdex/kyc"
-        className={styles.getVerified}
-      >
-        {t(`Get Verified`)}
-      </NavLink>
-    )
-  }
-
 	render() {
     const { t } = this.props
-    const { isExpanded: isResDexExpanded } = this.props.resDex.common
+    // const { isExpanded: isResDexExpanded } = this.props.resDex.common
+    const isResDexExpanded = false
 
     const getItemClasses = path => ({
       [HLayout.hBoxContainer]: true,
@@ -86,8 +37,6 @@ class NaviBar extends Component<Props> {
       [styles.active]: this.props.navi.currentNaviPath.startsWith(path)
     })
 
-    const pendingOrdersNumber = this.getPendingOrdersNumber()
-    const resDexStatus = this.props.settings.childProcessesStatus.RESDEX
     const { status: dutchAuctionStatus } = this.props.dutchAuction.status
 
 		return (
@@ -120,29 +69,6 @@ class NaviBar extends Component<Props> {
               {t(`Buy Bitcoin with`)}
               <img className={styles.visa} src={visaLogo} alt="VISA" />
               <img className={styles.mastercard} src={mastercardLogo} alt="Mastercard" />
-            </NavLink>
-          </div>
-          <div className={cn(styles.resdex, getItemClasses('/resdex'))}>
-            <i />
-            <NavLink to="/resdex">
-              {t(`ResDEX`)}
-
-              {!this.props.resDex.login.isRequired &&
-                <div
-                  className={cn(
-                    styles.resDexStatus,
-                    statusStyles[childProcess.getChildProcessStatusColor(resDexStatus)],
-                    { [styles.hasOrders]: resDexStatus  === 'RUNNING' && Boolean(pendingOrdersNumber) }
-                  )}
-                >
-                  <div className={styles.number}>
-                    {pendingOrdersNumber || false}
-                  </div>
-                </div>
-              }
-
-              {this.getVerificationLabel()}
-
             </NavLink>
           </div>
           {dutchAuctionStatus && dutchAuctionStatus !== 'terminated' &&

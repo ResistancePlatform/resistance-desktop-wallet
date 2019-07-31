@@ -31,13 +31,6 @@ import SendCurrency from './send-currency/send-currency'
 import Settings from './settings/settings'
 import SimplexPage from './SimplexPage'
 import DutchAuction from '~/components/DutchAuction/DutchAuction'
-import ResDexPage from './ResDexPage'
-import ResDexStart from '~/components/resdex/bootstrapping/Start'
-import ResDexCreatePortfolio from '~/components/resdex/bootstrapping/CreatePortfolio'
-import ResDexSaveSeed from '~/components/resdex/bootstrapping/SaveSeed'
-import ResDexEnterSeed from '~/components/resdex/bootstrapping/EnterSeed'
-import ResDexForgotPassword from '~/components/resdex/bootstrapping/ForgotPassword'
-import ResDexKyc from '~/components/resdex/bootstrapping/Kyc'
 import { DutchAuctionActions } from '~/reducers/dutch-auction/dutch-auction.reducer'
 
 import AddressBookPage from './AddressBookPage'
@@ -48,7 +41,6 @@ import { FetchParametersState, FetchParametersActions } from '~/reducers/fetch-p
 import { AuthState } from '~/reducers/auth/auth.reducer'
 import { GetStartedState } from '~/reducers/get-started/get-started.reducer'
 import { SettingsActions } from '~/reducers/settings/settings.reducer'
-import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 
 import styles from './App.scss'
 import HLayout from '../assets/styles/h-box-layout.scss'
@@ -59,7 +51,6 @@ type Props = {
   auth: AuthState,
   fetchParameters: FetchParametersState,
   getStarted: GetStartedState,
-  resDex: ResDexState,
   dutchAuctionActions: any
 }
 
@@ -139,19 +130,6 @@ class App extends React.Component<Props> {
 							<Route exact path="/address-book" component={AddressBookPage} />
 							<Route exact path="/dutch-auction" component={DutchAuction} />
 
-              <Route exact path="/resdex" render={() => (
-                this.props.resDex.bootstrapping.isInProgress
-                  ? (<ResDexStart />)
-                  : (<ResDexPage />)
-              )} />
-
-              <Route exact path="/resdex/start" component={ResDexStart} />
-              <Route exact path="/resdex/kyc" component={ResDexKyc} />
-              <Route exact path="/resdex/restore-portfolio" component={ResDexEnterSeed} />
-              <Route exact path="/resdex/create-portfolio" component={ResDexCreatePortfolio} />
-              <Route exact path="/resdex/save-seed" component={ResDexSaveSeed} />
-              <Route exact path="/resdex/confirm-seed" component={ResDexEnterSeed} />
-              <Route exact path="/resdex/forgot-password" component={ResDexForgotPassword} />
 						</Switch>
 					</div>
 				</div>

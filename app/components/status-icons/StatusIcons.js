@@ -11,7 +11,6 @@ import {
 } from '~/utils/child-process'
 import StatusModal from '~/components/settings/status-modal'
 import OperationsModal from '~/components/system-info/OperationsModal'
-import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { SendCurrencyActions, SendCurrencyState } from '~/reducers/send-currency/send-currency.reducer'
 import { SettingsActions, SettingsState } from '~/reducers/settings/settings.reducer'
 import { SystemInfoActions, SystemInfoState } from '~/reducers/system-info/system-info.reducer'
@@ -28,7 +27,6 @@ const operationsTooltipId = 'status-icons-operations-tooltip-id'
 type Props = {
   t: () => string,
   settings: SettingsState,
-  resDex: ResDexState,
   sendCurrency: SendCurrencyState,
 	systemInfo: SystemInfoState,
   settingsActions: SettingsActions,
@@ -53,7 +51,7 @@ class StatusIcons extends Component<Props> {
 
     const minerInfo = this.props.systemInfo.miner
 
-    const description = t(`Got {{blocksNumber}} blocks at {{hashingPower}} khash/s`, {
+    const description = t(`Got {{blocksNumber}} hashes at {{hashingPower}} hash/s`, {
       blocksNumber: minerInfo.minedBlocksNumber,
       hashingPower: minerInfo.hashingPower
     })
@@ -119,7 +117,7 @@ class StatusIcons extends Component<Props> {
 
     return (
       <div>
-        <div className={cn(styles.container, {[styles.hidden]: this.props.resDex.common.isExpanded})}>
+        <div className={cn(styles.container, {[styles.hidden]: false})}>
           <div
             className={cn('icon', styles.mining, { [styles.active]: childProcessesStatus.MINER === 'RUNNING' })}
             data-tip
@@ -282,7 +280,6 @@ const mapStateToProps = state => ({
 	sendCurrency: state.sendCurrency,
 	settings: state.settings,
   systemInfo: state.systemInfo,
-  resDex: state.resDex,
 })
 
 const mapDispatchToProps = dispatch => ({

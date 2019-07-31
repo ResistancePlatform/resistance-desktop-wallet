@@ -6,18 +6,15 @@ import { translate } from 'react-i18next'
 import cn from 'classnames'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
-import LedgerPolling from '~/components/ledger/ledger-polling'
 import OwnAddressList from '~/components/own-addresses/own-address-list'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { OwnAddressesActions, OwnAddressesState } from '~/reducers/own-addresses/own-addresses.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import {
-  RoundedButton,
   RoundedButtonWithDropdown,
   MoreButton
 } from '~/components/rounded-form'
-import ConnectLedgerModal from '~/components/own-addresses/ConnectLedgerModal'
 
 import styles from './own-addresses.scss'
 import scrollStyles from '~/assets/styles/scrollbar.scss'
@@ -85,12 +82,6 @@ class OwnAddresses extends Component<Props> {
           }}
         />
 
-        <LedgerPolling />
-
-        {this.props.ownAddresses.connectLedgerModal.isVisible &&
-          <ConnectLedgerModal />
-        }
-
 				{ /* Route content */}
 				<div className={cn(styles.container, VLayout.vBoxChild, HLayout.hBoxContainer, scrollStyles.scrollbar)}>
 
@@ -121,16 +112,6 @@ class OwnAddresses extends Component<Props> {
                   </PopupMenu>
 
                 </RoundedButtonWithDropdown>
-
-                <RoundedButton
-                  className={styles.menuButton}
-                  onClick={this.props.actions.showConnectLedgerModal}
-                  glyph="ledger"
-                  disabled={this.props.settings.childProcessesStatus.NODE !== 'RUNNING'}
-                  important
-                >
-                  {t(`Send RES from Ledger`)}
-                </RoundedButton>
 
                 <MoreButton
                   className={styles.moreButton}

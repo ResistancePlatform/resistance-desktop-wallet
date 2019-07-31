@@ -10,7 +10,6 @@ import { OverviewState } from './overview/overview.reducer'
 import { OwnAddressesState } from './own-addresses/own-addresses.reducer'
 import { SendCurrencyState } from './send-currency/send-currency.reducer'
 import { SettingsState } from './settings/settings.reducer'
-import { ResDexState } from './resdex/resdex.reducer'
 import { AddressBookState } from './address-book/address-book.reducer'
 
 export type Action = {
@@ -30,7 +29,6 @@ export type State = {
 	ownAddresses: OwnAddressesState,
 	sendCurrency: SendCurrencyState,
 	addressBook: AddressBookState,
-	settings: SettingsState,
-	resDex: ResDexState
+	settings: SettingsState
 }
 

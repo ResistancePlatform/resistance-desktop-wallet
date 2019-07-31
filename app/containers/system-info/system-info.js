@@ -10,9 +10,6 @@ import { toastr } from 'react-redux-toastr'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { getOS } from '~/utils/os'
 import { ChildProcessService } from '~/service/child-process-service'
-import { ResDexAssetsActions } from '~/reducers/resdex/assets/reducer'
-import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
-import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { SystemInfoActions, SystemInfoState } from '~/reducers/system-info/system-info.reducer'
 import { getStore } from '~/store/configureStore'
 import { State } from '~/reducers/types'
@@ -32,8 +29,7 @@ type Props = {
   t: any,
   i18n: any,
 	systemInfo: SystemInfoState,
-	settings: SettingsState,
-	resDex: ResDexState
+	settings: SettingsState
 }
 
 /**
@@ -155,7 +151,8 @@ class SystemInfo extends Component<Props> {
 	 */
 	render() {
     const { t } = this.props
-    const { isExpanded: isResDexExpanded } = this.props.resDex.common
+    // const { isExpanded: isResDexExpanded } = this.props.resDex.common
+    const isResDexExpanded = false
 
 		return (
 			<div className={cn(styles.systemInfoContainer, HLayout.hBoxContainer, {[styles.shrink]: isResDexExpanded})}>
@@ -186,25 +183,6 @@ class SystemInfo extends Component<Props> {
             polling: SystemInfoActions.getOperations,
             success: SystemInfoActions.gotOperations,
             failure: SystemInfoActions.getOperationsFailure
-          }}
-        />
-
-        <RpcPolling
-          interval={10.0}
-          criticalChildProcess="RESDEX"
-          actions={{
-            polling: ResDexOrdersActions.getSwapHistory,
-            success: ResDexOrdersActions.gotSwapHistory,
-            failure: ResDexOrdersActions.getSwapHistoryFailed
-          }}
-        />
-
-        <RpcPolling
-          interval={10.0 * 60 * 60}
-          actions={{
-            polling: ResDexAssetsActions.getCurrencyHistory,
-            success: ResDexAssetsActions.gotCurrencyHistory,
-            failure: ResDexAssetsActions.getCurrencyHistoryFailed
           }}
         />
 
@@ -277,7 +255,6 @@ const mapStateToProps = (state: State) => ({
 	systemInfo: state.systemInfo,
 	sendCurrency: state.sendCurrency,
 	settings: state.settings,
-	resDex: state.resDex
 })
 
 export default connect(mapStateToProps, null)(translate('other')(SystemInfo))

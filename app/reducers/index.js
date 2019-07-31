@@ -17,7 +17,6 @@ import { OverviewReducer } from './overview/overview.reducer'
 import { OwnAddressesReducer } from './own-addresses/own-addresses.reducer'
 import { SendCurrencyReducer } from './send-currency/send-currency.reducer'
 import { SettingsReducer } from './settings/settings.reducer'
-import { ResDexReducer } from './resdex/resdex.reducer'
 import { AddressBookReducer } from './address-book/address-book.reducer'
 import { DutchAuctionReducer } from './dutch-auction/dutch-auction.reducer'
 
@@ -31,7 +30,6 @@ import { OverviewEpics } from './overview/overview.epic'
 import { SystemInfoEpics } from './system-info/system-info.epic'
 import { SendCurrencyEpics } from './send-currency/send-currency.epic'
 import { SettingsEpics } from './settings/settings.epic'
-import { ResDexEpic } from './resdex/resdex.epic'
 import { AddressBookEpics } from './address-book/address-book.epic'
 import { DutchAuctionEpic } from './dutch-auction/dutch-auction.epic'
 
@@ -51,7 +49,6 @@ const rootReducer = combineReducers({
 	sendCurrency: SendCurrencyReducer,
 	addressBook: AddressBookReducer,
 	settings: SettingsReducer,
-  resDex: ResDexReducer,
   dutchAuction: DutchAuctionReducer,
 })
 
@@ -66,7 +63,6 @@ const rootEpic = combineEpics(
 	SendCurrencyEpics,
 	AddressBookEpics,
 	SettingsEpics,
-  ResDexEpic,
   DutchAuctionEpic,
 )
 
