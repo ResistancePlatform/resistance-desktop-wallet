@@ -42,7 +42,7 @@ export const DutchAuctionActions = createActions(
     UPDATE_KYC_DATA: (kyc: object) => ({ kyc }),
 
     REGISTER: undefined,
-    REGISTER_FINISHED: undefined,
+    REGISTRATION_FINISHED: undefined,
 
     UPDATE_CREDENTIALS: (credentials: object) => ({ credentials }),
   },
