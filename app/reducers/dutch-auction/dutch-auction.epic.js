@@ -38,7 +38,7 @@ const getUserStatus = (action$: ActionsObservable<any>, state$) => action$.pipe(
   switchMap(() => {
     const { status: auctionStatus } = state$.value.dutchAuction.status
 
-    if (auctionStatus !=='active' || !dutchAuction.hasCredentials()) {
+    if (!['active', 'finished'].includes(auctionStatus) || !dutchAuction.hasCredentials()) {
       return of(DutchAuctionActions.getUserStatusFailed())
     }
 
