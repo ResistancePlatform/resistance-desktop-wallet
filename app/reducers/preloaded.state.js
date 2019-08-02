@@ -276,7 +276,7 @@ Object.assign(preloadedState.getStarted, {
 Object.assign(preloadedState.settings, {
 	isMinerEnabled: config.get('manageDaemon.enableMiner', false),
 	isTorEnabled: config.get('manageDaemon.enableTor', false),
-  cpuCoresNumber: config.get('manageDaemon.cpuCoresNumber', os.cpus().length),
+  cpuCoresNumber: config.get('manageDaemon.cpuCoresNumber', Math.round(os.cpus().length / 2)),
 	language: config.get('language', 'en')
 })
 

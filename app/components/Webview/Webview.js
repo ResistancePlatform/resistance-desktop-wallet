@@ -5,6 +5,7 @@ import React, { Component } from 'react'
 import { shell } from 'electron'
 import cn from 'classnames'
 
+import { translate } from '~/i18next.config'
 import { RoundedButton } from '~/components/rounded-form'
 
 import animatedSpinner from '~/assets/images/animated-spinner.svg'
@@ -13,11 +14,12 @@ import VLayout from '~/assets/styles/v-box-layout.scss'
 import styles from './Webview.scss'
 
 type Props = {
-  t: any,
   className?: string,
   title: string,
   url: string
 }
+
+const t = translate('service')
 
 type State = {
   isInBrowserMode: boolean,
@@ -108,8 +110,6 @@ export class Webview extends Component<Props> {
    * @memberof Webview
 	 */
 	render() {
-    const { t } = this.props
-
     const isLoading = this.getIsLoading()
 
     return (
