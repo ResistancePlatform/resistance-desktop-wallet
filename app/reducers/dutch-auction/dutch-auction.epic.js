@@ -107,8 +107,24 @@ const register = (action$: ActionsObservable<any>, state$) => action$.pipe(
           )
         }),
         catchError(err => {
-          log.error(`Can't register for the Dutch auction`, err)
-          toastr.error(t(`Can't register for the auction, check the log for details`))
+          log.error(`Can't register for the Dutch auction`, err, err.response)
+
+          const { response } = err
+          let message
+
+          switch (response.state) {
+            case 'D':
+              toastr.error(t(`Your identity verification application was denied, please apply again.`))
+              return of(DutchAuctionActions.submitKycData({tid: null}))
+            case 'R':
+              message = t(`Your identity verification is under review, please try again later.`)
+              break
+            default:
+              message = t(`Can't register for the auction, check the log for details`)
+              break
+          }
+
+          toastr.error(message)
           return of(DutchAuctionActions.registrationFinished())
         })
       )

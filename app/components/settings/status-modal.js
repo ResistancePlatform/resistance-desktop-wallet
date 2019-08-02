@@ -16,7 +16,7 @@ import styles from './status-modal.scss'
 
 const childProcess = new ChildProcessService()
 
-const processNames = ['NODE', 'MINER', 'TOR']
+const processNames = ['NODE', 'MINER', 'TOR', 'RESWALLET']
 
 type Props = {
   t: any,
@@ -187,7 +187,14 @@ class StatusModal extends Component<Props> {
                     title={childProcess.getStatusName(this.props.settings.childProcessesStatus.TOR)}
                   />
                   {t(`Tor`)}
-                  </Tab>
+                </Tab>
+                <Tab className={styles.tab}>
+                  <i
+                    className={cn('icon-status-running', styles.statusIcon, styles.green)}
+                    title={childProcess.getStatusName('RUNNING')}
+                  />
+                  {t(`Wallet`)}
+                </Tab>
               </TabList>
 
               <TabPanel className={styles.tabPanel}>
