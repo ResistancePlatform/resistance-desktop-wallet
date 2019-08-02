@@ -326,6 +326,16 @@ export class RpcService {
   }
 
   /**
+   * @param {Client} client
+   * @returns {Promise<any>}
+   * @memberof RpcService
+   */
+  getWalletAllPublicAddresses(): Promise<any> {
+    const client = getClientInstance()
+    return client.command([{ method: 'listreceivedbyaddress', parameters: [0, true] }])
+  }
+
+  /**
    * @param {boolean} sortByGroupBalance
    * @param {boolean} disableThePrivateAddress
    * @returns {Observable<any>}
@@ -335,7 +345,7 @@ export class RpcService {
     const client = getClientInstance()
 
     const promiseArr = [
-      this::getWalletAllPublicAddresses(client),
+      this.getWalletAllPublicAddresses(),
       this::getWalletPublicAddressesWithUnspentOutputs(client),
       this::getWalletPrivateAddresses(client)
     ]
@@ -636,15 +646,6 @@ export class RpcService {
  */
 function getWalletPrivateAddresses(client: Client): Promise<any> {
   return client.command([{ method: 'z_listaddresses' }])
-}
-
-/**
- * @param {Client} client
- * @returns {Promise<any>}
- * @memberof RpcService
- */
-function getWalletAllPublicAddresses(client: Client): Promise<any> {
-  return client.command([{ method: 'listreceivedbyaddress', parameters: [0, true] }])
 }
 
 /**

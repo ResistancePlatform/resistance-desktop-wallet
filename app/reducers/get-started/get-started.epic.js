@@ -74,13 +74,13 @@ const generateWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
  * Main use case actions sequences.
  *
  * Create new wallet:
- *   applyConfiguration → encryptWallet → authenticate → createMiningAddress → walletBootstrappingSucceeded
+ *   applyConfiguration → encryptWallet → authenticate → setMiningAddress → walletBootstrappingSucceeded
  *
  * Restore from backup (encrypted):
- *   applyConfiguration → restoreWallet → changePassword → authenticate → createMiningAddress → walletBootstrappingSucceeded
+ *   applyConfiguration → restoreWallet → changePassword → authenticate → setMiningAddress → walletBootstrappingSucceeded
  *
  * Restore from backup (unencrypted):
- *   applyConfiguration → restoreWallet → encryptWallet → changePassword → authenticate → createMiningAddress → walletBootstrappingSucceeded
+ *   applyConfiguration → restoreWallet → encryptWallet → changePassword → authenticate → setMiningAddress → walletBootstrappingSucceeded
  *
  */
 
@@ -217,7 +217,7 @@ const authenticateEpic = (action$: ActionsObservable<Action>, state$) => action$
   switchMap(() => {
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
 
-    const nextObservables = [ of(WelcomeActions.createMiningAddress()) ]
+    const nextObservables = [ of(WelcomeActions.setMiningAddress()) ]
 
     const sendWalletObservable = from(rpc.sendWalletPassword(choosePasswordForm.fields.password, AUTH.sessionTimeoutSeconds)).pipe(
       mergeMap(() => concat(...nextObservables)),
@@ -234,37 +234,36 @@ const authenticateEpic = (action$: ActionsObservable<Action>, state$) => action$
   })
 )
 
-const createMiningAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(WelcomeActions.createMiningAddress),
+const setMiningAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(WelcomeActions.setMiningAddress),
   switchMap(() => {
     const nextObservables = [
       of(AuthActions.loginSucceeded()),
       of(WelcomeActions.walletBootstrappingSucceeded())
     ]
 
-    const nodeRestartedObservable = childProcess.getStartObservable({
-      processName: 'NODE',
-      onSuccess: concat(...nextObservables),
-      onFailure: of(WelcomeActions.walletBootstrappingFailed(t(`Unable to restart Resistance local node`))),
-      action$
-    })
+    const sendWalletObservable = from(rpc.getWalletAllPublicAddresses()).pipe(
+      mergeMap(response => {
+        log.debug(`Wallet addresses list`, response)
 
-    const sendWalletObservable = from(rpc.createNewAddress(false)).pipe(
-      mergeMap(address => {
+        if (!response.length || !response[0].length) {
+          return WelcomeActions.walletBootstrappingFailed(t(`Error getting setting mining address, unable to get wallet addresses list.`))
+        }
+
+        const { address } = response[0][0]
+
         config.set('miningAddress', address)
+
         addressBook.addAddress({
           name: t(`Mining`),
           address,
         })
-        return concat(
-          of(WelcomeActions.displayHint(t(`Restarting the local node...`))),
-          of(SettingsActions.restartLocalNode()),
-          nodeRestartedObservable
-        )
+
+        return concat(...nextObservables)
       }),
       catchError(err => {
-        log.error(`Error creating mining address`, err)
-        const errorMessage = t(`Error creating mining address, check the application log for details.`)
+        log.error(`Error setting mining address`, err)
+        const errorMessage = t(`Error setting mining address, check the application log for details.`)
         return WelcomeActions.walletBootstrappingFailed(errorMessage)
     }))
 
@@ -301,7 +300,7 @@ export const GetStartedEpic = (action$, state$) => merge(
   encryptWalletEpic(action$, state$),
   restoreWalletEpic(action$, state$),
   authenticateEpic(action$, state$),
-  createMiningAddressEpic(action$, state$),
+  setMiningAddressEpic(action$, state$),
   walletBootstrappingSucceededEpic(action$, state$),
   useResistanceEpic(action$, state$)
 )
