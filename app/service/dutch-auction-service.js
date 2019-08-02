@@ -95,6 +95,7 @@ export class DutchAuctionService {
         priceInterval: fromWei(data.priceInterval),
         reservePrice: fromWei(data.reservePrice),
         startTime: toDate(data.startTime),
+        endTime: toDate(data.startTime + (data.totalDuration || 0)),
         ethCommitted: fromWei(data.weiCommitted),
 
         // Active

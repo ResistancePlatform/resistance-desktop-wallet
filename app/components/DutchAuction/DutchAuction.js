@@ -166,6 +166,12 @@ export class DutchAuction extends Component<Props> {
     const userExpectedPayout = calculatePayout(user.ethCommitted, status.currentPrice)
     const nextPrice = status.currentPrice.minus(status.priceInterval)
 
+    const isFinishing = status.currentRound === status.roundCount
+
+    const countdownTime = isFinishing
+      ? status.endTime
+      : status.nextRoundTime
+
     return (
       <div className={cn(styles.activeAuction, styles.innerContainer)}>
         <div className={styles.title}>
@@ -218,12 +224,19 @@ export class DutchAuction extends Component<Props> {
         <hr />
 
         <div className={styles.centeredTitle}>
-          {t(`The price will decrease to {{nextPrice}} Ethereum (ETH) in`, {nextPrice: this.amountToCaption(nextPrice)})}
+          {!isFinishing &&
+            t(`The price will decrease to {{nextPrice}} Ethereum (ETH) in`, {nextPrice: this.amountToCaption(nextPrice)})
+          }
+
+          {isFinishing &&
+            t(`The auction will finish in`)
+          }
+
         </div>
 
         <Countdown
           className={styles.countdown}
-          date={status.nextRoundTime}
+          date={countdownTime}
           onStop={this.props.actions.getAuctionStatus}
         />
 
