@@ -66,7 +66,7 @@ export function retry(func) {
           return reject(err)
         }
 
-        if ((now() - startedTimestamp) > 10 * 1000) {
+        if ((now() - startedTimestamp) > 60 * 1000) {
           clear()
           log.debug(`Retry: Timed out`, func.name)
           return reject(err)
