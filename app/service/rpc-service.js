@@ -12,6 +12,7 @@ import { map, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
+import { RPC } from '~/constants/rpc'
 import { getExportDir, moveFile } from '~/utils/os'
 import { DECIMAL } from '~/constants/decimal'
 import { getStore } from '~/store/configureStore'
@@ -32,6 +33,52 @@ const addressBookService = new AddressBookService()
  */
 let instance = null
 const clientInstance = {}
+
+const recoverableErrors = ['ESOCKETTIMEDOUT', 'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', RPC.IN_WARMUP]
+
+export function retry(func) {
+  const promise = new Promise((resolve, reject) => {
+    let result
+    let interval
+
+    const clear = () => {
+      clearInterval(interval)
+      interval = null
+    }
+
+    const now = () => (new Date()).getTime()
+    const startedTimestamp = now()
+
+    log.debug(`Retry: Starting`, func.name)
+
+    interval = setInterval(async () => {
+      log.debug(`Retry: trying`, func.name)
+
+      try {
+        result = await func()
+        clear()
+        log.debug(`Retry: success`, func.name)
+        resolve(result)
+      } catch(err) {
+        if (!recoverableErrors.includes(err.code)) {
+          clear()
+          log.debug(`Retry: bad error`, func.name)
+          return reject(err)
+        }
+
+        if ((now() - startedTimestamp) > 10 * 1000) {
+          clear()
+          log.debug(`Retry: Timed out`, func.name)
+          return reject(err)
+        }
+
+        log.debug(`Retry: Recoverable error`, func.name)
+      }
+    }, 500)
+  })
+
+  return promise
+}
 
 /**
  * Create a new resistance client instance.

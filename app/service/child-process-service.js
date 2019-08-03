@@ -355,7 +355,7 @@ export class ChildProcessService {
     })
 
     return () => promise
-}
+  }
 }
 
 function spawnProcess(processName, args, spawnOptions) {
