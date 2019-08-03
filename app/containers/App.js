@@ -117,21 +117,25 @@ class App extends React.Component<Props> {
           <StatusIcons />
 
 					{ /* Route content container */}
-					<div className={cn(styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer)}>
-						<Switch>
-							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
+          {this.props.auth.isLoginRequired ? (
+            <Login />
+          ) : (
+            <div className={cn(styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer)}>
+              <Switch>
+                <Route exact path="/" render={() => (<Redirect to="/overview" />)} />
 
-							<Route exact path="/overview" component={Overview} />
-              <Route exact path="/overview/transaction-details" component={TransactionDetails} />
-							<Route exact path="/own-addresses" component={OwnAddress} />
-							<Route exact path="/send-currency" component={SendCurrency} />
-							<Route exact path="/settings" component={Settings} />
-							<Route exact path="/simplex" component={SimplexPage} />
-							<Route exact path="/address-book" component={AddressBookPage} />
-							<Route exact path="/dutch-auction" component={DutchAuction} />
+                <Route exact path="/overview" component={Overview} />
+                <Route exact path="/overview/transaction-details" component={TransactionDetails} />
+                <Route exact path="/own-addresses" component={OwnAddress} />
+                <Route exact path="/send-currency" component={SendCurrency} />
+                <Route exact path="/settings" component={Settings} />
+                <Route exact path="/simplex" component={SimplexPage} />
+                <Route exact path="/address-book" component={AddressBookPage} />
+                <Route exact path="/dutch-auction" component={DutchAuction} />
 
-						</Switch>
-					</div>
+              </Switch>
+            </div>
+          )}
 				</div>
 
 				<SystemInfo />
@@ -153,7 +157,7 @@ class App extends React.Component<Props> {
     } else if (!this.props.fetchParameters.isDownloadComplete) {
       content = (<FetchParametersDialog />)
     } else {
-      content = this.props.auth.isLoginRequired ? (<Login />) : this.getMainContent()
+      content = this.getMainContent()
     }
 
 		return (
