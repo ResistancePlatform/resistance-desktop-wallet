@@ -34,7 +34,7 @@ const addressBookService = new AddressBookService()
 let instance = null
 const clientInstance = {}
 
-const recoverableErrors = ['ESOCKETTIMEDOUT', 'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', RPC.IN_WARMUP]
+const recoverableErrors = ['ESOCKETTIMEDOUT', 'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', RPC.IN_WARMUP, 500]
 
 export function retry(func) {
   const promise = new Promise((resolve, reject) => {
@@ -62,7 +62,7 @@ export function retry(func) {
       } catch(err) {
         if (!recoverableErrors.includes(err.code)) {
           clear()
-          log.debug(`Retry: bad error`, func.name)
+          log.debug(`Retry: bad error`, func.name, err.code)
           return reject(err)
         }
 
@@ -74,7 +74,7 @@ export function retry(func) {
 
         log.debug(`Retry: Recoverable error`, func.name)
       }
-    }, 500)
+    }, 1000)
   })
 
   return promise
