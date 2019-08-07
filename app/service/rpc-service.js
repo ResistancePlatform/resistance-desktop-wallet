@@ -37,7 +37,7 @@ const clientInstance = {}
 
 const recoverableErrors = ['ESOCKETTIMEDOUT', 'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', RPC.IN_WARMUP, 500]
 
-export function retry(func) {
+export function retry(func, id) {
   const promise = new Promise((resolve, reject) => {
     let result
     let interval
@@ -63,7 +63,7 @@ export function retry(func) {
         return resolve(result)
       } catch(err) {
 
-        if (func.name === 'encryptWallet' && String(err.code) === String(RPC.WALLET_WRONG_ENC_STATE)) {
+        if (id === 'encryptWallet' && err.code === RPC.WALLET_WRONG_ENC_STATE) {
           log.debug(`Resolving encryptWallet due to an error`)
           clear()
           return resolve(result)
