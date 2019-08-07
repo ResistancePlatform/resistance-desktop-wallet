@@ -128,9 +128,9 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>, state$) => action
     const oldPassword = restoreForm.fields.password || ''
 
     // 2. Changing the node password to the new one
-    const func = () => rpc.changeWalletPassword(oldPassword, choosePasswordForm.fields.password)
+    const changeWalletPassword = () => rpc.changeWalletPassword(oldPassword, choosePasswordForm.fields.password)
 
-    const changePasswordObservable = defer(() => from(retry(func))).pipe(
+    const changePasswordObservable = defer(() => from(retry(changeWalletPassword))).pipe(
       switchMap(() => of(WelcomeActions.authenticate())),
       catchError(err => {
         let errorMessage
@@ -205,9 +205,9 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       ))
     )
 
-    const func = () => rpc.encryptWallet(choosePasswordForm.fields.password)
+    const encryptWallet = () => rpc.encryptWallet(choosePasswordForm.fields.password)
 
-    const observable = from(retry(func)).pipe(
+    const observable = from(retry(encryptWallet)).pipe(
       switchMap(() => nodeShutDownObservable),
       catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.toString())))
     )
@@ -223,9 +223,9 @@ const authenticateEpic = (action$: ActionsObservable<Action>, state$) => action$
 
     const nextObservables = [ of(WelcomeActions.setMiningAddress()) ]
 
-    const func = () => rpc.sendWalletPassword(choosePasswordForm.fields.password, AUTH.sessionTimeoutSeconds)
+    const sendWalletPassword = () => rpc.sendWalletPassword(choosePasswordForm.fields.password, AUTH.sessionTimeoutSeconds)
 
-    const sendWalletObservable = from(retry(func)).pipe(
+    const sendWalletObservable = from(retry(sendWalletPassword)).pipe(
       mergeMap(() => concat(...nextObservables)),
       catchError(err => {
         log.error(`Error sending wallet password`, err)
@@ -248,9 +248,9 @@ const setMiningAddressEpic = (action$: ActionsObservable<Action>) => action$.pip
       of(WelcomeActions.walletBootstrappingSucceeded())
     ]
 
-    const func = () => rpc.getWalletAllPublicAddresses()
+    const getWalletAllPublicAddresses = () => rpc.getWalletAllPublicAddresses()
 
-    const sendWalletObservable = from(retry(func)).pipe(
+    const sendWalletObservable = from(retry(getWalletAllPublicAddresses)).pipe(
       mergeMap(response => {
         log.debug(`Wallet addresses list`, response)
 
