@@ -63,7 +63,7 @@ export function retry(func) {
         return resolve(result)
       } catch(err) {
 
-        if (func.name === 'encryptWallet' && err.code === RPC.WALLET_WRONG_ENC_STATE) {
+        if (func.name === 'encryptWallet' && String(err.code) === String(RPC.WALLET_WRONG_ENC_STATE)) {
           log.debug(`Resolving encryptWallet due to an error`)
           clear()
           return resolve(result)
