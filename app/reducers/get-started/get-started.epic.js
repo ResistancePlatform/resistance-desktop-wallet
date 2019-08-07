@@ -205,10 +205,9 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       ))
     )
 
-    // const encryptWallet = () => rpc.encryptWallet(choosePasswordForm.fields.password)
+    const encryptWallet = () => rpc.encryptWallet(choosePasswordForm.fields.password)
 
-    // const observable = from(retry(encryptWallet)).pipe(
-    const observable = from(rpc.encryptWallet(choosePasswordForm.fields.password)).pipe(
+    const observable = from(retry(encryptWallet)).pipe(
       switchMap(() => nodeShutDownObservable),
       catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.toString())))
     )

@@ -1,6 +1,10 @@
 // @flow
 import path from 'path'
 import * as fs from 'fs'
+const {
+  setIntervalAsync,
+  clearIntervalAsync
+} = require('set-interval-async/dynamic')
 import { promisify } from 'util'
 import log from 'electron-log'
 import { Decimal } from 'decimal.js'
@@ -36,13 +40,14 @@ const clientInstance = {}
 
 const recoverableErrors = ['ESOCKETTIMEDOUT', 'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', RPC.IN_WARMUP, 500]
 
-export function retry(func) {
+export async function retry(func) {
   const promise = new Promise((resolve, reject) => {
     let result
     let interval
 
     const clear = () => {
-      clearInterval(interval)
+      log.debug(`Clearing interval`, interval)
+      clearIntervalAsync(interval)
       interval = null
     }
 
@@ -51,21 +56,21 @@ export function retry(func) {
 
     log.debug(`Retry: Starting`, func.name)
 
-    interval = setInterval(async () => {
-      log.debug(`Retry: trying`, func.name)
+    interval = setIntervalAsync(async () => {
+      log.debug(`Retry: trying`, func.name, interval)
 
       try {
         result = await func()
         clear()
         log.debug(`Retry: success`, func.name)
-        resolve(result)
+        return resolve(result)
       } catch(err) {
 
-        // if (func.name === 'encryptWallet' && err.code === RPC.WALLET_WRONG_ENC_STATE) {
-        //   log.debug(`Resolving encryptWallet due to an error`)
-        //   clear()
-        //   return resolve(result)
-        // }
+        if (func.name === 'encryptWallet' && err.code === RPC.WALLET_WRONG_ENC_STATE) {
+          log.debug(`Resolving encryptWallet due to an error`)
+          clear()
+          return resolve(result)
+        }
 
         if (!recoverableErrors.includes(err.code)) {
           clear()
@@ -84,7 +89,7 @@ export function retry(func) {
     }, 1000)
   })
 
-  return promise
+  return await promise
 }
 
 /**
