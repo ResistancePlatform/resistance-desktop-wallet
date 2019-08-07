@@ -1,10 +1,7 @@
 // @flow
 import path from 'path'
 import * as fs from 'fs'
-const {
-  setIntervalAsync,
-  clearIntervalAsync
-} = require('set-interval-async/dynamic')
+import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async/dynamic'
 import { promisify } from 'util'
 import log from 'electron-log'
 import { Decimal } from 'decimal.js'
@@ -40,7 +37,7 @@ const clientInstance = {}
 
 const recoverableErrors = ['ESOCKETTIMEDOUT', 'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', RPC.IN_WARMUP, 500]
 
-export async function retry(func) {
+export function retry(func) {
   const promise = new Promise((resolve, reject) => {
     let result
     let interval
@@ -89,7 +86,7 @@ export async function retry(func) {
     }, 1000)
   })
 
-  return await promise
+  return promise
 }
 
 /**
