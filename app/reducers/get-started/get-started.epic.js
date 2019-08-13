@@ -38,6 +38,41 @@ const addressBook = new AddressBookService()
 const WelcomeActions = GetStartedActions.welcome
 const unableToStartLocalNodeMessage = t(`Unable to start Resistance local node`)
 
+export function getSetMiningAddressObservable(successObservable, errorAction) {
+    const getWalletAllPublicAddresses = () => rpc.getWalletAllPublicAddresses()
+
+    const getAddressObservable = from(retry(getWalletAllPublicAddresses)).pipe(
+      switchMap(response => {
+        log.debug(`Wallet addresses list`, response)
+
+        if (!response.length || !response[0].length) {
+          return of(errorAction(t(`Error getting setting mining address, unable to get wallet addresses list.`)))
+        }
+
+        const { address } = response[0][0]
+        log.debug(`Setting mining address to`, address)
+
+        config.set('miningAddress', address)
+
+        log.debug(`Adding the address to the address book`, address)
+
+        addressBook.addAddress({
+          name: t(`Mining`),
+          address,
+        })
+
+        log.debug(`Setting mining address succeeded`, successObservable)
+
+        return successObservable
+      }),
+      catchError(err => {
+        log.error(`Error setting mining address`, err)
+        const errorMessage = t(`Error setting mining address, check the application log for details.`)
+        return of(errorAction(errorMessage))
+    }))
+
+    return getAddressObservable
+}
 
 const acceptEulaEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(GetStartedActions.acceptEula),
@@ -248,36 +283,14 @@ const setMiningAddressEpic = (action$: ActionsObservable<Action>) => action$.pip
       of(WelcomeActions.walletBootstrappingSucceeded())
     ]
 
-    const getWalletAllPublicAddresses = () => rpc.getWalletAllPublicAddresses()
-
-    const sendWalletObservable = from(retry(getWalletAllPublicAddresses)).pipe(
-      mergeMap(response => {
-        log.debug(`Wallet addresses list`, response)
-
-        if (!response.length || !response[0].length) {
-          return WelcomeActions.walletBootstrappingFailed(t(`Error getting setting mining address, unable to get wallet addresses list.`))
-        }
-
-        const { address } = response[0][0]
-
-        config.set('miningAddress', address)
-
-        addressBook.addAddress({
-          name: t(`Mining`),
-          address,
-        })
-
-        return concat(...nextObservables)
-      }),
-      catchError(err => {
-        log.error(`Error setting mining address`, err)
-        const errorMessage = t(`Error setting mining address, check the application log for details.`)
-        return WelcomeActions.walletBootstrappingFailed(errorMessage)
-    }))
+    const getAddressObservable = getSetMiningAddressObservable(
+      concat(...nextObservables),
+      WelcomeActions.walletBootstrappingFailed
+    )
 
     return concat(
       of(WelcomeActions.displayHint(t(`Sending the wallet password to the node...`))),
-      sendWalletObservable
+      getAddressObservable
     )
   })
 )
