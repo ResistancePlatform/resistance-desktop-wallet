@@ -235,7 +235,8 @@ const supportedCurrencies = [
     coin: 'ETH',
     fname: 'Ethereum',
     etomic: '0x0000000000000000000000000000000000000000',
-    rpcport: 80
+    rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'FAIR',
