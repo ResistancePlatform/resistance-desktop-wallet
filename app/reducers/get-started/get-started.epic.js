@@ -67,9 +67,16 @@ export function getSetMiningAddressObservable(successObservable, errorAction) {
       }),
       catchError(err => {
         log.error(`Error setting mining address`, err)
+
+        // TODO: Identify where this error comes from
+        if (err.message.includes('You provided an invalid object where a stream was expected.')) {
+          return GetStartedActions.empty()
+        }
+
         const errorMessage = t(`Error setting mining address, check the application log for details.`)
         return of(errorAction(errorMessage))
-    }))
+      })
+    )
 
     return getAddressObservable
 }

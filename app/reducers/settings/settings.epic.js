@@ -40,6 +40,7 @@ import { ResistanceService } from '~/service/resistance-service'
 import { MinerService } from '~/service/miner-service'
 import { TorService } from '~/service/tor-service'
 import { getSetMiningAddressObservable } from '~/reducers/get-started/get-started.epic'
+import { LoadingPopupActions } from '~/reducers/loading-popup/loading-popup.reducer'
 
 const t = translate('settings')
 const rpc = new RpcService()
@@ -315,6 +316,11 @@ const setNewMiningAddressEpic = (action$: ActionsObservable<Action>) => action$.
       processName: 'NODE',
       onSuccess: concat(
         of(AuthActions.ensureLogin(t(`Your restored wallet password is required`), true)),
+        of(LoadingPopupActions.hide()),
+        defer(() => {
+          toastr.success(t(`The wallet restored successfully`))
+          return of(SettingsActions.empty())
+        })
       ),
       onFailure: of(SettingsActions.restoringWalletFailed()),
       action$
@@ -323,7 +329,8 @@ const setNewMiningAddressEpic = (action$: ActionsObservable<Action>) => action$.
     const getAddressObservable = getSetMiningAddressObservable(
       concat(
         of(SettingsActions.restartLocalNode(true)),
-        startLocalNodeSecondTimeObservable
+        startLocalNodeSecondTimeObservable,
+        of(LoadingPopupActions.update(t(`Restarting Resistance with the new mining address…`)))
       ),
       SettingsActions.restoringWalletFailed
     )
@@ -355,11 +362,10 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
         config.set('wallet.name', walletName)
         config.set('miningAddress', null)
 
-        toastr.info(t(`Restarting the local node with the new wallet...`))
-
         return concat(
           of(SettingsActions.restartLocalNode(true)),
-          startLocalNodeFirstTimeObservable
+          startLocalNodeFirstTimeObservable,
+          of(LoadingPopupActions.show(t(`Restarting Resistance with the new wallet…`))),
         )
       }),
       catchError(err => of(SettingsActions.restoringWalletFailed(err.message)))
@@ -382,7 +388,7 @@ const restoringWalletFailedEpic = (action$: ActionsObservable<Action>) => action
 	ofType(SettingsActions.restoringWalletFailed),
   map(action => {
     toastr.error(t(`Failed to restore the wallet`), action.payload.errorMessage)
-    return SettingsActions.empty()
+    return LoadingPopupActions.hide()
   })
 )
 
