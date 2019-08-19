@@ -13,7 +13,7 @@ import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 
 
 const netId = 1234
-const seedNodeAddress = '54.226.203.173'
+const seedNodeAddress = '3.226.120.163'
 // const seedNodeAddress = '35.174.118.206'
 
 const processSettings = {

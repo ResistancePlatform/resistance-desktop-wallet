@@ -14,7 +14,7 @@ const RESDEX = {
     },
     {
       symbol: 'ETH',
-      useElectrum: true
+      useElectrum: false
     },
     {
       symbol: 'BTC',
@@ -22,7 +22,7 @@ const RESDEX = {
     },
     {
       symbol: 'USDT',
-      useElectrum: true
+      useElectrum: false
     },
   ],
   errorEvents: [

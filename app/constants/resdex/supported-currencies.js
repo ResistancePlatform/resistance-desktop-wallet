@@ -229,7 +229,7 @@ const supportedCurrencies = [
   },
   {
     coin: 'RES',
-    rpcport: 18132,
+    rpcport: 8132,
   },
   {
     coin: 'ETH',
@@ -517,7 +517,7 @@ const supportedCurrencies = [
     coin: 'RES',
     name: 'Resistance',
     asset: 'RES',
-    rpcport: 18132,
+    rpcport: 8132,
   },
   {
     coin: 'SALT',
@@ -552,7 +552,10 @@ const supportedCurrencies = [
   {
     coin: 'USDT',
     name: 'Tether',
+    id_in_cmc: "tether",
+    is_legacy: true,
     etomic: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+    swap_contract_address: "0xd85275Fa3F3Ef844E9D4C38822552568039F1BD4",
     rpcport: 80,
   },
   {

@@ -80,7 +80,7 @@ export class ResDex extends Component<Props> {
     return (
       <div className={cn({[styles.expanded]: isExpanded})}>
         <RpcPolling
-          interval={10.0}
+          interval={30.0}
           criticalChildProcess="RESDEX"
           actions={{
             polling: ResDexAccountsActions.getCurrencies,
