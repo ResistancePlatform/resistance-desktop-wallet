@@ -229,13 +229,14 @@ const supportedCurrencies = [
   },
   {
     coin: 'RES',
-    rpcport: 18132,
+    rpcport: 8132,
   },
   {
     coin: 'ETH',
     fname: 'Ethereum',
     etomic: '0x0000000000000000000000000000000000000000',
-    rpcport: 80
+    rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'FAIR',
@@ -517,7 +518,7 @@ const supportedCurrencies = [
     coin: 'RES',
     name: 'Resistance',
     asset: 'RES',
-    rpcport: 18132,
+    rpcport: 8132,
   },
   {
     coin: 'SALT',

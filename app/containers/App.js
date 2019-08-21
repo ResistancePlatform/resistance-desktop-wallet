@@ -180,7 +180,7 @@ class App extends React.Component<Props> {
     } else if (!this.props.fetchParameters.isDownloadComplete) {
       content = (<FetchParametersDialog />)
     } else {
-      content = this.props.auth.isLoginRequired ? (<Login />) : this.getMainContent()
+      content = this.getMainContent()
     }
 
 		return (

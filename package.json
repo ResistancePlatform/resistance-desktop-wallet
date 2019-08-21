@@ -70,8 +70,6 @@
       ]
     },
     "mac": {
-      "icon": "resources/icon.icns",
-      "target": "pkg",
       "extraResources": [
         "bin/macos"
       ]
