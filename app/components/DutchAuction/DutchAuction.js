@@ -18,6 +18,7 @@ import {
   DutchAuctionActions,
   DutchAuctionState
 } from '~/reducers/dutch-auction/dutch-auction.reducer'
+import { KycState } from '~/reducers/kyc/kyc.reducer'
 import { Kyc } from '~/components/Kyc/Kyc'
 import Countdown from './Countdown'
 
@@ -28,6 +29,7 @@ type Props = {
   t: any,
   i18n: any,
   dutchAuction: DutchAuctionState,
+  kyc: KycState,
   actions: object
 }
 
@@ -73,7 +75,8 @@ export class DutchAuction extends Component<Props> {
    * @memberof DutchAuction
 	 */
   getBootstrapping() {
-    const { resAddress, kyc, credentials } = this.props.dutchAuction
+    const { kyc } = this.props
+    const { resAddress, credentials } = this.props.dutchAuction
 
     if (resAddress === null) {
       return this.getAddressGeneration()
@@ -398,7 +401,6 @@ export class DutchAuction extends Component<Props> {
           <Kyc
             className={styles.kyc}
             url={kycUrl}
-            submitCallback={this.props.actions.submitKycData}
           />
 
         </div>

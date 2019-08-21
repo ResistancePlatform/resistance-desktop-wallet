@@ -72,19 +72,11 @@ const generateResAddress = (action$: ActionsObservable<any>) => action$.pipe(
   }),
 )
 
-const submitKycData = (action$: ActionsObservable<any>) => action$.pipe(
-	ofType(DutchAuctionActions.submitKycData),
-  switchMap(action => {
-    const { kyc } = action.payload
-    config.set('dutchAuction.kyc', kyc)
-    return of(DutchAuctionActions.updateKycData(kyc))
-  })
-)
-
 const register = (action$: ActionsObservable<any>, state$) => action$.pipe(
 	ofType(DutchAuctionActions.register),
   switchMap(() => {
-    const { resAddress, kyc } = state$.value.dutchAuction
+    const { kyc } = state$.value
+    const { resAddress } = state$.value.dutchAuction
 
     const observable = from(dutchAuction.register({ ...kyc, resAddress }))
       .pipe(
@@ -137,6 +129,5 @@ export const DutchAuctionEpic = (action$, state$) => merge(
 	getAuctionStatus(action$, state$),
   getUserStatus(action$, state$),
   generateResAddress(action$, state$),
-  submitKycData(action$, state$),
   register(action$, state$),
 )

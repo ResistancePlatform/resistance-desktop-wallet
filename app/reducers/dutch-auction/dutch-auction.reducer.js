@@ -39,7 +39,6 @@ export const DutchAuctionActions = createActions(
     GENERATE_RES_ADDRESS_FAILED: undefined,
 
     SUBMIT_KYC_DATA: (kyc: object) => ({ kyc }),
-    UPDATE_KYC_DATA: (kyc: object) => ({ kyc }),
 
     REGISTER: undefined,
     REGISTRATION_FINISHED: undefined,
@@ -73,10 +72,6 @@ export const DutchAuctionReducer = handleActions(
     [DutchAuctionActions.generateResAddressFailed]: state => ({
       ...state,
       isGeneratingAddress: false,
-    }),
-    [DutchAuctionActions.updateKycData]: (state, action) => ({
-      ...state,
-      kyc: action.payload.kyc
     }),
     [DutchAuctionActions.updateCredentials]: (state, action) => ({
       ...state,

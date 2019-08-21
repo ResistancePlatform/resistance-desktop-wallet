@@ -108,20 +108,6 @@ class App extends React.Component<Props> {
             <Route exact path="/get-started/restore-your-wallet" component={RestoreYourWalletPage} />
             <Route exact path="/get-started/welcome" component={WelcomePage} />
             <Route exact path="/" render={() => (<Redirect to="/get-started/eula" />)} />
-
-            <Route exact path="/resdex" render={() => (
-              this.props.resDex.bootstrapping.isInProgress
-                ? (<ResDexStart />)
-                : (<ResDexPage />)
-            )} />
-
-            <Route exact path="/resdex/start" component={ResDexStart} />
-            <Route exact path="/resdex/kyc" component={ResDexKyc} />
-            <Route exact path="/resdex/restore-portfolio" component={ResDexEnterSeed} />
-            <Route exact path="/resdex/create-portfolio" component={ResDexCreatePortfolio} />
-            <Route exact path="/resdex/save-seed" component={ResDexSaveSeed} />
-            <Route exact path="/resdex/confirm-seed" component={ResDexEnterSeed} />
-            <Route exact path="/resdex/forgot-password" component={ResDexForgotPassword} />
           </Switch>
         </div>
         <Footer />
@@ -155,6 +141,20 @@ class App extends React.Component<Props> {
                 <Route exact path="/simplex" component={SimplexPage} />
                 <Route exact path="/address-book" component={AddressBookPage} />
                 <Route exact path="/dutch-auction" component={DutchAuction} />
+
+                <Route exact path="/resdex" render={() => (
+                  this.props.resDex.bootstrapping.isInProgress
+                    ? (<ResDexStart />)
+                    : (<ResDexPage />)
+                )} />
+
+                <Route exact path="/resdex/start" component={ResDexStart} />
+                <Route exact path="/resdex/kyc" component={ResDexKyc} />
+                <Route exact path="/resdex/restore-portfolio" component={ResDexEnterSeed} />
+                <Route exact path="/resdex/create-portfolio" component={ResDexCreatePortfolio} />
+                <Route exact path="/resdex/save-seed" component={ResDexSaveSeed} />
+                <Route exact path="/resdex/confirm-seed" component={ResDexEnterSeed} />
+                <Route exact path="/resdex/forgot-password" component={ResDexForgotPassword} />
 
               </Switch>
             </div>

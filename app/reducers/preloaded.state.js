@@ -243,6 +243,10 @@ export const preloadedState: State = {
       }
     }
   },
+  kyc: {
+    tid: null,
+    email: null,
+  },
   dutchAuction: {
     status: {},
     user: {
@@ -250,11 +254,6 @@ export const preloadedState: State = {
       ethCommitted: null,
     },
     resAddress: null,
-    kyc: {
-      tid: null,
-      email: null,
-      phone: null,
-    },
     credentials: {
       userId: null,
       accessToken: null,
@@ -286,6 +285,13 @@ Object.assign(preloadedState.resDex.login, {
 
 Object.assign(preloadedState.resDex.bootstrapping, {
   isInProgress: config.get('resDex.bootstrappingInProgress', true)
+})
+
+// Old version compatibility precaution
+const dutchAuctionKyc = config.get('dutchAuction.kyc', preloadedState.kyc)
+
+Object.assign(preloadedState, {
+  kyc: config.get('kyc', dutchAuctionKyc),
 })
 
 Object.assign(preloadedState.dutchAuction, {
