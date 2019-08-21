@@ -553,6 +553,10 @@ const supportedCurrencies = [
     coin: 'USDT',
     name: 'Tether',
     etomic: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+    urls: ['https://mainnet.infura.io/v3/125e6ea342154b6bb962b180a15ae497'],
+    swap_contract_address: '0xd85275Fa3F3Ef844E9D4C38822552568039F1BD4',
+    id_in_cmc: 'tether',
+    is_legacy: true,
     rpcport: 80,
   },
   {
@@ -627,8 +631,15 @@ supportedCurrencies.forEach((_, index) => {
   const currency = supportedCurrencies[index]
 
   if (currency.etomic) {
-    currency.swap_contract_address = '0x8500AFc0bc5214728082163326C2FF0C73f4a871'
-    currency.urls = ['https://mainnet.infura.io/v3/221b0130b86441818f62fa33b348ec75']
+
+    if (!currency.swap_contract_address) {
+      currency.swap_contract_address = '0x8500AFc0bc5214728082163326C2FF0C73f4a871'
+    }
+
+    if (!currency.urls) {
+      currency.urls = ['https://mainnet.infura.io/v3/221b0130b86441818f62fa33b348ec75']
+    }
+
   } else if (currency.coin === 'RES') {
     const resistanceConfig = remote.getGlobal('resistanceNodeConfig')
     currency.confpath = resistanceConfig.configPath
