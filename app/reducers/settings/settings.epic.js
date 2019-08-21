@@ -39,6 +39,8 @@ import { ChildProcessService } from '~/service/child-process-service'
 import { ResistanceService } from '~/service/resistance-service'
 import { MinerService } from '~/service/miner-service'
 import { TorService } from '~/service/tor-service'
+import { getSetMiningAddressObservable } from '~/reducers/get-started/get-started.epic'
+import { LoadingPopupActions } from '~/reducers/loading-popup/loading-popup.reducer'
 
 const t = translate('settings')
 const rpc = new RpcService()
@@ -105,7 +107,6 @@ const kickOffChildProcessesEpic = (action$: ActionsObservable<Action>, state$) =
       )
     }
 
-    // return concat(observables, of(SettingsActions.startEtomicNode()))
     return concat(observables)
   })
 )
@@ -142,7 +143,10 @@ const restartLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => act
 		const settingsState = state$.value.settings
 		resistanceService.restart(settingsState.isTorEnabled)
 	}),
-  mapTo(AuthActions.ensureLogin(t(`Wallet password is required due to the local node restart`), true))
+  map(action => action.payload.suppressLogin
+    ? SettingsActions.empty()
+    : AuthActions.ensureLogin(t(`Wallet password is required due to the local node restart`), true)
+  )
 )
 
 const stopLocalNodeEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
@@ -282,7 +286,7 @@ const backupWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 
 const initiateWalletRestoreEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.initiateWalletRestore),
-  mergeMap(() => {
+  switchMap(() => {
     const showOpenDialogObservable = bindCallback(remote.dialog.showOpenDialog.bind(remote.dialog))
 
     const title = t(`Restore the wallet from a backup file`)
@@ -305,6 +309,36 @@ const initiateWalletRestoreEpic = (action$: ActionsObservable<Action>) => action
   })
 )
 
+const setNewMiningAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.setNewMiningAddress),
+  switchMap(() => {
+    const startLocalNodeSecondTimeObservable = childProcess.getStartObservable({
+      processName: 'NODE',
+      onSuccess: concat(
+        of(AuthActions.ensureLogin(t(`Your restored wallet password is required`), true)),
+        of(LoadingPopupActions.hide()),
+        defer(() => {
+          toastr.success(t(`The wallet restored successfully`))
+          return of(SettingsActions.empty())
+        })
+      ),
+      onFailure: of(SettingsActions.restoringWalletFailed()),
+      action$
+    })
+
+    const getAddressObservable = getSetMiningAddressObservable(
+      concat(
+        of(SettingsActions.restartLocalNode(true)),
+        startLocalNodeSecondTimeObservable,
+        of(LoadingPopupActions.update(t(`Restarting Resistance with the new mining address…`)))
+      ),
+      SettingsActions.restoringWalletFailed
+    )
+
+    return getAddressObservable
+  })
+)
+
 const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(SettingsActions.restoreWallet),
   switchMap(action => {
@@ -312,27 +346,26 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
     const newWalletPath = path.join(resistanceService.getWalletPath(), walletFileName)
 
     // Third, send the password for the new wallet
-    const startLocalNodeObservable = childProcess.getStartObservable({
+    const startLocalNodeFirstTimeObservable = childProcess.getStartObservable({
       processName: 'NODE',
-      onSuccess: concat(
-        of(AuthActions.ensureLogin(t(`Your restored wallet password is required`), true)),
-        of(defer(() => toastr.success(t(`Wallet restored successfully.`)))),
-      ),
+      onSuccess: of(SettingsActions.setNewMiningAddress()),
       onFailure: of(SettingsActions.restoringWalletFailed()),
       action$
     })
 
-    const copyPromise = promisify(fs.copyFile)(action.payload.filePath, newWalletPath)
+    const copyPromise = defer(() => promisify(fs.copyFile)(action.payload.filePath, newWalletPath))
 
     // Second, copy the backed up wallet to the export directory, update the config and restart the node
     const copyObservable = from(copyPromise).pipe(
       switchMap(() => {
         const walletName = path.basename(walletFileName, path.extname(walletFileName))
         config.set('wallet.name', walletName)
+        config.set('miningAddress', null)
+
         return concat(
-          of(defer(() => toastr.info(t(`Restarting the local node with the new wallet...`)))),
-          of(SettingsActions.restartLocalNode()),
-          startLocalNodeObservable
+          of(SettingsActions.restartLocalNode(true)),
+          startLocalNodeFirstTimeObservable,
+          of(LoadingPopupActions.show(t(`Restarting Resistance with the new wallet…`))),
         )
       }),
       catchError(err => of(SettingsActions.restoringWalletFailed(err.message)))
@@ -355,7 +388,7 @@ const restoringWalletFailedEpic = (action$: ActionsObservable<Action>) => action
 	ofType(SettingsActions.restoringWalletFailed),
   map(action => {
     toastr.error(t(`Failed to restore the wallet`), action.payload.errorMessage)
-    return SettingsActions.empty()
+    return LoadingPopupActions.hide()
   })
 )
 
@@ -460,6 +493,7 @@ export const SettingsEpics = (action$, state$) => merge(
   initiateWalletRestoreEpic(action$, state$),
   backupWalletEpic(action$, state$),
   restoreWalletEpic(action$, state$),
+  setNewMiningAddressEpic(action$, state$),
   restoringWalletFailedEpic(action$, state$),
 	childProcessFailedEpic(action$, state$),
 	childProcessMurderFailedEpic(action$, state$),

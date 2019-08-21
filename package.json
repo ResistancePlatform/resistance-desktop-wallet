@@ -278,6 +278,7 @@
     "request-promise-native": "^1.0.5",
     "round-to": "^3.0.0",
     "rxjs": "^6.3.3",
+    "set-interval-async": "^1.0.26",
     "source-map-support": "^0.5.9",
     "write-json-file": "^3.0.2"
   },

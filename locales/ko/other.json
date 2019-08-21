@@ -153,7 +153,7 @@
   "The auction starts in": "경매가 시작됩니다",
   "RES payout address": "RES 지불금 주소",
   "The current auction is in progress": "현재 경매가 진행 중입니다",
-  "Address to send Ethereum to": "Ethereu현재 경매가 진행 중입니다m을 보낼 주소",
+  "Address to send Ethereum to": "Ethereum 현재 경매가 진행 중입니다m을 보낼 주소",
   "You committed": "당신이 저지른",
   "Current price": "현재 가격",
   "Reserve price": "준비금",
@@ -167,7 +167,6 @@
   "RES sold": "RES 판매",
   "Your RES to payout": "지불 할 RES",
   "Note": "노트",
-  "No RES will be paid out until 48 hours after the *final* round of the Resistance Dutch Auction. The RES coins will be paid out to the RES address stated below": "레지스탕스 네덜란드 경매의 최종 라운드 이후 48 시간까지 RES는 지급되지 않습니다. RES 동전은 아래 명시된 RES 주소로 지급됩니다.",
   "There will be four auctions in total, with the first taking place on 2nd August 2019.": "총 4 건의 경매가 있으며, 첫 번째 경매는 2019 년 8 월 2 일에 개최됩니다.",
   "Following that, there will be a week’s interval before the second auction, another week before third, and another week before the final auction.": "그 다음에는 두 번째 경매 전 일주일, 세 번째 경주 전의 주간 그리고 마지막 경매 전의 한 주일이있을 것입니다.",
   "Only after the final auction ends will the Resistance IEO complete.": "최종 경매가 종료 된 후에 만 Resistance IEO가 완료됩니다.",
@@ -187,5 +186,9 @@
   "Error getting user status, check the log for details": "사용자 상태 가져 오는 중 오류가 발생했습니다. 자세한 내용은 로그를 확인하십시오",
   "Dutch Auction Payout": "네덜란드 경매 지불금",
   "Can't register for the auction, check the log for details": "경매에 등록 할 수 없으며 자세한 내용은 로그를 확인하십시오",
-  "Got {{blocksNumber}} hashes at {{hashingPower}} hash/s": "{{hashingPower}} 해시 / 초에서 {{blocksNumber}} 해시가 있습니다"
+  "Got {{blocksNumber}} hashes at {{hashingPower}} hash/s": "{{hashingPower}} 해시 / 초에서 {{blocksNumber}} 해시가 있습니다",
+  "Coming 25 Aug 2019": "오는 2019 년 8 월 25 일 예정",
+  "No RES will be paid out until 48 hours after the final round of the Resistance Dutch Auction.": "레지스탕스 네덜란드 경매의 최종 라운드 이후 48 시간까지 RES는 지급되지 않습니다.",
+  "This is estimated to be (at latest) August 25, 2019.": "이것은 (늦어도) 2019 년 8 월 25 일로 추정됩니다.",
+  "The RES coins will be paid out to the RES address specified above.": "RES 동전은 위에 지정된 RES 주소로 지급됩니다."
 }

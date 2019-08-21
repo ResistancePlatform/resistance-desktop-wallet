@@ -5,9 +5,12 @@ import moment from 'moment'
 import rp from 'request-promise-native'
 import log from 'electron-log'
 
+import { translate } from '~/i18next.config'
 import { RESDEX } from '~/constants/resdex'
 
+const t = translate('service')
 const apiUrl = 'https://lbt95atwl1.execute-api.us-east-1.amazonaws.com/api/v1/'
+
 
 /**
  * ES6 singleton
@@ -21,6 +24,14 @@ const fromWei = wei => (
 
 // const fromSatoshi = satoshi => satoshi  !== undefined && Decimal(satoshi).dividedBy(RESDEX.satoshiDivider)
 const toDate = ts => ts && moment(ts).toDate()
+
+class DutchAuctionApiError extends Error {
+  constructor(message, response) {
+    const { error } = response || {}
+    super(message || error)
+    this.response = response
+  }
+}
 
 /**
  * @export
@@ -84,6 +95,7 @@ export class DutchAuctionService {
         priceInterval: fromWei(data.priceInterval),
         reservePrice: fromWei(data.reservePrice),
         startTime: toDate(data.startTime),
+        endTime: toDate(data.startTime + (data.totalDuration || 0)),
         ethCommitted: fromWei(data.weiCommitted),
 
         // Active
@@ -133,7 +145,7 @@ export class DutchAuctionService {
 
     if (isAuthRequired) {
       if (!this.userId || !this.accessToken) {
-        throw new Error(`Missing credentials.`)
+        throw new DutchAuctionApiError(t(`Missing credentials.`))
       }
 
       const auth = Buffer.from(`${this.userId}:${this.accessToken}`).toString('base64')
@@ -149,11 +161,12 @@ export class DutchAuctionService {
     try {
       response = await rp(options)
     } catch(error) {
-      throw new Error(error)
+      throw new DutchAuctionApiError(error)
     }
 
     if (response.error) {
-      throw new Error(response.error)
+      log.debug(`Dutch auction error response:`, response)
+      throw new DutchAuctionApiError(response.error, response)
     }
 
     return response

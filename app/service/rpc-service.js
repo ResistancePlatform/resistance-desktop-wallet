@@ -1,6 +1,7 @@
 // @flow
 import path from 'path'
 import * as fs from 'fs'
+import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async/dynamic'
 import { promisify } from 'util'
 import log from 'electron-log'
 import { Decimal } from 'decimal.js'
@@ -12,6 +13,7 @@ import { map, take, catchError, switchMap } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
+import { RPC } from '~/constants/rpc'
 import { getExportDir, moveFile } from '~/utils/os'
 import { DECIMAL } from '~/constants/decimal'
 import { getStore } from '~/store/configureStore'
@@ -32,6 +34,60 @@ const addressBookService = new AddressBookService()
  */
 let instance = null
 const clientInstance = {}
+
+const recoverableErrors = ['ESOCKETTIMEDOUT', 'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', RPC.IN_WARMUP, 500]
+
+export function retry(func, id) {
+  const promise = new Promise((resolve, reject) => {
+    let result
+    let interval
+
+    const clear = () => {
+      log.debug(`Clearing interval`, interval)
+      clearIntervalAsync(interval)
+      interval = null
+    }
+
+    const now = () => (new Date()).getTime()
+    const startedTimestamp = now()
+
+    log.debug(`Retry: Starting`, func.name)
+
+    interval = setIntervalAsync(async () => {
+      log.debug(`Retry: trying`, func.name, interval)
+
+      try {
+        result = await func()
+        clear()
+        log.debug(`Retry: success`, func.name)
+        return resolve(result)
+      } catch(err) {
+
+        if (id === 'encryptWallet' && err.code === RPC.WALLET_WRONG_ENC_STATE) {
+          log.debug(`Resolving encryptWallet due to an error`)
+          clear()
+          return resolve(result)
+        }
+
+        if (!recoverableErrors.includes(err.code)) {
+          clear()
+          log.debug(`Retry: bad error`, func.name, err.code)
+          return reject(err)
+        }
+
+        if ((now() - startedTimestamp) > 60 * 1000) {
+          clear()
+          log.debug(`Retry: Timed out`, func.name)
+          return reject(err)
+        }
+
+        log.debug(`Retry: Recoverable error`, func.name)
+      }
+    }, 1000)
+  })
+
+  return promise
+}
 
 /**
  * Create a new resistance client instance.
@@ -326,6 +382,16 @@ export class RpcService {
   }
 
   /**
+   * @param {Client} client
+   * @returns {Promise<any>}
+   * @memberof RpcService
+   */
+  getWalletAllPublicAddresses(): Promise<any> {
+    const client = getClientInstance()
+    return client.command([{ method: 'listreceivedbyaddress', parameters: [0, true] }])
+  }
+
+  /**
    * @param {boolean} sortByGroupBalance
    * @param {boolean} disableThePrivateAddress
    * @returns {Observable<any>}
@@ -335,7 +401,7 @@ export class RpcService {
     const client = getClientInstance()
 
     const promiseArr = [
-      this::getWalletAllPublicAddresses(client),
+      this.getWalletAllPublicAddresses(),
       this::getWalletPublicAddressesWithUnspentOutputs(client),
       this::getWalletPrivateAddresses(client)
     ]
@@ -636,15 +702,6 @@ export class RpcService {
  */
 function getWalletPrivateAddresses(client: Client): Promise<any> {
   return client.command([{ method: 'z_listaddresses' }])
-}
-
-/**
- * @param {Client} client
- * @returns {Promise<any>}
- * @memberof RpcService
- */
-function getWalletAllPublicAddresses(client: Client): Promise<any> {
-  return client.command([{ method: 'listreceivedbyaddress', parameters: [0, true] }])
 }
 
 /**

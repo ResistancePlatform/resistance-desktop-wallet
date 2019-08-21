@@ -31,6 +31,7 @@ import SendCurrency from './send-currency/send-currency'
 import Settings from './settings/settings'
 import SimplexPage from './SimplexPage'
 import DutchAuction from '~/components/DutchAuction/DutchAuction'
+import { DutchAuctionActions } from '~/reducers/dutch-auction/dutch-auction.reducer'
 import ResDexPage from './ResDexPage'
 import ResDexStart from '~/components/resdex/bootstrapping/Start'
 import ResDexCreatePortfolio from '~/components/resdex/bootstrapping/CreatePortfolio'
@@ -38,7 +39,6 @@ import ResDexSaveSeed from '~/components/resdex/bootstrapping/SaveSeed'
 import ResDexEnterSeed from '~/components/resdex/bootstrapping/EnterSeed'
 import ResDexForgotPassword from '~/components/resdex/bootstrapping/ForgotPassword'
 import ResDexKyc from '~/components/resdex/bootstrapping/Kyc'
-import { DutchAuctionActions } from '~/reducers/dutch-auction/dutch-auction.reducer'
 
 import AddressBookPage from './AddressBookPage'
 
@@ -59,8 +59,8 @@ type Props = {
   auth: AuthState,
   fetchParameters: FetchParametersState,
   getStarted: GetStartedState,
-  resDex: ResDexState,
-  dutchAuctionActions: any
+  dutchAuctionActions: any,
+  resDex: ResDexState
 }
 
 /**
@@ -108,6 +108,20 @@ class App extends React.Component<Props> {
             <Route exact path="/get-started/restore-your-wallet" component={RestoreYourWalletPage} />
             <Route exact path="/get-started/welcome" component={WelcomePage} />
             <Route exact path="/" render={() => (<Redirect to="/get-started/eula" />)} />
+
+            <Route exact path="/resdex" render={() => (
+              this.props.resDex.bootstrapping.isInProgress
+                ? (<ResDexStart />)
+                : (<ResDexPage />)
+            )} />
+
+            <Route exact path="/resdex/start" component={ResDexStart} />
+            <Route exact path="/resdex/kyc" component={ResDexKyc} />
+            <Route exact path="/resdex/restore-portfolio" component={ResDexEnterSeed} />
+            <Route exact path="/resdex/create-portfolio" component={ResDexCreatePortfolio} />
+            <Route exact path="/resdex/save-seed" component={ResDexSaveSeed} />
+            <Route exact path="/resdex/confirm-seed" component={ResDexEnterSeed} />
+            <Route exact path="/resdex/forgot-password" component={ResDexForgotPassword} />
           </Switch>
         </div>
         <Footer />
@@ -126,34 +140,25 @@ class App extends React.Component<Props> {
           <StatusIcons />
 
 					{ /* Route content container */}
-					<div className={cn(styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer)}>
-						<Switch>
-							<Route exact path="/" render={() => (<Redirect to="/overview" />)} />
+          {this.props.auth.isLoginRequired ? (
+            <Login />
+          ) : (
+            <div className={cn(styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer)}>
+              <Switch>
+                <Route exact path="/" render={() => (<Redirect to="/overview" />)} />
 
-							<Route exact path="/overview" component={Overview} />
-              <Route exact path="/overview/transaction-details" component={TransactionDetails} />
-							<Route exact path="/own-addresses" component={OwnAddress} />
-							<Route exact path="/send-currency" component={SendCurrency} />
-							<Route exact path="/settings" component={Settings} />
-							<Route exact path="/simplex" component={SimplexPage} />
-							<Route exact path="/address-book" component={AddressBookPage} />
-							<Route exact path="/dutch-auction" component={DutchAuction} />
+                <Route exact path="/overview" component={Overview} />
+                <Route exact path="/overview/transaction-details" component={TransactionDetails} />
+                <Route exact path="/own-addresses" component={OwnAddress} />
+                <Route exact path="/send-currency" component={SendCurrency} />
+                <Route exact path="/settings" component={Settings} />
+                <Route exact path="/simplex" component={SimplexPage} />
+                <Route exact path="/address-book" component={AddressBookPage} />
+                <Route exact path="/dutch-auction" component={DutchAuction} />
 
-              <Route exact path="/resdex" render={() => (
-                this.props.resDex.bootstrapping.isInProgress
-                  ? (<ResDexStart />)
-                  : (<ResDexPage />)
-              )} />
-
-              <Route exact path="/resdex/start" component={ResDexStart} />
-              <Route exact path="/resdex/kyc" component={ResDexKyc} />
-              <Route exact path="/resdex/restore-portfolio" component={ResDexEnterSeed} />
-              <Route exact path="/resdex/create-portfolio" component={ResDexCreatePortfolio} />
-              <Route exact path="/resdex/save-seed" component={ResDexSaveSeed} />
-              <Route exact path="/resdex/confirm-seed" component={ResDexEnterSeed} />
-              <Route exact path="/resdex/forgot-password" component={ResDexForgotPassword} />
-						</Switch>
-					</div>
+              </Switch>
+            </div>
+          )}
 				</div>
 
 				<SystemInfo />

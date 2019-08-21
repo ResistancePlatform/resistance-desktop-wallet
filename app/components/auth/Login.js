@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import { translate } from 'react-i18next'
+import ReactTooltip from 'react-tooltip'
 import * as Joi from 'joi'
 import cn from 'classnames'
 
@@ -44,44 +45,52 @@ class Login extends Component<Props> {
     const isNodeRunning = this.props.settings.childProcessesStatus.NODE === 'RUNNING'
 
     return (
-      <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
-        <TitleBarButtons />
-        <DragBar />
+      <React.Fragment>
+        <div className={styles.overlay} data-tip data-for="#loginTooltip" />
 
-        <div className={styles.dragBar} />
+        <ReactTooltip id="#loginTooltip" className={styles.tooltip}>
+          {t(`Please login in order to access the interface`)}
+        </ReactTooltip>
 
-        <div className={cn(styles.header)}>
-          <img src={resistanceLogo} alt="Resistance" />
-        </div>
+        <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
+          <TitleBarButtons />
+          <DragBar />
 
-        {this.props.auth.reason &&
-          <div className={styles.reason}>
-            {this.props.auth.reason}
+          <div className={styles.dragBar} />
+
+          <div className={cn(styles.header)}>
+            <img src={resistanceLogo} alt="Resistance" />
           </div>
-        }
 
-        <RoundedForm id="authLogin" schema={getValidationSchema()} className={styles.form}>
-          <RoundedInput
-            name="password"
-            type="password"
-            placeholder={t(`Enter your password`)}
-            large
-          />
+          {this.props.auth.reason &&
+            <div className={styles.reason}>
+              {this.props.auth.reason}
+            </div>
+          }
 
-          <RoundedButton
-            type="submit"
-            className={styles.loginButton}
-            onClick={this.props.actions.submitPassword}
-            tooltip={isNodeRunning ? null : t(`Waiting for the daemon...`)}
-            spinner={!isNodeRunning}
-            disabled={!isNodeRunning}
-            important
-            large
-          >
-            {t(`Login`)}
-          </RoundedButton>
-        </RoundedForm>
-      </div>
+          <RoundedForm id="authLogin" schema={getValidationSchema()} className={styles.form}>
+            <RoundedInput
+              name="password"
+              type="password"
+              placeholder={t(`Enter your password`)}
+              large
+            />
+
+            <RoundedButton
+              type="submit"
+              className={styles.loginButton}
+              onClick={this.props.actions.submitPassword}
+              tooltip={isNodeRunning ? null : t(`Waiting for the daemon...`)}
+              spinner={!isNodeRunning}
+              disabled={!isNodeRunning}
+              important
+              large
+            >
+              {t(`Login`)}
+            </RoundedButton>
+          </RoundedForm>
+        </div>
+      </React.Fragment>
     )
   }
 }

@@ -29,7 +29,7 @@ export const SettingsActions = createActions(
 
     TOGGLE_LOCAL_NODE: undefined,
     START_LOCAL_NODE: undefined,
-    RESTART_LOCAL_NODE: undefined,
+    RESTART_LOCAL_NODE: (suppressLogin?: boolean) => ({ suppressLogin }),
     STOP_LOCAL_NODE: undefined,
 
     START_ETOMIC_NODE: undefined,
@@ -52,6 +52,7 @@ export const SettingsActions = createActions(
     RESTORE_WALLET: filePath => ({filePath}),
     RESTORING_WALLET_FAILED: (errorMessage: string = '') => ({ errorMessage }),
     RESTORING_WALLET_SUCCEEDED: undefined,
+    SET_NEW_MINING_ADDRESS: undefined,
 
     KICK_OFF_CHILD_PROCESSES: undefined,
 

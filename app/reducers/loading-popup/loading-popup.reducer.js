@@ -10,6 +10,7 @@ export type LoadingPopupState = {
 export const LoadingPopupActions = createActions(
 	{
     SHOW: (message: string) => ({ message }),
+    UPDATE: (message: string) => ({ message }),
     HIDE: undefined
   },
 	{
@@ -21,6 +22,10 @@ export const LoadingPopupReducer = handleActions({
   [LoadingPopupActions.show]: (state, action) => ({
     ...state,
     isVisible: true,
+    message: action.payload.message,
+  }),
+  [LoadingPopupActions.update]: (state, action) => ({
+    ...state,
     message: action.payload.message,
   }),
   [LoadingPopupActions.hide]: state => ({

@@ -18,7 +18,7 @@ import { AUTH } from '~/constants/auth'
 import { verifyDirectoryExistence } from '~/utils/os'
 import { ChildProcessService } from '~/service/child-process-service'
 import { ResistanceService } from '~/service/resistance-service'
-import { RpcService } from '~/service/rpc-service'
+import { retry, RpcService } from '~/service/rpc-service'
 import { Bip39Service } from '~/service/bip39-service'
 import { AddressBookService } from '~/service/address-book-service'
 import { AuthActions } from '../auth/auth.reducer'
@@ -38,6 +38,48 @@ const addressBook = new AddressBookService()
 const WelcomeActions = GetStartedActions.welcome
 const unableToStartLocalNodeMessage = t(`Unable to start Resistance local node`)
 
+export function getSetMiningAddressObservable(successObservable, errorAction) {
+    const getWalletAllPublicAddresses = () => rpc.getWalletAllPublicAddresses()
+
+    const getAddressObservable = from(retry(getWalletAllPublicAddresses)).pipe(
+      switchMap(response => {
+        log.debug(`Wallet addresses list`, response)
+
+        if (!response.length || !response[0].length) {
+          return of(errorAction(t(`Error getting setting mining address, unable to get wallet addresses list.`)))
+        }
+
+        const { address } = response[0][0]
+        log.debug(`Setting mining address to`, address)
+
+        config.set('miningAddress', address)
+
+        log.debug(`Adding the address to the address book`, address)
+
+        addressBook.addAddress({
+          name: t(`Mining`),
+          address,
+        })
+
+        log.debug(`Setting mining address succeeded`, successObservable)
+
+        return successObservable
+      }),
+      catchError(err => {
+        log.error(`Error setting mining address`, err)
+
+        // TODO: Identify where this error comes from
+        if (err.message.includes('You provided an invalid object where a stream was expected.')) {
+          return GetStartedActions.empty()
+        }
+
+        const errorMessage = t(`Error setting mining address, check the application log for details.`)
+        return of(errorAction(errorMessage))
+      })
+    )
+
+    return getAddressObservable
+}
 
 const acceptEulaEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(GetStartedActions.acceptEula),
@@ -74,13 +116,13 @@ const generateWalletEpic = (action$: ActionsObservable<Action>) => action$.pipe(
  * Main use case actions sequences.
  *
  * Create new wallet:
- *   applyConfiguration → encryptWallet → authenticate → createMiningAddress → walletBootstrappingSucceeded
+ *   applyConfiguration → encryptWallet → authenticate → setMiningAddress → walletBootstrappingSucceeded
  *
  * Restore from backup (encrypted):
- *   applyConfiguration → restoreWallet → changePassword → authenticate → createMiningAddress → walletBootstrappingSucceeded
+ *   applyConfiguration → restoreWallet → changePassword → authenticate → setMiningAddress → walletBootstrappingSucceeded
  *
  * Restore from backup (unencrypted):
- *   applyConfiguration → restoreWallet → encryptWallet → changePassword → authenticate → createMiningAddress → walletBootstrappingSucceeded
+ *   applyConfiguration → restoreWallet → encryptWallet → changePassword → authenticate → setMiningAddress → walletBootstrappingSucceeded
  *
  */
 
@@ -128,7 +170,9 @@ const restoreWalletEpic = (action$: ActionsObservable<Action>, state$) => action
     const oldPassword = restoreForm.fields.password || ''
 
     // 2. Changing the node password to the new one
-    const changePasswordObservable = defer(() => from(rpc.changeWalletPassword(oldPassword, choosePasswordForm.fields.password))).pipe(
+    const changeWalletPassword = () => rpc.changeWalletPassword(oldPassword, choosePasswordForm.fields.password)
+
+    const changePasswordObservable = defer(() => from(retry(changeWalletPassword))).pipe(
       switchMap(() => of(WelcomeActions.authenticate())),
       catchError(err => {
         let errorMessage
@@ -203,7 +247,9 @@ const encryptWalletEpic = (action$: ActionsObservable<Action>, state$) => action
       ))
     )
 
-    const observable = from(rpc.encryptWallet(choosePasswordForm.fields.password)).pipe(
+    const encryptWallet = () => rpc.encryptWallet(choosePasswordForm.fields.password)
+
+    const observable = from(retry(encryptWallet, 'encryptWallet')).pipe(
       switchMap(() => nodeShutDownObservable),
       catchError(err => of(WelcomeActions.walletBootstrappingFailed(err.toString())))
     )
@@ -217,9 +263,11 @@ const authenticateEpic = (action$: ActionsObservable<Action>, state$) => action$
   switchMap(() => {
     const choosePasswordForm = state$.value.roundedForm.getStartedChoosePassword
 
-    const nextObservables = [ of(WelcomeActions.createMiningAddress()) ]
+    const nextObservables = [ of(WelcomeActions.setMiningAddress()) ]
 
-    const sendWalletObservable = from(rpc.sendWalletPassword(choosePasswordForm.fields.password, AUTH.sessionTimeoutSeconds)).pipe(
+    const sendWalletPassword = () => rpc.sendWalletPassword(choosePasswordForm.fields.password, AUTH.sessionTimeoutSeconds)
+
+    const sendWalletObservable = from(retry(sendWalletPassword)).pipe(
       mergeMap(() => concat(...nextObservables)),
       catchError(err => {
         log.error(`Error sending wallet password`, err)
@@ -234,43 +282,22 @@ const authenticateEpic = (action$: ActionsObservable<Action>, state$) => action$
   })
 )
 
-const createMiningAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
-	ofType(WelcomeActions.createMiningAddress),
+const setMiningAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(WelcomeActions.setMiningAddress),
   switchMap(() => {
     const nextObservables = [
       of(AuthActions.loginSucceeded()),
       of(WelcomeActions.walletBootstrappingSucceeded())
     ]
 
-    const nodeRestartedObservable = childProcess.getStartObservable({
-      processName: 'NODE',
-      onSuccess: concat(...nextObservables),
-      onFailure: of(WelcomeActions.walletBootstrappingFailed(t(`Unable to restart Resistance local node`))),
-      action$
-    })
-
-    const sendWalletObservable = from(rpc.createNewAddress(false)).pipe(
-      mergeMap(address => {
-        config.set('miningAddress', address)
-        addressBook.addAddress({
-          name: t(`Mining`),
-          address,
-        })
-        return concat(
-          of(WelcomeActions.displayHint(t(`Restarting the local node...`))),
-          of(SettingsActions.restartLocalNode()),
-          nodeRestartedObservable
-        )
-      }),
-      catchError(err => {
-        log.error(`Error creating mining address`, err)
-        const errorMessage = t(`Error creating mining address, check the application log for details.`)
-        return WelcomeActions.walletBootstrappingFailed(errorMessage)
-    }))
+    const getAddressObservable = getSetMiningAddressObservable(
+      concat(...nextObservables),
+      WelcomeActions.walletBootstrappingFailed
+    )
 
     return concat(
       of(WelcomeActions.displayHint(t(`Sending the wallet password to the node...`))),
-      sendWalletObservable
+      getAddressObservable
     )
   })
 )
@@ -301,7 +328,7 @@ export const GetStartedEpic = (action$, state$) => merge(
   encryptWalletEpic(action$, state$),
   restoreWalletEpic(action$, state$),
   authenticateEpic(action$, state$),
-  createMiningAddressEpic(action$, state$),
+  setMiningAddressEpic(action$, state$),
   walletBootstrappingSucceededEpic(action$, state$),
   useResistanceEpic(action$, state$)
 )

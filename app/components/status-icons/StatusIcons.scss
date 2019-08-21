@@ -27,6 +27,10 @@
 .tooltip {
   max-width: 7rem;
 
+  &.mining {
+    max-width: 8rem;
+  }
+
   .title {
     margin-top: 0.7rem;
     margin-bottom: 0.5rem;
