@@ -634,7 +634,7 @@ supportedCurrencies.forEach((_, index) => {
   if (currency.etomic) {
 
     if (!currency.swap_contract_address) {
-      currency.swap_contract_address = '0x8500AFc0bc5214728082163326C2FF0C73f4a871'
+      currency.swap_contract_address = '0xd85275Fa3F3Ef844E9D4C38822552568039F1BD4'
     }
 
     if (!currency.urls) {

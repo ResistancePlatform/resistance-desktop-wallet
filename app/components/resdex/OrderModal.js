@@ -84,7 +84,11 @@ class OrderModal extends Component<Props> {
             </ul>
           </div>
           <div className={styles.summaryContainer}>
-            <OrderSummary className={styles.summary} order={order} />
+            <OrderSummary
+              className={styles.summary}
+              order={order}
+              flipPrice
+            />
           </div>
 
           <div className={styles.id}>
