@@ -114,7 +114,7 @@ const setDefaultPortfolioEpic = (action$: ActionsObservable<Action>) => action$.
   })
 )
 
-const startResdexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+const startResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexLoginActions.startResdex),
   switchMap(action => {
     const { seedPhrase, walletPassword } = action.payload
@@ -124,9 +124,18 @@ const startResdexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
       api.setToken(seedPhrase)
       resDex.start(processName, seedPhrase)
 
+      let nextObservable = of(ResDexLoginActions.initResdex(processName, walletPassword))
+
+      const { tid } = state$.value.kyc
+
+      if (tid !== null) {
+        log.debug(`KYC tid will be registered with ResDEX`)
+        nextObservable = concat(nextObservable, of(ResDexLoginActions.kycRegister(tid)))
+      }
+
       const resDexStartedObservable = defer(() => childProcess.getStartObservable({
         processName,
-        onSuccess: of(ResDexLoginActions.initResdex(processName, walletPassword)).pipe(delay(400)),  // Give marketmaker some time just in case
+        onSuccess: nextObservable.pipe(delay(400)),  // Give marketmaker some time just in case
         onFailure: of(ResDexLoginActions.loginFailed(t(`Unable to start ResDEX, check the log for details`))),
         action$
       }))
