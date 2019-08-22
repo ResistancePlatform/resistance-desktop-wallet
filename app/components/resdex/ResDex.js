@@ -5,6 +5,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
+import { KycState } from '~/reducers/kyc/kyc.reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 import ResDexLogin from './Login'
 import InstantDexDepositModal from './InstantDexDepositModal'
@@ -28,6 +29,7 @@ import scrollStyles from '~/assets/styles/scrollbar.scss'
 type Props = {
   t: any,
   resDex: ResDexState,
+  kyc: KycState,
   actions: object,
   loginActions: object
 }
@@ -41,19 +43,22 @@ export class ResDex extends Component<Props> {
 	props: Props
 
   getIsVerified() {
-    const { defaultPortfolioId, portfolios } = this.props.resDex.login
+    const { tid } = this.props.kyc
 
-    if (!portfolios || defaultPortfolioId === null) {
-      return false
-    }
+    // TODO: reuse in case of per-portfolio verification
+    // const { defaultPortfolioId, portfolios } = this.props.resDex.login
+    //
+    // if (!portfolios || defaultPortfolioId === null) {
+    //   return false
+    // }
+    //
+    // const portfolio = portfolios.find(p => p.id === defaultPortfolioId)
+    //
+    // if (!portfolio) {
+    //   return false
+    // }
 
-    const portfolio = portfolios.find(p => p.id === defaultPortfolioId)
-
-    if (!portfolio) {
-      return false
-    }
-
-    return portfolio.isVerified
+    return tid !== null
   }
 
   getGetVerifiedTooltip() {

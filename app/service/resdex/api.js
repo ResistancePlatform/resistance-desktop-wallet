@@ -22,6 +22,8 @@ const t = translate('service')
  */
 const apiInstances = {}
 
+const kycApiUrl = 'https://kvk0a65tl4.execute-api.us-east-1.amazonaws.com'
+
 /*
  * Returns ResDEX API instance for a process specified.
  *
@@ -384,6 +386,50 @@ class ResDexApiService {
       method: 'sign_kyc_msg',
       msg: JSON.stringify(message),
     })
+  }
+
+
+	/**
+	 * Register the KYC tid within ResDEX
+   *
+	 * @memberof ResDexApiService
+	 */
+  async kycRegister(tid: string): boolean {
+    const payload = await this.signKycMessage({ tid })
+    log.debug(`Submitting KYC ID to ResDEX:`, tid)
+    log.debug(`Got KYC registration payload:`, payload)
+
+    try {
+      const result = await this.postJson(`${kycApiUrl}/api/v1/register`, payload)
+      log.debug(`Register result`, typeof result, result)
+      return typeof result === "string" && result.includes(' VALID KYC')
+    } catch (err) {
+      log.error(`Can't submit verification form:`, err)
+      return false
+    }
+
+    // TODO: Reuse in case of per-portfolio KYC
+    //
+    // const { defaultPortfolioId } = this.props.resDex.login
+    //
+    // if (!isRegistered) {
+    //   toastr.error(t(`Error submitting verification form, please make sure your Internet connection is good or check the log for details.`))
+    // } else {
+    //   toastr.success(t(`You have successfully passed verification!`))
+    // }
+
+  }
+
+  async postJson(url, jsonData) {
+    const result = await request({
+      url,
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(jsonData)
+    })
+    return result
   }
 
 	/**

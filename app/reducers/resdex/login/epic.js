@@ -29,6 +29,27 @@ const resDex = new ResDexService()
 const portfolio = new ResDexPortfolioService()
 
 
+const kycRegister = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexLoginActions.kycRegister),
+  switchMap(action => {
+    const { tid } = action.payload
+    const resDexApi = resDexApiFactory('RESDEX')
+
+    // TODO: Reuse in case of per-portfolio KYC
+    // this.props.actions.updatePortfolio(defaultPortfolioId, { isVerified: true, tid })
+
+    const observable = from(resDexApi.kycRegister(tid))
+      .pipe(isRegistered => {
+        if (!isRegistered) {
+          toastr.error(t(`Error submitting verification data to ResDEX, please make sure your Internet connection is good or check the log for details.`))
+        }
+        return ResDexLoginActions.empty()
+      })
+
+    return observable
+  })
+)
+
 const getPortfolios = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexLoginActions.getPortfolios),
   switchMap(() => (
@@ -264,6 +285,7 @@ const logout = (action$: ActionsObservable<Action>) => action$.pipe(
 )
 
 export const ResDexLoginEpic = (action$, state$) => merge(
+  kycRegister(action$, state$),
   getPortfolios(action$, state$),
   updatePortfolio(action$, state$),
   login(action$, state$),

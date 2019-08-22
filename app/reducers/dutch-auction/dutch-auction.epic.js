@@ -11,6 +11,7 @@ import { DutchAuctionActions } from './dutch-auction.reducer'
 import { RpcService } from '~/service/rpc-service'
 import { DutchAuctionService } from '~/service/dutch-auction-service'
 import { AddressBookService } from '~/service/address-book-service'
+import { KycActions } from '~/reducers/kyc/kyc.reducer'
 
 const t = translate('resdex')
 const rpc = new RpcService()
@@ -107,7 +108,7 @@ const register = (action$: ActionsObservable<any>, state$) => action$.pipe(
           switch (response && response.state) {
             case 'D':
               toastr.error(t(`Your identity verification application was denied, please apply again.`))
-              return of(DutchAuctionActions.submitKycData({tid: null}))
+              return of(KycActions.update(null, null))
             case 'R':
               message = t(`Your identity verification application is under review, please try again later.`)
               break

@@ -23,6 +23,7 @@ export const ResDexLoginActions = createActions(
     LOGOUT_SUCCEEDED: undefined,
     LOGOUT_FAILED: undefined,
 
+    KYC_REGISTER: (tid: string) => ({ tid }),
     SET_DEFAULT_PORTFOLIO: (id: string) => ({ id }),
 
     START_RESDEX: (seedPhrase: string, walletPassword: string) => ({ seedPhrase, walletPassword }),
