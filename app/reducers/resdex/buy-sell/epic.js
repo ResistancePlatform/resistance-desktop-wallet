@@ -482,7 +482,7 @@ const createPrivateOrderSucceeded = (action$: ActionsObservable<Action>) => acti
 const createOrderFailed = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.createOrderFailed),
   map(action => {
-    toastr.error(t(`Error creating a market order`), action.payload.errorMessage)
+    toastr.error(t(`Error creating the order`), action.payload.errorMessage)
     return ResDexBuySellActions.empty()
   })
 )

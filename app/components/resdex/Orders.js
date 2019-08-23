@@ -41,12 +41,13 @@ class ResDexOrders extends Component<Props> {
 
     return (
       <UniformListHeader>
-        <UniformListColumn width="18%">{t(`Time`)}</UniformListColumn>
-        <UniformListColumn width="17%">{t(`Pair`)}</UniformListColumn>
-        <UniformListColumn width="17%">{t(`Amount out`)}</UniformListColumn>
-        <UniformListColumn width="17%">{t(`Amount in`)}</UniformListColumn>
+        <UniformListColumn width="17%">{t(`Time`)}</UniformListColumn>
+        <UniformListColumn width="11%">{t(`Pair`)}</UniformListColumn>
+        <UniformListColumn width="10%">{t(`Type`)}</UniformListColumn>
+        <UniformListColumn width="16%">{t(`Amount out`)}</UniformListColumn>
+        <UniformListColumn width="16%">{t(`Amount in`)}</UniformListColumn>
         <UniformListColumn width="10%">{t(`Private`)}</UniformListColumn>
-        <UniformListColumn width="21%">{t(`Status`)}</UniformListColumn>
+        <UniformListColumn width="20%">{t(`Status`)}</UniformListColumn>
       </UniformListHeader>
     )
   }
@@ -69,7 +70,7 @@ class ResDexOrders extends Component<Props> {
    * @memberof ResDexOrders
 	 */
   getListRowRenderer(order) {
-    const { i18n } = this.props
+    const { i18n, t } = this.props
 
     return (
       <UniformListRow
@@ -82,6 +83,9 @@ class ResDexOrders extends Component<Props> {
         </UniformListColumn>
         <UniformListColumn>
           {order.baseCurrency}/{order.quoteCurrency}
+        </UniformListColumn>
+        <UniformListColumn>
+          {order.isMarket ? t(`Market`) : t(`Limit`)}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.lesser)}>
           -{toDecimalPlaces(order.quoteCurrencyAmount)} {order.quoteCurrency}
