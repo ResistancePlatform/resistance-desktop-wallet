@@ -14,7 +14,6 @@ import { ResDexKycActions } from '~/reducers/resdex/kyc/reducer'
 import styles from './Kyc.scss'
 
 const kycUrl = 'https://kvk0a65tl4.execute-api.us-east-1.amazonaws.com/api'
-// const kycUrl = 'https://regtech.identitymind.store/viewform/vs33y/'
 
 type Props = {
   t: any,
@@ -43,10 +42,16 @@ export class ResDexKyc extends Component<Props> {
 
     if (kyc.tid === null) {
       return (
+      <div className={styles.container}>
+        <div className={styles.title}>
+          {t(`Get Verified`)}
+        </div>
         <Kyc
+          className={styles.kyc}
           url={kycUrl}
           submitCallback={data => this.props.actions.update(data.tid, data.email)}
         />
+      </div>
       )
     }
 
@@ -54,7 +59,7 @@ export class ResDexKyc extends Component<Props> {
       <div className={styles.container}>
         <div className={styles.register}>
           <div className={cn(styles.centerVertically, styles.innerContainer)}>
-            <div className={styles.title}>
+            <div className={styles.centeredTitle}>
               <div className={cn('icon', styles.check)} />
               {t(`Almost done!`)}
             </div>
