@@ -65,6 +65,7 @@ export class ResDexKyc extends Component<Props> {
 
             <div className={styles.buttons}>
               <RoundedButton
+                className={styles.submit}
                 onClick={() => this.props.actions.register(kyc.tid)}
                 important
                 disabled={kyc.isRegistering}

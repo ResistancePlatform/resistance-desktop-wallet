@@ -22,7 +22,7 @@ const register = (action$: ActionsObservable<Action>) => action$.pipe(
     .pipe(
       switchMap(isRegistered => {
         if (isRegistered) {
-          config.set('kyc.isRegistered', true)
+          config.set('resDex.kyc.isRegistered', true)
           toastr.success(t(`Registration succeeded`))
           return of(ResDexKycActions.registrationSucceeded(), routerActions.push('/resdex'))
         }
@@ -39,8 +39,8 @@ const register = (action$: ActionsObservable<Action>) => action$.pipe(
 const update = (action$: ActionsObservable<any>) => action$.pipe(
 	ofType(ResDexKycActions.update),
   map(action => {
-    config.set('kyc.tid', action.payload.tid)
-    config.set('kyc.email', action.payload.email)
+    config.set('resDex.kyc.tid', action.payload.tid)
+    config.set('resDex.kyc.email', action.payload.email)
     return ResDexKycActions.empty()
   })
 )
