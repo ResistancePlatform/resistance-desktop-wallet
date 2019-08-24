@@ -218,6 +218,7 @@ export const preloadedState: State = {
       },
       enabledCurrencies: [],
       currencyFees: {},
+      dynamicTrust: {},
       zCredits: null,
       addCurrencyModal: {
         isInEditMode: false,

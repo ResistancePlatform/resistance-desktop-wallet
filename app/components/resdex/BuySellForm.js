@@ -67,61 +67,28 @@ class BuySellForm extends Component<Props> {
     return asks.length ? asks[0].price : null
   }
 
-  getZCreditsQuoteEquivalent() {
-    const { zCredits } = this.props.accounts
+  getDynamicTrustCaption() {
+    const { baseCurrency } = this.props.buySell
+    const { dynamicTrust } = this.props.accounts
+    log.debug(`dynamicTrust`, dynamicTrust)
+    const amount = dynamicTrust[baseCurrency]
 
-    if (zCredits === null) {
-      return null
-    }
-
-    const { RESDEX: currencies } = this.props.accounts.currencies
-    const { quoteCurrency } = this.props.buySell
-
-    if (!(quoteCurrency in currencies)) {
-      return null
-    }
-
-    const { price } = currencies[quoteCurrency]
-
-    if (price.isZero()) {
-      return { amount: zCredits, symbol: 'RES' }
-    }
-
-    const amount = zCredits.dividedBy(price)
-    return { amount, symbol: quoteCurrency }
-  }
-
-  getZCreditsQuoteEquivalentCaption() {
-    const equivalent = this.getZCreditsQuoteEquivalent()
-
-    if (equivalent === null) {
-      return null
-    }
-
-    const { amount, symbol } = equivalent
-    return `${toDecimalPlaces(amount)} ${symbol}`
-  }
-
-  getIsInstanceSwapAllowed() {
-    const { zCredits } = this.props.accounts
-    const equivalent = this.getZCreditsQuoteEquivalent()
-
-    if (zCredits == null || equivalent === null || !this.props.form) {
+    if (!amount) {
       return false
     }
 
-    const { maxRel } = this.props.form.fields
+    return `${toDecimalPlaces(amount.negated())} ${baseCurrency}`
+  }
 
-    if (!maxRel) {
+  getIsInstantSwapAllowed(): boolean {
+    const { baseCurrency } = this.props.buySell
+    const { dynamicTrust } = this.props.accounts
+
+    if (!dynamicTrust[baseCurrency]) {
       return false
     }
 
-    // Show instant swaps as allowed if the order book is empty and zCredits balance is present
-    if (equivalent.symbol === 'RES') {
-      return zCredits.greaterThan(Decimal(0))
-    }
-
-    return zCredits.greaterThanOrEqualTo(Decimal(maxRel))
+    return dynamicTrust[baseCurrency].gte(Decimal(0))
   }
 
   getOrderAttributes() {
@@ -171,7 +138,7 @@ class BuySellForm extends Component<Props> {
     log.info(" baseCurrency, quoteCurrency ", baseCurrency, quoteCurrency)
 
     const orderAttrs = this.getOrderAttributes()
-    const isInstantSwapAllowed = this.getIsInstanceSwapAllowed()
+    const isInstantSwapAllowed = this.getIsInstantSwapAllowed()
 
     return (
       <RoundedForm
@@ -299,7 +266,7 @@ class BuySellForm extends Component<Props> {
               </div>
 
               <div className={styles.body}>
-                {this.getZCreditsQuoteEquivalentCaption() || t(`N/A`)}
+                {this.getDynamicTrustCaption() || t(`N/A`)}
               </div>
             </Info>
           </div>

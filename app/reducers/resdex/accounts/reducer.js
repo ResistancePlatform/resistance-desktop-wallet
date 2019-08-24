@@ -27,9 +27,9 @@ export const ResDexAccountsActions = createActions(
     GOT_CURRENCIES: (currencies: { [ChildProcessName]: { [string]: Currency } }) => ({ currencies }),
     GET_CURRENCIES_FAILED: (errorMessage: string) => ({ errorMessage }),
 
-    GET_Z_CREDITS: undefined,
-    GOT_Z_CREDITS: (zCredits: object | null) => ({ zCredits }),
-    GET_Z_CREDITS_FAILED: undefined,
+    GET_DYNAMIC_TRUST: undefined,
+    GOT_DYNAMIC_TRUST: (dynamicTrust: object, zCredits: object) => ({ dynamicTrust, zCredits }),
+    GET_DYNAMIC_TRUST_FAILED: undefined,
 
     UPDATE_ENABLED_CURRENCIES: (enabledCurrencies: EnabledCurrency[]) => ({ enabledCurrencies }),
 
@@ -88,8 +88,12 @@ export const ResDexAccountsReducer = handleActions(
       ...state,
       currencies: action.payload.currencies
     }),
-    [ResDexAccountsActions.gotZCredits]: (state, action) => ({
+    [ResDexAccountsActions.gotDynamicTrust]: (state, action) => ({
       ...state,
+      dynamicTrust: {
+        ...state.dynamicTrust,
+        ...action.payload.dynamicTrust
+      },
       zCredits: action.payload.zCredits
     }),
     [ResDexAccountsActions.showInstantDexDepositModal]: state => ({

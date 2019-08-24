@@ -9,6 +9,7 @@ import { switchMap, map, mapTo, catchError } from 'rxjs/operators'
 import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
+import { getExpectedBaseCurrencyAmount } from '~/reducers/resdex/buy-sell/epic'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { getSortedCurrencies, getCurrencyName } from '~/utils/resdex'
 import { resDexApiFactory } from '~/service/resdex/api'
@@ -68,21 +69,26 @@ const getCurrenciesFailedEpic = (action$: ActionsObservable<Action>, state$) => 
 )
 
 
-const getZCreditsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(ResDexAccountsActions.getZCredits),
+const getDynamicTrustEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(ResDexAccountsActions.getDynamicTrust),
   switchMap(() => {
-    const { accounts } = state$.value.resDex
-    const { RESDEX: currencies } = accounts.currencies
+    const { baseCurrency } = state$.value.resDex.buySell
+    const expectedBaseAmount = getExpectedBaseCurrencyAmount(state$)
 
-    if (!currencies.RES) {
-      return of(ResDexAccountsActions.gotZCredits(null))
-    }
+    const amount = expectedBaseAmount === null
+      ? Decimal(0)
+      : expectedBaseAmount
 
-    const observable = from(mainApi.balance('RES', currencies.RES.address)).pipe(
-      switchMap(response => of(ResDexAccountsActions.gotZCredits(response.zCredits))),
+    const observable = from(mainApi.getDynamicTrust(baseCurrency, amount)).pipe(
+      switchMap(response => {
+        const dynamicTrust = {
+          [baseCurrency]: response.dynamicTrust
+        }
+        return of(ResDexAccountsActions.gotDynamicTrust(dynamicTrust, response.zCredits))
+      }),
       catchError(err => {
-        log.error(`Can't get Instant DEX balance:`, err)
-        return of(ResDexAccountsActions.getZCreditsFailed(t(`Error getting Instant DEX balance, check the log for details`)))
+        log.error(`Can't get dynamic trust:`, err)
+        return of(ResDexAccountsActions.getDynamicTrustFailed(t(`Error getting Instant DEX status, check the log for details`)))
       })
     )
 
@@ -323,7 +329,7 @@ const closeWithdrawModalEpic = (action$: ActionsObservable<any>) => action$.pipe
 export const ResDexAccountsEpic = (action$, state$) => merge(
   getCurrenciesEpic(action$, state$),
   getCurrenciesFailedEpic(action$, state$),
-  getZCreditsEpic(action$, state$),
+  getDynamicTrustEpic(action$, state$),
   getTransactionsEpic(action$, state$),
   copySmartAddressEpic(action$, state$),
   addCurrencyEpic(action$, state$),

@@ -94,9 +94,8 @@ class ResDexApiService {
       method: 'instantdex_deposit',
       weeks,
       amount: amount.toString(),
-      broadcast: 1
     })
-    log.debug('instant dex response', response)
+    log.debug('Instant DEX response', response)
     return response
   }
 
@@ -293,16 +292,17 @@ class ResDexApiService {
     return response.result
   }
 
-  async balance(coin: string, address: string) {
+  async getDynamicTrust(coin: string, amount: object) {
     const response = await this.query({
-      method: 'balance',
+      method: 'my_dynamictrust',
       coin,
-      address
+      amount: amount.toString()
     })
 
     return {
-      balance: Decimal(response.balance),
-      zCredits: Decimal(response.zcredits)
+      address: response.address,
+      zCredits: Decimal(response.zcredits),
+      dynamicTrust: Decimal(response.dynamictrust),
     }
   }
 
@@ -421,7 +421,7 @@ class ResDexApiService {
   }
 
   async postJson(url, jsonData) {
-    const result = await request({
+    const result = await rp({
       url,
       method: 'POST',
       headers: {

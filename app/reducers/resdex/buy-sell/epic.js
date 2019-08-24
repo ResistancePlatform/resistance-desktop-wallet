@@ -389,22 +389,41 @@ const getPollResBaseOrderObservable = (relResOrderUuid, resBaseOrderUuid, state$
   return pollingObservable
 }
 
-const createPrivateOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe(
-	ofType(ResDexBuySellActions.createPrivateOrder),
-  switchMap(() => {
-    const { currencies } = state$.value.resDex.accounts
-    const { baseCurrency, quoteCurrency, orderBook } = state$.value.resDex.buySell
-    const { maxRel } = state$.value.roundedForm.resDexBuySell.fields
+export function getExpectedBaseCurrencyAmount(state$) {
+    const { orderBook } = state$.value.resDex.buySell
+    const { resDexBuySell: form } = state$.value.roundedForm
 
-    // Calculate expected amount to receive to display in the orders list
+    if (!form || !form.fields) {
+      return null
+    }
+
+    const { maxRel } = form.fields
+
+    if (!maxRel || !orderBook.baseRes.asks.length || !orderBook.resQuote.asks.length) {
+      return null
+    }
+
     const { price: baseResPrice } = orderBook.baseRes.asks[0]
     const { price: resQuotePrice } = orderBook.resQuote.asks[0]
     const dexFee = RESDEX.dexFee.dividedBy(Decimal('100'))
+
     const expectedBaseCurrencyAmount = (
       Decimal(maxRel)
       .dividedBy(resQuotePrice.plus(resQuotePrice.times(dexFee)))
       .dividedBy(baseResPrice)
     )
+    return expectedBaseCurrencyAmount
+}
+
+const createPrivateOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(ResDexBuySellActions.createPrivateOrder),
+  switchMap(() => {
+    const { currencies } = state$.value.resDex.accounts
+    const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
+    const { maxRel } = state$.value.roundedForm.resDexBuySell.fields
+
+    // Calculate expected amount to receive to display in the orders list
+    const expectedBaseCurrencyAmount = getExpectedBaseCurrencyAmount(state$)
 
     const privacy = {
       baseCurrency,
