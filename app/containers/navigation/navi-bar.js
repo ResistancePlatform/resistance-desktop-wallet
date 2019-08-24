@@ -9,7 +9,6 @@ import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ChildProcessService } from '~/service/child-process-service'
 import { NaviState } from '~/reducers/navi/navi.reducer'
-import { KycState } from '~/reducers/kyc/kyc.reducer'
 
 import visaLogo from '~/assets/images/visa-logo.svg'
 import mastercardLogo from '~/assets/images/mastercard-logo.svg'
@@ -25,8 +24,7 @@ type Props = {
   t: any,
 	navi: NaviState,
 	settings: SettingsState,
-  resDex: ResDexState,
-  kyc: KycState
+  resDex: ResDexState
 }
 
 class NaviBar extends Component<Props> {
@@ -46,7 +44,7 @@ class NaviBar extends Component<Props> {
   }
 
   getVerificationLabel() {
-    const { t, kyc } = this.props
+    const { t } = this.props
 
     const { RESDEX: resDexStatus } = this.props.settings.childProcessesStatus
 
@@ -54,15 +52,9 @@ class NaviBar extends Component<Props> {
       return null
     }
 
-    const { defaultPortfolioId, portfolios } = this.props.resDex.login
+    const { kyc } = this.props.resDex
 
-    if (!portfolios || defaultPortfolioId === null) {
-      return null
-    }
-
-    const portfolio = portfolios.find(p => p.id === defaultPortfolioId)
-
-    if (kyc.tid || !portfolio || portfolio.isVerified) {
+    if (kyc.isRegistered) {
       return null
     }
 
@@ -155,7 +147,6 @@ const mapStateToProps = state => ({
 	navi: state.navi,
 	settings: state.settings,
   resDex: state.resDex,
-  kyc: state.kyc
 })
 
 export default connect(mapStateToProps, null)(translate('other')(NaviBar))

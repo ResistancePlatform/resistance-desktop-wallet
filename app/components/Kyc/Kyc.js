@@ -1,14 +1,12 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux';
 import { remote } from 'electron'
 import { Webview } from '~/components/Webview/Webview'
 import cn from 'classnames'
 import log from 'electron-log'
 
 import { translate } from '~/i18next.config'
-import { KycActions } from '~/reducers/kyc/kyc.reducer'
 
 import styles from './Kyc.scss'
 
@@ -59,8 +57,6 @@ export class Kyc extends Component<Props> {
           phone: result.form_data.phone,
         }
 
-        this.props.actions.update(kycData.tid, kycData.email)
-
         if (submitCallback) {
           submitCallback(kycData)
         }
@@ -99,8 +95,4 @@ export class Kyc extends Component<Props> {
   }
 }
 
-const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(KycActions, dispatch),
-})
-
-export default connect(null, mapDispatchToProps)(Kyc)
+export default connect(null, null)(Kyc)

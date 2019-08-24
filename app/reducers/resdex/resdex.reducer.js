@@ -6,6 +6,7 @@ import { preloadedState } from '~/reducers/preloaded.state'
 import { ChildProcessName } from '~/service/child-process-service'
 import { ResDexBootstrappingReducer } from './bootstrapping/reducer'
 import { ResDexLoginReducer } from './login/reducer'
+import { ResDexKycReducer } from './kyc/reducer'
 import { ResDexAssetsReducer } from './assets/reducer'
 import { ResDexBuySellReducer } from './buy-sell/reducer'
 import { ResDexOrdersReducer } from './orders/reducer'
@@ -165,6 +166,7 @@ export const ResDexCommonReducer = handleActions(
 
 export const ResDexReducer = combineReducers({
   common: ResDexCommonReducer,
+  kyc: ResDexKycReducer,
   bootstrapping: ResDexBootstrappingReducer,
   login: ResDexLoginReducer,
   assets: ResDexAssetsReducer,

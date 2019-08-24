@@ -29,27 +29,6 @@ const resDex = new ResDexService()
 const portfolio = new ResDexPortfolioService()
 
 
-const kycRegister = (action$: ActionsObservable<Action>) => action$.pipe(
-  ofType(ResDexLoginActions.kycRegister),
-  switchMap(action => {
-    const { tid } = action.payload
-    const resDexApi = resDexApiFactory('RESDEX')
-
-    // TODO: Reuse in case of per-portfolio KYC
-    // this.props.actions.updatePortfolio(defaultPortfolioId, { isVerified: true, tid })
-
-    const observable = from(resDexApi.kycRegister(tid))
-      .pipe(isRegistered => {
-        if (!isRegistered) {
-          toastr.error(t(`Error submitting verification data to ResDEX, please make sure your Internet connection is good or check the log for details.`))
-        }
-        return ResDexLoginActions.empty()
-      })
-
-    return observable
-  })
-)
-
 const getPortfolios = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexLoginActions.getPortfolios),
   switchMap(() => (
@@ -114,7 +93,7 @@ const setDefaultPortfolioEpic = (action$: ActionsObservable<Action>) => action$.
   })
 )
 
-const startResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+const startResdexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexLoginActions.startResdex),
   switchMap(action => {
     const { seedPhrase, walletPassword } = action.payload
@@ -124,14 +103,7 @@ const startResdexEpic = (action$: ActionsObservable<Action>, state$) => action$.
       api.setToken(seedPhrase)
       resDex.start(processName, seedPhrase)
 
-      let nextObservable = of(ResDexLoginActions.initResdex(processName, walletPassword))
-
-      const { tid } = state$.value.kyc
-
-      if (tid !== null) {
-        log.debug(`KYC tid will be registered with ResDEX`)
-        nextObservable = concat(nextObservable, of(ResDexLoginActions.kycRegister(tid)))
-      }
+      const nextObservable = of(ResDexLoginActions.initResdex(processName, walletPassword))
 
       const resDexStartedObservable = defer(() => childProcess.getStartObservable({
         processName,
@@ -294,7 +266,6 @@ const logout = (action$: ActionsObservable<Action>) => action$.pipe(
 )
 
 export const ResDexLoginEpic = (action$, state$) => merge(
-  kycRegister(action$, state$),
   getPortfolios(action$, state$),
   updatePortfolio(action$, state$),
   login(action$, state$),

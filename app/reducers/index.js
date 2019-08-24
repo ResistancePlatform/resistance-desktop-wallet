@@ -19,8 +19,6 @@ import { SendCurrencyReducer } from './send-currency/send-currency.reducer'
 import { SettingsReducer } from './settings/settings.reducer'
 import { ResDexReducer } from './resdex/resdex.reducer'
 import { AddressBookReducer } from './address-book/address-book.reducer'
-import { DutchAuctionReducer } from './dutch-auction/dutch-auction.reducer'
-import { KycReducer } from './kyc/kyc.reducer'
 
 // Epics
 import { AuthEpic } from './auth/auth.epic'
@@ -34,8 +32,6 @@ import { SendCurrencyEpics } from './send-currency/send-currency.epic'
 import { SettingsEpics } from './settings/settings.epic'
 import { ResDexEpic } from './resdex/resdex.epic'
 import { AddressBookEpics } from './address-book/address-book.epic'
-import { DutchAuctionEpic } from './dutch-auction/dutch-auction.epic'
-import { KycEpic } from './kyc/kyc.epic'
 
 const rootReducer = combineReducers({
   toastr: toastrReducer,
@@ -54,8 +50,6 @@ const rootReducer = combineReducers({
 	addressBook: AddressBookReducer,
 	settings: SettingsReducer,
   resDex: ResDexReducer,
-  dutchAuction: DutchAuctionReducer,
-  kyc: KycReducer,
 })
 
 const rootEpic = combineEpics(
@@ -70,8 +64,6 @@ const rootEpic = combineEpics(
 	AddressBookEpics,
 	SettingsEpics,
   ResDexEpic,
-  DutchAuctionEpic,
-  KycEpic,
 )
 
 export default { rootReducer, rootEpic }

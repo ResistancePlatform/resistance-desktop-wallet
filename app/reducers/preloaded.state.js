@@ -126,6 +126,12 @@ export const preloadedState: State = {
       isExpanded: false,
       selectedTabIndex: 0,
     },
+    kyc: {
+      tid: null,
+      email: null,
+      isRegistered: false,
+      isRegistering: false
+    },
     bootstrapping: {
       isInProgress: false,
       isRestoring: false,
@@ -244,10 +250,6 @@ export const preloadedState: State = {
       }
     }
   },
-  kyc: {
-    tid: null,
-    email: null,
-  },
   dutchAuction: {
     status: {},
     user: {
@@ -284,21 +286,19 @@ Object.assign(preloadedState.resDex.login, {
   defaultPortfolioId: config.get('resDex.defaultPortfolioId', null)
 })
 
+// Reuse KYC TID for those users who participated in the Dutch Auction
+const defaultKyc = {
+  ...preloadedState.resDex.kyc,
+  tid: config.get('dutchAuction.kyc.tid', null)
+}
+
+Object.assign(preloadedState.resDex.kyc, {
+  tid: config.get('resDex.kyc.tid', defaultKyc.tid),
+  isRegistered: config.get('resDex.kyc.isRegistered', defaultKyc.isRegistered),
+})
+
 Object.assign(preloadedState.resDex.bootstrapping, {
   isInProgress: config.get('resDex.bootstrappingInProgress', true)
-})
-
-// Old version compatibility precaution
-const dutchAuctionKyc = config.get('dutchAuction.kyc', preloadedState.kyc)
-
-Object.assign(preloadedState, {
-  kyc: config.get('kyc', dutchAuctionKyc),
-})
-
-Object.assign(preloadedState.dutchAuction, {
-  resAddress: config.get('dutchAuction.resAddress', null),
-  kyc: config.get('dutchAuction.kyc', preloadedState.dutchAuction.kyc),
-  credentials: config.get('dutchAuction.credentials', preloadedState.dutchAuction.credentials),
 })
 
 const enabledCurrencies = config.get('resDex.enabledCurrencies', [])
