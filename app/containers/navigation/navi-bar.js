@@ -9,7 +9,6 @@ import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ChildProcessService } from '~/service/child-process-service'
 import { NaviState } from '~/reducers/navi/navi.reducer'
-import { DutchAuctionState } from '~/reducers/dutch-auction/dutch-auction.reducer'
 import { KycState } from '~/reducers/kyc/kyc.reducer'
 
 import visaLogo from '~/assets/images/visa-logo.svg'
@@ -27,7 +26,6 @@ type Props = {
 	navi: NaviState,
 	settings: SettingsState,
   resDex: ResDexState,
-  dutchAuction: DutchAuctionState,
   kyc: KycState
 }
 
@@ -90,7 +88,6 @@ class NaviBar extends Component<Props> {
 
     const pendingOrdersNumber = this.getPendingOrdersNumber()
     const resDexStatus = this.props.settings.childProcessesStatus.RESDEX
-    const { status: dutchAuctionStatus } = this.props.dutchAuction.status
 
 		return (
       <div className={cn(styles.container, {[styles.shrink]: isResDexExpanded})} data-tid="navi-bar-container">
@@ -147,14 +144,6 @@ class NaviBar extends Component<Props> {
 
             </NavLink>
           </div>
-          {dutchAuctionStatus && dutchAuctionStatus !== 'terminated' &&
-            <div className={cn(styles.dutchAuction, getItemClasses('/dutch-auction'))}>
-              <i />
-              <NavLink to="/dutch-auction">
-                {t(`IEO — Dutch Auction`)}
-              </NavLink>
-            </div>
-          }
         </div>
 
 			</div>
@@ -166,7 +155,6 @@ const mapStateToProps = state => ({
 	navi: state.navi,
 	settings: state.settings,
   resDex: state.resDex,
-  dutchAuction: state.dutchAuction,
   kyc: state.kyc
 })
 

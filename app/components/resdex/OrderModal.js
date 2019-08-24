@@ -32,6 +32,16 @@ class OrderModal extends Component<Props> {
     return order || null
   }
 
+  getIsFinished(order) {
+    const failed = order.eventTypes.find(t => t.includes('Failed'))
+
+    if (failed) {
+      return false
+    }
+
+    return order.eventTypes.includes('Finished')
+  }
+
 	render() {
     const { t } = this.props
 
@@ -78,7 +88,7 @@ class OrderModal extends Component<Props> {
               <li className={cn({ [styles.active]: order.eventTypes.includes('TakerPaymentSpent') })}>
                 {t(`My payment`)}
               </li>
-              <li className={cn({ [styles.active]: order.eventTypes.includes('Finished') })}>
+              <li className={cn({ [styles.active]: this.getIsFinished(order) })}>
                 {t(`Their spend`)}
               </li>
             </ul>
