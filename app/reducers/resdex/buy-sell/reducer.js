@@ -46,7 +46,7 @@ export const ResDexBuySellActions = createActions(
     UPDATE_CHART_SETTINGS: (settings: object) => ({ ...settings }),
     UPDATE_CHART_PERIOD: (period: string) => ({ period }),
 
-    SHOW_INDICATORS_MODAL: (type: string, submitCallback: func) => ({ type, submitCallback }),
+    SHOW_INDICATORS_MODAL: undefined,
     UPDATE_INDICATORS_SEARCH_STRING: (searchString: string) => ({searchString}),
     EDIT_INDICATOR: (key: string) => ({key}),
     CANCEL_INDICATOR_EDITION: (key: string) => ({key}),
@@ -59,7 +59,7 @@ export const ResDexBuySellActions = createActions(
     UPDATE_INTERACTIVE_MODE: (mode: string | null) => ({ mode }),
     UPDATE_INTERACTIVE: (config: object) => ({ ...config }),
 
-    SHOW_EDIT_TEXT_MODAL: undefined,
+    SHOW_EDIT_TEXT_MODAL: (type: string, submitCallback: func) => ({ type, submitCallback }),
     CLOSE_EDIT_TEXT_MODAL: undefined,
   },
   {

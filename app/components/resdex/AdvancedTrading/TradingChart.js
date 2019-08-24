@@ -45,6 +45,7 @@ import {
   getGannFans,
   getInteractiveTexts,
   getAlerts,
+  getOrders,
 } from './Interactive'
 import getMainSeries from './MainSeries'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
@@ -238,6 +239,8 @@ class TradingChart extends Component<Props> {
       xAccessor,
       displayXAccessor,
     }
+
+    log.debug('data', calculatedData)
 
     return result
 	}
@@ -448,6 +451,16 @@ class TradingChart extends Component<Props> {
 	 * @returns
    * @memberof TradingChart
 	 */
+  getActiveOrders() {
+    const { swapHistory } = this.props.resDex.orders
+    const orders = swapHistory.filter(s => s.isActive)
+    return orders
+  }
+
+	/**
+	 * @returns
+   * @memberof TradingChart
+	 */
 	render() {
     const { width, ratio } = this.props
 
@@ -472,11 +485,15 @@ class TradingChart extends Component<Props> {
       displayXAccessor,
     } = this.getDataAndScale()
 
+
+    const { baseCurrency, quoteCurrency } = this.props.resDex.buySell
+    const orders = this.getActiveOrders()
+
 		return (
       <div className={styles.container} ref={el => this.containerRef(el)}>
         <TradingChartSettings />
 
-        {data.length > 10 &&
+        {data.length > 1 &&
         <ChartCanvas
           ref={el => this.chartRef(el)}
           height={height}
@@ -604,6 +621,14 @@ class TradingChart extends Component<Props> {
                 mode: chartSettings.interactiveMode,
                 config: interactive,
                 update: this.props.actions.updateInteractive
+            })}
+
+            {getOrders({
+                chartId: 1,
+                ref: this.interactiveRef,
+                orders,
+                baseCurrency,
+                quoteCurrency
             })}
 
           </Chart>

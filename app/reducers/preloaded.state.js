@@ -186,12 +186,7 @@ export const preloadedState: State = {
           'StandardDeviationChannel_1': [],
           'GannFan_1': [],
           'InteractiveText_1': [],
-          'InteractiveYCoordinate_1': [{
-            ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
-            yValue: 55.90,
-            id: 220,
-            draggable: true,
-          }],
+          'InteractiveYCoordinate_1': [],
         }
       },
       indicatorsModal: {

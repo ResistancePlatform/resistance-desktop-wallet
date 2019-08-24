@@ -6,9 +6,6 @@ import { map, mapTo, take, filter, switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
-import { tsvParse } from  'd3-dsv'
-import { timeParse } from 'd3-time-format'
-
 import { translate } from '~/i18next.config'
 import { RESDEX } from '~/constants/resdex'
 import { flattenDecimals } from '~/utils/decimal'

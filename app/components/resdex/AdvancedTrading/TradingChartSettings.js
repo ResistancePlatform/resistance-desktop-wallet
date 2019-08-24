@@ -97,6 +97,7 @@ class TradingChartSettings extends Component<Props> {
                 {t(`Gann Fan`)}
               </div>
             </PopupMenuItem>
+            { /* TODO: finish the implementation
             <PopupMenuItem onClick={() => updateInteractiveMode('label')}>
               <div className={cn(styles.item, {[styles.active]: interactiveMode === 'label'})}>
                 {t(`Label`)}
@@ -107,6 +108,7 @@ class TradingChartSettings extends Component<Props> {
                 {t(`Alert`)}
               </div>
             </PopupMenuItem>
+            */ }
           </PopupMenu>
 
         </div>
