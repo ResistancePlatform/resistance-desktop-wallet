@@ -21,6 +21,7 @@ const configFileName = 'resistance.conf'
 const configFileContents = [
   // Uncomment for testnet
   // `testnet=1`,
+  `txindex=1`,
   `rpcuser=resuser`,
   `rpcpassword=%generatedPassword%`,
   ``
