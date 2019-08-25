@@ -16,7 +16,7 @@ import styles from './status-modal.scss'
 
 const childProcess = new ChildProcessService()
 
-const processNames = ['NODE', 'MINER', 'TOR', 'RESWALLET', 'RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2']
+const processNames = ['NODE', 'MINER', 'TOR', 'RESDEX', 'RESDEX_PRIVACY1', 'RESDEX_PRIVACY2', 'RESWALLET']
 
 type Props = {
   t: any,
@@ -187,13 +187,27 @@ class StatusModal extends Component<Props> {
                     title={childProcess.getStatusName(this.props.settings.childProcessesStatus.TOR)}
                   />
                   {t(`Tor`)}
-                  </Tab>
-                  <Tab className={styles.tab}>
+                </Tab>
+                <Tab className={styles.tab}>
                   <i
                     className={this.getChildProcessStatusClassNames('RESDEX')}
                     title={childProcess.getStatusName(this.props.settings.childProcessesStatus.RESDEX)}
                   />
                   {t(`ResDEX`)}
+                </Tab>
+                <Tab className={styles.tab}>
+                  <i
+                    className={this.getChildProcessStatusClassNames('RESDEX_PRIVACY1')}
+                    title={childProcess.getStatusName(this.props.settings.childProcessesStatus.RESDEX_PRIVACY1)}
+                  />
+                  {t(`ResDEX 1`)}
+                </Tab>
+                <Tab className={styles.tab}>
+                  <i
+                    className={this.getChildProcessStatusClassNames('RESDEX_PRIVACY2')}
+                    title={childProcess.getStatusName(this.props.settings.childProcessesStatus.RESDEX_PRIVACY2)}
+                  />
+                  {t(`ResDEX 2`)}
                 </Tab>
                 <Tab className={styles.tab}>
                   <i
