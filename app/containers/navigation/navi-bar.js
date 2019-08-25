@@ -118,6 +118,12 @@ class NaviBar extends Component<Props> {
             <NavLink to="/resdex">
               {t(`ResDEX`)}
 
+              {resDexStatus !== 'RUNNING' && this.props.resDex.login.isRequired &&
+                <div className={styles.comingSoon}>
+                  {t(`Beta`)}
+                </div>
+              }
+
               {!this.props.resDex.login.isRequired &&
                 <div
                   className={cn(

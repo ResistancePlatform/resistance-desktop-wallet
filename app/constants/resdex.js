@@ -21,6 +21,10 @@ const RESDEX = {
       useElectrum: true
     },
     {
+      symbol: 'BCH',
+      useElectrum: true
+    },
+    {
       symbol: 'USDT',
       useElectrum: false
     },
