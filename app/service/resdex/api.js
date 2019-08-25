@@ -299,6 +299,8 @@ class ResDexApiService {
       amount: amount.toString()
     })
 
+    log.debug(`Dynamic trust response`, response)
+
     return {
       address: response.address,
       zCredits: Decimal(response.zcredits),

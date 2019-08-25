@@ -82,9 +82,9 @@ export class ResDex extends Component<Props> {
           interval={10.0}
           criticalChildProcess="RESDEX"
           actions={{
-            polling: ResDexAccountsActions.getDynamicTrust,
-            success: ResDexAccountsActions.gotDynamicTrust,
-            failure: ResDexAccountsActions.getDynamicTrustFailed
+            polling: ResDexAccountsActions.getZCredits,
+            success: ResDexAccountsActions.gotZCredits,
+            failure: ResDexAccountsActions.getZCreditsFailed
           }}
         />
 
