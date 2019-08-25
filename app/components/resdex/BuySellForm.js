@@ -193,6 +193,7 @@ class BuySellForm extends Component<Props> {
         id="resDexBuySell"
         className={cn(styles.form, this.props.className)}
         schema={getValidationSchema(t, isAdvanced)}
+        overrideOnMount
         clearOnUnmount
       >
 
@@ -267,7 +268,7 @@ class BuySellForm extends Component<Props> {
                   bestPrice={this.getBestPrice()}
                   baseCurrency={baseCurrency}
                   quoteCurrency={quoteCurrency}
-                  disabled={orderAttrs.isMarket && orderAttrs.isPrivate}
+                  disabled={orderAttrs.isMarket || orderAttrs.isPrivate}
                 />
 
               </div>

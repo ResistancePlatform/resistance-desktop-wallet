@@ -186,8 +186,10 @@ const getCreateLimitOrderObservable = (options, successObservable, failureAction
   log.debug(`Submitting a swap (limit order)`, requestOpts)
 
   const orderObservable = from(mainApi.createLimitOrder(requestOpts)).pipe(
-    switchMap(response => {
-      if (response.result !== 'success') {
+    switchMap(result => {
+      log.debug(`Limit response:`, JSON.stringify(result))
+
+      if (!result || !result.uuid) {
         const message = t(`Something unexpected happened. Are you sure you have enough UTXO?`)
         return of(failureAction(message))
       }
@@ -230,7 +232,7 @@ const getCreateLimitOrderObservable = (options, successObservable, failureAction
     }),
     catchError(err => {
       log.error(`Swap error`, err)
-      return of(failureAction(t(`Can't create a limit order, check the log for details`)))
+      return of(failureAction(t(`Can't create a limit order: {{error}}`, err.message)))
     })
   )
 
@@ -461,7 +463,7 @@ const createPrivateOrder = (action$: ActionsObservable<Action>, state$) => actio
 const createOrderSucceeded = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexBuySellActions.createOrderSucceeded),
   map(() => {
-    toastr.success(t(`Market order created successfully`))
+    toastr.success(t(`Order created successfully`))
     return ResDexBuySellActions.empty()
   })
 )

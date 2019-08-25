@@ -368,14 +368,15 @@ class ResDexApiService {
    *
 	 * @memberof ResDexApiService
 	 */
-  createLimitOrder(opts) {
-    return this.query({
+  async createLimitOrder(opts) {
+    const response = await this.query({
       method: 'setprice',
       base: opts.baseCurrency,
       rel: opts.quoteCurrency,
       volume: opts.baseCurrencyAmount,
       price: opts.price.toNumber(),
     })
+    return response.result
   }
 
 	/**

@@ -18,6 +18,7 @@ type Props = {
   options?: object,
   onValidate?: (errors: object) => void,
   important?: boolean,
+  overrideOnMount?: boolean,
   clearOnUnmount?: boolean,
   children: any
 }
@@ -41,9 +42,10 @@ class RoundedForm extends Component<Props> {
 	 * @memberof RoundedForm
 	 */
   componentDidMount() {
-    if (!this.props.roundedForm[this.props.id]) {
-      this.props.actions.updateFields(this.props.id, this.defaultValues, false)
+    if (!this.props.overrideOnMount && this.props.roundedForm[this.props.id]) {
+      return
     }
+    this.props.actions.updateFields(this.props.id, this.defaultValues, false)
   }
 
 	/**
