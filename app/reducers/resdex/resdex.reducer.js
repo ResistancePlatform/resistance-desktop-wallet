@@ -82,7 +82,13 @@ export type ResDexState = {
     enhancedPrivacy: boolean,
     ohlc: object[],
     trades: object[],
+    tradesPair: {
+      baseCurrency?: string,
+      quoteCurrency?: string
+    },
     tradingChart: {
+      baseCurrency?: string,
+      quoteCurrency?: string,
       period: string,
       type: 'candlestick' | 'heikin-ashi' | 'kagi' | 'point-figure' | 'renko',
       indicators: {

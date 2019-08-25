@@ -3,7 +3,6 @@ import { remote } from 'electron'
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
 import { RESDEX } from '~/constants/resdex'
-import { InteractiveYCoordinate } from 'react-stockcharts/lib/interactive'
 
 export const preloadedState: State = {
   auth: {
@@ -172,7 +171,13 @@ export const preloadedState: State = {
       enhancedPrivacy: false,
       ohlc: [],
       trades: [],
+      tradesPair: {
+        baseCurrency: 'RES',
+        quoteCurrency: 'ETH'
+      },
       tradingChart: {
+        baseCurrency: 'RES',
+        quoteCurrency: 'ETH',
         period: 'day',
         type: 'candlestick',
         indicators: {

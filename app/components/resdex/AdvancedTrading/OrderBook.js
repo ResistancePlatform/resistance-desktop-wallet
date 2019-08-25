@@ -1,7 +1,9 @@
 // @flow
 import React, { Component } from 'react'
 import { translate } from 'react-i18next'
+import { connect } from 'react-redux'
 import cn from 'classnames'
+import log from 'electron-log'
 
 import { toDecimalPlaces } from '~/utils/decimal'
 import {
@@ -10,11 +12,13 @@ import {
   UniformListRow,
   UniformListColumn
 } from '~/components/uniform-list'
+import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 
 import styles from './OrderBook.scss'
 
 type Props = {
   t: any,
+  resDex: ResDexState,
   className?: string,
   baseCurrency: string,
   quoteCurrency: string,
@@ -33,7 +37,7 @@ class OrderBook extends Component<Props> {
 
   getListHeaderRenderer() {
     const { t } = this.props
-    const { baseCurrency, quoteCurrency } = this.props
+    const { baseCurrency, quoteCurrency } = this.props.resDex.buySell
 
     return (
       <UniformListHeader>
@@ -85,7 +89,12 @@ class OrderBook extends Component<Props> {
 
 	render() {
     const { t } = this.props
-    const { asks, bids } = this.props.orderBook
+
+    const { baseCurrency, quoteCurrency } = this.props.resDex.buySell
+    const { baseCurrency: base, quoteCurrency: rel, baseQuote } = this.props.resDex.buySell.orderBook
+
+    log.debug(baseCurrency, quoteCurrency, base, rel)
+    const isLoading = baseCurrency !== base || quoteCurrency !== rel
 
     return (
       <div className={cn(styles.orderBook, this.props.className)}>
@@ -97,10 +106,11 @@ class OrderBook extends Component<Props> {
 
           <UniformList
             className={styles.list}
-            items={asks}
+            items={baseQuote.asks}
             headerRenderer={() => this.getListHeaderRenderer()}
             rowRenderer={item => this.getListRowRenderer(item, this.props.baseSmartAddress, true)}
             emptyMessage={t(`No liquidity available yet`)}
+            loading={isLoading}
           />
 
         </div>
@@ -112,10 +122,11 @@ class OrderBook extends Component<Props> {
 
           <UniformList
             className={styles.list}
-            items={bids}
+            items={baseQuote.bids}
             headerRenderer={() => this.getListHeaderRenderer()}
             rowRenderer={item => this.getListRowRenderer(item, this.props.quoteSmartAddress, false)}
             emptyMessage={t(`No liquidity available yet`)}
+            loading={isLoading}
           />
 
         </div>
@@ -125,4 +136,8 @@ class OrderBook extends Component<Props> {
   }
 }
 
-export default translate('resdex')(OrderBook)
+const mapStateToProps = state => ({
+	resDex: state.resDex,
+})
+
+export default connect(mapStateToProps, null)(translate('resdex')(OrderBook))

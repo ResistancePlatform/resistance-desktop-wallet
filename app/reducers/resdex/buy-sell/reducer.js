@@ -40,7 +40,7 @@ export const ResDexBuySellActions = createActions(
     GET_OHLC_FAILED: undefined,
 
     GET_TRADES: undefined,
-    GOT_TRADES: (trades: object[]) => ({ trades }),
+    GOT_TRADES: (pair: object, trades: object[]) => ({ pair, trades }),
     GET_TRADES_FAILED: undefined,
 
     UPDATE_CHART_SETTINGS: (settings: object) => ({ ...settings }),
@@ -164,6 +164,7 @@ export const ResDexBuySellReducer = handleActions(
     [ResDexBuySellActions.gotTrades]: (state, action) => ({
       ...state,
       trades: action.payload.trades,
+      tradesPair: action.payload.pair
     }),
 
     // Chart Settings

@@ -544,7 +544,7 @@ const getTrades = (action$: ActionsObservable<Action>, state$) => action$.pipe(
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
 
     const tradesObservable = from(mainApi.getTrades(baseCurrency, quoteCurrency)).pipe(
-      map(trades => ResDexBuySellActions.gotTrades(trades)),
+      map(trades => ResDexBuySellActions.gotTrades({baseCurrency, quoteCurrency}, trades)),
       catchError(err => {
         log.error(`Can't get order trades`, err)
         toastr.error(t(`Error getting trades, please check the log for details`))

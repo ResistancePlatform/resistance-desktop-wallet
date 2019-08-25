@@ -1,5 +1,6 @@
 import moment from 'moment'
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 
@@ -17,6 +18,7 @@ type Props = {
   t: any,
   baseCurrency: string,
   quoteCurrency: string,
+  resDex: ResDexState,
   trades: object
 }
 
@@ -62,6 +64,10 @@ class Trades extends Component<Props> {
 	render() {
     const { t, trades } = this.props
 
+    const { baseCurrency, quoteCurrency } = this.props.resDex.buySell.tradesPair
+    const { baseCurrency: base, quoteCurrency: rel } = this.props
+    const isLoading = baseCurrency !== base || quoteCurrency !== rel
+
     return (
         <div className={styles.trades}>
           <div className={styles.title}>
@@ -76,6 +82,7 @@ class Trades extends Component<Props> {
             rowRenderer={item => this.getListRowRenderer(item)}
             emptyMessage={t(`No market trades available yet`)}
             scrollable
+            loading={isLoading}
           />
 
         </div>
@@ -83,4 +90,8 @@ class Trades extends Component<Props> {
   }
 }
 
-export default translate('resdex')(Trades)
+const mapStateToProps = state => ({
+	resDex: state.resDex,
+})
+
+export default connect(mapStateToProps, null)(translate('resdex')(Trades))

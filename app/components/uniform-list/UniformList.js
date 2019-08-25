@@ -6,6 +6,7 @@ import { translate } from 'react-i18next'
 
 import styles from './UniformList.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
+import animatedSpinner from '~/assets/images/animated-spinner.svg'
 
 type Props = {
   t: any,
@@ -13,6 +14,7 @@ type Props = {
   emptyMessage?: string | false,
   sortKeys?: string[],
   scrollable?: boolean,
+  loading?: boolean,
   +items: object[],
   +headerRenderer: item => void,
   +rowRenderer: item => void
@@ -41,7 +43,8 @@ class UniformList extends Component<Props> {
 	 * @memberof UniformList
 	 */
   getHeader() {
-    return React.cloneElement(this.header, {
+    const header = this.props.headerRenderer()
+    return React.cloneElement(header, {
       className: cn(styles.header, this.header.props.className),
       header: true
     })
@@ -82,6 +85,16 @@ class UniformList extends Component<Props> {
     return sortedItems
   }
 
+  getSpinner() {
+    const { t } = this.props
+    return (
+      <img
+        className={styles.spinner}
+        src={animatedSpinner}
+        alt={t(`Loading...`)}
+      />
+    )
+  }
 
 	/**
 	 * @memberof UniformList
@@ -89,7 +102,18 @@ class UniformList extends Component<Props> {
   render() {
     const { t } = this.props
 
-    const emptyMessage = this.props.emptyMessage === false ? '' : this.props.emptyMessage || t(`No data to display.`)
+    let emptyMessage
+
+    if (this.props.loading) {
+      emptyMessage = (
+        <React.Fragment>
+          {this.getSpinner()}
+          {t(`Loading…`)}
+        </React.Fragment>
+      )
+    } else {
+      emptyMessage = this.props.emptyMessage === false ? '' : this.props.emptyMessage || t(`No data to display.`)
+    }
 
     return (
       <div className={cn(
@@ -101,7 +125,7 @@ class UniformList extends Component<Props> {
 
         {this.props.items.length > 0 && this.getHeader()}
 
-        {this.props.items.length
+        {!this.props.loading && this.props.items.length
           ? this.getSortedItems().map((item, index) => this.applyColumnWidths(this.props.rowRenderer(item, index)))
           : (
             <div className={styles.emptyMessage}>
