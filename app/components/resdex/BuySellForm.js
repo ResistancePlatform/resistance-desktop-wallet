@@ -293,7 +293,7 @@ class BuySellForm extends Component<Props> {
         {orderAttrs.isMarket &&
         <div className={styles.bottomControls}>
 
-          <CheckBox name="enhancedPrivacy" className={styles.enhancedPrivacyCheckbox} defaultValue={false}>
+          <CheckBox name="enhancedPrivacy" className={styles.enhancedPrivacyCheckbox} defaultValue={false} disabled>
             {t(`Enhanced privacy`)}
 
             <Info

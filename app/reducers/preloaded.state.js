@@ -170,14 +170,16 @@ export const preloadedState: State = {
       },
       enhancedPrivacy: false,
       ohlc: [],
+      ohlcPair: {
+        baseCurrency: 'RES',
+        quoteCurrency: 'ETH',
+      },
       trades: [],
       tradesPair: {
         baseCurrency: 'RES',
         quoteCurrency: 'ETH'
       },
       tradingChart: {
-        baseCurrency: 'RES',
-        quoteCurrency: 'ETH',
         period: 'day',
         type: 'candlestick',
         indicators: {
@@ -249,20 +251,6 @@ export const preloadedState: State = {
         secretFunds: false
       }
     }
-  },
-  dutchAuction: {
-    status: {},
-    user: {
-      ethAddress: null,
-      ethCommitted: null,
-    },
-    resAddress: null,
-    credentials: {
-      userId: null,
-      accessToken: null,
-    },
-    isGeneratingAddress: false,
-    isRegistering: false
   },
 }
 

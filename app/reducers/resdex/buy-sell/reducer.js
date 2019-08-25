@@ -36,7 +36,7 @@ export const ResDexBuySellActions = createActions(
     CREATE_LIMIT_ORDER: undefined,
 
     GET_OHLC: undefined,
-    GOT_OHLC: (ohlc: object[]) => ({ ohlc }),
+    GOT_OHLC: (pair: object, ohlc: object[]) => ({ pair, ohlc }),
     GET_OHLC_FAILED: undefined,
 
     GET_TRADES: undefined,
@@ -159,6 +159,7 @@ export const ResDexBuySellReducer = handleActions(
 
     [ResDexBuySellActions.gotOhlc]: (state, action) => ({
       ...state,
+      ohlcPair: action.payload.pair,
       ohlc: action.payload.ohlc,
     }),
     [ResDexBuySellActions.gotTrades]: (state, action) => ({

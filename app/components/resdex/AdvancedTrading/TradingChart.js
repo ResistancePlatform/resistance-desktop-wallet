@@ -52,6 +52,7 @@ import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import TradingChartSettings from './TradingChartSettings'
 
 import styles from './TradingChart.scss'
+import animatedSpinner from '~/assets/images/animated-spinner.svg'
 
 type Props = {
   t: any,
@@ -462,7 +463,7 @@ class TradingChart extends Component<Props> {
    * @memberof TradingChart
 	 */
 	render() {
-    const { width, ratio } = this.props
+    const { t, width, ratio } = this.props
 
 		const margin = { left: 50, right: 50, top: 20, bottom: 30 }
     const { xGrid, yGrid } = this.getGrids(margin)
@@ -487,13 +488,27 @@ class TradingChart extends Component<Props> {
 
 
     const { baseCurrency, quoteCurrency } = this.props.resDex.buySell
+    const { baseCurrency: base, quoteCurrency: rel } = this.props.resDex.buySell.ohlcPair
+
+    const isLoading = baseCurrency !== base || quoteCurrency !== rel
+
     const orders = this.getActiveOrders()
 
 		return (
       <div className={styles.container} ref={el => this.containerRef(el)}>
         <TradingChartSettings />
 
-        {data.length > 1 &&
+        {isLoading &&
+          <div className={styles.loading}>
+            <img
+              className={styles.spinner}
+              src={animatedSpinner}
+              alt={t(`Loading...`)}
+            />
+          </div>
+        }
+
+        {!isLoading && data.length > 1 &&
         <ChartCanvas
           ref={el => this.chartRef(el)}
           height={height}

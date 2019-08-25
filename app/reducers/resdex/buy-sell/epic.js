@@ -526,7 +526,7 @@ const getOhlc = (action$: ActionsObservable<Action>, state$) => action$.pipe(
     // const ohlcObservable = from(getMsftOhlcDataPromise()).pipe(
 
     const ohlcObservable = from(mainApi.getOhlc(baseCurrency, quoteCurrency, periodSeconds)).pipe(
-      map(ohlc => ResDexBuySellActions.gotOhlc(ohlc)),
+      map(ohlc => ResDexBuySellActions.gotOhlc({baseCurrency, quoteCurrency}, ohlc)),
       catchError(err => {
         log.error(`Can't get order ticks`, err)
         toastr.error(t(`Error getting price ticks, please check the log for details`))
@@ -602,6 +602,21 @@ const saveIndicator = (action$: ActionsObservable<Action>, state$) => action$.pi
   })
 )
 
+const updateBaseCurrency = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+  ofType(ResDexBuySellActions.updateBaseCurrency, ResDexBuySellActions.updateQuoteCurrency),
+  switchMap(() => {
+    const { selectedTabIndex } = state$.value.resDex.common
+    if (selectedTabIndex === 2) {
+      return of(
+        ResDexBuySellActions.getOrderBook(),
+        ResDexBuySellActions.getOhlc(),
+        ResDexBuySellActions.getTrades()
+      )
+    }
+    return of(ResDexBuySellActions.getOrderBook())
+  })
+)
+
 export const ResDexBuySellEpic = (action$, state$) => merge(
   createOrder(action$, state$),
   createPrivateOrder(action$, state$),
@@ -619,5 +634,6 @@ export const ResDexBuySellEpic = (action$, state$) => merge(
   cancelIndicatorEdition(action$, state$),
   removeIndicator(action$, state$),
   saveIndicator(action$, state$),
+  updateBaseCurrency(action$, state$),
 )
 
