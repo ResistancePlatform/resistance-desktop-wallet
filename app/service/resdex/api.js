@@ -287,6 +287,7 @@ class ResDexApiService {
       rel: opts.quoteCurrency,
       volume: opts.amount.toNumber(),
       price: opts.price.toNumber(),
+      instant_swap: true,
     })
 
     return response.result
@@ -375,6 +376,7 @@ class ResDexApiService {
       rel: opts.quoteCurrency,
       volume: opts.baseCurrencyAmount,
       price: opts.price.toNumber(),
+      instant_swap: true,
     })
     return response.result
   }
