@@ -40,6 +40,7 @@ const supportedCurrencies = [
     id_in_cmc: 'aeternity',
     etomic: '0x5ca9a71b1d01849c0a95490cc00559717fcf0d1d',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'AST',
@@ -47,6 +48,7 @@ const supportedCurrencies = [
     id_in_cmc: 'airswap',
     etomic: '0x27054b13b1B798B345b591a4d22e6562d47eA75a',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'BAT',
@@ -54,6 +56,7 @@ const supportedCurrencies = [
     id_in_cmc: 'basic-attention-token',
     etomic: '0x0D8775F648430679A709E98d2b0Cb6250d2887EF',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'BCH',
@@ -124,6 +127,7 @@ const supportedCurrencies = [
     name: 'Bytom',
     etomic: '0xcB97e65F07DA24D46BcDD078EBebd7C6E6E3d750',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'CMT',
@@ -131,6 +135,7 @@ const supportedCurrencies = [
     id_in_cmc: 'cybermiles',
     etomic: '0xf85feea2fdd81d51177f6b8f35f0e6734ce45f5f',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'CVC',
@@ -138,6 +143,7 @@ const supportedCurrencies = [
     id_in_cmc: 'civic',
     etomic: '0x41e5560054824eA6B0732E656E3Ad64E20e94E45',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'DASH',
@@ -192,6 +198,7 @@ const supportedCurrencies = [
     etomic: '0xE0B7927c4aF23765Cb51314A0E0521A9645F0E2A',
     decimals: 9,
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'DOGE',
@@ -222,6 +229,7 @@ const supportedCurrencies = [
     id_in_cmc: 'aelf',
     etomic: '0xbf2179859fc6D5BEE9Bf9158632Dc51678a4100e',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'ENG',
@@ -229,12 +237,14 @@ const supportedCurrencies = [
     id_in_cmc: 'enigma',
     etomic: '0xf0ee6b27b759c9893ce4f094b49ad28fd15a23e4',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'EOS',
     name: 'EOS',
     etomic: '0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'RES',
@@ -305,12 +315,14 @@ const supportedCurrencies = [
     etomic: '0xb5a5f22694352c15b00323844ad545abb2b11028',
     decimals: 18,
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'IOST',
     name: 'IOST',
     etomic: '0xfa1a856cfa3409cfa145fa4e20eb270df3eb21ab',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'KMD',
@@ -336,6 +348,7 @@ const supportedCurrencies = [
     id_in_cmc: 'kyber-network',
     etomic: '0xdd974D5C2e2928deA5F71b9825b8b646686BD200',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'LINK',
@@ -343,6 +356,7 @@ const supportedCurrencies = [
     id_in_cmc: 'chainlink',
     etomic: '0x514910771af9ca656af840dff83e8264ecf986ca',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'LOOM',
@@ -350,6 +364,7 @@ const supportedCurrencies = [
     id_in_cmc: 'loom-network',
     etomic: '0xa4e8c3ec456107ea67d3075bf9e3df3a75823db0',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'LTC',
@@ -384,12 +399,14 @@ const supportedCurrencies = [
     id_in_cmc: 'lunyr',
     etomic: '0xfa05A73FfE78ef8f1a739473e462c54bae6567D9',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'MAN',
     name: 'Matrix AI Network',
     etomic: '0xe25bCec5D3801cE3a794079BF94adF1B8cCD802D',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'MANA',
@@ -397,6 +414,7 @@ const supportedCurrencies = [
     id_in_cmc: 'decentraland',
     etomic: '0x0F5D2fB29fb7d3CFeE444a200298f468908cC942',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'MCO',
@@ -404,6 +422,7 @@ const supportedCurrencies = [
     id_in_cmc: 'crypto-com',
     etomic: '0xB63B606Ac810a52cCa15e44bB630fd42D8d1d83d',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'MONA',
@@ -438,6 +457,7 @@ const supportedCurrencies = [
     id_in_cmc: 'metal',
     etomic: '0xF433089366899D83a9f26A773D59ec7eCF30355e',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'NAS',
@@ -445,6 +465,7 @@ const supportedCurrencies = [
     id_in_cmc: 'nebulas-token',
     etomic: '0x5d65d971895edc438f465c17db6992698a52318d',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'NEXO',
@@ -452,6 +473,7 @@ const supportedCurrencies = [
     id_in_cmc: 'nexo',
     etomic: '0xb62132e35a6c13ee1ee0f84dc5d40bad8d815206',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'NULS',
@@ -459,6 +481,7 @@ const supportedCurrencies = [
     id_in_cmc: 'nuls',
     etomic: '0xb91318f35bdb262e9423bc7c7c2a3a93dd93c92c',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'OMG',
@@ -466,6 +489,7 @@ const supportedCurrencies = [
     id_in_cmc: 'omisego',
     etomic: '0xd26114cd6EE289AccF82350c8d8487fedB8A0C07',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'PAY',
@@ -473,6 +497,7 @@ const supportedCurrencies = [
     id_in_cmc: 'tenx',
     etomic: '0xB97048628DB6B661D4C2aA833e95Dbe1A905B280',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'POLY',
@@ -480,6 +505,7 @@ const supportedCurrencies = [
     id_in_cmc: 'polymath-network',
     etomic: '0x9992ec3cf6a55b00978cddf2b27bc6882d88d1ec',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'POWR',
@@ -487,6 +513,7 @@ const supportedCurrencies = [
     id_in_cmc: 'power-ledger',
     etomic: '0x595832f8fc6bf59c85c527fec3740a1b7a361269',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'QASH',
@@ -494,6 +521,7 @@ const supportedCurrencies = [
     id_in_cmc: 'qash',
     etomic: '0x618E75Ac90b12c6049Ba3b27f5d5F8651b0037F6',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'QSP',
@@ -501,6 +529,7 @@ const supportedCurrencies = [
     id_in_cmc: 'quantstamp',
     etomic: '0x99ea4dB9EE77ACD40B119BD1dC4E33e1C070b80d',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'QTUM',
@@ -535,6 +564,7 @@ const supportedCurrencies = [
     id_in_cmc: 'ripio-credit-network',
     etomic: '0xF970b8E36e23F7fC3FD752EeA86f8Be8D83375A6',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'RDN',
@@ -542,6 +572,7 @@ const supportedCurrencies = [
     id_in_cmc: 'raiden-network-token',
     etomic: '0x255Aa6DF07540Cb5d3d297f0D0D4D84cb52bc8e6',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'REQ',
@@ -549,6 +580,7 @@ const supportedCurrencies = [
     id_in_cmc: 'request',
     etomic: '0x8f8221aFbB33998d8584A2B05749bA73c37a938a',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'SALT',
@@ -556,6 +588,7 @@ const supportedCurrencies = [
     id_in_cmc: 'salt',
     etomic: '0x4156D3342D5c385a87D264F90653733592000581',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'SNT',
@@ -563,6 +596,7 @@ const supportedCurrencies = [
     id_in_cmc: 'status',
     etomic: '0x744d70FDBE2Ba4CF95131626614a1763DF805B9E',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'SRN',
@@ -570,6 +604,7 @@ const supportedCurrencies = [
     id_in_cmc: 'sirin-labs-token',
     etomic: '0x68d57c9a1c35f63e2c83ee8e49a64e9d70528d25',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'STORJ',
@@ -577,6 +612,7 @@ const supportedCurrencies = [
     id_in_cmc: 'storj',
     etomic: '0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'THETA',
@@ -584,6 +620,7 @@ const supportedCurrencies = [
     id_in_cmc: 'theta',
     etomic: '0x3883f5e181fccaF8410FA61e12b59BAd963fb645',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'USDT',
@@ -594,6 +631,7 @@ const supportedCurrencies = [
     swap_contract_address: '0xd85275Fa3F3Ef844E9D4C38822552568039F1BD4',
     is_legacy: true,
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'WAX',
@@ -601,6 +639,7 @@ const supportedCurrencies = [
     id_in_cmc: 'wax',
     etomic: '0x39Bb259F66E1C59d5ABEF88375979b4D20D98022',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'WTC',
@@ -608,6 +647,7 @@ const supportedCurrencies = [
     id_in_cmc: 'waltonchain',
     etomic: '0xb7cb1c96db6b22b0d3d9536e0108d062bd488f74',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'XZC',
@@ -659,6 +699,7 @@ const supportedCurrencies = [
     id_in_cmc: 'zilliqa',
     etomic: '0x05f4a42e251f2d52b8ed15e9fedaacfcef1fad27',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
     coin: 'ZRX',
@@ -666,6 +707,7 @@ const supportedCurrencies = [
     id_in_cmc: '0x',
     etomic: '0xE41d2489571d322189246DaFA5ebDe1F4699F498',
     rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
 ]
 
