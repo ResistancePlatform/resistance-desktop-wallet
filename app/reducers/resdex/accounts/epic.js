@@ -50,6 +50,7 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
           [processName]: responseToCurrencies(result[index])
         }), {})
 
+        log.debug(`ResDEX Privacy 1 balance:`, currencies.RESDEX_PRIVACY1.RES.balance.toString())
         return of(ResDexAccountsActions.gotCurrencies(currencies))
       }),
       catchError(err => of(ResDexAccountsActions.getCurrenciesFailed(err.message)))

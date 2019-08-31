@@ -281,5 +281,5 @@ export const ResDexBuySellReducer = handleActions(
         ...state.editTextModal,
         isVisible: false
       }
-    }),
+    })
   }, preloadedState)

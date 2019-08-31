@@ -97,7 +97,7 @@ class ResDexOrders extends Component<Props> {
           <i className={cn('icon', styles.private, { [styles.enabled]: order.isPrivate })} />
         </UniformListColumn>
         <UniformListColumn>
-          <span className={cn(styles.status, styles[order.status])}>
+          <span className={cn(styles.status, styles[order.isPrivate ? order.privacy.status : order.status])}>
             {getOrderStatusName(order)}
           </span>
         </UniformListColumn>

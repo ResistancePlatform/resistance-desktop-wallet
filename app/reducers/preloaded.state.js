@@ -212,6 +212,7 @@ export const preloadedState: State = {
       isInitialKickStartDone: false,
       pendingSwaps: {},
       swapHistory: [],
+      privateSwaps: {},
       orderModal: {
         isVisible: false,
         uuid: null
@@ -297,6 +298,32 @@ RESDEX.alwaysEnabledCurrencies.forEach(currency => {
   if (index === -1) {
     enabledCurrencies.push(currency)
   }
+})
+
+const failUnfinishedSwaps = swaps => Object.keys(swaps).reduce((accumulated, uuid) => {
+  const swap = swaps[uuid]
+
+  const status = ['failed', 'completed', 'cancelled'].includes(swap.status)
+    ? swap.status
+    : 'failed'
+
+  const result = {
+    ...accumulated,
+    [uuid]: {
+      ...swap,
+      quoteCurrencyAmount: Decimal(swap.quoteCurrencyAmount),
+      baseCurrencyAmount: Decimal(swap.baseCurrencyAmount),
+      initialMainResBalance: Decimal(swap.initialMainResBalance),
+      initialPrivacy2ResBalance: Decimal(swap.initialPrivacy2ResBalance),
+      status
+    }
+  }
+
+  return result
+}, {})
+
+Object.assign(preloadedState.resDex.orders, {
+  privateSwaps: failUnfinishedSwaps(config.get('resDex.privateSwaps', {}))
 })
 
 Object.assign(preloadedState.resDex.accounts, {

@@ -104,8 +104,8 @@ class ResDexApiService {
 			method: 'withdraw',
 			coin: opts.symbol,
 			amount: opts.amount,
-			to:opts.address,
-			broadcast: 1,
+			to: opts.address,
+			broadcast: true,
 		})
 
 		if (!response.tx_hash) {
@@ -358,6 +358,27 @@ class ResDexApiService {
   async getRecentSwaps() {
     const response = await this.query({ method: 'my_recent_swaps' })
     return response.result
+  }
+
+  async getMakerOrders() {
+    const response = await this.query({ method: 'my_orders' })
+    log.debug(`My orders response:`, response)
+
+    const { maker_orders: makerOrders } = response.result
+
+    const result = Object.values(makerOrders).map(o => ({
+      uuid: o.uuid,
+      baseCurrency: o.base,
+      quoteCurrency: o.rel,
+      price: Decimal(o.price),
+      baseCurrencyAmount: Decimal(o.available_amount),
+      quoteCurrencyAmount: Decimal(o.available_amount).times(Decimal(o.price)),
+      timeStarted: moment(o.created_at).toDate(),
+      isInstantSwap: o.instant_swap,
+      isCancellable: o.cancellable,
+    }))
+
+    return result
   }
 
   async stop() {

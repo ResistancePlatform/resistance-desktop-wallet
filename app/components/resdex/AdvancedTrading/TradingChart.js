@@ -110,7 +110,7 @@ class TradingChart extends Component<Props> {
 
     if (sourceData.length === 1) {
       log.debug(`Tweaking data of length`, sourceData.length)
-      for (let day = -1; day > -10; day -= 1) {
+      for (let day = -1; day > -2; day -= 1) {
         const dayDate = new Date(sourceData[0].date.getTime())
         dayDate.setDate(dayDate.getDate() + day)
         data.unshift({
@@ -454,7 +454,7 @@ class TradingChart extends Component<Props> {
 	 */
   getActiveOrders() {
     const { swapHistory } = this.props.resDex.orders
-    const orders = swapHistory.filter(s => s.isActive)
+    const orders = swapHistory.filter(s => s.isActive && !s.isHidden)
     return orders
   }
 

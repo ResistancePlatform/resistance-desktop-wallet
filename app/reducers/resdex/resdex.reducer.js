@@ -9,7 +9,7 @@ import { ResDexLoginReducer } from './login/reducer'
 import { ResDexKycReducer } from './kyc/reducer'
 import { ResDexAssetsReducer } from './assets/reducer'
 import { ResDexBuySellReducer } from './buy-sell/reducer'
-import { ResDexOrdersReducer } from './orders/reducer'
+import { ResDexOrdersReducer, PrivateOrder } from './orders/reducer'
 import { EnabledCurrency, ResDexAccountsReducer } from './accounts/reducer'
 
 
@@ -115,6 +115,7 @@ export type ResDexState = {
     isInitialKickStartDone: boolean,
     pendingSwaps: {},
     swapHistory: [],
+    privateSwaps: {[string]: PrivateOrder},
     orderModal: {
       isVisible: boolean,
       uuid: string | null

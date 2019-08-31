@@ -90,6 +90,7 @@ function getOrders(options) {
 
   return (
     <InteractiveYCoordinate
+      enabled={false}
       ref={el => ref(interactiveType, chartId, el)}
       yCoordinateList={yCoordinateList}
       defaultPriceCoordinate={defaultPriceCoordinate}

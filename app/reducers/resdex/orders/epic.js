@@ -4,20 +4,22 @@ import moment from 'moment'
 import { remote } from 'electron'
 import log from 'electron-log'
 import { of, from, merge } from 'rxjs'
-import { switchMap, catchError } from 'rxjs/operators'
+import { map, switchMap, catchError } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
+import config from 'electron-settings'
 
 import { RESDEX } from '~/constants/resdex'
+import { flattenDecimals } from '~/utils/decimal'
 import { translate } from '~/i18next.config'
 import { resDexApiFactory } from '~/service/resdex/api'
 import { ResDexOrdersActions } from './reducer'
 
 
 const t = translate('resdex')
-const api = resDexApiFactory('RESDEX')
+const mainApi = resDexApiFactory('RESDEX')
 
-function recentSwapsToOrders(swaps) {
+function recentSwapsToOrders(swaps, privateSwaps) {
 
   const orderStatus = events => {
     const unmatched = events.find(event => event.event.type === 'NegotiateFailed')
@@ -43,7 +45,10 @@ function recentSwapsToOrders(swaps) {
     return 'swapping'
   }
 
-  const orders = swaps.swaps.map(swap => {
+  const convert = swap => {
+    const privateSwap = privateSwaps[swap.uuid]
+    const isHidden = Boolean(Object.values(privateSwaps).find(s => swap.uuid === s.privacy2Uuid))
+
     let order = {
       uuid: swap.uuid,
       status: 'pending',
@@ -51,9 +56,9 @@ function recentSwapsToOrders(swaps) {
       baseTxId: null,
       quoteTxId: null,
       isMarket: swap.type === 'Taker',
-      isPrivate: false,
-      isHidden: false,
+      isPrivate: Boolean(privateSwap),
       isActive: true,
+      isHidden,
     }
 
     if (!swap.events.length) {
@@ -70,7 +75,8 @@ function recentSwapsToOrders(swaps) {
     const quoteCurrencyAmount = Decimal(startedEvent.event.data.taker_amount)
 
     let status = orderStatus(swap.events)
-    let isActive = !['completed', 'failed', 'cancelled'].includes(status)
+    const finishedOrders = ['completed', 'failed', 'cancelled']
+    let isActive = !finishedOrders.includes(status)
 
     const momentStarted = moment(startedEvent.timestamp)
 
@@ -79,23 +85,56 @@ function recentSwapsToOrders(swaps) {
       isActive = false
     }
 
+    if (privateSwap) {
+      order = {
+        ...order,
+        price: privateSwap.baseCurrencyAmount.div(privateSwap.quoteCurrencyAmount),
+        privacy: privateSwap,
+        baseCurrency: privateSwap.baseCurrency,
+        quoteCurrency: privateSwap.quoteCurrency,
+        baseCurrencyAmount: privateSwap.baseCurrencyAmount,
+        quoteCurrencyAmount: privateSwap.quoteCurrencyAmount,
+      }
+    } else {
+      order = {
+        ...order,
+        price: baseCurrencyAmount.div(quoteCurrencyAmount),
+        baseCurrency: startedEvent.event.data.maker_coin,
+        quoteCurrency: startedEvent.event.data.taker_coin,
+        baseCurrencyAmount,
+        quoteCurrencyAmount,
+      }
+    }
+
     order = {
       ...order,
-      baseCurrency: startedEvent.event.data.maker_coin,
-      quoteCurrency: startedEvent.event.data.taker_coin,
-      baseCurrencyAmount,
-      quoteCurrencyAmount,
-      price: baseCurrencyAmount.div(quoteCurrencyAmount),
       baseTxId: makerPayment && makerPayment.event.data.tx_hash,
       quoteTxId: takerPayment && takerPayment.event.data.tx_hash,
       eventTypes: swap.events.map(e => e.event.type),
       timeStarted: momentStarted.toDate(),
       status,
-      isActive,
+      isActive: privateSwap ? !finishedOrders.includes(privateSwap.status) : isActive
     }
 
     return order
-  })
+  }
+  const orders = swaps.map(convert)
+
+  return orders
+}
+
+function makerOrdersToOrders(makerOrders) {
+  log.debug(`Maker orders`, makerOrders)
+
+  const orders = makerOrders.map(o => ({
+    ...o,
+    status: 'pending',
+    isPrivate: false,
+    isHidden: false,
+    isActive: true,
+    isMarket: false,
+    privacy: null,
+  }))
 
   return orders
 }
@@ -103,9 +142,26 @@ function recentSwapsToOrders(swaps) {
 const getSwapHistoryEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexOrdersActions.getSwapHistory),
   switchMap(() => {
-    const observable = from(api.getRecentSwaps()).pipe(
-      switchMap(recentSwaps => {
-        const orders = recentSwapsToOrders(recentSwaps)
+    const processNames = ['RESDEX', 'RESDEX_PRIVACY2', null]
+
+    const getRecentSwapsPromise = Promise.all(processNames.map(processName => {
+      if (processName === null) {
+        return mainApi.getMakerOrders()
+      }
+
+      const api = resDexApiFactory(processName)
+      return api.getRecentSwaps()
+    }))
+
+    const { privateSwaps } = state$.value.resDex.orders
+
+    const observable = from(getRecentSwapsPromise).pipe(
+      switchMap(([mainSwaps, privacy2Swaps, makerOrders]) => {
+        const recentSwaps = mainSwaps.swaps.concat(privacy2Swaps.swaps)
+
+        const orders = recentSwapsToOrders(recentSwaps, privateSwaps)
+          .concat(makerOrdersToOrders(makerOrders))
+
         log.debug(`Orders list updated, ${JSON.stringify(orders)}`)
 
         // Track pending activities to ask user for a quit confirmation
@@ -128,6 +184,36 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>, state$) => actio
   })
 )
 
+const savePrivateOrder = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexOrdersActions.savePrivateOrder),
+  map(action => {
+    const { order } = action.payload
+    config.set(`resDex.privateSwaps.${order.mainUuid}`, flattenDecimals(order))
+    return ResDexOrdersActions.empty()
+  })
+)
+
+const linkPrivateOrderToBaseResOrder = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexOrdersActions.linkPrivateOrderToBaseResOrder),
+  map(action => {
+    const { baseResOrderUuid } = action.payload.action.payload
+    config.set(`resDex.privateSwaps.${action.payload.uuid}.privacy2Uuid`, baseResOrderUuid)
+    return ResDexOrdersActions.empty()
+  })
+)
+
+const setPrivateOrderStatus = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexOrdersActions.setPrivateOrderStatus),
+  map(action => {
+    const { status } = action.payload
+    config.set(`resDex.privateSwaps.${action.payload.uuid}.status`, status)
+    return ResDexOrdersActions.empty()
+  })
+)
+
 export const ResDexOrdersEpic = (action$, state$) => merge(
   getSwapHistoryEpic(action$, state$),
+  setPrivateOrderStatus(action$, state$),
+  linkPrivateOrderToBaseResOrder(action$, state$),
+  savePrivateOrder(action$, state$),
 )

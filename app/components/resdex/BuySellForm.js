@@ -162,7 +162,7 @@ class BuySellForm extends Component<Props> {
 
     const arePendingPrivateOrdersPresent = swapHistory.filter(
       swap => swap.isPrivate &&
-      !['completed', 'failed'].includes(swap.privacy.status)
+      !['completed', 'failed', 'cancelled'].includes(swap.privacy.status)
     ).length
 
     const areAllAsksPresent = orderAttrs.isPrivate
