@@ -37,10 +37,13 @@ class ConfirmaitonModal extends Component<Props> {
       amount
     } = (this.props.form && this.props.form.fields || {})
 
-    const {
-      isSubmitting,
-      arePrivateTransactionsEnabled
-    } = this.props.sendCurrency
+    const { isSubmitting } = this.props.sendCurrency
+
+    const isPrivateTransaction = (
+      (fromAddress && fromAddress.startsWith('z'))
+        ||
+      (toAddress && toAddress.startsWith('z'))
+    )
 
     return (
       <div className={styles.overlay}>
@@ -74,13 +77,13 @@ class ConfirmaitonModal extends Component<Props> {
           <li className={styles.privateTransaction}>
             <span>{t(`Private transaction`)}</span>
 
-            <div className={cn('icon', styles.check, {[styles.enabled]: arePrivateTransactionsEnabled})} />
+            <div className={cn('icon', styles.check, {[styles.enabled]: isPrivateTransaction})} />
 
             <div className={styles.yesNo}>
               {t(`Yes`)}
             </div>
 
-            <div className={cn('icon', styles.check, {[styles.enabled]: !arePrivateTransactionsEnabled})} />
+            <div className={cn('icon', styles.check, {[styles.enabled]: !isPrivateTransaction})} />
 
             <div className={styles.yesNo}>
               {t(`No`)}
