@@ -14,7 +14,7 @@ export type AddressDropdownItem = {
 	address: string,
   name?: string,
 	balance: Decimal | null,
-	disabled?: boolean
+  disabled?: boolean
 }
 
 export type SendCurrencyState = {
@@ -22,7 +22,8 @@ export type SendCurrencyState = {
 	arePrivateTransactionsEnabled: boolean,
   addresses: AddressDropdownItem[],
   addressSearchString: string,
-  isSubmitting: boolean
+  isSubmitting: boolean,
+  isConfirmationModalVisible: boolean
 }
 
 export const SendCurrencyActions = createActions(
@@ -39,6 +40,9 @@ export const SendCurrencyActions = createActions(
     SEND_CURRENCY: undefined,
     SEND_CURRENCY_OPERATION_STARTED: undefined,
     SEND_CURRENCY_OPERATION_FAILED: (errorMessage: string) => ({ errorMessage }),
+
+    SHOW_CONFIRMATION_MODAL: undefined,
+    CLOSE_CONFIRMATION_MODAL: undefined,
 
     UPDATE_ADDRESS_SEARCH_STRING: searchString => ({ searchString }),
   },
@@ -72,6 +76,14 @@ export const SendCurrencyReducer = handleActions({
   [SendCurrencyActions.togglePrivateTransactions]: (state, action) => ({
     ...state,
     arePrivateTransactionsEnabled: action.payload.areEnabled
+  }),
+  [SendCurrencyActions.showConfirmationModal]: state => ({
+    ...state,
+    isConfirmationModalVisible: true,
+  }),
+  [SendCurrencyActions.closeConfirmationModal]: state => ({
+    ...state,
+    isConfirmationModalVisible: false,
   }),
   [SendCurrencyActions.updateAddressSearchString]: (state, action) => ({
     ...state,

@@ -1,23 +1,24 @@
 // @flow
 import React, { Component } from 'react'
+import { Decimal } from 'decimal.js'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
-import QRCode from 'qrcode.react'
 
-import { ResDexState } from '~/reducers/resdex/resdex.reducer'
+import { toDecimalPlaces } from '~/utils/decimal'
 import {
   RoundedButton,
 } from '~/components/rounded-form'
-import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
+import { SendCurrencyActions, SendCurrencyState } from '~/reducers/send-currency/send-currency.reducer'
 
-import styles from './ConfirmaitonModal.scss'
+import styles from './ConfirmationModal.scss'
 
 type Props = {
   t: any,
-  accounts: ResDexState.accounts,
-  actions: object
+  actions: object,
+  form: any,
+	sendCurrency: SendCurrencyState
 }
 
 /**
@@ -30,6 +31,17 @@ class ConfirmaitonModal extends Component<Props> {
 	render() {
     const { t } = this.props
 
+    const {
+      fromAddress,
+      toAddress,
+      amount
+    } = (this.props.form && this.props.form.fields || {})
+
+    const {
+      isSubmitting,
+      arePrivateTransactionsEnabled
+    } = this.props.sendCurrency
+
     return (
       <div className={styles.overlay}>
         <div className={cn(styles.container, styles.confirmation)}>
@@ -37,26 +49,61 @@ class ConfirmaitonModal extends Component<Props> {
             role="button"
             tabIndex={0}
             className={cn('icon', styles.closeButton)}
-            onClick={this.props.actions.closeConfirmaitonModal}
+            onClick={this.props.actions.closeConfirmationModal}
             onKeyDown={() => {}}
           />
 
         {/* Title */}
         <div className={styles.title}>
-          {t(`Deposit {{symbol}}`, { symbol })}
+          {t(`Please confirm your transaction`)}
         </div>
 
-        {address &&
-          <QRCode className={styles.qr} value={address} />
-        }
+        <ul className={styles.list}>
+          <li>
+            <span>{t(`From`)}</span>
+            {fromAddress}
+          </li>
+          <li>
+            <span>{t(`To`)}</span>
+            {toAddress}
+          </li>
+          <li>
+            <span>{t(`Amount`)}</span>
+            {toDecimalPlaces(Decimal(amount), 8)} RES
+          </li>
+          <li className={styles.privateTransaction}>
+            <span>{t(`Private transaction`)}</span>
 
-        <RoundedInputWithCopy
-          labelClassName={styles.addressInputLabel}
-          defaultValue={address}
-          label="Address"
-          readOnly
-        />
+            <div className={cn('icon', styles.check, {[styles.enabled]: arePrivateTransactionsEnabled})} />
 
+            <div className={styles.yesNo}>
+              {t(`Yes`)}
+            </div>
+
+            <div className={cn('icon', styles.check, {[styles.enabled]: !arePrivateTransactionsEnabled})} />
+
+            <div className={styles.yesNo}>
+              {t(`No`)}
+            </div>
+
+          </li>
+        </ul>
+
+
+        <div className={styles.buttons}>
+          <RoundedButton
+            type="submit"
+            onClick={this.props.actions.sendCurrency}
+            important
+            disabled={isSubmitting}
+          >
+            {t(`Send`)}
+          </RoundedButton>
+
+          <RoundedButton onClick={this.props.actions.closeConfirmationModal}>
+            {t(`Cancel`)}
+          </RoundedButton>
+        </div>
     </div>
     </div>
     )
@@ -64,10 +111,12 @@ class ConfirmaitonModal extends Component<Props> {
 }
 
 const mapStateToProps = state => ({
+  sendCurrency: state.sendCurrency,
+  form: state.roundedForm.sendCurrency
 })
 
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(SendCurrencyActions, dispatch)
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(ConfirmaitonModal))
+export default connect(mapStateToProps, mapDispatchToProps)(translate('send-currency')(ConfirmaitonModal))

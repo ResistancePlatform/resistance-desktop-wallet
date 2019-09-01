@@ -94,7 +94,8 @@ export const preloadedState: State = {
     arePrivateTransactionsEnabled: false,
     addresses: [],
     addressSearchString: '',
-    isSubmitting: false
+    isSubmitting: false,
+    isConfirmationModalVisible: false
 	},
 	addressBook: {
 		records: [],

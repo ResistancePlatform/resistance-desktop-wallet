@@ -22,6 +22,7 @@ import {
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { SendCurrencyActions, SendCurrencyState } from '~/reducers/send-currency/send-currency.reducer'
+import ConfirmationModal from '~/components/SendCurrency/ConfirmationModal'
 
 import styles from './send-currency.scss'
 import HLayout from '~/assets/styles/h-box-layout.scss'
@@ -189,12 +190,18 @@ class SendCurrency extends Component<Props> {
       arePrivateTransactionsEnabled
     } = this.props.sendCurrency
 
+    const { isConfirmationModalVisible } = this.props.sendCurrency
+
 		return (
 			// Layout container
 			<div
         role="none"
 				className={cn(HLayout.hBoxChild, VLayout.vBoxContainer)}
 			>
+
+      {isConfirmationModalVisible &&
+        <ConfirmationModal />
+      }
 
       <div className={cn(styles.container, VLayout.vBoxChild, HLayout.hBoxContainer)}>
 
@@ -290,7 +297,7 @@ class SendCurrency extends Component<Props> {
             <div className={styles.submitRow}>
               <RoundedButton
                 type="submit"
-                onClick={this.props.actions.sendCurrency}
+                onClick={this.props.actions.showConfirmationModal}
                 important
                 disabled={isSubmitting}
               >
