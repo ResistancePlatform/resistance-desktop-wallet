@@ -571,6 +571,7 @@ class TradingChart extends Component<Props> {
               yAccessor={d => d.close}
               fill={d => d.close > d.open ? "#00d492" : "#e20063"}
               textFill="rgb(90, 98, 131)"
+              displayFormat={format('.6f')}
               strokeOpacity={1}
               strokeWidth={0}
               arrowWidth={2}
