@@ -60,25 +60,12 @@ const supportedCurrencies = [
   },
   {
     coin: 'BCH',
-    rpcport: 33333,
-    pubtype: 0,
-    p2shtype: 5,
-    wiftype: 128,
-    txfee: 1000,
     id_in_cmc: 'bitcoin-cash',
     electrumServers: [
       {
-        host: 'electrum1.cipig.net',
-        port: 10051,
-      },
-      {
-        host: 'electrum2.cipig.net',
-        port: 10051,
-      },
-      {
-        host: 'electrum3.cipig.net',
-        port: 10051,
-      },
+        host: 'bitcoincash.network',
+        port: 50001,
+      }
     ],
   },
   {
