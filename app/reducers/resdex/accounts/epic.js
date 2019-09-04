@@ -190,7 +190,7 @@ const withdrawEpic = (action$: ActionsObservable<Action>, state$) => action$.pip
     const api = resDexApiFactory(secretFunds ? 'RESDEX_PRIVACY2' : 'RESDEX')
 
     const observable = from(api.withdraw({
-      symbol,
+      symbol: symbol || 'RES',
       address: recipientAddress,
       amount: Decimal(amount),
     }))

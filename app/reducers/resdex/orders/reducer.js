@@ -22,6 +22,9 @@ export const ResDexOrdersActions = createActions(
     GOT_SWAP_HISTORY: swapHistory => ({ swapHistory }),
     GET_SWAP_HISTORY_FAILED: undefined,
 
+    CANCEL_ORDER: (uuid: string) => ({ uuid }),
+    CANCEL_ORDER_FINISHED: undefined,
+
     SAVE_PRIVATE_ORDER: (order: PrivateOrder) => ({order}),
     SET_PRIVATE_ORDER_STATUS: (uuid: string, status: PrivateOrderStatus) => ({uuid, status}),
     LINK_PRIVATE_ORDER_TO_BASE_RES_ORDER: (uuid: string, baseResOrderUuid: string) => ({uuid, baseResOrderUuid}),
@@ -77,5 +80,13 @@ export const ResDexOrdersReducer = handleActions(
         ...state.privateSwaps,
         [action.payload.order.mainUuid]: action.payload.order
       }
+    }),
+    [ResDexOrdersActions.cancelOrder]: state => ({
+      ...state,
+      isCancelling: true
+    }),
+    [ResDexOrdersActions.cancelOrderFinished]: state => ({
+      ...state,
+      isCancelling: false
     })
   }, preloadedState)

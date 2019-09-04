@@ -27,6 +27,16 @@
 
   .row {
     cursor: pointer;
+
+    .cancelButton {
+      visibility: hidden;
+    }
+
+    &:hover {
+      .cancelButton {
+        visibility: visible;
+      }
+    }
   }
 }
 

@@ -360,14 +360,18 @@ class ResDexApiService {
     return response.result
   }
 
-  async getMakerOrders() {
+  async getOrders() {
     const response = await this.query({ method: 'my_orders' })
     log.debug(`My orders response:`, response)
 
-    const { maker_orders: makerOrders } = response.result
+    const {
+      taker_orders: takerOrders,
+      maker_orders: makerOrders
+    } = response.result
 
-    const result = Object.values(makerOrders).map(o => ({
+    const convert = (o, type) => ({
       uuid: o.uuid,
+      type,
       baseCurrency: o.base,
       quoteCurrency: o.rel,
       price: Decimal(o.price),
@@ -376,7 +380,14 @@ class ResDexApiService {
       timeStarted: moment(o.created_at).toDate(),
       isInstantSwap: o.instant_swap,
       isCancellable: o.cancellable,
-    }))
+    })
+
+    const result = Object.values(makerOrders)
+      .map(o => convert(o, 'Maker'))
+      .concat(
+        Object.values(takerOrders)
+          .map(o => convert(o, 'Taker'))
+      )
 
     return result
   }
@@ -400,6 +411,20 @@ class ResDexApiService {
       instant_swap: true,
     })
     return response.result
+  }
+
+	/**
+	 * Cancels an order.
+   *
+	 * @memberof ResDexApiService
+	 */
+  async cancelOrder(uuid: string): boolean {
+    const response = await this.query({
+      method: 'cancel_order',
+      uuid,
+    })
+
+    return response.result === 'success'
   }
 
 	/**

@@ -19,7 +19,7 @@ import { ResDexOrdersActions } from './reducer'
 const t = translate('resdex')
 const mainApi = resDexApiFactory('RESDEX')
 
-function recentSwapsToOrders(swaps, privateSwaps) {
+function convertRecentSwaps(swaps, privateSwaps) {
 
   const orderStatus = events => {
     const unmatched = events.find(event => event.event.type === 'NegotiateFailed')
@@ -58,6 +58,7 @@ function recentSwapsToOrders(swaps, privateSwaps) {
       isMarket: swap.type === 'Taker',
       isPrivate: Boolean(privateSwap),
       isActive: true,
+      isSwap: true,
       isHidden,
     }
 
@@ -123,7 +124,7 @@ function recentSwapsToOrders(swaps, privateSwaps) {
   return orders
 }
 
-function makerOrdersToOrders(makerOrders) {
+function convertOrders(makerOrders) {
   log.debug(`Maker orders`, makerOrders)
 
   const orders = makerOrders.map(o => ({
@@ -132,7 +133,8 @@ function makerOrdersToOrders(makerOrders) {
     isPrivate: false,
     isHidden: false,
     isActive: true,
-    isMarket: false,
+    isMarket: o.type === 'Taker',
+    isSwap: false,
     privacy: null,
   }))
 
@@ -146,7 +148,7 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>, state$) => actio
 
     const getRecentSwapsPromise = Promise.all(processNames.map(processName => {
       if (processName === null) {
-        return mainApi.getMakerOrders()
+        return mainApi.getOrders()
       }
 
       const api = resDexApiFactory(processName)
@@ -156,11 +158,11 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>, state$) => actio
     const { privateSwaps } = state$.value.resDex.orders
 
     const observable = from(getRecentSwapsPromise).pipe(
-      switchMap(([mainSwaps, privacy2Swaps, makerOrders]) => {
+      switchMap(([mainSwaps, privacy2Swaps, pendingOrders]) => {
         const recentSwaps = mainSwaps.swaps.concat(privacy2Swaps.swaps)
 
-        const orders = recentSwapsToOrders(recentSwaps, privateSwaps)
-          .concat(makerOrdersToOrders(makerOrders))
+        const orders = convertRecentSwaps(recentSwaps, privateSwaps)
+          .concat(convertOrders(pendingOrders))
 
         log.debug(`Orders list updated, ${JSON.stringify(orders)}`)
 
@@ -181,6 +183,28 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>, state$) => actio
     )
 
     return observable
+  })
+)
+
+const cancelOrder = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexOrdersActions.cancelOrder),
+  switchMap(action => {
+    const { uuid } = action.payload
+    return from(mainApi.cancelOrder(uuid))
+  }),
+  switchMap(isSuccess => {
+    if (isSuccess) {
+      toastr.success(t(`Order cancelled successfully`))
+    } else {
+      toastr.info(t(`ResDEX was unable to cancel the order upon your request`))
+    }
+
+    return of (ResDexOrdersActions.cancelOrderFinished())
+  }),
+  catchError(err => {
+    log.error(`Error cancelling the order`, err)
+    toastr.error(t(`Error cancelling the order, check the log for details`))
+    return of(ResDexOrdersActions.cancelOrderFinished())
   })
 )
 
@@ -213,6 +237,7 @@ const setPrivateOrderStatus = (action$: ActionsObservable<Action>) => action$.pi
 
 export const ResDexOrdersEpic = (action$, state$) => merge(
   getSwapHistoryEpic(action$, state$),
+  cancelOrder(action$, state$),
   setPrivateOrderStatus(action$, state$),
   linkPrivateOrderToBaseResOrder(action$, state$),
   savePrivateOrder(action$, state$),

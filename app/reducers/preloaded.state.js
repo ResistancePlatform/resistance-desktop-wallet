@@ -217,7 +217,8 @@ export const preloadedState: State = {
       orderModal: {
         isVisible: false,
         uuid: null
-      }
+      },
+      isCancelling: false
     },
     accounts: {
       transactions: {},

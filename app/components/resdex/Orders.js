@@ -43,11 +43,12 @@ class ResDexOrders extends Component<Props> {
       <UniformListHeader>
         <UniformListColumn width="17%">{t(`Time`)}</UniformListColumn>
         <UniformListColumn width="11%">{t(`Pair`)}</UniformListColumn>
-        <UniformListColumn width="10%">{t(`Type`)}</UniformListColumn>
+        <UniformListColumn width="9%">{t(`Type`)}</UniformListColumn>
         <UniformListColumn width="16%">{t(`Amount out`)}</UniformListColumn>
         <UniformListColumn width="16%">{t(`Amount in`)}</UniformListColumn>
-        <UniformListColumn width="10%">{t(`Private`)}</UniformListColumn>
-        <UniformListColumn width="20%">{t(`Status`)}</UniformListColumn>
+        <UniformListColumn width="9%">{t(`Private`)}</UniformListColumn>
+        <UniformListColumn width="14%">{t(`Status`)}</UniformListColumn>
+        <UniformListColumn width="8%" />
       </UniformListHeader>
     )
   }
@@ -66,17 +67,25 @@ class ResDexOrders extends Component<Props> {
     toastr.confirm(t(`Are you sure want to clear the swap history?`), confirmOptions)
   }
 
+  cancelOrder(uuid: string) {
+    const { t } = this.props
+    const confirmOptions = { onOk: () => this.props.actions.cancelOrder(uuid) }
+    toastr.confirm(t(`Are you sure want to cancel the order?`), confirmOptions)
+  }
+
 	/**
    * @memberof ResDexOrders
 	 */
   getListRowRenderer(order) {
     const { i18n, t } = this.props
 
+    const { isCancelling } = this.props.orders
+
     return (
       <UniformListRow
         className={styles.row}
         key={order.uuid}
-        onClick={() => this.props.actions.showOrderModal(order.uuid)}
+        onClick={() => order.isSwap ? this.props.actions.showOrderModal(order.uuid) : false}
       >
         <UniformListColumn className={styles.time}>
           {moment(order.timeStarted).locale(i18n.language).format('kk:mm L')}
@@ -101,6 +110,19 @@ class ResDexOrders extends Component<Props> {
             {getOrderStatusName(order)}
           </span>
         </UniformListColumn>
+        <UniformListColumn>
+          {!order.isSwap &&
+            <BorderlessButton
+              className={styles.cancelButton}
+              onClick={() => this.cancelOrder(order.uuid)}
+              disabled={!order.isCancellable || isCancelling}
+              tooltip={order.isCancellable ? null : t(`The order is not cancellable`)}
+            >
+              {t(`Cancel`)}
+            </BorderlessButton>
+
+          }
+        </UniformListColumn>
       </UniformListRow>
     )
   }
@@ -113,16 +135,18 @@ class ResDexOrders extends Component<Props> {
     const { t } = this.props
     const { swapHistory } = this.props.orders
 
-    const status = swap => swap.isPrivate ? swap.privacy.status : swap.status
-    const completed = swap => ['completed', 'failed', 'cancelled'].includes(status(swap))
+    const status = o => o.isPrivate ? o.privacy.status : o.status
+    const completed = o => ['completed', 'failed', 'cancelled'].includes(status(o))
 
-    const visibleSwapHistory = swapHistory.filter(swap => swap.isHidden === false)
-    const openOrders = visibleSwapHistory.filter(swap => !completed(swap))
-    const completedOrders = visibleSwapHistory.filter(swap => completed(swap))
+    const visibleOrders = swapHistory.filter(o => o.isHidden === false)
+
+    const openOrders = visibleOrders.filter(o => !o.isSwap && !completed(o))
+    const openSwaps = visibleOrders.filter(o => o.isSwap && !completed(o))
+    const completedSwaps = visibleOrders.filter(o => completed(o))
 
 		return (
       <div className={cn(styles.container)}>
-        <div className={styles.header}>{t(`Open orders`)}</div>
+        <div className={styles.header}>{t(`Orders`)}</div>
 
         <UniformList
           className={styles.list}
@@ -142,10 +166,29 @@ class ResDexOrders extends Component<Props> {
           </div>
         }
 
+        <div className={styles.header}>{t(`Swaps`)}</div>
+
+        <UniformList
+          className={styles.list}
+          items={openSwaps}
+          headerRenderer={() => this.getListHeaderRenderer()}
+          rowRenderer={openSwap => this.getListRowRenderer(openSwap)}
+          emptyMessage={false}
+        />
+
+        {!openSwaps.length &&
+          <div className={styles.noOrders}>
+            <div>{t(`You have no swaps yet`)}</div>
+
+            <RoundedButton onClick={() => this.props.resDexActions.selectTab(1)} important large>
+              {t(`Open an order`)}
+            </RoundedButton>
+          </div>
+        }
         <div className={styles.header}>
           {t(`Swap history`)}
 
-          {false && completedOrders.length !== 0 &&
+          {false && completedSwaps.length !== 0 &&
             <BorderlessButton
               className={styles.clearHistoryButton}
               onClick={() => this.onClearHistoryClick()}
@@ -158,13 +201,13 @@ class ResDexOrders extends Component<Props> {
 
         <UniformList
           className={styles.list}
-          items={completedOrders}
+          items={completedSwaps}
           headerRenderer={() => this.getListHeaderRenderer()}
           rowRenderer={completedOrder => this.getListRowRenderer(completedOrder)}
           emptyMessage={false}
         />
 
-        {!completedOrders.length &&
+        {!completedSwaps.length &&
           <div className={styles.noOrders}>
             <div>{t(`You have no swap history yet`)}</div>
 

@@ -119,7 +119,8 @@ export type ResDexState = {
     orderModal: {
       isVisible: boolean,
       uuid: string | null
-    }
+    },
+    isCancelling: boolean
   },
   accounts: {
     selectedSymbol: string,
