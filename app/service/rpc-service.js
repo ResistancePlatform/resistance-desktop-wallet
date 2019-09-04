@@ -108,7 +108,7 @@ export const getClientInstance = (isEtomic: boolean = false) => {
       port: isEtomic ? 15672 : nodeConfig.rpcport,
       username: nodeConfig.rpcuser,
       password: nodeConfig.rpcpassword,
-      timeout: 10000
+      timeout: 100000
     })
   }
 
@@ -451,7 +451,7 @@ export class RpcService {
             isUnspent: plainPublicUnspentAddresses.includes(addr),
             disabled: false
           }))
-          .filter(item => !(item.address.startsWith('rr') || item.address.startsWith('rs')))
+          //.filter(item => !(item.address.startsWith('rr') || item.address.startsWith('rs')))
 
         // Add Ledger Address to List
         if(getStore().getState().ownAddresses.connectLedgerModal.isLedgerResistanceAppOpen){
