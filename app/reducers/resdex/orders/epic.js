@@ -220,7 +220,7 @@ const savePrivateOrder = (action$: ActionsObservable<Action>) => action$.pipe(
 const linkPrivateOrderToBaseResOrder = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(ResDexOrdersActions.linkPrivateOrderToBaseResOrder),
   map(action => {
-    const { baseResOrderUuid } = action.payload.action.payload
+    const { uuid, baseResOrderUuid } = action.payload
     config.set(`resDex.privateSwaps.${action.payload.uuid}.privacy2Uuid`, baseResOrderUuid)
     return ResDexOrdersActions.empty()
   })

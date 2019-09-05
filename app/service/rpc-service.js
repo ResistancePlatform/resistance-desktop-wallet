@@ -108,7 +108,7 @@ export const getClientInstance = (isEtomic: boolean = false) => {
       port: isEtomic ? 15672 : nodeConfig.rpcport,
       username: nodeConfig.rpcuser,
       password: nodeConfig.rpcpassword,
-      timeout: 10000
+      timeout: 100000
     })
   }
 
