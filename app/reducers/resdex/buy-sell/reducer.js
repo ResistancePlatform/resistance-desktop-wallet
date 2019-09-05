@@ -25,6 +25,7 @@ export const ResDexBuySellActions = createActions(
     CREATE_ORDER: undefined,
     CREATE_ORDER_SUCCEEDED: undefined,
     CREATE_ORDER_FAILED: (errorMessage: string) => ({ errorMessage }),
+    CREATE_ORDER_REJECTED: undefined,
 
     CREATE_PRIVATE_ORDER: undefined,
     CREATE_PRIVATE_ORDER_SUCCEEDED: undefined,
@@ -138,6 +139,10 @@ export const ResDexBuySellReducer = handleActions(
       isSendingOrder: false,
     }),
     [ResDexBuySellActions.createOrderFailed]: state => ({
+      ...state,
+      isSendingOrder: false,
+    }),
+    [ResDexBuySellActions.createOrderRejected]: state => ({
       ...state,
       isSendingOrder: false,
     }),

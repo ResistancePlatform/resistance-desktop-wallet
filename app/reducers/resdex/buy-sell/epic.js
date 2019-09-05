@@ -80,6 +80,10 @@ const getOrderBookFailed = (action$: ActionsObservable<Action>) => action$.pipe(
 const createOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexBuySellActions.createOrder),
   switchMap(() => {
+    if (!verifyBitcoinAmount(state$)) {
+      return of(ResDexBuySellActions.createOrderRejected())
+    }
+
     const { fields } = state$.value.roundedForm.resDexBuySell
     let { price } = fields
     const { isMarketOrder, maxRel } = fields
@@ -400,6 +404,21 @@ export function getExpectedBaseCurrencyAmount(state$) {
     return expectedBaseCurrencyAmount
 }
 
+function verifyBitcoinAmount(state$, baseAmount) {
+    const { baseCurrency } = state$.value.resDex.buySell
+
+    const baseCurrencyAmount = !baseAmount
+      ? getExpectedBaseCurrencyAmount(state$) || Decimal(0)
+      : baseAmount
+
+    if (baseCurrency === 'BTC' && baseCurrencyAmount.lessThan(Decimal('0.001'))) {
+      toastr.warning(t(`The amount, in Bitcoin, you expect to receive cannot be less than 0.001 BTC`))
+      return false
+    }
+
+    return true
+}
+
 const createPrivateOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexBuySellActions.createPrivateOrder),
   switchMap(() => {
@@ -409,6 +428,10 @@ const createPrivateOrder = (action$: ActionsObservable<Action>, state$) => actio
 
     // Calculate expected amount to receive to display in the orders list
     const baseCurrencyAmount = getExpectedBaseCurrencyAmount(state$) || Decimal(0)
+
+    if (!verifyBitcoinAmount(state$, baseCurrencyAmount)) {
+      return of(ResDexBuySellActions.createOrderRejected())
+    }
 
     const privacy = {
       baseCurrency,

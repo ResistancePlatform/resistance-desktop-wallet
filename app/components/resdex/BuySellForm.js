@@ -251,6 +251,7 @@ class BuySellForm extends Component<Props> {
                   name="maxRel"
                   buttonLabel={t(`Use max`)}
                   addonClassName={styles.maxRelAddon}
+                  min="0.001"
                   maxAmount={this.getMaxQuoteAmount()}
                   symbol={quoteCurrency}
                 />
