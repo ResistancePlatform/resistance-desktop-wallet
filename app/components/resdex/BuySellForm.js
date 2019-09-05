@@ -117,7 +117,7 @@ class BuySellForm extends Component<Props> {
         return null
       }
 
-      const baseAmount = baseRes.times(orderBook.baseRes.bids[0].price)
+      const baseAmount = baseRes.dividedBy(orderBook.baseRes.bids[0].price)
 
       priceInRes = baseRes.dividedBy(baseAmount)
     }

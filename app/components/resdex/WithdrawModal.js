@@ -137,7 +137,7 @@ class WithdrawModal extends Component<Props> {
           {secretFunds ? (
             <div className={styles.memo}>
               <hr />
-              <strong>{t(`Note:`)}</strong>&nbsp;
+              <strong>{t(`Caution:`)}</strong>&nbsp;
               {t(`withdraw-modal-note`)}
             </div>
           ) : (

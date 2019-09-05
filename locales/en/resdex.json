@@ -143,7 +143,7 @@
   "Withdraw secret funds": "Withdraw secret funds",
   "Withdraw {{symbol}}": "Withdraw {{symbol}}",
   "Note:": "Note:",
-  "withdraw-modal-note": "withdraw-modal-note",
+  "withdraw-modal-note": "These funds confidential and located in confidential addresses. DO NOT under any circumstance withdraw to one of your exchange addresses. If you do, you will compromise your privacy, and people will be able to link your secret address to your transparent ResDEX address. Instead, create a new address in the respective wallet of the coin you are withdrawing and withdraw the funds into it.",
   "Can't create a limit order, check the log for details": "Can't create a limit order, check the log for details",
   "Error performing Resistance withdrawal to a privatizer address": "Error performing Resistance withdrawal to a privatizer address",
   "Private order created successfully": "Private order created successfully",

@@ -306,16 +306,19 @@ const getWithdrawFromMainToPrivacy1Observable = (privacy, pollPrivacy2BalanceObs
 const getPollPrivacy2BalanceObservable = (privacy, resBaseOrderObservable, state$) => {
   log.debug(`Private market order stage 4, polling the Privacy 2 ResDEX process for RES balance`, privacy)
 
+  const expectedBalance = (
+    privacy.initialPrivacy2ResBalance
+      .minus(Decimal(1))
+      .minus(Decimal(300).times(RESDEX.resFee))
+  )
+
   const pollingObservable = interval(1000).pipe(
     map(() => {
       const { balance } = state$.value.resDex.accounts.currencies.RESDEX_PRIVACY2.RES
-      log.debug(`Polling ResDEX Privacy 2 for RES balance:`, balance.toString(), privacy.initialPrivacy2ResBalance.toString())
-
-      const { balance: balance1ToDebug } = state$.value.resDex.accounts.currencies.RESDEX_PRIVACY1.RES
-      log.debug(`ResDEX Privacy 1 RES balance:`, balance1ToDebug.toString())
+      log.debug(`Polling ResDEX Privacy 2 for RES balance:`, balance.toString(), expectedBalance.toString())
       return balance
     }),
-    filter(balance => balance.greaterThan(privacy.initialPrivacy2ResBalance)),
+    filter(balance => balance.greaterThan(expectedBalance)),
     take(1),
     switchMap(() => resBaseOrderObservable),
   )
@@ -353,7 +356,7 @@ const getPollResBaseOrderObservable = (relResOrderUuid, resBaseOrderUuid, state$
       log.debug(`Polling RES base order to complete or fail...`)
 
       const { swapHistory } = state$.value.resDex.orders
-      const order = swapHistory.filter(swap => swap.uuid === resBaseOrderUuid).pop()
+      const order = swapHistory.find(swap => swap.uuid === resBaseOrderUuid)
 
       if (order) {
         log.debug(`Order status`, order.status, order.privacy.status)
