@@ -388,29 +388,50 @@ const getPollResBaseOrderObservable = (relResOrderUuid, resBaseOrderUuid, state$
 }
 
 export function getExpectedBaseCurrencyAmount(state$) {
-    const { orderBook } = state$.value.resDex.buySell
-    const { resDexBuySell: form } = state$.value.roundedForm
+  const {
+    baseCurrency,
+    quoteCurrency,
+    orderBook
+  } = state$.value.resDex.buySell
 
-    if (!form || !form.fields) {
-      return null
+  const { resDexBuySell: form } = state$.value.roundedForm
+
+  if (!form || !form.fields) {
+    return null
+  }
+
+  const { maxRel } = form.fields
+
+  if (!maxRel) {
+    return null
+  }
+
+  const getPrice = (symbol, asks) => {
+    if (symbol === 'RES') {
+      return Decimal(1)
     }
-
-    const { maxRel } = form.fields
-
-    if (!maxRel || !orderBook.baseRes.asks.length || !orderBook.resQuote.asks.length) {
-      return null
+    if (asks.length) {
+      return asks[0].price
     }
+    return null
+  }
 
-    const { price: baseResPrice } = orderBook.baseRes.asks[0]
-    const { price: resQuotePrice } = orderBook.resQuote.asks[0]
-    const dexFee = RESDEX.dexFee.dividedBy(Decimal('100'))
+  const baseResPrice = getPrice(baseCurrency, orderBook.baseRes.asks)
+  const resQuotePrice = getPrice(quoteCurrency, orderBook.resQuote.asks)
 
-    const expectedBaseCurrencyAmount = (
-      Decimal(maxRel)
-      .dividedBy(resQuotePrice.plus(resQuotePrice.times(dexFee)))
-      .dividedBy(baseResPrice)
-    )
-    return expectedBaseCurrencyAmount
+  if (baseResPrice === null || resQuotePrice === null) {
+    log.debug(`Can't calculate expected base amount`, String(baseResPrice), String(resQuotePrice))
+    return null
+  }
+
+  const dexFee = RESDEX.dexFee.dividedBy(Decimal('100'))
+
+  const expectedBaseCurrencyAmount = (
+    Decimal(maxRel)
+    .dividedBy(resQuotePrice.plus(resQuotePrice.times(dexFee)))
+    .dividedBy(baseResPrice)
+  )
+  return expectedBaseCurrencyAmount
 }
 
 function verifyBitcoinAmount(state$, baseAmount) {
