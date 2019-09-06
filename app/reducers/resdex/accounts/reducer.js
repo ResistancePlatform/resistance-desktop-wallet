@@ -179,7 +179,7 @@ export const ResDexAccountsReducer = handleActions(
         isVisible: false, symbol: null
       }
     }),
-    [ResDexAccountsActions.closeResDex2DepositModal]: state => ({
+    [ResDexAccountsActions.closeResdex2DepositModal]: state => ({
       ...state,
       depositModal: {
         ...state.depositModal,
