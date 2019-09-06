@@ -369,14 +369,16 @@ class ResDexApiService {
       maker_orders: makerOrders
     } = response.result
 
+    const zeroIfUndefined = d => Decimal(d || 0)
+
     const convert = (o, type) => ({
       uuid: o.uuid,
       type,
       baseCurrency: o.base,
       quoteCurrency: o.rel,
-      price: Decimal(o.price),
-      baseCurrencyAmount: Decimal(o.available_amount),
-      quoteCurrencyAmount: Decimal(o.available_amount).times(Decimal(o.price)),
+      price: zeroIfUndefined(o.price),
+      baseCurrencyAmount: zeroIfUndefined(o.available_amount),
+      quoteCurrencyAmount: zeroIfUndefined(o.available_amount).times(zeroIfUndefined(o.price)),
       timeStarted: moment(o.created_at).toDate(),
       isInstantSwap: o.instant_swap,
       isCancellable: o.cancellable,
