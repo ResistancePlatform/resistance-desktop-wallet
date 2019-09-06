@@ -245,6 +245,7 @@ export const preloadedState: State = {
       },
       depositModal: {
         isVisible: false,
+        isResDex2Visible: false,
         symbol: null
       },
       withdrawModal: {

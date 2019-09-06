@@ -144,6 +144,7 @@ export type ResDexState = {
     },
     depositModal: {
       isVisible: boolean,
+      isResDex2Visible: boolean,
       symbol: string | null
     },
     withdrawModal: {

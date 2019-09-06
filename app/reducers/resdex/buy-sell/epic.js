@@ -3,6 +3,7 @@ import { Decimal } from 'decimal.js'
 import log from 'electron-log'
 import { of, from, merge, interval, defer } from 'rxjs'
 import { map, mapTo, take, filter, switchMap, catchError } from 'rxjs/operators'
+import { getCurrency } from '~/utils/resdex'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
@@ -13,6 +14,7 @@ import { resDexApiFactory } from '~/service/resdex/api'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { ResDexBuySellActions } from './reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
+import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
 
 const t = translate('resdex')
@@ -319,7 +321,14 @@ const getPollPrivacy2BalanceObservable = (privacy, resBaseOrderObservable, state
   const pollingObservable = interval(1000).pipe(
     map(() => {
       const { balance } = state$.value.resDex.accounts.currencies.RESDEX_PRIVACY2.RES
-      log.debug(`Polling ResDEX Privacy 2 for RES balance:`, balance.toString(), expectedBalance.toString())
+      log.debug(
+        `Polling ResDEX Privacy 2 for RES balance:`,
+        balance.toString(),
+        `expected balance:`,
+        expectedBalance.toString(),
+        `initial ResDEX Privacy 1 balance:`,
+        privacy.initialPrivacy2ResBalance.toString()
+      )
       return balance
     }),
     filter(balance => balance.greaterThan(expectedBalance)),
@@ -419,6 +428,33 @@ function verifyBitcoinAmount(state$, baseAmount) {
     return true
 }
 
+function verifyErc20(state$) {
+  const { resDex } = state$.value
+    const { baseCurrency, quoteCurrency } = resDex.buySell
+
+    if (!getCurrency(baseCurrency).etomic && !getCurrency(quoteCurrency).etomic) {
+      return null
+    }
+
+    const { balance } = resDex.accounts.currencies.RESDEX_PRIVACY2.ETH || {}
+
+    if (!balance) {
+      toastr.warning(t(`ResDEX is updating balances, please try again later`))
+      return of(ResDexBuySellActions.createOrderRejected())
+    }
+
+    log.debug(`ResDEX Privacy 2 ETH balance:`, balance.toString())
+
+    if (balance.greaterThanOrEqualTo(Decimal('0.001'))) {
+      return null
+    }
+
+    return of(
+      ResDexBuySellActions.createOrderRejected(),
+      ResDexAccountsActions.showResdex2DepositModal()
+    )
+}
+
 const createPrivateOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexBuySellActions.createPrivateOrder),
   switchMap(() => {
@@ -431,6 +467,12 @@ const createPrivateOrder = (action$: ActionsObservable<Action>, state$) => actio
 
     if (!verifyBitcoinAmount(state$, baseCurrencyAmount)) {
       return of(ResDexBuySellActions.createOrderRejected())
+    }
+
+    const nextObservable = verifyErc20(state$)
+
+    if (nextObservable !== null) {
+      return nextObservable
     }
 
     const privacy = {

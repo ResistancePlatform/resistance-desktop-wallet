@@ -94,6 +94,9 @@ export class ResDex extends Component<Props> {
         {this.props.resDex.accounts.depositModal.isVisible &&
           <DepositModal />
         }
+        {this.props.resDex.accounts.depositModal.isResDex2Visible &&
+          <DepositModal resdex2 />
+        }
         {this.props.resDex.accounts.withdrawModal.isVisible &&
           <WithdrawModal />
         }

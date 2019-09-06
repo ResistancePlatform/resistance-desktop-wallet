@@ -6,6 +6,10 @@ $depositModalWidth: 17rem;
   width: $depositModalWidth;
   padding: 1.8rem;
 
+  &.resdex2 {
+    height: 14rem;
+  }
+
   .qr {
     width: $depositModalWidth - (1.8rem) * 2 !important;
     height: $depositModalWidth - (1.8rem) * 2 !important;
@@ -15,6 +19,19 @@ $depositModalWidth: 17rem;
     margin-top: 0.25rem;
     margin-bottom: 1.6rem;
     background: white;
+  }
+
+  .caution {
+    margin-bottom: 0.5rem;
+
+    strong {
+      color: $BASE_COLOR_WHITE;
+      margin-right: 0.4rem;
+    }
+
+    color: $BASE_COLOR_FONT_GRAY_2;
+    font-size: 0.7rem;
+    text-align: justify;
   }
 
   .addressInputLabel {

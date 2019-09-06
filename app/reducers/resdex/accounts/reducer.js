@@ -47,11 +47,13 @@ export const ResDexAccountsActions = createActions(
     DELETE_CURRENCY: (symbol: string) => ({ symbol }),
     SHOW_INSTANT_DEX_DEPOSIT_MODAL: undefined,
     SHOW_DEPOSIT_MODAL: (symbol: string) => ({ symbol }),
+    SHOW_RESDEX2_DEPOSIT_MODAL: undefined,
     SHOW_WITHDRAW_MODAL: (symbol: string | null, secretFunds: boolean = false) => ({ symbol, secretFunds }),
     SHOW_EDIT_CURRENCY_MODAL: (currency: object) => currency,
     SHOW_ADD_CURRENCY_MODAL: undefined,
     CLOSE_INSTANT_DEX_DEPOSIT_MODAL: undefined,
     CLOSE_DEPOSIT_MODAL: undefined,
+    CLOSE_RESDEX2_DEPOSIT_MODAL: undefined,
     CLOSE_WITHDRAW_MODAL: undefined,
     CLOSE_ADD_CURRENCY_MODAL: undefined,
 
@@ -102,8 +104,17 @@ export const ResDexAccountsReducer = handleActions(
     [ResDexAccountsActions.showDepositModal]: (state, action) => ({
       ...state,
       depositModal: {
+        ...state.depositModal,
         isVisible: true,
         symbol: action.payload.symbol
+      }
+    }),
+    [ResDexAccountsActions.showResdex2DepositModal]: state => ({
+      ...state,
+      depositModal: {
+        ...state.depositModal,
+        isResDex2Visible: true,
+        symbol: 'ETH'
       }
     }),
     [ResDexAccountsActions.showWithdrawModal]: (state, action) => ({
@@ -164,6 +175,10 @@ export const ResDexAccountsReducer = handleActions(
     [ResDexAccountsActions.closeDepositModal]: state => ({
       ...state,
       depositModal: { isVisible: false, symbol: null }
+    }),
+    [ResDexAccountsActions.closeResDex2DepositModal]: state => ({
+      ...state,
+      depositModal: { isResDex2Visible: false, symbol: null }
     }),
     [ResDexAccountsActions.withdrawalFailed]: (state) => ({
       ...state,
