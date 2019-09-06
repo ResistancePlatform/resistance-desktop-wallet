@@ -236,7 +236,8 @@ const supportedCurrencies = [
   {
     coin: 'RES',
     id_in_cmc: 'resistance',
-    rpcport: 8132,
+    txfee: 10000,
+    rpcport: 8132
   },
   {
     coin: 'ETH',

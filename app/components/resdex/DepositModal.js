@@ -39,7 +39,7 @@ class DepositModal extends Component<Props> {
 
     return (
       <div className={styles.overlay}>
-        <div className={cn(styles.container, styles.deposit)}>
+        <div className={cn(styles.container, styles.deposit, {[styles.resdex2]: this.props.resdex2})}>
           <div
             role="button"
             tabIndex={0}
