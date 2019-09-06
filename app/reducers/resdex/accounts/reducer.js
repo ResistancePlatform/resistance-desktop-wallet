@@ -174,11 +174,18 @@ export const ResDexAccountsReducer = handleActions(
     }),
     [ResDexAccountsActions.closeDepositModal]: state => ({
       ...state,
-      depositModal: { isVisible: false, symbol: null }
+      depositModal: {
+        ...state.depositModal,
+        isVisible: false, symbol: null
+      }
     }),
     [ResDexAccountsActions.closeResDex2DepositModal]: state => ({
       ...state,
-      depositModal: { isResDex2Visible: false, symbol: null }
+      depositModal: {
+        ...state.depositModal,
+        isResDex2Visible: false,
+        symbol: null
+      }
     }),
     [ResDexAccountsActions.withdrawalFailed]: (state) => ({
       ...state,

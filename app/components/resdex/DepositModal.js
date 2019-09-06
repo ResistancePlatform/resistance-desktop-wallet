@@ -44,7 +44,11 @@ class DepositModal extends Component<Props> {
             role="button"
             tabIndex={0}
             className={cn('icon', styles.closeButton)}
-            onClick={this.props.actions.closeDepositModal}
+            onClick={
+              this.props.resdex2
+              ? this.props.actions.closeResDex2DepositModal
+              : this.props.actions.closeDepositModal
+            }
             onKeyDown={() => {}}
           />
 
@@ -56,10 +60,12 @@ class DepositModal extends Component<Props> {
           }
         </div>
 
-        <div className={styles.caution}>
-          <strong>{t(`Caution`)}:</strong>
-          You must have 0.001 ETH deposited in both normal ETH wallet and 0.001 deposited in private balance in order to do private swap otherwise the swap won’t work.
-        </div>
+        {this.props.resdex2 &&
+          <div className={styles.caution}>
+              <strong>{t(`Caution`)}:</strong>
+            You must have 0.001 ETH deposited in both normal ETH wallet and 0.001 deposited in private balance in order to do private swap otherwise the swap won’t work.
+          </div>
+        }
 
         {address &&
           <QRCode className={styles.qr} value={address} />
