@@ -221,7 +221,7 @@ const linkPrivateOrderToBaseResOrder = (action$: ActionsObservable<Action>) => a
   ofType(ResDexOrdersActions.linkPrivateOrderToBaseResOrder),
   map(action => {
     const { uuid, baseResOrderUuid } = action.payload
-    config.set(`resDex.privateSwaps.${action.payload.uuid}.privacy2Uuid`, baseResOrderUuid)
+    config.set(`resDex.privateSwaps.${uuid}.privacy2Uuid`, baseResOrderUuid)
     return ResDexOrdersActions.empty()
   })
 )
