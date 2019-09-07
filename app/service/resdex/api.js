@@ -196,8 +196,10 @@ class ResDexApiService {
     return Decimal(response.txfee).dividedBy(divider)
 	}
 
-  getPortfolio() {
-    return this.query({ method: 'portfolio' })
+  async getPortfolio() {
+    const portfolio = await this.query({ method: 'portfolio' })
+    log.debug(`Portfolio:`, JSON.stringify(portfolio))
+    return portfolio
   }
 
   async enableCurrency(symbol: string, useElectrum: boolean = true) {

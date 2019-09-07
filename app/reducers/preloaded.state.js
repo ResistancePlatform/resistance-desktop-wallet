@@ -3,6 +3,7 @@ import { remote } from 'electron'
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
 import { RESDEX } from '~/constants/resdex'
+import log from 'electron-log'
 
 export const preloadedState: State = {
   auth: {
@@ -309,6 +310,8 @@ const failUnfinishedSwaps = swaps => Object.keys(swaps).reduce((accumulated, uui
   const status = ['failed', 'completed', 'cancelled'].includes(swap.status)
     ? swap.status
     : 'failed'
+
+  log.debug(`swap`, swap)
 
   const result = {
     ...accumulated,

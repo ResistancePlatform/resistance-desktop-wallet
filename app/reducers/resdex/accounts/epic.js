@@ -39,6 +39,7 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
         zcredits: Decimal(currency.zcredits || 0),
         price: Decimal(currency.price || 0),
         amount: Decimal(currency.amount || currency.balance),
+        lockedAmount: Decimal(currency.locked || 0),
       }
     }), {})
 
