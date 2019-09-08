@@ -8,6 +8,7 @@ import cn from 'classnames'
 import { translate } from 'react-i18next'
 import log from 'electron-log'
 
+import { RESDEX } from '~/constants/resdex'
 import { toDecimalPlaces } from '~/utils/decimal'
 import {
   Info,
@@ -58,7 +59,11 @@ class BuySellForm extends Component<Props> {
   getMaxQuoteAmount() {
     const { quoteCurrency } = this.props.buySell
     const currency = this.props.accounts.currencies.RESDEX[quoteCurrency]
-    return currency && currency.balance || Decimal(0)
+    if (!currency) {
+      return Decimal(0)
+    }
+    const maxAmount = currency.balance.minus(currency.lockedAmount)
+    return maxAmount.times(Decimal(1).minus(RESDEX.dexFee.dividedBy(Decimal(100))))
   }
 
   getBestPrice(): object | null {
