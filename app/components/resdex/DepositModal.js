@@ -63,7 +63,7 @@ class DepositModal extends Component<Props> {
         {this.props.resdex2 &&
           <div className={styles.caution}>
             <strong>{t(`Warning`)}:</strong>
-            {t(`You must have 0.001 ETH deposited in both normal ETH wallet and 0.001 deposited in private balance in order to do private swap otherwise the swap won’t work.`)}
+            {t(`You must have 0.01 ETH deposited in both normal ETH wallet and 0.01 deposited in private balance in order to do private swap otherwise the swap won’t work.`)}
           </div>
         }
 

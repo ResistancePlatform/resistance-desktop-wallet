@@ -475,7 +475,7 @@ function verifyErc20(state$) {
 
     log.debug(`ResDEX Privacy 2 ETH balance:`, balance.toString())
 
-    if (balance.greaterThanOrEqualTo(Decimal('0.001'))) {
+    if (balance.greaterThanOrEqualTo(Decimal('0.01'))) {
       return null
     }
 

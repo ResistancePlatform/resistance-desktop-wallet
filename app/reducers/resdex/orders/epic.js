@@ -124,19 +124,30 @@ function convertRecentSwaps(swaps, privateSwaps) {
   return orders
 }
 
+function applyPrivateSwaps(orders, privateSwaps) {
+  const convert = swap => {
+    const privateSwap = privateSwaps[swap.uuid]
+    const isHidden = Boolean(Object.values(privateSwaps).find(s => swap.uuid === s.privacy2Uuid))
+  }
+}
+
 function convertOrders(makerOrders) {
   log.debug(`Maker orders`, makerOrders)
 
-  const orders = makerOrders.map(o => ({
-    ...o,
-    status: 'pending',
-    isPrivate: false,
-    isHidden: false,
-    isActive: true,
-    isMarket: o.type === 'Taker',
-    isSwap: false,
-    privacy: null,
-  }))
+  const orders = makerOrders
+    .map(o => ({
+      ...o,
+      status: 'pending',
+      isPrivate: false,
+      isHidden: false,
+      isActive: true,
+      isMarket: o.type === 'Taker',
+      isSwap: false,
+      privacy: null,
+    }))
+    // TODO: Remove once fixed
+    // Filtering out empty orders (ResDEX backend bug)
+    .filter(o => Boolean(o.baseCurrency))
 
   return orders
 }
