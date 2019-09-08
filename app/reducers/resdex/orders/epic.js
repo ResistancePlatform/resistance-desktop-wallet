@@ -19,7 +19,7 @@ import { ResDexOrdersActions } from './reducer'
 const t = translate('resdex')
 const mainApi = resDexApiFactory('RESDEX')
 
-function convertRecentSwaps(swaps, privateSwaps) {
+function convertRecentSwaps(swaps) {
 
   const orderStatus = events => {
     const unmatched = events.find(event => event.event.type === 'NegotiateFailed')
@@ -45,10 +45,9 @@ function convertRecentSwaps(swaps, privateSwaps) {
     return 'swapping'
   }
 
-  const convert = swap => {
-    const privateSwap = privateSwaps[swap.uuid]
-    const isHidden = Boolean(Object.values(privateSwaps).find(s => swap.uuid === s.privacy2Uuid))
+  const finishedOrders = ['completed', 'failed', 'cancelled']
 
+  const convert = swap => {
     let order = {
       uuid: swap.uuid,
       status: 'pending',
@@ -56,10 +55,10 @@ function convertRecentSwaps(swaps, privateSwaps) {
       baseTxId: null,
       quoteTxId: null,
       isMarket: swap.type === 'Taker',
-      isPrivate: Boolean(privateSwap),
+      isPrivate: false,
       isActive: true,
       isSwap: true,
-      isHidden,
+      isHidden: false,
     }
 
     if (!swap.events.length) {
@@ -76,7 +75,6 @@ function convertRecentSwaps(swaps, privateSwaps) {
     const quoteCurrencyAmount = Decimal(startedEvent.event.data.taker_amount)
 
     let status = orderStatus(swap.events)
-    const finishedOrders = ['completed', 'failed', 'cancelled']
     let isActive = !finishedOrders.includes(status)
 
     const momentStarted = moment(startedEvent.timestamp)
@@ -86,35 +84,19 @@ function convertRecentSwaps(swaps, privateSwaps) {
       isActive = false
     }
 
-    if (privateSwap) {
-      order = {
-        ...order,
-        price: privateSwap.baseCurrencyAmount.div(privateSwap.quoteCurrencyAmount),
-        privacy: privateSwap,
-        baseCurrency: privateSwap.baseCurrency,
-        quoteCurrency: privateSwap.quoteCurrency,
-        baseCurrencyAmount: privateSwap.baseCurrencyAmount,
-        quoteCurrencyAmount: privateSwap.quoteCurrencyAmount,
-      }
-    } else {
-      order = {
-        ...order,
-        price: baseCurrencyAmount.div(quoteCurrencyAmount),
-        baseCurrency: startedEvent.event.data.maker_coin,
-        quoteCurrency: startedEvent.event.data.taker_coin,
-        baseCurrencyAmount,
-        quoteCurrencyAmount,
-      }
-    }
-
     order = {
       ...order,
+      price: baseCurrencyAmount.div(quoteCurrencyAmount),
+      baseCurrency: startedEvent.event.data.maker_coin,
+      quoteCurrency: startedEvent.event.data.taker_coin,
+      baseCurrencyAmount,
+      quoteCurrencyAmount,
       baseTxId: makerPayment && makerPayment.event.data.tx_hash,
       quoteTxId: takerPayment && takerPayment.event.data.tx_hash,
       eventTypes: swap.events.map(e => e.event.type),
       timeStarted: momentStarted.toDate(),
       status,
-      isActive: privateSwap ? !finishedOrders.includes(privateSwap.status) : isActive
+      isActive,
     }
 
     return order
@@ -125,10 +107,35 @@ function convertRecentSwaps(swaps, privateSwaps) {
 }
 
 function applyPrivateSwaps(orders, privateSwaps) {
-  const convert = swap => {
-    const privateSwap = privateSwaps[swap.uuid]
-    const isHidden = Boolean(Object.values(privateSwaps).find(s => swap.uuid === s.privacy2Uuid))
+  const finishedOrders = ['completed', 'failed', 'cancelled']
+
+  const convert = o => {
+    const privateSwap = privateSwaps[o.uuid]
+    const isHidden = Boolean(Object.values(privateSwaps).find(s => o.uuid === s.privacy2Uuid))
+
+    let order
+
+    if (privateSwap) {
+      order = {
+        ...o,
+        price: privateSwap.baseCurrencyAmount.div(privateSwap.quoteCurrencyAmount),
+        privacy: privateSwap,
+        baseCurrency: privateSwap.baseCurrency,
+        quoteCurrency: privateSwap.quoteCurrency,
+        baseCurrencyAmount: privateSwap.baseCurrencyAmount,
+        quoteCurrencyAmount: privateSwap.quoteCurrencyAmount,
+        isHidden,
+        isActive: !finishedOrders.includes(privateSwap.status),
+        isPrivate: true,
+      }
+    } else {
+      order = { ...o }
+    }
+
+    return order
   }
+
+  return orders.map(convert)
 }
 
 function convertOrders(makerOrders) {
@@ -172,8 +179,13 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>, state$) => actio
       switchMap(([mainSwaps, privacy2Swaps, pendingOrders]) => {
         const recentSwaps = mainSwaps.swaps.concat(privacy2Swaps.swaps)
 
-        const orders = convertRecentSwaps(recentSwaps, privateSwaps)
-          .concat(convertOrders(pendingOrders))
+        const orders = applyPrivateSwaps(
+          (
+            convertRecentSwaps(recentSwaps, privateSwaps)
+            .concat(convertOrders(pendingOrders))
+          ),
+          privateSwaps
+        )
 
         log.debug(`Orders list updated, ${JSON.stringify(orders)}`)
 
@@ -194,6 +206,17 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>, state$) => actio
     )
 
     return observable
+  })
+)
+
+const cancelPrivateOrder = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexOrdersActions.cancelPrivateOrder),
+  switchMap(action => {
+    const { uuid } = action.payload
+    return of(
+      ResDexOrdersActions.setPrivateOrderStatus(uuid, 'failed'),
+      ResDexOrdersActions.cancelOrder(uuid)
+    )
   })
 )
 
@@ -249,6 +272,7 @@ const setPrivateOrderStatus = (action$: ActionsObservable<Action>) => action$.pi
 export const ResDexOrdersEpic = (action$, state$) => merge(
   getSwapHistoryEpic(action$, state$),
   cancelOrder(action$, state$),
+  cancelPrivateOrder(action$, state$),
   setPrivateOrderStatus(action$, state$),
   linkPrivateOrderToBaseResOrder(action$, state$),
   savePrivateOrder(action$, state$),

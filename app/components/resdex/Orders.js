@@ -67,9 +67,13 @@ class ResDexOrders extends Component<Props> {
     toastr.confirm(t(`Are you sure want to clear the swap history?`), confirmOptions)
   }
 
-  cancelOrder(uuid: string) {
+  cancelOrder(uuid: string, isPrivate: boolean) {
     const { t } = this.props
-    const confirmOptions = { onOk: () => this.props.actions.cancelOrder(uuid) }
+    const confirmOptions = {
+      onOk: () => isPrivate
+        ? this.props.actions.cancelPrivateOrder(uuid)
+        : this.props.actions.cancelOrder(uuid)
+    }
     toastr.confirm(t(`Are you sure want to cancel the order?`), confirmOptions)
   }
 
@@ -114,7 +118,7 @@ class ResDexOrders extends Component<Props> {
           {!order.isSwap &&
             <BorderlessButton
               className={styles.cancelButton}
-              onClick={() => this.cancelOrder(order.uuid)}
+              onClick={() => this.cancelOrder(order.uuid, order.isPrivate)}
               disabled={!order.isCancellable || isCancelling}
               tooltip={order.isCancellable ? null : t(`The order is not cancellable`)}
             >

@@ -23,6 +23,7 @@ export const ResDexOrdersActions = createActions(
     GET_SWAP_HISTORY_FAILED: undefined,
 
     CANCEL_ORDER: (uuid: string) => ({ uuid }),
+    CANCEL_PRIVATE_ORDER: (uuid: string) => ({ uuid }),
     CANCEL_ORDER_FINISHED: undefined,
 
     SAVE_PRIVATE_ORDER: (order: PrivateOrder) => ({order}),
