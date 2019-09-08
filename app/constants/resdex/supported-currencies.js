@@ -61,6 +61,7 @@ const supportedCurrencies = [
   {
     coin: 'BCH',
     id_in_cmc: 'bitcoin-cash',
+    txfee: "5000",
     electrumServers: [
       {
         host: 'bitcoincash.network',
