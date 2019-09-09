@@ -86,6 +86,12 @@ const createOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe
       return of(ResDexBuySellActions.createOrderRejected())
     }
 
+    const nextObservable = verifyErc20(state$, false)
+
+    if (nextObservable !== null) {
+      return nextObservable
+    }
+
     const { fields } = state$.value.roundedForm.resDexBuySell
     let { price } = fields
     const { isMarketOrder, maxRel } = fields
@@ -479,7 +485,7 @@ function verifyBitcoinAmount(state$, baseAmount) {
     return true
 }
 
-function verifyErc20(state$) {
+function verifyErc20(state$, isPrivate) {
   const { resDex } = state$.value
     const { baseCurrency, quoteCurrency } = resDex.buySell
 
@@ -487,16 +493,26 @@ function verifyErc20(state$) {
       return null
     }
 
-    const { balance } = resDex.accounts.currencies.RESDEX_PRIVACY2.ETH || {}
+    const { balance: mainBalance } = resDex.accounts.currencies.RESDEX.ETH || {}
+    const { balance: privacy2Balance } = resDex.accounts.currencies.RESDEX_PRIVACY2.ETH || {}
 
-    if (!balance) {
+    if (!mainBalance || !privacy2Balance) {
       toastr.warning(t(`ResDEX is updating balances, please try again later`))
       return of(ResDexBuySellActions.createOrderRejected())
     }
 
-    log.debug(`ResDEX Privacy 2 ETH balance:`, balance.toString())
+    if (!mainBalance.greaterThanOrEqualTo(Decimal('0.005'))) {
+      toastr.error(t(`Please deposit at least 0.005 ETH into your account before trading with ETH or ERC-20 tokens.`))
+      return ResDexBuySellActions.createOrderRejected()
+    }
 
-    if (balance.greaterThanOrEqualTo(Decimal('0.01'))) {
+    if (!isPrivate) {
+      return null
+    }
+
+    log.debug(`ResDEX Privacy 2 ETH balance:`, privacy2Balance.toString())
+
+    if (privacy2Balance.greaterThanOrEqualTo(Decimal('0.005'))) {
       return null
     }
 
@@ -520,7 +536,7 @@ const createPrivateOrder = (action$: ActionsObservable<Action>, state$) => actio
       return of(ResDexBuySellActions.createOrderRejected())
     }
 
-    const nextObservable = verifyErc20(state$)
+    const nextObservable = verifyErc20(state$, true)
 
     if (nextObservable !== null) {
       return nextObservable
