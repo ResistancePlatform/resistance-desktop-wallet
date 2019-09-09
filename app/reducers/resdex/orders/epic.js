@@ -132,7 +132,10 @@ function applyPrivateSwaps(orders, privateSwaps) {
         isPrivate: true,
       }
     } else {
-      order = { ...o }
+      order = {
+        ...o,
+        isHidden
+      }
     }
 
     return order
