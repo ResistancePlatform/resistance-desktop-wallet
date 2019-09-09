@@ -167,9 +167,13 @@ export class ResDex extends Component<Props> {
    * @memberof ResDex
 	 */
 	render() {
+    const { isExpanded } = this.props.resDex.common
+
     return (
       <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.resDexContainer)}>
-        <div className={styles.dragBar} />
+        {!isExpanded &&
+          <div className={styles.dragBar} />
+        }
 
         {this.props.resDex.login.isRequired
           ?  <ResDexLogin />
