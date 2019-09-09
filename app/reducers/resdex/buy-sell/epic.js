@@ -502,7 +502,7 @@ function verifyErc20(state$, isPrivate) {
     }
 
     if (!mainBalance.greaterThanOrEqualTo(Decimal('0.005'))) {
-      toastr.error(t(`Please deposit at least 0.005 ETH into your account before trading with ETH or ERC-20 tokens.`))
+      toastr.error(t(`Before trading with ETH, or ERC-20 tokens, please deposit at least 0.005 ETH into your account.`))
       return of(ResDexBuySellActions.createOrderRejected())
     }
 
