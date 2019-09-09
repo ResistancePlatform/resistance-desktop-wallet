@@ -286,13 +286,31 @@ const getPollMainProcessBalanceObservable = (privacy, withdrawFromMainToPrivacy1
   return pollingObservable
 }
 
-const getWithdrawFromMainToPrivacy1Observable = (privacy, pollPrivacy2BalanceObservable, state$, relResOrderUuid) => {
+const getWithdrawFromMainToPrivacy1Observable = (privacy, resBaseOrderObservable, state$, relResOrderUuid) => {
   const { currencies } = state$.value.resDex.accounts
-  const { address } = currencies.RESDEX_PRIVACY1.RES
+  const { balance: privacy1Balance, address } = currencies.RESDEX_PRIVACY1.RES
   const { balance } = currencies.RESDEX.RES
 
   log.debug(`Private market order stage 3, withdrawing from the main ResDEX process to Privacy 1`, privacy)
   log.debug(`Withdrawal to: `, address, `amount:`, balance.minus(privacy.initialMainResBalance).toString())
+
+  const initialPrivacy1ResBalance = balance.minus(privacy.initialMainResBalance).plus(privacy1Balance)
+
+  log.debug(
+    `Going to withdraw from ResDEX main to ResDEX privacy 1`,
+    `current main balance`, balance.toString(),
+    `initial main balance`, privacy.initialMainResBalance.toString(),
+    `privacy 1 balance`, privacy1Balance.toString(),
+    `calculated initial privacy 1 balance`, initialPrivacy1ResBalance.toString(),
+  )
+
+  const pollPrivacy2BalanceObservable = getPollPrivacy2BalanceObservable(
+    privacy,
+    resBaseOrderObservable,
+    state$,
+    initialPrivacy1ResBalance
+  )
+
 
   const observable = from(mainApi.withdraw({
     symbol: 'RES',
@@ -539,30 +557,12 @@ const createPrivateOrder = (action$: ActionsObservable<Action>, state$) => actio
 
     const resBaseOrderObservable = defer(() => getResBaseOrderObservable(privacy, createResBaseOrderSuccessObservable, state$, relResOrderUuid))
 
-    const withdrawFromMainToPrivacy1Observable = defer(() => {
-      const { balance } = currencies.RESDEX.RES
-      const { balance: privacy1Balance } = currencies.RESDEX_PRIVACY1.RES
-      const initialPrivacy1ResBalance = balance.minus(privacy.initialMainResBalance).plus(privacy1Balance)
-
-      log.debug(`Going to withdraw from ResDEX main to ResDEX privacy 1`,
-        `current main balance`, balance.toString(),
-        `initial main balance`, privacy.initialMainResBalance.toString(),
-        `privacy 1 balance`, privacy1Balance.toString(),
-        `calculated initial privacy 1 balance`, initialPrivacy1ResBalance.toString(),
-      )
-
-      const pollPrivacy2BalanceObservable = defer(() => getPollPrivacy2BalanceObservable(
-        privacy,
-        resBaseOrderObservable,
-        state$,
-        initialPrivacy1ResBalance
-      ))
-
-      return merge(
+    const withdrawFromMainToPrivacy1Observable = defer(() => (
+      merge(
         of(ResDexOrdersActions.setPrivateOrderStatus(relResOrderUuid, 'privatizing')),
-        getWithdrawFromMainToPrivacy1Observable(privacy, pollPrivacy2BalanceObservable, state$, relResOrderUuid),
+        getWithdrawFromMainToPrivacy1Observable(privacy, resBaseOrderObservable, state$, relResOrderUuid),
       )
-    })
+    ))
 
     const pollMainProcessBalanceObservable = defer(() => getPollMainProcessBalanceObservable(privacy, withdrawFromMainToPrivacy1Observable, state$))
 
