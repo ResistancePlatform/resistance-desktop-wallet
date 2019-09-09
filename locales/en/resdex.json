@@ -14,7 +14,7 @@
   "1Y": "1Y",
   "Max. amount": "Max. amount",
   "Enhanced privacy": "Enhanced privacy",
-  "enhanced-privacy": "Choosing Enhanced Privacy will result in slower transaction speeds. However, this option allows you to use the Resistance coin (RES) as an intermediary mixer that utilizes zero-knowledge proofs to give any coin traded on the DEX privacy elements — even if such benefits didn’t exist before.",
+  "enhanced-privacy": "EXPERIMENTAL: Choosing Enhanced Privacy will result in slower transaction speeds. However, this option allows you to use the Resistance coin (RES) as an intermediary mixer that utilizes zero-knowledge proofs to give any coin traded on the DEX privacy elements — even if such benefits didn’t exist before.",
   "DEX Fee": "DEX Fee",
   "Max. Total Payout": "Max. Total Payout",
   "Deposit {{symbol}}": "Deposit {{symbol}}",
