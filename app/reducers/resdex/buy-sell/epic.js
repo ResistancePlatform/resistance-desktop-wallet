@@ -353,10 +353,12 @@ const getResBaseOrderObservable = (privacy, getSuccessObservable, state$, relRes
   const { baseCurrency, initialPrivacy2ResBalance } = privacy
   const { price: askPrice } = orderBook.baseRes.asks[0]
 
+  const dexFeeRatio = Decimal(1).minus(RESDEX.dexFee.div(Decimal(100)))
+
   const orderOptions = {
     baseCurrency,
     quoteCurrency: 'RES',
-    quoteCurrencyAmount: balance.minus(initialPrivacy2ResBalance),
+    quoteCurrencyAmount: balance.minus(initialPrivacy2ResBalance).times(dexFeeRatio),
     price: askPrice.times(Decimal('1.0001')),
   }
 
@@ -541,6 +543,13 @@ const createPrivateOrder = (action$: ActionsObservable<Action>, state$) => actio
       const { balance } = currencies.RESDEX.RES
       const { balance: privacy1Balance } = currencies.RESDEX_PRIVACY1.RES
       const initialPrivacy1ResBalance = balance.minus(privacy.initialMainResBalance).plus(privacy1Balance)
+
+      log.debug(`Going to withdraw from ResDEX main to ResDEX privacy 1`,
+        `current main balance`, balance.toString(),
+        `initial main balance`, privacy.initialMainResBalance.toString(),
+        `privacy 1 balance`, privacy1Balance.toString(),
+        `calculated initial privacy 1 balance`, initialPrivacy1ResBalance.toString(),
+      )
 
       const pollPrivacy2BalanceObservable = defer(() => getPollPrivacy2BalanceObservable(
         privacy,
