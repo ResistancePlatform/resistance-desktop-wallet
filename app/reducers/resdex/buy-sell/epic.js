@@ -336,6 +336,7 @@ const getPollPrivacy2BalanceObservable = (privacy, resBaseOrderObservable, state
 
   const expectedBalance = (
     initialPrivacy1ResBalance
+      .minus(Decimal(1))
       .minus(Decimal(300).times(RESDEX.resFee))
   )
 
