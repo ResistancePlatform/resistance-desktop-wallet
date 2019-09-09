@@ -65,6 +65,16 @@ export const ResDexOrdersReducer = handleActions(
         }
       }
     }),
+    [ResDexOrdersActions.linkPrivateOrderToBaseResOrder]: (state, action) => ({
+      ...state,
+      privateSwaps: {
+        ...state.privateSwaps,
+        [action.payload.uuid]: {
+          ...(state.privateSwaps[action.payload.uuid] || {}),
+          privacy2Uuid: action.payload.baseResOrderUuid
+        }
+      }
+    }),
     [ResDexOrdersActions.setPrivateOrderStatus]: (state, action) => ({
       ...state,
       privateSwaps: {

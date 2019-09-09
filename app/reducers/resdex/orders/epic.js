@@ -116,10 +116,13 @@ function applyPrivateSwaps(orders, privateSwaps) {
     let order
 
     if (privateSwap) {
+      const linkedOrder = orders.find(r => r.uuid === privateSwap.privacy2Uuid)
+
       order = {
         ...o,
         price: privateSwap.baseCurrencyAmount.div(privateSwap.quoteCurrencyAmount),
         privacy: privateSwap,
+        eventTypes: linkedOrder ? linkedOrder.eventTypes : o.eventTypes,
         baseCurrency: privateSwap.baseCurrency,
         quoteCurrency: privateSwap.quoteCurrency,
         baseCurrencyAmount: privateSwap.baseCurrencyAmount,
