@@ -124,7 +124,7 @@ class StatusIcons extends Component<Props> {
             className={cn('icon', styles.mining, { [styles.active]: childProcessesStatus.MINER === 'RUNNING' })}
             data-tip
             data-for={miningTooltipId}
-            data-place="bottom"
+            data-place="right"
           />
 
           <ReactTooltip
@@ -166,7 +166,7 @@ class StatusIcons extends Component<Props> {
             className={cn('icon', styles.privateTransactions, { [styles.active]: arePrivateTransactionsEnabled })}
             data-tip
             data-for={privateTransactionsTooltipId}
-            data-place="top"
+            data-place="right"
           />
 
           <ReactTooltip
@@ -193,7 +193,7 @@ class StatusIcons extends Component<Props> {
             className={cn('icon', styles.tor, { [styles.active]: childProcessesStatus.TOR === 'RUNNING' })}
             data-tip
             data-for={torTooltipId}
-            data-place="top"
+            data-place="right"
           />
 
           <ReactTooltip
@@ -235,6 +235,7 @@ class StatusIcons extends Component<Props> {
             onKeyDown={() => false}
             data-tip
             data-for={operationsTooltipId}
+            data-place="right"
           />
 
           {this.getOperationIconHint()}
