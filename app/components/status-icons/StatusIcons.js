@@ -125,13 +125,13 @@ class StatusIcons extends Component<Props> {
             data-tip
             data-for={miningTooltipId}
             data-place="bottom"
-            data-event="mouseover"
           />
 
           <ReactTooltip
             id={miningTooltipId}
-            globalEventOff="click"
             className={cn(styles.tooltip)}
+            delayHide={0}
+            effect="solid"
           >
 
             <div className={styles.title}>
@@ -167,13 +167,13 @@ class StatusIcons extends Component<Props> {
             data-tip
             data-for={privateTransactionsTooltipId}
             data-place="top"
-            data-event="mouseover"
           />
 
           <ReactTooltip
             id={privateTransactionsTooltipId}
-            globalEventOff="click"
             className={cn(styles.tooltip)}
+            delayHide={0}
+            effect="solid"
           >
             <div className={styles.title}>
               {t(`Private transactions`)}
@@ -183,7 +183,7 @@ class StatusIcons extends Component<Props> {
               <div className={cn(styles.label, {[styles.active]: !arePrivateTransactionsEnabled})}>{t(`Off`)}</div>
               <ToggleButton
                 value={arePrivateTransactionsEnabled}
-                onChange={this.props.sendCurrencyActions.togglePrivateSend}
+                onChange={this.props.sendCurrencyActions.togglePrivateTransactions}
               />
               <div className={cn(styles.label, {[styles.active]: arePrivateTransactionsEnabled})}>{t(`On`)}</div>
             </div>
@@ -194,13 +194,13 @@ class StatusIcons extends Component<Props> {
             data-tip
             data-for={torTooltipId}
             data-place="top"
-            data-event="mouseover"
           />
 
           <ReactTooltip
             id={torTooltipId}
-            globalEventOff="click"
             className={cn(styles.tooltip)}
+            delayHide={0}
+            effect="solid"
           >
             <div className={styles.title}>
               {t(`Tor status`)}
@@ -235,15 +235,15 @@ class StatusIcons extends Component<Props> {
             onKeyDown={() => false}
             data-tip
             data-for={operationsTooltipId}
-            data-event="mouseover"
           />
 
           {this.getOperationIconHint()}
 
           <ReactTooltip
             id={operationsTooltipId}
-            globalEventOff="click"
             className={cn(styles.tooltip)}
+            delayHide={0}
+            effect="solid"
           >
             <div className={styles.title}>
               {t(`Operations`)}
