@@ -69,5 +69,9 @@
   "With Tor enabled, users can achieve greater privacy by masking their IP addresses. This feature is currently in BETA phase.": "With Tor enabled, users can achieve greater privacy by masking their IP addresses. This feature is currently in BETA phase.",
   "Password changed.": "Password changed.",
   "The old wallet password is incorrect.": "The old wallet password is incorrect.",
-  "Error changing the password, check the log for details.": "Error changing the password, check the log for details."
+  "Error changing the password, check the log for details.": "Error changing the password, check the log for details.",
+  "Wallet": "Wallet",
+  "The wallet restored successfully": "The wallet restored successfully",
+  "Restarting Resistance with the new mining address…": "Restarting Resistance with the new mining address…",
+  "Restarting Resistance with the new wallet…": "Restarting Resistance with the new wallet…"
 }
