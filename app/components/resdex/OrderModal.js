@@ -76,20 +76,23 @@ class OrderModal extends Component<Props> {
 
           <div className={cn(styles.stagesContainer, styles.slider, {[styles.close]: status === 'privatizing'})}>
             <ul>
+              <li className={cn({ [styles.active]: order.eventTypes.includes('Started') })}>
+                {t(`KYC check`)}
+              </li>
               <li className={cn({ [styles.active]: order.eventTypes.includes('TakerFeeSent') })}>
                 {t(`My fee`)}
               </li>
               <li className={cn({ [styles.active]: order.eventTypes.includes('TakerFeeSent') })}>
-                {t(`My deposit`)}
+                {t(`Their Payment`)}
               </li>
               <li className={cn({ [styles.active]: order.eventTypes.includes('MakerPaymentValidatedAndConfirmed') })}>
-                {t(`Their deposit`)}
+                {t(`My Payment`)}
               </li>
               <li className={cn({ [styles.active]: order.eventTypes.includes('TakerPaymentSpent') })}>
-                {t(`My payment`)}
+                {t(`Their Spend`)}
               </li>
               <li className={cn({ [styles.active]: this.getIsFinished(order) })}>
-                {t(`Their spend`)}
+                {t(`My Spend`)}
               </li>
             </ul>
           </div>

@@ -52,7 +52,7 @@ $orderModalWidth: 28.3125rem;
     list-style-type: none;
     display: flex;
     text-transform: uppercase;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 100;
     color: $BASE_COLOR_FONT_GRAY;
     white-space: nowrap;
@@ -62,7 +62,7 @@ $orderModalWidth: 28.3125rem;
   }
 
   li {
-    width: 20%;
+    width: 16.667%;
     text-align: center;
     padding-bottom: 0.9rem;
     border-bottom: 1px solid $BASE_COLOR_BORDER_GRAY;
