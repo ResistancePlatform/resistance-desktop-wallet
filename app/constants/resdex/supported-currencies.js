@@ -66,6 +66,14 @@ const supportedCurrencies = [
       {
         host: 'bitcoincash.network',
         port: 50001,
+      },
+      {
+        host: 'bch.loping.net',
+        port: 50001,
+      },
+      {
+        host: 'electrumx-bch.cryptonermal.net',
+        port: 50001,
       }
     ],
   },

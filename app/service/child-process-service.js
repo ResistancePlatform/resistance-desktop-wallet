@@ -176,6 +176,7 @@ export class ChildProcessService {
 
     const childProcess = this::spawnProcess(processName, args, spawnOptions)
 
+    childProcessInfo.timeStarted = new Date()
     childProcessInfo.instance = childProcess
     childProcessInfo.shutdown = shutdownFunction
 

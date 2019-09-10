@@ -1,11 +1,14 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import moment from 'moment'
+import { remote } from 'electron'
 import { bindActionCreators } from 'redux';
 import { translate } from 'react-i18next'
 import ReactTooltip from 'react-tooltip'
 import * as Joi from 'joi'
 import cn from 'classnames'
+import log from 'electron-log'
 
 import { getPasswordValidationSchema } from '~/utils/auth'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
@@ -37,6 +40,29 @@ class Login extends Component<Props> {
 	props: Props
 
 	/**
+	 * @memberof Login
+	 */
+  getIsRescanning(): boolean {
+    const { NODE: childProcessInfo } = remote.getGlobal('childProcesses')
+    const { NODE: nodeStatus } = this.props.settings.childProcessesStatus
+
+    const { timeStarted } = childProcessInfo
+
+    log.debug(`time started`, timeStarted)
+    log.debug(`node status`, nodeStatus)
+
+    if (!timeStarted || nodeStatus !== 'STARTING') {
+      return false
+    }
+
+    if (moment(timeStarted).isBefore(moment().subtract(15, 'seconds'))) {
+      return true
+    }
+
+    return false
+  }
+
+	/**
 	 * @returns
    * @memberof Login
 	 */
@@ -65,6 +91,12 @@ class Login extends Component<Props> {
           {this.props.auth.reason &&
             <div className={styles.reason}>
               {this.props.auth.reason}
+            </div>
+          }
+
+          {this.getIsRescanning() &&
+            <div className={styles.reason}>
+              {t(`Please be patient… The blockchain is rescanning. Please don’t quit the application.`)}
             </div>
           }
 
