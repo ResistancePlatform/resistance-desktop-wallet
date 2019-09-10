@@ -8,7 +8,6 @@ import { translate } from 'react-i18next'
 import ReactTooltip from 'react-tooltip'
 import * as Joi from 'joi'
 import cn from 'classnames'
-import log from 'electron-log'
 
 import { getPasswordValidationSchema } from '~/utils/auth'
 import { SettingsState } from '~/reducers/settings/settings.reducer'
@@ -39,23 +38,45 @@ type Props = {
 class Login extends Component<Props> {
 	props: Props
 
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      time: moment()
+    }
+  }
+
 	/**
 	 * @memberof Login
 	 */
-  getIsRescanning(): boolean {
+	componentDidMount() {
+    this.intervalId = setInterval(
+      () => this.setState({ time: moment() }),
+      1000
+    )
+  }
+
+	/**
+	 * @memberof Login
+	 */
+	componentWillUnmount() {
+    clearInterval(this.intervalId)
+  }
+
+	/**
+	 * @memberof Login
+	 */
+  getIsRescanning() {
     const { NODE: childProcessInfo } = remote.getGlobal('childProcesses')
     const { NODE: nodeStatus } = this.props.settings.childProcessesStatus
 
     const { timeStarted } = childProcessInfo
 
-    log.debug(`time started`, timeStarted)
-    log.debug(`node status`, nodeStatus)
-
     if (!timeStarted || nodeStatus !== 'STARTING') {
       return false
     }
 
-    if (moment(timeStarted).isBefore(moment().subtract(15, 'seconds'))) {
+    if (moment(timeStarted).isBefore(this.state.time.subtract(15, 'seconds'))) {
       return true
     }
 
@@ -69,6 +90,7 @@ class Login extends Component<Props> {
 	render() {
     const { t } = this.props
     const isNodeRunning = this.props.settings.childProcessesStatus.NODE === 'RUNNING'
+    const isRescanning = this.getIsRescanning()
 
     return (
       <React.Fragment>
@@ -94,7 +116,7 @@ class Login extends Component<Props> {
             </div>
           }
 
-          {this.getIsRescanning() &&
+          {isRescanning &&
             <div className={styles.reason}>
               {t(`Please be patient… The blockchain is rescanning. Please don’t quit the application.`)}
             </div>
