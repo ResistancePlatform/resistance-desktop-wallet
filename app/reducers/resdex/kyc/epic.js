@@ -27,7 +27,8 @@ const register = (action$: ActionsObservable<Action>) => action$.pipe(
           return of(ResDexKycActions.registrationSucceeded(), routerActions.push('/resdex'))
         }
 
-        toastr.error(t(`Error submitting verification data to ResDEX, please make sure your Internet connection is good or check the log for details.`))
+        // toastr.error(t(`Error submitting verification data to ResDEX, please make sure your Internet connection is good or check the log for details.`))
+        toastr.error(t(`Your KYC application is currently being reviewed, please try again later.`))
         return of(ResDexKycActions.registrationFailed())
       })
     )
