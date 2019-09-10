@@ -167,12 +167,21 @@ export class ResDex extends Component<Props> {
    * @memberof ResDex
 	 */
 	render() {
+    const { t } = this.props
     const { isExpanded } = this.props.resDex.common
+    const isVerified = this.getIsVerified()
 
     return (
       <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.resDexContainer)}>
         {!isExpanded &&
-          <div className={styles.dragBar} />
+          <div className={styles.dragBar}>
+            {!this.props.resDex.login.isRequired && !isVerified &&
+              <div className={styles.kycNote}>
+                <strong>{t(`Please note`)}:</strong>
+                {t(`To begin using ResDEX you will need to complete KYC verification. Click the Get Verified button next to the ResDEX tab to get started.`)}
+              </div>
+            }
+          </div>
         }
 
         {this.props.resDex.login.isRequired
