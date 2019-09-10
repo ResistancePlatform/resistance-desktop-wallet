@@ -78,7 +78,7 @@ class ResDexLogin extends Component<Props> {
         {isSyncing &&
           <div className={styles.syncContainer}>
             <div className={styles.sync}>
-              {t(`Please wait until Resistance is 100% synchronised before logging in…`)}
+              {t(`Please wait until Resistance is 100% synchronized before logging in…`)}
             </div>
           </div>
         }

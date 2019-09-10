@@ -50,7 +50,7 @@ export function getSetMiningAddressObservable(successObservable, errorAction) {
         }
 
         const { address } = response[0][0]
-        log.debug(`Setting mining address to`, address)
+        log.info(`Setting mining address to`, address)
 
         config.set('miningAddress', address)
 
@@ -61,7 +61,7 @@ export function getSetMiningAddressObservable(successObservable, errorAction) {
           address,
         })
 
-        log.debug(`Setting mining address succeeded`, successObservable)
+        log.info(`Setting mining address succeeded`, successObservable)
 
         return successObservable
       }),
