@@ -352,7 +352,7 @@ export class ChildProcessService {
           log.error('Child process startup timed out')
           reject(new Error(`Startup timed out`))
         }
-      }, 1200000)
+      }, 2400000)
     })
 
     return () => promise
