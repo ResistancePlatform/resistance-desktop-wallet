@@ -32,14 +32,12 @@ function convertRecentSwaps(swaps) {
     const lastEventType = lastEvent.event.type
 
     switch (lastEventType) {
+      case RESDEX.errorEvents.includes(lastEventType):
+        return 'failed'
       case 'Finished':
         return 'completed'
       case 'Negotiated':
         return 'matched'
-      case 'NegotiateFailed':
-        return 'unmatched'
-      case RESDEX.errorEvents.includes(lastEventType):
-        return 'failed'
       default:
     }
     return 'swapping'

@@ -41,6 +41,11 @@ class ChooseWalletInput extends GenericInput {
 
   renderInput() {
     const selectedCurrency = this.props.currencies[this.state.value]
+
+    if (!selectedCurrency) {
+      return null
+    }
+
     const displayBalance = selectedCurrency.balance.minus(selectedCurrency.lockedAmount)
 
     return (

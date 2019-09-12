@@ -266,7 +266,7 @@ class ResDexApiService {
 				averageVolume: Decimal(order.avevolume),
 				maxVolume: Decimal(order.maxvolume),
 				zCredits: order.zcredits,
-			}))
+			})).sort((o1, o2) => o2.price.minus(o1.price).toNumber())
 
 		const formattedResponse = {
 			asks: formatOrders(response.asks),
@@ -348,11 +348,11 @@ class ResDexApiService {
 
     const trades = swaps.map(item => ({
       uuid: item[0],
-      time: moment.unix(item[1]).toDate(),
+      time: moment(item[1]).toDate(),
       baseAmount: Decimal(item[2]),
       quoteAmount: Decimal(item[3]),
       price: Decimal(item[4]),
-    }))
+    })).sort((t1, t2) => t2.time - t1.time)
 
     return trades
   }

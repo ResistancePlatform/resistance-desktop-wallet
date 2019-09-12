@@ -5,6 +5,7 @@ import cn from 'classnames'
 import { translate } from 'react-i18next'
 
 import styles from './UniformList.scss'
+import scrollStyles from '~/assets/styles/scrollbar.scss'
 import VLayout from '~/assets/styles/v-box-layout.scss'
 import animatedSpinner from '~/assets/images/animated-spinner.svg'
 
@@ -14,6 +15,7 @@ type Props = {
   emptyMessage?: string | false,
   sortKeys?: string[],
   scrollable?: boolean,
+  scrollBottom?: boolean,
   loading?: boolean,
   +items: object[],
   +headerRenderer: item => void,
@@ -37,6 +39,16 @@ class UniformList extends Component<Props> {
     this.header.props.children.forEach(child => {
       this.headerWidths.push(child.props.width || 'auto')
     })
+  }
+
+	/**
+	 * @memberof UniformList
+	 */
+	componentDidMount() {
+    if (!this.props.scrollBottom || !this.element) {
+      return
+    }
+    this.element.scrollTop = this.element.scrollHeight
   }
 
 	/**
@@ -116,11 +128,13 @@ class UniformList extends Component<Props> {
     }
 
     return (
-      <div className={cn(
+      <div
+        ref={el => { this.element = el } }
+        className={cn(
         styles.container,
         VLayout.vBoxChild,
         this.props.className,
-        {[styles.scrollable]: this.props.scrollable}
+        {[scrollStyles.scrollbar]: this.props.scrollable}
       )}>
 
         {this.props.items.length > 0 && this.getHeader()}

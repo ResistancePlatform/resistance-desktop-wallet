@@ -63,16 +63,19 @@ class OrderBook extends Component<Props> {
         className={cn(styles.row, { [styles.myOrder]: order.address === smartAddress })}
         onClick={e => this.onRowClick(e, order.price)}
       >
-        <UniformListColumn>
+        <UniformListColumn className={cn(styles.column, {
+          [styles.red]: isAsk,
+          [styles.green]: !isAsk
+        })}>
           {toDecimalPlaces(order.price)}
         </UniformListColumn>
-        <UniformListColumn>
+        <UniformListColumn className={styles.column}>
           {isAsk
             ? toDecimalPlaces(order.maxVolume.times(order.price))
             : toDecimalPlaces(order.maxVolume, 4)
           }
         </UniformListColumn>
-        <UniformListColumn>
+        <UniformListColumn className={styles.column}>
           {isAsk
             ? toDecimalPlaces(order.maxVolume, 4)
             : toDecimalPlaces(order.maxVolume.dividedBy(order.price))
@@ -111,6 +114,8 @@ class OrderBook extends Component<Props> {
             rowRenderer={item => this.getListRowRenderer(item, this.props.baseSmartAddress, true)}
             emptyMessage={t(`No liquidity available yet`)}
             loading={isLoading}
+            scrollable
+            scrollBottom
           />
 
         </div>
@@ -127,6 +132,7 @@ class OrderBook extends Component<Props> {
             rowRenderer={item => this.getListRowRenderer(item, this.props.quoteSmartAddress, false)}
             emptyMessage={t(`No liquidity available yet`)}
             loading={isLoading}
+            scrollable
           />
 
         </div>

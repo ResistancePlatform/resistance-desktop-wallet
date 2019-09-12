@@ -682,7 +682,34 @@ const getTrades = (action$: ActionsObservable<Action>, state$) => action$.pipe(
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
 
     const tradesObservable = from(mainApi.getTrades(baseCurrency, quoteCurrency)).pipe(
-      map(trades => ResDexBuySellActions.gotTrades({baseCurrency, quoteCurrency}, trades)),
+      map(trades => {
+        const updatedTrades = []
+
+        let lastTrade = null
+
+        for (let index = trades.length - 1; index >= 0; index -= 1) {
+          let isAscending = true
+
+          const trade = trades[index]
+
+          if (lastTrade) {
+            if (lastTrade.price.equals(trade.price)) {
+              ({ isAscending } = lastTrade)
+            } else {
+              isAscending = lastTrade.price.lessThan(trade.price)
+            }
+          }
+
+          updatedTrades.unshift({
+            ...trade,
+            isAscending,
+          })
+
+          lastTrade = trade
+        }
+
+        return ResDexBuySellActions.gotTrades({baseCurrency, quoteCurrency}, updatedTrades)
+      }),
       catchError(err => {
         log.error(`Can't get order trades`, err)
         toastr.error(t(`Error getting trades, please check the log for details`))

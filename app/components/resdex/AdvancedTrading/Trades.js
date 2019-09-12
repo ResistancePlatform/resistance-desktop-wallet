@@ -16,6 +16,7 @@ import styles from './Trades.scss'
 
 type Props = {
   t: any,
+  i18n: any,
   baseCurrency: string,
   quoteCurrency: string,
   resDex: ResDexState,
@@ -36,31 +37,40 @@ class Trades extends Component<Props> {
     return (
       <UniformListHeader>
         <UniformListColumn width="30%">{t(`Price`)}</UniformListColumn>
-        <UniformListColumn width="20%">{quoteCurrency}</UniformListColumn>
-        <UniformListColumn width="20%">{baseCurrency}</UniformListColumn>
-        <UniformListColumn width="20%">{t(`Time`)}</UniformListColumn>
+        <UniformListColumn width="25%">{quoteCurrency}</UniformListColumn>
+        <UniformListColumn width="25%">{baseCurrency}</UniformListColumn>
+        <UniformListColumn width="10%">{t(`Time`)}</UniformListColumn>
       </UniformListHeader>
     )
   }
 
   getListRowRenderer(trade) {
+    const { i18n } = this.props
+
     return (
-      <UniformListRow>
-        <UniformListColumn>
-          {toDecimalPlaces(trade.price, 4)}
+      <UniformListRow className={styles.row}>
+        <UniformListColumn className={cn(styles.column, {
+          [styles.green]: trade.isAscending,
+          [styles.red]: !trade.isAscending
+        })}>
+          {toDecimalPlaces(trade.price, 8)}
         </UniformListColumn>
-        <UniformListColumn>
+        <UniformListColumn className={styles.column}>
           {toDecimalPlaces(trade.quoteAmount, 4)}
         </UniformListColumn>
-        <UniformListColumn>
+        <UniformListColumn className={styles.column}>
           {toDecimalPlaces(trade.baseAmount, 4)}
         </UniformListColumn>
-        <UniformListColumn>
+        <UniformListColumn
+          className={styles.column}
+          tooltip={moment(trade.time).locale(i18n.language).format('L kk:mm')}
+        >
           {moment(trade.time).format('HH:mm:ss')}
         </UniformListColumn>
       </UniformListRow>
     )
   }
+
 	render() {
     const { t, trades } = this.props
 
@@ -79,7 +89,7 @@ class Trades extends Component<Props> {
             className={styles.list}
             items={trades}
             headerRenderer={() => this.getListHeaderRenderer()}
-            rowRenderer={item => this.getListRowRenderer(item)}
+            rowRenderer={(item, index) => this.getListRowRenderer(item, index)}
             emptyMessage={t(`No market trades available yet`)}
             scrollable
             loading={isLoading}
