@@ -22,9 +22,9 @@ const mainApi = resDexApiFactory('RESDEX')
 function convertRecentSwaps(swaps) {
 
   const orderStatus = events => {
-    const unmatched = events.find(event => event.event.type === 'NegotiateFailed')
+    const isFailed = events.find(event => RESDEX.errorEvents.includes(event.event.type))
 
-    if (unmatched) {
+    if (isFailed) {
       return 'failed'
     }
 
@@ -32,14 +32,13 @@ function convertRecentSwaps(swaps) {
     const lastEventType = lastEvent.event.type
 
     switch (lastEventType) {
-      case RESDEX.errorEvents.includes(lastEventType):
-        return 'failed'
       case 'Finished':
         return 'completed'
       case 'Negotiated':
         return 'matched'
       default:
     }
+
     return 'swapping'
   }
 

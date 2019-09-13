@@ -372,22 +372,22 @@ const supportedCurrencies = [
     txfee: 100000,
     id_in_cmc: 'litecoin',
     electrumServers: [
-      {
-        host: 'electrum1.cipig.net',
-        port: 10065,
-      },
-      {
-        host: 'electrum2.cipig.net',
-        port: 10065,
-      },
-      {
-        host: 'electrum3.cipig.net',
-        port: 10065,
-      },
-      {
-        host: '34.205.81.68',
-        port: 10004,
-      }
+			{
+				host: 'electrum-ltc.bysh.me',
+				port: 50001,
+			},
+			{
+				host: 'electrum.ltc.xurious.com',
+				port: 50001,
+			},
+			{
+				host: 'ltc.rentonisk.com',
+				port: 50001,
+			},
+			{
+				host: 'backup.electrum-ltc.org',
+				port: 50001,
+			},
     ],
   },
   {

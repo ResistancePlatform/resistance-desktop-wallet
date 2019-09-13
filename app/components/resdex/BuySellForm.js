@@ -263,17 +263,19 @@ class BuySellForm extends Component<Props> {
 
               </div>
 
-              <div className={styles.box}>
+              <div className={cn(styles.box)}>
+                {/* Base/Rel are reverted for setprice orders */}
+
                 <div className={styles.caption}>
-                  {t(`Price {{symbol}}`, {symbol: quoteCurrency})}
-                  <Info tooltip={t(`The minimum price in RES you will accept for 1 {{symbol}}`, {symbol: quoteCurrency})} />
+                  {t(`Price {{symbol}}`, {symbol: baseCurrency})}
+                  <Info tooltip={t(`The minimum price in {{quoteCurrency}} you will accept for 1 {{baseCurrency}}`, {quoteCurrency, baseCurrency})} />
                 </div>
 
                 <PriceInput
                   name="price"
                   bestPrice={this.getBestPrice()}
-                  baseCurrency={baseCurrency}
-                  quoteCurrency={quoteCurrency}
+                  baseCurrency={quoteCurrency}
+                  quoteCurrency={baseCurrency}
                   disabled={orderAttrs.isMarket || orderAttrs.isPrivate}
                 />
 

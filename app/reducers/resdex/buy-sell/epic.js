@@ -190,9 +190,11 @@ const getCreateLimitOrderObservable = (options, successObservable, failureAction
   } = options
 
   const requestOpts = {
-    baseCurrency,
-    quoteCurrency,
-    baseCurrencyAmount: quoteCurrencyAmount.dividedBy(price).times(Decimal('0.999')),
+    // Base/Rel are reverted for setprice orders
+    baseCurrency: quoteCurrency,
+    quoteCurrency: baseCurrency,
+    // baseCurrencyAmount: quoteCurrencyAmount.dividedBy(price).times(Decimal('0.999')),
+    baseCurrencyAmount: quoteCurrencyAmount,
     price,
   }
 
@@ -207,45 +209,11 @@ const getCreateLimitOrderObservable = (options, successObservable, failureAction
         return of(failureAction(message))
       }
 
-      // const swap = {
-      //   uuid: createUuid(),
-      //   base: baseCurrency,
-      //   rel: quoteCurrency,
-      //   basevalue: 0,
-      //   relvalue: 0,
-      // }
-      //
-      // const { swapHistory } = state$.value.resDex.orders
-      //
-      // const previousSwap = swapHistory.find(order => (
-      //   !order.isMarket
-      //   && order.isActive
-      //   && order.baseCurrency === baseCurrency
-      //   && order.quoteCurrency === quoteCurrency
-      // ))
-      //
-      // if (previousSwap) {
-      //   log.debug(`Cancelling the existing limit order(s)`)
-      //   // TODO: Fix for ResDEX 2
-      //   // swapDB.forceSwapStatus(previousSwap.uuid, 'cancelled')
-      // }
-
-      // Amount and total are just for the display
-      // TODO: Fix for ResDEX 2
-      // const flattenedOptions = flattenDecimals({
-      //   ...requestOpts,
-      //   amount: Decimal(quoteCurrencyAmount).dividedBy(price).toDP(8, Decimal.ROUND_FLOOR),
-      //   total: Decimal(quoteCurrencyAmount).toDP(8, Decimal.ROUND_FLOOR),
-      //   isMarket: false,
-      // })
-      // log.debug(`Inserting a swap`, swap, flattenedOptions)
-      // swapDB.insertSwapData(swap, flattenedOptions, false)
-
       return successObservable
     }),
     catchError(err => {
-      log.error(`Swap error`, err)
-      return of(failureAction(t(`Can't create a limit order: {{error}}`, err.message)))
+      log.error(`Can't create a limit order:`, err)
+      return of(failureAction(err.message))
     })
   )
 

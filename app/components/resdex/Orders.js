@@ -84,6 +84,8 @@ class ResDexOrders extends Component<Props> {
     const { i18n, t } = this.props
 
     const { isCancelling } = this.props.orders
+    const quoteLabel = `${toDecimalPlaces(order.quoteCurrencyAmount)} ${order.quoteCurrency}`
+    const baseLabel = `${toDecimalPlaces(order.baseCurrencyAmount)} ${order.baseCurrency}`
 
     return (
       <UniformListRow
@@ -95,16 +97,16 @@ class ResDexOrders extends Component<Props> {
           {moment(order.timeStarted).locale(i18n.language).format('kk:mm L')}
         </UniformListColumn>
         <UniformListColumn>
-          {order.baseCurrency}/{order.quoteCurrency}
+          {order.isMarket ? order.baseCurrency : order.quoteCurrency}/{order.isMarket ? order.quoteCurrency : order.baseCurrency}
         </UniformListColumn>
         <UniformListColumn>
           {order.isMarket ? t(`Market`) : t(`Limit`)}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.lesser)}>
-          -{toDecimalPlaces(order.quoteCurrencyAmount)} {order.quoteCurrency}
+          -{order.isMarket ? quoteLabel : baseLabel}
         </UniformListColumn>
         <UniformListColumn className={cn(styles.amount, styles.greater)}>
-          {toDecimalPlaces(order.baseCurrencyAmount)} {order.baseCurrency}
+          {order.isMarket ? baseLabel : quoteLabel}
         </UniformListColumn>
         <UniformListColumn>
           <i className={cn('icon', styles.private, { [styles.enabled]: order.isPrivate })} />
