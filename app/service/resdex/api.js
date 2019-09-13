@@ -4,6 +4,7 @@ import moment from 'moment'
 import crypto from 'crypto'
 import rp from 'request-promise-native'
 import log from 'electron-log'
+import { timeParse } from 'd3-time-format'
 
 import { RESDEX } from '~/constants/resdex'
 import { getActualSeedPhrase, getProcessSettings } from '~/service/resdex/resdex'
@@ -320,6 +321,9 @@ class ResDexApiService {
     })
 
     log.debug(`OHLC data response`, JSON.stringify(response))
+
+    const parseTime = timeParse("%B %d, %Y")
+    log.debug(`parseTime`, typeof parseTime("June 30, 2015"), parseTime("June 30, 2015"))
 
     // [timestamp, high, low, open, close, relvolume, basevolume, aveprice, numtrades]
     const ohlcData = response.map(item => ({

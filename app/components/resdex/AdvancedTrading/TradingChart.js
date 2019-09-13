@@ -516,7 +516,6 @@ class TradingChart extends Component<Props> {
           width={width}
           margin={margin}
           type="hybrid"
-          seriesName="RES/MONA"
           data={data}
           xAccessor={d => d && d.date}
           xScale={xScale}

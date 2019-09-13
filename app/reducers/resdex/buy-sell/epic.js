@@ -7,6 +7,9 @@ import { getCurrency } from '~/utils/resdex'
 import { ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 
+import { tsvParse } from  'd3-dsv'
+import { timeParse } from 'd3-time-format'
+
 import { translate } from '~/i18next.config'
 import { RESDEX } from '~/constants/resdex'
 import { flattenDecimals } from '~/utils/decimal'
@@ -16,6 +19,26 @@ import { ResDexBuySellActions } from './reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
 import { ResDexAccountsActions } from '~/reducers/resdex/accounts/reducer'
 
+function getMsftOhlcDataPromise() {
+    function parseData(parse) {
+      return d => ({
+        ...d,
+        date: parse(d.date),
+        open: +d.open,
+        high: +d.high,
+        low: +d.low,
+        close: +d.close,
+        volume: +d.volume,
+      })
+    }
+
+    const msftDataPromise = (
+      fetch("https://cdn.rawgit.com/rrag/react-stockcharts/master/docs/data/MSFT.tsv")
+        .then(response => response.text())
+        .then(data => tsvParse(data, parseData(timeParse("%Y-%m-%d"))))
+    )
+    return msftDataPromise
+}
 
 const t = translate('resdex')
 const mainApi = resDexApiFactory('RESDEX')
@@ -628,10 +651,8 @@ const getOhlc = (action$: ActionsObservable<Action>, state$) => action$.pipe(
       year: 365 * 24 * 60 * 60,
     }[period] || 24 * 60 * 60
 
-    // Fake data
-    // const ohlcObservable = from(getMsftOhlcDataPromise()).pipe(
-
-    const ohlcObservable = from(mainApi.getOhlc(baseCurrency, quoteCurrency, periodSeconds)).pipe(
+    const ohlcObservable = from(getMsftOhlcDataPromise()).pipe(
+    // const ohlcObservable = from(mainApi.getOhlc(baseCurrency, quoteCurrency, periodSeconds)).pipe(
       map(ohlc => ResDexBuySellActions.gotOhlc({baseCurrency, quoteCurrency}, ohlc)),
       catchError(err => {
         log.error(`Can't get order ticks`, err)
