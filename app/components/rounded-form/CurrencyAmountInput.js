@@ -48,7 +48,7 @@ export default class CurrencyAmountInput extends RoundedInput {
           className={cn(parentStyles.input, styles.input)}
           name={this.props.name}
           type="number"
-          step={this.props.step || '0.1'}
+          step={this.props.step || '0.001'}
           min={this.props.min || '0'}
           max={this.getTruncatedMaxAmount()}
           value={this.state.value}

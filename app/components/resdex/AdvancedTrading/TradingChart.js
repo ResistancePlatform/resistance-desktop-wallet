@@ -423,6 +423,7 @@ class TradingChart extends Component<Props> {
       case 8:
       case 46: {
         const newInteractive = Object.keys(interactive).reduce((accumulated, key) => ({
+          ...accumulated,
           [key]: interactive[key].filter(item => !item.selected)
         }), {})
         log.debug('New interactive', newInteractive)

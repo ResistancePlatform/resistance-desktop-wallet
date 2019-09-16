@@ -57,6 +57,7 @@ export const ResDexBuySellActions = createActions(
     RESET_INDICATOR: (key: string) => ({key}),
     CLOSE_INDICATORS_MODAL: undefined,
 
+    CLEAR_ALL_INTERACTIVE: undefined,
     UPDATE_INTERACTIVE_MODE: (mode: string | null) => ({ mode }),
     UPDATE_INTERACTIVE: (config: object) => ({ ...config }),
 
@@ -259,6 +260,16 @@ export const ResDexBuySellReducer = handleActions(
       tradingChart: {
         ...state.tradingChart,
         interactiveMode: action.payload.mode
+      }
+    }),
+    [ResDexBuySellActions.clearAllInteractive]: state => ({
+      ...state,
+      tradingChart: {
+        ...state.tradingChart,
+        interactive: Object.keys(state.tradingChart.interactive).reduce((accumulated, key) => ({
+          ...accumulated,
+          [key]: []
+        }), {}),
       }
     }),
     [ResDexBuySellActions.updateInteractive]: (state, action) => ({
