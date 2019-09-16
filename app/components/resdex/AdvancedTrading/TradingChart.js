@@ -5,6 +5,7 @@ import { translate } from 'react-i18next'
 import log from 'electron-log'
 
 import { format } from 'd3-format'
+import { scaleTime } from 'd3-scale'
 import { discontinuousTimeScaleProvider } from 'react-stockcharts/lib/scale'
 import { ChartCanvas, Chart } from 'react-stockcharts'
 import { OHLCTooltip } from 'react-stockcharts/lib/tooltip'
@@ -227,7 +228,6 @@ class TradingChart extends Component<Props> {
 
     const {
       data,
-      xScale,
       xAccessor,
       displayXAccessor,
     } = xScaleProvider(this.tweakData(initialData))
@@ -236,12 +236,12 @@ class TradingChart extends Component<Props> {
 
     const result = {
       data: calculatedData,
-      xScale,
+      xScale: scaleTime(),
       xAccessor,
       displayXAccessor,
     }
 
-    log.debug('data', calculatedData)
+    // log.debug('data', calculatedData)
 
     return result
 	}
@@ -538,7 +538,7 @@ class TradingChart extends Component<Props> {
               inverted
             />
 
-            { this.getXAxis(xGrid, true) }
+            { this.getXAxis(xGrid, bottomIndicatorsNumber === 0) }
 
             <MouseCoordinateY
               at="right"

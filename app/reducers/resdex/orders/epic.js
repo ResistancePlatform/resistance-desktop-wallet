@@ -190,7 +190,7 @@ const getSwapHistoryEpic = (action$: ActionsObservable<Action>, state$) => actio
           privateSwaps
         )
 
-        log.debug(`Orders list updated, ${JSON.stringify(orders)}`)
+        // log.debug(`Orders list updated, ${JSON.stringify(orders)}`)
 
         // Track pending activities to ask user for a quit confirmation
         remote.getGlobal('pendingActivities').orders = Boolean(
