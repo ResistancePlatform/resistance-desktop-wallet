@@ -222,7 +222,7 @@ class BuySellForm extends Component<Props> {
               defaultChecked
               defaultValue={false}
             >
-              {t(`Limit Order`)}
+              {t(`Limit Order (Maker Only)`)}
             </RadioButton>
           </div>
         }

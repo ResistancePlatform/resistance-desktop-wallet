@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
 
-import { toDecimalPlaces } from '~/utils/decimal'
+import { toDecimalPlaces, toMaxDigits } from '~/utils/decimal'
 import {
   UniformList,
   UniformListHeader,
@@ -50,16 +50,24 @@ class Trades extends Component<Props> {
     return (
       <UniformListRow className={styles.row}>
         <UniformListColumn className={cn(styles.column, {
-          [styles.green]: trade.isAscending,
-          [styles.red]: !trade.isAscending
-        })}>
-          {toDecimalPlaces(trade.price, 8)}
+            [styles.green]: trade.isAscending,
+            [styles.red]: !trade.isAscending
+          })}
+          tooltip={toDecimalPlaces(trade.price, 8)}
+        >
+          {toMaxDigits(trade.price)}
         </UniformListColumn>
-        <UniformListColumn className={styles.column}>
-          {toDecimalPlaces(trade.quoteAmount, 4)}
+        <UniformListColumn
+          className={styles.column}
+          tooltip={toDecimalPlaces(trade.quoteAmount, 8)}
+        >
+          {toMaxDigits(trade.quoteAmount, 8)}
         </UniformListColumn>
-        <UniformListColumn className={styles.column}>
-          {toDecimalPlaces(trade.baseAmount, 4)}
+        <UniformListColumn
+          className={styles.column}
+          tooltip={toDecimalPlaces(trade.baseAmount, 8)}
+        >
+          {toMaxDigits(trade.baseAmount, 8)}
         </UniformListColumn>
         <UniformListColumn
           className={styles.column}

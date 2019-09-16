@@ -25,8 +25,21 @@ function flattenDecimals(object) {
   return result
 }
 
+function toMaxDigits(amount, number: number = 10) {
+  const maxDigitsAfterComma = 8
+  const flattened = toDecimalPlaces(amount, maxDigitsAfterComma)
+
+  if (flattened.length > number) {
+    const digitsAfterComma = maxDigitsAfterComma - (flattened.length - number)
+    return toDecimalPlaces(amount, Math.max(0, digitsAfterComma))
+  }
+
+  return flattened
+}
+
 export {
   truncateAmount,
   toDecimalPlaces,
-  flattenDecimals
+  flattenDecimals,
+  toMaxDigits
 }

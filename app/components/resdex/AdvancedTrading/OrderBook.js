@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import cn from 'classnames'
 import log from 'electron-log'
 
-import { toDecimalPlaces } from '~/utils/decimal'
+import { toDecimalPlaces, toMaxDigits } from '~/utils/decimal'
 import {
   UniformList,
   UniformListHeader,
@@ -64,21 +64,27 @@ class OrderBook extends Component<Props> {
         onClick={e => this.onRowClick(e, order.price)}
       >
         <UniformListColumn className={cn(styles.column, {
-          [styles.red]: isAsk,
-          [styles.green]: !isAsk
-        })}>
-          {toDecimalPlaces(order.price)}
+            [styles.red]: isAsk,
+            [styles.green]: !isAsk
+          })}
+          tooltip={toDecimalPlaces(order.price, 8)}
+        >
+          {toMaxDigits(order.price, 8)}
         </UniformListColumn>
-        <UniformListColumn className={styles.column}>
+        <UniformListColumn
+          className={styles.column}
+        >
           {isAsk
-            ? toDecimalPlaces(order.maxVolume.times(order.price))
-            : toDecimalPlaces(order.maxVolume, 4)
+            ? toMaxDigits(order.maxVolume.times(order.price), 8)
+            : toMaxDigits(order.maxVolume, 8)
           }
         </UniformListColumn>
-        <UniformListColumn className={styles.column}>
+        <UniformListColumn
+          className={styles.column}
+        >
           {isAsk
-            ? toDecimalPlaces(order.maxVolume, 4)
-            : toDecimalPlaces(order.maxVolume.dividedBy(order.price))
+            ? toMaxDigits(order.maxVolume, 8)
+            : toMaxDigits(order.maxVolume.dividedBy(order.price), 8)
           }
         </UniformListColumn>
         {/*
