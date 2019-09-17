@@ -26,15 +26,20 @@ function flattenDecimals(object) {
 }
 
 function toMaxDigits(amount, number: number = 10) {
-  const maxDigitsAfterComma = 8
-  const flattened = toDecimalPlaces(amount, maxDigitsAfterComma)
+  const flattened = toDecimalPlaces(amount, 8)
 
-  if (flattened.length > number) {
-    const digitsAfterComma = maxDigitsAfterComma - (flattened.length - number)
-    return toDecimalPlaces(amount, Math.max(0, digitsAfterComma))
+  if (flattened.length <= number) {
+    return flattened
   }
 
-  return flattened
+  const splitted = flattened.split('.')
+
+  if (splitted.length < 2) {
+    return flattened
+  }
+
+  const digitsToCut = flattened.length - number
+  return flattened.substring(0, flattened.length - Math.min(digitsToCut, splitted.pop().length))
 }
 
 export {
