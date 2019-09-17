@@ -184,6 +184,10 @@ export class ResDex extends Component<Props> {
           </div>
         }
 
+        {isExpanded &&
+          <div className={cn(styles.dragBar, styles.expanded)} />
+        }
+
         {this.props.resDex.login.isRequired
           ?  <ResDexLogin />
           : this.getContents()

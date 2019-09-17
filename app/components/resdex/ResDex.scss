@@ -25,6 +25,16 @@
   -webkit-app-region: drag;
   height: 3.2rem;
   display: block;
+
+  &.expanded {
+    position: absolute;
+    height: 0.7rem;
+    width: 100%;
+    right: 0;
+    top: -2px;
+    cursor: pointer;
+    pointer-events: none;
+  }
 }
 
 .kycNote {
