@@ -343,7 +343,7 @@ class ResDexApiService {
       from_uuid: null
     })
 
-    log.debug(`Get Trades response`, JSON.stringify(response))
+    // log.debug(`Get Trades response`, JSON.stringify(response))
     const { swaps } = response.result
 
     const trades = swaps.map(item => ({

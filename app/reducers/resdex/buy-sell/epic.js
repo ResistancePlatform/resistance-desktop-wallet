@@ -617,7 +617,8 @@ const selectTab = (action$: ActionsObservable<Action>) => action$.pipe(
 const getOhlc = (action$: ActionsObservable<Action>, state$) => action$.pipe(
   ofType(ResDexBuySellActions.getOhlc),
   switchMap(() => {
-    const { baseCurrency, quoteCurrency, period } = state$.value.resDex.buySell
+    const { baseCurrency, quoteCurrency, tradingChart } = state$.value.resDex.buySell
+    const { period } = tradingChart
 
     const periodSeconds = {
       hour: 60 * 60,
@@ -638,6 +639,11 @@ const getOhlc = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 
     return ohlcObservable
   })
+)
+
+const updateChartPeriod = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(ResDexBuySellActions.updateChartPeriod),
+  mapTo(ResDexBuySellActions.getOhlc())
 )
 
 const getTrades = (action$: ActionsObservable<Action>, state$) => action$.pipe(
@@ -683,11 +689,6 @@ const getTrades = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 
     return tradesObservable
   })
-)
-
-const updateChartPeriod = (action$: ActionsObservable<Action>) => action$.pipe(
-  ofType(ResDexBuySellActions.updateChartPeriod),
-  mapTo(ResDexBuySellActions.getOhlc()),
 )
 
 const cancelIndicatorEdition = (action$: ActionsObservable<Action>) => action$.pipe(

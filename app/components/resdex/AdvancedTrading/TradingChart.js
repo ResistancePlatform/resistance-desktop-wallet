@@ -274,7 +274,7 @@ class TradingChart extends Component<Props> {
         firstDate.setMonth(firstDate.getMonth() - barsNumber)
         break
       case 'year':
-        firstDate.setYear(firstDate.getMonth() - barsNumber)
+        firstDate.setMonth(firstDate.getMonth() - barsNumber * 12)
         break
       case 'all':
         firstDate = first(data).date
