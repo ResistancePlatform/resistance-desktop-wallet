@@ -257,7 +257,9 @@ class TradingChart extends Component<Props> {
       return []
     }
 
-    const lastDate = last(data).date
+    // const lastDate = last(data).date
+    const lastDate = new Date()
+
     let firstDate = new Date(lastDate.getTime())
 
     switch (period) {
@@ -274,7 +276,7 @@ class TradingChart extends Component<Props> {
         firstDate.setMonth(firstDate.getMonth() - barsNumber)
         break
       case 'year':
-        firstDate.setMonth(firstDate.getMonth() - barsNumber * 12)
+        firstDate.setFullYear(firstDate.getFullYear() - barsNumber)
         break
       case 'all':
         firstDate = first(data).date
@@ -509,7 +511,7 @@ class TradingChart extends Component<Props> {
           </div>
         }
 
-        {!isLoading && data.length > 1 &&
+        {!isLoading && data.length > 2 &&
         <ChartCanvas
           ref={el => this.chartRef(el)}
           height={height}
