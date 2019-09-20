@@ -468,7 +468,7 @@ class TradingChart extends Component<Props> {
 	render() {
     const { t, width, ratio } = this.props
 
-		const margin = { left: 50, right: 50, top: 20, bottom: 30 }
+		const margin = { left: 50, right: 75, top: 20, bottom: 30 }
     const { xGrid, yGrid } = this.getGrids(margin)
 
     const height = this.getHeight()

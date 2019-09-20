@@ -94,6 +94,7 @@ function getOrders(options) {
       ref={el => ref(interactiveType, chartId, el)}
       yCoordinateList={yCoordinateList}
       defaultPriceCoordinate={defaultPriceCoordinate}
+      displayFormat={format('.6f')}
     />
   )
 }

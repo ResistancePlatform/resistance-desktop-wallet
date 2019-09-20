@@ -268,7 +268,7 @@ class BuySellForm extends Component<Props> {
 
                 <div className={styles.caption}>
                   {t(`Price {{symbol}}`, {symbol: baseCurrency})}
-                  <Info tooltip={t(`The minimum price in {{quoteCurrency}} you will accept for 1 {{baseCurrency}}`, {quoteCurrency, baseCurrency})} />
+                  <Info tooltip={t(`The maximum amount of {{quoteCurrency}} you will accept for 1 {{baseCurrency}}`, {quoteCurrency, baseCurrency})} />
                 </div>
 
                 <PriceInput

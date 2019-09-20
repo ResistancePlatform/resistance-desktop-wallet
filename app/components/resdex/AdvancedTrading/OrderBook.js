@@ -75,7 +75,7 @@ class OrderBook extends Component<Props> {
           className={styles.column}
         >
           {isAsk
-            ? toMaxDigits(order.maxVolume.times(order.price), 8)
+            ? toMaxDigits(order.maxVolume.dividedBy(order.price), 8)
             : toMaxDigits(order.maxVolume, 8)
           }
         </UniformListColumn>
@@ -84,7 +84,7 @@ class OrderBook extends Component<Props> {
         >
           {isAsk
             ? toMaxDigits(order.maxVolume, 8)
-            : toMaxDigits(order.maxVolume.dividedBy(order.price), 8)
+            : toMaxDigits(order.maxVolume.times(order.price), 8)
           }
         </UniformListColumn>
         {/*
