@@ -24,9 +24,9 @@ import styles from './system-info.scss'
 
 const childProcess = new ChildProcessService()
 
-const daemonInfoPollingInterval = 2.0
-const blockchainInfoPollingInterval = 4.0
-const operationsPollingInterval = 3.0
+const daemonInfoPollingInterval = 11.0
+const blockchainInfoPollingInterval = 10.0
+const operationsPollingInterval = 12.0
 
 type Props = {
   t: any,
@@ -225,7 +225,7 @@ class SystemInfo extends Component<Props> {
 					{ /* Resistance status coloumn */}
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>{t(`Synchronized`)}</div>
-						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockchainInfo.blockchainSynchronizedPercentage}%</div>
+						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockchainInfo.synchronizedPercentage}%</div>
 					</div>
 
 					{ /* Resistance status coloumn */}

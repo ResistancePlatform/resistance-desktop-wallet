@@ -58,8 +58,8 @@ class ResDexLogin extends Component<Props> {
 	 * @memberof ResDexLogin
 	 */
   getIsSyncing() {
-    const { blockchainSynchronizedPercentage } = this.props.systemInfo.blockchainInfo
-    return Math.floor(blockchainSynchronizedPercentage) < 100
+    const { synchronizedPercentage } = this.props.systemInfo.blockchainInfo
+    return Math.floor(synchronizedPercentage) < 100
   }
 
 	/**

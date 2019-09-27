@@ -281,22 +281,29 @@ export class RpcService {
     const client = getClientInstance()
 
     const blockchainInfo: BlockchainInfo = {
+			lastBlockDate: null,
       connectionCount: 0,
-      blockchainSynchronizedPercentage: 0,
-      lastBlockDate: null
+      synchronizedPercentage: 0
     }
 
     client.getConnectionCount()
       .then(result => {
         blockchainInfo.connectionCount = result
-        return client.getBlockCount()
+				return client.getBlockCount()
       })
       .then(result => client.getBlockHash(result))
       .then(result => client.getBlock(result))
       .then(result => {
-        log.debug(`Blockchain info: ${result}`)
-        blockchainInfo.lastBlockDate = new Date(result.time * 1000)
-        blockchainInfo.blockchainSynchronizedPercentage = this.getBlockchainSynchronizedPercentage(blockchainInfo.lastBlockDate)
+				blockchainInfo.lastBlockDate = new Date(result.time * 1000)
+        return client.getBlockchainInfo()
+      })
+      .then(result => {
+        blockchainInfo.synchronizedPercentage = 0
+
+        if (result.headers > 0) {
+          blockchainInfo.synchronizedPercentage = 100.0 * result.blocks / result.headers
+        }
+
         getStore().dispatch(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
         return Promise.resolve()
       })
@@ -306,34 +313,6 @@ export class RpcService {
         const errorPrefix = t(`Unable to get blockchain info`)
         getStore().dispatch(SystemInfoActions.getBlockchainInfoFailure(`${errorPrefix}: ${err}`, err.code))
       })
-  }
-
-  /**
-   * @param {*} tempDate
-   * @memberof RpcService
-   */
-  getBlockchainSynchronizedPercentage(tempDate: Date) {
-    // TODO: Get the start date right after ZCash release - from first block!!!
-    const startDate = new Date('28 Oct 2016 02:00:00 GMT')
-    const nowDate = new Date()
-
-    const fullTime = nowDate.getTime() - startDate.getTime()
-    const remainingTime = nowDate.getTime() - tempDate.getTime()
-
-    // After 20 min we report 100% anyway
-    if (remainingTime > 20 * 60 * 1000) {
-      let dPercentage = 100 - remainingTime / fullTime * 100
-      if (dPercentage < 0) {
-        dPercentage = 0
-      } else if (dPercentage > 100) {
-        dPercentage = 100
-      }
-
-      // Also set a member that may be queried
-      return parseFloat(dPercentage.toFixed(2))
-    }
-
-    return 100
   }
 
   /**
@@ -451,7 +430,8 @@ export class RpcService {
             isUnspent: plainPublicUnspentAddresses.includes(addr),
             disabled: false
           }))
-          //.filter(item => !(item.address.startsWith('rr') || item.address.startsWith('rs')))
+
+          // .filter(item => !(item.address.startsWith('rr') || item.address.startsWith('rs')))
 
         // Add Ledger Address to List
         if(getStore().getState().ownAddresses.connectLedgerModal.isLedgerResistanceAppOpen){

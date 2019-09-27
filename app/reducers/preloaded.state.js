@@ -49,7 +49,7 @@ export const preloadedState: State = {
 		daemonInfo: {},
 		blockchainInfo: {
 			connectionCount: 0,
-			blockchainSynchronizedPercentage: 0,
+			synchronizedPercentage: 0,
 			lastBlockDate: null
 		},
     operations: [],
