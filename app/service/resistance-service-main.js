@@ -7,8 +7,7 @@ import { app, dialog, remote } from 'electron'
 import rimraf from 'rimraf'
 
 import { translate } from '../i18next.config'
-import { getOS } from '../utils/os'
-
+import { getOS, getResourcesPath } from '../utils/os'
 
 const generator = require('generate-password')
 const PropertiesReader = require('properties-reader')
@@ -170,5 +169,33 @@ export class ResistanceService {
         app.quit()
       })
     }
+  }
+
+	/**
+   * Removes old Resistance node data
+   *
+	 * @memberof ResistanceService
+	 */
+  checkAndCopyPeersDat() {
+    const peersName = 'peers.dat'
+    const sourcePath = path.join(getResourcesPath(), 'bin', peersName)
+    const flagPath = path.join(this.getDataPath(), '.peers')
+
+    if (fs.existsSync(flagPath)) {
+      const { mtime: flagMTime } = fs.statSync(flagPath)
+      const { mtime: sourceMTime } = fs.statSync(sourcePath)
+
+      if (flagMTime > sourceMTime) {
+        log.debug(`No need to update peers.dat`, flagMTime, sourceMTime)
+        return
+      }
+    }
+
+    log.debug(`Updating peers.dat`)
+
+    const destinationPath = path.join(this.getDataPath(), peersName)
+
+    fs.copyFileSync(sourcePath, destinationPath)
+    fs.closeSync(fs.openSync(flagPath, 'w'))
   }
 }
