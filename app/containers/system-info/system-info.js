@@ -156,6 +156,8 @@ class SystemInfo extends Component<Props> {
 	render() {
     const { t } = this.props
     const { isExpanded: isResDexExpanded } = this.props.resDex.common
+    const { synchronizedPercentage } = this.props.systemInfo.blockchainInfo
+    const synchronizedPercentageCaption = synchronizedPercentage.toLocaleString(undefined, {maximumFractionDigits: 2})
 
 		return (
 			<div className={cn(styles.systemInfoContainer, HLayout.hBoxContainer, {[styles.shrink]: isResDexExpanded})}>
@@ -225,7 +227,7 @@ class SystemInfo extends Component<Props> {
 					{ /* Resistance status coloumn */}
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>{t(`Synchronized`)}</div>
-						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockchainInfo.synchronizedPercentage}%</div>
+						<div className={styles.statusColoumnValue}>{synchronizedPercentageCaption}%</div>
 					</div>
 
 					{ /* Resistance status coloumn */}

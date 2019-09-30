@@ -3,6 +3,8 @@ import { Decimal } from 'decimal.js'
 import { InteractiveYCoordinate } from 'react-stockcharts/lib/interactive'
 import log from 'electron-log'
 
+import { format } from 'd3-format'
+
 import { translate } from '~/i18next.config'
 import { RESDEX } from '~/constants/resdex'
 import { toDecimalPlaces } from '~/utils/decimal'
