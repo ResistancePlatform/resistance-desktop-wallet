@@ -237,15 +237,14 @@ class SystemInfo extends Component<Props> {
 					</div>
 
 					{ /* Resistance status coloumn */}
-					{/* <div className={styles.statusColumnWrapper}>
-						<div className={styles.statusColoumnTitle}>{t(`Resident`)}</div>
-						<div className={styles.statusColoumnValue}>{this.props.resident}</div>
-					</div> */}
-
-					{ /* Resistance status coloumn */}
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>{t(`Connections`)}</div>
 						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockchainInfo.connectionCount}</div>
+					</div>
+
+					<div className={styles.statusColumnWrapper}>
+						<div className={styles.statusColoumnTitle}>{t(`Version`)}</div>
+						<div className={styles.statusColoumnValue}>2.2.4</div>
 					</div>
 
 				</div>
