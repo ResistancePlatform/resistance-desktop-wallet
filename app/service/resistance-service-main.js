@@ -5,9 +5,10 @@ import path from 'path'
 import log from 'electron-log'
 import { app, dialog, remote } from 'electron'
 import rimraf from 'rimraf'
+import config from 'electron-settings'
 
 import { translate } from '../i18next.config'
-import { getOS, getResourcesPath } from '../utils/os'
+import { getOS, getResourcesPath, getAppDataPath } from '../utils/os'
 
 const generator = require('generate-password')
 const PropertiesReader = require('properties-reader')
@@ -19,6 +20,7 @@ const t = translate('service')
  */
 let instance = null
 
+const walletFolderName = ''
 const configFolderName = 'Resistance'
 const configFileName = 'resistance.conf'
 const configFileContents = [
@@ -172,7 +174,7 @@ export class ResistanceService {
   }
 
 	/**
-   * Removes old Resistance node data
+   * Copies bundled peers.dat if needed
    *
 	 * @memberof ResistanceService
 	 */
@@ -198,4 +200,49 @@ export class ResistanceService {
     fs.copyFileSync(sourcePath, destinationPath)
     fs.closeSync(fs.openSync(flagPath, 'w'))
   }
+
+	/**
+   * Copies current file to a backup folder
+   *
+	 * @memberof ResistanceService
+	 */
+  backupWallet() {
+    const backupFolder = path.join(getAppDataPath(), 'Backups')
+
+    if (!fs.existsSync(backupFolder)) {
+      fs.mkdirSync(backupFolder)
+    }
+
+    const now = new Date()
+    const timestamp = now.toISOString()
+
+    const walletName = config.get('wallet.name', 'wallet')
+    const newBackupFilePath = path.join(backupFolder, `${walletName}.${timestamp}.dat`)
+
+    const existingBackups = fs.readdirSync(backupFolder).sort().reverse()
+    log.debug('existingBackups', existingBackups)
+
+    const latestBackup = existingBackups.find(s => s.startsWith(walletName) && s.toLowerCase().endsWith('.dat'))
+    log.debug('latestBackup', latestBackup)
+
+    const walletFilePath = path.join(this.getDataPath(), walletFolderName, `${walletName}.dat`)
+
+    if (latestBackup) {
+      const latestBackupPath = path.join(backupFolder, latestBackup)
+      const { size: sourceSize } = fs.statSync(walletFilePath)
+      const { size: backupSize } = fs.statSync(latestBackupPath)
+      log.debug('sourceSize', sourceSize)
+      log.debug('backupSize', backupSize)
+
+      if (backupSize === sourceSize) {
+        log.debug(`No need to backup the wallet.`)
+        return
+      }
+    }
+
+    log.debug(`Backing up the wallet.`)
+
+    fs.copyFileSync(walletFilePath, newBackupFilePath)
+  }
+
 }

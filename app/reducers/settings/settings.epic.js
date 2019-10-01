@@ -4,7 +4,7 @@ import config from 'electron-settings'
 import path from 'path'
 import * as fs from 'fs'
 import { promisify } from 'util'
-import { remote, ipcRenderer } from 'electron'
+import { remote, ipcRenderer, shell } from 'electron'
 import {
   tap,
   filter,
@@ -31,6 +31,7 @@ import { toastr } from 'react-redux-toastr'
 import { i18n, translate } from '~/i18next.config'
 import { RPC } from '~/constants/rpc'
 import { getEnsureLoginObservable } from '~/utils/auth'
+import { getAppDataPath } from '~/utils/os'
 import { Action } from '../types'
 import { AuthActions } from '../auth/auth.reducer'
 import { SettingsActions } from './settings.reducer'
@@ -392,6 +393,15 @@ const restoringWalletFailedEpic = (action$: ActionsObservable<Action>) => action
   })
 )
 
+const openWalletBackupsFolder = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(SettingsActions.openWalletBackupsFolder),
+  map(() => {
+    const backupFolder = path.join(getAppDataPath(), 'Backups')
+    shell.openItem(backupFolder)
+    return SettingsActions.empty()
+  })
+)
+
 const childProcessFailedEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SettingsActions.childProcessFailed),
 	tap((action) => {
@@ -495,6 +505,7 @@ export const SettingsEpics = (action$, state$) => merge(
   restoreWalletEpic(action$, state$),
   setNewMiningAddressEpic(action$, state$),
   restoringWalletFailedEpic(action$, state$),
+  openWalletBackupsFolder(action$, state$),
 	childProcessFailedEpic(action$, state$),
 	childProcessMurderFailedEpic(action$, state$),
   stopChildProcessesEpic(action$, state$),
