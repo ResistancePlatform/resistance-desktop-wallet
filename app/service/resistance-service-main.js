@@ -214,7 +214,7 @@ export class ResistanceService {
     }
 
     const now = new Date()
-    const timestamp = now.toISOString()
+    const timestamp = now.toISOString().replace(/:/g, '.')   // Windows doesn't support colons in file names
 
     const walletName = config.get('wallet.name', 'wallet')
     const newBackupFilePath = path.join(backupFolder, `${walletName}.${timestamp}.dat`)
