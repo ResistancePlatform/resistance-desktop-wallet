@@ -10,6 +10,7 @@ import { translate } from 'react-i18next'
 const mapStateToProps = state => ({
   settings: state.settings,
   resDex: state.resDex,
+  kyc: state.kyc,
 })
 
 const mapDispatchToProps = dispatch => ({

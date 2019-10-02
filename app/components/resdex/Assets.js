@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
+import log from 'electron-log'
 
 import { RESDEX } from '~/constants/resdex'
 import { getSortedCurrencies, getCurrencyName } from '~/utils/resdex'
@@ -204,6 +205,8 @@ class ResDexAssets extends Component<Props> {
     const { zCredits } = this.props.accounts
     const resPrice = this.getLastPrice('RES')
 
+    log.debug(`ZCredits`, zCredits)
+
 		return (
       <div className={cn(styles.container)}>
 
@@ -261,7 +264,7 @@ class ResDexAssets extends Component<Props> {
           {t(`Instant DEX`)}
 
           <div className={styles.amount}>
-            {zCredits ? `${zCredits} RES` : t(`N/A`)}
+            {zCredits ? `${toDecimalPlaces(zCredits)} RES` : t(`N/A`)}
           </div>
 
           <div className={styles.equity}>

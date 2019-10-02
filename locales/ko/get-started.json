@@ -47,5 +47,7 @@
   "Unable to restart Resistance local node": "Resistance 로컬 노드를 다시 시작할 수 없습니다",
   "Mining": "채광",
   "Restarting the local node...": "로컬 노드 다시 시작 중 ...",
-  "Error creating mining address, check the application log for details.": "마이닝 주소를 만드는 동안 오류가 발생했습니다. 응용 프로그램 로그에서 자세한 내용을 확인하십시오."
+  "Error creating mining address, check the application log for details.": "마이닝 주소를 만드는 동안 오류가 발생했습니다. 응용 프로그램 로그에서 자세한 내용을 확인하십시오.",
+  "Error getting setting mining address, unable to get wallet addresses list.": "마이닝 주소를 설정하는 중 오류가 발생하여 지갑 주소 목록을 가져올 수 없습니다.",
+  "Error setting mining address, check the application log for details.": "마이닝 주소를 설정하는 동안 오류가 발생했습니다. 자세한 내용은 응용 프로그램 로그를 확인하십시오."
 }

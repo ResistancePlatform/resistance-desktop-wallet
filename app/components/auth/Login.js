@@ -1,6 +1,8 @@
 // @flow
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import moment from 'moment'
+import { remote } from 'electron'
 import { bindActionCreators } from 'redux';
 import { translate } from 'react-i18next'
 import ReactTooltip from 'react-tooltip'
@@ -36,6 +38,51 @@ type Props = {
 class Login extends Component<Props> {
 	props: Props
 
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      time: moment()
+    }
+  }
+
+	/**
+	 * @memberof Login
+	 */
+	componentDidMount() {
+    this.intervalId = setInterval(
+      () => this.setState({ time: moment() }),
+      1000
+    )
+  }
+
+	/**
+	 * @memberof Login
+	 */
+	componentWillUnmount() {
+    clearInterval(this.intervalId)
+  }
+
+	/**
+	 * @memberof Login
+	 */
+  getIsRescanning() {
+    const { NODE: childProcessInfo } = remote.getGlobal('childProcesses')
+    const { NODE: nodeStatus } = this.props.settings.childProcessesStatus
+
+    const { timeStarted } = childProcessInfo
+
+    if (!timeStarted || nodeStatus !== 'STARTING') {
+      return false
+    }
+
+    if (moment(timeStarted).isBefore(this.state.time.subtract(15, 'seconds'))) {
+      return true
+    }
+
+    return false
+  }
+
 	/**
 	 * @returns
    * @memberof Login
@@ -43,6 +90,7 @@ class Login extends Component<Props> {
 	render() {
     const { t } = this.props
     const isNodeRunning = this.props.settings.childProcessesStatus.NODE === 'RUNNING'
+    const isRescanning = this.getIsRescanning()
 
     return (
       <React.Fragment>
@@ -65,6 +113,12 @@ class Login extends Component<Props> {
           {this.props.auth.reason &&
             <div className={styles.reason}>
               {this.props.auth.reason}
+            </div>
+          }
+
+          {isRescanning &&
+            <div className={styles.reason}>
+              {t(`Please be patient… The blockchain is rescanning. Please don’t quit the application.`)}
             </div>
           }
 

@@ -8,8 +8,8 @@ export type Operation = { [string]: any }
 
 export type BlockchainInfo = {
 	connectionCount: number,
-	blockchainSynchronizedPercentage: number,
-	lastBlockDate: Date | null
+  synchronizedPercentage: number,
+  lastBlockDate: Date | null
 }
 
 export type SystemInfoState = {

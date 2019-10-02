@@ -2,7 +2,7 @@
 @import "~/assets/styles/tabs.scss";
 
 .expanded {
-  margin-top: -3rem;
+  margin-top: 0.2rem;
   position: relative;
   padding-right: 0.5rem;
 
@@ -25,6 +25,31 @@
   -webkit-app-region: drag;
   height: 3.2rem;
   display: block;
+
+  &.expanded {
+    position: absolute;
+    height: 0.7rem;
+    width: 100%;
+    right: 0;
+    top: -2px;
+    cursor: pointer;
+    pointer-events: none;
+  }
+}
+
+.kycNote {
+  padding: 0.5rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  background: $BASE_COLOR_PURPLE;
+
+  strong {
+    margin-right: 0.4rem;
+  }
+
+  color: $BASE_COLOR_WHITE;
+  font-size: 0.7rem;
+  text-align: justify;
 }
 
 .resDexContainer {

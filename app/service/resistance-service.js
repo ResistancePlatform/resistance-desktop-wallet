@@ -30,14 +30,14 @@ const configFileName = 'resistance.conf'
 const configFileContents = [
   // Uncomment for testnet
   // `testnet=1`,
+  `txindex=1`,
   `rpcuser=resuser`,
   `rpcpassword=%generatedPassword%`,
   ``
 ].join(EOL)
 
-const resistancedArgs = ['-printtoconsole', '-rpcthreads=8', '-server']
+const resistancedArgs = ['-printtoconsole', '-rpcthreads=32', '-rpcworkqueue=64', '-server']
 const torSwitch = '-proxy=127.0.0.1:9050'
-
 
 /**
  * @export

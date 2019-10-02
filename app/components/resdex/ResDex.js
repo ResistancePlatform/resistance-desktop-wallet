@@ -41,19 +41,8 @@ export class ResDex extends Component<Props> {
 	props: Props
 
   getIsVerified() {
-    const { defaultPortfolioId, portfolios } = this.props.resDex.login
-
-    if (!portfolios || defaultPortfolioId === null) {
-      return false
-    }
-
-    const portfolio = portfolios.find(p => p.id === defaultPortfolioId)
-
-    if (!portfolio) {
-      return false
-    }
-
-    return portfolio.isVerified
+    const { kyc } = this.props.resDex
+    return kyc.isRegistered
   }
 
   getGetVerifiedTooltip() {
@@ -80,7 +69,7 @@ export class ResDex extends Component<Props> {
     return (
       <div className={cn({[styles.expanded]: isExpanded})}>
         <RpcPolling
-          interval={10.0}
+          interval={30.0}
           criticalChildProcess="RESDEX"
           actions={{
             polling: ResDexAccountsActions.getCurrencies,
@@ -89,10 +78,8 @@ export class ResDex extends Component<Props> {
           }}
         />
 
-        {
-        /*
         <RpcPolling
-          interval={3.5}
+          interval={10.0}
           criticalChildProcess="RESDEX"
           actions={{
             polling: ResDexAccountsActions.getZCredits,
@@ -101,14 +88,14 @@ export class ResDex extends Component<Props> {
           }}
         />
 
-          */
-        }
-
         {this.props.resDex.accounts.instantDexDepositModal.isVisible &&
           <InstantDexDepositModal />
         }
         {this.props.resDex.accounts.depositModal.isVisible &&
           <DepositModal />
+        }
+        {this.props.resDex.accounts.depositModal.isResDex2Visible &&
+          <DepositModal resdex2 />
         }
         {this.props.resDex.accounts.withdrawModal.isVisible &&
           <WithdrawModal />
@@ -180,9 +167,26 @@ export class ResDex extends Component<Props> {
    * @memberof ResDex
 	 */
 	render() {
+    const { t } = this.props
+    const { isExpanded } = this.props.resDex.common
+    const isVerified = this.getIsVerified()
+
     return (
       <div className={cn(HLayout.hBoxChild, VLayout.vBoxContainer, styles.resDexContainer)}>
-        <div className={styles.dragBar} />
+        {!isExpanded &&
+          <div className={styles.dragBar}>
+            {!this.props.resDex.login.isRequired && !isVerified &&
+              <div className={styles.kycNote}>
+                <strong>{t(`Please note`)}:</strong>
+                {t(`To begin using ResDEX you will need to complete KYC verification. Click the Get Verified button next to the ResDEX tab to get started.`)}
+              </div>
+            }
+          </div>
+        }
+
+        {isExpanded &&
+          <div className={cn(styles.dragBar, styles.expanded)} />
+        }
 
         {this.props.resDex.login.isRequired
           ?  <ResDexLogin />

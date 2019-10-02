@@ -8,6 +8,7 @@ import cn from 'classnames'
 import { translate } from 'react-i18next'
 import log from 'electron-log'
 
+import { RESDEX } from '~/constants/resdex'
 import { toDecimalPlaces } from '~/utils/decimal'
 import {
   Info,
@@ -58,7 +59,11 @@ class BuySellForm extends Component<Props> {
   getMaxQuoteAmount() {
     const { quoteCurrency } = this.props.buySell
     const currency = this.props.accounts.currencies.RESDEX[quoteCurrency]
-    return currency && currency.balance || Decimal(0)
+    if (!currency) {
+      return Decimal(0)
+    }
+    const maxAmount = currency.balance.minus(currency.lockedAmount)
+    return maxAmount.times(Decimal(1).minus(RESDEX.dexFee.dividedBy(Decimal(100))))
   }
 
   getBestPrice(): object | null {
@@ -67,61 +72,76 @@ class BuySellForm extends Component<Props> {
     return asks.length ? asks[0].price : null
   }
 
-  getZCreditsQuoteEquivalent() {
+  getBaseResEquivalent() {
+    const { quoteCurrency } = this.props.buySell
+    const { orderBook } = this.props.buySell
+
+    if (!this.props.form) {
+      return null
+    }
+
+    const { maxRel } = this.props.form.fields
+
+    if (!maxRel) {
+      return null
+    }
+
+    if (quoteCurrency === 'RES') {
+      return Decimal(maxRel)
+    }
+
+    if (!orderBook.resQuote.asks.length) {
+      return null
+    }
+
+    const resAmount = Decimal(maxRel).dividedBy(orderBook.resQuote.asks[0].price)
+
+    return resAmount
+  }
+
+  getZCreditsBaseEquivalentCaption() {
+    const { baseCurrency } = this.props.buySell
+    const { orderBook } = this.props.buySell
+
+    const baseRes = this.getBaseResEquivalent()
+
+    if (baseRes === null) {
+      return null
+    }
+
     const { zCredits } = this.props.accounts
 
     if (zCredits === null) {
       return null
     }
 
-    const { RESDEX: currencies } = this.props.accounts.currencies
-    const { quoteCurrency } = this.props.buySell
+    let priceInRes = Decimal(1)
 
-    if (!(quoteCurrency in currencies)) {
-      return null
+    if (baseCurrency !== 'RES') {
+      if (!orderBook.baseRes.bids.length) {
+        return null
+      }
+
+      const baseAmount = baseRes.dividedBy(orderBook.baseRes.bids[0].price)
+
+      priceInRes = baseRes.dividedBy(baseAmount)
     }
 
-    const { price } = currencies[quoteCurrency]
+    const amount = zCredits.dividedBy(priceInRes)
 
-    if (price.isZero()) {
-      return { amount: zCredits, symbol: 'RES' }
-    }
-
-    const amount = zCredits.dividedBy(price)
-    return { amount, symbol: quoteCurrency }
+    return `${toDecimalPlaces(amount)} ${baseCurrency}`
   }
 
-  getZCreditsQuoteEquivalentCaption() {
-    const equivalent = this.getZCreditsQuoteEquivalent()
-
-    if (equivalent === null) {
-      return null
-    }
-
-    const { amount, symbol } = equivalent
-    return `${toDecimalPlaces(amount)} ${symbol}`
-  }
-
-  getIsInstanceSwapAllowed() {
+  getIsInstantSwapAllowed(): boolean {
     const { zCredits } = this.props.accounts
-    const equivalent = this.getZCreditsQuoteEquivalent()
+    const resBase = this.getBaseResEquivalent()
 
-    if (zCredits == null || equivalent === null || !this.props.form) {
+    if (zCredits == null || resBase  === null || resBase.isZero()) {
       return false
     }
 
-    const { maxRel } = this.props.form.fields
-
-    if (!maxRel) {
-      return false
-    }
-
-    // Show instant swaps as allowed if the order book is empty and zCredits balance is present
-    if (equivalent.symbol === 'RES') {
-      return zCredits.greaterThan(Decimal(0))
-    }
-
-    return zCredits.greaterThanOrEqualTo(Decimal(maxRel))
+    const dynamicTrust = zCredits.minus(resBase.times(Decimal('1.05')))
+    return dynamicTrust.greaterThanOrEqualTo(Decimal(0))
   }
 
   getOrderAttributes() {
@@ -147,7 +167,7 @@ class BuySellForm extends Component<Props> {
 
     const arePendingPrivateOrdersPresent = swapHistory.filter(
       swap => swap.isPrivate &&
-      !['completed', 'failed'].includes(swap.privacy.status)
+      !['completed', 'failed', 'cancelled'].includes(swap.privacy.status)
     ).length
 
     const areAllAsksPresent = orderAttrs.isPrivate
@@ -168,16 +188,17 @@ class BuySellForm extends Component<Props> {
     const { t, isAdvanced } = this.props
     const { baseCurrency, quoteCurrency } = this.props.buySell
     const txFee = this.props.accounts.currencyFees[quoteCurrency]
-    log.info(" baseCurrency, quoteCurrency ", baseCurrency, quoteCurrency)
+    log.debug('baseCurrency, quoteCurrency', baseCurrency, quoteCurrency)
 
     const orderAttrs = this.getOrderAttributes()
-    const isInstantSwapAllowed = this.getIsInstanceSwapAllowed()
+    const isInstantSwapAllowed = this.getIsInstantSwapAllowed()
 
     return (
       <RoundedForm
         id="resDexBuySell"
         className={cn(styles.form, this.props.className)}
         schema={getValidationSchema(t, isAdvanced)}
+        overrideOnMount
         clearOnUnmount
       >
 
@@ -201,7 +222,7 @@ class BuySellForm extends Component<Props> {
               defaultChecked
               defaultValue={false}
             >
-              {t(`Limit Order`)}
+              {t(`Limit Order (Maker Only)`)}
             </RadioButton>
           </div>
         }
@@ -235,24 +256,27 @@ class BuySellForm extends Component<Props> {
                   name="maxRel"
                   buttonLabel={t(`Use max`)}
                   addonClassName={styles.maxRelAddon}
+                  min="0.001"
                   maxAmount={this.getMaxQuoteAmount()}
                   symbol={quoteCurrency}
                 />
 
               </div>
 
-              <div className={styles.box}>
+              <div className={cn(styles.box)}>
+                {/* Base/Rel are reverted for setprice orders */}
+
                 <div className={styles.caption}>
-                  {t(`Price {{symbol}}`, {symbol: quoteCurrency})}
-                  <Info tooltip={t(`The minimum price in RES you will accept for 1 {{symbol}}`, {symbol: quoteCurrency})} />
+                  {t(`Price {{symbol}}`, {symbol: baseCurrency})}
+                  <Info tooltip={t(`The maximum amount of {{quoteCurrency}} you will accept for 1 {{baseCurrency}}`, {quoteCurrency, baseCurrency})} />
                 </div>
 
                 <PriceInput
                   name="price"
                   bestPrice={this.getBestPrice()}
-                  baseCurrency={baseCurrency}
-                  quoteCurrency={quoteCurrency}
-                  disabled={orderAttrs.isMarket && orderAttrs.isPrivate}
+                  baseCurrency={quoteCurrency}
+                  quoteCurrency={baseCurrency}
+                  disabled={orderAttrs.isMarket || orderAttrs.isPrivate}
                 />
 
               </div>
@@ -299,7 +323,7 @@ class BuySellForm extends Component<Props> {
               </div>
 
               <div className={styles.body}>
-                {this.getZCreditsQuoteEquivalentCaption() || t(`N/A`)}
+                {this.getZCreditsBaseEquivalentCaption() || t(`N/A`)}
               </div>
             </Info>
           </div>

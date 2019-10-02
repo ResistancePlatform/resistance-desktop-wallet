@@ -22,6 +22,8 @@ const t = translate('service')
  */
 const apiInstances = {}
 
+const kycApiUrl = 'https://kvk0a65tl4.execute-api.us-east-1.amazonaws.com'
+
 /*
  * Returns ResDEX API instance for a process specified.
  *
@@ -92,9 +94,8 @@ class ResDexApiService {
       method: 'instantdex_deposit',
       weeks,
       amount: amount.toString(),
-      broadcast: 1
     })
-    log.debug('instant dex response', response)
+    log.debug('Instant DEX response', response)
     return response
   }
 
@@ -103,8 +104,8 @@ class ResDexApiService {
 			method: 'withdraw',
 			coin: opts.symbol,
 			amount: opts.amount,
-			to:opts.address,
-			broadcast: 1,
+			to: opts.address,
+			broadcast: true,
 		})
 
 		if (!response.tx_hash) {
@@ -195,8 +196,10 @@ class ResDexApiService {
     return Decimal(response.txfee).dividedBy(divider)
 	}
 
-  getPortfolio() {
-    return this.query({ method: 'portfolio' })
+  async getPortfolio() {
+    const portfolio = await this.query({ method: 'portfolio' })
+    log.debug(`Portfolio:`, JSON.stringify(portfolio))
+    return portfolio
   }
 
   async enableCurrency(symbol: string, useElectrum: boolean = true) {
@@ -263,7 +266,7 @@ class ResDexApiService {
 				averageVolume: Decimal(order.avevolume),
 				maxVolume: Decimal(order.maxvolume),
 				zCredits: order.zcredits,
-			}))
+			})).sort((o1, o2) => o2.price.minus(o1.price).toNumber())
 
 		const formattedResponse = {
 			asks: formatOrders(response.asks),
@@ -286,21 +289,25 @@ class ResDexApiService {
       rel: opts.quoteCurrency,
       volume: opts.amount.toNumber(),
       price: opts.price.toNumber(),
+      instant_swap: true,
     })
 
     return response.result
   }
 
-  async balance(coin: string, address: string) {
+  async getDynamicTrust(coin: string, amount: object) {
     const response = await this.query({
-      method: 'balance',
+      method: 'my_dynamictrust',
       coin,
-      address
+      amount: amount.toString()
     })
 
+    log.debug(`Dynamic trust response`, response)
+
     return {
-      balance: Decimal(response.balance),
-      zCredits: Decimal(response.zcredits)
+      address: response.address,
+      zCredits: Decimal(response.zcredits),
+      dynamicTrust: Decimal(response.dynamictrust),
     }
   }
 
@@ -312,7 +319,7 @@ class ResDexApiService {
       timescale
     })
 
-    log.debug(`OHLC data response`, JSON.stringify(response))
+    // log.debug(`OHLC data response`, JSON.stringify(response))
 
     // [timestamp, high, low, open, close, relvolume, basevolume, aveprice, numtrades]
     const ohlcData = response.map(item => ({
@@ -336,16 +343,16 @@ class ResDexApiService {
       from_uuid: null
     })
 
-    log.debug(`Get Trades response`, JSON.stringify(response))
+    // log.debug(`Get Trades response`, JSON.stringify(response))
     const { swaps } = response.result
 
     const trades = swaps.map(item => ({
       uuid: item[0],
-      time: moment.unix(item[1]).toDate(),
+      time: moment(item[1]).toDate(),
       baseAmount: Decimal(item[2]),
       quoteAmount: Decimal(item[3]),
       price: Decimal(item[4]),
-    }))
+    })).sort((t1, t2) => t2.time - t1.time)
 
     return trades
   }
@@ -353,6 +360,44 @@ class ResDexApiService {
   async getRecentSwaps() {
     const response = await this.query({ method: 'my_recent_swaps' })
     return response.result
+  }
+
+  async getOrders() {
+    const response = await this.query({ method: 'my_orders' })
+    log.debug(`My orders response:`, response)
+
+    const {
+      taker_orders: takerOrders,
+      maker_orders: makerOrders
+    } = response.result
+
+    const zeroIfUndefined = d => Decimal(d || 0)
+
+    const convert = (o, type) => ({
+      uuid: o.uuid,
+      type,
+      baseCurrency: o.base,
+      quoteCurrency: o.rel,
+      price: zeroIfUndefined(o.price),
+      baseCurrencyAmount: zeroIfUndefined(o.available_amount),
+      quoteCurrencyAmount: (
+        zeroIfUndefined(o.price).equals(Decimal(0))
+          ? Decimal(0)
+          : zeroIfUndefined(o.available_amount).dividedBy(zeroIfUndefined(o.price))
+      ),
+      timeStarted: moment(o.created_at).toDate(),
+      isInstantSwap: o.instant_swap,
+      isCancellable: o.cancellable,
+    })
+
+    const result = Object.values(makerOrders)
+      .map(o => convert(o, 'Maker'))
+      .concat(
+        Object.values(takerOrders)
+          .map(o => convert(o, 'Taker'))
+      )
+
+    return result
   }
 
   async stop() {
@@ -364,14 +409,30 @@ class ResDexApiService {
    *
 	 * @memberof ResDexApiService
 	 */
-  createLimitOrder(opts) {
-    return this.query({
+  async createLimitOrder(opts) {
+    const response = await this.query({
       method: 'setprice',
       base: opts.baseCurrency,
       rel: opts.quoteCurrency,
       volume: opts.baseCurrencyAmount,
       price: opts.price.toNumber(),
+      instant_swap: true,
     })
+    return response.result
+  }
+
+	/**
+	 * Cancels an order.
+   *
+	 * @memberof ResDexApiService
+	 */
+  async cancelOrder(uuid: string): boolean {
+    const response = await this.query({
+      method: 'cancel_order',
+      uuid,
+    })
+
+    return response.result === 'success'
   }
 
 	/**
@@ -384,6 +445,50 @@ class ResDexApiService {
       method: 'sign_kyc_msg',
       msg: JSON.stringify(message),
     })
+  }
+
+
+	/**
+	 * Register the KYC tid within ResDEX
+   *
+	 * @memberof ResDexApiService
+	 */
+  async kycRegister(tid: string): boolean {
+    const payload = await this.signKycMessage({ tid })
+    log.debug(`Submitting KYC ID to ResDEX:`, tid)
+    log.debug(`Got KYC registration payload:`, payload)
+
+    try {
+      const result = await this.postJson(`${kycApiUrl}/api/v1/register`, payload)
+      log.debug(`Register result`, typeof result, result)
+      return typeof result === "string" && result.includes(' VALID KYC')
+    } catch (err) {
+      log.error(`Can't submit verification form:`, err)
+      return false
+    }
+
+    // TODO: Reuse in case of per-portfolio KYC
+    //
+    // const { defaultPortfolioId } = this.props.resDex.login
+    //
+    // if (!isRegistered) {
+    //   toastr.error(t(`Error submitting verification form, please make sure your Internet connection is good or check the log for details.`))
+    // } else {
+    //   toastr.success(t(`You have successfully passed verification!`))
+    // }
+
+  }
+
+  async postJson(url, jsonData) {
+    const result = await rp({
+      url,
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(jsonData)
+    })
+    return result
   }
 
 	/**

@@ -47,5 +47,7 @@
   "Unable to restart Resistance local node": "Unable to restart Resistance local node",
   "Mining": "Mining",
   "Restarting the local node...": "Restarting the local node...",
-  "Error creating mining address, check the application log for details.": "Error creating mining address, check the application log for details."
+  "Error creating mining address, check the application log for details.": "Error creating mining address, check the application log for details.",
+  "Error getting setting mining address, unable to get wallet addresses list.": "Error getting setting mining address, unable to get wallet addresses list.",
+  "Error setting mining address, check the application log for details.": "Error setting mining address, check the application log for details."
 }

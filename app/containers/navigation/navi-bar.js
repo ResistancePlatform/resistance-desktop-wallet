@@ -9,7 +9,6 @@ import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ChildProcessService } from '~/service/child-process-service'
 import { NaviState } from '~/reducers/navi/navi.reducer'
-import { DutchAuctionState } from '~/reducers/dutch-auction/dutch-auction.reducer'
 
 import visaLogo from '~/assets/images/visa-logo.svg'
 import mastercardLogo from '~/assets/images/mastercard-logo.svg'
@@ -25,8 +24,7 @@ type Props = {
   t: any,
 	navi: NaviState,
 	settings: SettingsState,
-  resDex: ResDexState,
-  dutchAuction: DutchAuctionState
+  resDex: ResDexState
 }
 
 class NaviBar extends Component<Props> {
@@ -54,15 +52,9 @@ class NaviBar extends Component<Props> {
       return null
     }
 
-    const { defaultPortfolioId, portfolios } = this.props.resDex.login
+    const { kyc } = this.props.resDex
 
-    if (!portfolios || defaultPortfolioId === null) {
-      return null
-    }
-
-    const portfolio = portfolios.find(p => p.id === defaultPortfolioId)
-
-    if (!portfolio || portfolio.isVerified) {
+    if (kyc.isRegistered) {
       return null
     }
 
@@ -88,7 +80,6 @@ class NaviBar extends Component<Props> {
 
     const pendingOrdersNumber = this.getPendingOrdersNumber()
     const resDexStatus = this.props.settings.childProcessesStatus.RESDEX
-    const { status: dutchAuctionStatus } = this.props.dutchAuction.status
 
 		return (
       <div className={cn(styles.container, {[styles.shrink]: isResDexExpanded})} data-tid="navi-bar-container">
@@ -127,6 +118,12 @@ class NaviBar extends Component<Props> {
             <NavLink to="/resdex">
               {t(`ResDEX`)}
 
+              {resDexStatus !== 'RUNNING' && this.props.resDex.login.isRequired &&
+                <div className={styles.comingSoon}>
+                  {t(`Beta`)}
+                </div>
+              }
+
               {!this.props.resDex.login.isRequired &&
                 <div
                   className={cn(
@@ -145,14 +142,6 @@ class NaviBar extends Component<Props> {
 
             </NavLink>
           </div>
-          {dutchAuctionStatus && dutchAuctionStatus !== 'terminated' &&
-            <div className={cn(styles.dutchAuction, getItemClasses('/dutch-auction'))}>
-              <i />
-              <NavLink to="/dutch-auction">
-                {t(`IEO — Dutch Auction`)}
-              </NavLink>
-            </div>
-          }
         </div>
 
 			</div>
@@ -164,7 +153,6 @@ const mapStateToProps = state => ({
 	navi: state.navi,
 	settings: state.settings,
   resDex: state.resDex,
-  dutchAuction: state.dutchAuction
 })
 
 export default connect(mapStateToProps, null)(translate('other')(NaviBar))

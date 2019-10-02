@@ -176,6 +176,7 @@ export class ChildProcessService {
 
     const childProcess = this::spawnProcess(processName, args, spawnOptions)
 
+    childProcessInfo.timeStarted = new Date()
     childProcessInfo.instance = childProcess
     childProcessInfo.shutdown = shutdownFunction
 
@@ -351,7 +352,7 @@ export class ChildProcessService {
           log.error('Child process startup timed out')
           reject(new Error(`Startup timed out`))
         }
-      }, 120000)
+      }, 2400000)
     })
 
     return () => promise

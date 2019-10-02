@@ -6,7 +6,6 @@ import { ipcRenderer } from 'electron'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router'
-import { bindActionCreators } from 'redux';
 import cn from 'classnames'
 
 import Footer from '~/components/get-started/Footer'
@@ -30,8 +29,6 @@ import OwnAddress from './own-addresses/own-addresses'
 import SendCurrency from './send-currency/send-currency'
 import Settings from './settings/settings'
 import SimplexPage from './SimplexPage'
-import DutchAuction from '~/components/DutchAuction/DutchAuction'
-import { DutchAuctionActions } from '~/reducers/dutch-auction/dutch-auction.reducer'
 import ResDexPage from './ResDexPage'
 import ResDexStart from '~/components/resdex/bootstrapping/Start'
 import ResDexCreatePortfolio from '~/components/resdex/bootstrapping/CreatePortfolio'
@@ -59,7 +56,6 @@ type Props = {
   auth: AuthState,
   fetchParameters: FetchParametersState,
   getStarted: GetStartedState,
-  dutchAuctionActions: any,
   resDex: ResDexState
 }
 
@@ -85,8 +81,6 @@ class App extends React.Component<Props> {
     }
 
     ipcRenderer.on('cleanup', () => this.cleanup())
-
-    this.props.dutchAuctionActions.getAuctionStatus()
   }
 
   cleanup() {
@@ -108,20 +102,6 @@ class App extends React.Component<Props> {
             <Route exact path="/get-started/restore-your-wallet" component={RestoreYourWalletPage} />
             <Route exact path="/get-started/welcome" component={WelcomePage} />
             <Route exact path="/" render={() => (<Redirect to="/get-started/eula" />)} />
-
-            <Route exact path="/resdex" render={() => (
-              this.props.resDex.bootstrapping.isInProgress
-                ? (<ResDexStart />)
-                : (<ResDexPage />)
-            )} />
-
-            <Route exact path="/resdex/start" component={ResDexStart} />
-            <Route exact path="/resdex/kyc" component={ResDexKyc} />
-            <Route exact path="/resdex/restore-portfolio" component={ResDexEnterSeed} />
-            <Route exact path="/resdex/create-portfolio" component={ResDexCreatePortfolio} />
-            <Route exact path="/resdex/save-seed" component={ResDexSaveSeed} />
-            <Route exact path="/resdex/confirm-seed" component={ResDexEnterSeed} />
-            <Route exact path="/resdex/forgot-password" component={ResDexForgotPassword} />
           </Switch>
         </div>
         <Footer />
@@ -154,7 +134,20 @@ class App extends React.Component<Props> {
                 <Route exact path="/settings" component={Settings} />
                 <Route exact path="/simplex" component={SimplexPage} />
                 <Route exact path="/address-book" component={AddressBookPage} />
-                <Route exact path="/dutch-auction" component={DutchAuction} />
+
+                <Route exact path="/resdex" render={() => (
+                  this.props.resDex.bootstrapping.isInProgress
+                    ? (<ResDexStart />)
+                    : (<ResDexPage />)
+                )} />
+
+                <Route exact path="/resdex/start" component={ResDexStart} />
+                <Route exact path="/resdex/kyc" component={ResDexKyc} />
+                <Route exact path="/resdex/restore-portfolio" component={ResDexEnterSeed} />
+                <Route exact path="/resdex/create-portfolio" component={ResDexCreatePortfolio} />
+                <Route exact path="/resdex/save-seed" component={ResDexSaveSeed} />
+                <Route exact path="/resdex/confirm-seed" component={ResDexEnterSeed} />
+                <Route exact path="/resdex/forgot-password" component={ResDexForgotPassword} />
 
               </Switch>
             </div>
@@ -180,7 +173,7 @@ class App extends React.Component<Props> {
     } else if (!this.props.fetchParameters.isDownloadComplete) {
       content = (<FetchParametersDialog />)
     } else {
-      content = this.props.auth.isLoginRequired ? (<Login />) : this.getMainContent()
+      content = this.getMainContent()
     }
 
 		return (
@@ -191,8 +184,4 @@ class App extends React.Component<Props> {
 	}
 }
 
-const mapDispatchToProps = dispatch => ({
-  dutchAuctionActions: bindActionCreators(DutchAuctionActions, dispatch),
-})
-
-export default connect(state => state, mapDispatchToProps)(App)
+export default connect(state => state, null)(App)

@@ -44,5 +44,10 @@
   "Incorrect ResDEX password": "Incorrect ResDEX password",
   "Checking Resistance parameters presence": "Checking Resistance parameters presence",
   "Calculating parameters checksums": "Calculating parameters checksums",
-  "Z-addresses are {{zAddressLength}} characters long, not {{length}}": "Z-addresses are {{zAddressLength}} characters long, not {{length}}"
+  "Z-addresses are {{zAddressLength}} characters long, not {{length}}": "Z-addresses are {{zAddressLength}} characters long, not {{length}}",
+  "Missing credentials.": "Missing credentials.",
+  "Error": "Error",
+  "An error occurred while removing old Resistance data files, make sure Resistance is not running!": "An error occurred while removing old Resistance data files, make sure Resistance is not running!",
+  "Error submitting verification form, please make sure your Internet connection is good or check the log for details.": "Error submitting verification form, please make sure your Internet connection is good or check the log for details.",
+  "You have successfully passed verification!": "You have successfully passed verification!"
 }

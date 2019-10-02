@@ -103,9 +103,11 @@ const startResdexEpic = (action$: ActionsObservable<Action>) => action$.pipe(
       api.setToken(seedPhrase)
       resDex.start(processName, seedPhrase)
 
+      const nextObservable = of(ResDexLoginActions.initResdex(processName, walletPassword))
+
       const resDexStartedObservable = defer(() => childProcess.getStartObservable({
         processName,
-        onSuccess: of(ResDexLoginActions.initResdex(processName, walletPassword)).pipe(delay(400)),  // Give marketmaker some time just in case
+        onSuccess: nextObservable.pipe(delay(400)),  // Give marketmaker some time just in case
         onFailure: of(ResDexLoginActions.loginFailed(t(`Unable to start ResDEX, check the log for details`))),
         action$
       }))

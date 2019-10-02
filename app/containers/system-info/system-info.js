@@ -24,9 +24,9 @@ import styles from './system-info.scss'
 
 const childProcess = new ChildProcessService()
 
-const daemonInfoPollingInterval = 2.0
-const blockchainInfoPollingInterval = 4.0
-const operationsPollingInterval = 3.0
+const daemonInfoPollingInterval = 11.0
+const blockchainInfoPollingInterval = 10.0
+const operationsPollingInterval = 12.0
 
 type Props = {
   t: any,
@@ -156,6 +156,8 @@ class SystemInfo extends Component<Props> {
 	render() {
     const { t } = this.props
     const { isExpanded: isResDexExpanded } = this.props.resDex.common
+    const { synchronizedPercentage } = this.props.systemInfo.blockchainInfo
+    const synchronizedPercentageCaption = synchronizedPercentage.toLocaleString(undefined, {maximumFractionDigits: 2})
 
 		return (
 			<div className={cn(styles.systemInfoContainer, HLayout.hBoxContainer, {[styles.shrink]: isResDexExpanded})}>
@@ -225,7 +227,7 @@ class SystemInfo extends Component<Props> {
 					{ /* Resistance status coloumn */}
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>{t(`Synchronized`)}</div>
-						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockchainInfo.blockchainSynchronizedPercentage}%</div>
+						<div className={styles.statusColoumnValue}>{synchronizedPercentageCaption}%</div>
 					</div>
 
 					{ /* Resistance status coloumn */}
@@ -235,15 +237,14 @@ class SystemInfo extends Component<Props> {
 					</div>
 
 					{ /* Resistance status coloumn */}
-					{/* <div className={styles.statusColumnWrapper}>
-						<div className={styles.statusColoumnTitle}>{t(`Resident`)}</div>
-						<div className={styles.statusColoumnValue}>{this.props.resident}</div>
-					</div> */}
-
-					{ /* Resistance status coloumn */}
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>{t(`Connections`)}</div>
 						<div className={styles.statusColoumnValue}>{this.props.systemInfo.blockchainInfo.connectionCount}</div>
+					</div>
+
+					<div className={styles.statusColumnWrapper}>
+						<div className={styles.statusColoumnTitle}>{t(`Version`)}</div>
+						<div className={styles.statusColoumnValue}>2.2.4</div>
 					</div>
 
 				</div>

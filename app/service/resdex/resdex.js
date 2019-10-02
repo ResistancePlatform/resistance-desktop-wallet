@@ -12,10 +12,6 @@ import { ChildProcessService } from '../child-process-service'
 import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 
 
-const netId = 1234
-const seedNodeAddress = '54.226.203.173'
-// const seedNodeAddress = '35.174.118.206'
-
 const processSettings = {
   RESDEX: {
     folderName: 'Main',
@@ -95,9 +91,7 @@ export class ResDexService {
     const rpcPassword = crypto.createHash('sha256').update(actualSeedPhrase).digest('hex')
 
     const options = {
-      netid: netId,
       rpcport: rpcPort,
-      seednodes: [seedNodeAddress],
       userhome,
       passphrase: actualSeedPhrase,
       coins: supportedCurrencies,

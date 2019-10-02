@@ -11,6 +11,7 @@ import { getPasswordValidationSchema } from '~/utils/auth'
 import { getIsLoginDisabled } from '~/utils/resdex'
 import Logo from './Logo'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
+import { SystemInfoState } from '~/reducers/system-info/system-info.reducer'
 import { ResDexLoginActions } from '~/reducers/resdex/login/reducer'
 import {
   RoundedForm,
@@ -33,6 +34,7 @@ const getValidationSchema = t => (
 
 type Props = {
   t: any,
+	systemInfo: SystemInfoState,
   resDex: ResDexState,
   actions: object,
   routerActions: object
@@ -53,16 +55,34 @@ class ResDexLogin extends Component<Props> {
   }
 
 	/**
+	 * @memberof ResDexLogin
+	 */
+  getIsSyncing() {
+    const { synchronizedPercentage } = this.props.systemInfo.blockchainInfo
+    return Math.floor(synchronizedPercentage) < 100
+  }
+
+	/**
 	 * @returns
    * @memberof ResDexLogin
 	 */
 	render() {
     const { t } = this.props
-    const isDisabled = getIsLoginDisabled(this.props)
+    const isSyncing = this.getIsSyncing()
+    const isDisabled = isSyncing || getIsLoginDisabled(this.props)
 
     return (
       <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
         <Logo />
+
+        {isSyncing &&
+          <div className={styles.syncContainer}>
+            <div className={styles.sync}>
+              {t(`Please wait until Resistance is 100% synchronized before logging in…`)}
+            </div>
+          </div>
+        }
+
         <RoundedForm id="resDexLogin" schema={getValidationSchema(t)} className={styles.form}>
           <ChoosePortfolioInput
             name="portfolioId"
@@ -115,6 +135,7 @@ class ResDexLogin extends Component<Props> {
 }
 
 const mapStateToProps = state => ({
+	systemInfo: state.systemInfo,
   resDex: state.resDex,
   settings: state.settings,
   form: state.roundedForm.authLogin

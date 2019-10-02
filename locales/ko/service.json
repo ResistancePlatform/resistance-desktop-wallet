@@ -44,5 +44,10 @@
   "Incorrect ResDEX password": "잘못된 ResDEX 비밀번호",
   "Checking Resistance parameters presence": "저항 매개 변수 존재 확인",
   "Calculating parameters checksums": "매개 변수 체크섬 계산",
-  "Z-addresses are {{zAddressLength}} characters long, not {{length}}": "Z- 주소는 {{zAddressLength}} 자이며 {{length}}가 아닙니다."
+  "Z-addresses are {{zAddressLength}} characters long, not {{length}}": "Z- 주소는 {{zAddressLength}} 자이며 {{length}}가 아닙니다.",
+  "Missing credentials.": "자격 증명이 누락되었습니다.",
+  "Error": "오류",
+  "An error occurred while removing old Resistance data files, make sure Resistance is not running!": "오래된 Resistance 데이터 파일을 제거하는 동안 오류가 발생했습니다. Resistance가 실행되고 있지 않은지 확인하십시오!",
+  "Error submitting verification form, please make sure your Internet connection is good or check the log for details.": "확인 양식을 제출하는 동안 오류가 발생했습니다. 인터넷 연결 상태를 확인하거나 로그를 확인하십시오.",
+  "You have successfully passed verification!": "확인을 통과했습니다!"
 }

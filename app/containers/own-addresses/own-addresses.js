@@ -122,6 +122,10 @@ class OwnAddresses extends Component<Props> {
 
                 </RoundedButtonWithDropdown>
 
+                {/*
+
+                  Uncomment to revert Ledger
+
                 <RoundedButton
                   className={styles.menuButton}
                   onClick={this.props.actions.showConnectLedgerModal}
@@ -131,6 +135,8 @@ class OwnAddresses extends Component<Props> {
                 >
                   {t(`Send RES from Ledger`)}
                 </RoundedButton>
+
+                */}
 
                 <MoreButton
                   className={styles.moreButton}

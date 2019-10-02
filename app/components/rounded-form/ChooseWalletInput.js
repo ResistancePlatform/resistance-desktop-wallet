@@ -42,13 +42,19 @@ class ChooseWalletInput extends GenericInput {
   renderInput() {
     const selectedCurrency = this.props.currencies[this.state.value]
 
+    if (!selectedCurrency) {
+      return null
+    }
+
+    const displayBalance = selectedCurrency.balance.minus(selectedCurrency.lockedAmount)
+
     return (
       <div className={styles.chooseWallet}>
         <CurrencyIcon className={styles.currencyIcon} symbol={this.state.value} size="1.0rem" />
 
         <div className={styles.walletName}>{t(`{{symbol}} Wallet`, {symbol: this.state.value})}</div>
 
-        <div className={styles.balance}>{selectedCurrency && toDecimalPlaces(selectedCurrency.balance)}</div>
+        <div className={styles.balance}>{selectedCurrency && toDecimalPlaces(displayBalance)}</div>
 
         <div className={styles.symbol}>{this.state.value}</div>
 

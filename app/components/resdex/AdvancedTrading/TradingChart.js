@@ -5,6 +5,7 @@ import { translate } from 'react-i18next'
 import log from 'electron-log'
 
 import { format } from 'd3-format'
+import { scaleTime } from 'd3-scale'
 import { discontinuousTimeScaleProvider } from 'react-stockcharts/lib/scale'
 import { ChartCanvas, Chart } from 'react-stockcharts'
 import { OHLCTooltip } from 'react-stockcharts/lib/tooltip'
@@ -45,12 +46,14 @@ import {
   getGannFans,
   getInteractiveTexts,
   getAlerts,
+  getOrders,
 } from './Interactive'
 import getMainSeries from './MainSeries'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import TradingChartSettings from './TradingChartSettings'
 
 import styles from './TradingChart.scss'
+import animatedSpinner from '~/assets/images/animated-spinner.svg'
 
 type Props = {
   t: any,
@@ -108,7 +111,7 @@ class TradingChart extends Component<Props> {
 
     if (sourceData.length === 1) {
       log.debug(`Tweaking data of length`, sourceData.length)
-      for (let day = -1; day > -10; day -= 1) {
+      for (let day = -1; day > -2; day -= 1) {
         const dayDate = new Date(sourceData[0].date.getTime())
         dayDate.setDate(dayDate.getDate() + day)
         data.unshift({
@@ -225,7 +228,6 @@ class TradingChart extends Component<Props> {
 
     const {
       data,
-      xScale,
       xAccessor,
       displayXAccessor,
     } = xScaleProvider(this.tweakData(initialData))
@@ -234,10 +236,12 @@ class TradingChart extends Component<Props> {
 
     const result = {
       data: calculatedData,
-      xScale,
+      xScale: scaleTime(),
       xAccessor,
       displayXAccessor,
     }
+
+    // log.debug('data', calculatedData)
 
     return result
 	}
@@ -253,7 +257,9 @@ class TradingChart extends Component<Props> {
       return []
     }
 
-    const lastDate = last(data).date
+    // const lastDate = last(data).date
+    const lastDate = new Date()
+
     let firstDate = new Date(lastDate.getTime())
 
     switch (period) {
@@ -270,7 +276,7 @@ class TradingChart extends Component<Props> {
         firstDate.setMonth(firstDate.getMonth() - barsNumber)
         break
       case 'year':
-        firstDate.setYear(firstDate.getMonth() - barsNumber)
+        firstDate.setFullYear(firstDate.getFullYear() - barsNumber)
         break
       case 'all':
         firstDate = first(data).date
@@ -419,6 +425,7 @@ class TradingChart extends Component<Props> {
       case 8:
       case 46: {
         const newInteractive = Object.keys(interactive).reduce((accumulated, key) => ({
+          ...accumulated,
           [key]: interactive[key].filter(item => !item.selected)
         }), {})
         log.debug('New interactive', newInteractive)
@@ -448,10 +455,20 @@ class TradingChart extends Component<Props> {
 	 * @returns
    * @memberof TradingChart
 	 */
-	render() {
-    const { width, ratio } = this.props
+  getActiveOrders() {
+    const { swapHistory } = this.props.resDex.orders
+    const orders = swapHistory.filter(s => s.isActive && !s.isHidden)
+    return orders
+  }
 
-		const margin = { left: 50, right: 50, top: 20, bottom: 30 }
+	/**
+	 * @returns
+   * @memberof TradingChart
+	 */
+	render() {
+    const { t, width, ratio } = this.props
+
+		const margin = { left: 50, right: 75, top: 20, bottom: 30 }
     const { xGrid, yGrid } = this.getGrids(margin)
 
     const height = this.getHeight()
@@ -472,11 +489,29 @@ class TradingChart extends Component<Props> {
       displayXAccessor,
     } = this.getDataAndScale()
 
+
+    const { baseCurrency, quoteCurrency } = this.props.resDex.buySell
+    const { baseCurrency: base, quoteCurrency: rel } = this.props.resDex.buySell.ohlcPair
+
+    const isLoading = baseCurrency !== base || quoteCurrency !== rel
+
+    const orders = this.getActiveOrders()
+
 		return (
       <div className={styles.container} ref={el => this.containerRef(el)}>
         <TradingChartSettings />
 
-        {data.length > 10 &&
+        {isLoading &&
+          <div className={styles.loading}>
+            <img
+              className={styles.spinner}
+              src={animatedSpinner}
+              alt={t(`Loading...`)}
+            />
+          </div>
+        }
+
+        {!isLoading && data.length > 2 &&
         <ChartCanvas
           ref={el => this.chartRef(el)}
           height={height}
@@ -484,7 +519,6 @@ class TradingChart extends Component<Props> {
           width={width}
           margin={margin}
           type="hybrid"
-          seriesName="RES/MONA"
           data={data}
           xAccessor={d => d && d.date}
           xScale={xScale}
@@ -507,7 +541,7 @@ class TradingChart extends Component<Props> {
               inverted
             />
 
-            { this.getXAxis(xGrid, true) }
+            { this.getXAxis(xGrid, bottomIndicatorsNumber === 0) }
 
             <MouseCoordinateY
               at="right"
@@ -539,6 +573,7 @@ class TradingChart extends Component<Props> {
               yAccessor={d => d.close}
               fill={d => d.close > d.open ? "#00d492" : "#e20063"}
               textFill="rgb(90, 98, 131)"
+              displayFormat={format('.6f')}
               strokeOpacity={1}
               strokeWidth={0}
               arrowWidth={2}
@@ -604,6 +639,14 @@ class TradingChart extends Component<Props> {
                 mode: chartSettings.interactiveMode,
                 config: interactive,
                 update: this.props.actions.updateInteractive
+            })}
+
+            {getOrders({
+                chartId: 1,
+                ref: this.interactiveRef,
+                orders,
+                baseCurrency,
+                quoteCurrency
             })}
 
           </Chart>

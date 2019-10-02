@@ -69,5 +69,9 @@
   "With Tor enabled, users can achieve greater privacy by masking their IP addresses. This feature is currently in BETA phase.": "Tor를 사용하면 사용자는 자신의 IP 주소를 마스킹하여 더 큰 프라이버시를 얻을 수 있습니다. 이 기능은 현재 베타 단계에 있습니다.",
   "Password changed.": "암호가 변경되었습니다.",
   "The old wallet password is incorrect.": "이전 지갑 암호가 잘못되었습니다.",
-  "Error changing the password, check the log for details.": "암호를 변경하는 동안 오류가 발생했습니다. 자세한 내용은 로그를 확인하십시오."
+  "Error changing the password, check the log for details.": "암호를 변경하는 동안 오류가 발생했습니다. 자세한 내용은 로그를 확인하십시오.",
+  "The wallet restored successfully": "지갑이 성공적으로 복원되었습니다",
+  "Restarting Resistance with the new mining address…": "새로운 채굴 주소로 저항을 다시 시작하는 중…",
+  "Restarting Resistance with the new wallet…": "새로운 지갑으로 저항을 다시 시작하는 중…",
+  "Wallet": "지갑"
 }

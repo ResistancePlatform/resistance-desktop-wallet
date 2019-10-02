@@ -25,10 +25,11 @@ export const ResDexBuySellActions = createActions(
     CREATE_ORDER: undefined,
     CREATE_ORDER_SUCCEEDED: undefined,
     CREATE_ORDER_FAILED: (errorMessage: string) => ({ errorMessage }),
+    CREATE_ORDER_REJECTED: undefined,
 
     CREATE_PRIVATE_ORDER: undefined,
     CREATE_PRIVATE_ORDER_SUCCEEDED: undefined,
-    CREATE_PRIVATE_ORDER_FAILED: (errorMessage: string) => ({ errorMessage }),
+    CREATE_PRIVATE_ORDER_FAILED: (errorMessage: string, uuid?: string) => ({ errorMessage, uuid }),
 
     SET_PRIVATE_ORDER_STATUS: (uuid: string, status: PrivateOrderStatus) => ({uuid, status}),
     LINK_PRIVATE_ORDER_TO_BASE_RES_ORDER: (uuid: string, baseResOrderUuid: string) => ({uuid, baseResOrderUuid}),
@@ -36,17 +37,17 @@ export const ResDexBuySellActions = createActions(
     CREATE_LIMIT_ORDER: undefined,
 
     GET_OHLC: undefined,
-    GOT_OHLC: (ohlc: object[]) => ({ ohlc }),
+    GOT_OHLC: (pair: object, ohlc: object[]) => ({ pair, ohlc }),
     GET_OHLC_FAILED: undefined,
 
     GET_TRADES: undefined,
-    GOT_TRADES: (trades: object[]) => ({ trades }),
+    GOT_TRADES: (pair: object, trades: object[]) => ({ pair, trades }),
     GET_TRADES_FAILED: undefined,
 
     UPDATE_CHART_SETTINGS: (settings: object) => ({ ...settings }),
     UPDATE_CHART_PERIOD: (period: string) => ({ period }),
 
-    SHOW_INDICATORS_MODAL: (type: string, submitCallback: func) => ({ type, submitCallback }),
+    SHOW_INDICATORS_MODAL: undefined,
     UPDATE_INDICATORS_SEARCH_STRING: (searchString: string) => ({searchString}),
     EDIT_INDICATOR: (key: string) => ({key}),
     CANCEL_INDICATOR_EDITION: (key: string) => ({key}),
@@ -56,10 +57,11 @@ export const ResDexBuySellActions = createActions(
     RESET_INDICATOR: (key: string) => ({key}),
     CLOSE_INDICATORS_MODAL: undefined,
 
+    CLEAR_ALL_INTERACTIVE: undefined,
     UPDATE_INTERACTIVE_MODE: (mode: string | null) => ({ mode }),
     UPDATE_INTERACTIVE: (config: object) => ({ ...config }),
 
-    SHOW_EDIT_TEXT_MODAL: undefined,
+    SHOW_EDIT_TEXT_MODAL: (type: string, submitCallback: func) => ({ type, submitCallback }),
     CLOSE_EDIT_TEXT_MODAL: undefined,
   },
   {
@@ -141,6 +143,10 @@ export const ResDexBuySellReducer = handleActions(
       ...state,
       isSendingOrder: false,
     }),
+    [ResDexBuySellActions.createOrderRejected]: state => ({
+      ...state,
+      isSendingOrder: false,
+    }),
     [ResDexBuySellActions.createPrivateOrder]: state => ({
       ...state,
       isSendingOrder: true,
@@ -159,11 +165,13 @@ export const ResDexBuySellReducer = handleActions(
 
     [ResDexBuySellActions.gotOhlc]: (state, action) => ({
       ...state,
+      ohlcPair: action.payload.pair,
       ohlc: action.payload.ohlc,
     }),
     [ResDexBuySellActions.gotTrades]: (state, action) => ({
       ...state,
       trades: action.payload.trades,
+      tradesPair: action.payload.pair
     }),
 
     // Chart Settings
@@ -254,6 +262,16 @@ export const ResDexBuySellReducer = handleActions(
         interactiveMode: action.payload.mode
       }
     }),
+    [ResDexBuySellActions.clearAllInteractive]: state => ({
+      ...state,
+      tradingChart: {
+        ...state.tradingChart,
+        interactive: Object.keys(state.tradingChart.interactive).reduce((accumulated, key) => ({
+          ...accumulated,
+          [key]: []
+        }), {}),
+      }
+    }),
     [ResDexBuySellActions.updateInteractive]: (state, action) => ({
       ...state,
       tradingChart: {
@@ -279,5 +297,5 @@ export const ResDexBuySellReducer = handleActions(
         ...state.editTextModal,
         isVisible: false
       }
-    }),
+    })
   }, preloadedState)

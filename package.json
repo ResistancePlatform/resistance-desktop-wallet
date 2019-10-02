@@ -70,10 +70,9 @@
       ]
     },
     "mac": {
-      "icon": "resources/icon.icns",
-      "target": "pkg",
       "extraResources": [
-        "bin/macos"
+        "bin/macos",
+        "bin/peers.dat"
       ]
     },
     "win": {
@@ -81,7 +80,8 @@
         "nsis"
       ],
       "extraResources": [
-        "bin/windows"
+        "bin/windows",
+        "bin/peers.dat"
       ]
     },
     "linux": {
@@ -91,7 +91,8 @@
       ],
       "category": "Development",
       "extraResources": [
-        "bin/linux"
+        "bin/linux",
+        "bin/peers.dat"
       ]
     },
     "directories": {

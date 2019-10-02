@@ -1,7 +1,9 @@
 @import "~/assets/styles/section.scss";
+@import "~/assets/styles/vars.scss";
 
 .container {
   width: 100%;
+  position: relative;
 
   .title {
     font-size: 1.25rem;
@@ -10,7 +12,66 @@
     cursor: default;
   }
 
-  .webview {
-    margin-top: 0.5rem;
+}
+
+.kyc {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+}
+
+.centeredTitle {
+  text-align: center;
+  font-size: 1.2rem;
+  color: $BASE_COLOR_WHITE;
+  margin-bottom: 1.5rem;
+  user-select: none;
+  cursor: default;
+  margin-top: 1rem;
+
+  .check {
+    display: inline;
+    margin-right: 0.4rem;
+    margin-top: 0.2rem;
+    color: $BASE_COLOR_LIGHT_GREEN;
+    font-size: 1rem;
+    &:before {
+      content: "\e90d";
+    }
+  }
+
+}
+
+.note {
+  text-align: center;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+  bottom: 1.5rem;
+  font-size: 0.67rem;
+  color: $BASE_COLOR_FONT_GRAY;
+
+  strong {
+    color: $BASE_COLOR_WHITE;
+  }
+}
+
+.innerContainer {
+  padding: 1.5rem;
+}
+
+.centerVertically {
+  position: absolute;
+  width: calc(100% - 6rem);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.buttons {
+  text-align: center;
+  margin-top: 2rem;
+
+  .submit {
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }

@@ -53,6 +53,7 @@ export const SettingsActions = createActions(
     RESTORING_WALLET_FAILED: (errorMessage: string = '') => ({ errorMessage }),
     RESTORING_WALLET_SUCCEEDED: undefined,
     SET_NEW_MINING_ADDRESS: undefined,
+    OPEN_WALLET_BACKUPS_FOLDER: undefined,
 
     KICK_OFF_CHILD_PROCESSES: undefined,
 

@@ -22,6 +22,7 @@ import styles from './WithdrawModal.scss'
 
 const getValidationSchema = t => Joi.object().keys({
   recipientAddress: Joi.string().required().label(t(`Recipient address`)),
+  // withdrawFrom: Joi.string().optional().label(t(`Withdraw from`)),
   amount: Joi.number().min(0).required().label(t(`Amount`)),
   equity: Joi.number(),
   note: Joi.string().optional().label(t(`Note`)),
@@ -91,6 +92,7 @@ class WithdrawModal extends Component<Props> {
           <RoundedForm
             id="resDexAccountsWithdrawModal"
             schema={getValidationSchema(t)}
+            options={{stripUnknown: true}}
           >
 
           <RoundedInputWithPaste
@@ -137,7 +139,7 @@ class WithdrawModal extends Component<Props> {
           {secretFunds ? (
             <div className={styles.memo}>
               <hr />
-              <strong>{t(`Note:`)}</strong>&nbsp;
+              <strong>{t(`Caution:`)}</strong>&nbsp;
               {t(`withdraw-modal-note`)}
             </div>
           ) : (

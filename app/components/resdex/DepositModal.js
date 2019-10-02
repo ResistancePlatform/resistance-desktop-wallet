@@ -14,6 +14,7 @@ import styles from './DepositModal.scss'
 
 type Props = {
   t: any,
+  resdex2?: boolean,
   accounts: ResDexState.accounts,
   actions: object
 }
@@ -29,23 +30,42 @@ class DepositModal extends Component<Props> {
     const { t } = this.props
 
     const { symbol } = this.props.accounts.depositModal
-    const { address } = this.props.accounts.currencies.RESDEX[symbol]
+    const { currencies } = this.props.accounts
+
+
+    const { address } = this.props.resdex2
+      ? currencies.RESDEX_PRIVACY2[symbol]
+      : currencies.RESDEX[symbol]
 
     return (
       <div className={styles.overlay}>
-        <div className={cn(styles.container, styles.deposit)}>
+        <div className={cn(styles.container, styles.deposit, {[styles.resdex2]: this.props.resdex2})}>
           <div
             role="button"
             tabIndex={0}
             className={cn('icon', styles.closeButton)}
-            onClick={this.props.actions.closeDepositModal}
+            onClick={
+              this.props.resdex2
+              ? this.props.actions.closeResdex2DepositModal
+              : this.props.actions.closeDepositModal
+            }
             onKeyDown={() => {}}
           />
 
         {/* Title */}
         <div className={styles.title}>
-          {t(`Deposit {{symbol}}`, { symbol })}
+          {this.props.resdex2
+            ? t(`Deposit ETH to private balance`)
+            : t(`Deposit {{symbol}}`, { symbol })
+          }
         </div>
+
+        {this.props.resdex2 &&
+          <div className={styles.caution}>
+            <strong>{t(`Warning`)}:</strong>
+            {t(`You must have 0.005 ETH deposited in both normal ETH wallet and 0.005 deposited in private balance in order to do private swap otherwise the swap won’t work.`)}
+          </div>
+        }
 
         {address &&
           <QRCode className={styles.qr} value={address} />

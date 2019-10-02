@@ -6,9 +6,10 @@ import { preloadedState } from '~/reducers/preloaded.state'
 import { ChildProcessName } from '~/service/child-process-service'
 import { ResDexBootstrappingReducer } from './bootstrapping/reducer'
 import { ResDexLoginReducer } from './login/reducer'
+import { ResDexKycReducer } from './kyc/reducer'
 import { ResDexAssetsReducer } from './assets/reducer'
 import { ResDexBuySellReducer } from './buy-sell/reducer'
-import { ResDexOrdersReducer } from './orders/reducer'
+import { ResDexOrdersReducer, PrivateOrder } from './orders/reducer'
 import { EnabledCurrency, ResDexAccountsReducer } from './accounts/reducer'
 
 
@@ -80,7 +81,15 @@ export type ResDexState = {
     },
     enhancedPrivacy: boolean,
     ohlc: object[],
+    ohlcPair: {
+      baseCurrency?: string,
+      quoteCurrency?: string
+    },
     trades: object[],
+    tradesPair: {
+      baseCurrency?: string,
+      quoteCurrency?: string
+    },
     tradingChart: {
       period: string,
       type: 'candlestick' | 'heikin-ashi' | 'kagi' | 'point-figure' | 'renko',
@@ -106,10 +115,12 @@ export type ResDexState = {
     isInitialKickStartDone: boolean,
     pendingSwaps: {},
     swapHistory: [],
+    privateSwaps: {[string]: PrivateOrder},
     orderModal: {
       isVisible: boolean,
       uuid: string | null
-    }
+    },
+    isCancelling: boolean
   },
   accounts: {
     selectedSymbol: string,
@@ -117,7 +128,8 @@ export type ResDexState = {
     currencies: { [ChildProcessName]: { [string]: Currency } },
     enabledCurrencies: EnabledCurrency[],
     currencyFees: { [string]: any },
-    zCredits: object | null,
+    dynamicTrust: { [string]: object },
+    zCredit: object | null,
     addCurrencyModal: {
       isInEditMode: boolean,
       isVisible: boolean,
@@ -132,6 +144,7 @@ export type ResDexState = {
     },
     depositModal: {
       isVisible: boolean,
+      isResDex2Visible: boolean,
       symbol: string | null
     },
     withdrawModal: {
@@ -164,6 +177,7 @@ export const ResDexCommonReducer = handleActions(
 
 export const ResDexReducer = combineReducers({
   common: ResDexCommonReducer,
+  kyc: ResDexKycReducer,
   bootstrapping: ResDexBootstrappingReducer,
   login: ResDexLoginReducer,
   assets: ResDexAssetsReducer,

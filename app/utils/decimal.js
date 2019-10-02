@@ -25,8 +25,26 @@ function flattenDecimals(object) {
   return result
 }
 
+function toMaxDigits(amount, number: number = 10) {
+  const flattened = toDecimalPlaces(amount, 8)
+
+  if (flattened.length <= number) {
+    return flattened
+  }
+
+  const splitted = flattened.split('.')
+
+  if (splitted.length < 2) {
+    return flattened
+  }
+
+  const digitsToCut = flattened.length - number
+  return flattened.substring(0, flattened.length - Math.min(digitsToCut, splitted.pop().length))
+}
+
 export {
   truncateAmount,
   toDecimalPlaces,
-  flattenDecimals
+  flattenDecimals,
+  toMaxDigits
 }

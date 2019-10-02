@@ -47,7 +47,8 @@ function getChildProcessesGlobal() {
     childProcesses[processName] = {
       pid: null,
       instance: null,
-      isGettingKilled: false
+      isGettingKilled: false,
+      timeStarted: null
     }
   })
 

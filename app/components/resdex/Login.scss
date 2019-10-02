@@ -1,7 +1,7 @@
 @import "./bootstrapping/Bootstrapping.scss";
 
 .container {
-    width: 14rem;
+  width: 14rem;
 }
 
 .form {
@@ -17,4 +17,19 @@
   user-select: none;
 
   text-transform: uppercase;
+}
+
+.syncContainer {
+  color: $BASE_COLOR_PURPLE;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.65rem;
+  height: 2.5rem;
+  position: relative;
+}
+
+.sync {
+  position: absolute;
+  white-space: nowrap;
+  transform: translateX(-21%);
 }

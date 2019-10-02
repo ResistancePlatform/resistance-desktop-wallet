@@ -107,7 +107,7 @@ async function fetchSymbol(symbol, resolution) {
     time: time * 1000,
     // 1 RES ICO price = $0.55046
     // 20 RES = 1 DGB for now for a nicer chart
-    value: Decimal(symbol === 'RES' ? close / 20 : close),
+    value: Decimal(symbol === 'RES' ? '0.55046' : close),
   }))
 
   return prices

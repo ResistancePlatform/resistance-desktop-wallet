@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { remote } from 'electron'
 import { Webview } from '~/components/Webview/Webview'
 import cn from 'classnames'
@@ -12,7 +13,8 @@ import styles from './Kyc.scss'
 type Props = {
   className?: string,
   url: string,
-  submitCallback: func
+  submitCallback?: func,
+  actions: object
 }
 
 const t = translate('service')
@@ -49,11 +51,15 @@ export class Kyc extends Component<Props> {
 
         log.debug(`Got KYC data:`, JSON.stringify(result))
 
-        submitCallback({
+        const kycData = {
           tid: result.tid,
           email: result.form_data.email,
           phone: result.form_data.phone,
-        })
+        }
+
+        if (submitCallback) {
+          submitCallback(kycData)
+        }
 
         callback({ cancel: true })
       } else {
@@ -89,4 +95,4 @@ export class Kyc extends Component<Props> {
   }
 }
 
-export default Kyc
+export default connect(null, null)(Kyc)

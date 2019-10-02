@@ -32,6 +32,16 @@ class OrderModal extends Component<Props> {
     return order || null
   }
 
+  getIsFinished(order) {
+    const failed = order.eventTypes.find(t => t.includes('Failed'))
+
+    if (failed) {
+      return false
+    }
+
+    return order.eventTypes.includes('Finished')
+  }
+
 	render() {
     const { t } = this.props
 
@@ -66,25 +76,32 @@ class OrderModal extends Component<Props> {
 
           <div className={cn(styles.stagesContainer, styles.slider, {[styles.close]: status === 'privatizing'})}>
             <ul>
+              <li className={cn({ [styles.active]: order.eventTypes.includes('Started') })}>
+                {t(`KYC check`)}
+              </li>
               <li className={cn({ [styles.active]: order.eventTypes.includes('TakerFeeSent') })}>
                 {t(`My fee`)}
               </li>
               <li className={cn({ [styles.active]: order.eventTypes.includes('TakerFeeSent') })}>
-                {t(`My deposit`)}
+                {t(`Their Payment`)}
               </li>
               <li className={cn({ [styles.active]: order.eventTypes.includes('MakerPaymentValidatedAndConfirmed') })}>
-                {t(`Their deposit`)}
+                {t(`My Payment`)}
               </li>
               <li className={cn({ [styles.active]: order.eventTypes.includes('TakerPaymentSpent') })}>
-                {t(`My payment`)}
+                {t(`Their Spend`)}
               </li>
-              <li className={cn({ [styles.active]: order.eventTypes.includes('Finished') })}>
-                {t(`Their spend`)}
+              <li className={cn({ [styles.active]: this.getIsFinished(order) })}>
+                {t(`My Spend`)}
               </li>
             </ul>
           </div>
           <div className={styles.summaryContainer}>
-            <OrderSummary className={styles.summary} order={order} />
+            <OrderSummary
+              className={styles.summary}
+              order={order}
+              flipPrice
+            />
           </div>
 
           <div className={styles.id}>

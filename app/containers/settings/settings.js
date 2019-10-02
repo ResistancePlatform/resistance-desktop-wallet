@@ -190,6 +190,14 @@ class Settings extends Component<Props> {
                   >
                     {t(`Restore`)}
                   </RoundedButton>
+
+
+                  <RoundedButton
+                    onClick={this.props.actions.openWalletBackupsFolder}
+                  >
+                    {t(`Open Backups Folder`)}
+                  </RoundedButton>
+
                 </div>
                 </TabPanel>
 

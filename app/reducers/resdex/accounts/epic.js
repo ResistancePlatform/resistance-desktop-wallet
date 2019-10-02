@@ -39,6 +39,7 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
         zcredits: Decimal(currency.zcredits || 0),
         price: Decimal(currency.price || 0),
         amount: Decimal(currency.amount || currency.balance),
+        lockedAmount: Decimal(currency.locked || 0),
       }
     }), {})
 
@@ -50,6 +51,7 @@ const getCurrenciesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
           [processName]: responseToCurrencies(result[index])
         }), {})
 
+        log.debug(`ResDEX Privacy 1 balance:`, currencies.RESDEX_PRIVACY1.RES.balance.toString())
         return of(ResDexAccountsActions.gotCurrencies(currencies))
       }),
       catchError(err => of(ResDexAccountsActions.getCurrenciesFailed(err.message)))
@@ -68,21 +70,14 @@ const getCurrenciesFailedEpic = (action$: ActionsObservable<Action>, state$) => 
 )
 
 
-const getZCreditsEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+const getZCreditsEpic = (action$: ActionsObservable<Action>) => action$.pipe(
 	ofType(ResDexAccountsActions.getZCredits),
   switchMap(() => {
-    const { accounts } = state$.value.resDex
-    const { RESDEX: currencies } = accounts.currencies
-
-    if (!currencies.RES) {
-      return of(ResDexAccountsActions.gotZCredits(null))
-    }
-
-    const observable = from(mainApi.balance('RES', currencies.RES.address)).pipe(
+    const observable = from(mainApi.getDynamicTrust('RES', Decimal(0))).pipe(
       switchMap(response => of(ResDexAccountsActions.gotZCredits(response.zCredits))),
       catchError(err => {
-        log.error(`Can't get Instant DEX balance:`, err)
-        return of(ResDexAccountsActions.getZCreditsFailed(t(`Error getting Instant DEX balance, check the log for details`)))
+        log.error(`Can't get dynamic trust:`, err)
+        return of(ResDexAccountsActions.getZCreditsFailed(t(`Error getting Instant DEX status, check the log for details`)))
       })
     )
 
@@ -196,7 +191,7 @@ const withdrawEpic = (action$: ActionsObservable<Action>, state$) => action$.pip
     const api = resDexApiFactory(secretFunds ? 'RESDEX_PRIVACY2' : 'RESDEX')
 
     const observable = from(api.withdraw({
-      symbol,
+      symbol: symbol || 'RES',
       address: recipientAddress,
       amount: Decimal(amount),
     }))

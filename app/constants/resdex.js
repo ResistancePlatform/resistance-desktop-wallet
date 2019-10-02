@@ -14,15 +14,19 @@ const RESDEX = {
     },
     {
       symbol: 'ETH',
-      useElectrum: true
+      useElectrum: false
     },
     {
       symbol: 'BTC',
       useElectrum: true
     },
     {
-      symbol: 'USDT',
+      symbol: 'BCH',
       useElectrum: true
+    },
+    {
+      symbol: 'USDT',
+      useElectrum: false
     },
   ],
   errorEvents: [

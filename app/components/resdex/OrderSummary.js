@@ -24,7 +24,8 @@ type Props = {
     quoteCurrency: string,
     isPrivate: boolean
   },
-  accounts: ResDexState.accounts
+  accounts: ResDexState.accounts,
+  flipPrice?: boolean
 }
 
 /**
@@ -34,6 +35,20 @@ type Props = {
 class OrderSummary extends Component<Props> {
 	props: Props
 
+  getCorrectedPrice() {
+    const { price } = this.props.order
+
+    if (price === null || price.isZero()) {
+      return price
+    }
+
+    const { flipPrice } = this.props
+    const newPrice = flipPrice
+      ? Decimal(1).dividedBy(price)
+      : price
+    return newPrice
+  }
+
   getTxFee(): Decimal | null {
     const { quoteCurrency } = this.props.order
     const txFee = this.props.accounts.currencyFees[quoteCurrency] || null
@@ -41,7 +56,8 @@ class OrderSummary extends Component<Props> {
   }
 
   getBaseAmount(): Decimal | null {
-    const { quoteCurrencyAmount, price } = this.props.order
+    const { quoteCurrencyAmount } = this.props.order
+    const price = this.getCorrectedPrice()
     const txFee = this.getTxFee() || Decimal(0)
 
     if (price === null) {
@@ -67,7 +83,8 @@ class OrderSummary extends Component<Props> {
   }
 
   getAtCaption(t) {
-    const { price, baseCurrency, quoteCurrency } = this.props.order
+    const { baseCurrency, quoteCurrency } = this.props.order
+    const price = this.getCorrectedPrice()
 
     if (price === null) {
       return t(`No liquidity available yet`)

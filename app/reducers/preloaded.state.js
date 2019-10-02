@@ -3,7 +3,7 @@ import { remote } from 'electron'
 import config from 'electron-settings'
 import { Decimal } from 'decimal.js'
 import { RESDEX } from '~/constants/resdex'
-import { InteractiveYCoordinate } from 'react-stockcharts/lib/interactive'
+import log from 'electron-log'
 
 export const preloadedState: State = {
   auth: {
@@ -49,7 +49,7 @@ export const preloadedState: State = {
 		daemonInfo: {},
 		blockchainInfo: {
 			connectionCount: 0,
-			blockchainSynchronizedPercentage: 0,
+			synchronizedPercentage: 0,
 			lastBlockDate: null
 		},
     operations: [],
@@ -95,7 +95,8 @@ export const preloadedState: State = {
     arePrivateTransactionsEnabled: false,
     addresses: [],
     addressSearchString: '',
-    isSubmitting: false
+    isSubmitting: false,
+    isConfirmationModalVisible: false
 	},
 	addressBook: {
 		records: [],
@@ -125,6 +126,12 @@ export const preloadedState: State = {
     common: {
       isExpanded: false,
       selectedTabIndex: 0,
+    },
+    kyc: {
+      tid: null,
+      email: null,
+      isRegistered: false,
+      isRegistering: false
     },
     bootstrapping: {
       isInProgress: false,
@@ -165,7 +172,15 @@ export const preloadedState: State = {
       },
       enhancedPrivacy: false,
       ohlc: [],
+      ohlcPair: {
+        baseCurrency: 'RES',
+        quoteCurrency: 'ETH',
+      },
       trades: [],
+      tradesPair: {
+        baseCurrency: 'RES',
+        quoteCurrency: 'ETH'
+      },
       tradingChart: {
         period: 'day',
         type: 'candlestick',
@@ -180,12 +195,7 @@ export const preloadedState: State = {
           'StandardDeviationChannel_1': [],
           'GannFan_1': [],
           'InteractiveText_1': [],
-          'InteractiveYCoordinate_1': [{
-            ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
-            yValue: 55.90,
-            id: 220,
-            draggable: true,
-          }],
+          'InteractiveYCoordinate_1': [],
         }
       },
       indicatorsModal: {
@@ -204,10 +214,12 @@ export const preloadedState: State = {
       isInitialKickStartDone: false,
       pendingSwaps: {},
       swapHistory: [],
+      privateSwaps: {},
       orderModal: {
         isVisible: false,
         uuid: null
-      }
+      },
+      isCancelling: false
     },
     accounts: {
       transactions: {},
@@ -218,6 +230,7 @@ export const preloadedState: State = {
       },
       enabledCurrencies: [],
       currencyFees: {},
+      dynamicTrust: {},
       zCredits: null,
       addCurrencyModal: {
         isInEditMode: false,
@@ -233,6 +246,7 @@ export const preloadedState: State = {
       },
       depositModal: {
         isVisible: false,
+        isResDex2Visible: false,
         symbol: null
       },
       withdrawModal: {
@@ -242,25 +256,6 @@ export const preloadedState: State = {
         secretFunds: false
       }
     }
-  },
-  dutchAuction: {
-    status: {},
-    user: {
-      ethAddress: null,
-      ethCommitted: null,
-    },
-    resAddress: null,
-    kyc: {
-      tid: null,
-      email: null,
-      phone: null,
-    },
-    credentials: {
-      userId: null,
-      accessToken: null,
-    },
-    isGeneratingAddress: false,
-    isRegistering: false
   },
 }
 
@@ -284,14 +279,19 @@ Object.assign(preloadedState.resDex.login, {
   defaultPortfolioId: config.get('resDex.defaultPortfolioId', null)
 })
 
-Object.assign(preloadedState.resDex.bootstrapping, {
-  isInProgress: config.get('resDex.bootstrappingInProgress', true)
+// Reuse KYC TID for those users who participated in the Dutch Auction
+const defaultKyc = {
+  ...preloadedState.resDex.kyc,
+  tid: config.get('dutchAuction.kyc.tid', null)
+}
+
+Object.assign(preloadedState.resDex.kyc, {
+  tid: config.get('resDex.kyc.tid', defaultKyc.tid),
+  isRegistered: config.get('resDex.kyc.isRegistered', defaultKyc.isRegistered),
 })
 
-Object.assign(preloadedState.dutchAuction, {
-  resAddress: config.get('dutchAuction.resAddress', null),
-  kyc: config.get('dutchAuction.kyc', preloadedState.dutchAuction.kyc),
-  credentials: config.get('dutchAuction.credentials', preloadedState.dutchAuction.credentials),
+Object.assign(preloadedState.resDex.bootstrapping, {
+  isInProgress: config.get('resDex.bootstrappingInProgress', true)
 })
 
 const enabledCurrencies = config.get('resDex.enabledCurrencies', [])
@@ -302,6 +302,34 @@ RESDEX.alwaysEnabledCurrencies.forEach(currency => {
   if (index === -1) {
     enabledCurrencies.push(currency)
   }
+})
+
+const failUnfinishedSwaps = swaps => Object.keys(swaps).reduce((accumulated, uuid) => {
+  const swap = swaps[uuid]
+
+  const status = ['failed', 'completed', 'cancelled'].includes(swap.status)
+    ? swap.status
+    : 'failed'
+
+  log.debug(`swap`, swap)
+
+  const result = {
+    ...accumulated,
+    [uuid]: {
+      ...swap,
+      quoteCurrencyAmount: Decimal(swap.quoteCurrencyAmount),
+      baseCurrencyAmount: Decimal(swap.baseCurrencyAmount),
+      initialMainResBalance: Decimal(swap.initialMainResBalance),
+      initialPrivacy2ResBalance: Decimal(swap.initialPrivacy2ResBalance),
+      status
+    }
+  }
+
+  return result
+}, {})
+
+Object.assign(preloadedState.resDex.orders, {
+  privateSwaps: failUnfinishedSwaps(config.get('resDex.privateSwaps', {}))
 })
 
 Object.assign(preloadedState.resDex.accounts, {

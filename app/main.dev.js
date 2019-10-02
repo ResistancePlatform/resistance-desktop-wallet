@@ -123,7 +123,13 @@ global.childProcesses = getChildProcessesGlobal()
 global.resistanceNodeConfig = resistance.checkAndCreateConfig()
 global.resDex = { apiTokens: [] }
 
+// Copy the bundled peers.dat
+resistance.checkAndCopyPeersDat()
+
 checkAndCreateWalletAppFolder()
+
+// Backup current wallet
+resistance.backupWallet()
 
 // Uncomment this line to make the app working in Parallels Desktop
 // app.disableHardwareAcceleration()
