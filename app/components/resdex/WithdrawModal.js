@@ -14,7 +14,6 @@ import {
   RoundedButton,
   RoundedInputWithPaste,
   CurrencyAmountInput,
-  RoundedTextArea,
   ChooseWalletInput,
 } from '~/components/rounded-form'
 
@@ -136,26 +135,14 @@ class WithdrawModal extends Component<Props> {
 
           </div>
 
-          {secretFunds ? (
-            <div className={styles.memo}>
-              <hr />
-              <strong>{t(`Caution:`)}</strong>&nbsp;
-              {t(`withdraw-modal-note`)}
-            </div>
-          ) : (
-            <div className={styles.note}>
-              <div className={styles.caption}>
-                {t(`Note`)}
-              </div>
-
-              <RoundedTextArea
-                className={styles.noteTextArea}
-                name="note"
-                rows={4}
-                placeholder={t(`Write an optional message`)}
-              />
-            </div>
-          )}
+          <div className={styles.memo}>
+            <hr />
+            <strong>{t(`Caution:`)}</strong>&nbsp;
+            {secretFunds
+              ? t(`withdraw-modal-note`)
+              : t(`ResDEX does not support SegWit, or any advanced address types. Only the address type that is used in the deposit interface is valid.`)
+            }
+          </div>
 
           <RoundedButton
             type="submit"
