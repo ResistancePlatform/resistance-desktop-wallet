@@ -217,6 +217,13 @@ export class ResistanceService {
     const timestamp = now.toISOString().replace(/:/g, '.')   // Windows doesn't support colons in file names
 
     const walletName = config.get('wallet.name', 'wallet')
+    const walletFilePath = path.join(this.getDataPath(), walletFolderName, `${walletName}.dat`)
+
+    if (!fs.existsSync(walletFilePath)) {
+      log.debug(`Wallet file not found, most likely Get Started mode`)
+      return
+    }
+
     const newBackupFilePath = path.join(backupFolder, `${walletName}.${timestamp}.dat`)
 
     const existingBackups = fs.readdirSync(backupFolder).sort().reverse()
@@ -224,8 +231,6 @@ export class ResistanceService {
 
     const latestBackup = existingBackups.find(s => s.startsWith(walletName) && s.toLowerCase().endsWith('.dat'))
     log.debug('latestBackup', latestBackup)
-
-    const walletFilePath = path.join(this.getDataPath(), walletFolderName, `${walletName}.dat`)
 
     if (latestBackup) {
       const latestBackupPath = path.join(backupFolder, latestBackup)
