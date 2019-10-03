@@ -22,14 +22,14 @@ const mainApi = resDexApiFactory('RESDEX')
 function convertRecentSwaps(swaps) {
 
   const orderStatus = events => {
-    const isFailed = events.find(event => RESDEX.errorEvents.includes(event.event.type))
+    const isFailed = events.find(event => RESDEX.errorEvents.includes(event && event.event && event.event.type))
 
     if (isFailed) {
       return 'failed'
     }
 
     const lastEvent = events[events.length-1]
-    const lastEventType = lastEvent.event.type
+    const lastEventType = lastEvent && lastEvent.event && lastEvent.event.type
 
     switch (lastEventType) {
       case 'Finished':
