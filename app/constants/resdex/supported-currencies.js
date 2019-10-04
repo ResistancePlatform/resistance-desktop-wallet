@@ -718,7 +718,7 @@ supportedCurrencies.forEach((_, index) => {
     }
 
     if (!currency.urls) {
-      currency.urls = ['https://mainnet.infura.io/v3/221b0130b86441818f62fa33b348ec75']
+      currency.urls = ['https://mainnet.infura.io/v3/3a5514867b1744beb0d39dc261766efb']
     }
 
   } else if (currency.coin === 'RES') {
