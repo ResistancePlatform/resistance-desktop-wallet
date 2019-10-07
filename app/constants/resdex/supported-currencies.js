@@ -624,7 +624,6 @@ const supportedCurrencies = [
     name: 'Tether',
     id_in_cmc: 'tether',
     etomic: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-    urls: ['https://mainnet.infura.io/v3/125e6ea342154b6bb962b180a15ae497'],
     swap_contract_address: '0xd85275Fa3F3Ef844E9D4C38822552568039F1BD4',
     is_legacy: true,
     rpcport: 80,
