@@ -8,6 +8,7 @@ import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import TradingChart from './TradingChart'
+import Orders from './Orders'
 import BuySellForm from '../BuySellForm'
 import IndicatorsModal from './IndicatorsModal'
 import OrderBook from './OrderBook'
@@ -82,11 +83,15 @@ class ResDexAdvancedTrading extends Component<Props> {
         }
 
         <div className={styles.container}>
-          <div className={styles.chartContainer}>
-            <TradingChart />
+
+          <div className={styles.rightContainer}>
+            <div className={styles.chartContainer}>
+              <TradingChart />
+            </div>
+            <Orders />
           </div>
 
-          <div className={styles.widgetsContainer}>
+          <div className={styles.rightContainer}>
             <BuySellForm
               className={styles.buySellForm}
               isAdvanced

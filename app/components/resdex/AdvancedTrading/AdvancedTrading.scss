@@ -5,12 +5,18 @@
   height: 100%;
 }
 
-.chartContainer {
-  width: 100%;
+.leftContainer {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+
+  .chartContainer {
+    width: 100%;
+    height: 100%;
+  }
 }
 
-.widgetsContainer {
+.rightContainer {
   padding-left: 0.5rem;
   padding-right: 0.75rem;
   min-width: 24.75rem;
