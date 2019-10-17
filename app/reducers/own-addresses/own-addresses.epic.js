@@ -1,7 +1,7 @@
 // @flow
 import { remote } from 'electron'
 import { tap, map, mapTo, mergeMap, switchMap, catchError } from 'rxjs/operators'
-import { of, bindCallback, merge } from 'rxjs'
+import { of, bindCallback, from, merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
 import LedgerRes from 'ledger-res'
@@ -120,6 +120,38 @@ const exportPrivateKeysEpic = (action$: ActionsObservable<Action>) => action$.pi
         return of(OwnAddressesActions.empty())
       })
   )))
+)
+
+const initiatePrivateKeyImportEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+	ofType(OwnAddressesActions.initiatePrivateKeyImport),
+  mergeMap(() => (
+    getEnsureLoginObservable(null, of(OwnAddressesActions.showImportPrivateKeyModal()), action$)
+  ))
+)
+
+const importPrivateKeyEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(OwnAddressesActions.importPrivateKey),
+  mergeMap(() => {
+    const { privateKey } = state$.value.roundedForm.ownAddressesImportPrivateKeyModal.fields
+    log.debug(`Importing private key`, privateKey)
+
+    const observable = from(rpc.importPrivateKey(privateKey)).pipe(
+      switchMap(() => {
+        log.debug(`Imported private key`, privateKey)
+        toastr.success(
+          t(`Private key imported successfully`),
+          t(`It may take several minutes to rescan the blockchain for transactions affecting the newly-added keys.`)
+        )
+        return of(OwnAddressesActions.importPrivateKeyFinished())
+      }),
+      catchError(err => {
+        toastr.error(t(`Unable to import private key`), err.message)
+        return of(OwnAddressesActions.importPrivateKeyFinished())
+      })
+    )
+
+    return observable
+  })
 )
 
 const initiatePrivateKeysImportEpic = (action$: ActionsObservable<Action>) => action$.pipe(
@@ -280,7 +312,9 @@ export const OwnAddressesEpics = (action$, state$) => merge(
   createAddressEpic(action$, state$),
 	initiatePrivateKeysExportEpic(action$, state$),
 	exportPrivateKeysEpic(action$, state$),
+  initiatePrivateKeyImportEpic(action$, state$),
   initiatePrivateKeysImportEpic(action$, state$),
+  importPrivateKeyEpic(action$, state$),
 	importPrivateKeysEpic(action$, state$),
   mergeAllMinedCoinsEpic(action$, state$),
   mergeAllRAddressCoinsEpic(action$, state$),

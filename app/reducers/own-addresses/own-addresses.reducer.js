@@ -27,7 +27,11 @@ export type OwnAddressesState = {
     destinationAmount: Decimal,
     isTransactionPending: boolean,
     txid: string,
-    pollForLedger: boolean,
+    pollForLedger: boolean
+  },
+  importPrivateKeyModal: {
+    isVisible: boolean,
+    isInProgress: boolean
   }
 }
 
@@ -58,6 +62,12 @@ export const OwnAddressesActions = createActions(
     SEND_LEDGER_TRANSACTION_SUCCESS: (txid: string) => ({txid}),
     SEND_LEDGER_TRANSACTION_FAILURE: undefined,
     SEND_LEDGER_TRANSACTION_INVALID_PARAMS: undefined,
+
+    INITIATE_PRIVATE_KEY_IMPORT: undefined,
+    SHOW_IMPORT_PRIVATE_KEY_MODAL: undefined,
+    CLOSE_IMPORT_PRIVATE_KEY_MODAL: undefined,
+    IMPORT_PRIVATE_KEY: undefined,
+    IMPORT_PRIVATE_KEY_FINISHED: undefined,
 
     INITIATE_PRIVATE_KEYS_EXPORT: undefined,
     EXPORT_PRIVATE_KEYS: filePath => ({filePath}),
@@ -151,27 +161,27 @@ export const OwnAddressesReducer = handleActions(
       connectLedgerModal: {
         ...state.connectLedgerModal,
         isTransactionPending: true,
-        //pollForLedger: false
+        // pollForLedger: false
       }
     }),
-    /*[OwnAddressesActions.sendLedgerTransactionInvalidParams]: state => ({
+    /* [OwnAddressesActions.sendLedgerTransactionInvalidParams]: state => ({
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
         isTransactionPending: false,
       }
-    }),*/
+    }), */
     [OwnAddressesActions.sendLedgerTransactionSuccess]: (state, action) => ({
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
         isTransactionPending: false,
-        //ledgerAddress: "",
-        //destinationAddress: "",
-        //destinationAmount: Decimal("0"),
+        // ledgerAddress: "",
+        // destinationAddress: "",
+        // destinationAmount: Decimal("0"),
         isTransactionSent: true,
         txid: action.payload.txid,
-        //pollForLedger: false
+        // pollForLedger: false
       }
     }),
     [OwnAddressesActions.sendLedgerTransactionFailure]: state => ({
@@ -179,7 +189,7 @@ export const OwnAddressesReducer = handleActions(
       connectLedgerModal: {
         ...state.connectLedgerModal,
         isTransactionPending: false,
-        //pollForLedger: true
+        // pollForLedger: true
       }
     }),
     [OwnAddressesActions.updateDestinationAddress]: (state, action) => ({
@@ -204,21 +214,49 @@ export const OwnAddressesReducer = handleActions(
         isTransactionConfirmed: true,
         isTransactionSent: true
       }
-    }),*/
+    }), */
     [OwnAddressesActions.closeConnectLedgerModal]: state => ({
       ...state,
       connectLedgerModal: {
         ...state.connectLedgerModal,
         isVisible: false,
         isTransactionPending: false,
-        //ledgerAddress: "",
-        //destinationAddress: "",
-        //destinationAmount: Decimal("0"),
+        // ledgerAddress: "",
+        // destinationAddress: "",
+        // destinationAmount: Decimal("0"),
         isTransactionSent: false,
         txid: "",
-        //isLedgerConnected: false,
-        //isLedgerResistanceAppOpen: false,
+        // isLedgerConnected: false,
+        // isLedgerResistanceAppOpen: false,
         pollForLedger: true
+      }
+    }),
+    [OwnAddressesActions.showImportPrivateKeyModal]: state => ({
+      ...state,
+      importPrivateKeyModal: {
+        ...state.importPrivateKeyModal,
+        isVisible: true,
+      }
+    }),
+    [OwnAddressesActions.importPrivateKey]: state => ({
+      ...state,
+      importPrivateKeyModal: {
+        ...state.importPrivateKeyModal,
+        isInProgress: true,
+      }
+    }),
+    [OwnAddressesActions.importPrivateKeyFinished]: state => ({
+      ...state,
+      importPrivateKeyModal: {
+        ...state.importPrivateKeyModal,
+        isInProgress: false,
+      }
+    }),
+    [OwnAddressesActions.closeImportPrivateKeyModal]: state => ({
+      ...state,
+      importPrivateKeyModal: {
+        ...state.importPrivateKeyModal,
+        isVisible: false,
       }
     }),
     [OwnAddressesActions.mergeAllMinedCoins]: (state, action) => ({

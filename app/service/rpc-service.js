@@ -628,6 +628,17 @@ export class RpcService {
   }
 
   /**
+   * Import a single private key.
+   *
+   * @memberof RpcService
+   * @returns {Observable}
+   */
+  importPrivateKey(privateKey: string) {
+    const client = getClientInstance()
+    return client.command('importprivkey', privateKey)
+  }
+
+  /**
    * Import private keys from a file.
    *
    * @memberof RpcService

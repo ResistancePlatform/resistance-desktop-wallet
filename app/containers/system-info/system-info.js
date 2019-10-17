@@ -244,7 +244,7 @@ class SystemInfo extends Component<Props> {
 
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>{t(`Version`)}</div>
-						<div className={styles.statusColoumnValue}>2.2.4</div>
+						<div className={styles.statusColoumnValue}>2.2.5</div>
 					</div>
 
 				</div>
