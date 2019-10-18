@@ -142,7 +142,10 @@ const importPrivateKeyEpic = (action$: ActionsObservable<Action>, state$) => act
           t(`Private key imported successfully`),
           t(`It may take several minutes to rescan the blockchain for transactions affecting the newly-added keys.`)
         )
-        return of(OwnAddressesActions.importPrivateKeyFinished())
+        return of(
+          OwnAddressesActions.importPrivateKeyFinished(),
+          OwnAddressesActions.closeImportPrivateKeyModal()
+        )
       }),
       catchError(err => {
         toastr.error(t(`Unable to import private key`), err.message)

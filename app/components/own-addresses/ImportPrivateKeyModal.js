@@ -22,7 +22,6 @@ const getValidationSchema = t => Joi.object().keys({
 type Props = {
   t: any,
   ownAddresses: OwnAddressesState,
-  form: object,
   actions: object
 }
 
@@ -57,6 +56,7 @@ class ImportPrivateKeyModal extends Component<Props> {
             id="ownAddressesImportPrivateKeyModal"
             schema={getValidationSchema(t)}
             options={{stripUnknown: true}}
+            clearOnUnmount
           >
 
           <RoundedInputWithPaste
@@ -84,7 +84,6 @@ class ImportPrivateKeyModal extends Component<Props> {
 
 const mapStateToProps = state => ({
 	ownAddresses: state.ownAddresses,
-  form: state.roundedForm.ownAddressesImportPrivateKeyModal,
 })
 
 const mapDispatchToProps = dispatch => ({
