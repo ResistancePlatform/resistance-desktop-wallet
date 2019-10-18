@@ -1,0 +1,16 @@
+@import "~/assets/styles/modal.scss";
+
+$importPrivateKeyModalWidth: 26.25rem;
+
+.importPrivateKey {
+  padding: 2rem;
+  padding-bottom: 1rem;
+  width: $importPrivateKeyModalWidth - 4rem;
+  height: 10rem;
+  position: relative;
+
+  .title {
+    display: flex;
+    align-items: center;
+  }
+}

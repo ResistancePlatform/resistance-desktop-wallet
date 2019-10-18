@@ -13,11 +13,11 @@ import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { OwnAddressesActions, OwnAddressesState } from '~/reducers/own-addresses/own-addresses.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import {
-  RoundedButton,
   RoundedButtonWithDropdown,
   MoreButton
 } from '~/components/rounded-form'
 import ConnectLedgerModal from '~/components/own-addresses/ConnectLedgerModal'
+import ImportPrivateKeyModal from '~/components/own-addresses/ImportPrivateKeyModal'
 
 import styles from './own-addresses.scss'
 import scrollStyles from '~/assets/styles/scrollbar.scss'
@@ -87,6 +87,10 @@ class OwnAddresses extends Component<Props> {
 
         <LedgerPolling />
 
+        {this.props.ownAddresses.importPrivateKeyModal.isVisible &&
+          <ImportPrivateKeyModal />
+        }
+
         {this.props.ownAddresses.connectLedgerModal.isVisible &&
           <ConnectLedgerModal />
         }
@@ -146,7 +150,7 @@ class OwnAddresses extends Component<Props> {
                 />
 
                 <PopupMenu id={privateKeysPopupMenuId} relative>
-                  <PopupMenuItem onClick={this.props.actions.importPrivateKey}>
+                  <PopupMenuItem onClick={this.props.actions.initiatePrivateKeyImport}>
                     {t(`Import private key`)}
                   </PopupMenuItem>
                   <PopupMenuItem onClick={this.props.actions.initiatePrivateKeysImport}>

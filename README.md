@@ -11,6 +11,7 @@ cd resistance-desktop-wallet
 yarn
 ```
 **Note**: If you can't use [yarn](https://github.com/yarnpkg/yarn), run `npm install`.
+Also, if you're running Ubuntu or Debian and see node-gyp build errors, you may need to install the libudev-dev library via `sudo apt-get install libudev-dev`.
 
 <hr><br>
 

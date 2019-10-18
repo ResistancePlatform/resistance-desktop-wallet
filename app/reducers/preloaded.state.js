@@ -89,6 +89,10 @@ export const preloadedState: State = {
       ledgerBalance: "0",
       txid: "",
       pollForLedger: true,
+    },
+    importPrivateKeyModal: {
+      isVisible: false,
+      isInProgress: false
     }
 	},
 	sendCurrency: {
