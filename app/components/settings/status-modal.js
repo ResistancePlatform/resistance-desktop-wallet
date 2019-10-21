@@ -6,10 +6,13 @@ import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { LazyLog } from 'react-lazylog'
+import { getAppDataPath } from '~/utils/os'
+import { shell } from 'electron'
 import cn from 'classnames'
 
 import { ChildProcessService, ChildProcessName } from '~/service/child-process-service'
 import { SettingsActions, SettingsState } from '~/reducers/settings/settings.reducer'
+import { BorderlessButton } from '~/components/rounded-form'
 
 import 'react-tabs/style/react-tabs.scss'
 import styles from './status-modal.scss'
@@ -146,6 +149,7 @@ class StatusModal extends Component<Props> {
     return (
         <div className={styles.overlay}>
           <div className={cn(styles.container, styles.statusModal)}>
+
             <div
               role="button"
               tabIndex={0}
@@ -157,6 +161,13 @@ class StatusModal extends Component<Props> {
             <div className={styles.title}>
               {t(`Services status`)}
             </div>
+
+            <BorderlessButton
+              className={styles.logsButton}
+              onClick={() => { shell.openItem(getAppDataPath()); return false }}
+            >
+              {t(`Logs folder`)}
+            </BorderlessButton>
 
             <Tabs
               className={styles.tabs}
