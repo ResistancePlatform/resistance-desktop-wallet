@@ -88,7 +88,9 @@ class ResDexAdvancedTrading extends Component<Props> {
             <div className={styles.chartContainer}>
               <TradingChart />
             </div>
-            <Orders />
+            <Orders
+              className={styles.orders}
+            />
           </div>
 
           <div className={styles.rightContainer}>

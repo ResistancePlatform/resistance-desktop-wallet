@@ -100,13 +100,26 @@ class ResDexApiService {
   }
 
   async withdraw(opts) {
-		const response = await this.query({
+    const options = {
 			method: 'withdraw',
 			coin: opts.symbol,
 			amount: opts.amount,
 			to: opts.address,
 			broadcast: true,
-		})
+		}
+
+    if (opts.symbol === 'BTC') {
+      const btcFee = '0.00006053'
+
+      options.fee = {
+        type: 'UtxoFixed',
+        amount: btcFee
+      }
+
+      log.debug(`Using custom fee for BTC:`, btcFee)
+    }
+
+		const response = await this.query()
 
 		if (!response.tx_hash) {
 			throw new ResDexApiError(response, t(`Couldn't create withdrawal transaction`))

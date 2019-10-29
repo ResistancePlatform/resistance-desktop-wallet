@@ -8,6 +8,23 @@ import { supportedCurrencies } from '~/constants/resdex/supported-currencies'
 
 const t = translate('resdex')
 
+function getOrdersBreakdown(swapHistory) {
+  const status = o => o.isPrivate ? o.privacy.status : o.status
+  const completed = o => ['completed', 'failed', 'cancelled'].includes(status(o))
+
+  const visibleOrders = swapHistory.filter(o => o.isHidden === false)
+
+  const openOrders = visibleOrders.filter(o => !o.isSwap && !completed(o))
+  const openSwaps = visibleOrders.filter(o => o.isSwap && !completed(o))
+  const completedSwaps = visibleOrders.filter(o => completed(o))
+
+  return ({
+    openOrders,
+    openSwaps,
+    completedSwaps
+  })
+}
+
 function getEquity(symbol, amount, currencyHistory) {
   if (!amount) {
     return null
@@ -77,6 +94,7 @@ const isEtomic = symbol => {
 
 
 export {
+  getOrdersBreakdown,
   getIsLoginDisabled,
   getEquity,
   getOrderStatusName,
