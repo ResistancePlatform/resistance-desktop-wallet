@@ -21,8 +21,10 @@ export const ResDexBuySellActions = createActions(
 
     UPDATE_BASE_CURRENCY: (symbol: string) => ({ symbol }),
     UPDATE_QUOTE_CURRENCY: (symbol: string) => ({ symbol }),
+    UPDATE_PAIR: (baseCurrency: string, quoteCurrency: string) => ({ baseCurrency, quoteCurrency }),
 
     CREATE_ORDER: undefined,
+    CREATE_ADVANCED_ORDER: ({isBuy, isMaker}) => ({ isBuy, isMaker}),
     CREATE_ORDER_SUCCEEDED: undefined,
     CREATE_ORDER_FAILED: (errorMessage: string) => ({ errorMessage }),
     CREATE_ORDER_REJECTED: undefined,
@@ -63,6 +65,9 @@ export const ResDexBuySellActions = createActions(
 
     SHOW_EDIT_TEXT_MODAL: (type: string, submitCallback: func) => ({ type, submitCallback }),
     CLOSE_EDIT_TEXT_MODAL: undefined,
+
+    SHOW_TRADING_CHART_MODAL: undefined,
+    CLOSE_TRADING_CHART_MODAL: undefined,
   },
   {
     prefix: 'APP/RESDEX/BUY_SELL'
@@ -130,6 +135,10 @@ export const ResDexBuySellReducer = handleActions(
       ...state,
       quoteCurrency: action.payload.symbol,
       baseCurrency: state.baseCurrency === action.payload.symbol ? state.quoteCurrency : state.baseCurrency,
+    }),
+    [ResDexBuySellActions.updatePair]: (state, action) => ({
+      ...state,
+      ...action.payload,
     }),
     [ResDexBuySellActions.createOrder]: state => ({
       ...state,
@@ -297,5 +306,21 @@ export const ResDexBuySellReducer = handleActions(
         ...state.editTextModal,
         isVisible: false
       }
-    })
+    }),
+
+    [ResDexBuySellActions.showTradingChartModal]: state => ({
+      ...state,
+      tradingChartModal: {
+        ...state.tradingChartModal,
+        isVisible: true
+      }
+    }),
+    [ResDexBuySellActions.closeTradingChartModal]: state => ({
+      ...state,
+      tradingChartModal: {
+        ...state.tradingChartModal,
+        isVisible: false
+      }
+    }),
+
   }, preloadedState)

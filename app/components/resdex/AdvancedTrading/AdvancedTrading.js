@@ -7,12 +7,12 @@ import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
-import TradingChart from './TradingChart'
 import Orders from './Orders'
-import BuySellForm from '../BuySellForm'
+import LimitOrderForm from './LimitOrderForm'
 import IndicatorsModal from './IndicatorsModal'
 import OrderBook from './OrderBook'
 import Trades from './Trades'
+import ChoosePair from './ChoosePair'
 
 import styles from './AdvancedTrading.scss'
 
@@ -84,38 +84,49 @@ class ResDexAdvancedTrading extends Component<Props> {
 
         <div className={styles.container}>
 
-          <div className={styles.rightContainer}>
-            <div className={styles.chartContainer}>
-              <TradingChart />
-            </div>
-            <Orders
-              className={styles.orders}
-            />
-          </div>
+          <div className={styles.topContainer}>
 
-          <div className={styles.rightContainer}>
-            <BuySellForm
-              className={styles.buySellForm}
-              isAdvanced
-            />
-            <div className={styles.listsContainer}>
-              <OrderBook
-                className={styles.orderBook}
-                baseCurrency={baseCurrency}
-                quoteCurrency={quoteCurrency}
-                baseSmartAddress={baseSmartAddress}
-                quoteSmartAddress={quoteSmartAddress}
-                onPickPrice={price => this.props.formActions.updateField('resDexBuySell', 'price', price.toString())}
-                orderBook={orderBook.baseQuote}
+            <div className={styles.leftContainer}>
+              <ChoosePair
+                className={styles.choosePair}
               />
+
               <Trades
                 baseCurrency={baseCurrency}
                 quoteCurrency={quoteCurrency}
                 trades={trades}
               />
+
             </div>
+
+            <div className={styles.rightContainer}>
+              <LimitOrderForm
+                className={styles.limitOrderForm}
+                isAdvanced
+              />
+
+              <div className={styles.listsContainer}>
+                <OrderBook
+                  className={styles.orderBook}
+                  baseCurrency={baseCurrency}
+                  quoteCurrency={quoteCurrency}
+                  baseSmartAddress={baseSmartAddress}
+                  quoteSmartAddress={quoteSmartAddress}
+                  onPickPrice={price => this.props.formActions.updateField('resDexLimitOrder', 'price', price.toString())}
+                  orderBook={orderBook.baseQuote}
+                />
+              </div>
+
+            </div>
+
           </div>
+
+          <Orders
+            className={styles.orders}
+          />
+
         </div>
+
       </React.Fragment>
 		)
   }

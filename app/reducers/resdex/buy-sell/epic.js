@@ -129,12 +129,62 @@ const createOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe
   })
 )
 
+const createAdvancedOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(ResDexBuySellActions.createAdvancedOrder),
+  switchMap(action => {
+    /*
+    if (!verifyBitcoinAmount(state$)) {
+      return of(ResDexBuySellActions.createOrderRejected())
+    }
+
+    const nextObservable = verifyErc20(state$, false)
+
+    if (nextObservable !== null) {
+      return nextObservable
+    }
+    */
+
+    const { fields } = state$.value.roundedForm.resDexLimitOrderBuy
+    const { amount, price } = fields
+    const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
+    const { isBuy, isMaker } = action.payload
+
+    const orderOptions = {
+      baseCurrency,
+      quoteCurrency,
+      quoteCurrencyAmount: Decimal(amount),
+      price: Decimal(price),
+      type: isBuy ? 'buy' : 'sell',
+      isMarketOrder: !isMaker
+    }
+
+    if (!isMaker) {
+      return getCreateMarketOrderObservable(
+        'RESDEX',
+        orderOptions,
+        null,
+        () => of(ResDexBuySellActions.createOrderSucceeded()),
+        ResDexBuySellActions.createOrderFailed,
+        state$
+      )
+    }
+
+    return getCreateLimitOrderObservable(
+      orderOptions,
+      of(ResDexBuySellActions.createOrderSucceeded()),
+      ResDexBuySellActions.createOrderFailed,
+      state$
+    )
+  })
+)
+
 const getCreateMarketOrderObservable = (processName, options, privacy, getSuccessObservable, failureAction) => {
   const {
     baseCurrency,
     quoteCurrency,
     quoteCurrencyAmount,
-    price
+    price,
+    type: orderType
   } = options
 
   const api = resDexApiFactory(processName)
@@ -144,7 +194,7 @@ const getCreateMarketOrderObservable = (processName, options, privacy, getSucces
   // const divider = price.plus(price.times(dexFee)).plus(txFee)
 
   const requestOpts = {
-    type: 'buy',
+    type: orderType || 'buy',
     baseCurrency,
     quoteCurrency,
     price,
@@ -749,6 +799,7 @@ const updateBaseCurrency = (action$: ActionsObservable<Action>, state$) => actio
 
 export const ResDexBuySellEpic = (action$, state$) => merge(
   createOrder(action$, state$),
+  createAdvancedOrder(action$, state$),
   createPrivateOrder(action$, state$),
   createOrderSucceeded(action$, state$),
   createPrivateOrderSucceeded(action$, state$),

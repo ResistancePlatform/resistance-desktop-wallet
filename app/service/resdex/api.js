@@ -109,10 +109,15 @@ class ResDexApiService {
 		}
 
     if (opts.symbol === 'BTC') {
-      const btcFee = '0.00006053'
+      const btcFee = (
+        Decimal(39)
+          .times(1000)
+          .dividedBy(Decimal(RESDEX.satoshiDivider))
+          .toString()
+      )
 
       options.fee = {
-        type: 'UtxoFixed',
+        type: 'UtxoPerKbyte',
         amount: btcFee
       }
 

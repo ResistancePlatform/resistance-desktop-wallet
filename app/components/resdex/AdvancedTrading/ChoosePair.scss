@@ -1,0 +1,44 @@
+@import '~/assets/styles/vars.scss';
+@import '../ResDex.scss';
+@import '~/components/uniform-list/UniformList.scss';
+
+.choosePair {
+  @extend %smallContainer;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  margin-right: -1rem;
+}
+
+.info {
+  background: $BALANCE_BACKGROUND_IMAGE;
+  display: flex;
+  font-size: 0.67rem;
+  justify-content: space-between;
+
+  .pair {
+    color: $BASE_COLOR_WHITE;
+    font-size: 0.9rem;
+  }
+
+}
+
+.lists {
+  display: flex;
+  height: 100%;
+
+  .list {
+    height: 100%;
+
+    .row {
+      cursor: pointer;
+
+      .column {
+        padding: 0.2rem 0;
+        border: none;
+        font-size: 0.6rem !important;
+      }
+    }
+
+  }
+
+}

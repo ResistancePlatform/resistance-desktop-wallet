@@ -39,7 +39,7 @@ class TradingChartSettings extends Component<Props> {
   render() {
     const { t } = this.props
     const { updateInteractiveMode, clearAllInteractive } = this.props.actions
-    const { tradingChart: chartSettings } = this.props.resDex.buySell
+    const { baseCurrency, quoteCurrency, tradingChart: chartSettings } = this.props.resDex.buySell
     const chartPeriods = ['hour', 'day', 'week', 'month', 'year']
     const { updateChartSettings, updateChartPeriod } = this.props.actions
     const { type: chartType, interactiveMode } = chartSettings

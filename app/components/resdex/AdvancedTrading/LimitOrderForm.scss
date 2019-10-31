@@ -1,0 +1,36 @@
+@import "~/assets/styles/vars.scss";
+@import '../ResDex.scss';
+
+.limitOrder {
+  @extend %smallContainer;
+}
+
+.title {
+  display: flex;
+  justify-content: space-between;
+
+  .caption {
+    font-size: 0.6rem;
+  }
+
+  .makerOnlyCheckbox {
+  }
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.exchangeButton {
+  border: none !important;
+  width: 100%;
+
+  &.buy {
+    background: $BASE_COLOR_LIGHT_GREEN;
+  }
+
+  &.sell {
+    background: $BASE_COLOR_LIGHT_RED;
+  }
+}

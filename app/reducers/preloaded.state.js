@@ -212,6 +212,9 @@ export const preloadedState: State = {
         sumbitCallback: null,
         defaultText: '',
         type: 'label'
+      },
+      tradingChartModal: {
+        isVisible: false
       }
     },
     orders: {

@@ -1,13 +1,9 @@
 @import "~/assets/styles/vars.scss";
 
 .container {
-  position: absolute;
   display: flex;
-  top: 0.57rem;
-  left: calc(100% - 0.78rem);
-  float: right;
-  transform: translateX(-100%);
-  z-index: 10000000;
+  justify-content: flex-end;
+  padding: 0.1rem;
 }
 
 .popupMenu {

@@ -1,5 +1,13 @@
 .container {
   display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  margin-top: 1rem;
+}
+
+.topContainer {
+  display: flex;
   flex-direction: row;
   width: 100%;
   height: 100%;
@@ -8,7 +16,10 @@
 .leftContainer {
   display: flex;
   flex-direction: column;
+  width: 100%;
   height: 100%;
+  margin-left: 1rem;
+  margin-right: 1rem;
 
   .chartContainer {
     width: 100%;
@@ -16,15 +27,24 @@
   }
 }
 
+.choosePair {
+}
+
+.orders {
+  border: 1px dotted fuchsia;
+  height: 20rem;
+  margin-bottom: 1rem;
+}
+
 .rightContainer {
   padding-left: 0.5rem;
   padding-right: 0.75rem;
-  min-width: 24.75rem;
+  min-width: 16.75rem;
   display: flex;
   flex-direction: column;
   height: 100%;
 
-  .buySellForm {
+  .limitOrderForm {
     margin-left: 0.5rem;
     margin-right: -0.65rem;
   }
@@ -46,8 +66,4 @@
     margin-top: 0;
     width: 90%;
   }
-}
-
-.orders {
-  display: block;
 }
