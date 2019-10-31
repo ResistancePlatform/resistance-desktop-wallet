@@ -11,12 +11,12 @@
 }
 
 .asks, .bids {
-  height: 50%;
+  height: 100%;
   width: 100%;
 }
 
 .trades {
-  height: calc(100% - 0.65rem) !important;
+  height: 100%;
 }
 
 .scrollbar {
@@ -42,7 +42,6 @@
 }
 
 .asks {
-  margin-bottom: 0.5rem;
   margin-right: 0.5rem;
 }
 

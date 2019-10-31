@@ -1,7 +1,7 @@
 // @flow
 import { Decimal } from 'decimal.js'
 import * as Joi from 'joi'
-import React, { Component } from 'react'
+import React from 'react'
 import { bindActionCreators } from 'redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
@@ -18,6 +18,7 @@ import {
 } from '~/components/rounded-form'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
+import BuySellFormMixin from '../BuySellFormMixin'
 
 import styles from './LimitOrderForm.scss'
 
@@ -40,7 +41,7 @@ type Props = {
  * @class LimitOrderForm
  * @extends {Component<Props>}
  */
-class LimitOrderForm extends Component<Props> {
+class LimitOrderForm extends BuySellFormMixin {
 	props: Props
 
 	/**
@@ -52,20 +53,6 @@ class LimitOrderForm extends Component<Props> {
     this.state = {
       isMaker: false
     }
-  }
-
-  getBestPrice(): object | null {
-    const { orderBook } = this.props.resDex.buySell
-    const { asks  } = orderBook.baseQuote
-    return asks.length ? asks[0].price : null
-  }
-
-  getSubmitButtonDisabledAttribute() {
-    return false
-  }
-
-  getMaxQuoteAmount() {
-    return Decimal(0)
   }
 
   render() {
@@ -83,6 +70,8 @@ class LimitOrderForm extends Component<Props> {
     const { updateField } = this.props.formActions
 
     const maxQuoteAmount = this.getMaxQuoteAmount()
+
+    const isInstantSwapAllowed = this.getIsInstantSwapAllowed()
 
     return (
       <div className={styles.limitOrder}>
@@ -122,7 +111,7 @@ class LimitOrderForm extends Component<Props> {
           <CurrencyAmountInput
             name="amount"
             labelClassName={styles.inputLabel}
-            label={t(`Max. {{quoteCurrency}}`, { quoteCurrency })}
+            label={t(`Amount`)}
             addonClassName={styles.maxRelAddon}
             buttonLabel={t(`Use max`)}
             maxAmount={maxQuoteAmount}
@@ -157,7 +146,7 @@ class LimitOrderForm extends Component<Props> {
         </RoundedForm>
 
 
-        <div className={styles.buttons}>
+        <div className={styles.bottomControls}>
           <RoundedButton
             type="submit"
             className={cn(styles.exchangeButton, styles.buy)}
@@ -186,6 +175,23 @@ class LimitOrderForm extends Component<Props> {
             {t(`Sell {{quoteCurrency}}`, { quoteCurrency })}
           </RoundedButton>
 
+          <div className={cn(styles.instantSwap, {[styles.allowed]: isInstantSwapAllowed})}>
+            {isInstantSwapAllowed
+              ? t(`Instant swap allowed`)
+              : t(`Instant swap disallowed`)
+            }
+
+            <Info tooltipClassName={styles.tooltip}>
+              <div className={styles.title}>
+                {t(`Instant swap`)}
+              </div>
+
+              <div className={styles.body}>
+                {this.getZCreditsBaseEquivalentCaption() || t(`N/A`)}
+              </div>
+            </Info>
+          </div>
+
         </div>
 
       </div>
@@ -195,6 +201,9 @@ class LimitOrderForm extends Component<Props> {
 
 const mapStateToProps = (state) => ({
 	resDex: state.resDex,
+	buySell: state.resDex.buySell,
+	orders: state.resDex.orders,
+	accounts: state.resDex.accounts,
 })
 
 const mapDispatchToProps = dispatch => ({

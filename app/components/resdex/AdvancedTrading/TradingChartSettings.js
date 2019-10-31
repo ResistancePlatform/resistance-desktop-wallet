@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
 
+import { getPeriodCaption } from '~/utils/resdex'
 import { PopupMenuActions } from '~/reducers/popup-menu/popup-menu.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
@@ -20,15 +21,6 @@ type Props = {
   actions: object,
   popupMenuActions: object
 }
-
-const getPeriodCaption = (t, period) => ({
-  hour: t(`1H`),
-  day: t(`1D`),
-  week: t(`1W`),
-  month: t(`1M`),
-  year: t(`1Y`),
-  all: t(`All`),
-})[period]
 
 /**
  * @class TradingChartSettings
@@ -181,7 +173,7 @@ class TradingChartSettings extends Component<Props> {
               onKeyDown={() => updateChartPeriod(period)}
 
             >
-              {getPeriodCaption(t, period)}
+              {getPeriodCaption(period)}
             </li>
           ))}
         </ul>

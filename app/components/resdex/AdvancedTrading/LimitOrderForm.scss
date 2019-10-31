@@ -41,9 +41,41 @@
   }
 }
 
-.buttons {
+.bottomControls {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+
+  > div:first-child {
+    margin-right: 0.5rem;
+  }
+
+  .instantSwap {
+    text-align: right;
+    flex: 1;
+
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.63rem !important;
+
+    &.allowed {
+      color: $BASE_COLOR_LIGHT_GREEN;
+    }
+
+    .tooltip {
+      text-align: left;
+      font-size: 0.7rem;
+
+      .title {
+        color: $BASE_COLOR_FONT_GRAY;
+        margin-bottom: 0.3rem;
+      }
+
+      .body {
+        color: $BASE_COLOR_WHITE;
+        font-weight: 500;
+      }
+    }
+  }
 }
 
 .exchangeButton {

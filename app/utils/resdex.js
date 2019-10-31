@@ -93,6 +93,15 @@ const isEtomic = symbol => {
 }
 
 
+const getPeriodCaption = period => ({
+  hour: t(`1H`),
+  day: t(`1D`),
+  week: t(`1W`),
+  month: t(`1M`),
+  year: t(`1Y`),
+  all: t(`All`),
+})[period]
+
 export {
   getOrdersBreakdown,
   getIsLoginDisabled,
@@ -102,4 +111,5 @@ export {
 	getCurrencyName,
 	getCurrency,
   isEtomic,
+  getPeriodCaption
 }

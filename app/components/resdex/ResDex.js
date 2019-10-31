@@ -120,7 +120,7 @@ export class ResDex extends Component<Props> {
           selectedIndex={this.props.resDex.common.selectedTabIndex}
           onSelect={tabIndex => this.props.actions.selectTab(tabIndex)}
           selectedTabClassName={styles.selectedTab}
-          selectedTabPanelClassName={cn(styles.selectedMainTabPanel, {[styles.scrollbar]: selectedTabIndex !== 2})}
+          selectedTabPanelClassName={cn(styles.selectedMainTabPanel)}
         >
           <TabList className={styles.tabList}>
             <Tab className={styles.tab}>{t(`Assets`)}</Tab>
@@ -156,7 +156,7 @@ export class ResDex extends Component<Props> {
           <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
             <ResDexBuySell />
           </TabPanel>
-          <TabPanel className={cn(styles.tabPanel, styles.advancedTrading)}>
+          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
             <ResDexAdvancedTrading />
           </TabPanel>
           <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>

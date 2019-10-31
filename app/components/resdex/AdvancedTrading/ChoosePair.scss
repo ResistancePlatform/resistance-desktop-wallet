@@ -12,14 +12,33 @@
 .info {
   // background: $BALANCE_BACKGROUND_IMAGE;
   display: flex;
-  font-size: 0.63rem;
+  font-size: 0.60rem;
   justify-content: space-between;
   color: $BASE_COLOR_FONT_GRAY;
 
   .pair {
     color: $BASE_COLOR_WHITE;
-    font-size: 1.2rem;
+    font-size: 1.46rem;
     cursor: default;
+    margin-top: -0.1rem;
+  }
+
+  .caption {
+    color: $BASE_COLOR_FONT_GRAY;
+  }
+
+  .last {
+  }
+
+  .high {
+    color: $BASE_COLOR_LIGHT_GREEN;
+  }
+
+  .low {
+    color: $BASE_COLOR_LIGHT_RED;
+  }
+
+  .volume {
   }
 
   height: 2rem;

@@ -44,7 +44,7 @@ class Orders extends Component<Props> {
     const { t } = this.props
 
     return (
-      <UniformListHeader>
+      <UniformListHeader className={styles.header}>
         <UniformListColumn width="17%">{t(`Time`)}</UniformListColumn>
         <UniformListColumn width="11%">{t(`Pair`)}</UniformListColumn>
         <UniformListColumn width="9%">{t(`Type`)}</UniformListColumn>
@@ -70,25 +70,25 @@ class Orders extends Component<Props> {
         key={order.uuid}
         onClick={() => order.isSwap ? this.props.actions.showOrderModal(order.uuid) : false}
       >
-        <UniformListColumn className={styles.time}>
+        <UniformListColumn className={cn(styles.column, styles.time)}>
           {moment(order.timeStarted).locale(i18n.language).format('kk:mm L')}
         </UniformListColumn>
-        <UniformListColumn>
+        <UniformListColumn className={styles.column}>
           {order.isMarket ? order.baseCurrency : order.quoteCurrency}/{order.isMarket ? order.quoteCurrency : order.baseCurrency}
         </UniformListColumn>
-        <UniformListColumn>
+        <UniformListColumn className={styles.column}>
           {order.isMarket ? t(`Market`) : t(`Limit`)}
         </UniformListColumn>
-        <UniformListColumn className={cn(styles.amount, styles.lesser)}>
+        <UniformListColumn className={cn(styles.column, styles.amount, styles.lesser)}>
           -{order.isMarket ? quoteLabel : baseLabel}
         </UniformListColumn>
-        <UniformListColumn className={cn(styles.amount, styles.greater)}>
+        <UniformListColumn className={cn(styles.column, styles.amount, styles.greater)}>
           {order.isMarket ? baseLabel : quoteLabel}
         </UniformListColumn>
-        <UniformListColumn>
+        <UniformListColumn className={styles.column}>
           <i className={cn('icon', styles.private, { [styles.enabled]: order.isPrivate })} />
         </UniformListColumn>
-        <UniformListColumn>
+        <UniformListColumn className={styles.column}>
           <span className={cn(styles.status, styles[order.isPrivate ? order.privacy.status : order.status])}>
             {getOrderStatusName(order)}
           </span>
@@ -121,34 +121,34 @@ class Orders extends Component<Props> {
             <Tab className={styles.tab}>{t(`Swap History`)}</Tab>
           </TabList>
 
-          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
+          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar)}>
             <UniformList
               className={styles.list}
               items={openOrders}
               headerRenderer={() => this.getListHeaderRenderer()}
               rowRenderer={openOrder => this.getListRowRenderer(openOrder)}
-              emptyMessage={false}
+              emptyMessage={t(`You have no orders yet`)}
             />
           </TabPanel>
 
-          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
+          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar)}>
             <UniformList
               className={styles.list}
               items={openSwaps}
               headerRenderer={() => this.getListHeaderRenderer()}
               rowRenderer={openSwap => this.getListRowRenderer(openSwap)}
-              emptyMessage={false}
+              emptyMessage={t(`You have no swaps yet`)}
             />
           </TabPanel>
 
 
-          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
+          <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar)}>
             <UniformList
               className={styles.list}
               items={completedSwaps}
               headerRenderer={() => this.getListHeaderRenderer()}
               rowRenderer={completedOrder => this.getListRowRenderer(completedOrder)}
-              emptyMessage={false}
+              emptyMessage={t(`You have no swap history yet`)}
             />
           </TabPanel>
 
