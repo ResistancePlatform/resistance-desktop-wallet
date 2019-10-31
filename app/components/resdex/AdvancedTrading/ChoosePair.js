@@ -45,11 +45,11 @@ class ChoosePair extends Component<Props> {
 
     const currencies = Object.values(currenciesMap)
 
-    const grouppedCurrencies = quoteSymbols.reduce((accumulated, quoteSymbol) => ({
+    const grouppedCurrencies = quoteSymbols.reduce((accumulated, quoteSymbol, index) => ({
       ...accumulated,
       [quoteSymbol]: (
         currencies
-          .filter(c => c.symbol !== quoteSymbol)
+          .filter(c => c.symbol !== quoteSymbol && !quoteSymbols.slice(0, index).includes(c.symbol))
           .sort((c1, c2) => c1.symbol.localeCompare(c2.symbol))
       )
     }), {})
@@ -75,7 +75,7 @@ class ChoosePair extends Component<Props> {
    * @memberof ChoosePair
 	 */
   getListRowRenderer(quoteSymbol, currency) {
-    // const { t } = this.props
+    const { baseCurrency, quoteCurrency } = this.props.resDex.buySell
 
     return (
       <UniformListRow
@@ -83,7 +83,12 @@ class ChoosePair extends Component<Props> {
         key={currency.symbol}
         onClick={() => this.props.actions.updatePair(currency.symbol, quoteSymbol)}
       >
-        <UniformListColumn className={styles.column} width="100%">
+        <UniformListColumn
+          className={cn(styles.column, {
+            [styles.selected]: baseCurrency === currency.symbol && quoteCurrency === quoteSymbol
+          })}
+          width="100%"
+        >
           {currency.symbol}/{quoteSymbol}
         </UniformListColumn>
 

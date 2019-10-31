@@ -7,6 +7,7 @@ import cn from 'classnames'
 import { translate } from 'react-i18next'
 import { connect } from 'react-redux'
 
+import { toMaxDigits } from '~/utils/decimal'
 import {
   Info,
   RoundedForm,
@@ -104,8 +105,8 @@ class LimitOrderForm extends BuySellFormMixin {
             label={t(`Price`)}
             labelClassName={styles.inputLabel}
             bestPrice={this.getBestPrice()}
-            baseCurrency={quoteCurrency}
-            quoteCurrency={baseCurrency}
+            baseCurrency={baseCurrency}
+            quoteCurrency={quoteCurrency}
           />
 
           <CurrencyAmountInput
@@ -125,17 +126,17 @@ class LimitOrderForm extends BuySellFormMixin {
 
             <div className={styles.rates}>
               <BorderlessButton
-                onClick={() => updateField('resDexLimitOrder', 'amount', maxQuoteAmount.times(Decimal('0.25')).toString())}
+                onClick={() => updateField('resDexLimitOrder', 'amount', toMaxDigits(maxQuoteAmount.times(Decimal('0.25'))))}
               >25%
               </BorderlessButton>
 
               <BorderlessButton
-                onClick={() => updateField('resDexLimitOrder', 'amount', maxQuoteAmount.times(Decimal('0.5')).toString())}
+                onClick={() => updateField('resDexLimitOrder', 'amount', toMaxDigits(maxQuoteAmount.times(Decimal('0.5'))))}
               >50%
               </BorderlessButton>
 
               <BorderlessButton
-                onClick={() => updateField('resDexLimitOrder', 'amount', maxQuoteAmount.times(Decimal('0.75')).toString())}
+                onClick={() => updateField('resDexLimitOrder', 'amount', toMaxDigits(maxQuoteAmount.times(Decimal('0.75'))))}
               >75%
               </BorderlessButton>
 
