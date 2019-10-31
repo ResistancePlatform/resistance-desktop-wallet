@@ -129,8 +129,10 @@ class ChoosePair extends Component<Props> {
           <RoundedButton
             className={styles.tradingChartButton}
             onClick={this.props.actions.showTradingChartModal}
+            important
+            small
           >
-            {t(`Trading Chart`)}
+            {t(`Chart`)}
           </RoundedButton>
 
         </div>

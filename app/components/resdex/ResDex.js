@@ -64,7 +64,12 @@ export class ResDex extends Component<Props> {
 	 */
   getContents() {
     const { t } = this.props
-    const { isExpanded, selectedTabIndex } = this.props.resDex.common
+    const { selectedTabIndex } = this.props.resDex.common
+
+    // TODO: Uncomment in order to revert expanded mode support
+    // const { isExpanded } = this.props.resDex.common
+    const isExpanded = false
+
     const isVerified = this.getIsVerified()
 
     return (
@@ -115,7 +120,7 @@ export class ResDex extends Component<Props> {
           selectedIndex={this.props.resDex.common.selectedTabIndex}
           onSelect={tabIndex => this.props.actions.selectTab(tabIndex)}
           selectedTabClassName={styles.selectedTab}
-          selectedTabPanelClassName={styles.selectedMainTabPanel}
+          selectedTabPanelClassName={cn(styles.selectedMainTabPanel, {[styles.scrollbar]: selectedTabIndex !== 2})}
         >
           <TabList className={styles.tabList}>
             <Tab className={styles.tab}>{t(`Assets`)}</Tab>
@@ -151,7 +156,7 @@ export class ResDex extends Component<Props> {
           <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>
             <ResDexBuySell />
           </TabPanel>
-          <TabPanel className={cn(styles.tabPanel)}>
+          <TabPanel className={cn(styles.tabPanel, styles.advancedTrading)}>
             <ResDexAdvancedTrading />
           </TabPanel>
           <TabPanel className={cn(styles.tabPanel, scrollStyles.scrollbar, scrollStyles.resdex)}>

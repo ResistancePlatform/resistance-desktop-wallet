@@ -1,6 +1,20 @@
 @import '~/assets/styles/vars.scss';
 @import "~/assets/styles/tabs.scss";
+@import '../ResDex.scss';
 
 .list {
   background: $BASE_COLOR_DARK_BLUE_3;
+}
+
+.orders {
+  @extend %smallContainer;
+  margin: 1rem;
+  margin-right: 0.63rem;
+  margin-top: 0.5rem;
+}
+
+.tab {
+  padding: 0.25rem;
+  font-size: 0.67rem;
+  margin-left: 0.25rem;
 }

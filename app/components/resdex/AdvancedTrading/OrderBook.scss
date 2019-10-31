@@ -4,13 +4,15 @@
 
 .orderBook {
   display: flex;
-  margin-top: 1.8rem;
+  margin-top: 0rem;
   flex-direction: row;
   height: 100%;
+  width: 100%;
 }
 
 .asks, .bids {
   height: 50%;
+  width: 100%;
 }
 
 .trades {
@@ -41,6 +43,7 @@
 
 .asks {
   margin-bottom: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 .asksIcon, .bidsIcon {

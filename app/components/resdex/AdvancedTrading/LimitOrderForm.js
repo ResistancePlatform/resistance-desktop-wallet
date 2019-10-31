@@ -14,7 +14,9 @@ import {
   CheckBox,
   CurrencyAmountInput,
   PriceInput,
+  BorderlessButton,
 } from '~/components/rounded-form'
+import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 
 import styles from './LimitOrderForm.scss'
@@ -30,7 +32,8 @@ function getValidationSchema(t) {
 type Props = {
   t: any,
   resDex: ResDexState,
-  actions: object
+  actions: object,
+  formActions: object
 }
 
 /**
@@ -77,6 +80,10 @@ class LimitOrderForm extends Component<Props> {
 
     const { isMaker } = this.state
 
+    const { updateField } = this.props.formActions
+
+    const maxQuoteAmount = this.getMaxQuoteAmount()
+
     return (
       <div className={styles.limitOrder}>
         <div className={styles.title}>
@@ -105,6 +112,8 @@ class LimitOrderForm extends Component<Props> {
         >
           <PriceInput
             name="price"
+            label={t(`Price`)}
+            labelClassName={styles.inputLabel}
             bestPrice={this.getBestPrice()}
             baseCurrency={quoteCurrency}
             quoteCurrency={baseCurrency}
@@ -112,12 +121,38 @@ class LimitOrderForm extends Component<Props> {
 
           <CurrencyAmountInput
             name="amount"
-            buttonLabel={t(`Use max`)}
+            labelClassName={styles.inputLabel}
+            label={t(`Max. {{quoteCurrency}}`, { quoteCurrency })}
             addonClassName={styles.maxRelAddon}
-            min="0.001"
-            maxAmount={this.getMaxQuoteAmount()}
+            buttonLabel={t(`Use max`)}
+            maxAmount={maxQuoteAmount}
             symbol={quoteCurrency}
           />
+
+          <div className={styles.amountRate}>
+            <div className={styles.caption}>
+              {t(`Amount`)}
+            </div>
+
+            <div className={styles.rates}>
+              <BorderlessButton
+                onClick={() => updateField('resDexLimitOrder', 'amount', maxQuoteAmount.times(Decimal('0.25')).toString())}
+              >25%
+              </BorderlessButton>
+
+              <BorderlessButton
+                onClick={() => updateField('resDexLimitOrder', 'amount', maxQuoteAmount.times(Decimal('0.5')).toString())}
+              >50%
+              </BorderlessButton>
+
+              <BorderlessButton
+                onClick={() => updateField('resDexLimitOrder', 'amount', maxQuoteAmount.times(Decimal('0.75')).toString())}
+              >75%
+              </BorderlessButton>
+
+            </div>
+
+          </div>
 
         </RoundedForm>
 
@@ -164,6 +199,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(ResDexBuySellActions, dispatch),
+  formActions: bindActionCreators(RoundedFormActions, dispatch),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(LimitOrderForm))

@@ -10,16 +10,19 @@
 }
 
 .info {
-  background: $BALANCE_BACKGROUND_IMAGE;
+  // background: $BALANCE_BACKGROUND_IMAGE;
   display: flex;
-  font-size: 0.67rem;
+  font-size: 0.63rem;
   justify-content: space-between;
+  color: $BASE_COLOR_FONT_GRAY;
 
   .pair {
     color: $BASE_COLOR_WHITE;
-    font-size: 0.9rem;
+    font-size: 1.2rem;
+    cursor: default;
   }
 
+  height: 2rem;
 }
 
 .lists {

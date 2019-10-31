@@ -102,12 +102,18 @@
   padding-right: 0.3rem;
   height: calc(100vh - 11.7rem);
 
-  &::after {
-    position: absolute;
-    height: 100%;
-    border-right: 1px solid $BASE_COLOR_BORDER_BLUE;
-    content: ' ';
-    top: 5.9rem;
-    right: 0.9rem;
+  &.scrollbar {
+    &::after {
+      position: absolute;
+      height: 100%;
+      border-right: 1px solid $BASE_COLOR_BORDER_BLUE;
+      content: ' ';
+      top: 5.9rem;
+      right: 0.9rem;
+    }
   }
+}
+
+.advancedTrading {
+  height: 100%;
 }
