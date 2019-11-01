@@ -144,6 +144,10 @@ export const ResDexBuySellReducer = handleActions(
       ...state,
       isSendingOrder: true,
     }),
+    [ResDexBuySellActions.createAdvancedOrder]: state => ({
+      ...state,
+      isSendingOrder: true,
+    }),
     [ResDexBuySellActions.createOrderSucceeded]: state => ({
       ...state,
       isSendingOrder: false,

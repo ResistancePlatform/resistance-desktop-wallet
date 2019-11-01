@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux'
 import cn from 'classnames'
 import { translate } from 'react-i18next'
 import { connect } from 'react-redux'
+import animatedSpinner from '~/assets/images/animated-spinner.svg'
 
 import { toMaxDigits } from '~/utils/decimal'
 import {
@@ -102,8 +103,6 @@ class LimitOrderForm extends BuySellFormMixin {
 
     const buttonAttributes = {
       disabled: this.getSubmitButtonDisabledAttribute(),
-      spinner: this.props.resDex.buySell.isSendingOrder,
-      spinnerTooltip: t(`Sending the order...`),
     }
 
     const { isMaker } = this.state
@@ -115,11 +114,22 @@ class LimitOrderForm extends BuySellFormMixin {
 
     const isInstantSwapAllowed = this.getIsInstantSwapAllowed()
 
+    const { isSendingOrder } = this.props.resDex.buySell
+
     return (
       <div className={styles.limitOrder}>
         <div className={styles.title}>
           <div className={styles.caption}>
             {t(`Limit Order`)}
+
+            {isSendingOrder &&
+              <img
+                className={styles.spinner}
+                src={animatedSpinner}
+                alt={t(`Loading`)}
+                title={t(`Sending the order...`)}
+              />
+            }
           </div>
 
           <CheckBox

@@ -132,7 +132,6 @@ const createOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe
 const createAdvancedOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(ResDexBuySellActions.createAdvancedOrder),
   switchMap(action => {
-    /*
     if (!verifyBitcoinAmount(state$)) {
       return of(ResDexBuySellActions.createOrderRejected())
     }
@@ -142,7 +141,6 @@ const createAdvancedOrder = (action$: ActionsObservable<Action>, state$) => acti
     if (nextObservable !== null) {
       return nextObservable
     }
-    */
 
     const { fields } = state$.value.roundedForm.resDexLimitOrder
     const { amount, price } = fields

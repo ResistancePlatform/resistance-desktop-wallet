@@ -27,6 +27,7 @@
 }
 
 .title {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -116,4 +117,11 @@
     width: 25%;
     margin-right: 0.1rem;
   }
+}
+
+.spinner {
+  position: absolute;
+  width: 0.75rem;
+  margin-top: 0.05rem;
+  margin-left: 0.4rem;
 }
