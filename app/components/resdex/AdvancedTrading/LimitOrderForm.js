@@ -26,8 +26,9 @@ import styles from './LimitOrderForm.scss'
 
 function getValidationSchema(t) {
   return Joi.object().keys({
+    price: Joi.string().required().label(t(`Price`)),
     amount: Joi.string().required().label(t(`Max. amount`)),
-    price: Joi.string().required().label(t(`Price`))
+    total: Joi.string().optional()
   })
 }
 
@@ -109,16 +110,6 @@ class LimitOrderForm extends BuySellFormMixin {
             quoteCurrency={quoteCurrency}
           />
 
-          <CurrencyAmountInput
-            name="amount"
-            labelClassName={styles.inputLabel}
-            label={t(`Amount`)}
-            addonClassName={styles.maxRelAddon}
-            buttonLabel={t(`Use max`)}
-            maxAmount={maxQuoteAmount}
-            symbol={quoteCurrency}
-          />
-
           <div className={styles.amountRate}>
             <div className={styles.caption}>
               {t(`Amount`)}
@@ -144,56 +135,70 @@ class LimitOrderForm extends BuySellFormMixin {
 
           </div>
 
-        </RoundedForm>
+          <CurrencyAmountInput
+            name="amount"
+            addonClassName={styles.maxRelAddon}
+            buttonLabel={t(`Use max`)}
+            maxAmount={maxQuoteAmount}
+            symbol={baseCurrency}
+          />
 
+          <CurrencyAmountInput
+            name="total"
+            labelClassName={styles.inputLabel}
+            label={t(`Total`)}
+            symbol={quoteCurrency}
+          />
 
-        <div className={styles.bottomControls}>
-          <RoundedButton
-            type="submit"
-            className={cn(styles.exchangeButton, styles.buy)}
-            onClick={() => this.props.actions.createAdvancedOrder({
-              isBuy: true,
-              isMaker,
-            })}
-            {...buttonAttributes}
-            important
-            small
-          >
-            {t(`Buy {{quoteCurrency}}`, { quoteCurrency })}
-          </RoundedButton>
+          <div className={styles.bottomControls}>
+            <RoundedButton
+              type="submit"
+              className={cn(styles.exchangeButton, styles.buy)}
+              onClick={() => this.props.actions.createAdvancedOrder({
+                isBuy: true,
+                isMaker,
+              })}
+              {...buttonAttributes}
+              important
+              small
+            >
+              {t(`Buy {{baseCurrency}}`, { baseCurrency })}
+            </RoundedButton>
 
-          <RoundedButton
-            type="submit"
-            className={cn(styles.exchangeButton, styles.sell)}
-            onClick={() => this.props.actions.createAdvancedOrder({
-              isBuy: false,
-              isMaker,
-            })}
-            {...buttonAttributes}
-            important
-            small
-          >
-            {t(`Sell {{quoteCurrency}}`, { quoteCurrency })}
-          </RoundedButton>
+            <RoundedButton
+              type="submit"
+              className={cn(styles.exchangeButton, styles.sell)}
+              onClick={() => this.props.actions.createAdvancedOrder({
+                isBuy: false,
+                isMaker,
+              })}
+              {...buttonAttributes}
+              important
+              small
+            >
+              {t(`Sell {{baseCurrency}}`, { baseCurrency })}
+            </RoundedButton>
 
-          <div className={cn(styles.instantSwap, {[styles.allowed]: isInstantSwapAllowed})}>
-            {isInstantSwapAllowed
-              ? t(`Instant swap allowed`)
-              : t(`Instant swap disallowed`)
-            }
+            <div className={cn(styles.instantSwap, {[styles.allowed]: isInstantSwapAllowed})}>
+              {isInstantSwapAllowed
+                ? t(`Instant swap allowed`)
+                : t(`Instant swap disallowed`)
+              }
 
-            <Info tooltipClassName={styles.tooltip}>
-              <div className={styles.title}>
-                {t(`Instant swap`)}
-              </div>
+              <Info tooltipClassName={styles.tooltip}>
+                <div className={styles.title}>
+                  {t(`Instant swap`)}
+                </div>
 
-              <div className={styles.body}>
-                {this.getZCreditsBaseEquivalentCaption() || t(`N/A`)}
-              </div>
-            </Info>
+                <div className={styles.body}>
+                  {this.getZCreditsBaseEquivalentCaption() || t(`N/A`)}
+                </div>
+              </Info>
+            </div>
+
           </div>
 
-        </div>
+        </RoundedForm>
 
       </div>
     )

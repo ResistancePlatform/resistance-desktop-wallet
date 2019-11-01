@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 
+import { toMaxDigits } from '~/utils/decimal'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
@@ -95,7 +96,7 @@ class ResDexAdvancedTrading extends Component<Props> {
               quoteCurrency={quoteCurrency}
               baseSmartAddress={baseSmartAddress}
               quoteSmartAddress={quoteSmartAddress}
-              onPickPrice={price => this.props.formActions.updateField('resDexLimitOrder', 'price', price.toString())}
+              onPickPrice={price => this.props.formActions.updateField('resDexLimitOrder', 'price', toMaxDigits(price))}
               orderBook={orderBook.baseQuote}
             />
 

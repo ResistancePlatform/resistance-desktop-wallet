@@ -144,7 +144,7 @@ const createAdvancedOrder = (action$: ActionsObservable<Action>, state$) => acti
     }
     */
 
-    const { fields } = state$.value.roundedForm.resDexLimitOrderBuy
+    const { fields } = state$.value.roundedForm.resDexLimitOrder
     const { amount, price } = fields
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
     const { isBuy, isMaker } = action.payload

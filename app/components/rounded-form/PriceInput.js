@@ -1,6 +1,7 @@
 import React from 'react'
 import cn from 'classnames'
 
+import { toMaxDigits } from '~/utils/decimal'
 import { RoundedInputProps } from './RoundedInput'
 import CurrencyAmountInput from './CurrencyAmountInput'
 
@@ -36,7 +37,7 @@ export default class PriceInput extends CurrencyAmountInput {
           role="button"
           className={cn('icon', styles.setBestPriceButton)}
           tabIndex={0}
-          onClick={() => this.props.bestPrice && this.changeValue(this.props.bestPrice.toString())}
+          onClick={() => this.props.bestPrice && this.changeValue(toMaxDigits(this.props.bestPrice))}
           onKeyDown={() => false}
         />
       </div>

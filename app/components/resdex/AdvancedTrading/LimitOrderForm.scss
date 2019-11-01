@@ -11,14 +11,14 @@
 }
 
 .maxRelAddon {
-  width: 5.2rem;
+  width: 4.1rem;
   border-left: 1px solid $BASE_COLOR_BORDER_GRAY;
   padding-left: 0.3rem;
 
   button {
-    color: $BASE_COLOR_WHITE;
-    background-color: $BASE_COLOR_PURPLE;
-    border: 0;
+    color: $BASE_COLOR_WHITE !important;
+    background-color: $BASE_COLOR_PURPLE !important;
+    border: none !important;
   }
 }
 
@@ -97,17 +97,19 @@
 
   .caption {
     color: $BASE_COLOR_FONT_GRAY_2;
-    font-size: 0.67rem;
+    font-size: 0.61rem;
     font-weight: 300;
     text-transform: uppercase;
     margin-left: 1rem;
     white-space: nowrap;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.25rem;
+    margin-top: 0rem;
   }
 
   .rates {
     display: flex;
     justify-content: space-between;
     width: 25%;
+    margin-right: 0.1rem;
   }
 }
