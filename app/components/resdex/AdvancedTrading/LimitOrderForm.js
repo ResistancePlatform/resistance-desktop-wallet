@@ -147,6 +147,7 @@ class LimitOrderForm extends BuySellFormMixin {
             bestPrice={this.getBestPrice()}
             baseCurrency={baseCurrency}
             quoteCurrency={quoteCurrency}
+            onChange={price => this.updateTotalWithPrice(price)}
           />
 
           <div className={styles.amountRate}>

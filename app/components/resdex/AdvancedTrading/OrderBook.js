@@ -58,9 +58,11 @@ class OrderBook extends Component<Props> {
   }
 
   getListRowRenderer(order, smartAddress, isAsk) {
+    const { baseSmartAddress, quoteSmartAddress } = this.props
+
     return (
       <UniformListRow
-        className={cn(styles.row, { [styles.myOrder]: order.address === smartAddress })}
+        className={cn(styles.row, { [styles.myOrder]: [baseSmartAddress, quoteSmartAddress].includes(order.address) })}
         onClick={e => this.onRowClick(e, order.price)}
       >
         <UniformListColumn className={cn(styles.column, {
@@ -75,7 +77,7 @@ class OrderBook extends Component<Props> {
           className={styles.column}
         >
           {isAsk
-            ? toMaxDigits(order.maxVolume.dividedBy(order.price), 8)
+            ? toMaxDigits(order.maxVolume.times(order.price), 8)
             : toMaxDigits(order.maxVolume, 8)
           }
         </UniformListColumn>
@@ -84,7 +86,7 @@ class OrderBook extends Component<Props> {
         >
           {isAsk
             ? toMaxDigits(order.maxVolume, 8)
-            : toMaxDigits(order.maxVolume.times(order.price), 8)
+            : toMaxDigits(order.maxVolume.dividedBy(order.price), 8)
           }
         </UniformListColumn>
         {/*

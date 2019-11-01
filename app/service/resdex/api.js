@@ -399,9 +399,7 @@ class ResDexApiService {
       price: zeroIfUndefined(o.price),
       baseCurrencyAmount: zeroIfUndefined(o.available_amount),
       quoteCurrencyAmount: (
-        zeroIfUndefined(o.price).equals(Decimal(0))
-          ? Decimal(0)
-          : zeroIfUndefined(o.available_amount).dividedBy(zeroIfUndefined(o.price))
+        zeroIfUndefined(o.available_amount).times(zeroIfUndefined(o.price))
       ),
       timeStarted: moment(o.created_at).toDate(),
       isInstantSwap: o.instant_swap,

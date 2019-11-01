@@ -248,7 +248,7 @@ const getCreateLimitOrderObservable = (options, successObservable, failureAction
     baseCurrency: isBuy ? quoteCurrency : baseCurrency,
     quoteCurrency: isBuy ? baseCurrency : quoteCurrency,
     baseCurrencyAmount: isBuy ? quoteCurrencyAmount : baseCurrencyAmount,
-    price,
+    price: isBuy ? Decimal(1).dividedBy(price) : price
   }
 
   log.debug(`Submitting a swap (limit order)`, requestOpts)

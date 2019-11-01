@@ -221,7 +221,7 @@ class RoundedForm extends Component<Props> {
         }
 
         return React.cloneElement(child, {
-          onChange: child.props.onChange ? child.props.onChange : onChange,
+          onChange: child.props.onChange ? v => { child.props.onChange(v); onChange(v) } : onChange,
           error: child.props.error ? child.props.error : error,
           defaultValue: getDefaultValue(),
           important: child.props.important ? child.props.important : this.props.important
