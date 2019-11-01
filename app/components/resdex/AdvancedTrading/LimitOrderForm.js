@@ -36,6 +36,7 @@ type Props = {
   t: any,
   resDex: ResDexState,
   actions: object,
+  form: any,
   formActions: object
 }
 
@@ -57,6 +58,44 @@ class LimitOrderForm extends BuySellFormMixin {
     }
   }
 
+  updateValue(field, calculator) {
+    const { updateField } = this.props.formActions
+
+    let value
+
+    try {
+      value = calculator()
+    } catch(err) {
+      return
+    }
+
+    updateField('resDexLimitOrder', field, toMaxDigits(value))
+  }
+
+  updateAmount(total) {
+    if (!this.props.form || !this.props.form.fields) {
+      return
+    }
+    const { price } = this.props.form.fields
+    this.updateValue('amount', () => Decimal(total).dividedBy(price))
+  }
+
+  updateTotalWithAmount(amount) {
+    if (!this.props.form || !this.props.form.fields) {
+      return
+    }
+    const { price } = this.props.form.fields
+    this.updateValue('total', () => Decimal(amount).times(Decimal(price)))
+  }
+
+  updateTotalWithPrice(price) {
+    if (!this.props.form || !this.props.form.fields) {
+      return
+    }
+    const { amount } = this.props.form.fields
+    this.updateValue('total', () => Decimal(amount).times(Decimal(price)))
+  }
+
   render() {
     const { t } = this.props
     const { baseCurrency, quoteCurrency } = this.props.resDex.buySell
@@ -71,7 +110,8 @@ class LimitOrderForm extends BuySellFormMixin {
 
     const { updateField } = this.props.formActions
 
-    const maxQuoteAmount = this.getMaxQuoteAmount()
+    const maxBaseAmount = this.getMaxAmount(baseCurrency)
+    const maxQuoteAmount = this.getMaxAmount(quoteCurrency)
 
     const isInstantSwapAllowed = this.getIsInstantSwapAllowed()
 
@@ -99,7 +139,6 @@ class LimitOrderForm extends BuySellFormMixin {
           className={cn(styles.form)}
           schema={getValidationSchema(t)}
           overrideOnMount
-          clearOnUnmount
         >
           <PriceInput
             name="price"
@@ -117,17 +156,17 @@ class LimitOrderForm extends BuySellFormMixin {
 
             <div className={styles.rates}>
               <BorderlessButton
-                onClick={() => updateField('resDexLimitOrder', 'amount', toMaxDigits(maxQuoteAmount.times(Decimal('0.25'))))}
+                onClick={() => updateField('resDexLimitOrder', 'amount', toMaxDigits(maxBaseAmount.times(Decimal('0.25'))))}
               >25%
               </BorderlessButton>
 
               <BorderlessButton
-                onClick={() => updateField('resDexLimitOrder', 'amount', toMaxDigits(maxQuoteAmount.times(Decimal('0.5'))))}
+                onClick={() => updateField('resDexLimitOrder', 'amount', toMaxDigits(maxBaseAmount.times(Decimal('0.5'))))}
               >50%
               </BorderlessButton>
 
               <BorderlessButton
-                onClick={() => updateField('resDexLimitOrder', 'amount', toMaxDigits(maxQuoteAmount.times(Decimal('0.75'))))}
+                onClick={() => updateField('resDexLimitOrder', 'amount', toMaxDigits(maxBaseAmount.times(Decimal('0.75'))))}
               >75%
               </BorderlessButton>
 
@@ -137,17 +176,22 @@ class LimitOrderForm extends BuySellFormMixin {
 
           <CurrencyAmountInput
             name="amount"
-            addonClassName={styles.maxRelAddon}
+            addonClassName={styles.maxBaseAddon}
             buttonLabel={t(`Use max`)}
-            maxAmount={maxQuoteAmount}
+            maxAmount={maxBaseAmount}
             symbol={baseCurrency}
+            onChange={amount => this.updateTotalWithAmount(amount)}
           />
 
           <CurrencyAmountInput
             name="total"
+            addonClassName={styles.maxQuoteAddon}
+            buttonLabel={t(`Use max`)}
+            maxAmount={maxQuoteAmount}
             labelClassName={styles.inputLabel}
             label={t(`Total`)}
             symbol={quoteCurrency}
+            onChange={total => this.updateAmount(total)}
           />
 
           <div className={styles.bottomControls}>
@@ -210,6 +254,7 @@ const mapStateToProps = (state) => ({
 	buySell: state.resDex.buySell,
 	orders: state.resDex.orders,
 	accounts: state.resDex.accounts,
+  form: state.roundedForm.resDexLimitOrder
 })
 
 const mapDispatchToProps = dispatch => ({

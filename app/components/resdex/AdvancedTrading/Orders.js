@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import cn from 'classnames'
 
-import { toDecimalPlaces } from '~/utils/decimal'
+import { toDecimalPlaces, toMaxDigits } from '~/utils/decimal'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import {
   UniformList,
@@ -45,11 +45,12 @@ class Orders extends Component<Props> {
 
     return (
       <UniformListHeader className={styles.header}>
-        <UniformListColumn width="17%">{t(`Time`)}</UniformListColumn>
-        <UniformListColumn width="11%">{t(`Pair`)}</UniformListColumn>
+        <UniformListColumn width="14%">{t(`Time`)}</UniformListColumn>
+        <UniformListColumn width="10%">{t(`Pair`)}</UniformListColumn>
         <UniformListColumn width="9%">{t(`Type`)}</UniformListColumn>
-        <UniformListColumn width="18%">{t(`Amount out`)}</UniformListColumn>
-        <UniformListColumn width="18%">{t(`Amount in`)}</UniformListColumn>
+        <UniformListColumn width="15%">{t(`Amount out`)}</UniformListColumn>
+        <UniformListColumn width="15%">{t(`Amount in`)}</UniformListColumn>
+        <UniformListColumn width="11%">{t(`Price`)}</UniformListColumn>
         <UniformListColumn width="11%">{t(`Private`)}</UniformListColumn>
         <UniformListColumn width="16%">{t(`Status`)}</UniformListColumn>
       </UniformListHeader>
@@ -84,6 +85,9 @@ class Orders extends Component<Props> {
         </UniformListColumn>
         <UniformListColumn className={cn(styles.column, styles.amount, styles.greater)}>
           {order.isMarket ? baseLabel : quoteLabel}
+        </UniformListColumn>
+        <UniformListColumn className={cn(styles.column, styles.price)}>
+          {toMaxDigits(order.price)}
         </UniformListColumn>
         <UniformListColumn className={styles.column}>
           <i className={cn('icon', styles.private, { [styles.enabled]: order.isPrivate })} />

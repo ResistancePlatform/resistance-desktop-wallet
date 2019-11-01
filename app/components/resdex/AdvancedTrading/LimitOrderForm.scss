@@ -10,7 +10,7 @@
   min-width: 2.8rem;
 }
 
-.maxRelAddon {
+.maxBaseAddon, .maxQuoteAddon {
   width: 4.1rem;
   border-left: 1px solid $BASE_COLOR_BORDER_GRAY;
   padding-left: 0.3rem;
@@ -20,6 +20,10 @@
     background-color: $BASE_COLOR_PURPLE !important;
     border: none !important;
   }
+}
+
+.maxQuoteAddon {
+  width: 5.8rem !important;
 }
 
 .title {

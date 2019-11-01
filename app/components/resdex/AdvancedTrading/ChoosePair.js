@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 import cn from 'classnames'
-import log from 'electron-log'
 
 import { getPeriodCaption } from '~/utils/resdex'
 import { toMaxDigits } from '~/utils/decimal'
@@ -132,7 +131,6 @@ class ChoosePair extends Component<Props> {
     const { t } = this.props
     const { baseCurrency, quoteCurrency } = this.props.resDex.buySell
     const grouppedCurrencies = this.getGrouppedCurrencies()
-    log.debug('grouppedCurrencies', JSON.stringify(grouppedCurrencies))
 
     const { period } = this.props.resDex.buySell.tradingChart
     const periodCaption = getPeriodCaption(period)

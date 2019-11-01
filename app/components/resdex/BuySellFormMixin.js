@@ -11,14 +11,18 @@ import { toDecimalPlaces } from '~/utils/decimal'
  * @extends {Component<Props>}
  */
 class BuySellFormMixin extends Component<Props> {
-  getMaxQuoteAmount() {
-    const { quoteCurrency } = this.props.buySell
-    const currency = this.props.accounts.currencies.RESDEX[quoteCurrency]
+  getMaxAmount(symbol: string) {
+    const currency = this.props.accounts.currencies.RESDEX[symbol]
     if (!currency) {
       return Decimal(0)
     }
     const maxAmount = currency.balance.minus(currency.lockedAmount)
     return maxAmount.times(Decimal(1).minus(RESDEX.dexFee.dividedBy(Decimal(100))))
+  }
+
+  getMaxQuoteAmount() {
+    const { quoteCurrency } = this.props.buySell
+    return this.getMaxAmount(quoteCurrency)
   }
 
   getBestPrice(): object | null {

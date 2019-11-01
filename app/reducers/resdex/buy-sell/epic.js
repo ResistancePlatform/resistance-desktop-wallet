@@ -149,10 +149,13 @@ const createAdvancedOrder = (action$: ActionsObservable<Action>, state$) => acti
     const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
     const { isBuy, isMaker } = action.payload
 
+    log.debug(`Advanced order: isBuy ${isBuy}, isMaker ${isMaker}`)
+
     const orderOptions = {
       baseCurrency,
       quoteCurrency,
-      quoteCurrencyAmount: Decimal(amount),
+      baseCurrencyAmount: Decimal(amount),
+      quoteCurrencyAmount: Decimal(amount).times(Decimal(price)),
       price: Decimal(price),
       type: isBuy ? 'buy' : 'sell',
       isMarketOrder: !isMaker
@@ -234,16 +237,17 @@ const getCreateLimitOrderObservable = (options, successObservable, failureAction
   const {
     baseCurrency,
     quoteCurrency,
+    baseCurrencyAmount,
     quoteCurrencyAmount,
+    isBuy,
     price
   } = options
 
   const requestOpts = {
-    // Base/Rel are reverted for setprice orders
-    baseCurrency: quoteCurrency,
-    quoteCurrency: baseCurrency,
-    // baseCurrencyAmount: quoteCurrencyAmount.dividedBy(price).times(Decimal('0.999')),
-    baseCurrencyAmount: quoteCurrencyAmount,
+    // setprice orders don't support order type
+    baseCurrency: isBuy ? quoteCurrency : baseCurrency,
+    quoteCurrency: isBuy ? baseCurrency : quoteCurrency,
+    baseCurrencyAmount: isBuy ? quoteCurrencyAmount : baseCurrencyAmount,
     price,
   }
 
