@@ -101,7 +101,10 @@ class ChoosePair extends Component<Props> {
     const { trades } = this.props.resDex.buySell
 
     if (trades.length === 0) {
-      return na
+      return {
+        price: na,
+        isGreen: true,
+      }
     }
 
     let isGreen = true
