@@ -124,7 +124,7 @@ class ResDexApiService {
       log.debug(`Using custom fee for BTC:`, btcFee)
     }
 
-		const response = await this.query()
+		const response = await this.query(options)
 
 		if (!response.tx_hash) {
 			throw new ResDexApiError(response, t(`Couldn't create withdrawal transaction`))

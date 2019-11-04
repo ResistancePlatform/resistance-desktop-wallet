@@ -117,13 +117,12 @@ class OrderBook extends Component<Props> {
 
           <UniformList
             className={styles.list}
-            items={baseQuote.asks}
+            items={(baseQuote.asks || []).slice().reverse()}
             headerRenderer={() => this.getListHeaderRenderer()}
             rowRenderer={item => this.getListRowRenderer(item, this.props.baseSmartAddress, true)}
             emptyMessage={t(`No liquidity available yet`)}
             loading={isLoading}
             scrollable
-            scrollBottom
           />
 
         </div>
