@@ -155,6 +155,7 @@ const createAdvancedOrder = (action$: ActionsObservable<Action>, state$) => acti
       baseCurrencyAmount: Decimal(amount),
       quoteCurrencyAmount: Decimal(amount).times(Decimal(price)),
       price: Decimal(price),
+      isBuy,
       type: isBuy ? 'buy' : 'sell',
       isMarketOrder: !isMaker
     }
