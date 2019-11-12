@@ -3,15 +3,17 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { translate } from 'react-i18next'
 
+import { toMaxDigits } from '~/utils/decimal'
 import RpcPolling from '~/components/rpc-polling/rpc-polling'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
-import TradingChart from './TradingChart'
-import BuySellForm from '../BuySellForm'
+import Orders from './Orders'
+import LimitOrderForm from './LimitOrderForm'
 import IndicatorsModal from './IndicatorsModal'
 import OrderBook from './OrderBook'
 import Trades from './Trades'
+import ChoosePair from './ChoosePair'
 
 import styles from './AdvancedTrading.scss'
 
@@ -46,7 +48,7 @@ class ResDexAdvancedTrading extends Component<Props> {
     const quoteSmartAddress = quoteCurrency in currencies ? currencies[quoteCurrency].address : null
 
 		return (
-      <React.Fragment>
+      <div className={styles.container}>
         <RpcPolling
           criticalChildProcess="RESDEX"
           interval={10.0}
@@ -81,35 +83,49 @@ class ResDexAdvancedTrading extends Component<Props> {
           <IndicatorsModal />
         }
 
-        <div className={styles.container}>
-          <div className={styles.chartContainer}>
-            <TradingChart />
+        <div className={styles.topContainer}>
+
+          <div className={styles.leftContainer}>
+            <ChoosePair
+              className={styles.choosePair}
+            />
+
+            <OrderBook
+              className={styles.orderBook}
+              baseCurrency={baseCurrency}
+              quoteCurrency={quoteCurrency}
+              baseSmartAddress={baseSmartAddress}
+              quoteSmartAddress={quoteSmartAddress}
+              onPickPrice={price => this.props.formActions.updateField('resDexLimitOrder', 'price', toMaxDigits(price))}
+              orderBook={orderBook.baseQuote}
+            />
+
           </div>
 
-          <div className={styles.widgetsContainer}>
-            <BuySellForm
-              className={styles.buySellForm}
+          <div className={styles.rightContainer}>
+            <LimitOrderForm
+              className={styles.limitOrderForm}
               isAdvanced
             />
+
             <div className={styles.listsContainer}>
-              <OrderBook
-                className={styles.orderBook}
-                baseCurrency={baseCurrency}
-                quoteCurrency={quoteCurrency}
-                baseSmartAddress={baseSmartAddress}
-                quoteSmartAddress={quoteSmartAddress}
-                onPickPrice={price => this.props.formActions.updateField('resDexBuySell', 'price', price.toString())}
-                orderBook={orderBook.baseQuote}
-              />
               <Trades
                 baseCurrency={baseCurrency}
                 quoteCurrency={quoteCurrency}
                 trades={trades}
               />
+
             </div>
+
           </div>
+
         </div>
-      </React.Fragment>
+
+        <Orders
+          className={styles.orders}
+        />
+
+      </div>
 		)
   }
 }

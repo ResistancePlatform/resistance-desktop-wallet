@@ -7,6 +7,7 @@ import styles from './Info.scss'
 
 
 export type InfoProps = {
+  className?: string,
   tooltipClassName?: string,
   tooltip?: string,
 	children: any
@@ -23,7 +24,7 @@ export default class Info extends Component<Props> {
 
   render() {
     return (
-      <div className={styles.container}>
+      <div className={cn(styles.container, this.props.className)}>
         <i className={styles.info} data-tip={this.props.tooltip || true} data-for={this.tooltipId} />
 
         <ReactTooltip id={this.tooltipId} className={cn(styles.tooltip, this.props.tooltipClassName)}>

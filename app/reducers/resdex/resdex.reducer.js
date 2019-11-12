@@ -109,6 +109,9 @@ export type ResDexState = {
       sumbitCallback: func | null,
       defaultText: string,
       type: 'label' | 'alert'
+    },
+    tradingChartModal: {
+      isVisible: boolean
     }
   },
   orders: {

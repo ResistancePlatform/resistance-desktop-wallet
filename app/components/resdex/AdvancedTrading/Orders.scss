@@ -1,0 +1,42 @@
+@import '~/assets/styles/vars.scss';
+@import "~/assets/styles/tabs.scss";
+@import '../ResDex.scss';
+@import '~/components/uniform-list/UniformList.scss';
+@import '~/components/resdex/Orders.scss';
+
+.list {
+  background: $BASE_COLOR_DARK_BLUE_3;
+
+  .header {
+    margin-top: 0.0rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .row {
+    cursor: pointer;
+
+    .column {
+      padding: 0.2rem 0;
+      border: none;
+      font-size: 0.6rem !important;
+    }
+  }
+}
+
+.orders {
+  @extend %smallContainer;
+  margin: 1rem;
+  margin-right: 0.75rem;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  padding-bottom: 2rem;
+  padding-right: 0;
+}
+
+.tab {
+  padding: 0.25rem;
+  padding-top: 0;
+  padding-left: 0;
+  margin-left: 0.0rem;
+  font-size: 0.67rem;
+}

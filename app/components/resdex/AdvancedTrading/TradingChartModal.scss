@@ -1,0 +1,23 @@
+@import "~/assets/styles/modal.scss";
+@import "~/assets/styles/vars.scss";
+
+$tradingChartModalWidth: 48rem;
+
+.tradingChart {
+  padding: 2rem;
+  padding-bottom: 1rem;
+  width: $tradingChartModalWidth - 4rem;
+  height: 28rem;
+  position: relative;
+
+  .title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+}
+
+.chartContainer {
+  background: $BASE_COLOR_DARK_BLUE_2;
+  height: calc(100% - 3rem);
+}

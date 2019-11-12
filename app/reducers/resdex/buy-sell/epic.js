@@ -129,12 +129,64 @@ const createOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe
   })
 )
 
+const createAdvancedOrder = (action$: ActionsObservable<Action>, state$) => action$.pipe(
+	ofType(ResDexBuySellActions.createAdvancedOrder),
+  switchMap(action => {
+    if (!verifyBitcoinAmount(state$)) {
+      return of(ResDexBuySellActions.createOrderRejected())
+    }
+
+    const nextObservable = verifyErc20(state$, false)
+
+    if (nextObservable !== null) {
+      return nextObservable
+    }
+
+    const { fields } = state$.value.roundedForm.resDexLimitOrder
+    const { amount, price } = fields
+    const { baseCurrency, quoteCurrency } = state$.value.resDex.buySell
+    const { isBuy, isMaker } = action.payload
+
+    log.debug(`Advanced order: isBuy ${isBuy}, isMaker ${isMaker}`)
+
+    const orderOptions = {
+      baseCurrency,
+      quoteCurrency,
+      baseCurrencyAmount: Decimal(amount),
+      quoteCurrencyAmount: Decimal(amount).times(Decimal(price)),
+      price: Decimal(price),
+      isBuy,
+      type: isBuy ? 'buy' : 'sell',
+      isMarketOrder: !isMaker
+    }
+
+    if (!isMaker) {
+      return getCreateMarketOrderObservable(
+        'RESDEX',
+        orderOptions,
+        null,
+        () => of(ResDexBuySellActions.createOrderSucceeded()),
+        ResDexBuySellActions.createOrderFailed,
+        state$
+      )
+    }
+
+    return getCreateLimitOrderObservable(
+      orderOptions,
+      of(ResDexBuySellActions.createOrderSucceeded()),
+      ResDexBuySellActions.createOrderFailed,
+      state$
+    )
+  })
+)
+
 const getCreateMarketOrderObservable = (processName, options, privacy, getSuccessObservable, failureAction) => {
   const {
     baseCurrency,
     quoteCurrency,
     quoteCurrencyAmount,
-    price
+    price,
+    type: orderType
   } = options
 
   const api = resDexApiFactory(processName)
@@ -144,7 +196,7 @@ const getCreateMarketOrderObservable = (processName, options, privacy, getSucces
   // const divider = price.plus(price.times(dexFee)).plus(txFee)
 
   const requestOpts = {
-    type: 'buy',
+    type: orderType || 'buy',
     baseCurrency,
     quoteCurrency,
     price,
@@ -184,17 +236,18 @@ const getCreateLimitOrderObservable = (options, successObservable, failureAction
   const {
     baseCurrency,
     quoteCurrency,
+    baseCurrencyAmount,
     quoteCurrencyAmount,
+    isBuy,
     price
   } = options
 
   const requestOpts = {
-    // Base/Rel are reverted for setprice orders
-    baseCurrency: quoteCurrency,
-    quoteCurrency: baseCurrency,
-    // baseCurrencyAmount: quoteCurrencyAmount.dividedBy(price).times(Decimal('0.999')),
-    baseCurrencyAmount: quoteCurrencyAmount,
-    price,
+    // setprice orders don't support order type
+    baseCurrency: isBuy ? quoteCurrency : baseCurrency,
+    quoteCurrency: isBuy ? baseCurrency : quoteCurrency,
+    baseCurrencyAmount: isBuy ? quoteCurrencyAmount : baseCurrencyAmount,
+    price: isBuy ? Decimal(1).dividedBy(price) : price
   }
 
   log.debug(`Submitting a swap (limit order)`, requestOpts)
@@ -749,6 +802,7 @@ const updateBaseCurrency = (action$: ActionsObservable<Action>, state$) => actio
 
 export const ResDexBuySellEpic = (action$, state$) => merge(
   createOrder(action$, state$),
+  createAdvancedOrder(action$, state$),
   createPrivateOrder(action$, state$),
   createOrderSucceeded(action$, state$),
   createPrivateOrderSucceeded(action$, state$),

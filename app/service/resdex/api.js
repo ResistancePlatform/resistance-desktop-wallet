@@ -100,13 +100,31 @@ class ResDexApiService {
   }
 
   async withdraw(opts) {
-		const response = await this.query({
+    const options = {
 			method: 'withdraw',
 			coin: opts.symbol,
 			amount: opts.amount,
 			to: opts.address,
 			broadcast: true,
-		})
+		}
+
+    if (opts.symbol === 'BTC') {
+      const btcFee = (
+        Decimal(39)
+          .times(1000)
+          .dividedBy(Decimal(RESDEX.satoshiDivider))
+          .toString()
+      )
+
+      options.fee = {
+        type: 'UtxoPerKbyte',
+        amount: btcFee
+      }
+
+      log.debug(`Using custom fee for BTC:`, btcFee)
+    }
+
+		const response = await this.query(options)
 
 		if (!response.tx_hash) {
 			throw new ResDexApiError(response, t(`Couldn't create withdrawal transaction`))
@@ -381,9 +399,7 @@ class ResDexApiService {
       price: zeroIfUndefined(o.price),
       baseCurrencyAmount: zeroIfUndefined(o.available_amount),
       quoteCurrencyAmount: (
-        zeroIfUndefined(o.price).equals(Decimal(0))
-          ? Decimal(0)
-          : zeroIfUndefined(o.available_amount).dividedBy(zeroIfUndefined(o.price))
+        zeroIfUndefined(o.available_amount).times(zeroIfUndefined(o.price))
       ),
       timeStarted: moment(o.created_at).toDate(),
       isInstantSwap: o.instant_swap,

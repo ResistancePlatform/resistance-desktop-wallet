@@ -70,7 +70,8 @@ class NaviBar extends Component<Props> {
 
 	render() {
     const { t } = this.props
-    const { isExpanded: isResDexExpanded } = this.props.resDex.common
+    // const { isExpanded: isResDexExpanded } = this.props.resDex.common
+    const isResDexExpanded = false
 
     const getItemClasses = path => ({
       [HLayout.hBoxContainer]: true,

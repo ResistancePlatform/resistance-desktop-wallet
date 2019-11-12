@@ -1,0 +1,127 @@
+@import "~/assets/styles/vars.scss";
+@import '../ResDex.scss';
+
+.limitOrder {
+  @extend %smallContainer;
+  padding: 0.5rem;
+}
+
+.inputLabel {
+  min-width: 2.8rem;
+}
+
+.maxBaseAddon, .maxQuoteAddon {
+  width: 4.1rem;
+  border-left: 1px solid $BASE_COLOR_BORDER_GRAY;
+  padding-left: 0.3rem;
+
+  button {
+    color: $BASE_COLOR_WHITE !important;
+    background-color: $BASE_COLOR_PURPLE !important;
+    border: none !important;
+  }
+}
+
+.maxQuoteAddon {
+  width: 5.8rem !important;
+}
+
+.title {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+
+  .caption {
+    margin-top: -0.3rem;
+  }
+
+  .makerOnlyCheckbox {
+    margin: 0;
+  }
+}
+
+.bottomControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  > div:first-child {
+    margin-right: 0.5rem;
+  }
+
+  .instantSwap {
+    text-align: right;
+    flex: 1;
+
+    color: $BASE_COLOR_FONT_GRAY;
+    font-size: 0.63rem !important;
+
+    &.allowed {
+      color: $BASE_COLOR_LIGHT_GREEN;
+    }
+
+    .tooltip {
+      text-align: left;
+      font-size: 0.7rem;
+
+      .title {
+        color: $BASE_COLOR_FONT_GRAY;
+        margin-bottom: 0.3rem;
+      }
+
+      .body {
+        color: $BASE_COLOR_WHITE;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.exchangeButton {
+  border: none !important;
+  width: 100%;
+
+  &.buy {
+    background: $BASE_COLOR_LIGHT_GREEN;
+  }
+
+  &.sell {
+    background: $BASE_COLOR_LIGHT_RED;
+  }
+}
+
+.amountRate {
+  display: flex;
+  justify-content: space-between;
+
+  .caption {
+    color: $BASE_COLOR_FONT_GRAY_2;
+    font-size: 0.61rem;
+    font-weight: 300;
+    text-transform: uppercase;
+    margin-left: 1rem;
+    white-space: nowrap;
+    margin-bottom: 0.25rem;
+    margin-top: 0rem;
+  }
+
+  .rates {
+    display: flex;
+    justify-content: space-between;
+    width: 25%;
+    margin-right: 0.1rem;
+  }
+}
+
+.spinner {
+  position: absolute;
+  width: 0.75rem;
+  margin-top: 0.05rem;
+  margin-left: 0.4rem;
+}

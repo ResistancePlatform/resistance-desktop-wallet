@@ -155,7 +155,11 @@ class SystemInfo extends Component<Props> {
 	 */
 	render() {
     const { t } = this.props
-    const { isExpanded: isResDexExpanded } = this.props.resDex.common
+
+    // TODO: Uncomment in order to revert expanded mode support
+    // const { isExpanded: isResDexExpanded } = this.props.resDex.common
+    const isResDexExpanded = false
+
     const { synchronizedPercentage } = this.props.systemInfo.blockchainInfo
     const synchronizedPercentageCaption = synchronizedPercentage.toLocaleString(undefined, {maximumFractionDigits: 2})
 
@@ -244,7 +248,7 @@ class SystemInfo extends Component<Props> {
 
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>{t(`Version`)}</div>
-						<div className={styles.statusColoumnValue}>2.2.5</div>
+						<div className={styles.statusColoumnValue}>2.2.6</div>
 					</div>
 
 				</div>

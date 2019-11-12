@@ -117,9 +117,13 @@ class StatusIcons extends Component<Props> {
     const { arePrivateTransactionsEnabled } = this.props.sendCurrency
     const miningDescription = this.getMiningStateDescription()
 
+    // TODO: uncomment in case of reverting expanded interface
+    // const { isExpanded} = this.props.resDex.common
+    const isExpanded = false
+
     return (
       <div>
-        <div className={cn(styles.container, {[styles.hidden]: this.props.resDex.common.isExpanded})}>
+        <div className={cn(styles.container, {[styles.hidden]: isExpanded })}>
           <div
             className={cn('icon', styles.mining, { [styles.active]: childProcessesStatus.MINER === 'RUNNING' })}
             data-tip

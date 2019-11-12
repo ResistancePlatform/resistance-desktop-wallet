@@ -16,7 +16,7 @@ import {
 } from 'react-stockcharts/lib/coordinates'
 import { XAxis, YAxis } from 'react-stockcharts/lib/axes'
 import { fitWidth } from 'react-stockcharts/lib/helper'
-import { first, last } from 'react-stockcharts/lib/utils'
+import { first } from 'react-stockcharts/lib/utils'
 import {
   heikinAshi,
   kagi,
@@ -330,7 +330,7 @@ class TradingChart extends Component<Props> {
     if (!this.containerElement) {
       return 0
     }
-    return Math.max(504, this.containerElement.clientHeight - 64)
+    return Math.max(384, this.containerElement.clientHeight - 64)
   }
 
   getBottomIndicatorsNumber() {
@@ -580,7 +580,7 @@ class TradingChart extends Component<Props> {
             />
 
             <OHLCTooltip
-              origin={[-40, 0]}
+              origin={[0, 0]}
               textFill="rgb(238, 238, 241)"
               fontFamily={RESDEX.chartFontFamily}
             />

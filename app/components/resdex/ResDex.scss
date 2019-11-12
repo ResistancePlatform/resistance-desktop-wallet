@@ -100,7 +100,8 @@
   overflow-y: scroll;
   margin-top: 0.3rem;
   padding-right: 0.3rem;
-  height: calc(100vh - 11.7rem);
+  max-height: calc(100vh - 11.7rem);
+  height: 100%;
 
   &::after {
     position: absolute;

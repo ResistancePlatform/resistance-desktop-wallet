@@ -1,7 +1,7 @@
 // @flow
 import { Decimal } from 'decimal.js'
 import * as Joi from 'joi'
-import React, { Component } from 'react'
+import React from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import cn from 'classnames'
@@ -22,6 +22,7 @@ import {
 } from '~/components/rounded-form'
 import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
+import BuySellFormMixin from './BuySellFormMixin'
 
 import styles from './BuySellForm.scss'
 
@@ -53,7 +54,7 @@ function getValidationSchema(t, isAdvanced) {
  * @class BuySellForm
  * @extends {Component<Props>}
  */
-class BuySellForm extends Component<Props> {
+class BuySellForm extends BuySellFormMixin {
 	props: Props
 
   getMaxQuoteAmount() {
