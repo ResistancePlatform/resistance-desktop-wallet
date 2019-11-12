@@ -108,6 +108,11 @@ class ResDexApiService {
 			broadcast: true,
 		}
 
+    // SegWit addresses are not allowed
+    if (['BTC', 'BCH'].includes(opts.symbol) && !opts.address.startsWith('1')) {
+			throw new ResDexApiError({}, t(`SegWit addresses are not supported by ResDEX`))
+    }
+
     if (opts.symbol === 'BTC') {
       const btcFee = (
         Decimal(39)
