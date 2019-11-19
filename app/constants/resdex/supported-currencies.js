@@ -142,6 +142,14 @@ const supportedCurrencies = [
     gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
   },
   {
+    coin: 'DAI',
+    name: 'Dai',
+    id_in_cmc: 'dai',
+    etomic: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+    rpcport: 80,
+    gas_station_url:"https://ethgasstation.info/json/ethgasAPI.json"
+  },
+  {
     coin: 'DASH',
     rpcport: 9998,
     pubtype: 76,

@@ -371,6 +371,30 @@ export class RpcService {
   }
 
   /**
+   * @returns {Promise<any>}
+   * @memberof RpcService
+   */
+  async getMyAddresses() {
+    /*
+    const client = getClientInstance()
+
+    const promises = [
+      client.command('listreceivedbyaddress', 0, true),
+      client.command('listunspent', 0),
+      client.command('z_listaddresses'),
+    ]
+
+    log.debug('Addresses', promises)
+    const [r, unspent, z] = await Promise.all(promises)
+
+    const withLedger = await this::addLedgerAddress()
+    const result = await this::fetchAddressData(withLedger)
+
+    return result
+    */
+  }
+
+  /**
    * @param {boolean} sortByGroupBalance
    * @param {boolean} disableThePrivateAddress
    * @returns {Observable<any>}
