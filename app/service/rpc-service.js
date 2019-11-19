@@ -375,7 +375,6 @@ export class RpcService {
    * @memberof RpcService
    */
   async getMyAddresses() {
-    /*
     const client = getClientInstance()
 
     const promises = [
@@ -391,7 +390,6 @@ export class RpcService {
     const result = await this::fetchAddressData(withLedger)
 
     return result
-    */
   }
 
   /**

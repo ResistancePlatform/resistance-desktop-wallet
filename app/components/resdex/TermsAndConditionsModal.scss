@@ -1,0 +1,54 @@
+@import "~/assets/styles/modal.scss";
+
+$termsAndConditionsModalWidth: 42rem;
+
+.termsAndConditions {
+  width: $termsAndConditionsModalWidth;
+  height: 26.5rem;
+  padding: 1.8rem;
+
+  .hint {
+    color: $BASE_COLOR_FONT_GRAY;
+    text-transform: uppercase;
+    font-size: 0.67rem;
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .content {
+    line-height: 1.3rem;
+    padding-right: 1rem;
+    text-align: justify;
+    overflow-y: scroll;
+    font-size: 0.8rem;
+    margin: 0;
+    height: calc(100% - 6.5rem);
+
+    h1 {
+      color: inherit;
+    }
+
+    h2 {
+      color: inherit;
+    }
+
+    h3 {
+      color: inherit;
+    }
+
+    h4 {
+      color: inherit;
+    }
+  }
+
+  .buttons {
+    display: flex;
+    height: 2rem;
+    margin-top: 1rem;
+    justify-content: flex-end;
+
+    .disagree {
+      margin-right: 1rem;
+    }
+  }
+}

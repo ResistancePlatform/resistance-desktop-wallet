@@ -147,6 +147,9 @@ export const preloadedState: State = {
       isInProgress: false,
       defaultPortfolioId: null,
       portfolios: [],
+      termsAndConditionsModal: {
+        isVisible: false
+      },
     },
     assets: {
       resolution: 'month',

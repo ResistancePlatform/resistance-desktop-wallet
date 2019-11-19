@@ -36,6 +36,7 @@ import ResDexSaveSeed from '~/components/resdex/bootstrapping/SaveSeed'
 import ResDexEnterSeed from '~/components/resdex/bootstrapping/EnterSeed'
 import ResDexForgotPassword from '~/components/resdex/bootstrapping/ForgotPassword'
 import ResDexKyc from '~/components/resdex/bootstrapping/Kyc'
+import TermsAndConditionsModal from '~/components/resdex/TermsAndConditionsModal'
 
 import AddressBookPage from './AddressBookPage'
 
@@ -112,6 +113,11 @@ class App extends React.Component<Props> {
   getMainContent() {
     return (
       <div className={cn(styles.contentContainer, VLayout.vBoxContainer)}>
+
+        {this.props.resDex.login.termsAndConditionsModal.isVisible &&
+          <TermsAndConditionsModal />
+        }
+
 				{ /* Content container */}
 				<div className={cn(VLayout.vBoxChild, HLayout.hBoxContainer)} style={{overflowY: 'hidden', height: '100%'}}>
           <LoadingPopup />

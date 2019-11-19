@@ -23,6 +23,9 @@ export const ResDexLoginActions = createActions(
     LOGOUT_SUCCEEDED: undefined,
     LOGOUT_FAILED: undefined,
 
+    SHOW_TERMS_AND_CONDITIONS_MODAL: undefined,
+    CLOSE_TERMS_AND_CONDITIONS_MODAL: undefined,
+
     SET_DEFAULT_PORTFOLIO: (id: string) => ({ id }),
 
     START_RESDEX: (seedPhrase: string, walletPassword: string) => ({ seedPhrase, walletPassword }),
@@ -53,6 +56,18 @@ export const ResDexLoginReducer = handleActions(
       ...state,
       isRequired: true,
       isInProgress: false,
+    }),
+    [ResDexLoginActions.showTermsAndConditionsModal]: state => ({
+      ...state,
+      termsAndConditionsModal: {
+        isVisible: true,
+      }
+    }),
+    [ResDexLoginActions.closeTermsAndConditionsModal]: state => ({
+      ...state,
+      termsAndConditionsModal: {
+        isVisible: false,
+      }
     }),
     [ResDexLoginActions.showDialog]: state => ({
       ...state,
