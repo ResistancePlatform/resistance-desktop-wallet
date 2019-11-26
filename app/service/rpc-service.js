@@ -8,9 +8,8 @@ import { Decimal } from 'decimal.js'
 import { v4 as uuid } from 'uuid'
 import { remote } from 'electron'
 import Client from 'bitcoin-core'
-import { from, of, Observable } from 'rxjs'
+import { from, of } from 'rxjs'
 import { map, take, catchError, switchMap } from 'rxjs/operators'
-import { toastr } from 'react-redux-toastr'
 
 import { translate } from '~/i18next.config'
 import { RPC } from '~/constants/rpc'
@@ -20,7 +19,7 @@ import { getStore } from '~/store/configureStore'
 import { AddressBookService } from './address-book-service'
 import { BlockchainInfo, DaemonInfo, SystemInfoActions } from '../reducers/system-info/system-info.reducer'
 import { Balances, OverviewActions, Transaction } from '../reducers/overview/overview.reducer'
-import { OwnAddressesActions, AddressRow } from '../reducers/own-addresses/own-addresses.reducer'
+import { OwnAddressesActions } from '../reducers/own-addresses/own-addresses.reducer'
 import { SendCurrencyActions } from '~/reducers/send-currency/send-currency.reducer'
 import { AddressBookRecord } from '~/reducers/address-book/address-book.reducer'
 
@@ -374,166 +373,62 @@ export class RpcService {
    * @returns {Promise<any>}
    * @memberof RpcService
    */
-  async getMyAddresses() {
+  async getMyAddresses(sortByBalance?: boolean, disablePrivateAddresses?: boolean) {
     const client = getClientInstance()
 
-    const promises = [
-      client.command('listreceivedbyaddress', 0, true),
-      client.command('listunspent', 0),
-      client.command('z_listaddresses'),
+    const commands = [
+      {
+        method: 'listreceivedbyaddress',
+        parameters: [0, true]
+      },
+      {
+        method: 'listunspent',
+        parameters: [0]
+      },
+      {
+        method: 'z_listaddresses'
+      },
+      {
+        method: 'listaddressgroupings'
+      },
     ]
 
-    log.debug('Addresses', promises)
-    const [r, unspent, z] = await Promise.all(promises)
+    const [r, unspent, z, groupings] = await client.command(commands)
 
-    const withLedger = await this::addLedgerAddress()
-    const result = await this::fetchAddressData(withLedger)
+    const addresses = Array.from(new Set(Array.prototype.concat(
+      r.map(a => a.address),
+      unspent.map(a => a.address),
+      z,
+      groupings.reduce((accumulated, value) => (
+        accumulated.concat(
+          value.map(l => l[0])
+        )
+      ), [])
+    )))
+
+    const ledgerAddress = this::getLedgerAddress()
+    if (ledgerAddress !== null) {
+      addresses.unshift(ledgerAddress)
+    }
+
+    const result = await this::fetchAddressBalances(addresses, ledgerAddress)
+
+    if (sortByBalance) {
+      const zIndex = addresses.findIndex(a => a.startsWith('z'))
+
+      const rAddresses = zIndex === -1 ? result : result.slice(0, zIndex)
+      const zAddresses = zIndex === -1 ? [] : result.slice(zIndex)
+
+      if (disablePrivateAddresses) {
+        zAddresses.forEach((address, index) => {
+          zAddresses[index].disabled = true
+        })
+      }
+
+      return [...rAddresses, ...zAddresses]
+    }
 
     return result
-  }
-
-  /**
-   * @param {boolean} sortByGroupBalance
-   * @param {boolean} disableThePrivateAddress
-   * @returns {Observable<any>}
-   * @memberof RpcService
-   */
-  getWalletAddressAndBalance(sortByGroupBalance?: boolean, disableThePrivateAddress?: boolean): Observable<any> {
-    const client = getClientInstance()
-
-    const promiseArr = [
-      this.getWalletAllPublicAddresses(),
-      this::getWalletPublicAddressesWithUnspentOutputs(client),
-      this::getWalletPrivateAddresses(client)
-    ]
-
-    const queryPromise = Promise.all(promiseArr)
-      .then(result => {
-        let plainPublicUnspentAddresses: string[] = []
-
-        const PublicAddressesResult = result[0][0]
-        const PublicAddressesUnspendResult = result[1][0]
-        const privateAddressesResult = result[2][0]
-
-        const publicAddressResultSet = new Set()
-        const privateAddressResultSet = new Set()
-
-        if (Array.isArray(PublicAddressesResult)) {
-          const publicAddresses = [] // PublicAddressesResult.map(tempValue => tempValue.address)
-          for (let index = 0; index < PublicAddressesResult.length; index += 1) {
-            publicAddressResultSet.add(PublicAddressesResult[index].address)
-            publicAddresses.push(PublicAddressesResult[index].address)
-          }
-        }
-
-        if (Array.isArray(PublicAddressesUnspendResult)) {
-          plainPublicUnspentAddresses = [] // PublicAddressesUnspendResult.map(tempValue => tempValue.address)
-          for (let index = 0; index < PublicAddressesUnspendResult.length; index += 1) {
-            if(('spendable' in PublicAddressesUnspendResult[index] && PublicAddressesUnspendResult[index].spendable)){
-              publicAddressResultSet.add(PublicAddressesUnspendResult[index].address)
-            } else {
-              const addressToRemove = PublicAddressesUnspendResult[index].address
-              publicAddressResultSet.delete(addressToRemove) // Remove any addresses that aren't spendable
-            }
-          }
-        }
-
-        if (Array.isArray(privateAddressesResult)) {
-          for (let index = 0; index < privateAddressesResult.length; index += 1) {
-            privateAddressResultSet.add(privateAddressesResult[index])
-          }
-        }
-
-        const combinedAddresses = [...Array.from(publicAddressResultSet), ...Array.from(privateAddressesResult)]
-          .map(addr => ({
-            balance: Decimal('0'),
-            confirmed: false,
-            address: addr,
-            isUnspent: plainPublicUnspentAddresses.includes(addr),
-            disabled: false
-          }))
-
-          // .filter(item => !(item.address.startsWith('rr') || item.address.startsWith('rs')))
-
-        // Add Ledger Address to List
-        if(getStore().getState().ownAddresses.connectLedgerModal.isLedgerResistanceAppOpen){
-          combinedAddresses.unshift({
-            balance: Decimal('0'),
-            confirmed: false,
-            address: getStore().getState().ownAddresses.connectLedgerModal.ledgerAddress,
-            isUnspent: false,
-            disabled: false,
-            isLedger: true
-          })
-        }
-
-        log.debug(`Fetching the balances for the combined addresses: ${combinedAddresses}`)
-        return this::getAddressesBalance(client, combinedAddresses)
-      })
-      .then(addresses => {
-        let addressList = null
-
-        // Sort for each groups
-        if (sortByGroupBalance) {
-          const publicAddresses = []
-          const privateAddresses= []
-
-          for (let index = 0; index < addresses.length; index += 1) {
-            const tempAddressItem = addresses[index];
-            if (tempAddressItem.address.startsWith('z')) {
-              privateAddresses.push(tempAddressItem)
-            } else {
-              publicAddresses.push(tempAddressItem)
-            }
-          }
-
-          publicAddresses.sort((item1, item2) => item2.balance.sub(item1.balance))
-          privateAddresses.sort((item1, item2) => item2.balance.sub(item1.balance))
-
-          addressList = [...publicAddresses, ...privateAddresses]
-        } else {
-          addressList = addresses
-        }
-
-        // Show the error to user
-        const errorAddressItems = addressList.filter(tempAddressItem => tempAddressItem.balance === null && tempAddressItem.errorMessage)
-
-        if (errorAddressItems && errorAddressItems.length > 0) {
-          const errorMessages = errorAddressItems.map(tempAddressItem => `"${tempAddressItem.errorMessage}"`)
-          const uniqueErrorMessages = Array.from(new Set(errorMessages)).join(', ')
-          const errorKey = `Error fetching balances for {{errorCount}} out of {{addressCount}} addresses. Error messages included: {{errorMessages}}.`
-          toastr.error(t(`Address balance error`), t(errorKey, errorAddressItems.length, addressList.length, uniqueErrorMessages.toString()))
-        }
-
-        if (disableThePrivateAddress) {
-          const isPrivateAddress = (tempAddress: string) => tempAddress.startsWith('z')
-          const processedAddressList = addressList.map(tempAddressItem => isPrivateAddress(tempAddressItem.address) ? { ...tempAddressItem, disabled: true } : tempAddressItem)
-          log.debug(`The processed address list: ${processedAddressList}`)
-          return processedAddressList
-        }
-
-        return addressList
-      })
-      .catch(error => {
-        log.debug(`An error occurred when fetching the wallet addresses and balances: ${error}`)
-        return []
-      })
-
-    return from(queryPromise).pipe(take(1))
-  }
-
-
-  /**
-   * Request own addresses with balances.
-   *
-   * @memberof RpcService
-   */
-  requestOwnAddresses() {
-    this.getWalletAddressAndBalance(false).subscribe(result => {
-      getStore().dispatch(OwnAddressesActions.gotOwnAddresses(result))
-    }, err => {
-      getStore().dispatch(OwnAddressesActions.getOwnAddressesFailure(err.toString()))
-    })
   }
 
   /**
@@ -709,24 +604,6 @@ export class RpcService {
 /* RPC Service private methods */
 
 /**
- * @param {Client} client
- * @returns {Promise<any>}
- * @memberof RpcService
- */
-function getWalletPrivateAddresses(client: Client): Promise<any> {
-  return client.command([{ method: 'z_listaddresses' }])
-}
-
-/**
- * @param {Client} client
- * @returns {Promise<any>}
- * @memberof RpcService
- */
-function getWalletPublicAddressesWithUnspentOutputs(client: Client): Promise<any> {
-  return client.command([{ method: 'listunspent', parameters: [0] }])
-}
-
-/**
  * Private method. Returns public transactions array.
  *
  * @param {Client} client
@@ -864,65 +741,67 @@ function applyAddressBookNamesToTransactions(transactionsPromise) {
 }
 
 /**
- * Private method. Gets addresses balances in a batch request.
+ * Private method. Appends ledger address to address list
  *
- * @param {Client} client
- * @param {AddressRow[]} addressRows
- * @returns {Promise<any>}
+ * @returns {string}
  * @memberof RpcService
  */
-function getAddressesBalance(client: Client, addressRows: AddressRow[]): Promise<any> {
-  const commands: Object[] = []
+function getLedgerAddress(): string | null {
+  const state = getStore().getState()
 
-  addressRows.forEach(address => {
-    const confirmedCmd = { method: 'z_getbalance', parameters: [address.address] }
-    const unconfirmedCmd = { method: 'z_getbalance', parameters: [address.address, 0] }
-    commands.push(confirmedCmd, unconfirmedCmd)
-  })
+  const {
+    ledgerAddress,
+    isLedgerResistanceAppOpen
+  } = state.ownAddresses.connectLedgerModal
 
-  const promise = client.command(commands)
-    .then(balances => {
+  if (isLedgerResistanceAppOpen) {
+    return ledgerAddress
+  }
 
-      const addresses = addressRows.map((address, index) => {
+  return null
+}
 
-        const confirmedBalance = balances[index * 2]
-        const unconfirmedBalance = balances[index * 2 + 1]
+async function fetchAddressBalances(addresses, ledgerAddress) {
+  const client = getClientInstance()
 
-        if (typeof(confirmedBalance) === 'object' || typeof(unconfirmedBalance) === 'object') {
-          return {
-            ...address,
-            balance: null,
-            confirmed: false,
-            errorMessage: confirmedBalance.message || unconfirmedBalance.message
-          }
-        }
+  addresses.sort()
 
-        const isConfirmed = confirmedBalance === unconfirmedBalance
-        const displayBalance = isConfirmed ? confirmedBalance : unconfirmedBalance
+  const commands = addresses.reduce((accumulated, address) =>(
+    accumulated.concat([
+      {
+        method: 'z_getbalance',
+        parameters: [address],
+      },
+      {
+        method: 'z_getbalance',
+        parameters: [address, 0],
+      },
+    ])
+  ), [])
 
-        return {
-          ...address,
-          balance: Decimal(displayBalance),
-          confirmed: isConfirmed
-        }
-      })
+  const balances = await client.command(commands)
 
-      return addresses
-    })
-    .catch(err => {
-      log.debug(`An error occurred while fetching an address balances: ${err}`)
+  const result = addresses.map((address, index) => {
+    const confirmedBalance = balances[index * 2]
+    const unconfirmedBalance = balances[index * 2 + 1]
 
-      const addresses = addressRows.map(address => ({
-        ...address,
+    if ((confirmedBalance instanceof Error) || (unconfirmedBalance instanceof Error)) {
+      return {
         balance: null,
         confirmed: false,
-        errorMessage: err.toString()
-      }))
+        errorMessage: confirmedBalance.message || unconfirmedBalance.message
+      }
+    }
 
-      return addresses
-    })
+    return {
+      address,
+      balance: Decimal(unconfirmedBalance),
+      confirmed: confirmedBalance === unconfirmedBalance,
+      isLedger: address === ledgerAddress
+    }
+  })
 
-  return promise
+  return result
 }
 
 /**

@@ -8,7 +8,8 @@ export type AddressRow = {
 	balance: Decimal | null,
 	confirmed: boolean,
 	address: string,
-  isUnspent: boolean
+  isUnspent?: boolean,
+  isLedger?: boolean
 }
 
 export type OwnAddressesState = {

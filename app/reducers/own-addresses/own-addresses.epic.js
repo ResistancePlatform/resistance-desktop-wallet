@@ -64,8 +64,16 @@ let ledgerRes
 
 const getOwnAddressesEpic = (action$: ActionsObservable<Action>) => action$.pipe(
   ofType(OwnAddressesActions.getOwnAddresses),
-  tap(() => { rpc.requestOwnAddresses() }),
-  mapTo(OwnAddressesActions.empty())
+  switchMap(() => {
+    const observable = from(rpc.getMyAddresses()).pipe(
+      switchMap(addresses => of(OwnAddressesActions.gotOwnAddresses(addresses))),
+      catchError(err => {
+        log.error(`Can't get my addresses:`, err)
+        return of(OwnAddressesActions.getOwnAddressesFailure(t(`Error getting the address list`)))
+      })
+    )
+    return observable
+  })
 )
 
 const createAddressEpic = (action$: ActionsObservable<Action>) => action$.pipe(
