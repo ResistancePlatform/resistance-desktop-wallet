@@ -58,7 +58,12 @@ export const preloadedState: State = {
 			minedBlocksNumber: 0
 		},
     isNewOperationTriggered: false,
-    isOperationsModalOpen: false
+    isOperationsModalOpen: false,
+    updateModal: {
+      versionName: null,
+      downloadUrl: null,
+      isVisible: false
+    }
 	},
 	overview: {
 		balances: {

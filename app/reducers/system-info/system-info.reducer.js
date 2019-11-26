@@ -21,7 +21,12 @@ export type SystemInfoState = {
     minedBlocksNumber: number
   },
   isNewOperationTriggered: boolean,
-  isOperationsModalOpen: boolean
+  isOperationsModalOpen: boolean,
+  updateModal: {
+    versionName: string | null,
+    downloadUrl: string | null,
+    isVisible: boolean | false
+  }
 }
 
 export const SystemInfoActions = createActions(
@@ -48,7 +53,14 @@ export const SystemInfoActions = createActions(
     UPDATE_MINER_INFO: (hashingPower, minedBlocksNumber) => ({ hashingPower, minedBlocksNumber }),
 
     OPEN_OPERATIONS_MODAL: undefined,
-    CLOSE_OPERATIONS_MODAL: undefined
+    CLOSE_OPERATIONS_MODAL: undefined,
+
+    OPEN_UPDATE_MODAL: (name: string, url: string) => ({ name, url }),
+    CLOSE_UPDATE_MODAL: undefined,
+
+    CHECK_WALLET_UPDATE: undefined,
+    CHECK_WALLET_UPDATE_SUCCEEDED: undefined,
+    CHECK_WALLET_UPDATE_FAILED: undefined,
   },
   {
     prefix: 'APP/SYSTEM_INFO'
@@ -84,6 +96,24 @@ export const SystemInfoReducer = handleActions(
     }),
     [SystemInfoActions.closeOperationsModal]: state => ({
       ...state, isOperationsModalOpen: false
+    }),
+
+    // Update Modal
+    [SystemInfoActions.openUpdateModal]: (state, action) => ({
+      ...state,
+      updateModal: {
+        ...state.updateModal,
+        isVisible: true,
+        versionName: action.payload.name,
+        downloadUrl: action.payload.url
+      }
+    }),
+    [SystemInfoActions.closeUpdateModal]: state => ({
+      ...state,
+      updateModal: {
+        ...state.updateModal,
+        isVisible: false,
+      }
     })
 
   }, preloadedState)

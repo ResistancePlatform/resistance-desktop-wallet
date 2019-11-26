@@ -1,0 +1,28 @@
+@import "~/assets/styles/modal.scss";
+@import "~/assets/styles/vars.scss";
+
+$updateModalWidth: 22rem;
+
+.update {
+  width: $updateModalWidth;
+  height: 11rem;
+  padding: 1.8rem;
+}
+
+.note {
+  strong {
+    color: $BASE_COLOR_WHITE;
+    margin-right: 0.4rem;
+  }
+
+  color: $BASE_COLOR_FONT_GRAY_2;
+  font-size: 0.7rem;
+  text-align: justify;
+}
+
+.button {
+  margin-top: 1.5rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
