@@ -15,6 +15,16 @@
   .row {
     cursor: pointer;
 
+    .cancelButton {
+      visibility: hidden;
+    }
+
+    &:hover {
+      .cancelButton {
+        visibility: visible;
+      }
+    }
+
     .column {
       padding: 0.2rem 0;
       border: none;
