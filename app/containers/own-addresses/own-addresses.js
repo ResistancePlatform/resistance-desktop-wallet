@@ -13,6 +13,7 @@ import { SettingsState } from '~/reducers/settings/settings.reducer'
 import { OwnAddressesActions, OwnAddressesState } from '~/reducers/own-addresses/own-addresses.reducer'
 import { PopupMenu, PopupMenuItem } from '~/components/popup-menu'
 import {
+  RoundedButton,
   RoundedButtonWithDropdown,
   MoreButton
 } from '~/components/rounded-form'
@@ -126,10 +127,6 @@ class OwnAddresses extends Component<Props> {
 
                 </RoundedButtonWithDropdown>
 
-                {/*
-
-                  Uncomment to revert Ledger
-
                 <RoundedButton
                   className={styles.menuButton}
                   onClick={this.props.actions.showConnectLedgerModal}
@@ -139,8 +136,6 @@ class OwnAddresses extends Component<Props> {
                 >
                   {t(`Send RES from Ledger`)}
                 </RoundedButton>
-
-                */}
 
                 <MoreButton
                   className={styles.moreButton}
