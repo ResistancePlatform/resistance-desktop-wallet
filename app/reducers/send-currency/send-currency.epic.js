@@ -1,9 +1,10 @@
 // @flow
-import { switchMap, map } from 'rxjs/operators'
+import { switchMap, map, catchError  } from 'rxjs/operators'
 import { Decimal } from 'decimal.js'
-import { of, merge } from 'rxjs'
+import { of, from, merge } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
+import log from 'electron-log'
 
 import { i18n } from '~/i18next.config'
 import { RoundedFormActions } from '~/reducers/rounded-form/rounded-form.reducer'
@@ -63,26 +64,33 @@ const sendCurrencyOperationFailedEpic = (action$: ActionsObservable<Action>) => 
 const getAddressesEpic = (action$: ActionsObservable<Action>, state$) => action$.pipe(
 	ofType(SendCurrencyActions.getAddresses),
 	switchMap(() => {
-		const sendCurrencyState = state$.value.sendCurrency
-		return rpc.getWalletAddressAndBalance(true, !sendCurrencyState.arePrivateTransactionsEnabled)
-  }),
-  map(walletAddresses => {
-    const result = walletAddresses.slice()
+		const { arePrivateTransactionsEnabled } = state$.value.sendCurrency
+    const observable = from(rpc.getMyAddresses(true, !arePrivateTransactionsEnabled)).pipe(
+      switchMap(addresses => {
+        const result = addresses.slice()
 
-    addressBook.loadAddressBook().subscribe(bookAddresses => {
-      const bookAddressesMap = {}
+        addressBook.loadAddressBook().subscribe(bookAddresses => {
+          const bookAddressesMap = {}
 
-      bookAddresses.reduce((accumulator, record) => {
-        accumulator[record.address] = record.name
-        return accumulator
-      }, bookAddressesMap)
+          bookAddresses.reduce((accumulator, record) => {
+            accumulator[record.address] = record.name
+            return accumulator
+          }, bookAddressesMap)
 
-      result.forEach((address, index) => {
-        result[index].name = bookAddressesMap[address.address]
+          result.forEach((address, index) => {
+            result[index].name = bookAddressesMap[address.address]
+          })
+        })
+
+        return of(SendCurrencyActions.gotAddresses(result))
+      }),
+      catchError(err => {
+        log.error(`Can't get my addresses:`, err)
+        return of(SendCurrencyActions.empty())
       })
-    })
+    )
 
-    return SendCurrencyActions.gotAddresses(result)
+    return observable
   })
 )
 

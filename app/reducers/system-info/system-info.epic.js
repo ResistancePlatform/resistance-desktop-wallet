@@ -1,12 +1,15 @@
 // @flow
-import { shell } from 'electron'
-import { tap, mapTo } from 'rxjs/operators'
-import { merge } from 'rxjs'
+import { tap, mapTo, switchMap, catchError  } from 'rxjs/operators'
+import { merge, of, from } from 'rxjs'
 import { ActionsObservable, ofType } from 'redux-observable'
 import { toastr } from 'react-redux-toastr'
+import { shell } from 'electron'
+import rp from 'request-promise-native'
+import log from 'electron-log'
 
 import { Action } from '../types'
 import { RPC } from '~/constants/rpc'
+import { AUTH } from '~/constants/auth'
 import { getInstallationPath } from '~/utils/os'
 import { SystemInfoActions } from './system-info.reducer'
 import { RpcService } from '~/service/rpc-service'
@@ -14,6 +17,59 @@ import { ResistanceService } from '~/service/resistance-service'
 
 const rpcService = new RpcService()
 const resistanceService = new ResistanceService()
+
+const gitHubApiUrl = `https://api.github.com/graphql`
+const lastReleaseQuery = (
+  `query {` +
+    `repository(owner:"ResistancePlatform", name:"resistance-platform-release") {` +
+      `releases(last:1) {` +
+        `edges {` +
+          `node {` +
+            `name,` +
+            `url` +
+          `}` +
+        `}` +
+      `}` +
+    `}` +
+  `}`
+)
+
+async function getLastRelease() {
+  const jsonData = {
+    query: lastReleaseQuery
+  }
+
+  const response = await rp({
+    url: gitHubApiUrl,
+    method: 'POST',
+    headers: {
+      'User-Agent': 'ResistanceWallet',
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.github.v4.idl',
+      'Authorization': 'Bearer 54e11fc01d9bc1ba343f61e0f4d95d8037caeb7f',
+    },
+    body: JSON.stringify(jsonData),
+  })
+
+  const result = JSON.parse(response)
+
+  if (!result.data) {
+    log.error(`GitHub response`, response, typeof response)
+    throw Error(`Invalid response`)
+  }
+
+  const { edges } = result.data.repository.releases
+
+  if (edges.length === 0) {
+    throw Error(`No releases found`)
+  }
+
+  const { node } = edges[0]
+
+  log.debug(`Last release:`, JSON.stringify(node))
+
+  return node
+}
 
 // TODO: Get rid of the behaviour after the issue is fixed:
 // https://github.com/ResistancePlatform/resistance-core/issues/94
@@ -83,6 +139,34 @@ const openInstallationFolderEpic = (action$: ActionsObservable<Action>) => actio
   mapTo(SystemInfoActions.empty())
 )
 
+const checkWalletUpdateEpic = (action$: ActionsObservable<Action>) => action$.pipe(
+  ofType(SystemInfoActions.checkWalletUpdate),
+  switchMap(() => {
+    const observable = from(getLastRelease()).pipe(
+      switchMap(release => {
+        const lastVersion = release.name.split(' ').pop()
+
+        log.debug(`App Versions:`, lastVersion, AUTH.appVersion)
+
+        if (lastVersion !== AUTH.appVersion) {
+          return of(
+            SystemInfoActions.openUpdateModal(release.name, release.url),
+            SystemInfoActions.checkWalletUpdateSucceeded()
+          )
+        }
+
+        return of(SystemInfoActions.checkWalletUpdateSucceeded())
+      }),
+      catchError(err => {
+        log.error(`Can't get last release information`, err)
+        return of(SystemInfoActions.checkWalletUpdateFailed())
+      })
+    )
+
+    return observable
+  })
+)
+
 export const SystemInfoEpics = (action$, state$) => merge(
   openWalletInFileManagerEpic(action$, state$),
   openInstallationFolderEpic(action$, state$),
@@ -91,5 +175,6 @@ export const SystemInfoEpics = (action$, state$) => merge(
   getBlockchainInfoEpic(action$, state$),
   getBlockchainInfoFailureEpic(action$, state$),
   getOperationsEpic(action$, state$),
-  getOperationsFailureEpic(action$, state$)
+  getOperationsFailureEpic(action$, state$),
+  checkWalletUpdateEpic(action$, state$)
 )

@@ -12,10 +12,10 @@ import { getOS } from '~/utils/os'
 import { ChildProcessService } from '~/service/child-process-service'
 import { ResDexAssetsActions } from '~/reducers/resdex/assets/reducer'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
-import { ResDexState } from '~/reducers/resdex/resdex.reducer'
 import { SystemInfoActions, SystemInfoState } from '~/reducers/system-info/system-info.reducer'
 import { getStore } from '~/store/configureStore'
 import { State } from '~/reducers/types'
+import { AUTH } from '~/constants/auth'
 import humanizeOperationName from '~/components/system-info/humanize-operation'
 
 import HLayout from '~/assets/styles/h-box-layout.scss'
@@ -32,8 +32,7 @@ type Props = {
   t: any,
   i18n: any,
 	systemInfo: SystemInfoState,
-	settings: SettingsState,
-	resDex: ResDexState
+	settings: SettingsState
 }
 
 /**
@@ -165,6 +164,17 @@ class SystemInfo extends Component<Props> {
 
 		return (
 			<div className={cn(styles.systemInfoContainer, HLayout.hBoxContainer, {[styles.shrink]: isResDexExpanded})}>
+
+        <RpcPolling
+          criticalChildProcess="NODE"
+          interval={3600.0}
+          actions={{
+            polling: SystemInfoActions.checkWalletUpdate,
+            success: SystemInfoActions.checkWalletUpdateSucceeded,
+            failure: SystemInfoActions.checkWalletUpdateFailed
+          }}
+        />
+
         <RpcPolling
           criticalChildProcess="NODE"
           interval={daemonInfoPollingInterval}
@@ -248,7 +258,7 @@ class SystemInfo extends Component<Props> {
 
 					<div className={styles.statusColumnWrapper}>
 						<div className={styles.statusColoumnTitle}>{t(`Version`)}</div>
-						<div className={styles.statusColoumnValue}>2.2.6</div>
+						<div className={styles.statusColoumnValue}>{AUTH.appVersion}</div>
 					</div>
 
 				</div>

@@ -47,7 +47,10 @@ export type ResDexState = {
     isRequired: boolean,
     isInProgress: boolean,
     defaultPortfolioId: string | null,
-    portfolios: Portfolio[]
+    portfolios: Portfolio[],
+    termsAndConditionsModal: {
+      isVisible: boolean
+    }
   },
   assets: {
     resolution: CurrencyHistoryResolution,

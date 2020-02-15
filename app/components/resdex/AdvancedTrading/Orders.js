@@ -6,6 +6,7 @@ import { translate } from 'react-i18next'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import cn from 'classnames'
+import { toastr } from 'react-redux-toastr'
 
 import { toDecimalPlaces, toMaxDigits } from '~/utils/decimal'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
@@ -15,6 +16,7 @@ import {
   UniformListRow,
   UniformListColumn
 } from '~/components/uniform-list'
+import { BorderlessButton } from '~/components/rounded-form'
 import { ResDexState, ResDexActions  } from '~/reducers/resdex/resdex.reducer'
 import { getOrdersBreakdown, getOrderStatusName } from '~/utils/resdex'
 import { ResDexOrdersActions } from '~/reducers/resdex/orders/reducer'
@@ -45,22 +47,35 @@ class Orders extends Component<Props> {
 
     return (
       <UniformListHeader className={styles.header}>
-        <UniformListColumn width="14%">{t(`Time`)}</UniformListColumn>
-        <UniformListColumn width="10%">{t(`Pair`)}</UniformListColumn>
-        <UniformListColumn width="9%">{t(`Type`)}</UniformListColumn>
-        <UniformListColumn width="15%">{t(`Amount out`)}</UniformListColumn>
-        <UniformListColumn width="15%">{t(`Amount in`)}</UniformListColumn>
-        <UniformListColumn width="11%">{t(`Price`)}</UniformListColumn>
-        <UniformListColumn width="11%">{t(`Private`)}</UniformListColumn>
-        <UniformListColumn width="16%">{t(`Status`)}</UniformListColumn>
+        <UniformListColumn width="13%">{t(`Time`)}</UniformListColumn>
+        <UniformListColumn width="9%">{t(`Pair`)}</UniformListColumn>
+        <UniformListColumn width="8%">{t(`Type`)}</UniformListColumn>
+        <UniformListColumn width="14%">{t(`Amount out`)}</UniformListColumn>
+        <UniformListColumn width="14%">{t(`Amount in`)}</UniformListColumn>
+        <UniformListColumn width="10%">{t(`Price`)}</UniformListColumn>
+        <UniformListColumn width="10%">{t(`Private`)}</UniformListColumn>
+        <UniformListColumn width="15%">{t(`Status`)}</UniformListColumn>
+        <UniformListColumn width="8%" />
       </UniformListHeader>
     )
+  }
+
+  cancelOrder(uuid: string, isPrivate: boolean) {
+    const { t } = this.props
+    const confirmOptions = {
+      onOk: () => isPrivate
+        ? this.props.actions.cancelPrivateOrder(uuid)
+        : this.props.actions.cancelOrder(uuid)
+    }
+    toastr.confirm(t(`Are you sure want to cancel the order?`), confirmOptions)
   }
 
 	/** @memberof ResDexOrders
 	 */
   getListRowRenderer(order) {
     const { i18n, t } = this.props
+
+    const { isCancelling } = this.props.resDex.orders
 
     const quoteLabel = `${toDecimalPlaces(order.quoteCurrencyAmount)} ${order.quoteCurrency}`
     const baseLabel = `${toDecimalPlaces(order.baseCurrencyAmount)} ${order.baseCurrency}`
@@ -97,6 +112,18 @@ class Orders extends Component<Props> {
             {getOrderStatusName(order)}
           </span>
         </UniformListColumn>
+          <UniformListColumn className={styles.column}>
+            {!order.isSwap &&
+              <BorderlessButton
+                className={styles.cancelButton}
+                onClick={() => this.cancelOrder(order.uuid, order.isPrivate)}
+                disabled={!order.isCancellable || isCancelling}
+                tooltip={order.isCancellable ? null : t(`The order is not cancellable`)}
+              >
+                {t(`Cancel`)}
+              </BorderlessButton>
+            }
+          </UniformListColumn>
       </UniformListRow>
     )
   }

@@ -36,6 +36,8 @@ import ResDexSaveSeed from '~/components/resdex/bootstrapping/SaveSeed'
 import ResDexEnterSeed from '~/components/resdex/bootstrapping/EnterSeed'
 import ResDexForgotPassword from '~/components/resdex/bootstrapping/ForgotPassword'
 import ResDexKyc from '~/components/resdex/bootstrapping/Kyc'
+import UpdateModal from '~/components/UpdateModal/UpdateModal'
+import TermsAndConditionsModal from '~/components/resdex/TermsAndConditionsModal'
 
 import AddressBookPage from './AddressBookPage'
 
@@ -56,6 +58,7 @@ type Props = {
   auth: AuthState,
   fetchParameters: FetchParametersState,
   getStarted: GetStartedState,
+	systemInfo: SystemInfoState,
   resDex: ResDexState
 }
 
@@ -112,6 +115,11 @@ class App extends React.Component<Props> {
   getMainContent() {
     return (
       <div className={cn(styles.contentContainer, VLayout.vBoxContainer)}>
+
+        {this.props.resDex.login.termsAndConditionsModal.isVisible &&
+          <TermsAndConditionsModal />
+        }
+
 				{ /* Content container */}
 				<div className={cn(VLayout.vBoxChild, HLayout.hBoxContainer)} style={{overflowY: 'hidden', height: '100%'}}>
           <LoadingPopup />
@@ -124,6 +132,11 @@ class App extends React.Component<Props> {
             <Login />
           ) : (
             <div className={cn(styles.routeContentContainer, HLayout.hBoxChild, HLayout.hBoxContainer)}>
+
+              {this.props.systemInfo.updateModal.isVisible &&
+                <UpdateModal />
+              }
+
               <Switch>
                 <Route exact path="/" render={() => (<Redirect to="/overview" />)} />
 

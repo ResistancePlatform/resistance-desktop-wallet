@@ -58,11 +58,11 @@ class OrderBook extends Component<Props> {
   }
 
   getListRowRenderer(order, smartAddress, isAsk) {
-    const { baseSmartAddress, quoteSmartAddress } = this.props
+    const isMyOrder = smartAddress.toLowerCase() === order.address.toLowerCase()
 
     return (
       <UniformListRow
-        className={cn(styles.row, { [styles.myOrder]: [baseSmartAddress, quoteSmartAddress].includes(order.address) })}
+        className={cn(styles.row, { [styles.myOrder]: isMyOrder })}
         onClick={e => this.onRowClick(e, order.price)}
       >
         <UniformListColumn className={cn(styles.column, {

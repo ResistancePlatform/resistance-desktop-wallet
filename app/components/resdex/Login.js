@@ -73,6 +73,7 @@ class ResDexLogin extends Component<Props> {
 
     return (
       <div className={cn(styles.container, HLayout.hBoxChild, VLayout.vBoxContainer)}>
+
         <Logo />
 
         {isSyncing &&
@@ -122,11 +123,18 @@ class ResDexLogin extends Component<Props> {
         </RoundedForm>
 
         <a role="button"
-          className={styles.forgotPassword}
+          className={cn(styles.bottomLink, styles.forgotPassword)}
           tabIndex={0}
           onClick={() => this.props.routerActions.push('/resdex/restore-portfolio')}
           onKeyDown={ () => false }
         >{t(`Forgot password`)}</a>
+
+        <a role="button"
+          className={cn(styles.bottomLink, styles.termsAndConditions)}
+          tabIndex={0}
+          onClick={this.props.actions.showTermsAndConditionsModal}
+          onKeyDown={ () => false }
+        >{t(`Terms and Conditions`)}</a>
 
       </div>
     )

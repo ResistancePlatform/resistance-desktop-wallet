@@ -67,9 +67,9 @@ class ConnectLedgerModal extends Component<Props> {
   }
 
   onViewTransactionDetails(){
-    const blockchainExplorerUrl = `http://54.91.60.116:3001`
+    const blockchainExplorerUrl = `https://blockexplorer.resistance.io`
     const { txid } = this.props.connectLedgerModal
-    const url = `${blockchainExplorerUrl}/insight/tx/${txid}`
+    const url = `${blockchainExplorerUrl}/tx/${txid}`
     log.debug(`Transaction details URL`, blockchainExplorerUrl)
     shell.openExternal(url)
   }
