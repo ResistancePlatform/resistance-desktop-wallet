@@ -49,5 +49,6 @@
   "Error": "Error",
   "An error occurred while removing old Resistance data files, make sure Resistance is not running!": "An error occurred while removing old Resistance data files, make sure Resistance is not running!",
   "Error submitting verification form, please make sure your Internet connection is good or check the log for details.": "Error submitting verification form, please make sure your Internet connection is good or check the log for details.",
-  "You have successfully passed verification!": "You have successfully passed verification!"
+  "You have successfully passed verification!": "You have successfully passed verification!",
+  "SegWit addresses are not supported by ResDEX": "SegWit addresses are not supported by ResDEX"
 }

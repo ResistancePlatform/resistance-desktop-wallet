@@ -73,5 +73,7 @@
   "Wallet": "Wallet",
   "The wallet restored successfully": "The wallet restored successfully",
   "Restarting Resistance with the new mining address…": "Restarting Resistance with the new mining address…",
-  "Restarting Resistance with the new wallet…": "Restarting Resistance with the new wallet…"
+  "Restarting Resistance with the new wallet…": "Restarting Resistance with the new wallet…",
+  "Open Backups Folder": "Open Backups Folder",
+  "Logs folder": "Logs folder"
 }

@@ -50,5 +50,11 @@
   "Send RES from Ledger": "원장에게 RES 보내기",
   "Please make sure destination address and amount are valid.": "목적지 주소와 금액이 유효한지 확인하십시오.",
   "N/A": "N/A",
-  "Address {{address}} created successfully": "{{address}} 주소가 성공적으로 생성되었습니다"
+  "Address {{address}} created successfully": "{{address}} 주소가 성공적으로 생성되었습니다",
+  "Error getting the address list": "Error getting the address list",
+  "Private key imported successfully": "Private key imported successfully",
+  "Unable to import private key": "Unable to import private key",
+  "Recipient address": "Recipient address",
+  "Private key": "Private key",
+  "Import": "Import"
 }

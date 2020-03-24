@@ -50,5 +50,11 @@
   "Send RES from Ledger": "Send RES from Ledger",
   "Please make sure destination address and amount are valid.": "Please make sure destination address and amount are valid.",
   "N/A": "N/A",
-  "Address {{address}} created successfully": "Address {{address}} created successfully"
+  "Address {{address}} created successfully": "Address {{address}} created successfully",
+  "Error getting the address list": "Error getting the address list",
+  "Private key imported successfully": "Private key imported successfully",
+  "Unable to import private key": "Unable to import private key",
+  "Recipient address": "Recipient address",
+  "Private key": "Private key",
+  "Import": "Import"
 }

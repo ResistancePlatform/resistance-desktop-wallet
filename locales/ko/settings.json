@@ -73,5 +73,7 @@
   "The wallet restored successfully": "지갑이 성공적으로 복원되었습니다",
   "Restarting Resistance with the new mining address…": "새로운 채굴 주소로 저항을 다시 시작하는 중…",
   "Restarting Resistance with the new wallet…": "새로운 지갑으로 저항을 다시 시작하는 중…",
-  "Wallet": "지갑"
+  "Wallet": "지갑",
+  "Open Backups Folder": "Open Backups Folder",
+  "Logs folder": "Logs folder"
 }

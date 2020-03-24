@@ -1,0 +1,16 @@
+{
+  "Address Book": "Адресная книга",
+  "Add new address": "Добавить адрес",
+  "Edit address": "Редактировать адрес",
+  "Copy Address": "Скопировать адрес",
+  "Remove Address": "Удалить адрес",
+  "Name": "Имя",
+  "Address": "Адрес",
+  "You don't have any address records yet.": "У вас пока нет ни одной записи",
+  "New address": "Новый адрес",
+  "Edit": "Редактировать",
+  "Add": "Добавить",
+  "Cancel": "Отменить",
+  "Copied to clipboard": "Скопировано в буфер обмена",
+  "Are you sure want to remove the address for \"{{addressName}}\"?": "Вы уверены, что хотите удалить адрес \"{{addressName}}\"?"
+}

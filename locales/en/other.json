@@ -202,5 +202,16 @@
   "Please login in order to access the interface": "Please login in order to access the interface",
   "Please be patient… The blockchain is rescanning. Please don’t quit the application.": "Please be patient… The blockchain is rescanning. Please don’t quit the application.",
   "Loading…": "Loading…",
-  "Beta": "Beta"
+  "Beta": "Beta",
+  "1H": "1H",
+  "1D": "1D",
+  "1W": "1W",
+  "1M": "1M",
+  "1Y": "1Y",
+  "All": "All",
+  "Version": "Version",
+  "Update Resistance Wallet": "Update Resistance Wallet",
+  "Important:": "Important:",
+  "Version {{version}} of Resistance Wallet available. Please follow the link below to update your desktop application. It is important that you keep your app up to date to ensure you benefit from all relevant bug fixes and improvements, failure to do so could result in operating errors.": "Version {{version}} of Resistance Wallet available. Please follow the link below to update your desktop application. It is important that you keep your app up to date to ensure you benefit from all relevant bug fixes and improvements, failure to do so could result in operating errors.",
+  "Open release download page": "Open release download page"
 }

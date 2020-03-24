@@ -201,5 +201,16 @@
   "Send": "보내다",
   "Please login in order to access the interface": "인터페이스에 액세스하려면 로그인하십시오",
   "Please be patient… The blockchain is rescanning. Please don’t quit the application.": "기다려주십시오… 블록 체인이 재검색 중입니다. 응용 프로그램을 종료하지 마십시오.",
-  "Loading…": "로드 중…"
+  "Loading…": "로드 중…",
+  "1H": "1H",
+  "1D": "1D",
+  "1W": "1W",
+  "1M": "1M",
+  "1Y": "1Y",
+  "All": "All",
+  "Version": "Version",
+  "Update Resistance Wallet": "Update Resistance Wallet",
+  "Important:": "Important:",
+  "Version {{version}} of Resistance Wallet available. Please follow the link below to update your desktop application. It is important that you keep your app up to date to ensure you benefit from all relevant bug fixes and improvements, failure to do so could result in operating errors.": "Version {{version}} of Resistance Wallet available. Please follow the link below to update your desktop application. It is important that you keep your app up to date to ensure you benefit from all relevant bug fixes and improvements, failure to do so could result in operating errors.",
+  "Open release download page": "Open release download page"
 }

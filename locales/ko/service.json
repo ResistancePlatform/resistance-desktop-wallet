@@ -49,5 +49,6 @@
   "Error": "오류",
   "An error occurred while removing old Resistance data files, make sure Resistance is not running!": "오래된 Resistance 데이터 파일을 제거하는 동안 오류가 발생했습니다. Resistance가 실행되고 있지 않은지 확인하십시오!",
   "Error submitting verification form, please make sure your Internet connection is good or check the log for details.": "확인 양식을 제출하는 동안 오류가 발생했습니다. 인터넷 연결 상태를 확인하거나 로그를 확인하십시오.",
-  "You have successfully passed verification!": "확인을 통과했습니다!"
+  "You have successfully passed verification!": "확인을 통과했습니다!",
+  "SegWit addresses are not supported by ResDEX": "SegWit addresses are not supported by ResDEX"
 }
