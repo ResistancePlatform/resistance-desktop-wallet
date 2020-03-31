@@ -109,42 +109,42 @@
     "port": "must be a valid port"
   },
   "string": {
-    "base": "must be a string",
-    "min": "length must be at least {{limit}} characters long",
-    "max": "length must be less than or equal to {{limit}} characters long",
-    "length": "length must be {{limit}} characters long",
-    "alphanum": "must only contain alpha-numeric characters",
-    "token": "must only contain alpha-numeric and underscore characters",
+    "base": "должно быть строкой",
+    "min": "должно быть не менее {{limit}} символов в длину",
+    "max": "должно быть не более {{limit}} символов в длину",
+    "length": "должно быть {{limit}} длинной в длину",
+    "alphanum": "должно содержать только буквенно-цифровые символы",
+    "token": "должно содержать только буквенно-цифровые символы и символы подчеркивания",
     "regex": {
-      "base": "can contain letters, numbers, special characters and spaces",
-      "name": "with value \"{{!value}}\" fails to match the {{name}} pattern",
+      "base": "может содержать буквы, цифры, специальные символы и пробелы",
+      "name": "со значением \"{{!value}} \" не соответствует шаблону {{name}}",
       "invert": {
-        "base": "with value \"{{!value}}\" matches the inverted pattern: {{pattern}}",
-        "name": "with value \"{{!value}}\" matches the inverted {{name}} pattern"
+        "base": "со значением \"{{!value}}\" соответствует перевернутыму шаблону: {{pattern}}",
+        "name": "со значением \"{{! value}}\" соответствует перевернутому шаблону {{name}}"
       }
     },
-    "email": "must be a valid email",
-    "uri": "must be a valid uri",
-    "uriRelativeOnly": "must be a valid relative uri",
-    "uriCustomScheme": "must be a valid uri with a scheme matching the {{scheme}} pattern",
-    "isoDate": "must be a valid ISO 8601 date",
-    "guid": "must be a valid GUID",
-    "hex": "must only contain hexadecimal characters",
-    "hexAlign": "hex decoded representation must be byte aligned",
-    "base64": "must be a valid base64 string",
-    "dataUri": "must be a valid dataUri string",
-    "hostname": "must be a valid hostname",
-    "normalize": "must be unicode normalized in the {{form}} form",
-    "lowercase": "must only contain lowercase characters",
-    "uppercase": "must only contain uppercase characters",
-    "trim": "must not have leading or trailing whitespace",
-    "creditCard": "must be a credit card",
-    "ref": "references \"{{ref}}\" which is not a number",
-    "ip": "must be a valid ip address with a {{cidr}} CIDR",
-    "ipVersion": "must be a valid ip address of one of the following versions {{version}} with a {{cidr}} CIDR"
+    "email": "должно быть действительным адресом электронной почты",
+    "uri": "должно быть действительным URI",
+    "uriRelativeOnly": "должно быть действительным относительным URI",
+    "uriCustomScheme": "должно быть действительным URI со схемой, соответствующей шаблону {{scheme}}",
+    "isoDate": "должно быть действительной датой ISO 8601",
+    "guid": "должно быть действительным GUID",
+    "hex": "должно содержать только шестнадцатеричные символы",
+    "hexAlign": "шестнадцатеричное декодированное представление должно быть выровнено по байту",
+    "base64": "должно быть допустимой строкой base64",
+    "dataUri": "должно быть допустимой строкой dataUri",
+    "hostname": "должно быть действительным именем хоста",
+    "normalize": "должно быть нормализованной строкой Unicode форме {{form}}",
+    "lowercase": "должно содержать только строчные буквы",
+    "uppercase": "должно содержать только заглавные буквы",
+    "trim": "не должно иметь начальных или конечных пробелов",
+    "creditCard": "должно быть кредитной картой",
+    "ref": "ссылается на \"{{ref}}\", которое не является числом",
+    "ip": "должно быть действительным IP-адресом с {{cidr}} CIDR",
+    "ipVersion": "должно быть действительным IP-адресом одной из следующих версий {{version}} с CIDR {{cidr}}"
   },
   "symbol": {
-    "base": "must be a symbol",
-    "map": "must be one of {{map}}"
+    "base": "должно быть символом",
+    "map": "должно быть одним из {{map}}"
   }
 }
