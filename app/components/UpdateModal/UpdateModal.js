@@ -78,4 +78,4 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(SystemInfoActions, dispatch)
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate('resdex')(UpdateModal))
+export default connect(mapStateToProps, mapDispatchToProps)(translate('other')(UpdateModal))

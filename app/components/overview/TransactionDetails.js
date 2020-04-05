@@ -34,6 +34,7 @@ const getNameTranslation = (t, name) => ({
   confirmations: t(`Confirmations`),
   expiryheight: t(`Expiry height`),
   generated: t(`Generated`),
+  fee: t(`Fee`),
   hex: t(`Hex`),
   time: t(`Time`),
   timereceived: t(`Time received`),
