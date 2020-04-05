@@ -213,5 +213,6 @@
   "Update Resistance Wallet": "Update Resistance Wallet",
   "Important:": "Important:",
   "Version {{version}} of Resistance Wallet available. Please follow the link below to update your desktop application. It is important that you keep your app up to date to ensure you benefit from all relevant bug fixes and improvements, failure to do so could result in operating errors.": "Version {{version}} of Resistance Wallet available. Please follow the link below to update your desktop application. It is important that you keep your app up to date to ensure you benefit from all relevant bug fixes and improvements, failure to do so could result in operating errors.",
-  "Open release download page": "Open release download page"
+  "Open release download page": "Open release download page",
+  "Password strength": "Password strength"
 }

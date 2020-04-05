@@ -155,5 +155,6 @@
   "Quit app": "Выйти из приложения",
   "Downloading Resistance parameters": "Загрузка параметров Resistance",
   "Download complete": "Загрузка завершена",
-  "Download failed": "Загрузка не удалась"
+  "Download failed": "Загрузка не удалась",
+  "Password strength": "Надежность пароля"
 }

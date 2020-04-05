@@ -76,7 +76,7 @@ class PasswordStrength extends Component<Props> {
 		return (
 			<div className={styles.container}>
         <div className={styles.strength}>
-          Password strength
+          {t(`Password strength`)}
           <div className={styles[this.state.status]}>
             {getStatusMessage(t, this.state.status) || ''}
           </div>
