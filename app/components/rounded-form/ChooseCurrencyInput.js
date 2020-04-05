@@ -16,7 +16,7 @@ import GenericInput, { GenericInputProps } from './GenericInput'
 import styles from './ChooseCurrencyInput.scss'
 
 
-const t = translate('resdex')
+const t = translate('other')
 
 export type ChooseCurrencyInputProps = {
   ...GenericInputProps,

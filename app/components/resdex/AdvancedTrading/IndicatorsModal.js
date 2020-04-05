@@ -6,6 +6,7 @@ import { translate } from 'react-i18next'
 import cn from 'classnames'
 import log from 'electron-log'
 
+import { translate as translateI18n } from '~/i18next.config'
 import {
   RoundedInput,
 } from '~/components/rounded-form'
@@ -16,6 +17,10 @@ import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 
 import scrollStyles from '~/assets/styles/scrollbar.scss'
 import styles from './IndicatorsModal.scss'
+
+
+const otherT = translateI18n('other')
+
 
 type Props = {
   t: any,
@@ -38,10 +43,9 @@ class IndicatorsModal extends Component<Props> {
   }
 
   getAvailableIndicators() {
-    const { t } = this.props
     const { searchString } = this.props.resDex.buySell.indicatorsModal
 
-    const indicators = RESDEX.getAvailableIndicators(t)
+    const indicators = RESDEX.getAvailableIndicators(otherT)
     indicators.sort((indicator1, indicator2) => (indicator1.label || indicator1.key).localeCompare(indicator2.label || indicator2.key))
 
     log.debug(JSON.stringify(indicators))

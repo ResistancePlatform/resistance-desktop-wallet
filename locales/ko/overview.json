@@ -39,5 +39,6 @@
   "File name:": "파일 이름:",
   "Comma-Separated Values (CSV) ": "쉼표로 구분 된 값 (CSV)",
   "CSV export completed.": "CSV 내보내기가 완료되었습니다.",
-  "Error exporting to CSV, check the log for details.": "CSV로 내보내는 중에 오류가 발생했습니다. 자세한 내용은 로그를 확인하십시오."
+  "Error exporting to CSV, check the log for details.": "CSV로 내보내는 중에 오류가 발생했습니다. 자세한 내용은 로그를 확인하십시오.",
+  "Fee": "Fee"
 }

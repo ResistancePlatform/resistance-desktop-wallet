@@ -74,7 +74,7 @@ class DepositModal extends Component<Props> {
         <RoundedInputWithCopy
           labelClassName={styles.addressInputLabel}
           defaultValue={address}
-          label="Address"
+          label={t(`Address`)}
           readOnly
         />
 

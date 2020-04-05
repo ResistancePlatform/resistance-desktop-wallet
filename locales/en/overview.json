@@ -39,5 +39,6 @@
   "File name:": "File name:",
   "Comma-Separated Values (CSV) ": "Comma-Separated Values (CSV) ",
   "CSV export completed.": "CSV export completed.",
-  "Error exporting to CSV, check the log for details.": "Error exporting to CSV, check the log for details."
+  "Error exporting to CSV, check the log for details.": "Error exporting to CSV, check the log for details.",
+  "Fee": "Fee"
 }

@@ -6,6 +6,7 @@ import { translate } from 'react-i18next'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import cn from 'classnames'
 
+import { translate as translateI18n } from '~/i18next.config'
 import {
   RoundedForm,
   RoundedButton,
@@ -19,6 +20,8 @@ import { ResDexBuySellActions } from '~/reducers/resdex/buy-sell/reducer'
 
 import 'react-tabs/style/react-tabs.scss'
 import styles from './IndicatorForm.scss'
+
+const otherT = translateI18n('other')
 
 type Props = {
   t: any,
@@ -107,7 +110,7 @@ class IndicatorForm extends Component<Props> {
   render() {
     const { t, indicatorKey } = this.props
 
-    const defaultIndicator = RESDEX.getAvailableIndicators(t).find(item => item.key === indicatorKey)
+    const defaultIndicator = RESDEX.getAvailableIndicators(otherT).find(item => item.key === indicatorKey)
     const formId = `resDexBuySellIndicatorsModal-${indicatorKey}`
 
     return (
