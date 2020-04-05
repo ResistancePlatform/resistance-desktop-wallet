@@ -9,7 +9,7 @@
   "Confirmations": "Подтверждения",
   "Expiry height": "Высота истечения",
   "Generated": "Сгенерировано",
-  "Hex": "Шестнадцатеричное значение",
+  "Hex": "Шестнадцатеричный вид",
   "Time": "Время",
   "Time received": "Время получения",
   "Transaction ID": "Идентификатор транзакции",
@@ -39,5 +39,6 @@
   "File name:": "Имя файла:",
   "Comma-Separated Values (CSV) ": "Значения через запятую (CSV) ",
   "CSV export completed.": "Экспорт в CSV завершен.",
-  "Error exporting to CSV, check the log for details.": "Ошибка экспорта в CSV, откройте журнал приложения для подробной информации."
+  "Error exporting to CSV, check the log for details.": "Ошибка экспорта в CSV, откройте журнал приложения для подробной информации.",
+  "Fee": "Комиссия"
 }

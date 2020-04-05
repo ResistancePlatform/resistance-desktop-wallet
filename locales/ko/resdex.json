@@ -277,5 +277,6 @@
   "Sell {{baseCurrency}}": "Sell {{baseCurrency}}",
   "Open Orders": "Open Orders",
   "Swap History": "Swap History",
-  "Trading Chart {{pair}}": "Trading Chart {{pair}}"
+  "Trading Chart {{pair}}": "Trading Chart {{pair}}",
+  "Address": "Address"
 }

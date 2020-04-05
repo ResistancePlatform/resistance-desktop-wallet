@@ -1,5 +1,5 @@
 {
-  "N/A": "нет данных",
+  "N/A": "н/д",
   "Sent {{name}}": "Отправлено {{name}}",
   "Received {{name}}": "Получено {{name}}",
   "To {{name}} address": "На адрес {{name}}",
@@ -25,6 +25,7 @@
   "Add coin": "Добавить монету",
   "1H": "ч.",
   "24H": "д.",
+  "1D": "д.",
   "1W": "нед.",
   "1M": "мес.",
   "1Y": "г.",
@@ -44,7 +45,7 @@
   "Limit Order (Maker Only)": "Лимитный ордер (только маркет-мейкер)",
   "Max. {{symbol}}": "Макс. {{symbol}}",
   "The maximum amount of {{symbol}} you are willing to trade — the actual trade amount can be less.": "Максимальная сумма {{symbol}}, которую вы готовы задействовать в торгах — фактическая сумма сделки может быть меньше.",
-  "Use max": "Максимум",
+  "Use max": "Макс.",
   "Price {{symbol}}": "Цена {{symbol}}",
   "The maximum amount of {{quoteCurrency}} you will accept for 1 {{baseCurrency}}": "Максимальная сумма {{quoteCurrency}}, которую вы готовы принять за 1 {{baseCurrency}}",
   "Max. {{quoteCurrency}}": "Макс. {{quoteCurrency}}",
@@ -113,7 +114,7 @@
   "Assets": "Средства",
   "Buy/Sell": "Купить/продать",
   "Advanced Trading": "Расширенная торговля",
-  "Accounts": "Учетные записи",
+  "Accounts": "Кошельки",
   "Logout from ResDEX": "Выйти из ResDEX",
   "Please note": "Обратите внимание",
   "To begin using ResDEX you will need to complete KYC verification. Click the Get Verified button next to the ResDEX tab to get started.": "Чтобы начать использовать ResDEX, вам необходимо пройти проверку KYC. Чтобы это сделать, нажмите кнопку «Пройти верификацию» рядом с вкладкой ResDEX.",
@@ -131,9 +132,9 @@
   "Caution:": "Внимание:",
   "withdraw-modal-note": "Эти средства конфиденциальны и размещены на конфиденциальных адресах. Ни при каких обстоятельствах не снимайте деньги с одного из ваших биржевых адресов. В противном случае вы нарушите свою конфиденциальность, и злоумышленники смогут связать ваш секретный адрес с вашим прозрачным адресом ResDEX. Вместо этого создайте новый адрес в соответствующем кошельке монеты, которую вы снимаете, и выведите средства в нее.",
   "ResDEX does not support SegWit, or any advanced address types. Only the address type that is used in the deposit interface is valid.": "ResDEX не поддерживает SegWit или какие-либо дополнительные типы адресов. Действителен только тот тип адреса, который используется в интерфейсе депозита.",
-  "Last Price": "Последняя цена",
-  "{{period}} High": "Максимум {{period}}",
-  "{{period}} Low": "Минимум {{period}}",
+  "Last Price": "Последняя",
+  "{{period}} High": "Макс. {{period}}",
+  "{{period}} Low": "Мин. {{period}}",
   "{{period}} Volume": "Объем {{period}}",
   "Chart": "График",
   "Inputs": "Поля ввода",
@@ -253,5 +254,6 @@
   "Order": "Заказ",
   "{{type}} {{direction}} {{amount}} {{symbol1}} for {{symbol2}}": "{{type}} {{direction}} {{amount}} {{symbol1}} для {{symbol2}}",
   "buy": "купить",
-  "sell": "продать"
+  "sell": "продать",
+  "Address": "Адрес"
 }

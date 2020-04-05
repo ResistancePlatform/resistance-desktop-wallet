@@ -2,7 +2,7 @@
   "The log file for {{processName}} doesn't exist yet. Start the process in order to have something here.": "Файл журнала для {{processName}} еще не существует. Запустите процесс, чтобы что-то здесь было.",
   "Services status": "Статус служб",
   "Logs folder": "Папка журналов",
-  "Get Info": "Получить информацию",
+  "Get Info": "Информация",
   "Node": "Узел",
   "Miner": "Майнер",
   "Tor": "Tor",

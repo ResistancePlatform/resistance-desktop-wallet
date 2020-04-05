@@ -8,6 +8,7 @@ import { RESDEX } from '~/constants/resdex'
 export type PrivateOrderStatus = 'swapping_rel_res' | 'privatizing' | 'swapping_res_base' | 'completed' | 'failed' | 'cancelled'
 
 const t = translate('resdex')
+const otherT = translate('other')
 
 export const ResDexBuySellActions = createActions(
   {
@@ -79,7 +80,7 @@ function getIndicators(key: string, indicators: object) {
     return indicators
   }
 
-  const newIndicator = RESDEX.getAvailableIndicators(t).find(i => i.key === key)
+  const newIndicator = RESDEX.getAvailableIndicators(otherT).find(i => i.key === key)
 
   const updatedIndicators = {
     ...indicators,
