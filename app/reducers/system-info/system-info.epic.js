@@ -148,7 +148,8 @@ const checkWalletUpdateEpic = (action$: ActionsObservable<Action>) => action$.pi
 
         log.debug(`App Versions:`, lastVersion, AUTH.appVersion)
 
-        if (lastVersion !== AUTH.appVersion) {
+        // 2.2.9-1 Windows packaging issue hotfix
+        if (lastVersion !== AUTH.appVersion && lastVersion !== '2.2.9') {
           return of(
             SystemInfoActions.openUpdateModal(release.name, release.url),
             SystemInfoActions.checkWalletUpdateSucceeded()
