@@ -279,6 +279,11 @@ export class RpcService {
   requestBlockchainInfo() {
     const client = getClientInstance()
 
+    //wkt
+    const timenow = () => new Date().getTime();
+    var lastBlocktime;
+    //wkt end
+    
     const blockchainInfo: BlockchainInfo = {
 			lastBlockDate: null,
       connectionCount: 0,
@@ -294,15 +299,43 @@ export class RpcService {
       .then(result => client.getBlock(result))
       .then(result => {
 				blockchainInfo.lastBlockDate = new Date(result.time * 1000)
+        lastBlocktime = Date.parse(blockchainInfo.lastBlockDate) / 1000;
         return client.getBlockchainInfo()
       })
       .then(result => {
         blockchainInfo.synchronizedPercentage = 0
 
-        if (result.headers > 0) {
-          blockchainInfo.synchronizedPercentage = 100.0 * result.blocks / result.headers
+        var block_diff = (timenow() / 1000 - lastBlocktime) / 60;
+        // Design constrain, no option to check if system time is in future
+        if (block_diff < -150) {
+          throw "Incorrect System Time";
+        }
+        if (block_diff < 0) {
+          block_diff = 0;
         }
 
+        var estimatedTotalHeight = result.blocks + block_diff;
+        if (estimatedTotalHeight < result.headers) {
+          estimatedTotalHeight = result.headers;
+        }
+        if (estimatedTotalHeight < 500000) {
+          estimatedTotalHeight = 500000;
+        }
+        var syncpercent_onEstHeight =
+          (100.0 * [(result.blocks + result.headers) / 2]) /
+          (estimatedTotalHeight + 1);
+
+        //Resdex login works only on 100%
+        if (
+          estimatedTotalHeight - result.blocks < 60 &&
+          result.blocks == result.headers &&
+          result.blocks > 500000
+        ) {
+          syncpercent_onEstHeight = 100;
+        }
+
+        blockchainInfo.synchronizedPercentage = syncpercent_onEstHeight;
+      
         getStore().dispatch(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
         return Promise.resolve()
       })
