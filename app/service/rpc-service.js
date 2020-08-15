@@ -279,10 +279,8 @@ export class RpcService {
   requestBlockchainInfo() {
     const client = getClientInstance()
 
-    //wkt
-    const timenow = () => new Date().getTime();
-    var lastBlocktime;
-    //wkt end
+    const timenow = () => new Date().getTime()
+    let lastBlocktime
     
     const blockchainInfo: BlockchainInfo = {
 			lastBlockDate: null,
@@ -298,43 +296,43 @@ export class RpcService {
       .then(result => client.getBlockHash(result))
       .then(result => client.getBlock(result))
       .then(result => {
-				blockchainInfo.lastBlockDate = new Date(result.time * 1000)
-        lastBlocktime = Date.parse(blockchainInfo.lastBlockDate) / 1000;
+        blockchainInfo.lastBlockDate = new Date(result.time * 1000)
+        lastBlocktime = Date.parse(blockchainInfo.lastBlockDate) / 1000
         return client.getBlockchainInfo()
       })
       .then(result => {
         blockchainInfo.synchronizedPercentage = 0
 
-        var block_diff = (timenow() / 1000 - lastBlocktime) / 60;
-        // Design constrain, no option to check if system time is in future
-        if (block_diff < -150) {
-          throw "Incorrect System Time";
+        let blockDiff = (timenow() / 1000 - lastBlocktime) / 60
+        // Design constraint, no way to check if system time is in the future
+        if (blockDiff < -150) {
+          throw new Error("Incorrect System Time")
         }
-        if (block_diff < 0) {
-          block_diff = 0;
+        if (blockDiff < 0) {
+          blockDiff = 0
         }
 
-        var estimatedTotalHeight = result.blocks + block_diff;
+        let estimatedTotalHeight = result.blocks + blockDiff
         if (estimatedTotalHeight < result.headers) {
-          estimatedTotalHeight = result.headers;
+          estimatedTotalHeight = result.headers
         }
         if (estimatedTotalHeight < 500000) {
-          estimatedTotalHeight = 500000;
+          estimatedTotalHeight = 500000
         }
-        var syncpercent_onEstHeight =
+        let syncpercentonEstHeight =
           (100.0 * [(result.blocks + result.headers) / 2]) /
-          (estimatedTotalHeight + 1);
+          (estimatedTotalHeight + 1)
 
-        //Resdex login works only on 100%
+        // Resdex login works only on 100%
         if (
           estimatedTotalHeight - result.blocks < 60 &&
-          result.blocks == result.headers &&
+          result.blocks === result.headers &&
           result.blocks > 500000
         ) {
-          syncpercent_onEstHeight = 100;
+          syncpercentonEstHeight = 100
         }
 
-        blockchainInfo.synchronizedPercentage = syncpercent_onEstHeight;
+        blockchainInfo.synchronizedPercentage = syncpercentonEstHeight
       
         getStore().dispatch(SystemInfoActions.gotBlockchainInfo(blockchainInfo))
         return Promise.resolve()
