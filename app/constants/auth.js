@@ -56,7 +56,7 @@ const unicodeLetters = (
 const AUTH = {
   sessionTimeoutSeconds: 1800,
   unicodeLetters,
-  appVersion: '2.2.9-1'
+  appVersion: '2.3.0'
 }
 
 export { AUTH }
